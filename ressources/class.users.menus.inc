@@ -1306,7 +1306,7 @@ private function roundcube_detect_version(){
 //		if($this->AsPostfixAdministrator==true && $this->dnsmasq_installed==true && $this->BIND9_INSTALLED==false){$array["dnsmasq"]="dnsmasq.index.php";}
 		if($this->POSTFIX_INSTALLED){if($this->AsPostfixAdministrator==true && $this->mailgraph_installed==true){$array["Mailman"]="mailman.index.php";}}
 		if($this->AllowViewStatistics==true){
-			$array["{statistics}"]="javascript:Loadjs('statistics.index.php')";
+			$array["{statistics}"]["MAIN"]="javascript:Loadjs('statistics.index.php')";
 			$array["{statistics}"]["SUB"]["{web_proxy}"]="javascript:Loadjs('squid.statistics.php')";
 		
 		}		
