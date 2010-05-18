@@ -1,0 +1,611 @@
+<?php
+
+if(!is_file(dirname($_SERVER['SCRIPT_FILENAME'])."/ressources/class.templates.inc")){include_once(dirname(__FILE__) . '/class.templates.inc');}else{include_once(dirname($_SERVER['SCRIPT_FILENAME'])."/ressources/class.templates.inc");}
+if(!is_file(dirname($_SERVER['SCRIPT_FILENAME'])."/ressources/class.ldap.inc")){include_once(dirname(__FILE__) . '/class.ldap.inc');}else{include_once(dirname($_SERVER['SCRIPT_FILENAME'])."/ressources/class.ldap.inc");}
+include_once(dirname(__FILE__).'/class.artica.inc');
+
+class kavmilterd{
+	var $main_array;
+	var $rule_array;
+	var $rule_notify_array;
+	var $PolicyNumber_array=array();
+	var $stats_array;
+	var $KavMilterdGroup;
+	var $milter_enabled;
+	var $RuleDatas;
+	var $ArticaRuleName;
+	function kavmilterd(){
+		$this->GetKavMilterConf();
+		
+	}
+	
+	
+	function GetSatus(){
+		$sock=new sockets();
+		$datas=trim($sock->getfile('kavmilter_mem'));
+		
+		$pattern_date=$this->ParsePatternDate();
+		if(trim($datas)==null){
+			writelogs("kavmilter_mem -> no datas.. error ???",__FUNCTION__ . '/'. __CLASS__,__FILE__);
+			$img="danger32.png";
+			$text="<h6>{some_service_is_stopped}</h6>";
+		}else{
+			$img="ok32.png";
+			$tbl=split(";",$datas);
+			$count=count($tbl)-1;
+			$html="
+			
+			<i>{running} $count {processes}</i>
+			<table style=width:100%'>";
+			while (list ($num, $val) = each ($tbl) ){
+				if(preg_match('#(.+?)=(.+)#',$val,$re)){
+					$html=$html . "<tr>
+					<td><strong>kavmilter</strong>
+					<td>{$re[1]}</td><td><strong>{$re[2]} mb</strong></td></tr>";
+					
+				}
+				
+			
+			}$html=$html . "</table>";$text=$html;}
+			
+				
+			return "
+			<table>
+			<tr>
+			<td width=1% valign='top'><img src='img/$img'></td>
+			<td valing='top'><H5>{status}</H5>
+				$text
+			
+			</td>
+			</tr>
+			<tr>
+			<td colspan=2><br>" . RoundedLightGrey("<strong>{ave_pattern_date}</strong><br> <strong>$pattern_date</strong>")."</td>
+			</tr>
+			</table>";
+			
+		
+		
+		
+		
+		
+	}
+	
+	function AddRuleToGroup(){
+		$sock=new sockets();
+		$key=md5($this->rule_array["GroupName"]);
+		$sock->SaveConfigFile($this->KavMilterdGroup,"kavmilterGroup_$key");
+		}
+	
+	
+	
+	function ParsePatternDate(){
+		$sock=new sockets();
+		$data=$sock->getfile("kavmilter_pattern");
+		
+		if(preg_match('#([0-9]{1,2})([0-9]{1,2})([0-9]{1,4});([0-9]{1,2})([0-9]{1,2})#',$data,$regs)){
+			return "".$regs[3]. "/" .$regs[2]. "/" .$regs[1] . " " . $regs[4] . ":" . $regs[5]  . ' (moscow GMT)';
+		}
+		
+	}
+	
+	function GetKavMilterConf(){
+		$sock=new sockets();
+		$kavmilterconf=$sock->GET_INFO("kavmilterConf");
+		$this->LoadPolicyNumber();
+		if(trim($kavmilterconf)==null){
+			$sock->SaveConfigFile($this->BuildConf(),"kavmilterConf");
+			$kavmilterconf=$sock->GET_INFO("kavmilterConf");
+		}
+		$this->milter_enabled=$sock->GET_INFO("kavmilterEnable");
+		
+		$tbl=split("\n",$kavmilterconf);
+		while (list ($num, $val) = each ($tbl) ){
+			if(preg_match('#(.+?)=(.*)#',$val,$res)){
+				$this->main_array[trim($res[1])]=trim($res[2]);
+			}
+		}
+		
+		}
+		
+	function SaveToLdap($rebuild=0,$norestart=0){
+		$sock=new sockets();
+		$sock->SaveConfigFile($this->BuildConf(),"kavmilterConf");
+		$sock->SET_INFO("kavmilterEnable",$this->milter_enabled);
+		if($norestart==0){$sock->getfile('BuildKavMilterSettings');}
+		$tpl=new templates();
+		
+		if($rebuild==1){$this->ReBuildAllRules();}
+		$tpl=new templates();
+		echo $tpl->_ENGINE_parse_body("KavMilter:Global {success}\n");
+		return true;
+		
+	}
+	
+	function ReBuildAllRules(){
+		$sock=new sockets();
+		$datas=$sock->getfile('KavMilterPoliciesList');
+		
+		$tbl=split("\n",$datas);
+		writelogs(count($tbl)." policies \"$datas\"",__FUNCTION__ . '/'. __CLASS__,__FILE__);
+		if(!is_array($tbl)){return null;}
+		while (list ($num, $val) = each ($tbl) ){
+			if(trim($val)==null){continue;}
+			if(!preg_match('#(.+?)_KavMilterGroupRule#',$val,$re)){
+				writelogs("Policy $val NO REGEX",__FUNCTION__ . '/'. __CLASS__,__FILE__);
+				continue;
+			
+			}
+		
+			$this->LoadRule($re[1]);
+			$this->SaveRuleToLdap(1);
+			unset($this->rule_array);
+			
+		}
+		
+		
+		
+	}
+	
+	
+	function BuildConf(){
+		   if($this->main_array["MaxScanRequests"]==null){$this->main_array["MaxScanRequests"]=0;}
+		   if($this->main_array["MilterTimeout"]==null){$this->main_array["MilterTimeout"]=600;}
+		   if($this->main_array["MaxScanTime"]==null){$this->main_array["MaxScanTime"]=10;}
+		   
+		   if($this->main_array["MaxScanTime"]==null){$this->main_array["MaxScanTime"]=10;}
+		   if($this->main_array["ScanArchives"]==null){$this->main_array["ScanArchives"]="yes";}
+		   if($this->main_array["ScanPacked"]==null){$this->main_array["ScanPacked"]="yes";}
+		   if($this->main_array["ScanCodeanalyzer"]==null){$this->main_array["ScanCodeanalyzer"]="yes";}
+		   if($this->main_array["UseAVBasesSet"]==null){$this->main_array["UseAVBasesSet"]="standard";}
+		   if($this->main_array["LogFacility"]==null){$this->main_array["LogFacility"]="syslog";}
+		   if($this->main_array["LogRotate"]==null){$this->main_array["LogRotate"]="yes";}
+		   if($this->main_array["RotateSize"]==null){$this->main_array["RotateSize"]="1";}
+		   if($this->main_array["RotateRounds"]==null){$this->main_array["RotateRounds"]="10";}
+		   if($this->main_array["UseUpdateServerUrl"]==null){$this->main_array["UseUpdateServerUrl"]="no";}
+		   if($this->main_array["UpdateServerUrl"]==null){$this->main_array["UpdateServerUrl"]="ftp://downloads1.kaspersky-labs.com";}
+		   if($this->main_array["UseUpdateServerUrlOnly"]==null){$this->main_array["UseUpdateServerUrlOnly"]="no";}
+		   if($this->main_array["RegionSettings"]==null){$this->main_array["RegionSettings"]="Europe";}
+		   if($this->main_array["UseProxy"]==null){$this->main_array["UseProxy"]="no";}
+		   if($this->main_array["PassiveFtp"]==null){$this->main_array["PassiveFtp"]="no";}
+		   
+		   if(preg_match('#([0-9]+)#',$this->main_array["RotateSize"],$re)){$this->main_array["RotateSize"]=$re[1];}
+		
+			$conf=$cont. "[kavmilter.global]\n";
+			$conf=$conf . "\n";
+			$conf=$conf . "RunAsUid=kav\n";
+			$conf=$conf . "RunAsGid=kav\n";
+			$conf=$conf . "ServiceSocket=inet:1052@localhost\n";
+			$conf=$conf . "MilterTimeout={$this->main_array["MilterTimeout"]}\n";
+			$conf=$conf . "WatchdogMaxRetries=10\n";
+			$conf=$conf . "TempDir=/var/db/kav/5.6/kavmilter/tmp/\n";
+			$conf=$conf . "LicensedUsersDomains=localhost\n";
+			$conf=$conf . "LicensedUsersDomains=pc-touzeau.klf.fr\n";
+			$conf=$conf . "LicensedUsersDomains=klf.fr\n";
+			$conf=$conf . "\n";
+			$conf=$conf . "\n";
+			$conf=$conf . "[kavmilter.snmp]\n";
+			$conf=$conf . "SNMPServices=none\n";
+			$conf=$conf . "SNMPTraps=none\n";
+			$conf=$conf . "AlertThreshold=10\n";
+			$conf=$conf . "\n";
+			$conf=$conf . "\n";
+			$conf=$conf . "[kavmilter.agentx]\n";
+			$conf=$conf . "Socket=/var/agentx/master\n";
+			$conf=$conf . "PingInterval=30\n";
+			$conf=$conf . "Timeout=5\n";
+			$conf=$conf . "Retries=10\n";
+			$conf=$conf . "\n";
+			$conf=$conf . "\n";
+			$conf=$conf . "[kavmilter.engine]\n";
+			$conf=$conf . "MaxScanRequests={$this->main_array["MaxScanRequests"]}\n";
+			$conf=$conf . "MaxScanTime={$this->main_array["MaxScanTime"]}\n";
+			$conf=$conf . "ScanArchives=yes\n";
+			$conf=$conf . "ScanPacked={$this->main_array["ScanPacked"]}\n";
+			$conf=$conf . "ScanCodeanalyzer={$this->main_array["ScanCodeanalyzer"]}\n";
+			$conf=$conf . "UseAVBasesSet={$this->main_array["UseAVBasesSet"]}\n";
+			$conf=$conf . "\n";
+			$conf=$conf . "\n";
+			$conf=$conf . "[kavmilter.log]\n";
+			$conf=$conf . "LogFacility={$this->main_array["LogFacility"]}\n";
+			$conf=$conf . "LogFilepath=/var/log/kav/5.6/kavmilter/kavmilter.log\n";
+			$conf=$conf . "LogOption=all\n";
+			$conf=$conf . "LogOption=-all.debug\n";
+			$conf=$conf . "LogRotate={$this->main_array["LogRotate"]}\n";
+			$conf=$conf . "RotateSize={$this->main_array["RotateSize"]}MB\n";
+			$conf=$conf . "RotateRounds={$this->main_array["RotateRounds"]}\n";
+			$conf=$conf . "\n";
+			$conf=$conf . "\n";
+			$conf=$conf . "[kavmilter.statistics]\n";
+			$conf=$conf . "TrackStatistics=all\n";
+			$conf=$conf . "DataFormat=text\n";
+			$conf=$conf . "DataFile=/var/log/kav/5.6/kavmilter/statistics.data\n";
+			$conf=$conf . "MessageStatistics=/var/log/kav/5.6/kavmilter/message-statistics.data\n";
+			$conf=$conf . "\n";
+			$conf=$conf . "\n";
+			$conf=$conf . "[path]\n";
+			$conf=$conf . "BasesPath=/var/db/kav/5.6/kavmilter/bases/\n";
+			$conf=$conf . "LicensePath=/var/db/kav/5.6/kavmilter/licenses/\n";
+			$conf=$conf . "\n";
+			$conf=$conf . "\n";
+			$conf=$conf . "[locale]\n";
+			$conf=$conf . "DateFormat=%d-%m-%Y\n";
+			$conf=$conf . "TimeFormat=%H:%M:%S\n";
+			$conf=$conf . "\n";
+			$conf=$conf . "\n";
+			$conf=$conf . "[updater.path]\n";
+			$conf=$conf . "UploadPatchPath=/var/db/kav/5.6/kavmilter/patches/\n";
+			$conf=$conf . "BackUpPath=/var/db/kav/5.6/kavmilter/bases/backup/\n";
+			$conf=$conf . "AVBasesTestPath=/opt/kav/5.6/kavmilter/bin/avbasestest\n";
+			$conf=$conf . "\n";
+			$conf=$conf . "\n";
+			$conf=$conf . "[updater.options]\n";
+			$conf=$conf . "KeepSilent=no\n";
+			
+			$conf=$conf . "UseUpdateServerUrl={$this->main_array["UseUpdateServerUrl"]}\n";
+			$conf=$conf . "UpdateServerUrl={$this->main_array["UpdateServerUrl"]}\n";
+			$conf=$conf . "UseUpdateServerUrlOnly={$this->main_array["UseUpdateServerUrlOnly"]}\n";
+			$conf=$conf . "RegionSettings={$this->main_array["RegionSettings"]}\n";
+			$conf=$conf . "PostUpdateCmd=/opt/kav/5.6/kavmilter/bin/kavmilter -r bases\n";
+			$conf=$conf . "ConnectTimeout=30\n";
+			
+			$artica=new artica_general();
+			if($artica->ArticaProxyServerEnabled=='yes'){
+				$this->main_array["UseProxy"]='yes';
+				$this->main_array["ProxyAddress"]=$artica->ArticaCompiledProxyUri;
+			}
+			
+			$conf=$conf . "UseProxy={$this->main_array["UseProxy"]}\n";
+			$conf=$conf . "ProxyAddress={$this->main_array["ProxyAddress"]}\n";
+			$conf=$conf . "PassiveFtp={$this->main_array["PassiveFtp"]}\n";
+			$conf=$conf . "\n";
+			$conf=$conf . "\n";
+			$conf=$conf . "[updater.report]\n";
+			$conf=$conf . "Append=no\n";
+			$conf=$conf . "ReportFileName=/var/log/kav/5.6/kavmilter/keepup2date.log\n";
+			$conf=$conf . "ReportLevel=3\n";		
+			return $conf;		
+		
+	}
+	
+	
+	function LoadRule($rule_name){
+		$ldap=new clladp();
+		writelogs("Load kav milter rule group name \"$rule_name\"",__CLASS__ . '/' . __FUNCTION__,__FILE__);
+		$sock=new sockets();
+		$this->ArticaRuleName=$rule_name;
+		$this->RuleDatas=$sock->GET_INFO("{$rule_name}_KavMilterGroupRule");
+
+		if($this->RuleDatas==null){
+			writelogs("Datas of \"{$rule_name}_KavMilterGroupRule\" is null save a new one",__CLASS__ . '/' . __FUNCTION__,__FILE__);
+			if(strtolower($rule_name)=='default'){$level=0;}else{$level=$this->RuleAddPolicyNumber();}
+			writelogs("GroupName=$rule_name, Priority=$level",__CLASS__ . '/' . __FUNCTION__,__FILE__);
+			$this->rule_array["GroupName"]=$rule_name;
+			$this->rule_array["Priority"]=$level;
+			$this->SaveRuleToLdap();
+			$this->RuleDatas=$sock->GET_INFO("{$rule_name}_KavMilterGroupRule");
+		}
+		writelogs("Datas of \"{$rule_name}_KavMilterGroupRule\" are ".strlen($this->RuleDatas)." bytes len",__CLASS__ . '/' . __FUNCTION__,__FILE__);
+		if(strlen(trim($this->RuleDatas))==0){
+			writelogs("Datas of \"{$rule_name}_KavMilterGroupRule\" is defenitively bugged, abort..",__CLASS__ . '/' . __FUNCTION__,__FILE__);
+			return null;
+		}
+		
+			// load rules value ------------------------------------
+			$tbl=split("\n",$this->RuleDatas);
+			while (list ($num, $val) = each ($tbl) ){
+				if(preg_match('#(.+?)=(.+?)\.(.+)#',$val,$res)){
+					$this->rule_array[trim($res[1])]=trim($res[2]);
+				}
+				
+				if(preg_match('#^Notify(.+)=([a-z]+)#',$val,$res)){
+					$this->rule_notify_array[trim($res[1])][trim($res[2])]=trim($res[2]);
+				}
+				
+			}			
+
+				$this->rule_array["Priority"]=$this->GetPolicyNumber($rule_name);
+				$this->RuleDefault();
+		
+		
+			
+		
+	}
+	
+	function SaveRuleToLdap($echo=0){
+		$ldap=new clladp();
+		
+		$rule_name=trim($this->ArticaRuleName);
+		if($rule_name==null){
+			writelogs("No rule name for this rule, aborting...",__CLASS__ . '/' . __FUNCTION__,__FILE__);
+			return null;
+		}
+		writelogs("[{$rule_name}]: Save {$rule_name}_KavMilterGroupRule",__CLASS__ . '/' . __FUNCTION__,__FILE__);
+		$this->SavePolicyNumber($rule_name,$this->rule_array["Priority"]);
+		$sock=new sockets();
+		$ruleDatas=$this->BuildRule();
+		writelogs("[{$rule_name}]: datas: ".strlen($ruleDatas). " bytes lenght",__CLASS__ . '/' . __FUNCTION__,__FILE__);
+		if($ruleDatas==null){$ruleDatas="ABORT\n";}
+		$sock->SaveConfigFile($ruleDatas,"{$rule_name}_KavMilterGroupRule");
+		writelogs("[{$rule_name}]: Saving token : {$rule_name}_KavMilterGroupRule success..",__CLASS__ . '/' . __FUNCTION__,__FILE__);
+		$sock->getfile('BuildKavMilterSettings');
+		if($echo==1){
+			$tpl=new templates();
+			echo $tpl->_ENGINE_parse_body("KavMilter:$rule_name rule {success}\n");		
+		}
+		return true;
+		}
+		
+	function LoadRuleList(){
+		$sock=new sockets();
+		$sock->GET_INFO("KavMilterdRuleConf");
+		return $results;
+	}
+		
+		
+	function FixPolicyNumber($num){
+
+	}
+	
+	function RuleAddPolicyNumber(){
+		$sock=new sockets();
+		$datas=$sock->GET_INFO("KavMilterPolicyNumber");
+		$array=split("\n",$datas);
+		if(!is_array($array)){return 0;}
+		while (list ($num, $val) = each ($array) ){
+			if(trim($val)==null){continue;}
+			$res[]=$val;
+		}
+		$count=count($res);
+		if($count==0){$count=1;}
+		return $count;
+		
+	}
+	
+	function SavePolicyNumber($rulename,$number){
+		reset($this->PolicyNumber_array);
+		$this->PolicyNumber_array[$number]=$rulename;
+		while (list ($num, $val) = each ($this->PolicyNumber_array) ){
+			if(trim($val)==null){continue;}
+			$conf=$conf."$val\n";
+		}
+		$sock=new sockets();
+		writelogs("Save SavePolicyNumber",__CLASS__.'/'.__FUNCTION__,__FILE__);
+		$sock->SaveConfigFile($conf,'KavMilterPolicyNumber');
+		
+		
+	}
+	
+	function LoadPolicyNumber(){
+		$sock=new sockets();
+		$datas=$sock->GET_INFO("KavMilterPolicyNumber");
+		$array=split("\n",$datas);
+		if(!is_array($array)){return array();}
+		$count=0;
+		while (list ($num, $val) = each ($array) ){
+			if(trim($val)==null){continue;}
+			$this->PolicyNumber_array[$count]=$val;
+			$count=$count+1;
+		}
+	}
+	
+	function GetPolicyNumber($rulename){
+		if(!is_array($this->PolicyNumber_array)){return 1;}
+		reset($this->PolicyNumber_array);
+		while (list ($num, $val) = each ($this->PolicyNumber_array) ){
+			if(trim(strtolower($rulename))==trim(strtolower($val))){
+				return $num;
+			}
+			
+		}
+		
+		return 1;
+	}
+	
+	
+	function RuleDefault(){
+		  $rulename=$this->ArticaRuleName;
+		   if($this->rule_array["ScanPolicy"]==null){$this->rule_array["ScanPolicy"]="message";}
+           if($this->rule_array["AddDisclaimer"]==null){$this->rule_array["AddDisclaimer"]="no";}
+           if($this->rule_array["DefaultAction"]==null){$this->rule_array["DefaultAction"]="delete";}
+           if($this->rule_array["DefaultAction"]==null){$this->rule_array["DefaultAction"]="delete";}
+           if($this->rule_array["SuspiciousAction"]==null){$this->rule_array["SuspiciousAction"]="delete";}
+           if($this->rule_array["ProtectedAction"]==null){$this->rule_array["ProtectedAction"]="skip";}
+           if($this->rule_array["ErrorAction"]==null){$this->rule_array["ErrorAction"]="skip";}
+           if($this->rule_array["VirusNameAction"]==null){$this->rule_array["VirusNameAction"]="drop";}
+           if($this->rule_array["UsePlaceholderNotice"]==null){$this->rule_array["UsePlaceholderNotice"]="yes";}
+           if($this->rule_array["EnableNotifications"]==null){$this->rule_array["EnableNotifications"]="yes";}
+           if($this->rule_array["AdminAddresses"]==null){$this->rule_array["AdminAddresses"]="root@localhost";}
+           if($this->rule_array["PostmasterAddress"]==null){$this->rule_array["PostmasterAddress"]="postmaster";}
+           
+           
+           if(!isset($this->rule_notify_array["Sender"])){$this->rule_notify_array["Sender"]["none"]="none";}
+           if(!isset($this->rule_notify_array["Recipients"])){$this->rule_notify_array["Recipients"]["none"]="none";}
+           if(!isset($this->rule_notify_array["Admin"])){$this->rule_notify_array["Admin"]["none"]="none";}
+           
+		   if($this->rule_array["MessageSubject"]==null){$this->rule_array["MessageSubject"]="Anti-virus notification message";}
+		   if($this->rule_array["SenderSubject"]==null){$this->rule_array["SenderSubject"]="Anti-virus notification message (sender)";}
+		   if($this->rule_array["ReceiverSubject"]==null){$this->rule_array["ReceiverSubject"]="Anti-virus notification message (recipient)";}
+		   if($this->rule_array["AdminSubject"]==null){$this->rule_array["AdminSubject"]="Anti-virus notification message (Admin)";}
+		  	if($rulename<>'default'){if($this->rule_array["Priority"]==0){$this->rule_array["Priority"]=10;}}
+		   unset($this->rule_notify_array["Recipient"]);
+	}
+	
+	
+	function BuildRuleRecipients(){
+		//get the number of groups using this rule...
+		
+		if(!preg_match("#(.+?)\.(.+)#",$this->ArticaRuleName,$re)){
+			writelogs("Not a group rule: {$this->ArticaRuleName} ->(.+?)\.(.+) failed",__CLASS__.'/'.__FUNCTION__,__FILE__);
+		}
+		writelogs("Loading recipients for this \"{$this->ArticaRuleName}\" rule",__CLASS__.'/'.__FUNCTION__,__FILE__);
+		$ldap=new clladp();
+		$id=$ldap->GroupIDFromName($re[2],$re[1]);
+		$members=$this->GetMembersFromGroup($id);
+		
+		if(!is_array($members)){
+			writelogs("No members in this groupid:$id cn={$re[1]} ou={$re[2]} ({$this->ArticaRuleName})",__CLASS__.'/'.__FUNCTION__,__FILE__);	
+			return "Recipients=";}
+		
+		while (list ($num, $val) = each ($members) ){
+			if(trim($val)==null){continue;}
+			writelogs("Member of this rule: $val",__CLASS__.'/'.__FUNCTION__,__FILE__);
+			$mails=$this->GetMailsFromMember($val);
+			
+			if(!is_array($mails)){continue;}
+			while (list ($index, $mailAlias) = each ($mails) ){
+					if(trim($mailAlias==null)){continue;}
+					if(preg_match("#(.+?)@(.+)#",$mailAlias)){$R[]="Recipients=$mailAlias";}
+				}
+		}
+	if(count($R)==0){return null;}
+	return implode("\n",$R);}
+	
+	
+    function GetMembersFromGroup($gpid){
+    	$ldap=new clladp();
+    	$array[]="memberUid";
+    	$sr =@ldap_search($ldap->ldap_connection,$ldap->suffix,"(gidnumber=$gpid)",$array);
+    	if(!$sr){return null;}
+		$entry_id = ldap_first_entry($ldap->ldap_connection,$sr);
+		if(!$entry_id){writelogs("entry_id false query (gidnumber=$this->group_id)",__CLASS__.'/'.__FUNCTION__,__FILE__);return null;}
+		$attrs = ldap_get_attributes($ldap->ldap_connection, $entry_id);    	
+    	
+    	for($i=0;$i<$attrs["memberUid"]["count"];$i++){
+				$res[]=$attrs["memberUid"][$i];
+		}
+		
+		if(!is_array($res)){return null;}else{return $res;}
+    }
+    
+    function GetMailsFromMember($member){
+    	$ldap=new clladp();
+    	$filters[]="mail";
+    	$filters[]="mailAlias";
+    	$sr =@ldap_search($ldap->ldap_connection,$ldap->suffix,"(uid=$member)");
+		if(!$sr){return null;}
+		$entry_id = ldap_first_entry($ldap->ldap_connection,$sr);
+		if(!$entry_id){return null;}
+		$attrs = ldap_get_attributes($ldap->ldap_connection, $entry_id);
+		$attrs["mail"][0]=str_replace(' ','',$attrs["mail"][0]);
+		$mail[]=$attrs["mail"][0];
+		
+		for($i=0;$i<$attrs["mailAlias"]["count"];$i++){
+			$attrs["mailAlias"][$i]=str_replace(' ','',$attrs["mailAlias"][$i]);
+			$mail[]=$attrs["mailAlias"][$i];
+		}
+		
+		return $mail;
+    	
+    }
+    
+    
+	
+	
+	
+	function BuildRule(){
+			$rulename=$this->ArticaRuleName;
+			writelogs("[$rulename]: Building rule",__CLASS__.'/'.__FUNCTION__,__FILE__);
+			$this->RuleDefault();
+			
+			$recipients=$this->BuildRuleRecipients();
+			writelogs("[$rulename]: Recipients:\"$recipients\" ". strlen($recipients). " bytes lenght",__CLASS__.'/'.__FUNCTION__,__FILE__);
+			if(strlen($recipients)<12){
+				writelogs("[$rulename]: No recipients match for this rule, aborting...",__CLASS__.'/'.__FUNCTION__,__FILE__);
+				return null;
+			}
+		
+			$rule=$rule ."\n";
+			$rule=$rule ."[group.definition]\n";
+			$rule=$rule ."GroupName=$rulename\n";
+			if(strtolower($this->rule_array["GroupName"])=='default'){
+				writelogs("[$rulename]: This rule is default pass priority to 0",__CLASS__.'/'.__FUNCTION__,__FILE__);
+				$rule=$rule ."Priority=0\n";
+			}else{
+				$rule=$rule ."Priority={$this->rule_array["Priority"]}\n";
+			}
+			writelogs("[$rulename]: ScanPolicy -> {$this->rule_array["ScanPolicy"]}",__CLASS__.'/'.__FUNCTION__,__FILE__);
+			$rule=$rule ."$recipients\n";
+			$rule=$rule ."Senders=\n";
+			$rule=$rule ."\n";
+			$rule=$rule ."[group.settings]\n";
+			$rule=$rule ." \n";
+			$rule=$rule ."ScanPolicy={$this->rule_array["ScanPolicy"]}\n";
+			$rule=$rule ."AddXHeaders=yes\n";
+			$rule=$rule ."AddDisclaimer={$this->rule_array["AddDisclaimer"]}\n";
+			$rule=$rule ."\n";
+			$rule=$rule ."[group.actions] \n";
+			$rule=$rule ."DefaultAction={$this->rule_array["DefaultAction"]}\n";
+			$rule=$rule ."SuspiciousAction={$this->rule_array["SuspiciousAction"]}\n";
+			$rule=$rule ."ProtectedAction={$this->rule_array["ProtectedAction"]}\n";
+			$rule=$rule ."ErrorAction={$this->rule_array["ErrorAction"]}\n";
+			$rule=$rule ."VirusNameAction={$this->rule_array["VirusNameAction"]}\n";
+			$rule=$rule ."VirusNameList=\n";
+			$rule=$rule ."UsePlaceholderNotice={$this->rule_array["UsePlaceholderNotice"]}\n";
+			$rule=$rule ."\n";
+			$rule=$rule ."[group.filter]\n";
+			$rule=$rule ."IncludeMime=\n";
+			$rule=$rule ."ExcludeMime=\n";
+			$rule=$rule ."IncludeName=  \n";
+			$rule=$rule ."ExcludeName=\n";
+			$rule=$rule ."IncludeSize=\n";
+			$rule=$rule ."ExcludeSize= \n";
+			$rule=$rule ."FilteredMimeAction=skip\n";
+			$rule=$rule ."FilteredNameAction=skip  \n";
+			$rule=$rule ."FilteredSizeAction=skip\n";
+			$rule=$rule ."\n";
+			$rule=$rule ."[group.notifications]\n";
+			$rule=$rule ."EnableNotifications={$this->rule_array["EnableNotifications"]}\n";
+
+			
+			reset($this->rule_notify_array);
+			while (list ($num, $val) = each ($this->rule_notify_array) ){
+				if(is_array($val)){
+					if($num<>null){while (list ($c, $d) = each ($val)){
+						if($d<>null){
+							writelogs("Save -> Notify{$num}=$c",__CLASS__.'/'.__FUNCTION__,__FILE__);
+							$rule=$rule ."Notify{$num}=$c\n";
+							}
+						}
+					}
+				}
+			}
+			
+			$rule=$rule ."AdminAddresses={$this->rule_array["AdminAddresses"]}\n";
+			$rule=$rule ."PostmasterAddress={$this->rule_array["PostmasterAddress"]}\n";
+			$rule=$rule ."MessageDir=/var/db/kav/5.6/kavmilter/templates\n";
+			$rule=$rule ."MessageSubject={$this->rule_array["MessageSubject"]}\n";
+			$rule=$rule ."Charset=us-ascii\n";
+			$rule=$rule ."TransferEncoding=7bit\n";
+			$rule=$rule ."RejectReply=Message rejected because it contains malware\n";
+			$rule=$rule ."SendmailPath=/usr/sbin/sendmail\n";
+			$rule=$rule ."UseCustomTemplates=no\n";
+			$rule=$rule ."SenderSubject={$this->rule_array["SenderSubject"]}\n";
+			$rule=$rule ."ReceiverSubject={$this->rule_array["ReceiverSubject"]}\n";
+			$rule=$rule ."AdminSubject={$this->rule_array["AdminSubject"]}\n";
+			$rule=$rule ."\n";
+			$rule=$rule ."[group.backup]\n";
+			$rule=$rule ."BackupPolicy=info\n";
+			$rule=$rule ."BackupOption=all \n";
+			$rule=$rule ."BackupDir=/var/db/kav/5.6/kavmilter/backup/\n";
+			return $rule;
+		
+		
+	}
+	
+	function BuildStatistics(){
+		$sock=new sockets();
+		$datas=$sock->getfile('kavmilter_stats');
+		$tbl=split("\n",$datas);
+		
+		if(!is_array($tbl)){return null;}
+		while (list ($num, $val) = each ($tbl) ){
+		
+			if(preg_match('#(.+?)=(.*)#',$val,$res)){
+					$this->stats_array[$res[1]]=$res[2];
+				}
+			}
+		}
+	
+	
+	
+}

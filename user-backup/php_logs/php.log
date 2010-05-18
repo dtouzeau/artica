@@ -1,0 +1,346 @@
+[05-Dec-2009 17:37:12] PHP Fatal error:  Class 'articaLang' not found in /home/dtouzeau/developpement/artica-backup/ressources/class.templates.inc on line 147
+[05-Dec-2009 17:38:24] PHP Fatal error:  Call to undefined function CurrentPageName() in /home/dtouzeau/developpement/artica-backup/ressources/class.templates.inc on line 152
+[05-Dec-2009 17:40:35] lang=fr
+[05-Dec-2009 17:41:22] lang=fr
+[05-Dec-2009 17:44:27] username
+[05-Dec-2009 17:44:27] password
+[05-Dec-2009 17:45:03] username
+[05-Dec-2009 17:45:03] Unable to find {username} in array of 0
+[05-Dec-2009 17:45:03] password
+[05-Dec-2009 17:45:03] Unable to find {password} in array of 0
+[05-Dec-2009 17:46:27] username
+[05-Dec-2009 17:46:28] Unable to find {username} in array of 0
+[05-Dec-2009 17:46:28] password
+[05-Dec-2009 17:46:28] Unable to find {password} in array of 0
+[05-Dec-2009 17:48:47] PHP Parse error:  syntax error, unexpected ';', expecting T_FUNCTION in /home/dtouzeau/developpement/artica-backup/ressources/class.templates.inc on line 212
+[05-Dec-2009 17:49:16] username
+[05-Dec-2009 17:49:16] Unable to find {username} in array of 0
+[05-Dec-2009 17:49:16] password
+[05-Dec-2009 17:49:16] Unable to find {password} in array of 0
+[05-Dec-2009 17:50:17] username
+[05-Dec-2009 17:50:17] Unable to find {username} in array of 0
+[05-Dec-2009 17:50:17] password
+[05-Dec-2009 17:50:17] Unable to find {password} in array of 0
+[05-Dec-2009 17:51:12] username
+[05-Dec-2009 17:51:12] Unable to find {username} in array of 0
+[05-Dec-2009 17:51:12] password
+[05-Dec-2009 17:51:12] Unable to find {password} in array of 0
+[05-Dec-2009 17:52:27] Unable to find {username} in array of 0
+[05-Dec-2009 17:52:27] Unable to find {password} in array of 0
+[05-Dec-2009 17:53:23] pattern_array=0
+[05-Dec-2009 17:53:23] Unable to find {username} in array of 0
+[05-Dec-2009 17:53:23] Unable to find {password} in array of 0
+[05-Dec-2009 17:53:59] currentPageadd=2
+[05-Dec-2009 17:53:59] Unable to find {username} in array of 0
+[05-Dec-2009 17:53:59] Unable to find {password} in array of 0
+[05-Dec-2009 17:54:33] currentPageadd=2
+[05-Dec-2009 17:54:33] load /home/dtouzeau/developpement/artica-backup/ressources/language/fr/index.php.txt in templates/LoadPatterns in /home/dtouzeau/developpement/artica-backup/ressources/class.templates.inc
+[05-Dec-2009 17:54:33] 0 sessions arry
+[05-Dec-2009 17:54:33] PHP Fatal error:  Call to undefined function writelogs() in /home/dtouzeau/developpement/artica-backup/ressources/class.templates.inc on line 169
+[05-Dec-2009 17:54:49] currentPageadd=2
+[05-Dec-2009 17:54:49] load /home/dtouzeau/developpement/artica-backup/ressources/language/fr/index.php.txt in templates/LoadPatterns in /home/dtouzeau/developpement/artica-backup/ressources/class.templates.inc
+[05-Dec-2009 17:54:49] 0 sessions arry
+[05-Dec-2009 17:54:49] load /home/dtouzeau/developpement/artica-backup/ressources/language/fr/language.txt in templates/LoadPatterns in /home/dtouzeau/developpement/artica-backup/ressources/class.templates.inc
+[05-Dec-2009 17:54:49] 0 sessions arry
+[05-Dec-2009 18:07:35] currentPageadd=2
+[05-Dec-2009 18:07:35] unable to stat /home/dtouzeau/developpement/artica-backup/ressources/class.templates.inclanguages/index.php.txt in /home/dtouzeau/developpement/artica-backup/ressources/class.templates.inc line 197
+[05-Dec-2009 18:07:35] unable to stat /home/dtouzeau/developpement/artica-backup/ressources/class.templates.inclanguages/language.txt in /home/dtouzeau/developpement/artica-backup/ressources/class.templates.inc line 197
+[05-Dec-2009 18:07:35] Unable to find {username} in array of 0
+[05-Dec-2009 18:07:35] Unable to find {password} in array of 0
+[05-Dec-2009 18:07:38] currentPageadd=2
+[05-Dec-2009 18:07:38] unable to stat /home/dtouzeau/developpement/artica-backup/ressources/class.templates.inclanguages/index.php.txt in /home/dtouzeau/developpement/artica-backup/ressources/class.templates.inc line 197
+[05-Dec-2009 18:07:38] unable to stat /home/dtouzeau/developpement/artica-backup/ressources/class.templates.inclanguages/language.txt in /home/dtouzeau/developpement/artica-backup/ressources/class.templates.inc line 197
+[05-Dec-2009 18:07:38] Unable to find {username} in array of 0
+[05-Dec-2009 18:07:38] Unable to find {password} in array of 0
+[05-Dec-2009 18:08:17] currentPageadd=2
+[05-Dec-2009 18:08:17] 0 sessions arry
+[05-Dec-2009 18:08:17] 0 sessions arry
+[05-Dec-2009 18:10:17] currentPageadd=2
+[05-Dec-2009 18:10:17] 0 sessions arry
+[05-Dec-2009 18:10:17] 0 sessions arry
+[05-Dec-2009 18:10:51] currentPageadd=2
+[05-Dec-2009 18:10:51] 0 sessions arry
+[05-Dec-2009 18:10:51] 0 sessions arry
+[05-Dec-2009 18:11:10] currentPageadd=2
+[05-Dec-2009 18:11:10] 0 sessions arry
+[05-Dec-2009 18:11:10] 0 sessions arry
+[05-Dec-2009 18:11:16] currentPageadd=2
+[05-Dec-2009 18:11:16] 0 sessions arry
+[05-Dec-2009 18:11:16] 0 sessions arry
+[05-Dec-2009 18:12:38] currentPageadd=2
+[05-Dec-2009 18:12:38] 0 sessions arry
+[05-Dec-2009 18:12:38] 0 sessions arry
+[05-Dec-2009 18:13:45] currentPageadd=2
+[05-Dec-2009 18:13:45] 0 sessions arry
+[05-Dec-2009 18:13:45] 0 sessions arry
+[05-Dec-2009 18:23:43] currentPageadd=2
+[05-Dec-2009 18:23:43] 0 sessions arry
+[05-Dec-2009 18:23:43] 0 sessions arry
+[05-Dec-2009 18:23:59] currentPageadd=2
+[05-Dec-2009 18:23:59] 0 sessions arry
+[05-Dec-2009 18:23:59] 0 sessions arry
+[05-Dec-2009 18:30:58] PHP Fatal error:  Cannot redeclare currentpagename() (previously declared in /home/dtouzeau/developpement/artica-backup/ressources/class.templates.inc:206) in /home/dtouzeau/developpement/artica-postfix/ressources/class.templates.inc on line 64
+[05-Dec-2009 18:32:41] index.php is not allowed, no session, die.. in /home/dtouzeau/developpement/artica-postfix/ressources/class.templates.inc line 2696
+[05-Dec-2009 18:34:52] index.php is not allowed, no session, die.. in /home/dtouzeau/developpement/artica-postfix/ressources/class.templates.inc line 2696
+[05-Dec-2009 18:35:57] index.php is not allowed, no session, die.. in /home/dtouzeau/developpement/artica-postfix/ressources/class.templates.inc line 2696
+[05-Dec-2009 18:37:35] index.php is not allowed, no session, die.. in /home/dtouzeau/developpement/artica-postfix/ressources/class.templates.inc line 2696
+[05-Dec-2009 18:37:56] index.php is not allowed, no session, die.. in /home/dtouzeau/developpement/artica-postfix/ressources/class.templates.inc line 2696
+[05-Dec-2009 18:37:57] index.php is not allowed, no session, die.. in /home/dtouzeau/developpement/artica-postfix/ressources/class.templates.inc line 2696
+[05-Dec-2009 18:37:58] index.php is not allowed, no session, die.. in /home/dtouzeau/developpement/artica-postfix/ressources/class.templates.inc line 2696
+[05-Dec-2009 18:37:59] index.php is not allowed, no session, die.. in /home/dtouzeau/developpement/artica-postfix/ressources/class.templates.inc line 2696
+[05-Dec-2009 18:38:08] index.php is not allowed, no session, die.. in /home/dtouzeau/developpement/artica-postfix/ressources/class.templates.inc line 2696
+[05-Dec-2009 18:38:57] index.php is not allowed, no session, die.. in /home/dtouzeau/developpement/artica-postfix/ressources/class.templates.inc line 2696
+[05-Dec-2009 18:39:25] index.php is not allowed, no session, die.. in /home/dtouzeau/developpement/artica-postfix/ressources/class.templates.inc line 2696
+[05-Dec-2009 18:40:08] index.php is not allowed, no session, die.. in /home/dtouzeau/developpement/artica-postfix/ressources/class.templates.inc line 2696
+[05-Dec-2009 18:43:30] currentPageadd=2
+[05-Dec-2009 18:43:30] 0 sessions arry
+[05-Dec-2009 18:43:30] 0 sessions arry
+[05-Dec-2009 18:43:34] PHP Fatal error:  Class 'clladp' not found in /home/dtouzeau/developpement/artica-backup/index.php on line 38
+[05-Dec-2009 18:43:49] index.php is not allowed, no session, die.. in /home/dtouzeau/developpement/artica-postfix/ressources/class.templates.inc line 2696
+[05-Dec-2009 18:48:20] index.php is not allowed, no session, die.. in /home/dtouzeau/developpement/artica-postfix/ressources/class.templates.inc line 2696
+[05-Dec-2009 18:52:06] index.php is not allowed, no session, die.. in /home/dtouzeau/developpement/artica-postfix/ressources/class.templates.inc line 2696
+[05-Dec-2009 18:53:52] index.php is not allowed, no session, die.. in /home/dtouzeau/developpement/artica-postfix/ressources/class.templates.inc line 2696
+[05-Dec-2009 18:56:09] index.php is not allowed, no session, die.. in /home/dtouzeau/developpement/artica-postfix/ressources/class.templates.inc line 2696
+[05-Dec-2009 18:56:57] index.php is not allowed, no session, die.. in /home/dtouzeau/developpement/artica-postfix/ressources/class.templates.inc line 2696
+[05-Dec-2009 18:58:07] index.php is not allowed, no session, die.. in /home/dtouzeau/developpement/artica-postfix/ressources/class.templates.inc line 2696
+[05-Dec-2009 19:00:15] index.php is not allowed, no session, die.. in /home/dtouzeau/developpement/artica-postfix/ressources/class.templates.inc line 2696
+[05-Dec-2009 19:03:18] PHP Fatal error:  Cannot redeclare class templates in /home/dtouzeau/developpement/artica-postfix/ressources/class.templates.inc on line 66
+[05-Dec-2009 19:03:36] PHP Fatal error:  Cannot redeclare class templates in /home/dtouzeau/developpement/artica-postfix/ressources/class.templates.inc on line 66
+[05-Dec-2009 19:05:07] loading /home/dtouzeau/developpement/artica-postfix/ressources/class.ldap.inc
+[05-Dec-2009 19:05:07] PHP Fatal error:  Cannot redeclare class templates in /home/dtouzeau/developpement/artica-postfix/ressources/class.templates.inc on line 66
+[05-Dec-2009 19:05:33] loading /home/dtouzeau/developpement/artica-backup/ressources/class.templates.inc
+[05-Dec-2009 19:05:33] loading /home/dtouzeau/developpement/artica-postfix/ressources/class.ldap.inc
+[05-Dec-2009 19:05:33] PHP Fatal error:  Cannot redeclare class templates in /home/dtouzeau/developpement/artica-postfix/ressources/class.templates.inc on line 66
+[05-Dec-2009 19:05:58] loading /home/dtouzeau/developpement/artica-backup/ressources/class.templates.inc
+[05-Dec-2009 19:05:59] loading /home/dtouzeau/developpement/artica-postfix/ressources/class.ldap.inc
+[05-Dec-2009 19:05:59] loading /home/dtouzeau/developpement/artica-postfix/ressources/class.html.pages.inc
+[05-Dec-2009 19:05:59] PHP Fatal error:  Cannot redeclare class templates in /home/dtouzeau/developpement/artica-postfix/ressources/class.templates.inc on line 66
+[05-Dec-2009 19:06:38] loading /home/dtouzeau/developpement/artica-backup/ressources/class.templates.inc
+[05-Dec-2009 19:06:38] loading /home/dtouzeau/developpement/artica-postfix/ressources/class.ldap.inc
+[05-Dec-2009 19:06:38] loading /home/dtouzeau/developpement/artica-postfix/ressources/class.html.pages.inc
+[05-Dec-2009 19:06:38] loading /home/dtouzeau/developpement/artica-postfix/ressources/class.templates.inc
+[05-Dec-2009 19:06:38] PHP Fatal error:  Cannot redeclare class templates in /home/dtouzeau/developpement/artica-postfix/ressources/class.templates.inc on line 67
+[05-Dec-2009 19:07:00] loading /home/dtouzeau/developpement/artica-backup/ressources/class.templates.inc
+[05-Dec-2009 19:07:00] loading /home/dtouzeau/developpement/artica-postfix/ressources/class.ldap.inc
+[05-Dec-2009 19:07:00] loading /home/dtouzeau/developpement/artica-postfix/ressources/class.html.pages.inc
+[05-Dec-2009 19:07:00] loading /home/dtouzeau/developpement/artica-postfix/ressources/class.templates.inc
+[05-Dec-2009 19:07:00] PHP Fatal error:  Cannot redeclare class templates in /home/dtouzeau/developpement/artica-postfix/ressources/class.templates.inc on line 67
+[05-Dec-2009 19:07:05] loading /home/dtouzeau/developpement/artica-backup/ressources/class.templates.inc
+[05-Dec-2009 19:07:05] loading /home/dtouzeau/developpement/artica-postfix/ressources/class.ldap.inc
+[05-Dec-2009 19:07:05] loading /home/dtouzeau/developpement/artica-postfix/ressources/class.html.pages.inc
+[05-Dec-2009 19:07:05] loading /home/dtouzeau/developpement/artica-postfix/ressources/class.templates.inc
+[05-Dec-2009 19:07:05] PHP Fatal error:  Cannot redeclare class templates in /home/dtouzeau/developpement/artica-postfix/ressources/class.templates.inc on line 67
+[05-Dec-2009 19:08:23] loading /home/dtouzeau/developpement/artica-backup/ressources/class.templates.inc
+[05-Dec-2009 19:08:23] loading /home/dtouzeau/developpement/artica-postfix/ressources/class.ldap.inc
+[05-Dec-2009 19:08:23] loading /home/dtouzeau/developpement/artica-postfix/ressources/class.html.pages.inc
+[05-Dec-2009 19:08:23] loading /home/dtouzeau/developpement/artica-postfix/ressources/class.templates.inc
+[05-Dec-2009 19:08:23] PHP Fatal error:  Cannot redeclare class templates in /home/dtouzeau/developpement/artica-postfix/ressources/class.templates.inc on line 67
+[05-Dec-2009 19:08:48] loading /home/dtouzeau/developpement/artica-backup/ressources/class.templates.inc
+[05-Dec-2009 19:08:48] loading /home/dtouzeau/developpement/artica-postfix/ressources/class.ldap.inc
+[05-Dec-2009 19:08:48] loading /home/dtouzeau/developpement/artica-postfix/ressources/class.html.pages.inc
+[05-Dec-2009 19:08:48] loading /home/dtouzeau/developpement/artica-postfix/ressources/class.templates.inc
+[05-Dec-2009 19:08:48] loading /home/dtouzeau/developpement/artica-postfix/ressources/class.users.menus.inc
+[05-Dec-2009 19:08:48] PHP Fatal error:  Cannot redeclare class templates in /home/dtouzeau/developpement/artica-postfix/ressources/class.templates.inc on line 67
+[05-Dec-2009 19:09:34] loading /home/dtouzeau/developpement/artica-backup/ressources/class.templates.inc
+[05-Dec-2009 19:09:34] loading /home/dtouzeau/developpement/artica-postfix/ressources/class.ldap.inc
+[05-Dec-2009 19:09:34] loading templates /home/dtouzeau/developpement/artica-postfix/ressources/class.html.pages.inc
+[05-Dec-2009 19:09:34] loading /home/dtouzeau/developpement/artica-postfix/ressources/class.templates.inc
+[05-Dec-2009 19:09:34] loading /home/dtouzeau/developpement/artica-postfix/ressources/class.users.menus.inc
+[05-Dec-2009 19:09:34] PHP Fatal error:  Cannot redeclare class templates in /home/dtouzeau/developpement/artica-postfix/ressources/class.templates.inc on line 67
+[05-Dec-2009 19:09:52] loading /home/dtouzeau/developpement/artica-backup/ressources/class.templates.inc
+[05-Dec-2009 19:09:52] loading /home/dtouzeau/developpement/artica-postfix/ressources/class.ldap.inc
+[05-Dec-2009 19:09:52] loading templates /home/dtouzeau/developpement/artica-postfix/ressources/class.html.pages.inc
+[05-Dec-2009 19:09:52] loading /home/dtouzeau/developpement/artica-postfix/ressources/class.templates.inc
+[05-Dec-2009 19:09:52] loading /home/dtouzeau/developpement/artica-postfix/ressources/class.users.menus.inc
+[05-Dec-2009 19:09:52] PHP Fatal error:  Cannot redeclare class templates in /home/dtouzeau/developpement/artica-postfix/ressources/class.templates.inc on line 67
+[05-Dec-2009 19:10:43] loading /home/dtouzeau/developpement/artica-backup/ressources/class.templates.inc
+[05-Dec-2009 19:10:43] loading /home/dtouzeau/developpement/artica-postfix/ressources/class.ldap.inc
+[05-Dec-2009 19:10:43] /usr/share/artica-groupware/domains/backup.touzeau.biz/logon.php
+[05-Dec-2009 19:10:43] loading templates /home/dtouzeau/developpement/artica-postfix/ressources/class.html.pages.inc
+[05-Dec-2009 19:10:43] loading /home/dtouzeau/developpement/artica-postfix/ressources/class.templates.inc
+[05-Dec-2009 19:10:43] loading /home/dtouzeau/developpement/artica-postfix/ressources/class.users.menus.inc
+[05-Dec-2009 19:10:43] PHP Fatal error:  Cannot redeclare class templates in /home/dtouzeau/developpement/artica-postfix/ressources/class.templates.inc on line 67
+[05-Dec-2009 19:12:18] loading /home/dtouzeau/developpement/artica-backup/ressources/class.templates.inc
+[05-Dec-2009 19:12:18] loading /home/dtouzeau/developpement/artica-postfix/ressources/class.ldap.inc
+[05-Dec-2009 19:12:18] loading /home/dtouzeau/developpement/artica-postfix/ressources/class.templates.inc
+[05-Dec-2009 19:12:18] loading /home/dtouzeau/developpement/artica-postfix/ressources/class.users.menus.inc
+[05-Dec-2009 19:12:18] PHP Fatal error:  Cannot redeclare class templates in /home/dtouzeau/developpement/artica-postfix/ressources/class.templates.inc on line 67
+[05-Dec-2009 19:15:20] loading /home/dtouzeau/developpement/artica-backup/ressources/class.templates.inc
+[05-Dec-2009 19:15:20] loading /home/dtouzeau/developpement/artica-postfix/ressources/class.ldap.inc
+[05-Dec-2009 19:15:20] loading /home/dtouzeau/developpement/artica-postfix/ressources/class.templates.inc
+[05-Dec-2009 19:15:20] loading /home/dtouzeau/developpement/artica-postfix/ressources/class.users.menus.inc
+[05-Dec-2009 19:15:20] PHP Fatal error:  Cannot redeclare class templates in /home/dtouzeau/developpement/artica-postfix/ressources/class.templates.inc on line 67
+[05-Dec-2009 19:22:35] loading /home/dtouzeau/developpement/artica-backup/ressources/class.templates.inc
+[05-Dec-2009 19:22:35] currentPageadd=2
+[05-Dec-2009 19:22:35] 0 sessions arry
+[05-Dec-2009 19:22:35] 0 sessions arry
+[05-Dec-2009 19:22:39] loading /home/dtouzeau/developpement/artica-backup/ressources/class.templates.inc
+[05-Dec-2009 19:22:39] currentPageadd=2
+[05-Dec-2009 19:22:39] 0 sessions arry
+[05-Dec-2009 19:22:39] 0 sessions arry
+[05-Dec-2009 19:23:38] currentPageadd=2
+[05-Dec-2009 19:23:38] 0 sessions arry
+[05-Dec-2009 19:23:38] 0 sessions arry
+[05-Dec-2009 19:24:07] currentPageadd=2
+[05-Dec-2009 19:24:07] 0 sessions arry
+[05-Dec-2009 19:24:07] 0 sessions arry
+[05-Dec-2009 19:24:43] currentPageadd=2
+[05-Dec-2009 19:24:43] 0 sessions arry
+[05-Dec-2009 19:24:43] 0 sessions arry
+[05-Dec-2009 19:25:28] currentPageadd=2
+[05-Dec-2009 19:25:28] 0 sessions arry
+[05-Dec-2009 19:25:28] 0 sessions arry
+[05-Dec-2009 19:28:06] INFOS: bad value $entry_id: ()  find: (uid=) -> aborting function search engine doesn`t found the pattern in logon.php line 51
+[05-Dec-2009 19:28:06] PHP Fatal error:  Using $this when not in object context in /home/dtouzeau/developpement/artica-backup/logon.php on line 52
+[05-Dec-2009 19:29:00] INFOS: bad value $entry_id: ()  find: (uid=) -> aborting function search engine doesn`t found the pattern in /home/dtouzeau/developpement/artica-backup/logon.php line 50
+[05-Dec-2009 19:29:00] currentPageadd=2
+[05-Dec-2009 19:29:00] Unable to find {unknown_user} in array of 2207
+[05-Dec-2009 19:29:00] currentPageadd=2
+[05-Dec-2009 19:29:00] Unable to find {unknown_user} in array of 2207
+[05-Dec-2009 19:34:12] currentPageadd=2
+[05-Dec-2009 19:35:41] currentPageadd=2
+[05-Dec-2009 19:38:15] currentPageadd=2
+[05-Dec-2009 19:38:15] Unable to find {bad_password} in array of 2207
+[05-Dec-2009 19:38:15] currentPageadd=2
+[05-Dec-2009 19:38:15] Unable to find {bad_password} in array of 2207
+[05-Dec-2009 19:40:15] currentPageadd=2
+[05-Dec-2009 19:40:18] currentPageadd=2
+[05-Dec-2009 19:40:33] currentPageadd=2
+[05-Dec-2009 19:48:14] currentPageadd=2
+[05-Dec-2009 19:51:45] PHP Fatal error:  Class 'usersMenus' not found in /home/dtouzeau/developpement/artica-postfix/ressources/class.user.inc on line 129
+[05-Dec-2009 19:51:49] PHP Fatal error:  Class 'usersMenus' not found in /home/dtouzeau/developpement/artica-postfix/ressources/class.user.inc on line 129
+[05-Dec-2009 19:53:14] loading /home/dtouzeau/developpement/artica-postfix/ressources/class.users.menus.inc
+[05-Dec-2009 19:53:14] PHP Fatal error:  Cannot redeclare get_perfs() (previously declared in /home/dtouzeau/developpement/artica-backup/ressources/class.ldap.inc:3514) in /home/dtouzeau/developpement/artica-postfix/ressources/class.ldap.inc on line 3523
+[05-Dec-2009 19:54:51] loading /home/dtouzeau/developpement/artica-postfix/ressources/class.users.menus.inc
+[05-Dec-2009 19:54:51] PHP Fatal error:  Cannot redeclare get_perfs() (previously declared in /home/dtouzeau/developpement/artica-backup/ressources/class.ldap.inc:3514) in /home/dtouzeau/developpement/artica-postfix/ressources/class.ldap.inc on line 3523
+[05-Dec-2009 19:55:19] loading /home/dtouzeau/developpement/artica-postfix/ressources/class.users.menus.inc
+[05-Dec-2009 19:55:19] PHP Fatal error:  Call to undefined function DefineSessions() in /home/dtouzeau/developpement/artica-postfix/ressources/class.users.menus.inc on line 10
+[05-Dec-2009 19:56:04] loading /home/dtouzeau/developpement/artica-postfix/ressources/class.users.menus.inc
+[05-Dec-2009 19:56:04] PHP Fatal error:  Call to undefined function CheckSessions() in /home/dtouzeau/developpement/artica-postfix/ressources/class.users.menus.inc on line 11
+[05-Dec-2009 19:56:22] loading /home/dtouzeau/developpement/artica-postfix/ressources/class.users.menus.inc
+[05-Dec-2009 19:56:22] PHP Fatal error:  Call to undefined function CurrentPageName() in /home/dtouzeau/developpement/artica-postfix/ressources/class.users.menus.inc on line 540
+[05-Dec-2009 19:57:28] loading /home/dtouzeau/developpement/artica-postfix/ressources/class.users.menus.inc
+[05-Dec-2009 19:57:28] SID MSHOME From ldap is S-1-15-21-2596694876-1976058220-2319217280 in /home/dtouzeau/developpement/artica-backup/ressources/class.ldap.inc line clladp/LOCAL_SID
+[05-Dec-2009 19:57:28] SID MSHOME From ldap is S-1-15-21-2596694876-1976058220-2319217280 in /home/dtouzeau/developpement/artica-backup/ressources/class.ldap.inc line clladp/LOCAL_SID
+[05-Dec-2009 19:57:28] loading "david.touzeau" uid in /home/dtouzeau/developpement/artica-postfix/ressources/class.user.inc line user/user
+[05-Dec-2009 19:57:28] ou=touzeau,dc=organizations,dc=my-domain,dc=com in /home/dtouzeau/developpement/artica-backup/ressources/class.ldap.inc line OUDatas
+[05-Dec-2009 19:57:28] PRIV:AllowChangeUserPassword=yes in /home/dtouzeau/developpement/artica-backup/ressources/class.ldap.inc line clladp/_Get_privileges_userid
+[05-Dec-2009 19:57:28] PRIV:AllowFetchMails=yes in /home/dtouzeau/developpement/artica-backup/ressources/class.ldap.inc line clladp/_Get_privileges_userid
+[05-Dec-2009 19:57:28] PRIV:AllowChangeMailBoxRules=yes in /home/dtouzeau/developpement/artica-backup/ressources/class.ldap.inc line clladp/_Get_privileges_userid
+[05-Dec-2009 19:57:28] PRIV:AllowSenderCanonical=yes in /home/dtouzeau/developpement/artica-backup/ressources/class.ldap.inc line clladp/_Get_privileges_userid
+[05-Dec-2009 19:57:28] PRIV:ForceLanguageUsers=en in /home/dtouzeau/developpement/artica-backup/ressources/class.ldap.inc line clladp/_Get_privileges_userid
+[05-Dec-2009 19:57:28] SID MSHOME From ldap is S-1-15-21-2596694876-1976058220-2319217280 in /home/dtouzeau/developpement/artica-backup/ressources/class.ldap.inc line clladp/LOCAL_SID
+[05-Dec-2009 19:57:28] Resquest an uid (uid=david.touzeau) in "dc=organizations,dc=my-domain,dc=com" in /home/dtouzeau/developpement/artica-postfix/ressources/class.user.inc line user/LoadUserDatas
+[05-Dec-2009 19:57:28] DN david.touzeau: cn=Touzeau David,ou=users,ou=touzeau,dc=organizations,dc=my-domain,dc=com in /home/dtouzeau/developpement/artica-postfix/ressources/class.user.inc line user/LoadUserDatas
+[05-Dec-2009 19:57:28] Class userAccount found in /home/dtouzeau/developpement/artica-postfix/ressources/class.user.inc line user/LoadUserDatas
+[05-Dec-2009 19:57:28] Class posixAccount found in /home/dtouzeau/developpement/artica-postfix/ressources/class.user.inc line user/LoadUserDatas
+[05-Dec-2009 19:57:28] Class top found in /home/dtouzeau/developpement/artica-postfix/ressources/class.user.inc line user/LoadUserDatas
+[05-Dec-2009 19:57:28] Class ArticaSettings found in /home/dtouzeau/developpement/artica-postfix/ressources/class.user.inc line user/LoadUserDatas
+[05-Dec-2009 19:57:28] Class organizationalPerson found in /home/dtouzeau/developpement/artica-postfix/ressources/class.user.inc line user/LoadUserDatas
+[05-Dec-2009 19:57:28] Class UserArticaClass found in /home/dtouzeau/developpement/artica-postfix/ressources/class.user.inc line user/LoadUserDatas
+[05-Dec-2009 19:57:28] Class Vacation found in /home/dtouzeau/developpement/artica-postfix/ressources/class.user.inc line user/LoadUserDatas
+[05-Dec-2009 19:57:28] Class PureFTPdUser found in /home/dtouzeau/developpement/artica-postfix/ressources/class.user.inc line user/LoadUserDatas
+[05-Dec-2009 19:57:28] Class JoomlaUser found in /home/dtouzeau/developpement/artica-postfix/ressources/class.user.inc line user/LoadUserDatas
+[05-Dec-2009 19:57:28] Class amavisAccount found in /home/dtouzeau/developpement/artica-postfix/ressources/class.user.inc line user/LoadUserDatas
+[05-Dec-2009 19:57:28] Class person found in /home/dtouzeau/developpement/artica-postfix/ressources/class.user.inc line user/LoadUserDatas
+[05-Dec-2009 19:57:28] Class inetOrgPerson found in /home/dtouzeau/developpement/artica-postfix/ressources/class.user.inc line user/LoadUserDatas
+[05-Dec-2009 19:57:28] Class mozillaOrgPerson found in /home/dtouzeau/developpement/artica-postfix/ressources/class.user.inc line user/LoadUserDatas
+[05-Dec-2009 19:57:28] Class sambaSamAccount found in /home/dtouzeau/developpement/artica-postfix/ressources/class.user.inc line user/LoadUserDatas
+[05-Dec-2009 19:57:28] Class shadowAccount found in /home/dtouzeau/developpement/artica-postfix/ressources/class.user.inc line user/LoadUserDatas
+[05-Dec-2009 19:57:28] gidNumber:: Group number 513 found in /home/dtouzeau/developpement/artica-postfix/ressources/class.user.inc line user/LoadUserDatas
+[05-Dec-2009 19:57:28] Vacation Enable="FALSE"; vacationActive="FALSE" in /home/dtouzeau/developpement/artica-postfix/ressources/class.user.inc line user/LoadUserDatas
+[05-Dec-2009 19:57:28] Check 2001 in /home/dtouzeau/developpement/artica-postfix/ressources/class.user.inc line user/uidNumberCheck
+[05-Dec-2009 19:57:28] Search count uid number 2001 in /home/dtouzeau/developpement/artica-postfix/ressources/class.user.inc line user/CountUidNumbers
+[05-Dec-2009 19:57:28] This user has "2001"<>"2001" has numeric identifier.. in /home/dtouzeau/developpement/artica-postfix/ressources/class.user.inc line user/LoadUserDatas
+[05-Dec-2009 19:57:28] Search samba SID S-1-15-21-2596694876-1976058220-2319217280-513 in /home/dtouzeau/developpement/artica-postfix/ressources/class.groups.inc line groups/samba_group_id_from_sid
+[05-Dec-2009 19:57:28] gidNumber=513 in /home/dtouzeau/developpement/artica-postfix/ressources/class.groups.inc line groups/samba_group_id_from_sid
+[05-Dec-2009 19:57:28] david.touzeau ou=touzeau in /home/dtouzeau/developpement/artica-postfix/ressources/class.user.inc line user/LoadUserDatas
+[05-Dec-2009 19:57:28] Not a samba users:: ou="touzeau" dn="cn=Touzeau David,ou=users,ou=touzeau,dc=organizations,dc=my-domain,dc=com" in /home/dtouzeau/developpement/artica-postfix/ressources/class.user.inc line user/LoadUserDatas
+[05-Dec-2009 19:57:28] dn : cn=david.touzeau@touzeau.biz,cn=recipient_canonical_maps,ou=touzeau,dc=organizations,dc=my-domain,dc=com in /home/dtouzeau/developpement/artica-postfix/ressources/class.user.inc line user/GetMailAlternateAddress
+[05-Dec-2009 19:57:28] david.touzeau: amavisWhitelistSender:5; amavisBlacklistSender: in /home/dtouzeau/developpement/artica-postfix/ressources/class.user.inc line user/LoadUserDatas
+[05-Dec-2009 19:57:28] This user has "david.touzeau@touzeau.biz" has default email address... in /home/dtouzeau/developpement/artica-postfix/ressources/class.user.inc line user/LoadUserDatas
+[05-Dec-2009 19:57:28] This user has "david.touzeau" prefix email in /home/dtouzeau/developpement/artica-postfix/ressources/class.user.inc line user/LoadUserDatas
+[05-Dec-2009 19:57:28] This user has "touzeau.biz" suffix email in /home/dtouzeau/developpement/artica-postfix/ressources/class.user.inc line user/LoadUserDatas
+[05-Dec-2009 20:13:02] loading /home/dtouzeau/developpement/artica-postfix/ressources/class.users.menus.inc
+[05-Dec-2009 20:13:02] PHP Warning:  include_once(/home/dtouzeau/developpement/artica-backup/ressources/ressources/class.user.inc): failed to open stream: Aucun fichier ou dossier de ce type in /home/dtouzeau/developpement/artica-backup/ressources/class.functions.inc on line 2
+[05-Dec-2009 20:13:02] PHP Warning:  include_once(): Failed opening '/home/dtouzeau/developpement/artica-backup/ressources/ressources/class.user.inc' for inclusion (include_path='.:/usr/share/php:/usr/share/obm:/usr/share/php5:/usr/share/obm2') in /home/dtouzeau/developpement/artica-backup/ressources/class.functions.inc on line 2
+[05-Dec-2009 20:13:02] PHP Fatal error:  Cannot unset string offsets in /home/dtouzeau/developpement/artica-backup/ressources/class.functions.inc on line 10
+[05-Dec-2009 20:13:23] loading /home/dtouzeau/developpement/artica-postfix/ressources/class.users.menus.inc
+[05-Dec-2009 20:13:23] PHP Warning:  include_once(/home/dtouzeau/developpement/artica-backup/ressources/ressources/class.user.inc): failed to open stream: Aucun fichier ou dossier de ce type in /home/dtouzeau/developpement/artica-backup/ressources/class.functions.inc on line 2
+[05-Dec-2009 20:13:23] PHP Warning:  include_once(): Failed opening '/home/dtouzeau/developpement/artica-backup/ressources/ressources/class.user.inc' for inclusion (include_path='.:/usr/share/php:/usr/share/obm:/usr/share/php5:/usr/share/obm2') in /home/dtouzeau/developpement/artica-backup/ressources/class.functions.inc on line 2
+[05-Dec-2009 22:45:47] loading /home/dtouzeau/developpement/artica-postfix/ressources/class.users.menus.inc
+[05-Dec-2009 22:45:47] currentPageadd=2
+[05-Dec-2009 22:45:50] loading /home/dtouzeau/developpement/artica-postfix/ressources/class.users.menus.inc
+[05-Dec-2009 22:45:50] currentPageadd=2
+[05-Dec-2009 22:45:54] loading /home/dtouzeau/developpement/artica-postfix/ressources/class.users.menus.inc
+[05-Dec-2009 22:45:54] SID MSHOME From ldap is S-1-15-21-2596694876-1976058220-2319217280 in /home/dtouzeau/developpement/artica-backup/ressources/class.ldap.inc line clladp/LOCAL_SID
+[05-Dec-2009 22:45:54] SID MSHOME From ldap is S-1-15-21-2596694876-1976058220-2319217280 in /home/dtouzeau/developpement/artica-backup/ressources/class.ldap.inc line clladp/LOCAL_SID
+[05-Dec-2009 22:45:54] loading "david.touzeau" uid in /home/dtouzeau/developpement/artica-postfix/ressources/class.user.inc line user/user
+[05-Dec-2009 22:45:54] ou=touzeau,dc=organizations,dc=my-domain,dc=com in /home/dtouzeau/developpement/artica-backup/ressources/class.ldap.inc line OUDatas
+[05-Dec-2009 22:45:54] PRIV:AllowChangeUserPassword=yes in /home/dtouzeau/developpement/artica-backup/ressources/class.ldap.inc line clladp/_Get_privileges_userid
+[05-Dec-2009 22:45:54] PRIV:AllowFetchMails=yes in /home/dtouzeau/developpement/artica-backup/ressources/class.ldap.inc line clladp/_Get_privileges_userid
+[05-Dec-2009 22:45:54] PRIV:AllowChangeMailBoxRules=yes in /home/dtouzeau/developpement/artica-backup/ressources/class.ldap.inc line clladp/_Get_privileges_userid
+[05-Dec-2009 22:45:54] PRIV:AllowSenderCanonical=yes in /home/dtouzeau/developpement/artica-backup/ressources/class.ldap.inc line clladp/_Get_privileges_userid
+[05-Dec-2009 22:45:54] PRIV:ForceLanguageUsers=en in /home/dtouzeau/developpement/artica-backup/ressources/class.ldap.inc line clladp/_Get_privileges_userid
+[05-Dec-2009 22:45:54] SID MSHOME From ldap is S-1-15-21-2596694876-1976058220-2319217280 in /home/dtouzeau/developpement/artica-backup/ressources/class.ldap.inc line clladp/LOCAL_SID
+[05-Dec-2009 22:45:54] Resquest an uid (uid=david.touzeau) in "dc=organizations,dc=my-domain,dc=com" in /home/dtouzeau/developpement/artica-postfix/ressources/class.user.inc line user/LoadUserDatas
+[05-Dec-2009 22:45:54] DN david.touzeau: cn=Touzeau David,ou=users,ou=touzeau,dc=organizations,dc=my-domain,dc=com in /home/dtouzeau/developpement/artica-postfix/ressources/class.user.inc line user/LoadUserDatas
+[05-Dec-2009 22:45:54] Class userAccount found in /home/dtouzeau/developpement/artica-postfix/ressources/class.user.inc line user/LoadUserDatas
+[05-Dec-2009 22:45:54] Class posixAccount found in /home/dtouzeau/developpement/artica-postfix/ressources/class.user.inc line user/LoadUserDatas
+[05-Dec-2009 22:45:54] Class top found in /home/dtouzeau/developpement/artica-postfix/ressources/class.user.inc line user/LoadUserDatas
+[05-Dec-2009 22:45:54] Class ArticaSettings found in /home/dtouzeau/developpement/artica-postfix/ressources/class.user.inc line user/LoadUserDatas
+[05-Dec-2009 22:45:54] Class organizationalPerson found in /home/dtouzeau/developpement/artica-postfix/ressources/class.user.inc line user/LoadUserDatas
+[05-Dec-2009 22:45:54] Class UserArticaClass found in /home/dtouzeau/developpement/artica-postfix/ressources/class.user.inc line user/LoadUserDatas
+[05-Dec-2009 22:45:54] Class Vacation found in /home/dtouzeau/developpement/artica-postfix/ressources/class.user.inc line user/LoadUserDatas
+[05-Dec-2009 22:45:54] Class PureFTPdUser found in /home/dtouzeau/developpement/artica-postfix/ressources/class.user.inc line user/LoadUserDatas
+[05-Dec-2009 22:45:54] Class JoomlaUser found in /home/dtouzeau/developpement/artica-postfix/ressources/class.user.inc line user/LoadUserDatas
+[05-Dec-2009 22:45:54] Class amavisAccount found in /home/dtouzeau/developpement/artica-postfix/ressources/class.user.inc line user/LoadUserDatas
+[05-Dec-2009 22:45:54] Class person found in /home/dtouzeau/developpement/artica-postfix/ressources/class.user.inc line user/LoadUserDatas
+[05-Dec-2009 22:45:54] Class inetOrgPerson found in /home/dtouzeau/developpement/artica-postfix/ressources/class.user.inc line user/LoadUserDatas
+[05-Dec-2009 22:45:54] Class mozillaOrgPerson found in /home/dtouzeau/developpement/artica-postfix/ressources/class.user.inc line user/LoadUserDatas
+[05-Dec-2009 22:45:54] Class sambaSamAccount found in /home/dtouzeau/developpement/artica-postfix/ressources/class.user.inc line user/LoadUserDatas
+[05-Dec-2009 22:45:54] Class shadowAccount found in /home/dtouzeau/developpement/artica-postfix/ressources/class.user.inc line user/LoadUserDatas
+[05-Dec-2009 22:45:54] gidNumber:: Group number 513 found in /home/dtouzeau/developpement/artica-postfix/ressources/class.user.inc line user/LoadUserDatas
+[05-Dec-2009 22:45:54] Vacation Enable="FALSE"; vacationActive="FALSE" in /home/dtouzeau/developpement/artica-postfix/ressources/class.user.inc line user/LoadUserDatas
+[05-Dec-2009 22:45:54] Check 2001 in /home/dtouzeau/developpement/artica-postfix/ressources/class.user.inc line user/uidNumberCheck
+[05-Dec-2009 22:45:54] Search count uid number 2001 in /home/dtouzeau/developpement/artica-postfix/ressources/class.user.inc line user/CountUidNumbers
+[05-Dec-2009 22:45:54] This user has "2001"<>"2001" has numeric identifier.. in /home/dtouzeau/developpement/artica-postfix/ressources/class.user.inc line user/LoadUserDatas
+[05-Dec-2009 22:45:54] Search samba SID S-1-15-21-2596694876-1976058220-2319217280-513 in /home/dtouzeau/developpement/artica-postfix/ressources/class.groups.inc line groups/samba_group_id_from_sid
+[05-Dec-2009 22:45:54] gidNumber=513 in /home/dtouzeau/developpement/artica-postfix/ressources/class.groups.inc line groups/samba_group_id_from_sid
+[05-Dec-2009 22:45:54] david.touzeau ou=touzeau in /home/dtouzeau/developpement/artica-postfix/ressources/class.user.inc line user/LoadUserDatas
+[05-Dec-2009 22:45:54] Not a samba users:: ou="touzeau" dn="cn=Touzeau David,ou=users,ou=touzeau,dc=organizations,dc=my-domain,dc=com" in /home/dtouzeau/developpement/artica-postfix/ressources/class.user.inc line user/LoadUserDatas
+[05-Dec-2009 22:45:54] dn : cn=david.touzeau@touzeau.biz,cn=recipient_canonical_maps,ou=touzeau,dc=organizations,dc=my-domain,dc=com in /home/dtouzeau/developpement/artica-postfix/ressources/class.user.inc line user/GetMailAlternateAddress
+[05-Dec-2009 22:45:54] david.touzeau: amavisWhitelistSender:5; amavisBlacklistSender: in /home/dtouzeau/developpement/artica-postfix/ressources/class.user.inc line user/LoadUserDatas
+[05-Dec-2009 22:45:54] This user has "david.touzeau@touzeau.biz" has default email address... in /home/dtouzeau/developpement/artica-postfix/ressources/class.user.inc line user/LoadUserDatas
+[05-Dec-2009 22:45:54] This user has "david.touzeau" prefix email in /home/dtouzeau/developpement/artica-postfix/ressources/class.user.inc line user/LoadUserDatas
+[05-Dec-2009 22:45:54] This user has "touzeau.biz" suffix email in /home/dtouzeau/developpement/artica-postfix/ressources/class.user.inc line user/LoadUserDatas
+[05-Dec-2009 22:45:54] currentPageadd=2
+[05-Dec-2009 22:45:54] unable to stat /home/dtouzeau/developpement/artica-backup/ressources/language/fr/user.php.txt in /home/dtouzeau/developpement/artica-backup/ressources/class.templates.inc line 197
+[05-Dec-2009 22:45:54] Unable to find {email_events} in array of 2203
+[05-Dec-2009 22:45:54] Unable to find {user_events_emails_query_text} in array of 2203
+[05-Dec-2009 22:48:38] PHP Parse error:  syntax error, unexpected T_PRIVATE in /home/dtouzeau/developpement/artica-backup/ressources/class.templates.inc on line 207
+[05-Dec-2009 22:48:58] loading /home/dtouzeau/developpement/artica-postfix/ressources/class.users.menus.inc
+[05-Dec-2009 22:48:58] currentPageadd=2
+[05-Dec-2009 22:48:58] unable to stat /home/dtouzeau/developpement/artica-backup/ressources/language/fr/user.php.txt in /home/dtouzeau/developpement/artica-backup/ressources/class.templates.inc line 198
+[05-Dec-2009 22:48:58] Unable to find {email_events} in array of 2204
+[05-Dec-2009 22:49:41] loading /home/dtouzeau/developpement/artica-postfix/ressources/class.users.menus.inc
+[05-Dec-2009 22:49:41] currentPageadd=2
+[05-Dec-2009 22:49:41] unable to stat /home/dtouzeau/developpement/artica-backup/ressources/language/fr/user.php.txt in /home/dtouzeau/developpement/artica-backup/ressources/class.templates.inc line 198
+[05-Dec-2009 22:52:08] loading /home/dtouzeau/developpement/artica-postfix/ressources/class.users.menus.inc
+[05-Dec-2009 22:52:08] currentPageadd=2
+[05-Dec-2009 22:52:08] unable to stat /home/dtouzeau/developpement/artica-backup/ressources/language/fr/user.php.txt in /home/dtouzeau/developpement/artica-backup/ressources/class.templates.inc line 198
+[05-Dec-2009 22:54:12] loading /home/dtouzeau/developpement/artica-postfix/ressources/class.users.menus.inc
+[05-Dec-2009 22:54:12] currentPageadd=2
+[05-Dec-2009 22:54:12] unable to stat /home/dtouzeau/developpement/artica-backup/ressources/language/fr/user.php.txt in /home/dtouzeau/developpement/artica-backup/ressources/class.templates.inc line 198
+[05-Dec-2009 22:55:23] loading /home/dtouzeau/developpement/artica-postfix/ressources/class.users.menus.inc
+[05-Dec-2009 22:55:23] currentPageadd=2
+[05-Dec-2009 22:55:23] unable to stat /home/dtouzeau/developpement/artica-backup/ressources/language/fr/user.php.txt in /home/dtouzeau/developpement/artica-backup/ressources/class.templates.inc line 198
+[05-Dec-2009 22:55:34] loading /home/dtouzeau/developpement/artica-postfix/ressources/class.users.menus.inc
+[05-Dec-2009 22:55:34] currentPageadd=2
+[05-Dec-2009 22:55:34] unable to stat /home/dtouzeau/developpement/artica-backup/ressources/language/fr/user.php.txt in /home/dtouzeau/developpement/artica-backup/ressources/class.templates.inc line 198
+[05-Dec-2009 22:55:52] loading /home/dtouzeau/developpement/artica-postfix/ressources/class.users.menus.inc
+[05-Dec-2009 22:55:52] currentPageadd=2
+[05-Dec-2009 22:55:52] unable to stat /home/dtouzeau/developpement/artica-backup/ressources/language/fr/user.php.txt in /home/dtouzeau/developpement/artica-backup/ressources/class.templates.inc line 198
+[05-Dec-2009 22:56:02] loading /home/dtouzeau/developpement/artica-postfix/ressources/class.users.menus.inc
+[05-Dec-2009 22:56:02] currentPageadd=2
+[05-Dec-2009 22:56:02] unable to stat /home/dtouzeau/developpement/artica-backup/ressources/language/fr/user.php.txt in /home/dtouzeau/developpement/artica-backup/ressources/class.templates.inc line 198
