@@ -1,1 +1,0 @@
-../artica-install/global_conf.pas
