@@ -1,0 +1,530 @@
+2009-09-19 19:40:37: [search] Search Array,david
+2009-09-19 19:57:45: artica_addressbook_backend.php [search] Search Array,david
+2009-09-19 19:57:45: artica_addressbook_backend.php [search] fields[0]=name
+2009-09-19 19:57:45: artica_addressbook_backend.php [search] fields[1]=email
+2009-09-19 21:44:53: artica_addressbook_backend.php [search] Search da
+2009-09-19 21:44:53: class.ldap.inc [roundcube_ldap] ERROR number : -1
+Warning
+ unable to connect with following
+ cn=Manager,dc=my-domain,dc=com (secret)
+2009-09-19 21:45:13: artica_addressbook_backend.php [search] Search david
+2009-09-19 21:45:13: class.ldap.inc [roundcube_ldap] ERROR number : -1
+Warning
+ unable to connect with following
+ cn=Manager,dc=my-domain,dc=com (secret)
+2009-09-19 21:48:56: artica_addressbook_backend.php [search] Search david
+2009-09-19 21:48:56: class.ldap.inc [roundcube_ldap] ERROR number : -1 unable to bind with following cn=Manager,dc=my-domain,dc=com (secret)
+2009-09-19 21:51:09: artica_addressbook_backend.php [search] Search david
+2009-09-19 21:51:09: class.ldap.inc [roundcube_ldap] ERROR number : -1 "Unknown error" unable to bind with following cn=Manager,dc=my-domain,dc=com (secret)
+2009-09-19 21:53:02: artica_addressbook_backend.php [search] Search david
+2009-09-19 21:53:02: class.ldap.inc [roundcube_ldap] ERROR number : -1 "Unknown error" unable to bind with following cn=Manager,dc=my-domain,dc=com (secret)
+2009-09-19 21:53:46: artica_addressbook_backend.php [search] Search david
+2009-09-19 21:53:46: class.ldap.inc [roundcube_ldap] ERROR number : -1 "Unknown error" unable to bind with following cn=Manager,dc=my-domain,dc=com (secret)
+2009-09-19 21:54:33: artica_addressbook_backend.php [search] Search david
+2009-09-19 21:54:33: class.ldap.inc [roundcube_ldap] ERROR number : -1 "Unknown error" unable to bind with following cn=Manager,dc=my-domain,dc=com (secret)
+2009-09-19 21:54:33: class.ldap.inc [SearchAddressBook] Searching david.touzeau "david"
+2009-09-19 21:55:35: artica_addressbook_backend.php [search] Search david
+2009-09-19 21:55:35: class.ldap.inc [roundcube_ldap] ERROR number : -1 "Unknown error" unable to bind with following cn=Manager,dc=my-domain,dc=com (secret)
+2009-09-19 21:55:35: class.ldap.inc [SearchAddressBook] Searching david.touzeau "david"
+2009-09-19 21:56:24: artica_addressbook_backend.php [search] Search david
+2009-09-19 21:56:24: class.ldap.inc [roundcube_ldap] ERROR number : -1 "Unknown error" unable to bind with following cn=Manager,dc=my-domain,dc=com (secret)
+2009-09-19 21:56:24: class.ldap.inc [SearchAddressBook] Searching david.touzeau "david"
+2009-09-19 21:56:24: class.ldap.inc [GetOuForUser] david.touzeau -> 
+2009-09-19 21:57:47: artica_addressbook_backend.php [search] Search david*
+2009-09-19 21:57:47: class.ldap.inc [roundcube_ldap] ERROR number : -1 "Unknown error" unable to bind with following cn=Manager,dc=my-domain,dc=com (secret)
+2009-09-19 21:57:47: class.ldap.inc [SearchAddressBook] Searching david.touzeau "david*"
+2009-09-19 21:57:47: class.ldap.inc [GetOuForUser] david.touzeau -> 
+2009-09-19 21:57:47: class.ldap.inc [user_search] Unable to find organization for david.touzeau
+2009-09-19 21:59:10: artica_addressbook_backend.php [search] Search david*
+2009-09-19 21:59:10: class.ldap.inc [roundcube_ldap] ERROR number : -1 "Unknown error" unable to bind with following cn=Manager,dc=my-domain,dc=com (secret)
+2009-09-19 21:59:10: class.ldap.inc [SearchAddressBook] Searching david.touzeau "david*"
+2009-09-19 21:59:10: class.ldap.inc [GetOuForUser] david.touzeau -> 
+2009-09-19 21:59:10: class.ldap.inc [user_search] Unable to find organization for david.touzeau
+2009-09-19 21:59:10: class.ldap.inc [SearchAddressBook] Failed
+2009-09-19 22:01:06: artica_addressbook_backend.php [search] Search david*
+2009-09-19 22:01:06: class.ldap.inc [roundcube_ldap] Connect to   success Resource id #61
+2009-09-19 22:01:06: class.ldap.inc [roundcube_ldap] ERROR number : -1 "Unknown error" unable to bind with following cn=Manager,dc=my-domain,dc=com (secret)
+2009-09-19 22:01:06: class.ldap.inc [SearchAddressBook] Searching david.touzeau "david*"
+2009-09-19 22:01:06: class.ldap.inc [GetOuForUser] david.touzeau -> 
+2009-09-19 22:01:06: class.ldap.inc [user_search] Unable to find organization for david.touzeau
+2009-09-19 22:01:06: class.ldap.inc [SearchAddressBook] Failed
+2009-09-19 22:01:56: artica_addressbook_backend.php [search] Search david
+2009-09-19 22:01:56: class.ldap.inc [roundcube_ldap] Connect to  127.0.0.1 success Resource id #61
+2009-09-19 22:01:56: class.ldap.inc [SearchAddressBook] Searching david.touzeau "david"
+2009-09-19 22:01:56: class.ldap.inc [GetOuForUser] david.touzeau -> cn=Touzeau David,ou=users,ou=touzeau,dc=organizations,dc=my-domain,dc=com
+2009-09-19 22:01:56: class.ldap.inc [GetOuForUser] david.touzeau is in organization touzeau
+2009-09-19 22:03:29: artica_addressbook_backend.php [search] Search david
+2009-09-19 22:03:29: class.ldap.inc [roundcube_ldap] Connect to  127.0.0.1 success Resource id #61
+2009-09-19 22:03:29: class.ldap.inc [SearchAddressBook] Searching david.touzeau "david"
+2009-09-19 22:03:29: class.ldap.inc [SearchAddressBook] Success with 1 entries
+2009-09-19 22:03:29: artica_addressbook_backend.php [search] Search =1 results
+2009-09-19 22:06:09: artica_addressbook_backend.php [list_records] request to list_records...
+2009-09-19 22:07:04: artica_addressbook_backend.php [list_records] request to list_records...
+2009-09-19 22:07:04: class.ldap.inc [roundcube_ldap] Connect to  127.0.0.1 success Resource id #62
+2009-09-19 22:07:04: class.ldap.inc [SearchAddressBook] Searching david.touzeau ""
+2009-09-19 22:07:04: class.ldap.inc [SearchAddressBook] Success with 14 entries
+2009-09-19 22:07:04: artica_addressbook_backend.php [list_records] Search =14 results
+2009-09-19 22:07:05: artica_addressbook_backend.php [list_records] request to list_records...
+2009-09-19 22:07:05: class.ldap.inc [roundcube_ldap] Connect to  127.0.0.1 success Resource id #64
+2009-09-19 22:07:05: class.ldap.inc [SearchAddressBook] Searching david.touzeau ""
+2009-09-19 22:07:05: class.ldap.inc [SearchAddressBook] Success with 14 entries
+2009-09-19 22:07:05: artica_addressbook_backend.php [list_records] Search =14 results
+2009-09-19 22:07:35: artica_addressbook_backend.php [list_records] request to list_records...
+2009-09-19 22:07:35: class.ldap.inc [roundcube_ldap] Connect to  127.0.0.1 success Resource id #64
+2009-09-19 22:07:35: class.ldap.inc [SearchAddressBook] Searching david.touzeau ""
+2009-09-19 22:07:35: class.ldap.inc [SearchAddressBook] Success with 14 entries
+2009-09-19 22:07:35: artica_addressbook_backend.php [list_records] Search =14 results
+2009-09-19 22:09:07: artica_addressbook_backend.php [get_record] get_record 1248353736-1281
+2009-09-19 22:09:07: artica_addressbook_backend.php [list_records] request to list_records...
+2009-09-19 22:09:07: class.ldap.inc [roundcube_ldap] Connect to  127.0.0.1 success Resource id #65
+2009-09-19 22:09:07: class.ldap.inc [SearchAddressBook] Searching david.touzeau ""
+2009-09-19 22:09:07: class.ldap.inc [SearchAddressBook] Success with 14 entries
+2009-09-19 22:09:07: artica_addressbook_backend.php [list_records] Search =14 results
+2009-09-19 22:09:23: artica_addressbook_backend.php [get_record] get_record florent
+2009-09-19 22:09:23: artica_addressbook_backend.php [list_records] request to list_records...
+2009-09-19 22:09:23: class.ldap.inc [roundcube_ldap] Connect to  127.0.0.1 success Resource id #65
+2009-09-19 22:09:23: class.ldap.inc [SearchAddressBook] Searching david.touzeau ""
+2009-09-19 22:09:23: class.ldap.inc [SearchAddressBook] Success with 14 entries
+2009-09-19 22:09:23: artica_addressbook_backend.php [list_records] Search =14 results
+2009-09-19 22:12:31: artica_addressbook_backend.php [get_record] get_record michel
+2009-09-19 22:12:31: artica_addressbook_backend.php [list_records] request to list_records...
+2009-09-19 22:12:31: class.ldap.inc [roundcube_ldap] Connect to  127.0.0.1 success Resource id #65
+2009-09-19 22:12:32: class.ldap.inc [SearchAddressBook] Searching david.touzeau ""
+2009-09-19 22:12:32: class.ldap.inc [SearchAddressBook] Success with 14 entries
+2009-09-19 22:12:32: artica_addressbook_backend.php [list_records] Search =14 results
+2009-09-19 22:12:41: artica_addressbook_backend.php [get_record] get_record sebastien
+2009-09-19 22:12:41: artica_addressbook_backend.php [list_records] request to list_records...
+2009-09-19 22:12:41: class.ldap.inc [roundcube_ldap] Connect to  127.0.0.1 success Resource id #65
+2009-09-19 22:12:41: class.ldap.inc [SearchAddressBook] Searching david.touzeau ""
+2009-09-19 22:12:41: class.ldap.inc [SearchAddressBook] Success with 14 entries
+2009-09-19 22:12:41: artica_addressbook_backend.php [list_records] Search =14 results
+2009-09-19 22:13:00: artica_addressbook_backend.php [list_records] request to list_records...
+2009-09-19 22:13:00: class.ldap.inc [roundcube_ldap] Connect to  127.0.0.1 success Resource id #62
+2009-09-19 22:13:00: class.ldap.inc [SearchAddressBook] Searching david.touzeau ""
+2009-09-19 22:13:00: class.ldap.inc [SearchAddressBook] Success with 14 entries
+2009-09-19 22:13:00: artica_addressbook_backend.php [list_records] Search =14 results
+2009-09-19 22:13:08: artica_addressbook_backend.php [get_record] get_record NAB
+2009-09-19 22:13:08: artica_addressbook_backend.php [list_records] request to list_records...
+2009-09-19 22:13:08: class.ldap.inc [roundcube_ldap] Connect to  127.0.0.1 success Resource id #65
+2009-09-19 22:13:08: class.ldap.inc [SearchAddressBook] Searching david.touzeau ""
+2009-09-19 22:13:08: class.ldap.inc [SearchAddressBook] Success with 14 entries
+2009-09-19 22:13:08: artica_addressbook_backend.php [list_records] Search =14 results
+2009-09-19 22:13:42: artica_addressbook_backend.php [list_records] request to list_records...
+2009-09-19 22:13:42: class.ldap.inc [roundcube_ldap] Connect to  127.0.0.1 success Resource id #62
+2009-09-19 22:13:42: class.ldap.inc [SearchAddressBook] Searching david.touzeau ""
+2009-09-19 22:13:42: class.ldap.inc [SearchAddressBook] Success with 14 entries
+2009-09-19 22:13:42: artica_addressbook_backend.php [list_records] Search =14 results
+2009-09-19 22:13:45: artica_addressbook_backend.php [get_record] get_record NAB-1248353515-8617
+2009-09-19 22:13:45: artica_addressbook_backend.php [list_records] request to list_records...
+2009-09-19 22:13:45: class.ldap.inc [roundcube_ldap] Connect to  127.0.0.1 success Resource id #65
+2009-09-19 22:13:45: class.ldap.inc [SearchAddressBook] Searching david.touzeau ""
+2009-09-19 22:13:45: class.ldap.inc [SearchAddressBook] Success with 14 entries
+2009-09-19 22:13:45: artica_addressbook_backend.php [list_records] Search =14 results
+2009-09-19 22:25:09: artica_addressbook_backend.php [list_records] request to list_records...
+2009-09-19 22:25:09: class.ldap.inc [roundcube_ldap] Connect to  127.0.0.1 success Resource id #62
+2009-09-19 22:25:09: class.ldap.inc [SearchAddressBook] Searching david.touzeau ""
+2009-09-19 22:25:09: class.ldap.inc [SearchAddressBook] Success with 14 entries
+2009-09-19 22:25:09: artica_addressbook_backend.php [list_records] Search =14 results
+2009-09-19 22:26:26: artica_addressbook_backend.php [get_record] failed to preg_match  ORG-sebastien
+2009-09-19 22:26:51: artica_addressbook_backend.php [get_record] get_record ORG florent
+2009-09-19 22:26:51: class.ldap.inc [roundcube_ldap] Connect to  127.0.0.1 success Resource id #63
+2009-09-19 22:26:51: class.ldap.inc [GetLocalUserinfos] INFOS: bad value $entry_id
+2009-09-19 22:27:32: artica_addressbook_backend.php [get_record] get_record ORG michel
+2009-09-19 22:27:32: class.ldap.inc [roundcube_ldap] Connect to  127.0.0.1 success Resource id #63
+2009-09-19 22:27:33: artica_addressbook_backend.php [get_record] get_record ORG florent
+2009-09-19 22:27:33: class.ldap.inc [roundcube_ldap] Connect to  127.0.0.1 success Resource id #63
+2009-09-19 22:28:01: artica_addressbook_backend.php [list_records] request to list_records...
+2009-09-19 22:28:01: class.ldap.inc [roundcube_ldap] Connect to  127.0.0.1 success Resource id #62
+2009-09-19 22:28:01: class.ldap.inc [SearchAddressBook] Searching david.touzeau ""
+2009-09-19 22:28:01: class.ldap.inc [SearchAddressBook] Success with 14 entries
+2009-09-19 22:28:01: artica_addressbook_backend.php [list_records] Search =14 results
+2009-09-19 22:28:02: artica_addressbook_backend.php [get_record] get_record NAB 1248353736-1281
+2009-09-19 22:28:02: class.ldap.inc [roundcube_ldap] Connect to  127.0.0.1 success Resource id #63
+2009-09-19 22:28:02: class.ldap.inc [GetLocalUserinfos] INFOS: bad value $entry_id
+2009-09-19 22:28:40: artica_addressbook_backend.php [get_record] get_record ORG admins
+2009-09-19 22:28:40: class.ldap.inc [roundcube_ldap] Connect to  127.0.0.1 success Resource id #63
+2009-09-19 22:29:18: artica_addressbook_backend.php [get_record] get_record ORG florent
+2009-09-19 22:29:18: class.ldap.inc [roundcube_ldap] Connect to  127.0.0.1 success Resource id #63
+2009-09-19 22:29:23: artica_addressbook_backend.php [get_record] get_record ORG david
+2009-09-19 22:29:23: class.ldap.inc [roundcube_ldap] Connect to  127.0.0.1 success Resource id #63
+2009-09-19 22:29:23: class.ldap.inc [GetLocalUserinfos] INFOS: bad value $entry_id
+2009-09-19 22:29:26: artica_addressbook_backend.php [get_record] get_record ORG admins
+2009-09-19 22:29:26: class.ldap.inc [roundcube_ldap] Connect to  127.0.0.1 success Resource id #63
+2009-09-19 22:30:42: artica_addressbook_backend.php [get_record] get_record NAB 1248353736-1281
+2009-09-19 22:30:47: artica_addressbook_backend.php [get_record] get_record ORG david
+2009-09-19 22:30:47: class.ldap.inc [roundcube_ldap] Connect to  127.0.0.1 success Resource id #63
+2009-09-19 22:30:47: class.ldap.inc [GetLocalUserinfos] INFOS: bad value $entry_id
+2009-09-19 22:30:49: artica_addressbook_backend.php [get_record] get_record ORG florent
+2009-09-19 22:30:49: class.ldap.inc [roundcube_ldap] Connect to  127.0.0.1 success Resource id #63
+2009-09-19 22:30:52: artica_addressbook_backend.php [get_record] get_record ORG michel
+2009-09-19 22:30:52: class.ldap.inc [roundcube_ldap] Connect to  127.0.0.1 success Resource id #63
+2009-09-19 22:30:53: artica_addressbook_backend.php [get_record] get_record ORG sebastien
+2009-09-19 22:30:53: class.ldap.inc [roundcube_ldap] Connect to  127.0.0.1 success Resource id #63
+2009-09-19 22:30:55: artica_addressbook_backend.php [get_record] get_record ORG jean-marie
+2009-09-19 22:30:55: class.ldap.inc [roundcube_ldap] Connect to  127.0.0.1 success Resource id #63
+2009-09-19 22:30:56: artica_addressbook_backend.php [get_record] get_record ORG pierre
+2009-09-19 22:30:56: class.ldap.inc [roundcube_ldap] Connect to  127.0.0.1 success Resource id #63
+2009-09-19 22:30:57: artica_addressbook_backend.php [get_record] get_record ORG admins
+2009-09-19 22:30:57: class.ldap.inc [roundcube_ldap] Connect to  127.0.0.1 success Resource id #63
+2009-09-19 22:31:15: artica_addressbook_backend.php [get_record] get_record ORG david
+2009-09-19 22:31:15: class.ldap.inc [roundcube_ldap] Connect to  127.0.0.1 success Resource id #63
+2009-09-19 22:31:15: class.ldap.inc [GetLocalUserinfos] INFOS: bad value $entry_id
+2009-09-19 22:31:22: artica_addressbook_backend.php [get_record] get_record ORG florent
+2009-09-19 22:31:22: class.ldap.inc [roundcube_ldap] Connect to  127.0.0.1 success Resource id #63
+2009-09-19 22:31:25: artica_addressbook_backend.php [get_record] get_record ORG marie
+2009-09-19 22:31:25: class.ldap.inc [roundcube_ldap] Connect to  127.0.0.1 success Resource id #63
+2009-09-19 22:31:26: artica_addressbook_backend.php [get_record] get_record ORG pierre
+2009-09-19 22:31:26: class.ldap.inc [roundcube_ldap] Connect to  127.0.0.1 success Resource id #63
+2009-09-19 22:33:57: artica_addressbook_backend.php [list_records] request to list_records...
+2009-09-19 22:33:57: class.ldap.inc [roundcube_ldap] Connect to  127.0.0.1 success Resource id #62
+2009-09-19 22:33:57: class.ldap.inc [SearchAddressBook] Searching david.touzeau ""
+2009-09-19 22:33:57: class.ldap.inc [SearchAddressBook] Success with 14 entries
+2009-09-19 22:33:57: artica_addressbook_backend.php [list_records] Search =14 results
+2009-09-19 22:34:00: artica_addressbook_backend.php [get_record] get_record NAB 1248353736-1281
+2009-09-19 22:34:13: artica_addressbook_backend.php [get_record] get_record NAB 1248353515-8617
+2009-09-19 22:34:26: artica_addressbook_backend.php [get_record] get_record ORG florent
+2009-09-19 22:34:26: class.ldap.inc [roundcube_ldap] Connect to  127.0.0.1 success Resource id #63
+2009-09-19 22:34:56: artica_addressbook_backend.php [get_record] get_record ORG admins
+2009-09-19 22:34:56: class.ldap.inc [roundcube_ldap] Connect to  127.0.0.1 success Resource id #63
+2009-09-19 22:36:09: artica_addressbook_backend.php [get_record] get_record ORG pierre
+2009-09-19 22:36:09: class.ldap.inc [roundcube_ldap] Connect to  127.0.0.1 success Resource id #63
+2009-09-19 22:36:09: artica_addressbook_backend.php [get_record] success found user to preg_match pierre
+2009-09-19 22:37:45: artica_addressbook_backend.php [list_records] request to list_records...
+2009-09-19 22:37:45: class.ldap.inc [roundcube_ldap] Connect to  127.0.0.1 success Resource id #64
+2009-09-19 22:37:45: class.ldap.inc [SearchAddressBook] Searching david.touzeau ""
+2009-09-19 22:37:45: class.ldap.inc [SearchAddressBook] Success with 14 entries
+2009-09-19 22:37:45: artica_addressbook_backend.php [list_records] Search =14 results
+2009-09-19 22:37:45: artica_addressbook_backend.php [get_record] get_record ORG admins
+2009-09-19 22:37:45: class.ldap.inc [roundcube_ldap] Connect to  127.0.0.1 success Resource id #73
+2009-09-19 22:37:45: artica_addressbook_backend.php [get_record] success found user to admins
+2009-09-19 22:38:59: artica_addressbook_backend.php [list_records] request to list_records...
+2009-09-19 22:38:59: class.ldap.inc [roundcube_ldap] Connect to  127.0.0.1 success Resource id #64
+2009-09-19 22:38:59: class.ldap.inc [SearchAddressBook] Searching david.touzeau ""
+2009-09-19 22:38:59: class.ldap.inc [SearchAddressBook] Success with 14 entries
+2009-09-19 22:38:59: artica_addressbook_backend.php [list_records] Search =14 results
+2009-09-19 22:38:59: artica_addressbook_backend.php [get_record] get_record NAB 1248353736-1281
+2009-09-19 22:40:17: artica_addressbook_backend.php [list_records] request to list_records...
+2009-09-19 22:40:17: class.ldap.inc [roundcube_ldap] Connect to  127.0.0.1 success Resource id #64
+2009-09-19 22:40:17: class.ldap.inc [SearchAddressBook] Searching david.touzeau ""
+2009-09-19 22:40:17: class.ldap.inc [SearchAddressBook] Success with 14 entries
+2009-09-19 22:40:17: artica_addressbook_backend.php [list_records] Search =14 results
+2009-09-19 22:40:17: artica_addressbook_backend.php [get_record] get_record NAB 1248353515-8617
+2009-09-19 22:42:55: artica_addressbook_backend.php [get_record] get_record ORG david
+2009-09-19 22:42:55: class.ldap.inc [roundcube_ldap] Connect to  127.0.0.1 success Resource id #63
+2009-09-19 22:42:55: class.ldap.inc [GetLocalUserinfos] INFOS: bad value $entry_id for david
+2009-09-19 22:43:46: artica_addressbook_backend.php [get_record] get_record ORG bibi for "ORG-bibi"
+2009-09-19 22:43:46: class.ldap.inc [roundcube_ldap] Connect to  127.0.0.1 success Resource id #63
+2009-09-19 22:43:46: artica_addressbook_backend.php [get_record] success found user to bibi
+2009-09-19 22:49:19: artica_addressbook_backend.php [get_record] get_record ORG admins for "ORG-admins" 
+2009-09-19 22:49:19: class.ldap.inc [roundcube_ldap] Connect to  127.0.0.1 success Resource id #63
+2009-09-19 22:49:19: artica_addressbook_backend.php [get_record] success found user to admins
+2009-09-19 22:49:24: artica_addressbook_backend.php [get_record] get_record NAB 1248353736-1281 for "NAB-1248353736-1281" 
+2009-09-19 22:49:26: artica_addressbook_backend.php [get_record] get_record NAB 1248353515-8617 for "NAB-1248353515-8617" 
+2009-09-19 22:49:28: artica_addressbook_backend.php [get_record] get_record ORG florent for "ORG-florent" 
+2009-09-19 22:49:28: class.ldap.inc [roundcube_ldap] Connect to  127.0.0.1 success Resource id #63
+2009-09-19 22:49:28: artica_addressbook_backend.php [get_record] success found user to florent
+2009-09-19 22:49:57: artica_addressbook_backend.php [get_record] get_record ORG admins for "ORG-admins" 
+2009-09-19 22:49:57: class.ldap.inc [roundcube_ldap] Connect to  127.0.0.1 success Resource id #63
+2009-09-19 22:49:57: artica_addressbook_backend.php [get_record] success found user to admins
+2009-09-19 22:50:22: artica_addressbook_backend.php [get_record] get_record NAB 1248353736-1281 for "NAB-1248353736-1281" 
+2009-09-19 22:50:26: artica_addressbook_backend.php [get_record] get_record ORG bibi for "ORG-bibi" 
+2009-09-19 22:50:26: class.ldap.inc [roundcube_ldap] Connect to  127.0.0.1 success Resource id #63
+2009-09-19 22:50:26: artica_addressbook_backend.php [get_record] success found user to bibi
+2009-09-19 22:50:27: artica_addressbook_backend.php [get_record] get_record ORG david for "ORG-david" 
+2009-09-19 22:50:27: class.ldap.inc [roundcube_ldap] Connect to  127.0.0.1 success Resource id #63
+2009-09-19 22:50:27: class.ldap.inc [GetLocalUserinfos] INFOS: bad value $entry_id for david
+2009-09-19 22:50:32: artica_addressbook_backend.php [get_record] get_record ORG florent for "ORG-florent" 
+2009-09-19 22:50:32: class.ldap.inc [roundcube_ldap] Connect to  127.0.0.1 success Resource id #63
+2009-09-19 22:50:32: artica_addressbook_backend.php [get_record] success found user to florent
+2009-09-19 22:50:40: artica_addressbook_backend.php [list_records] request to list_records...
+2009-09-19 22:50:40: class.ldap.inc [roundcube_ldap] Connect to  127.0.0.1 success Resource id #62
+2009-09-19 22:50:40: class.ldap.inc [SearchAddressBook] Searching david.touzeau ""
+2009-09-19 22:50:40: class.ldap.inc [SearchAddressBook] Success with 14 entries
+2009-09-19 22:50:40: artica_addressbook_backend.php [list_records] Search =14 results
+2009-09-19 22:50:45: artica_addressbook_backend.php [list_records] request to list_records...
+2009-09-19 22:50:45: class.ldap.inc [roundcube_ldap] Connect to  127.0.0.1 success Resource id #62
+2009-09-19 22:50:45: class.ldap.inc [SearchAddressBook] Searching david.touzeau ""
+2009-09-19 22:50:45: class.ldap.inc [SearchAddressBook] Success with 14 entries
+2009-09-19 22:50:45: artica_addressbook_backend.php [list_records] Search =14 results
+2009-09-19 22:50:48: artica_addressbook_backend.php [list_records] request to list_records...
+2009-09-19 22:50:48: class.ldap.inc [roundcube_ldap] Connect to  127.0.0.1 success Resource id #62
+2009-09-19 22:50:48: class.ldap.inc [SearchAddressBook] Searching david.touzeau ""
+2009-09-19 22:50:48: class.ldap.inc [SearchAddressBook] Success with 14 entries
+2009-09-19 22:50:48: artica_addressbook_backend.php [list_records] Search =14 results
+2009-09-19 22:50:49: artica_addressbook_backend.php [get_record] get_record ORG florent for "ORG-florent" 
+2009-09-19 22:50:49: class.ldap.inc [roundcube_ldap] Connect to  127.0.0.1 success Resource id #63
+2009-09-19 22:50:49: artica_addressbook_backend.php [get_record] success found user to florent
+2009-09-19 22:50:54: artica_addressbook_backend.php [list_records] request to list_records...
+2009-09-19 22:50:54: class.ldap.inc [roundcube_ldap] Connect to  127.0.0.1 success Resource id #62
+2009-09-19 22:50:54: class.ldap.inc [SearchAddressBook] Searching david.touzeau ""
+2009-09-19 22:50:54: class.ldap.inc [SearchAddressBook] Success with 14 entries
+2009-09-19 22:50:54: artica_addressbook_backend.php [list_records] Search =14 results
+2009-09-19 22:50:55: artica_addressbook_backend.php [get_record] get_record ORG maki for "ORG-maki" 
+2009-09-19 22:50:55: class.ldap.inc [roundcube_ldap] Connect to  127.0.0.1 success Resource id #63
+2009-09-19 22:50:55: artica_addressbook_backend.php [get_record] success found user to maki
+2009-09-19 22:51:42: artica_addressbook_backend.php [get_record] get_record ORG sebastien for "ORG-sebastien" 
+2009-09-19 22:51:42: class.ldap.inc [roundcube_ldap] Connect to  127.0.0.1 success Resource id #63
+2009-09-19 22:51:42: artica_addressbook_backend.php [get_record] success found user to sebastien
+2009-09-19 22:51:43: artica_addressbook_backend.php [get_record] get_record ORG marie for "ORG-marie" 
+2009-09-19 22:51:43: class.ldap.inc [roundcube_ldap] Connect to  127.0.0.1 success Resource id #63
+2009-09-19 22:51:43: artica_addressbook_backend.php [get_record] success found user to marie
+2009-09-19 22:51:45: artica_addressbook_backend.php [get_record] get_record ORG pierre for "ORG-pierre" 
+2009-09-19 22:51:45: class.ldap.inc [roundcube_ldap] Connect to  127.0.0.1 success Resource id #63
+2009-09-19 22:51:45: artica_addressbook_backend.php [get_record] success found user to pierre
+2009-09-19 22:51:53: artica_addressbook_backend.php [search] Search ORG-pierre
+2009-09-19 22:51:53: class.ldap.inc [roundcube_ldap] Connect to  127.0.0.1 success Resource id #61
+2009-09-19 22:51:53: class.ldap.inc [SearchAddressBook] Searching david.touzeau "ORG-pierre"
+2009-09-19 22:51:53: class.ldap.inc [SearchAddressBook] Success with 0 entries
+2009-09-19 22:52:05: artica_addressbook_backend.php [search] Search ORG-pierre
+2009-09-19 22:52:05: class.ldap.inc [roundcube_ldap] Connect to  127.0.0.1 success Resource id #61
+2009-09-19 22:52:05: class.ldap.inc [SearchAddressBook] Searching david.touzeau "ORG-pierre"
+2009-09-19 22:52:05: class.ldap.inc [SearchAddressBook] Success with 0 entries
+2009-09-19 22:52:33: artica_addressbook_backend.php [get_record] get_record ORG pierre for "ORG-pierre" 
+2009-09-19 22:52:33: class.ldap.inc [roundcube_ldap] Connect to  127.0.0.1 success Resource id #63
+2009-09-19 22:52:33: artica_addressbook_backend.php [get_record] success found user to pierre
+2009-09-19 22:52:42: artica_addressbook_backend.php [list_records] request to list_records...
+2009-09-19 22:52:42: class.ldap.inc [roundcube_ldap] Connect to  127.0.0.1 success Resource id #62
+2009-09-19 22:52:42: class.ldap.inc [SearchAddressBook] Searching david.touzeau ""
+2009-09-19 22:52:42: class.ldap.inc [SearchAddressBook] Success with 14 entries
+2009-09-19 22:52:42: artica_addressbook_backend.php [list_records] Search =14 results
+2009-09-19 22:52:45: artica_addressbook_backend.php [get_record] get_record ORG popo for "ORG-popo" 
+2009-09-19 22:52:45: class.ldap.inc [roundcube_ldap] Connect to  127.0.0.1 success Resource id #63
+2009-09-19 22:52:45: artica_addressbook_backend.php [get_record] success found user to popo
+2009-09-19 22:52:46: artica_addressbook_backend.php [get_record] get_record ORG florent for "ORG-florent" 
+2009-09-19 22:52:46: class.ldap.inc [roundcube_ldap] Connect to  127.0.0.1 success Resource id #63
+2009-09-19 22:52:46: artica_addressbook_backend.php [get_record] success found user to florent
+2009-09-20 00:38:34: artica_addressbook_backend.php [search] Search ORG-florent
+2009-09-20 00:38:34: class.ldap.inc [roundcube_ldap] Connect to  127.0.0.1 success Resource id #61
+2009-09-20 00:38:34: class.ldap.inc [SearchAddressBook] Searching david.touzeau "ORG-florent"
+2009-09-20 00:38:34: class.ldap.inc [SearchAddressBook] Success with 0 entries
+2009-09-20 00:39:06: artica_addressbook_backend.php [search] Search d
+2009-09-20 00:39:06: class.ldap.inc [roundcube_ldap] Connect to  127.0.0.1 success Resource id #68
+2009-09-20 00:39:06: class.ldap.inc [SearchAddressBook] Searching david.touzeau "d"
+2009-09-20 00:39:06: class.ldap.inc [SearchAddressBook] Success with 4 entries
+2009-09-20 00:39:06: artica_addressbook_backend.php [search] Search =4 results
+2009-09-20 00:39:06: artica_addressbook_backend.php [search] Search dav
+2009-09-20 00:39:06: class.ldap.inc [roundcube_ldap] Connect to  127.0.0.1 success Resource id #68
+2009-09-20 00:39:06: class.ldap.inc [SearchAddressBook] Searching david.touzeau "dav"
+2009-09-20 00:39:06: class.ldap.inc [SearchAddressBook] Success with 1 entries
+2009-09-20 00:39:06: artica_addressbook_backend.php [search] Search =1 results
+2009-09-20 00:39:07: artica_addressbook_backend.php [search] Search davud
+2009-09-20 00:39:07: class.ldap.inc [roundcube_ldap] Connect to  127.0.0.1 success Resource id #68
+2009-09-20 00:39:07: class.ldap.inc [SearchAddressBook] Searching david.touzeau "davud"
+2009-09-20 00:39:07: class.ldap.inc [SearchAddressBook] Success with 0 entries
+2009-09-20 00:39:08: artica_addressbook_backend.php [search] Search davu
+2009-09-20 00:39:08: class.ldap.inc [roundcube_ldap] Connect to  127.0.0.1 success Resource id #68
+2009-09-20 00:39:08: class.ldap.inc [SearchAddressBook] Searching david.touzeau "davu"
+2009-09-20 00:39:08: class.ldap.inc [SearchAddressBook] Success with 0 entries
+2009-09-20 00:39:08: artica_addressbook_backend.php [search] Search dav
+2009-09-20 00:39:08: class.ldap.inc [roundcube_ldap] Connect to  127.0.0.1 success Resource id #68
+2009-09-20 00:39:08: class.ldap.inc [SearchAddressBook] Searching david.touzeau "dav"
+2009-09-20 00:39:08: class.ldap.inc [SearchAddressBook] Success with 1 entries
+2009-09-20 00:39:08: artica_addressbook_backend.php [search] Search =1 results
+2009-09-20 00:39:10: artica_addressbook_backend.php [search] Search da
+2009-09-20 00:39:10: class.ldap.inc [roundcube_ldap] Connect to  127.0.0.1 success Resource id #68
+2009-09-20 00:39:10: class.ldap.inc [SearchAddressBook] Searching david.touzeau "da"
+2009-09-20 00:39:10: class.ldap.inc [SearchAddressBook] Success with 1 entries
+2009-09-20 00:39:10: artica_addressbook_backend.php [search] Search =1 results
+2009-09-20 00:39:11: artica_addressbook_backend.php [search] Search d
+2009-09-20 00:39:11: class.ldap.inc [roundcube_ldap] Connect to  127.0.0.1 success Resource id #68
+2009-09-20 00:39:11: class.ldap.inc [SearchAddressBook] Searching david.touzeau "d"
+2009-09-20 00:39:11: class.ldap.inc [SearchAddressBook] Success with 4 entries
+2009-09-20 00:39:11: artica_addressbook_backend.php [search] Search =4 results
+2009-09-20 00:39:13: artica_addressbook_backend.php [search] Search a
+2009-09-20 00:39:13: class.ldap.inc [roundcube_ldap] Connect to  127.0.0.1 success Resource id #68
+2009-09-20 00:39:13: class.ldap.inc [SearchAddressBook] Searching david.touzeau "a"
+2009-09-20 00:39:13: class.ldap.inc [SearchAddressBook] Success with 14 entries
+2009-09-20 00:39:13: artica_addressbook_backend.php [search] Search =14 results
+2009-09-20 00:39:15: artica_addressbook_backend.php [search] Search adm
+2009-09-20 00:39:15: class.ldap.inc [roundcube_ldap] Connect to  127.0.0.1 success Resource id #68
+2009-09-20 00:39:15: class.ldap.inc [SearchAddressBook] Searching david.touzeau "adm"
+2009-09-20 00:39:15: class.ldap.inc [SearchAddressBook] Success with 1 entries
+2009-09-20 00:39:15: artica_addressbook_backend.php [search] Search =1 results
+2009-09-20 00:42:58: artica_addressbook_backend.php [list_records] request to list_records...
+2009-09-20 00:42:58: class.ldap.inc [roundcube_ldap] Connect to  127.0.0.1 success Resource id #62
+2009-09-20 00:42:58: class.ldap.inc [SearchAddressBook] Searching david.touzeau ""
+2009-09-20 00:42:58: class.ldap.inc [SearchAddressBook] Success with 14 entries
+2009-09-20 00:42:58: artica_addressbook_backend.php [list_records] Search =14 results
+2009-09-20 00:43:00: artica_addressbook_backend.php [get_record] get_record NAB 1248353736-1281 for "NAB-1248353736-1281" 
+2009-09-20 00:43:00: class.ldap.inc [roundcube_ldap] Connect to  127.0.0.1 success Resource id #63
+2009-09-20 00:43:00: class.ldap.inc [GetNABUserinfos] Unable to find : 1248353736-1281
+2009-09-20 00:43:51: artica_addressbook_backend.php [get_record] get_record NAB 1248353515-8617 for "NAB-1248353515-8617" 
+2009-09-20 00:43:51: class.ldap.inc [roundcube_ldap] Connect to  127.0.0.1 success Resource id #63
+2009-09-20 00:43:51: class.ldap.inc [GetNABUserinfos] Unable to find : 1248353515-8617 in ou=david.touzeau,ou=People,dc=,dc=NAB,dc=my-domain,dc=com branch
+2009-09-20 00:44:19: artica_addressbook_backend.php [get_record] get_record NAB 1248353736-1281 for "NAB-1248353736-1281" 
+2009-09-20 00:44:19: class.ldap.inc [roundcube_ldap] Connect to  127.0.0.1 success Resource id #63
+2009-09-20 00:44:19: artica_addressbook_backend.php [get_record] success found user to 1248353736-1281
+2009-09-20 00:44:39: artica_addressbook_backend.php [get_record] get_record ORG admins for "ORG-admins" 
+2009-09-20 00:44:39: class.ldap.inc [roundcube_ldap] Connect to  127.0.0.1 success Resource id #63
+2009-09-20 00:44:39: artica_addressbook_backend.php [get_record] success found user to admins
+2009-09-20 00:44:57: artica_addressbook_backend.php [search] Search toto@titi.com
+2009-09-20 00:44:57: class.ldap.inc [roundcube_ldap] Connect to  127.0.0.1 success Resource id #63
+2009-09-20 00:44:57: class.ldap.inc [SearchAddressBook] Searching david.touzeau "toto@titi.com"
+2009-09-20 00:44:57: class.ldap.inc [SearchAddressBook] Success with 0 entries
+2009-09-20 00:51:46: artica_addressbook_backend.php [search] Search toto@titi.com
+2009-09-20 00:51:46: class.ldap.inc [roundcube_ldap] Connect to  127.0.0.1 success Resource id #63
+2009-09-20 00:51:46: class.ldap.inc [SearchAddressBook] Searching david.touzeau "toto@titi.com"
+2009-09-20 00:51:46: class.ldap.inc [SearchAddressBook] Success with 0 entries
+2009-09-20 01:15:41: artica_addressbook_backend.php [search] Search new@new.com
+2009-09-20 01:15:41: class.ldap.inc [roundcube_ldap] Connect to  127.0.0.1 success Resource id #63
+2009-09-20 01:15:41: class.ldap.inc [SearchAddressBook] Searching david.touzeau "new@new.com"
+2009-09-20 01:15:41: class.ldap.inc [SearchAddressBook] Success with 0 entries
+2009-09-20 01:15:41: class.ldap.inc [roundcube_ldap] Connect to  127.0.0.1 success Resource id #70
+2009-09-20 01:15:41: class.ldap.inc [LastUidNumber] Search the last uid number
+2009-09-20 01:15:41: class.ldap.inc [LastUidNumber] biguid=
+2009-09-20 01:16:49: artica_addressbook_backend.php [list_records] request to list_records...
+2009-09-20 01:16:49: class.ldap.inc [roundcube_ldap] Connect to  127.0.0.1 success Resource id #62
+2009-09-20 01:16:49: class.ldap.inc [SearchAddressBook] Searching david.touzeau ""
+2009-09-20 01:16:49: class.ldap.inc [SearchAddressBook] Success with 14 entries
+2009-09-20 01:16:49: artica_addressbook_backend.php [list_records] Search =14 results
+2009-09-20 01:17:05: artica_addressbook_backend.php [search] Search new@new.com
+2009-09-20 01:17:05: class.ldap.inc [roundcube_ldap] Connect to  127.0.0.1 success Resource id #63
+2009-09-20 01:17:05: class.ldap.inc [SearchAddressBook] Searching david.touzeau "new@new.com"
+2009-09-20 01:17:05: class.ldap.inc [SearchAddressBook] Success with 0 entries
+2009-09-20 01:17:05: class.ldap.inc [roundcube_ldap] Connect to  127.0.0.1 success Resource id #70
+2009-09-20 01:17:05: class.ldap.inc [LastUidNumber] Search the last uid number
+2009-09-20 01:17:05: class.ldap.inc [LastUidNumber] biguid=
+2009-09-20 01:18:38: artica_addressbook_backend.php [search] Search new@new.com
+2009-09-20 01:18:38: class.ldap.inc [roundcube_ldap] Connect to  127.0.0.1 success Resource id #63
+2009-09-20 01:18:38: class.ldap.inc [SearchAddressBook] Searching david.touzeau "new@new.com"
+2009-09-20 01:18:38: class.ldap.inc [SearchAddressBook] Success with 0 entries
+2009-09-20 01:18:38: class.ldap.inc [roundcube_ldap] Connect to  127.0.0.1 success Resource id #70
+2009-09-20 01:18:38: class.ldap.inc [LastUidNumber] Search the last uid number
+2009-09-20 01:18:38: class.ldap.inc [LastUidNumber] biguid=65535
+2009-09-20 01:20:00: artica_addressbook_backend.php [list_records] request to list_records...
+2009-09-20 01:20:00: class.ldap.inc [roundcube_ldap] Connect to  127.0.0.1 success Resource id #62
+2009-09-20 01:20:00: class.ldap.inc [SearchAddressBook] Searching david.touzeau ""
+2009-09-20 01:20:00: class.ldap.inc [SearchAddressBook] Success with 14 entries
+2009-09-20 01:20:00: artica_addressbook_backend.php [list_records] Search =14 results
+2009-09-20 01:21:21: artica_addressbook_backend.php [search] Search new@new.com
+2009-09-20 01:21:21: class.ldap.inc [roundcube_ldap] Connect to  127.0.0.1 success Resource id #63
+2009-09-20 01:21:21: class.ldap.inc [SearchAddressBook] Searching david.touzeau "new@new.com"
+2009-09-20 01:21:21: class.ldap.inc [SearchAddressBook] Success with 0 entries
+2009-09-20 01:21:21: class.ldap.inc [roundcube_ldap] Connect to  127.0.0.1 success Resource id #70
+2009-09-20 01:21:21: class.ldap.inc [LastUidNumber] Search the last uid number
+2009-09-20 01:21:21: class.ldap.inc [LastUidNumber] biguid=65535
+2009-09-20 01:21:21: class.ldap.inc [add_contact] success adding new contact 1253402481-8596
+2009-09-20 01:21:21: artica_addressbook_backend.php [search] Search 1253402481-8596
+2009-09-20 01:21:21: class.ldap.inc [roundcube_ldap] Connect to  127.0.0.1 success Resource id #78
+2009-09-20 01:21:21: class.ldap.inc [SearchAddressBook] Searching david.touzeau "1253402481-8596"
+2009-09-20 01:21:21: class.ldap.inc [SearchAddressBook] Success with 1 entries
+2009-09-20 01:21:21: artica_addressbook_backend.php [search] Search =1 results
+2009-09-20 01:21:21: artica_addressbook_backend.php [get_record] failed to preg_match  1253402481-8596
+2009-09-20 01:21:25: artica_addressbook_backend.php [get_record] get_record NAB 1253402481-8596 for "NAB-1253402481-8596" 
+2009-09-20 01:21:25: class.ldap.inc [roundcube_ldap] Connect to  127.0.0.1 success Resource id #63
+2009-09-20 01:21:25: artica_addressbook_backend.php [get_record] success found user to 1253402481-8596
+2009-09-20 01:23:27: artica_addressbook_backend.php [get_record] get_record NAB 1248353515-8617 for "NAB-1248353515-8617" 
+2009-09-20 01:23:27: class.ldap.inc [roundcube_ldap] Connect to  127.0.0.1 success Resource id #63
+2009-09-20 01:23:27: artica_addressbook_backend.php [get_record] success found user to 1248353515-8617
+2009-09-20 01:27:02: artica_addressbook_backend.php [get_record] get_record NAB 1253402481-8596 for "NAB-1253402481-8596" 
+2009-09-20 01:27:02: class.ldap.inc [roundcube_ldap] Connect to  127.0.0.1 success Resource id #63
+2009-09-20 01:27:02: artica_addressbook_backend.php [get_record] success found user to 1253402481-8596
+2009-09-20 01:27:09: artica_addressbook_backend.php [get_record] get_record NAB 1248353515-8617 for "NAB-1248353515-8617" 
+2009-09-20 01:27:09: class.ldap.inc [roundcube_ldap] Connect to  127.0.0.1 success Resource id #63
+2009-09-20 01:27:09: artica_addressbook_backend.php [get_record] success found user to 1248353515-8617
+2009-09-20 01:27:13: artica_addressbook_backend.php [list_records] request to list_records...
+2009-09-20 01:27:13: class.ldap.inc [roundcube_ldap] Connect to  127.0.0.1 success Resource id #62
+2009-09-20 01:27:13: class.ldap.inc [SearchAddressBook] Searching david.touzeau ""
+2009-09-20 01:27:13: class.ldap.inc [SearchAddressBook] Success with 15 entries
+2009-09-20 01:27:13: artica_addressbook_backend.php [list_records] Search =15 results
+2009-09-20 01:27:14: artica_addressbook_backend.php [get_record] get_record NAB 1253402481-8596 for "NAB-1253402481-8596" 
+2009-09-20 01:27:14: class.ldap.inc [roundcube_ldap] Connect to  127.0.0.1 success Resource id #63
+2009-09-20 01:27:14: artica_addressbook_backend.php [get_record] success found user to 1253402481-8596
+2009-09-20 01:27:22: artica_addressbook_backend.php [get_record] get_record ORG admins for "ORG-admins" 
+2009-09-20 01:27:22: class.ldap.inc [roundcube_ldap] Connect to  127.0.0.1 success Resource id #63
+2009-09-20 01:27:22: artica_addressbook_backend.php [get_record] success found user to admins
+2009-09-20 01:27:53: artica_addressbook_backend.php [get_record] get_record ORG marie for "ORG-marie" 
+2009-09-20 01:27:53: class.ldap.inc [roundcube_ldap] Connect to  127.0.0.1 success Resource id #63
+2009-09-20 01:27:53: artica_addressbook_backend.php [get_record] success found user to marie
+2009-09-20 01:28:23: artica_addressbook_backend.php [get_record] get_record ORG sebastien for "ORG-sebastien" 
+2009-09-20 01:28:23: class.ldap.inc [roundcube_ldap] Connect to  127.0.0.1 success Resource id #63
+2009-09-20 01:28:23: artica_addressbook_backend.php [get_record] success found user to sebastien
+2009-09-20 01:29:23: artica_addressbook_backend.php [get_record] get_record ORG maki for "ORG-maki" 
+2009-09-20 01:29:23: class.ldap.inc [roundcube_ldap] Connect to  127.0.0.1 success Resource id #63
+2009-09-20 01:29:54: artica_addressbook_backend.php [list_records] request to list_records...
+2009-09-20 01:29:54: class.ldap.inc [SearchAddressBook] Searching david.touzeau ""
+2009-09-20 01:29:54: class.ldap.inc [SearchAddressBook] Success with 15 entries
+2009-09-20 01:29:54: artica_addressbook_backend.php [list_records] Search =15 results
+2009-09-20 01:29:56: artica_addressbook_backend.php [get_record] get_record NAB 1253402481-8596 for "NAB-1253402481-8596" 
+2009-09-20 01:29:59: artica_addressbook_backend.php [get_record] get_record NAB 1248353515-8617 for "NAB-1248353515-8617" 
+2009-09-20 01:31:19: artica_addressbook_backend.php [list_records] request to list_records...
+2009-09-20 01:31:19: class.ldap.inc [SearchAddressBook] Searching david.touzeau ""
+2009-09-20 01:31:19: class.ldap.inc [SearchAddressBook] Success with 15 entries
+2009-09-20 01:31:19: artica_addressbook_backend.php [list_records] Search =15 results
+2009-09-20 01:31:20: artica_addressbook_backend.php [get_record] get_record ORG popo for "ORG-popo" 
+2009-09-20 01:31:22: artica_addressbook_backend.php [get_record] get_record ORG florent for "ORG-florent" 
+2009-09-20 01:31:25: artica_addressbook_backend.php [get_record] get_record NAB 1253402481-8596 for "NAB-1253402481-8596" 
+2009-09-20 01:31:27: artica_addressbook_backend.php [get_record] get_record ORG maki for "ORG-maki" 
+2009-09-20 01:31:37: artica_addressbook_backend.php [get_record] get_record ORG david for "ORG-david" 
+2009-09-20 01:31:37: class.ldap.inc [GetLocalUserinfos] INFOS: bad value $entry_id for david
+2009-09-20 01:31:38: artica_addressbook_backend.php [get_record] get_record ORG bibi for "ORG-bibi" 
+2009-09-20 01:31:39: artica_addressbook_backend.php [get_record] get_record ORG florent for "ORG-florent" 
+2009-09-20 01:31:41: artica_addressbook_backend.php [get_record] get_record ORG david for "ORG-david" 
+2009-09-20 01:31:41: class.ldap.inc [GetLocalUserinfos] INFOS: bad value $entry_id for david
+2009-09-20 01:31:43: artica_addressbook_backend.php [get_record] get_record ORG bibi for "ORG-bibi" 
+2009-09-20 01:31:44: artica_addressbook_backend.php [get_record] get_record ORG florent for "ORG-florent" 
+2009-09-20 01:31:46: artica_addressbook_backend.php [get_record] get_record NAB 1248353736-1281 for "NAB-1248353736-1281" 
+2009-09-20 01:31:48: artica_addressbook_backend.php [get_record] get_record NAB 1248353515-8617 for "NAB-1248353515-8617" 
+2009-09-20 01:35:26: artica_addressbook_backend.php [search] Search new2@new.com
+2009-09-20 01:35:26: class.ldap.inc [SearchAddressBook] Searching david.touzeau "new2@new.com"
+2009-09-20 01:35:26: class.ldap.inc [SearchAddressBook] Success with 0 entries
+2009-09-20 01:35:26: class.ldap.inc [LastUidNumber] Search the last uid number
+2009-09-20 01:35:26: class.ldap.inc [LastUidNumber] biguid=65536
+2009-09-20 01:35:26: class.ldap.inc [add_contact] success adding new contact 1253403326-4957
+2009-09-20 01:35:26: artica_addressbook_backend.php [search] Search 1253403326-4957
+2009-09-20 01:35:26: class.ldap.inc [SearchAddressBook] Searching david.touzeau "1253403326-4957"
+2009-09-20 01:35:26: class.ldap.inc [SearchAddressBook] Success with 1 entries
+2009-09-20 01:35:26: artica_addressbook_backend.php [search] Search =1 results
+2009-09-20 01:35:26: artica_addressbook_backend.php [get_record] failed to preg_match  1253403326-4957
+2009-09-20 01:35:32: artica_addressbook_backend.php [get_record] get_record NAB 1253402481-8596 for "NAB-1253402481-8596" 
+2009-09-20 01:35:35: artica_addressbook_backend.php [get_record] get_record NAB 1253403326-4957 for "NAB-1253403326-4957" 
+2009-09-20 01:36:50: artica_addressbook_backend.php [get_record] get_record ORG florent for "ORG-florent" 
+2009-09-20 01:36:53: artica_addressbook_backend.php [get_record] get_record ORG michel for "ORG-michel" 
+2009-09-20 01:40:05: artica_addressbook_backend.php [get_record] get_record ORG maki for "ORG-maki" 
+2009-09-20 01:41:00: artica_addressbook_backend.php [get_record] get_record ORG sebastien for "ORG-sebastien" 
+2009-09-20 01:41:04: artica_addressbook_backend.php [get_record] get_record ORG marie for "ORG-marie" 
+2009-09-20 01:44:05: artica_addressbook_backend.php [get_record] get_record ORG jean-marie for "ORG-jean-marie" 
+2009-09-20 01:44:07: artica_addressbook_backend.php [get_record] get_record ORG david for "ORG-david" 
+2009-09-20 01:44:07: class.ldap.inc [GetLocalUserinfos] INFOS: bad value $entry_id for david
+2009-09-20 01:44:38: artica_addressbook_backend.php [get_record] get_record NAB 1253403326-4957 for "NAB-1253403326-4957" 
+2009-09-20 01:44:43: artica_addressbook_backend.php [get_record] get_record NAB 1248353515-8617 for "NAB-1248353515-8617" 
+2009-09-20 01:47:20: artica_addressbook_backend.php [list_records] request to list_records...
+2009-09-20 01:47:20: class.ldap.inc [SearchAddressBook] Searching david.touzeau ""
+2009-09-20 01:47:20: class.ldap.inc [SearchAddressBook] Success with 16 entries
+2009-09-20 01:47:20: artica_addressbook_backend.php [list_records] Search =16 results
+2009-09-20 01:47:23: artica_addressbook_backend.php [get_record] get_record NAB 1253403326-4957 for "NAB-1253403326-4957" 
+2009-09-20 01:47:28: artica_addressbook_backend.php [get_record] get_record NAB 1253402481-8596 for "NAB-1253402481-8596" 
+2009-09-20 01:47:28: artica_addressbook_backend.php [get_record] get_record NAB 1253403326-4957 for "NAB-1253403326-4957" 
+2009-09-20 01:48:32: artica_addressbook_backend.php [list_records] request to list_records...
+2009-09-20 01:48:32: class.ldap.inc [SearchAddressBook] Searching david.touzeau ""
+2009-09-20 01:48:32: class.ldap.inc [SearchAddressBook] Success with 16 entries
+2009-09-20 01:48:32: artica_addressbook_backend.php [list_records] Search =16 results
+2009-09-20 01:48:35: artica_addressbook_backend.php [get_record] get_record ORG maki for "ORG-maki" 
+2009-09-20 02:44:47: artica_addressbook_backend.php [get_record] get_record ORG admins for "ORG-admins" 
+2009-09-20 02:44:56: artica_addressbook_backend.php [get_record] get_record NAB 1248353736-1281 for "NAB-1248353736-1281" 
+2009-09-20 02:45:01: artica_addressbook_backend.php [get_record] get_record NAB 1248353515-8617 for "NAB-1248353515-8617" 
+2009-09-20 02:45:47: artica_addressbook_backend.php [get_record] get_record ORG admins for "ORG-admins" 
+2009-09-20 03:00:38: artica_addressbook_backend.php [list_records] request to list_records...
+2009-09-20 03:00:38: class.ldap.inc [SearchAddressBook] Searching david.touzeau ""
+2009-09-20 03:00:38: class.ldap.inc [GetOuForUser] david.touzeau -> cn=Touzeau David,ou=users,ou=touzeau,dc=organizations,dc=my-domain,dc=com
+2009-09-20 03:00:38: class.ldap.inc [GetOuForUser] david.touzeau is in organization touzeau
+2009-09-20 03:00:38: class.ldap.inc [SearchAddressBook] Success with 16 entries
+2009-09-20 03:00:38: artica_addressbook_backend.php [list_records] Search =16 results
+2009-09-20 03:00:41: artica_addressbook_backend.php [get_record] get_record ORG jean-marie for "ORG-jean-marie" 
+2009-09-20 03:00:46: artica_addressbook_backend.php [get_record] get_record ORG pierre for "ORG-pierre" 
+2009-09-20 03:00:55: artica_addressbook_backend.php [get_record] get_record ORG admins for "ORG-admins" 
+2009-09-20 03:01:20: artica_addressbook_backend.php [get_record] get_record ORG jean-marie for "ORG-jean-marie" 
+2009-09-20 03:01:22: artica_addressbook_backend.php [get_record] get_record ORG florent for "ORG-florent" 
+2009-09-20 03:01:26: artica_addressbook_backend.php [get_record] get_record NAB 1248353515-8617 for "NAB-1248353515-8617" 
+2009-09-20 03:01:28: artica_addressbook_backend.php [get_record] get_record NAB 1253402481-8596 for "NAB-1253402481-8596" 
+2009-09-20 03:01:29: artica_addressbook_backend.php [get_record] get_record NAB 1253403326-4957 for "NAB-1253403326-4957" 
+2009-09-20 03:01:30: artica_addressbook_backend.php [get_record] get_record ORG david for "ORG-david" 
+2009-09-20 03:01:30: class.ldap.inc [GetLocalUserinfos] INFOS: bad value $entry_id for david
+2009-09-20 03:01:32: artica_addressbook_backend.php [get_record] get_record ORG bibi for "ORG-bibi" 
+2009-09-20 03:01:34: artica_addressbook_backend.php [get_record] get_record ORG florent for "ORG-florent" 
+2009-09-20 03:01:37: artica_addressbook_backend.php [get_record] get_record ORG michel for "ORG-michel" 
+2009-09-20 03:01:44: artica_addressbook_backend.php [get_record] get_record NAB 1248353515-8617 for "NAB-1248353515-8617" 
+2009-09-20 03:01:45: artica_addressbook_backend.php [get_record] get_record NAB 1248353736-1281 for "NAB-1248353736-1281" 
+2009-09-20 03:01:47: artica_addressbook_backend.php [get_record] get_record NAB 1248353515-8617 for "NAB-1248353515-8617" 
+2009-09-20 03:01:49: artica_addressbook_backend.php [get_record] get_record NAB 1253402481-8596 for "NAB-1253402481-8596" 
+2009-09-20 03:01:52: artica_addressbook_backend.php [get_record] get_record NAB 1253403326-4957 for "NAB-1253403326-4957" 
