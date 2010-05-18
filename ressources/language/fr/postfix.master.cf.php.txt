@@ -1,0 +1,117 @@
+<AddOptionService_text>Donnez l'option pour ajouter ce service, n'oublier pas d'utiliser &quot;-o&quot; si n&eacute;cessaire</AddOptionService_text>
+<add_postfix_service>Ajouter un nouveau service postfix</add_postfix_service>
+<CHROOT>Chroot</CHROOT>
+<CHROOT_TEXT>(par d&eacute;faut oui) Si vraiment le service doit &ecirc;tre chroot&eacute; dans le r&eacute;pertoire de file d'attente du courrier (le chemin d'acc&egrave;s est contr&ocirc;l&eacute; par la variable de configuration queue_directory du fichier main.cf)</CHROOT_TEXT>
+<COMMAND>Commande</COMMAND>
+<ENABLE_SMTPS>Activer SMTP SSL (smtps)</ENABLE_SMTPS>
+<generated_config>Fichier de configuration</generated_config>
+<MAXPROC>Limite de processus</MAXPROC>
+<MAXPROC_TEXT>Le nombre maximal de processus qui peuvent ex&eacute;cuter ce service simultan&eacute;ment.[br]Indiquez 0 pour aucune limite du nombre de processus.[br] [i]NOTE : quelques services Postfix doivent &ecirc;tre configur&eacute;s comme service &agrave; processus-unique (par exemple, qmgr) et quelques services doivent &ecirc;tre configur&eacute;s sans limite du nombre de processus (par exemple, cleanup).[br]Ces limites ne doivent pas &ecirc;tre chang&eacute;es.</MAXPROC_TEXT>
+<OPTIONS>options</OPTIONS>
+<PRIVATE>Priv&eacute;</PRIVATE>
+<PRIVATE_TEXT>Acc&egrave;s limit&eacute; ou pas au syst&egrave;me de messagerie.[br]
+Les services Internet (entrez inet) ne peuvent pas &ecirc;tre privatifs</PRIVATE_TEXT>
+<rebuild_configuration>Revenir &agrave; la configuration par d&eacute;faut</rebuild_configuration>
+<services_table>Table des services</services_table>
+<service_anvil>Nombre de session et contr&ocirc;le du taux de requ&ecirc;te</service_anvil>
+<service_anvil_text>Le serveur Postfix tient &agrave; jour des statistiques &agrave; propos du nombre de connexions ou des taux de requ&ecirc;te.[br]
+Cette information peut &ecirc;tre employ&eacute;e pour se d&eacute;fendre contre les clients qui harc&egrave;lent un serveur avec un nombre important de sessions simultan&eacute;es, ou avec trop de requ&ecirc;tes successives dans une p&eacute;riode configurable.[br]
+Ce serveur est destin&eacute; &agrave; fonctionner sous le contr&ocirc;le du serveur principal de Postfix.</service_anvil_text>
+<service_bounce>Rapports sur l'&eacute;tat d'avancement des livraisons</service_bounce>
+<service_bounce_text>Le d&eacute;mon bounce tient &agrave; jour des journaux par message avec informations sur l&eacute;tat de la livraison.[br]
+Chaque journal est appel&eacute; apr&egrave;s la file d'attente dont il d&eacute;pend, et est maintenu dans un sous-r&eacute;pertoire de la file d'attente figurant apr&egrave;s le nom du service dans le fichier master.cf (bounce, defer ou trace).[br]
+Ce programme s'attend &agrave; &ecirc;tre lanc&eacute; gestionnaire de processus principal</service_bounce_text>
+<service_cleanup>Normalisez et mettez le message dans la file d'attente de Postix</service_cleanup>
+<service_cleanup_text>Le d&eacute;mon cleanup traite le courrier &agrave; l'arriv&eacute;e, l'ins&egrave;re dans la file d'attente du courrier entrant, et informe le gestionnaire des files d'attente de son arriv&eacute;e</service_cleanup_text>
+<service_defer>Rapports sur l'&eacute;tat d'avancement de la livraison (defer)</service_defer>
+<service_defer_text> </service_defer_text>
+<service_discard>Annulez l'agent de distribution du courrier</service_discard>
+<service_discard_text>L'agent de non-livraison de Postfix traite les demandes de livraison du gestionnaire de files d'attente.[br]
+Chaque demande d&eacute;pend d'une file d'attente, d'une adresse d'exp&eacute;diteur, d'un domaine ou d'un nom d'h&ocirc;te qui sont trait&eacute;s comme autant de raisons de rejeter l'e-mail, ainsi que le nom du destinataire.[br]
+Le motif du rejet peut &ecirc;tre pr&eacute;fix&eacute; avec le code RFC 3463.[br]
+Ce programme s'attend &agrave; &ecirc;tre lanc&eacute; par le gestionnaire de processus principal.[br]
+L'agent de non-livraison feint la livraison de tous les destinataires dans la demande de la livraison,
+note le domaine &laquo; next-hop &raquo; ou les informations sur l'h&ocirc;te de comme raison de rejeter le courrier, met &agrave; jour la file d'attente et marque les destinataires comme termin&eacute;s ou informe le gestionnaire de file d'attente que la livraison devrait &ecirc;tre retent&eacute;e ult&eacute;rieurement.[br]Des rapports sur l'&eacute;tat de la livraison sont envoy&eacute;s au d&eacute;mon trace comme appropri&eacute;s.</service_discard_text>
+<service_error>Essai/erreur de l'agent de distribution du courrier</service_error>
+<service_error_text>l'agent de non-livraison de Postfix traite les demandes de livraison du gestionnaire de files d'attente. Chaque demande d&eacute;pends d'une file d'attente, d'une adresse d'exp&eacute;diteur, du motif de non-livraison (sp&eacute;cifi&eacute;e par le destination next-hop), et l'information sur le destinataire.[br]
+La raison peut &ecirc;tre pr&eacute;fix&eacute;e avec un code RFC 3463; si aucun n'est sp&eacute;cifi&eacute;, une valeur par d&eacute;faut de 4.0.0 ou de 5.0.0 est employ&eacute; &agrave; la place.[br]
+Ce programme s'attend &agrave; &ecirc;tre lanc&eacute; par le gestionnaire de processus principal.</service_error_text>
+<service_flush>Vidange rapide du serveur</service_flush>
+<service_flush_text>flush tient &agrave; jour un enregistrement des courriers report&eacute;s par destination.[br]
+Cette information est utilis&eacute;e pour l'am&eacute;lioration des performances des requ&ecirc;tes SMTP ETRN, ou de leur &eacute;quivalent en ligne de commande, &quot;sendmail -qR&quot; ou &quot;postqueue -f&quot;.[br]
+Ce programme s'attend &agrave; &ecirc;tre lanc&eacute; par le gestionnaire de processus principal.</service_flush_text>
+<service_lmtp>Client LMTP</service_lmtp>
+<service_lmtp_text>Le client LMTP de Postfix impl&eacute;mente les protocoles de livraison LMTP.[br]
+Il traite les requ&ecirc;tes de livraison du gestionnaire de file d'attente.[br]
+Chaque requ&ecirc;te d&eacute;pend d'une file d'attente, d'une adresse d'exp&eacute;diteur, d'un nom de domaine ou d'h&ocirc;te pour la livraison, ainsi que de l'information sur le destinataire.[br]
+Ce programme s'attend &agrave; &ecirc;tre lanc&eacute; par le gestionnaire de processus principal.</service_lmtp_text>
+<service_local>Distribution du courrier local</service_local>
+<service_local_text>Le d&eacute;mon local traite les requ&ecirc;tes de livraison du gestionnaire de files d'attente de Postfix et livre le courrier aux destinataires locaux.[br]
+Chaque requ&ecirc;te de livraison d&eacute;pend d'une file d'attente, d'une adresse d'exp&eacute;diteur, d'un nom de domaine ou d'h&ocirc;te pour la livraison et d'un ou plusieurs destinataires.[br]
+Ce programme s'attend &agrave; &ecirc;tre lanc&eacute; par le gestionnaire des locaux.[br]
+Le d&eacute;mon local mets &agrave; jour les files d'attente et marque les destinataires comme termin&eacute;s, ou il informe le gestionnaire de files d'attente que la livraison devrait &ecirc;tre tent&eacute;e &agrave; un moment ult&eacute;rieur.[br]
+Les rapports sur l'&eacute;tat d'avancement de la livraison sont envoy&eacute;s aux d&eacute;mons bounce, defer ou trace si appropri&eacute;s.</service_local_text>
+<service_maildrop>maildrop</service_maildrop>
+<service_maildrop_maildrop_text>service maildrop</service_maildrop_maildrop_text>
+<service_new>Nouveau service</service_new>
+<service_pickup>Collecte du courrier local</service_pickup>
+<service_pickup_text>Le d&eacute;mon pickup attend de voir si les nouveaux courriers on &eacute;t&eacute; d&eacute;pos&eacute; dans le r&eacute;pertoire de maildrop, et l'introduit dans le d&eacute;mon cleanup. Les fichiers . Ill seront effac&eacute;s sans notifier l'organitor.[br]
+Ce programme s'attend &agrave; &ecirc;tre lanc&eacute; par le gestionnaire des processus locaux.</service_pickup_text>
+<service_proxymap>Serveur proxy de table de consultation</service_proxymap>
+<service_proxymap_text>The proxymap server provides read-only table lookup service to Postfix processes.[br]
+The purpose of the service is:[br]
+[ul][li]To  overcome  chroot restrictions.[br]
+For example, a chrooted SMTP server needs access to the system passwd file in order to reject mail for non-existent local addresses,
+but it is not practical to maintain a copy of the passwd file in the chroot jail.[/li]
+[li]To consolidate the number of open lookup tables by sharing one open table among multiple processes.[br]
+For example, making mysql connections from every Postfix daemon process results in "too many connections" errors.[/li]
+[/ul]The total number of connections is limited by the number of proxymap server processes.</service_proxymap_text>
+<service_qmgr>G&eacute;rer files d'attentes</service_qmgr>
+<service_qmgr_text> The  qmgr daemon awaits the arrival of incoming mail and arranges for its delivery via Postfix delivery processes.[br]
+The actual mail routing strategy is delegated to the trivial-rewrite daemon.[br]
+This program expects to be run from the master process manager</service_qmgr_text>
+<service_relay>relais</service_relay>
+<service_relay_text>relais</service_relay_text>
+<service_retry>R&eacute;essayer</service_retry>
+<service_retry_text>Service de r&eacute;essai</service_retry_text>
+<service_rewrite>R&eacute;&eacute;crire</service_rewrite>
+<service_rewrite_text>utilis&eacute; pour la r&eacute;ecriture des messages</service_rewrite_text>
+<service_scache>Cache des connexions partag&eacute;es</service_scache>
+<service_scache_text>The scache server maintains a shared multi-connection cache.[br]
+This information can be used by, for example, Postfix SMTP clients or other Postfix delivery agents.[br]
+The connection cache is organized into logical destination names, physical endpoint names, and connections.[br]
+As a specific example, logical SMTP destinations specify (transport, domain, port), and physical SMTP endpoints specify (transport, IP address, port).[br]
+An SMTP connection may be saved after a successful mail transaction.[br]
+In the general case, one logical destination may refer to zero or more physical endpoints, one physical endpoint may be referenced by zero or more logical destinations,
+and one endpoint may refer to zero or more connections.</service_scache_text>
+<service_showq>Lister la queue de mail Postfix</service_showq>
+<service_showq_text>The showq daemon reports the Postfix mail queue status.[br]
+It is the program that emulates the sendmail "mailq" command.[br]
+The showq daemon can also be run in stand-alone mode by the superuser.[br]
+This mode of operation is used to emulate the "mailq" command while the Postfix mail system is down</service_showq_text>
+<service_smtp>Client SMTP</service_smtp>
+<service_smtp_text>The  Postfix  SMTP  client  implements the SMTP mail delivery protocols.[br]
+It processes message delivery requests from the queue manager.[br]
+Each request specifies a queue file, a sender address, a domain or host to deliver to, and recipient information.[br]
+This program expects to be run from the master process manager</service_smtp_text>
+<service_tlsmgr>Gestionnaire de cache des sessions TLS</service_tlsmgr>
+<service_tlsmgr_text>he tlsmgr manages the Postfix TLS session caches.[br]
+It stores and retrieves cache entries on request by smtpd and smtp processes, and periodically removes entries that have expired</service_tlsmgr_text>
+<service_trace>Rapport sur l'&eacute;tat d'avancement de la livraison (trace)</service_trace>
+<service_trace_text> </service_trace_text>
+<SERVICE_TYPE>service</SERVICE_TYPE>
+<service_verify>Serveur de v&eacute;rification d'adresse</service_verify>
+<service_verify_text>The verify address verification server maintains a record of what recipient addresses are known to be deliverable or undeliverable.</service_verify_text>
+<service_virtual>Agent de livraison du courrier des domaines virtuels</service_virtual>
+<service_virtual_text> The  virtual delivery agent is designed for virtual mail hosting services.[br]
+Originally based on the Postfix local delivery agent, this agent looks up recipients with map lookups of their full recipient address, instead
+of using hard-coded unix password file lookups of the address local part only.[br]
+This delivery agent only delivers mail.[br]
+Other features such as mail forwarding, out-of-office notifications, etc., must be configured via virtual_alias maps or via similar lookup mechanisms.</service_virtual_text>
+<SMTPS_TEXT>Cette section vous autorise &agrave; activer le SMTP SSL (utilisant le port 465).[br]Si vous activez cette fonctionnalit&eacute;, le ficher de configuration principal de postfix sera enrichi du service SMTPs</SMTPS_TEXT>
+<UNIPRIV>Sans privil&egrave;ges</UNIPRIV>
+<UNIPRIV_TEXT>(default yes) Whether the service runs with root privileges or as the  owner of
+the Postfix system (the owner name is controlled by the mail_owner configuration variablein the main.cf file).</UNIPRIV_TEXT>
+<WAKEUP>Heure de r&eacute;veil</WAKEUP>
+<WAKEUP_TEXT>Par d&eacute;faut: 0, r&eacute;veille le service nomm&eacute; apr&egrave;s le nombre de secondes sp&eacute;cifi&eacute;. Le r&eacute;veil est impl&eacute;ment&eacute; en se connectant au service et en lan&ccedil;ant une commande de r&eacute;veil.
+[br]Sp&eacute;cifiez 0 pour ne pas activer la fonction de r&eacute;veil automatique.[br]Les services pickup, qmgr et flush n&eacute;cessite un temps de r&eacute;veil.</WAKEUP_TEXT>

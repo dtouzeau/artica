@@ -1,0 +1,2 @@
+2010-05-18 18:52:29: [clladp/Hash_get_restrictions_classes()]:: [13603] [DAEMON]::clladp/Hash_get_restrictions_classes:: search (&(objectclass=PostFixRestrictionClasses)(cn=*)) in cn=restrictions_classes,cn=artica,dc=my-domain,dc=com in ressources/class.ldap.inc
+2010-05-18 18:52:29: [clladp/Hash_get_restrictions_classes()]:: [13603] [DAEMON]::clladp/Hash_get_restrictions_classes:: search (&(objectclass=PostFixRestrictionClasses)(cn=*)) in cn=restrictions_classes,cn=artica,dc=my-domain,dc=com in ressources/class.ldap.inc

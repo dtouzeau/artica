@@ -1,0 +1,2 @@
+2010-05-18 18:53:52: [user/LoadUserDatas()]:: [16275] [DAEMON]::user/LoadUserDatas:: CryptedHome="",Vacation Enable="FALSE"; vacationActive="FALSE" in ressources/class.user.inc line 573
+2010-05-18 18:53:53: [user/LoadUserDatas()]:: [16328] [DAEMON]::user/LoadUserDatas:: CryptedHome="",Vacation Enable="FALSE"; vacationActive="FALSE" in ressources/class.user.inc line 573

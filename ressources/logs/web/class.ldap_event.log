@@ -1,0 +1,86 @@
+2010-05-18 18:51:50: [clladp/ldap_event()]:: [11937] [DAEMON]::clladp/ldap_event:: ldap_add ERROR  (Success) on DN "cn=artica,dc=my-domain,dc=com" entries:  in ressources/class.ldap.inc
+2010-05-18 18:51:50: [clladp/ldap_event()]:: [11937] [DAEMON]::clladp/ldap_event:: ERROR ldap_add : cn(0)='artica' in ressources/class.ldap.inc
+2010-05-18 18:51:50: [clladp/ldap_event()]:: [11937] [DAEMON]::clladp/ldap_event:: ERROR ldap_add : objectClass(0)='organizationalRole' in ressources/class.ldap.inc
+2010-05-18 18:51:50: [clladp/ldap_event()]:: [11937] [DAEMON]::clladp/ldap_event:: ERROR ldap_add : objectClass(1)='ArticaSettings' in ressources/class.ldap.inc
+2010-05-18 18:51:50: [clladp/ldap_event()]:: [11937] [DAEMON]::clladp/ldap_event:: ERROR ldap_add : objectClass(2)='top' in ressources/class.ldap.inc
+2010-05-18 18:51:50: [clladp/ldap_event()]:: [11937] [DAEMON]::clladp/ldap_event:: ldap_add ERROR  (Success) on DN "cn=mynetworks_maps,cn=artica,dc=my-domain,dc=com" entries:  in ressources/class.ldap.inc
+2010-05-18 18:51:50: [clladp/ldap_event()]:: [11937] [DAEMON]::clladp/ldap_event:: ERROR ldap_add : cn(0)='mynetworks_maps' in ressources/class.ldap.inc
+2010-05-18 18:51:50: [clladp/ldap_event()]:: [11937] [DAEMON]::clladp/ldap_event:: ERROR ldap_add : ObjectClass(0)='top' in ressources/class.ldap.inc
+2010-05-18 18:51:50: [clladp/ldap_event()]:: [11937] [DAEMON]::clladp/ldap_event:: ERROR ldap_add : ObjectClass(1)='PostfixMynetworks' in ressources/class.ldap.inc
+2010-05-18 18:52:20: [clladp/ldap_event()]:: [12969] [DAEMON]::clladp/ldap_event:: ldap_add ERROR  (Success) on DN "cn=artica,dc=my-domain,dc=com" entries:  in ressources/class.ldap.inc
+2010-05-18 18:52:20: [clladp/ldap_event()]:: [12969] [DAEMON]::clladp/ldap_event:: ERROR ldap_add : cn(0)='artica' in ressources/class.ldap.inc
+2010-05-18 18:52:20: [clladp/ldap_event()]:: [12969] [DAEMON]::clladp/ldap_event:: ERROR ldap_add : objectClass(0)='organizationalRole' in ressources/class.ldap.inc
+2010-05-18 18:52:20: [clladp/ldap_event()]:: [12969] [DAEMON]::clladp/ldap_event:: ERROR ldap_add : objectClass(1)='ArticaSettings' in ressources/class.ldap.inc
+2010-05-18 18:52:20: [clladp/ldap_event()]:: [12969] [DAEMON]::clladp/ldap_event:: ERROR ldap_add : objectClass(2)='top' in ressources/class.ldap.inc
+2010-05-18 18:52:20: [clladp/ldap_event()]:: [12969] [DAEMON]::clladp/ldap_event:: ldap_add ERROR  (Success) on DN "cn=mynetworks_maps,cn=artica,dc=my-domain,dc=com" entries:  in ressources/class.ldap.inc
+2010-05-18 18:52:20: [clladp/ldap_event()]:: [12969] [DAEMON]::clladp/ldap_event:: ERROR ldap_add : cn(0)='mynetworks_maps' in ressources/class.ldap.inc
+2010-05-18 18:52:20: [clladp/ldap_event()]:: [12969] [DAEMON]::clladp/ldap_event:: ERROR ldap_add : ObjectClass(0)='top' in ressources/class.ldap.inc
+2010-05-18 18:52:20: [clladp/ldap_event()]:: [12969] [DAEMON]::clladp/ldap_event:: ERROR ldap_add : ObjectClass(1)='PostfixMynetworks' in ressources/class.ldap.inc
+2010-05-18 18:52:29: [clladp/ldap_event()]:: [13603] [DAEMON]::clladp/ldap_event:: ldap_add ERROR  (Success) on DN "cn=artica,dc=my-domain,dc=com" entries:  in ressources/class.ldap.inc
+2010-05-18 18:52:29: [clladp/ldap_event()]:: [13603] [DAEMON]::clladp/ldap_event:: ERROR ldap_add : cn(0)='artica' in ressources/class.ldap.inc
+2010-05-18 18:52:29: [clladp/ldap_event()]:: [13603] [DAEMON]::clladp/ldap_event:: ERROR ldap_add : objectClass(0)='organizationalRole' in ressources/class.ldap.inc
+2010-05-18 18:52:29: [clladp/ldap_event()]:: [13603] [DAEMON]::clladp/ldap_event:: ERROR ldap_add : objectClass(1)='ArticaSettings' in ressources/class.ldap.inc
+2010-05-18 18:52:29: [clladp/ldap_event()]:: [13603] [DAEMON]::clladp/ldap_event:: ERROR ldap_add : objectClass(2)='top' in ressources/class.ldap.inc
+2010-05-18 18:52:29: [clladp/ldap_event()]:: [13603] [DAEMON]::clladp/ldap_event:: ldap_add ERROR  (Success) on DN "cn=mynetworks_maps,cn=artica,dc=my-domain,dc=com" entries:  in ressources/class.ldap.inc
+2010-05-18 18:52:29: [clladp/ldap_event()]:: [13603] [DAEMON]::clladp/ldap_event:: ERROR ldap_add : cn(0)='mynetworks_maps' in ressources/class.ldap.inc
+2010-05-18 18:52:29: [clladp/ldap_event()]:: [13603] [DAEMON]::clladp/ldap_event:: ERROR ldap_add : ObjectClass(0)='top' in ressources/class.ldap.inc
+2010-05-18 18:52:29: [clladp/ldap_event()]:: [13603] [DAEMON]::clladp/ldap_event:: ERROR ldap_add : ObjectClass(1)='PostfixMynetworks' in ressources/class.ldap.inc
+2010-05-18 18:52:29: [clladp/ldap_event()]:: [13603] [DAEMON]::clladp/ldap_event:: ldap_add ERROR  (Success) on DN "cn=PostfixRobots,cn=artica,dc=my-domain,dc=com" entries:  in ressources/class.ldap.inc
+2010-05-18 18:52:29: [clladp/ldap_event()]:: [13603] [DAEMON]::clladp/ldap_event:: ERROR ldap_add : cn(0)='PostfixRobots' in ressources/class.ldap.inc
+2010-05-18 18:52:29: [clladp/ldap_event()]:: [13603] [DAEMON]::clladp/ldap_event:: ERROR ldap_add : objectClass(0)='PostFixStructuralClass' in ressources/class.ldap.inc
+2010-05-18 18:52:29: [clladp/ldap_event()]:: [13603] [DAEMON]::clladp/ldap_event:: ERROR ldap_add : objectClass(1)='top' in ressources/class.ldap.inc
+2010-05-18 18:52:29: [clladp/ldap_event()]:: [13603] [DAEMON]::clladp/ldap_event:: ldap_add ERROR  (Success) on DN "cn=catch-all,cn=artica,dc=my-domain,dc=com" entries:  in ressources/class.ldap.inc
+2010-05-18 18:52:29: [clladp/ldap_event()]:: [13603] [DAEMON]::clladp/ldap_event:: ERROR ldap_add : cn(0)='catch-all' in ressources/class.ldap.inc
+2010-05-18 18:52:29: [clladp/ldap_event()]:: [13603] [DAEMON]::clladp/ldap_event:: ERROR ldap_add : objectClass(0)='PostFixStructuralClass' in ressources/class.ldap.inc
+2010-05-18 18:52:29: [clladp/ldap_event()]:: [13603] [DAEMON]::clladp/ldap_event:: ERROR ldap_add : objectClass(1)='top' in ressources/class.ldap.inc
+2010-05-18 18:52:29: [clladp/ldap_event()]:: [13603] [DAEMON]::clladp/ldap_event:: ldap_add ERROR  (Success) on DN "cn=relay_clientcerts_maps,cn=artica,dc=my-domain,dc=com" entries:  in ressources/class.ldap.inc
+2010-05-18 18:52:29: [clladp/ldap_event()]:: [13603] [DAEMON]::clladp/ldap_event:: ERROR ldap_add : objectClass(0)='top' in ressources/class.ldap.inc
+2010-05-18 18:52:29: [clladp/ldap_event()]:: [13603] [DAEMON]::clladp/ldap_event:: ERROR ldap_add : objectClass(1)='PostFixStructuralClass' in ressources/class.ldap.inc
+2010-05-18 18:52:29: [clladp/ldap_event()]:: [13603] [DAEMON]::clladp/ldap_event:: ERROR ldap_add : cn(0)='relay_clientcerts_maps' in ressources/class.ldap.inc
+2010-05-18 18:52:30: [clladp/ldap_event()]:: [13603] [DAEMON]::clladp/ldap_event:: ldap_add ERROR  (Success) on DN "cn=smtp_sasl_password_maps,cn=artica,dc=my-domain,dc=com" entries:  in ressources/class.ldap.inc
+2010-05-18 18:52:30: [clladp/ldap_event()]:: [13603] [DAEMON]::clladp/ldap_event:: ERROR ldap_add : objectClass(0)='PostFixStructuralClass' in ressources/class.ldap.inc
+2010-05-18 18:52:30: [clladp/ldap_event()]:: [13603] [DAEMON]::clladp/ldap_event:: ERROR ldap_add : objectClass(1)='top' in ressources/class.ldap.inc
+2010-05-18 18:52:30: [clladp/ldap_event()]:: [13603] [DAEMON]::clladp/ldap_event:: ERROR ldap_add : cn(0)='smtp_sasl_password_maps' in ressources/class.ldap.inc
+2010-05-18 18:52:30: [clladp/ldap_event()]:: [13603] [DAEMON]::clladp/ldap_event:: ldap_add ERROR  (Success) on DN "cn=mailman,cn=artica,dc=my-domain,dc=com" entries:  in ressources/class.ldap.inc
+2010-05-18 18:52:30: [clladp/ldap_event()]:: [13603] [DAEMON]::clladp/ldap_event:: ERROR ldap_add : objectClass(0)='PostFixStructuralClass' in ressources/class.ldap.inc
+2010-05-18 18:52:30: [clladp/ldap_event()]:: [13603] [DAEMON]::clladp/ldap_event:: ERROR ldap_add : objectClass(1)='top' in ressources/class.ldap.inc
+2010-05-18 18:52:30: [clladp/ldap_event()]:: [13603] [DAEMON]::clladp/ldap_event:: ERROR ldap_add : cn(0)='mailman' in ressources/class.ldap.inc
+2010-05-18 18:52:30: [clladp/ldap_event()]:: [13603] [DAEMON]::clladp/ldap_event:: ldap_add ERROR  (Success) on DN "cn=restrictions_classes,cn=artica,dc=my-domain,dc=com" entries:  in ressources/class.ldap.inc
+2010-05-18 18:52:30: [clladp/ldap_event()]:: [13603] [DAEMON]::clladp/ldap_event:: ERROR ldap_add : objectClass(0)='top' in ressources/class.ldap.inc
+2010-05-18 18:52:30: [clladp/ldap_event()]:: [13603] [DAEMON]::clladp/ldap_event:: ERROR ldap_add : objectClass(1)='PostFixStructuralClass' in ressources/class.ldap.inc
+2010-05-18 18:52:30: [clladp/ldap_event()]:: [13603] [DAEMON]::clladp/ldap_event:: ldap_add ERROR  (Success) on DN "cn=smtpd_client_restrictions,cn=restrictions_classes,cn=artica,dc=my-domain,dc=com" entries:  in ressources/class.ldap.inc
+2010-05-18 18:52:30: [clladp/ldap_event()]:: [13603] [DAEMON]::clladp/ldap_event:: ERROR ldap_add : objectClass(0)='top' in ressources/class.ldap.inc
+2010-05-18 18:52:30: [clladp/ldap_event()]:: [13603] [DAEMON]::clladp/ldap_event:: ERROR ldap_add : objectClass(1)='PostFixRestrictionStandardClasses' in ressources/class.ldap.inc
+2010-05-18 18:52:30: [clladp/ldap_event()]:: [13603] [DAEMON]::clladp/ldap_event:: ERROR ldap_add : PostFixRestrictionClassDescription(0)='bann ip addresses' in ressources/class.ldap.inc
+2010-05-18 18:52:30: [clladp/ldap_event()]:: [13603] [DAEMON]::clladp/ldap_event:: ERROR ldap_add : PostFixRestrictionClassList(0)='check_client_access="ldap"' in ressources/class.ldap.inc
+2010-05-18 18:52:30: [clladp/ldap_event()]:: [13603] [DAEMON]::clladp/ldap_event:: ldap_add ERROR  (Success) on DN "cn=check_client_access,cn=smtpd_client_restrictions,cn=restrictions_classes,cn=artica,dc=my-domain,dc=com" entries:  in ressources/class.ldap.inc
+2010-05-18 18:52:30: [clladp/ldap_event()]:: [13603] [DAEMON]::clladp/ldap_event:: ERROR ldap_add : objectClass(0)='top' in ressources/class.ldap.inc
+2010-05-18 18:52:30: [clladp/ldap_event()]:: [13603] [DAEMON]::clladp/ldap_event:: ERROR ldap_add : objectClass(1)='PostFixStructuralClass' in ressources/class.ldap.inc
+2010-05-18 18:52:30: [clladp/ldap_event()]:: [13603] [DAEMON]::clladp/ldap_event:: ldap_add ERROR  (Success) on DN "cn=Sender_Dependent_Relay_host_Maps,cn=artica,dc=my-domain,dc=com" entries:  in ressources/class.ldap.inc
+2010-05-18 18:52:30: [clladp/ldap_event()]:: [13603] [DAEMON]::clladp/ldap_event:: ERROR ldap_add : objectClass(0)='top' in ressources/class.ldap.inc
+2010-05-18 18:52:30: [clladp/ldap_event()]:: [13603] [DAEMON]::clladp/ldap_event:: ERROR ldap_add : objectClass(1)='PostFixStructuralClass' in ressources/class.ldap.inc
+2010-05-18 18:52:30: [clladp/ldap_event()]:: [13603] [DAEMON]::clladp/ldap_event:: ldap_add ERROR  (Success) on DN "cn=PostfixFilesStorage,cn=artica,dc=my-domain,dc=com" entries:  in ressources/class.ldap.inc
+2010-05-18 18:52:30: [clladp/ldap_event()]:: [13603] [DAEMON]::clladp/ldap_event:: ERROR ldap_add : objectClass(0)='top' in ressources/class.ldap.inc
+2010-05-18 18:52:30: [clladp/ldap_event()]:: [13603] [DAEMON]::clladp/ldap_event:: ERROR ldap_add : objectClass(1)='PostfixStoreFiles' in ressources/class.ldap.inc
+2010-05-18 18:52:30: [clladp/ldap_event()]:: [13603] [DAEMON]::clladp/ldap_event:: ERROR ldap_add : cn(0)='PostfixFilesStorage' in ressources/class.ldap.inc
+2010-05-18 18:52:30: [clladp/ldap_event()]:: [13603] [DAEMON]::clladp/ldap_event:: ERROR ldap_add : PostfixMasterCfFile(0)='#' in ressources/class.ldap.inc
+2010-05-18 18:52:30: [clladp/ldap_event()]:: [13603] [DAEMON]::clladp/ldap_event:: ldap_add ERROR  (Success) on DN "cn=smtp_sasl_password_maps,cn=artica,dc=my-domain,dc=com" entries:  in ressources/class.ldap.inc
+2010-05-18 18:52:30: [clladp/ldap_event()]:: [13603] [DAEMON]::clladp/ldap_event:: ERROR ldap_add : cn(0)='smtp_sasl_password_maps' in ressources/class.ldap.inc
+2010-05-18 18:52:30: [clladp/ldap_event()]:: [13603] [DAEMON]::clladp/ldap_event:: ERROR ldap_add : objectClass(0)='PostFixStructuralClass' in ressources/class.ldap.inc
+2010-05-18 18:52:30: [clladp/ldap_event()]:: [13603] [DAEMON]::clladp/ldap_event:: ERROR ldap_add : objectClass(1)='top' in ressources/class.ldap.inc
+2010-05-18 18:52:30: [clladp/ldap_event()]:: [13603] [DAEMON]::clladp/ldap_event:: ldap_add ERROR  (Success) on DN "cn=PostfixRobots,cn=artica,dc=my-domain,dc=com" entries:  in ressources/class.ldap.inc
+2010-05-18 18:52:30: [clladp/ldap_event()]:: [13603] [DAEMON]::clladp/ldap_event:: ERROR ldap_add : cn(0)='PostfixRobots' in ressources/class.ldap.inc
+2010-05-18 18:52:30: [clladp/ldap_event()]:: [13603] [DAEMON]::clladp/ldap_event:: ERROR ldap_add : objectClass(0)='PostFixStructuralClass' in ressources/class.ldap.inc
+2010-05-18 18:52:30: [clladp/ldap_event()]:: [13603] [DAEMON]::clladp/ldap_event:: ERROR ldap_add : objectClass(1)='top' in ressources/class.ldap.inc
+2010-05-18 18:52:30: [clladp/ldap_event()]:: [13603] [DAEMON]::clladp/ldap_event:: ldap_add ERROR  (Success) on DN "cn=catch-all,cn=artica,dc=my-domain,dc=com" entries:  in ressources/class.ldap.inc
+2010-05-18 18:52:30: [clladp/ldap_event()]:: [13603] [DAEMON]::clladp/ldap_event:: ERROR ldap_add : cn(0)='catch-all' in ressources/class.ldap.inc
+2010-05-18 18:52:30: [clladp/ldap_event()]:: [13603] [DAEMON]::clladp/ldap_event:: ERROR ldap_add : objectClass(0)='PostFixStructuralClass' in ressources/class.ldap.inc
+2010-05-18 18:52:30: [clladp/ldap_event()]:: [13603] [DAEMON]::clladp/ldap_event:: ERROR ldap_add : objectClass(1)='top' in ressources/class.ldap.inc
+2010-05-18 18:52:30: [clladp/ldap_event()]:: [13603] [DAEMON]::clladp/ldap_event:: ldap_add ERROR  (Success) on DN "cn=maincf_perso,cn=artica,dc=my-domain,dc=com" entries:  in ressources/class.ldap.inc
+2010-05-18 18:52:30: [clladp/ldap_event()]:: [13603] [DAEMON]::clladp/ldap_event:: ERROR ldap_add : objectClass(0)='top' in ressources/class.ldap.inc
+2010-05-18 18:52:30: [clladp/ldap_event()]:: [13603] [DAEMON]::clladp/ldap_event:: ERROR ldap_add : objectClass(1)='PostFixStructuralClass' in ressources/class.ldap.inc
+2010-05-18 18:52:30: [clladp/ldap_event()]:: [13603] [DAEMON]::clladp/ldap_event:: ERROR ldap_add : cn(0)='maincf_perso' in ressources/class.ldap.inc
+2010-05-18 18:52:30: [clladp/ldap_event()]:: [13603] [DAEMON]::clladp/ldap_event:: ldap_add ERROR  (Success) on DN "cn=master.cf,cn=artica,dc=my-domain,dc=com" entries:  in ressources/class.ldap.inc
+2010-05-18 18:52:30: [clladp/ldap_event()]:: [13603] [DAEMON]::clladp/ldap_event:: ERROR ldap_add : objectClass(0)='top' in ressources/class.ldap.inc
+2010-05-18 18:52:30: [clladp/ldap_event()]:: [13603] [DAEMON]::clladp/ldap_event:: ERROR ldap_add : objectClass(1)='PostFixStructuralClass' in ressources/class.ldap.inc
+2010-05-18 18:52:30: [clladp/ldap_event()]:: [13603] [DAEMON]::clladp/ldap_event:: ldap_add ERROR  (Success) on DN "cn=PostfixFilesStorage,cn=artica,dc=my-domain,dc=com" entries:  in ressources/class.ldap.inc

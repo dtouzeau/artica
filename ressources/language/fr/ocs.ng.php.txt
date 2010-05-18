@@ -1,0 +1,2 @@
+<ocs_web_params>Web server/interface</ocs_web_params>
+<ocs_web_params_text>Indiquez les param&egrave;tres du serveur Web et de l'interface principale d'OCS inventory.</ocs_web_params_text>

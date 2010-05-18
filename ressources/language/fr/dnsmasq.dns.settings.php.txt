@@ -1,0 +1,28 @@
+<bogus-priv>Faux priv&eacute;</bogus-priv>
+<bogus-priv_text>Adresses non rout&eacute;s dans les espaces d'adresse non-achemin&eacute;s</bogus-priv_text>
+<cache-size>Taille du cache local</cache-size>
+<code>Le zinc va &agrave; 192.168.1.30</code>
+<dnmasq_interface_text>If you want dnsmasq to listen for requests only on specified interfaces (and the loopback) give the name of the interface (eg eth0) here.</dnmasq_interface_text>
+<dnsmasq_address>L'adresse pour forcer &agrave; un IP</dnsmasq_address>
+<dnsmasq_domain_text>&lt;expand-hosts&gt;H&ocirc;te &eacute;tendu</dnsmasq_domain_text>
+<dnsmasq_intro_settings>Dnsmasq caches internet addresses (A records and AAAA records) and address-to-name mappings (PTR records), reducing the load on upstream servers and improving performance (especially on modem connections)...</dnsmasq_intro_settings>
+<dnsmasq_listen_address>Ou adresses d'&eacute;coute</dnsmasq_listen_address>
+<dnsmasq_listen_address_text>Ou qui, &agrave; l'&eacute;coute sur une adresse (ne pas oublier d'inclure 127.0.0.1 si vous l'utilisez).</dnsmasq_listen_address_text>
+<domain-needed>Domaine n&eacute;c&eacute;ssaire</domain-needed>
+<domain-needed_text>Never forward plain names (without a dot or domain part)</domain-needed_text>
+<domain_or_server>Domaine ou nom d'ordinateur</domain_or_server>
+<filterwin2k>filter useless windows-originated DNS</filterwin2k>
+<ip>Adresse IP</ip>
+<li>D&eacute;finit l'opition DHCP &quot;domaine&quot;  ainsi potentiellement la cr&eacute;ation du domaine de tous les syst&egrave;mes configur&eacute;s par DHCP</li>
+<log-queries>Requ&ecirc;tes de log</log-queries>
+<log-queries_text>For debugging purposes, log each DNS query as it passes through dnsmasq.</log-queries_text>
+<no-negcache>Pas de cache n&eacute;gatif</no-negcache>
+<no-negcache_text>Si vous voulez d&eacute;sactivez le cache n&eacute;gatif, activez ceci</no-negcache_text>
+<no-poll>no pool</no-poll>
+<no-poll_text>If you don't want dnsmasq to poll resolv.conf or other resolv files for changes and re-read them then disable this.</no-poll_text>
+<no-resolv>non resolu</no-resolv>
+<no-resolv_text>If you don't want dnsmasq to read resolv.conf or any other file, getting its servers from this settings instead (see below), then uncomment this.</no-resolv_text>
+<resolv-file>r&eacute;soudre le chemin de l'emplacement du fichier</resolv-file>
+<resolv-file_text>Modifier ceci  si vous voulez obtenir en amont des serveurs dns &agrave; partir d'un autre que le fichier
+ /etc/resolv.conf</resolv-file_text>
+<strict-order>l'ordre strict</strict-order>

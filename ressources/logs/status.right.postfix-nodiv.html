@@ -1,0 +1,54 @@
+
+	<div style='background-image:url(img/status_postfix_bg_ok27.png);background-repeat:no-repeat;width:350px;height:270px'>
+	<div style='padding-left:155px'>
+	<span style='font-size:16px;font-weight:bold;color:#005447'>{APP_POSTFIX}</span>
+	<br><span style='font-size:11px;font-weight:bold'><i style='color:black'>{service_running}<br>{using_version} 2.7.0 {pid} 13917</i>
+		
+			<table>
+			<tr>
+				<td colspan=2 style='border-bottom:1px solid #005447'><span style='font-size:13px;color:#005447;'><strong>{smtp_queues}:</strong></span></td>
+			</tr>
+			<tr><td colspan=2>&nbsp;</td></tr>
+				<tr>
+					<td align='right' OnMouseOver="this.style.background='#D1D1D1';this.style.cursor='pointer';" OnMouseOut="this.style.background='transparent';this.style.cursor='default';" OnClick="javascript:Loadjs('postfix.queue.monitoring.php?show-queue=incoming&count=0');"  style='font-size:12px'>{incoming_queue}:</a>&nbsp;</td>
+					<td OnMouseOver="this.style.background='#D1D1D1';this.style.cursor='pointer';" OnMouseOut="this.style.background='transparent';this.style.cursor='default';" OnClick="javascript:Loadjs('postfix.queue.monitoring.php?show-queue=incoming&count=0');" ><strong style='font-size:12px'>0 </strong>emails</td>
+				</tr>
+				<tr>
+					<td align='right' OnMouseOver="this.style.background='#D1D1D1';this.style.cursor='pointer';" OnMouseOut="this.style.background='transparent';this.style.cursor='default';" OnClick="javascript:Loadjs('postfix.queue.monitoring.php?show-queue=active&count=20');"  style='font-size:12px'>{active_queue}:</a>&nbsp;</td>
+					<td OnMouseOver="this.style.background='#D1D1D1';this.style.cursor='pointer';" OnMouseOut="this.style.background='transparent';this.style.cursor='default';" OnClick="javascript:Loadjs('postfix.queue.monitoring.php?show-queue=active&count=20');" ><strong style='font-size:12px'>20 </strong>emails</td>
+				</tr>
+				<tr>
+					<td align='right' OnMouseOver="this.style.background='#D1D1D1';this.style.cursor='pointer';" OnMouseOut="this.style.background='transparent';this.style.cursor='default';" OnClick="javascript:Loadjs('postfix.queue.monitoring.php?show-queue=deferred&count=0');"  style='font-size:12px'>{deferred_queue}:</a>&nbsp;</td>
+					<td OnMouseOver="this.style.background='#D1D1D1';this.style.cursor='pointer';" OnMouseOut="this.style.background='transparent';this.style.cursor='default';" OnClick="javascript:Loadjs('postfix.queue.monitoring.php?show-queue=deferred&count=0');" ><strong style='font-size:12px'>0 </strong>emails</td>
+				</tr>
+				<tr OnMouseOver="this.style.background='#D1D1D1';this.style.cursor='pointer';" OnMouseOut="this.style.background='transparent';this.style.cursor='default';" OnClick="javascript:Loadjs('postfix.corrupt.queue.php')" >
+					<td align='right' style='font-size:12px'>{corrupt_queue}:</a>&nbsp;</td>
+					<td><strong style='font-size:12px'>0 </strong>emails</td>
+				</tr>				
+	
+				<tr OnMouseOver="this.style.background='#D1D1D1';this.style.cursor='pointer';" OnMouseOut="this.style.background='transparent';this.style.cursor='default';" OnClick="javascript:Loadjs('postfix.queue.monitoring.php?js')" >
+					<td align='right' style='color:#C53110;border-top:1px dotted #CCCCCC;font-size:12px'>Total:&nbsp;</td>
+					<td style='color:#C53110;border-top:1px dotted #CCCCCC;font-size:12px'>
+					<strong style='font-size:12px'>20&nbsp;</strong>emails</td>
+				</tr>
+				
+			</table>
+	</div>
+	<table style='width:100%'>
+		<tr>
+			<td valign='top'>
+				<table style='width:100%;border-top:1px solid #CCCCCC;margin-top:5px'>
+					<tr>
+						<td style='border-right:2px solid #005447;padding:4px' align='center'><div  OnClick="Loadjs('amavis.index.php?ajax=yes');"  onMouseOver="javascript:this.style.cursor='pointer';AffBulle('{APP_AMAVIS_EXPLAIN}');this.style.textDecoration='underline';this.style.backgroundColor='none'"  OnMouseOut="javascript:this.style.cursor='default';HideBulle();this.style.textDecoration='none'">{APP_AMAVISD_NEW}</a></a></div></td>
+						<td style='border-right:2px solid #005447;padding:4px' align='center'></td>
+						<td style='border-right:2px solid #005447;padding:4px' align='center'><div  OnClick="Loadjs('postfix.process.number.php');"  onMouseOver="javascript:this.style.cursor='pointer';AffBulle('{POSTFIX_PROCESS_NUMBER}');this.style.textDecoration='underline';this.style.backgroundColor='none'"  OnMouseOut="javascript:this.style.cursor='default';HideBulle();this.style.textDecoration='none'">{POSTFIX_PROCESS_NUMBER}</a></a></div></td>
+					</tr>
+				</table>
+			</td>
+			<td valign='top'>
+				
+			</td>
+		</tr>
+	</table>
+	</div>
+	

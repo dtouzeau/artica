@@ -1,0 +1,3 @@
+2010-05-18 18:51:50: [clladp/ArticaCreate()]:: [11937] [DAEMON]::clladp/ArticaCreate:: Creating cn=artica,dc=my-domain,dc=com branch in ressources/class.ldap.inc
+2010-05-18 18:52:20: [clladp/ArticaCreate()]:: [12969] [DAEMON]::clladp/ArticaCreate:: Creating cn=artica,dc=my-domain,dc=com branch in ressources/class.ldap.inc
+2010-05-18 18:52:29: [clladp/ArticaCreate()]:: [13603] [DAEMON]::clladp/ArticaCreate:: Creating cn=artica,dc=my-domain,dc=com branch in ressources/class.ldap.inc

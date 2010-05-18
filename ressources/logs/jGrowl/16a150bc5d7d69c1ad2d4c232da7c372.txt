@@ -1,0 +1,52 @@
+#
+
+[LOG]
+processname=class.templates.inc
+date=2010-05-18 19:50:05
+context=KASPERSKY_UPDATES
+subject=[2010-05-18 19:50:05]: [ARTICA]: (dtouzeau-desktop) : Kaspersky Retranslator: 5 files updated (298.29 KB)
+
+
+<text>Kaspersky Retranslator 5.0.0.7/DEBUG build #11
+Copyright (C) Kaspersky Lab, 1997-2008.
+Portions Copyright (C) Lan Crypto
+Configuration file: /etc/kretranslator/retranslator.conf
+=== Task started event
+Update source is selected 'ftp://downloads2.kaspersky-labs.com/'
+Downloading file  'index/u0607g.xml.dif'
+Generate list of files to download
+Downloading file  'bases/blst/blst-0607g.xml.dif'
+Downloading file  'index/masterv2.xml.dif'
+Downloading file  'bases/rt/rt-0607g.xml.dif'
+Downloading file  'bases/upd/upd-0607g.xml.dif'
+Downloading file  'index/rt60.xml.dif'
+Downloading file  'index/master.xml.dif'
+Downloading file  'bases/five/avc/kavset.xml.dif'
+Downloading file  'diffs/bases/five/avc/kavset.xml.idh'
+Downloading file  'bases/five/avc/kavset.xml.klz'
+Downloading file  'diffs/index/6/u0607g.xml.zyu'
+Downloading file  'index/6/u0607g.xml'
+Downloading file  'diffs/bases/five/avc/fa001.avc.5do'
+Downloading file  'diffs/bases/five/avc/base139c.avc.2gv'
+Downloading file  'bases/five/avc/base139c.avc'
+Downloading file  'diffs/bases/five/avc/dailyc.avc.2rf'
+Downloading file  'diffs/bases/five/avc/daily-ec.avc.ktq'
+Downloading file  'diffs/bases/five/avc/daily.avc.pdx'
+Downloading file  'diffs/bases/five/avc/avp.klb.kl3'
+Downloading file  'bases/five/avc/avp.klb'
+=== Started installation files for retranslation
+File updated '/var/db/kav/databases/index/u0607g.xml'
+File updated '/var/db/kav/databases/index/masterv2.xml'
+File updated '/var/db/kav/databases/bases/five/avc/kavset.xml'
+File updated '/var/db/kav/databases/bases/five/avc/fa001.avc'
+File updated '/var/db/kav/databases/bases/five/avc/base139c.avc'
+File updated '/var/db/kav/databases/bases/five/avc/dailyc.avc'
+File updated '/var/db/kav/databases/bases/five/avc/daily-ec.avc'
+File updated '/var/db/kav/databases/bases/five/avc/daily.avc'
+File updated '/var/db/kav/databases/bases/five/avc/avp.klb'
+File updated '/var/db/kav/databases/bases/blst/blst-0607g.xml'
+File updated '/var/db/kav/databases/index/master.xml'
+File updated '/var/db/kav/databases/index/6/u0607g.xml'
+File updated '/var/db/kav/databases/index/rt60.xml'
+Retranslation completed successfully
+</text>

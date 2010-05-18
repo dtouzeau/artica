@@ -1,0 +1,43 @@
+<add_attachment_group_text>Donnez le nom de votre groupe d'attachement</add_attachment_group_text>
+<add_attachment_text>Ajoutez votre liste d'extension interdites s&eacute;par&eacute; par une virgule</add_attachment_text>
+<add_attach_group>Ajoutez un groupe d'attachement</add_attach_group>
+<add_a_new_block_ext>Ajoutez une nouvelle extension &agrave; interdire</add_a_new_block_ext>
+<add_default_dangerous_extensions>Ajoutez une liste d'extensions dangereuses pr&eacute;d&eacute;finies</add_default_dangerous_extensions>
+<add_subject>Ajouter un texte au sujet (si n&eacute;cessaire)</add_subject>
+<add_subject_text>Ajouter un texte si une pi&egrave;ce jointe est filtr&eacute;e.[br]
+Ceci est la priorit&eacute; la plus basse et est utilis&eacute; uniquement si l'option pr&eacute;c&eacute;dente &quot;Ajouter du texte au sujet (xxx)&quot; n'est pas d&eacute;finie.</add_subject_text>
+<attachments_explain>Cette section vous permet d'ajouter les groupes de pi&egrave;ces jointes refus&eacute;es.[br]
+Ces groupes seront ajout&eacute;s &agrave; un groupe d'utilisateurs ou un compte sp&eacute;cifique.[br]
+Les messages &eacute;lectronique qui contiendront des pi&egrave;ces jointes refus&eacute;es peuvent &ecirc;tre effac&eacute;s ou mis en quarantaine.</attachments_explain>
+<delete_default_dangerous_extensions>Effacer la liste pr&eacute;definie des extensions dangereuses</delete_default_dangerous_extensions>
+<filters_list>Listes de Filtres</filters_list>
+<groupslisttext>Voici la liste de tout les groupes d'utilisateurs qui utilisent cette politique de pi&egrave;ce jointes</groupslisttext>
+<notifications>Param&egrave;tres de notifications</notifications>
+<search_zip>Recherchez des noms de fichiers avec ZIP</search_zip>
+<search_zip_text>Search for filenames within ZIP archives using the internal ZIP parsing[br]Any filenames found are subject to the same checks, for instance Forbidden attachments or good list, with the
+notable difference that the rename action has no effect on ZIP files.[br]
+This is due to a shortcoming in this version of the filter; by the time the ZIP file is decoded, it is “too late” to rename the attachment. 
+[br]Only the delete or kill actions will modify ZIP files.[br]
+In order for search zip to have an effect, you must either:
+use Forbidden attachments mode  and specify in the Forbidden attachments the kill or delete  actions for select extensions.
+</search_zip_text>
+<subj_deleted>Ajouter du texte au sujet (supprim&eacute;s)</subj_deleted>
+<subj_deleted_text>Add text to Subject if an attachment is deleted for any reason.
+Undefined by default, so renattach falls through to the next valid subject directive, and eventually to add subject</subj_deleted_text>
+<subj_renamed>Ajouter du texte au sujet (renomm&eacute;s)</subj_renamed>
+<subj_renamed_text>Add text to Subject if an attachment is renamed for any reason.[br]Undefined by default, so renattach falls through to add subject</subj_renamed_text>
+<users_groups_list>Liste des groupe d'utilisateurs</users_groups_list>
+<warning_html>Message de notification en Html</warning_html>
+<warning_html_text>Inserts a warning message into HTML portions of the email when
+filtering occurs. The HTML is inserted at a position determined by
+htmlwarn_pos (see above) which provides a good hope for adding a
+visible warning. Unfortunately, inserting arbitrary HTML is tricky due
+to the complexity of markup interactions. Inserting warnings in HTML
+may thoroughly disrupt the original message, so use with caution</warning_html_text>
+<warning_text>Notification sur le corps du texte</warning_text>
+<warning_text_text>
+If an attachment is filtered, this lets you specify some warning text that
+will be inserted into any plain text portion(s) of the email.[br] This is
+effective for informing users of filtered files, but the act of inserting
+arbitrary text into an email can cause new problems.[br] Use with caution.
+</warning_text_text>

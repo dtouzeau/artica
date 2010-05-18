@@ -1,0 +1,598 @@
+<?php
+include_once(dirname(__FILE__)."/class.semaphores.php");
+error_reporting(E_ALL & ~E_NOTICE);
+if(!$GLOBALS["KAV4PROXY_NOSESSION"]){session_start();}
+class sockets{
+	var $remote_ip;
+	var $remote_port;
+	var $error=false;
+	var $semaphore_key=1376880653;
+	var $semaphore_memory=9024000;
+
+	
+	function sockets(){
+		if($GLOBALS["DEBUG"]){echo "Instanciate sockets()\n";}
+		$this->remote_ip=$this->APC_GET("ARTICA_DAEMON_IP");
+		$this->remote_port=$this->APC_GET("ARTICA_DAEMON_PORT");
+		
+		if($this->remote_ip==null){
+			if(!file_exists(dirname(__FILE__) . '/settings.inc')){
+				if(function_exists("writelogs")){writelogs("ERROR: unable to stat " . dirname(__FILE__) . '/settings.inc',__CLASS__ . "=>" . __FUNCTION__,__FILE__);};
+				return false;}
+			include(dirname(__FILE__) . '/settings.inc');
+			if($_GLOBAL["ARTICA_DAEMON_IP"]=='0.0.0.0'){$this->remote_ip='127.0.0.1';}else{$this->remote_ip=$_GLOBAL["ARTICA_DAEMON_IP"];}
+			$this->remote_port=$_GLOBAL["ARTICA_DAEMON_PORT"];
+			if($_GLOBAL["ARTICA_SECOND_PORT"]>0){$this->remote_port=$_GLOBAL["ARTICA_SECOND_PORT"];}
+			if($this->remote_ip==null){$this->remote_ip="127.0.0.1";}
+			$this->APC_SAVE("ARTICA_DAEMON_IP",$this->remote_ip);
+			$this->APC_SAVE("ARTICA_DAEMON_PORT",$this->remote_port);
+			}
+	}
+		
+
+function file_ext($filename){
+        return strtolower(str_replace(".", "", strrchr($filename, ".")));
+}		
+		
+function download_attach($folder,$filename){
+	$url_stuff="http://127.0.0.1:$this->remote_port/queue/bightml/$folder/$filename";
+	$fileext=$this->file_ext($filename);
+	
+	$filemime=file_get_contents(dirname(__FILE__) . '/databases/extentions-mime.db');
+	$tb=explode("\n",$filemime);
+	while (list ($num, $ligne) = each ($tb) ){
+		if(preg_match("#$fileext\s+(.+)#i",$ligne,$re)){
+			$mime=$re[1];
+		}
+	}
+	if($mime==null){$mime="application/octet-stream";}
+	header("Content-type: $mime");
+	header('Content-Disposition: attachment; filename="'.$filename.'"');
+	$binary_data = file_get_contents($url_stuff);
+	echo $binary_data;
+	
+}
+
+function download_srvfile($path){
+	include(dirname(__FILE__) . '/settings.inc');
+	$md=md5($_GLOBAL["ldap_password"].$_GLOBAL["ldap_root_database"]);
+	$url_stuff="http://127.0.0.1:$this->remote_port/$md$path";
+	$pathbase=basename($path);
+	$fileext=$this->file_ext($pathbase);
+	
+	$filemime=file_get_contents(dirname(__FILE__) . '/databases/extentions-mime.db');
+	$tb=explode("\n",$filemime);
+	while (list ($num, $ligne) = each ($tb) ){
+		if(preg_match("#$fileext\s+(.+)#i",$ligne,$re)){
+			$mime=$re[1];
+		}
+	}
+	if($mime==null){$mime="application/octet-stream";}
+	header("Content-type: $mime");
+	header('Content-Disposition: attachment; filename="'.$pathbase.'"');
+	$binary_data = file_get_contents($url_stuff);
+	if(function_exists("writelogs")){writelogs("$url_stuff ->$mime (".strlen($binary_data).')',__CLASS__.'/'.__FUNCTION__,__FILE__);}
+	echo $binary_data;
+	
+}
+		
+function downloadFile($url,$hostname)  {
+   $url_stuff="http://$hostname:$this->remote_port/$url";
+   header("Content-type: image/png");
+   $binary_data=@file_get_contents($url_stuff);
+   if(strlen($binary_data)==0){
+   	$binary_data=@file_get_contents("/usr/share/artica-postfix/img/kas-graph-no-datas.png");
+   }
+   
+   
+   echo $binary_data;
+}
+
+   function SaveConfigFile($datas,$keyConfig){
+   	if(!function_exists("writelogs")){include(dirname(__FILE__)."/logs.inc");}
+   	 $tmp=md5($datas.$keyConfig);
+   	 if(!$this->WriteConfigToFile($tmp,$datas)){
+   	 	if(function_exists("writelogs")){writelogs("Writing $tmp ". strlen($tmp)." bytes FAILED",__CLASS__.'/'.__FUNCTION__,__FILE__,__LINE__);}
+   	 	echo "Unable to save $tmp";
+   	 	return false;
+   	 }
+   	 $this->getFrameWork("cmd.php?SaveConfigFile=$tmp&key=$keyConfig");
+   	 $this->SET_APC_STORE($keyConfig,$datas);
+   	 $this->DeleteCache();
+   	 return true;
+   }
+   
+   function SaveClusterConfigFile($datas,$keyConfig){
+   	 $tmp=md5($datas.$keyConfig);
+   	 if(!$this->WriteConfigToFile($tmp,$datas)){
+   	 	echo "Unable to save $tmp";
+   	 	return false;
+   	 }
+   	 $this->getFrameWork("cmd.php?SaveClusterConfigFile=$tmp&key=$keyConfig");
+   	 $this->DeleteCache();
+   	 return true;
+   }   
+   
+   function SaveDansGuardianFile($datas,$filename){
+   		$tmp=md5($datas.$filename);
+   	 	if(!$this->WriteConfigToFile($tmp,$datas)){
+   	 		echo "Unable to save $tmp";
+   	 		return false;
+   	 	}  
+
+   	 	$this->getfile("SaveDansGuardianFile:$tmp;$filename");
+   	
+   }
+   
+   
+   function WriteConfigToFile($myFile,$stringData){
+   	if(!function_exists("writelogs")){include(dirname(__FILE__)."/logs.inc");}
+   	if(!is_dir(dirname(__FILE__).'/conf')){mkdir(dirname(__FILE__).'/conf');}
+   	
+   	
+   	$myFile=dirname(__FILE__).'/conf/'.$myFile;
+   	@file_put_contents($myFile,$stringData);
+   	if(!is_file($myFile)){
+   	if(function_exists("writelogs")){
+		writelogs("Writing $myFile ". strlen($stringData)." bytes failed",__CLASS__.'/'.__FUNCTION__,__FILE__,__LINE__);
+		}
+   		return false;
+   	}
+   	
+   	chmod($myFile,0755);
+	if(function_exists("writelogs")){
+		writelogs("Writing $myFile ". strlen($stringData)." bytes ok",__CLASS__.'/'.__FUNCTION__,__FILE__,__LINE__);
+	}
+	return true;
+   	
+   }
+
+   function GET_INFO($key,$nocache=false){
+   	
+   	if(!$nocache){
+   			$data=$this->APC_GET($key);
+   			if($data<>null){return $data;}
+   	
+   			$uid=posix_getuid();
+   			if(isset($GLOBALS["GET_INFO"][$key])){return $GLOBALS["GET_INFO"][$key];}
+   	
+   			if($uid==0){
+				$value=trim(@file_get_contents("/etc/artica-postfix/settings/Daemons/$key"));
+   				$GLOBALS["GET_INFO"][$key]=$value;
+   				$this->SET_APC_STORE($key,$value);
+   				return $value;
+   				}
+   	}
+   			
+   			
+   			
+   	$value=trim($this->getFrameWork("getinfos.php?key=$key&uid=".$uid));
+    $GLOBALS["GET_INFO"][$key]=$value;
+   	$this->SET_APC_STORE($key,$value);
+   	return trim($value);
+   
+   	}
+   	
+   function GET_CLUSTER($key){
+   		if(isset($GLOBALS["GET_CLUSTER"][$key])){
+   			return $GLOBALS["GET_CLUSTER"][$key];
+   		}
+   	
+   	
+   		if(posix_getuid()==0){
+   			$value=trim(@file_get_contents("/etc/artica-cluster/$key"));
+   			$GLOBALS["GET_CLUSTER"][$key]=$value;
+   			return $value;
+   		}
+   	
+
+   	$value=trim($this->getFrameWork("getinfos.php?cluster-key=$key"));
+    $GLOBALS["GET_CLUSTER"][$key]=$value;
+   	return $value;
+   
+   	}   	
+   	
+   function SET_INFO($key,$value){
+   		if(posix_getuid()==0){
+   			file_put_contents("/etc/artica-postfix/settings/Daemons/$key",$value);
+   			return true;
+   		}
+   		
+   	   	writelogs("SET $key=".strlen($value)." bytes",__CLASS__ . "=>" . __FUNCTION__,__FILE__);
+   	   	$file=md5($value);
+   	   	@mkdir(dirname(__FILE__)."/logs");
+   	   	@file_put_contents(dirname(__FILE__)."/logs/$key",$value);
+   		$this->getFrameWork("setinfos.php?key=$key");
+   		if($value==null){$value=' ';}
+   		$this->SET_APC_STORE($key,$value);
+		$this->DeleteCache();
+   		
+   		
+   		
+   }
+   function SET_CLUSTER($key,$value){
+   	if(strlen($value)>0){
+   		if(posix_getuid()==0){
+   			file_put_contents("/etc/artica-cluster/$key",$value);
+   			return true;
+   		}
+   		
+   	   	writelogs("SET $key=".strlen($value)." bytes",__CLASS__ . "=>" . __FUNCTION__,__FILE__);
+   	   	$file=md5($value);
+   	   	
+   	   	@mkdir(dirname(__FILE__)."/logs/cluster",0755,true);
+   	   	@file_put_contents(dirname(__FILE__)."/logs/cluster/$key",$value);
+   		$this->getFrameWork("setinfos.php?cluster-key=$key");
+   		$this->DeleteCache();
+   		}
+   }   
+   
+   function MYSQL_INFO($key){
+   	if($GLOBALS["MYSQL_INFO"][$key]<>null){return $GLOBALS["MYSQL_INFO"][$key];}
+   	
+   	if(posix_getuid()==0){return $this->GET_MYSQL_ROOT($key);}
+   	$answer=$this->getfile("MSQLINFOS:$key");
+   	if($answer==null){$answer='!nil';}
+   	$GLOBALS["MYSQL_INFO"][$key]=$answer;
+   	return $answer;
+   	}
+   
+   function DeleteCache(){
+   	unset($GLOBALS["GET_INFO"]);
+   	unset($GLOBALS["MYSQL_INFO"]);
+   	unset($_SESSION["APC"]);
+   	if(!is_array($_SESSION)){return null;}
+   	while (list ($num, $val) = each ($_SESSION) ){
+   			if(preg_match('#CACHEINFOS_.+#',$num)){unset($_SESSION[$num]);}
+			if(preg_match("#^cachepage_(.+)#",$num)){unset($_SESSION[$num]);}
+		}   			
+   		
+   }
+   
+   
+function GET_PERFS($key){
+	$value=$this->APC_GET("PERFORMANCES_{$key}");
+	if($value==null){
+		if(!class_exists("Bs_IniHandler")){include_once(dirname(__FILE__)."/class.ini.inc");}
+		$ini=new Bs_IniHandler("/etc/artica-postfix/performances.conf");
+		$value=$ini->get("PERFORMANCES",$key);
+		$this->SET_APC_STORE("PERFORMANCES_{$key}",$value);
+	}
+	return $value;
+	
+}
+function GET_NOTIFS($key){
+	$value=$this->APC_GET("NOTIFS_{$key}");
+	if($value==null){
+		if(!class_exists("Bs_IniHandler")){include_once(dirname(__FILE__)."/class.ini.inc");}
+		$ini=new Bs_IniHandler("/etc/artica-postfix/smtpnotif.conf");
+		$value=$ini->get("SMTP",$key);
+		$this->SET_APC_STORE("NOTIFS_{$key}",$value);
+	}
+	return $value;
+	
+}
+   
+   
+function GET_MYSQL_ROOT($key){
+	if($GLOBALS["MYSQL_INFO_ROOT"][$key]<>null){return $GLOBALS["MYSQL_INFO_ROOT"][$key];}
+	if($key=='server'){$key='mysql_server';}
+	if($key=='root'){ $key='database_admin';}
+	if($key=='password'){ $key='database_password';}
+	 if(is_file('/etc/artica-postfix/settings/Mysql/'.$key)){
+	      $datas=trim(file_get_contents('/etc/artica-postfix/settings/Mysql/'.$key));
+	   }else{
+	   $ini=new Bs_IniHandler("/etc/artica-postfix/artica-mysql.conf");
+	   $datas=trim($ini->get("MYSQL",$key));
+	  }
+	   
+	if ($key=='mysql_server'){if($datas==null){$datas="127.0.0.1";}}
+	if ($key=='port'){if($datas==null){$datas="3306";}}
+	if ($key=='database_admin'){if($datas==null){$datas="root";}}
+	$GLOBALS["MYSQL_INFO_ROOT"][$key]=$datas;
+	return $datas;   
+}
+
+	function getFrameWork($uri){
+		
+		if($uri=="cmd.php?uri=artica_version"){
+			if(function_exists("apc_store")){
+   				$value=apc_fetch("artica_version");
+   				if($value<>null){return $value;}
+   			}
+		}
+		
+
+		$fp = @fopen ("http://127.0.0.1:47980/$uri", "r");
+
+		if (!$fp) {
+			error_log("ERROR: unable to open remote file http://127.0.0.1:47980/$uri $errno $errstr");
+			if(function_exists("writelogs")){writelogs("ERROR: unable to open remote file http://127.0.0.1:47980/$uri",
+			__CLASS__ . "=>" . __FUNCTION__,__FILE__);}
+			$this->error=true;
+			return false;
+		}
+		
+		while (!feof ($fp)) {
+			$line =$line .  fgets ($fp, 1024) . "\n";
+		}
+		
+		fclose($fp);
+		if(trim($line)==null){return null;}
+		if(trim($line)=="<articadatascgi></articadatascgi>"){return null;}
+
+		if(preg_match('#<articadatascgi>(.+)</articadatascgi>#s',$line,$regs)){
+			$results=trim($regs[1]);
+			//writelogs("receive ".strlen($results),__FUNCTION__,__FILE__);
+			if($uri=="cmd.php?uri=artica_version"){$this->SET_APC_STORE("artica_version",$results);}
+			return $results;
+		}
+		
+		if(preg_match('#<articadatascgi>(.+)</articadat#s',$line,$regs)){
+				$results=trim($regs[1]);
+				if($uri=="cmd.php?uri=artica_version"){$this->SET_APC_STORE("artica_version",$results);}
+				return $results;
+		}
+			
+			writelogs("unable to preg_match \"$line\" uri=$uri",__FUNCTION__,__FILE__);
+		
+	}
+	
+	
+	function DATA_CACHE_SAVE($key,$value,$IsAnArray=false){
+		$shm=new semaphores($this->semaphore_key,$this->semaphore_memory);
+		$shm->SET($key,$value);
+		$shm->SET("{$key}-time",time());
+		$shm->CLOSE();
+		}
+		
+	function DATA_CACHE($key,$IsAnArray=false,$maxtime=0){
+	   		$shm=new semaphores($this->semaphore_key,$this->semaphore_memory);
+			$value=$shm->GET($key);
+   			$time=$shm->GET("{$key}-time");
+			$shm->CLOSE();
+   		if($maxtime>0){
+	 		$data1 = $time;
+			$data2 = time();
+			$difference = ($data2 - $data1); 	 
+			$min=round($difference/60);
+			if($min>$maxtime){
+				writelogs("Release $key time: $min exceed $maxtime",__CLASS__,__FILE__,__LINE__);
+				$value=null;}   			
+   			}
+
+   		if(!$IsAnArray){return trim($value);}
+   		return $value;	
+		
+	}		
+	
+	function LANGUAGE_CACHE_IMPORT($array_keys,$lang){
+		$shm=new semaphores($this->semaphore_key,$this->semaphore_memory,2);
+		$shm->SET($lang,$array_keys);
+		$shm->CLOSE();
+	}	
+	
+
+
+	function LANGUAGE_DUMP($lang){
+		
+		$shm=new semaphores($this->semaphore_key,$this->semaphore_memory,2);
+		if($shm->ok){
+			$data=$shm->GET($lang);
+			$shm->CLOSE();
+		}
+		
+		if($GLOBALS["DEBUG"]){echo "LANGUAGE_DUMP Memory store ". count($data)." rows\n";}
+		
+		if(count($data)<100){
+			$filepath=dirname(__FILE__)."/language/$lang.db";
+			if(!is_file("$filepath")){if($GLOBALS["DEBUG"]){echo "LANGUAGE_DUMP unable to stat $filepath\n";}}			
+			$file=@file_get_contents(dirname(__FILE__)."/language/$lang.db");
+			if($GLOBALS["DEBUG"]){echo "LANGUAGE_DUMP File: $filepath ". strlen($file)." bytes\n";}
+			$data=unserialize($file);
+			if($GLOBALS["DEBUG"]){echo "LANGUAGE_DUMP Serialised=". count($data)." rows\n";}
+			$this->LANGUAGE_CACHE_IMPORT($lang,$data);
+		}
+		return $data;
+		
+	}	
+	
+	
+	function DATA_CACHE_EMPTY(){
+		$shm=new semaphores($this->semaphore_key,$this->semaphore_memory,1);
+		$shm->removekey(1);
+		$shm->Delete();
+		$shm=new semaphores($this->semaphore_key,$this->semaphore_memory,2);
+		$shm->removekey(2);
+		$shm->Delete();
+		$shm=new semaphores($this->semaphore_key,$this->semaphore_memory,2);
+		$shm->removekey(3);
+		$shm->Delete();
+		
+	}
+	
+
+	
+	public function SHARED_INFO_BYTES($numeric_key=1){
+		$shm=new semaphores($this->semaphore_key,$this->semaphore_memory,$numeric_key);
+		$array=serialize($shm->DUMP());
+		return strlen(trim($array));	
+	}
+	
+	
+	function SET_APC_STORE($key,$value){
+		$shm=new semaphores($this->semaphore_key,$this->semaphore_memory,3);
+		$shm->SET($key,$value);
+		$shm->SET("{$key}-time",time());
+		$_SESSION["APC"][$key]=$value;
+		$_SESSION["APC"]["{$key}-time"]=time();
+		$shm->CLOSE();
+		}
+		
+	function APC_CLEAN(){
+		$shm=new semaphores($this->semaphore_key,$this->semaphore_memory,3);
+		unset($_SESSION["APC"]);
+		$shm->removekey();
+		$shm->Delete();
+		$shm->CLOSE();
+	}
+	
+	function APC_GET($key,$maxtime=0){
+			$value=$_SESSION["APC"][$key];
+			$time=$_SESSION["APC"][$key];
+			if($GLOBALS["DEBUG"]){echo "APC_GET($key,$maxtime) no _SESSION cache\n";}
+			if(trim($value)==null){
+   				$shm=new semaphores($this->semaphore_key,$this->semaphore_memory,3);   				
+				if($GLOBALS["DEBUG"]){echo "APC_GET($key,$maxtime) -> semaphores($sock->semaphore_key,$sock->semaphore_memory,3) \n";}
+				$value=$shm->GET($key);
+   				$time=$shm->GET("{$key}-time");
+   				$_SESSION["APC"][$key]=$value;
+   				$_SESSION["APC"]["{$key}-time"]=$time;
+			}
+
+   		if($maxtime>0){
+   			$md5=md5("{$key}-time");
+	 		$data1 = $time;
+			$data2 = time();
+			$difference = ($data2 - $data1); 	 
+			$min=round($difference/60);
+			if($min>$maxtime){
+				$value=null;
+				$_SESSION["APC"][$key]=null;
+				$_SESSION["APC"]["{$key}-time"]=0;
+			}   			
+   		}
+   		
+   		
+   		return trim($value);
+   	
+	}
+	
+	function APC_SAVE($key,$value){
+		$this->SET_APC_STORE($key,$value);
+		$this->SET_APC_STORE("{$key}-time",time());
+	}
+   
+		
+	function getfile($uri,$hostname=null){
+
+		if($this->GetFileCache($uri)==true){
+			if($_SESSION["CACHEINFOS_{$uri}"]<>null){
+					return $_SESSION["CACHEINFOS_{$uri}"];
+				}
+			}
+		
+			
+		$array["GlobalApplicationsStatus"]=true;
+		$array["artica_version"]=true;
+		$array["pid"]=true;
+		$array["daemons_status"]=true;
+		$array["myhostname"]=true;
+		if($array[$uri]){
+			return $this->getFrameWork("cmd.php?uri=$uri");
+		}
+		
+		
+		$uri=str_replace(" ","%20",$uri);
+		if(!$this->TestArticaPort()){
+			error_log("ERROR: unable to open remote file http://$this->remote_ip:$this->remote_port/$uri line ".__LINE__);
+			if(function_exists("writelogs")){writelogs("ERROR: unable to open remote file http://$this->remote_ip:$this->remote_port/$uri ",__CLASS__ . "=>" . __FUNCTION__,__FILE__);};return null;$this->error=true;}
+			if($this->error==true){return null;}
+		
+		if(function_exists("writelogsSocketsLogs")){writelogsSocketsLogs("INFOS: Load [$this->remote_ip:$this->remote_port/cgi/articacgi?URI=$uri]",
+		__CLASS__ . "=>" . __FUNCTION__,__FILE__);};
+		
+		
+		$file = @fopen ("http://$this->remote_ip:$this->remote_port/cgi/articacgi?URI=$uri", "r");
+		
+		
+		if (!$file) {
+			error_log("ERROR: unable to open remote file http://$this->remote_ip:$this->remote_port/$uri");
+			if(function_exists("writelogs")){writelogs("ERROR: unable to open remote file http://$this->remote_ip:$this->remote_port/$uri ",
+			__CLASS__ . "=>" . __FUNCTION__,__FILE__);}
+			$this->error=true;
+			return false;
+		}
+		while (!feof ($file)) {
+			$line =$line .  fgets ($file, 1024) . "\n";
+		}
+		fclose($file);
+		
+		if(preg_match('#<articadatascgi>(.+)</articadatascgi>#s',$line,$regs)){
+			return trim($regs[1]);
+		}
+	}
+		
+	function GetFileCache($uri){
+		$arr["artica_version"]=true;
+		return $arr[$uri];
+	}
+		
+	function TestArticaPort(){
+		
+		if($_SESSION["CACHEINFOS_TestArticaPort"][$time]){return true;}
+		$time=date('h:i');
+		unset($_SESSION["CACHEINFOS_TestArticaPort"]);
+		$fp = @fsockopen($this->remote_ip, $this->remote_port, $errno, $errstr, 1);
+		
+		if(!$fp){
+			$this->error=true;
+			if(posix_getuid()==0){
+				//write_syslog("BOA ERROR !!! Bind remote $this->remote_ip:$this->remote_port   $errstr ($errno)",__FILE__);
+				return false;
+			}
+			
+			if(function_exists("writelogs")){writelogs("BOA ERROR !!! Bind remote $this->remote_ip:$this->remote_port   $errstr ($errno) ",
+			__CLASS__ . "=>" . __FUNCTION__,__FILE__);}		
+			if(function_exists("writelogs")){writelogs("ERROR: unable to connect remote $this->remote_ip:$this->remote_port  $errstr ($errno)" ,
+			__CLASS__ . "=>" . __FUNCTION__,__FILE__);}	
+			$_SESSION["CACHEINFOS_TestArticaPort"][$time]=false;	
+			return true;	
+		}
+		$_SESSION["CACHEINFOS_TestArticaPort"][$time]=true;
+		return true;
+		
+	}
+	function TestArticaFilterPort(){
+		$fp = @fsockopen ($this->remote_ip,$this->remote_port , $errno, $errstr, 1);
+		
+		if(!$fp){
+			$this->error=true;
+			if(function_exists("writelogs")){writelogs("Bind remote LOCAL:29900  $errstr ($errno) ",__CLASS__ . "=>" . __FUNCTION__,__FILE__);}		
+			if(function_exists("writelogs")){writelogs("ERROR: unable to connect remote remote LOCAL:29900  $errstr ($errno)" ,__CLASS__ . "=>" . __FUNCTION__,__FILE__);}		
+			return false;
+		}
+		fclose($fp);
+		return true;
+		
+	}
+	
+	function RandomPort(){
+		$min='1024';
+		$max='65534';
+		while (true) {
+			$port=rand($min,$max);
+			if(!$this->PortExists($port)){
+				return $port;
+			}
+		}
+		
+		
+	}
+	
+
+	function PortExists($port_number){
+		for($port = $from; $port <= $to; $port++){
+		$fp =@fsockopen("127.0.0.1", $port);
+		if ($fp){
+			fclose($fp);
+			return true;}
+		
+		}
+		
+	}
+	
+	
+
+}
+?>

@@ -1,0 +1,67 @@
+
+<H1>ldap</H1>
+<div style='width:100%;height:728px;overflow:auto'>
+<table style='width:100%'>
+<tr>
+<td valign='top'>
+	<div style='width:210px' class='paragraphe' id='7c00b3111c779fe9f328f0920d0d8883' 
+		OnMouseOver="javascript:this.className='paragraphe_over';this.style.cursor='pointer';lightup(document.getElementById('img_7c00b3111c779fe9f328f0920d0d8883'), 100);;AffBulle('{Configuring the LDAP BDB subsystem and performances related parameters}');"
+		OnMouseOut="javascript:this.className='paragraphe';this.style.cursor='default';lightup(document.getElementById('img_7c00b3111c779fe9f328f0920d0d8883'), 50);;HideBulle()"
+		OnClick="javascript:Loadjs('artica.settings.php?js-ldap-interface=yes')">
+	<table style='width:100%'>
+	<tr>
+	<td width=1% valign='top'><img src='img/ldap-performances-64.png'  onMouseOver="javascript:AffBulle('Configuring the LDAP BDB subsystem and performances related parameters');lightup(this, 100);" OnMouseOut="javascript:HideBulle();lightup(this, 50);" style="filter:alpha(opacity=50);-moz-opacity:0.5;border:0px;" style="filter:alpha(opacity=50);-moz-opacity:0.5;border:0px;"  id='img_7c00b3111c779fe9f328f0920d0d8883'></a></td>
+	<td valign='top' ><h3 style='min-height:36px;'>LDAP server performances</h3><div id='text_7c00b3111c779fe9f328f0920d0d8883' style='min-height:70px;font-size:11px'>Configuring the LDAP BDB subsystem and performances related parameters.&nbsp;</div></td>
+	</tr>
+	</table>
+	</div>
+	
+	</td>
+</tr>
+<tr>
+<td valign='top'>
+	<div style='width:210px' class='paragraphe' id='ea310315a854d3438493fc16b16f12de' 
+		OnMouseOver="javascript:this.className='paragraphe_over';this.style.cursor='pointer';lightup(document.getElementById('img_ea310315a854d3438493fc16b16f12de'), 100);;AffBulle('{Add a new icon/Widget in this web page}');"
+		OnMouseOut="javascript:this.className='paragraphe';this.style.cursor='default';lightup(document.getElementById('img_ea310315a854d3438493fc16b16f12de'), 50);;HideBulle()"
+		OnClick="javascript:Loadjs('admin.tabs.php?add-icon=044063c23354128b336df86f11872e68');">
+	<table style='width:100%'>
+	<tr>
+	<td width=1% valign='top'><img src='img/64-circle-plus.png'  onMouseOver="javascript:AffBulle('Add a new icon/Widget in this web page');lightup(this, 100);" OnMouseOut="javascript:HideBulle();lightup(this, 50);" style="filter:alpha(opacity=50);-moz-opacity:0.5;border:0px;" style="filter:alpha(opacity=50);-moz-opacity:0.5;border:0px;"  id='img_ea310315a854d3438493fc16b16f12de'></a></td>
+	<td valign='top' ><h3 style='min-height:36px;'>Add a new widget</h3><div id='text_ea310315a854d3438493fc16b16f12de' style='min-height:70px;font-size:11px'>Add a new icon/Widget in this web page.&nbsp;</div></td>
+	</tr>
+	</table>
+	</div>
+	
+	</td>	
+<td valign='top'>
+	<div style='width:210px' class='paragraphe' id='f58f1402514995d87fd5282d9d611916' 
+		OnMouseOver="javascript:this.className='paragraphe_over';this.style.cursor='pointer';lightup(document.getElementById('img_f58f1402514995d87fd5282d9d611916'), 100);;AffBulle('{Change the display order, delete widgets}');"
+		OnMouseOut="javascript:this.className='paragraphe';this.style.cursor='default';lightup(document.getElementById('img_f58f1402514995d87fd5282d9d611916'), 50);;HideBulle()"
+		OnClick="javascript:Loadjs('admin.tabs.php?manage-icon=044063c23354128b336df86f11872e68');">
+	<table style='width:100%'>
+	<tr>
+	<td width=1% valign='top'><img src='img/64-widget-manage.png'  onMouseOver="javascript:AffBulle('Change the display order, delete widgets');lightup(this, 100);" OnMouseOut="javascript:HideBulle();lightup(this, 50);" style="filter:alpha(opacity=50);-moz-opacity:0.5;border:0px;" style="filter:alpha(opacity=50);-moz-opacity:0.5;border:0px;"  id='img_f58f1402514995d87fd5282d9d611916'></a></td>
+	<td valign='top' ><h3 style='min-height:36px;'>Configure widgets</h3><div id='text_f58f1402514995d87fd5282d9d611916' style='min-height:70px;font-size:11px'>Change the display order, delete widgets.&nbsp;</div></td>
+	</tr>
+	</table>
+	</div>
+	
+	</td>
+<td valign='top'>
+	<div style='width:210px' class='paragraphe' id='14ec2b001a69788b19d4c53600e50d54' 
+		OnMouseOver="javascript:this.className='paragraphe_over';this.style.cursor='pointer';lightup(document.getElementById('img_14ec2b001a69788b19d4c53600e50d54'), 100);;AffBulle('{This operation will delete this page and this tab form your panel}');"
+		OnMouseOut="javascript:this.className='paragraphe';this.style.cursor='default';lightup(document.getElementById('img_14ec2b001a69788b19d4c53600e50d54'), 50);;HideBulle()"
+		OnClick="javascript:Loadjs('admin.tabs.php?delete-tab=044063c23354128b336df86f11872e68');">
+	<table style='width:100%'>
+	<tr>
+	<td width=1% valign='top'><img src='img/64-cancel.png'  onMouseOver="javascript:AffBulle('This operation will delete this page and this tab form your panel');lightup(this, 100);" OnMouseOut="javascript:HideBulle();lightup(this, 50);" style="filter:alpha(opacity=50);-moz-opacity:0.5;border:0px;" style="filter:alpha(opacity=50);-moz-opacity:0.5;border:0px;"  id='img_14ec2b001a69788b19d4c53600e50d54'></a></td>
+	<td valign='top' ><h3 style='min-height:36px;'>Delete this personal page</h3><div id='text_14ec2b001a69788b19d4c53600e50d54' style='min-height:70px;font-size:11px'>This operation will delete this page and this tab form your panel.&nbsp;</div></td>
+	</tr>
+	</table>
+	</div>
+	
+	</td>
+</tr>
+</table>
+
+</div>

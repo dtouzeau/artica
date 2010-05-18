@@ -1,0 +1,5 @@
+2010-05-18 18:52:29: [clladp/RestrictionClassData()]:: [13603] [DAEMON]::clladp/RestrictionClassData:: search path : cn=smtpd_helo_restrictions,cn=restrictions_classes,cn=artica,dc=my-domain,dc=com in ressources/class.ldap.inc
+2010-05-18 18:52:29: [clladp/RestrictionClassData()]:: [13603] [DAEMON]::clladp/RestrictionClassData:: search path : cn=smtpd_client_restrictions,cn=restrictions_classes,cn=artica,dc=my-domain,dc=com in ressources/class.ldap.inc
+2010-05-18 18:52:29: [clladp/RestrictionClassData()]:: [13603] [DAEMON]::clladp/RestrictionClassData:: search path : cn=smtpd_sender_restrictions,cn=restrictions_classes,cn=artica,dc=my-domain,dc=com in ressources/class.ldap.inc
+2010-05-18 18:52:29: [clladp/RestrictionClassData()]:: [13603] [DAEMON]::clladp/RestrictionClassData:: search path : cn=smtpd_helo_restrictions,cn=restrictions_classes,cn=artica,dc=my-domain,dc=com in ressources/class.ldap.inc
+2010-05-18 18:52:29: [clladp/RestrictionClassData()]:: [13603] [DAEMON]::clladp/RestrictionClassData:: search path : cn=smtpd_recipient_restrictions,cn=restrictions_classes,cn=artica,dc=my-domain,dc=com in ressources/class.ldap.inc

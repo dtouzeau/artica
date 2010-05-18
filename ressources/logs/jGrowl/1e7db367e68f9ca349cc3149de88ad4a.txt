@@ -1,0 +1,35 @@
+#
+
+[LOG]
+processname=class.templates.inc
+date=2010-05-18 19:00:49
+context=system
+subject=[19:00:49]: [ARTICA]: (dtouzeau-desktop) : CPU overload (100%)
+
+
+<text>Artica report that your  server has reach 100% CPU average consumption in 5 minute(s)
+
+	You will find below a processes report:
+---------------------------------------------
+
+ PPID %CPU %MEM     TIME COMMAND
+25697 55.2  0.8 00:00:02 /usr/bin/perl -T -w /usr/bin/sa-compile -D
+    1 19.0  0.7 00:00:00 /usr/bin/php5 /usr/share/artica-postfix/exec.mpstat.php
+ 4663 17.1  8.1 00:13:51 /usr/lib/firefox-3.6.3/firefox-bin
+    1 15.0  0.1 00:00:00 /usr/share/artica-postfix/bin/process1 --cleanlogs
+    1  6.3  0.0 00:32:55 /usr/local/ap-mailfilter3/bin/ap-process-server
+ 8195  6.1 11.1 00:26:25 /usr/local/Zend/ZendStudioForEclipse-6.1.2/ZendStudio $@
+ 6580  5.4  1.9 00:23:25 /usr/bin/X :0 -br -verbose -auth /var/run/gdm/auth-for-gdm-XZZcZB/database -nolisten tcp
+ 7767  0.7  2.4 00:03:09 nautilus
+    1  0.6  2.2 00:00:02 amavisd (master)
+19770  0.6  1.5 00:00:52 /usr/lib/lazarus/0.9.28.2/lazarus --no-splash-screen --started-by-startlazarus
+29270  0.5  3.5 00:02:20 /usr/lib/thunderbird-3.0.4/thunderbird-bin
+    1  0.5  1.6 00:00:03 /usr/sbin/spamd --username=postfix --groupname=postfix --max-children 10 -l --create-prefs --nouser-config --siteconfigpath=/etc/spamassassin/ --pidfile /var/run/spamd.pid -H /var/lib/spamassassin/tmp --listen-ip=127.0.0.1 --port=9031 --daemonize
+    1  0.5  0.9 00:01:53 filezilla
+    1  0.3  1.8 00:00:01 /usr/sbin/mysqld
+    1  0.3  0.2 00:01:23 /usr/lib/gnome-applets/multiload-applet-2 --oaf-activate-iid=OAFIID:GNOME_MultiLoadApplet_Factory --oaf-ior-fd=42
+    1  0.3  2.6 00:01:18 evolution
+    1  0.2  0.4 00:01:15 /usr/lib/gnome-panel/wnck-applet --oaf-activate-iid=OAFIID:GNOME_Wncklet_Factory --oaf-ior-fd=18
+ 6340  0.1  0.0 00:00:43 /usr/sbin/zabbix_agentd
+ 7767  0.1  0.4 00:00:36 metacity
+</text>

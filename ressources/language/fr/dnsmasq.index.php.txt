@@ -1,0 +1,5 @@
+<dnsmasq_DNS_cache_settings>Param&egrave;tres de Cache DNS</dnsmasq_DNS_cache_settings>
+<dnsmasq_DNS_cache_settings_text>Param&egrave;tres permettant de g&eacute;rer la temporisation des addresses</dnsmasq_DNS_cache_settings_text>
+<dnsmasq_intro>param&egrave;tres de Cache DNS</dnsmasq_intro>
+<domain-needed>Domaine n&eacute;c&eacute;ssaire</domain-needed>
+<domain-needed_text>Ne jamais renvoyer le nom (sans un point ou nom de domaine)</domain-needed_text>

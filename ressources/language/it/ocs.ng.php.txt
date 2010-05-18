@@ -1,0 +1,2 @@
+<ocs_web_params>Web server/interface</ocs_web_params>
+<ocs_web_params_text>Set parameters of the web server and the interface of OCS Inventory</ocs_web_params_text>

@@ -1,0 +1,4 @@
+<artica_events>Artica events</artica_events>
+<artica_events_text>Display status of Artica tasks and watchdog processing</artica_events_text>
+<process>Processes</process>
+<context>Context</context>

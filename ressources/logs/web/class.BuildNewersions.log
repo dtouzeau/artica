@@ -1,0 +1,160 @@
+2010-05-18 18:51:50: [status/BuildNewersions()]:: [11937] [DAEMON]::status/BuildNewersions:: front_page_notify():: front_page_notify=yes in ressources/class.status.inc line 1121
+2010-05-18 18:51:50: [status/BuildNewersions()]:: [11937] [DAEMON]::status/BuildNewersions:: status_fetchmail_version:: unable to stat fetchmail version in ressources/class.status.inc line 1121
+2010-05-18 18:51:50: [status/BuildNewersions()]:: [11937] [DAEMON]::status/BuildNewersions:: status_nmap_version:: Local version is 5.21 in ressources/class.status.inc line 1121
+2010-05-18 18:51:50: [status/BuildNewersions()]:: [11937] [DAEMON]::status/BuildNewersions:: status_nmap_version:: remote version is 5.21 in ressources/class.status.inc line 1121
+2010-05-18 18:51:50: [status/BuildNewersions()]:: [11937] [DAEMON]::status/BuildNewersions:: status_nmap_version:: Local 5210 against 5210  in ressources/class.status.inc line 1121
+2010-05-18 18:51:50: [status/BuildNewersions()]:: [11937] [DAEMON]::status/BuildNewersions:: status_roundcube_version:: Local int version is 310 in ressources/class.status.inc line 1121
+2010-05-18 18:51:50: [status/BuildNewersions()]:: [11937] [DAEMON]::status/BuildNewersions:: status_roundcube_version:: Folder is /usr/share/roundcube in ressources/class.status.inc line 1121
+2010-05-18 18:51:50: [status/BuildNewersions()]:: [11937] [DAEMON]::status/BuildNewersions:: status_roundcube_version:: Local version is 310 in ressources/class.status.inc line 1121
+2010-05-18 18:51:50: [status/BuildNewersions()]:: [11937] [DAEMON]::status/BuildNewersions:: status_roundcube_version:: remote version is 0.3.1  in ressources/class.status.inc line 1121
+2010-05-18 18:51:50: [status/BuildNewersions()]:: [11937] [DAEMON]::status/BuildNewersions:: status_roundcube_version:: remote version (2) is 3.10  in ressources/class.status.inc line 1121
+2010-05-18 18:51:50: [status/BuildNewersions()]:: [11937] [DAEMON]::status/BuildNewersions:: status_roundcube_version:: Local 310 against 310  in ressources/class.status.inc line 1121
+2010-05-18 18:51:50: [status/BuildNewersions()]:: [11937] [DAEMON]::status/BuildNewersions:: status_assp_version:: ASSP "1.6.5.5" On web server in ressources/class.status.inc line 1121
+2010-05-18 18:51:50: [status/BuildNewersions()]:: [11937] [DAEMON]::status/BuildNewersions:: status_assp_version:: Local 1655 against 1655  in ressources/class.status.inc line 1121
+2010-05-18 18:51:50: [status/BuildNewersions()]:: [11937] [DAEMON]::status/BuildNewersions:: status_spamassassin:: Local version is 3.3.10 in ressources/class.status.inc line 1121
+2010-05-18 18:51:50: [status/BuildNewersions()]:: [11937] [DAEMON]::status/BuildNewersions:: status_spamassassin:: remote version is 3.3.10 in ressources/class.status.inc line 1121
+2010-05-18 18:51:50: [status/BuildNewersions()]:: [11937] [DAEMON]::status/BuildNewersions:: status_spamassassin:: Local 3310 against 3310  in ressources/class.status.inc line 1121
+2010-05-18 19:02:13: [status/BuildNewersions()]:: [28280] [DAEMON]::status/BuildNewersions:: front_page_notify():: front_page_notify=yes in ressources/class.status.inc line 1121
+2010-05-18 19:02:13: [status/BuildNewersions()]:: [28280] [DAEMON]::status/BuildNewersions:: status_fetchmail_version:: unable to stat fetchmail version in ressources/class.status.inc line 1121
+2010-05-18 19:02:13: [status/BuildNewersions()]:: [28280] [DAEMON]::status/BuildNewersions:: status_nmap_version:: Local version is 5.21 in ressources/class.status.inc line 1121
+2010-05-18 19:02:13: [status/BuildNewersions()]:: [28280] [DAEMON]::status/BuildNewersions:: status_nmap_version:: remote version is 5.21 in ressources/class.status.inc line 1121
+2010-05-18 19:02:13: [status/BuildNewersions()]:: [28280] [DAEMON]::status/BuildNewersions:: status_nmap_version:: Local 5210 against 5210  in ressources/class.status.inc line 1121
+2010-05-18 19:02:13: [status/BuildNewersions()]:: [28280] [DAEMON]::status/BuildNewersions:: status_roundcube_version:: Local int version is 310 in ressources/class.status.inc line 1121
+2010-05-18 19:02:13: [status/BuildNewersions()]:: [28280] [DAEMON]::status/BuildNewersions:: status_roundcube_version:: Folder is /usr/share/roundcube in ressources/class.status.inc line 1121
+2010-05-18 19:02:13: [status/BuildNewersions()]:: [28280] [DAEMON]::status/BuildNewersions:: status_roundcube_version:: Local version is 310 in ressources/class.status.inc line 1121
+2010-05-18 19:02:13: [status/BuildNewersions()]:: [28280] [DAEMON]::status/BuildNewersions:: status_roundcube_version:: remote version is 0.3.1  in ressources/class.status.inc line 1121
+2010-05-18 19:02:13: [status/BuildNewersions()]:: [28280] [DAEMON]::status/BuildNewersions:: status_roundcube_version:: remote version (2) is 3.10  in ressources/class.status.inc line 1121
+2010-05-18 19:02:13: [status/BuildNewersions()]:: [28280] [DAEMON]::status/BuildNewersions:: status_roundcube_version:: Local 310 against 310  in ressources/class.status.inc line 1121
+2010-05-18 19:02:13: [status/BuildNewersions()]:: [28280] [DAEMON]::status/BuildNewersions:: status_assp_version:: ASSP "1.6.5.5" On web server in ressources/class.status.inc line 1121
+2010-05-18 19:02:13: [status/BuildNewersions()]:: [28280] [DAEMON]::status/BuildNewersions:: status_assp_version:: Local 1655 against 1655  in ressources/class.status.inc line 1121
+2010-05-18 19:02:13: [status/BuildNewersions()]:: [28280] [DAEMON]::status/BuildNewersions:: status_spamassassin:: Local version is 3.3.10 in ressources/class.status.inc line 1121
+2010-05-18 19:02:13: [status/BuildNewersions()]:: [28280] [DAEMON]::status/BuildNewersions:: status_spamassassin:: remote version is 3.3.10 in ressources/class.status.inc line 1121
+2010-05-18 19:02:13: [status/BuildNewersions()]:: [28280] [DAEMON]::status/BuildNewersions:: status_spamassassin:: Local 3310 against 3310  in ressources/class.status.inc line 1121
+2010-05-18 19:12:11: [status/BuildNewersions()]:: [9137] [DAEMON]::status/BuildNewersions:: front_page_notify():: front_page_notify=yes in ressources/class.status.inc line 1121
+2010-05-18 19:12:11: [status/BuildNewersions()]:: [9137] [DAEMON]::status/BuildNewersions:: status_fetchmail_version:: unable to stat fetchmail version in ressources/class.status.inc line 1121
+2010-05-18 19:12:11: [status/BuildNewersions()]:: [9137] [DAEMON]::status/BuildNewersions:: status_nmap_version:: Local version is 5.21 in ressources/class.status.inc line 1121
+2010-05-18 19:12:11: [status/BuildNewersions()]:: [9137] [DAEMON]::status/BuildNewersions:: status_nmap_version:: remote version is 5.21 in ressources/class.status.inc line 1121
+2010-05-18 19:12:11: [status/BuildNewersions()]:: [9137] [DAEMON]::status/BuildNewersions:: status_nmap_version:: Local 5210 against 5210  in ressources/class.status.inc line 1121
+2010-05-18 19:12:11: [status/BuildNewersions()]:: [9137] [DAEMON]::status/BuildNewersions:: status_roundcube_version:: Local int version is 310 in ressources/class.status.inc line 1121
+2010-05-18 19:12:11: [status/BuildNewersions()]:: [9137] [DAEMON]::status/BuildNewersions:: status_roundcube_version:: Folder is /usr/share/roundcube in ressources/class.status.inc line 1121
+2010-05-18 19:12:11: [status/BuildNewersions()]:: [9137] [DAEMON]::status/BuildNewersions:: status_roundcube_version:: Local version is 310 in ressources/class.status.inc line 1121
+2010-05-18 19:12:11: [status/BuildNewersions()]:: [9137] [DAEMON]::status/BuildNewersions:: status_roundcube_version:: remote version is 0.3.1  in ressources/class.status.inc line 1121
+2010-05-18 19:12:11: [status/BuildNewersions()]:: [9137] [DAEMON]::status/BuildNewersions:: status_roundcube_version:: remote version (2) is 3.10  in ressources/class.status.inc line 1121
+2010-05-18 19:12:11: [status/BuildNewersions()]:: [9137] [DAEMON]::status/BuildNewersions:: status_roundcube_version:: Local 310 against 310  in ressources/class.status.inc line 1121
+2010-05-18 19:12:11: [status/BuildNewersions()]:: [9137] [DAEMON]::status/BuildNewersions:: status_assp_version:: ASSP "1.6.5.5" On web server in ressources/class.status.inc line 1121
+2010-05-18 19:12:11: [status/BuildNewersions()]:: [9137] [DAEMON]::status/BuildNewersions:: status_assp_version:: Local 1655 against 1655  in ressources/class.status.inc line 1121
+2010-05-18 19:12:11: [status/BuildNewersions()]:: [9137] [DAEMON]::status/BuildNewersions:: status_spamassassin:: Local version is 3.3.10 in ressources/class.status.inc line 1121
+2010-05-18 19:12:11: [status/BuildNewersions()]:: [9137] [DAEMON]::status/BuildNewersions:: status_spamassassin:: remote version is 3.3.10 in ressources/class.status.inc line 1121
+2010-05-18 19:12:11: [status/BuildNewersions()]:: [9137] [DAEMON]::status/BuildNewersions:: status_spamassassin:: Local 3310 against 3310  in ressources/class.status.inc line 1121
+2010-05-18 19:22:16: [status/BuildNewersions()]:: [22306] [DAEMON]::status/BuildNewersions:: front_page_notify():: front_page_notify=yes in ressources/class.status.inc line 1121
+2010-05-18 19:22:16: [status/BuildNewersions()]:: [22306] [DAEMON]::status/BuildNewersions:: status_fetchmail_version:: unable to stat fetchmail version in ressources/class.status.inc line 1121
+2010-05-18 19:22:16: [status/BuildNewersions()]:: [22306] [DAEMON]::status/BuildNewersions:: status_nmap_version:: Local version is 5.21 in ressources/class.status.inc line 1121
+2010-05-18 19:22:16: [status/BuildNewersions()]:: [22306] [DAEMON]::status/BuildNewersions:: status_nmap_version:: remote version is 5.21 in ressources/class.status.inc line 1121
+2010-05-18 19:22:16: [status/BuildNewersions()]:: [22306] [DAEMON]::status/BuildNewersions:: status_nmap_version:: Local 5210 against 5210  in ressources/class.status.inc line 1121
+2010-05-18 19:22:16: [status/BuildNewersions()]:: [22306] [DAEMON]::status/BuildNewersions:: status_roundcube_version:: Local int version is 310 in ressources/class.status.inc line 1121
+2010-05-18 19:22:16: [status/BuildNewersions()]:: [22306] [DAEMON]::status/BuildNewersions:: status_roundcube_version:: Folder is /usr/share/roundcube in ressources/class.status.inc line 1121
+2010-05-18 19:22:16: [status/BuildNewersions()]:: [22306] [DAEMON]::status/BuildNewersions:: status_roundcube_version:: Local version is 310 in ressources/class.status.inc line 1121
+2010-05-18 19:22:16: [status/BuildNewersions()]:: [22306] [DAEMON]::status/BuildNewersions:: status_roundcube_version:: remote version is 0.3.1  in ressources/class.status.inc line 1121
+2010-05-18 19:22:16: [status/BuildNewersions()]:: [22306] [DAEMON]::status/BuildNewersions:: status_roundcube_version:: remote version (2) is 3.10  in ressources/class.status.inc line 1121
+2010-05-18 19:22:16: [status/BuildNewersions()]:: [22306] [DAEMON]::status/BuildNewersions:: status_roundcube_version:: Local 310 against 310  in ressources/class.status.inc line 1121
+2010-05-18 19:22:16: [status/BuildNewersions()]:: [22306] [DAEMON]::status/BuildNewersions:: status_assp_version:: ASSP "1.6.5.5" On web server in ressources/class.status.inc line 1121
+2010-05-18 19:22:16: [status/BuildNewersions()]:: [22306] [DAEMON]::status/BuildNewersions:: status_assp_version:: Local 1655 against 1655  in ressources/class.status.inc line 1121
+2010-05-18 19:22:16: [status/BuildNewersions()]:: [22306] [DAEMON]::status/BuildNewersions:: status_spamassassin:: Local version is 3.3.10 in ressources/class.status.inc line 1121
+2010-05-18 19:22:16: [status/BuildNewersions()]:: [22306] [DAEMON]::status/BuildNewersions:: status_spamassassin:: remote version is 3.3.10 in ressources/class.status.inc line 1121
+2010-05-18 19:22:16: [status/BuildNewersions()]:: [22306] [DAEMON]::status/BuildNewersions:: status_spamassassin:: Local 3310 against 3310  in ressources/class.status.inc line 1121
+2010-05-18 19:32:17: [status/BuildNewersions()]:: [2453] [DAEMON]::status/BuildNewersions:: front_page_notify():: front_page_notify=yes in ressources/class.status.inc line 1121
+2010-05-18 19:32:17: [status/BuildNewersions()]:: [2453] [DAEMON]::status/BuildNewersions:: status_fetchmail_version:: unable to stat fetchmail version in ressources/class.status.inc line 1121
+2010-05-18 19:32:17: [status/BuildNewersions()]:: [2453] [DAEMON]::status/BuildNewersions:: status_nmap_version:: Local version is 5.21 in ressources/class.status.inc line 1121
+2010-05-18 19:32:17: [status/BuildNewersions()]:: [2453] [DAEMON]::status/BuildNewersions:: status_nmap_version:: remote version is 5.21 in ressources/class.status.inc line 1121
+2010-05-18 19:32:17: [status/BuildNewersions()]:: [2453] [DAEMON]::status/BuildNewersions:: status_nmap_version:: Local 5210 against 5210  in ressources/class.status.inc line 1121
+2010-05-18 19:32:17: [status/BuildNewersions()]:: [2453] [DAEMON]::status/BuildNewersions:: status_roundcube_version:: Local int version is 310 in ressources/class.status.inc line 1121
+2010-05-18 19:32:17: [status/BuildNewersions()]:: [2453] [DAEMON]::status/BuildNewersions:: status_roundcube_version:: Folder is /usr/share/roundcube in ressources/class.status.inc line 1121
+2010-05-18 19:32:17: [status/BuildNewersions()]:: [2453] [DAEMON]::status/BuildNewersions:: status_roundcube_version:: Local version is 310 in ressources/class.status.inc line 1121
+2010-05-18 19:32:17: [status/BuildNewersions()]:: [2453] [DAEMON]::status/BuildNewersions:: status_roundcube_version:: remote version is 0.3.1  in ressources/class.status.inc line 1121
+2010-05-18 19:32:17: [status/BuildNewersions()]:: [2453] [DAEMON]::status/BuildNewersions:: status_roundcube_version:: remote version (2) is 3.10  in ressources/class.status.inc line 1121
+2010-05-18 19:32:17: [status/BuildNewersions()]:: [2453] [DAEMON]::status/BuildNewersions:: status_roundcube_version:: Local 310 against 310  in ressources/class.status.inc line 1121
+2010-05-18 19:32:17: [status/BuildNewersions()]:: [2453] [DAEMON]::status/BuildNewersions:: status_assp_version:: ASSP "1.6.5.5" On web server in ressources/class.status.inc line 1121
+2010-05-18 19:32:17: [status/BuildNewersions()]:: [2453] [DAEMON]::status/BuildNewersions:: status_assp_version:: Local 1655 against 1655  in ressources/class.status.inc line 1121
+2010-05-18 19:32:17: [status/BuildNewersions()]:: [2453] [DAEMON]::status/BuildNewersions:: status_spamassassin:: Local version is 3.3.10 in ressources/class.status.inc line 1121
+2010-05-18 19:32:17: [status/BuildNewersions()]:: [2453] [DAEMON]::status/BuildNewersions:: status_spamassassin:: remote version is 3.3.10 in ressources/class.status.inc line 1121
+2010-05-18 19:32:17: [status/BuildNewersions()]:: [2453] [DAEMON]::status/BuildNewersions:: status_spamassassin:: Local 3310 against 3310  in ressources/class.status.inc line 1121
+2010-05-18 19:42:16: [status/BuildNewersions()]:: [15510] [DAEMON]::status/BuildNewersions:: front_page_notify():: front_page_notify=yes in ressources/class.status.inc line 1121
+2010-05-18 19:42:16: [status/BuildNewersions()]:: [15510] [DAEMON]::status/BuildNewersions:: status_fetchmail_version:: unable to stat fetchmail version in ressources/class.status.inc line 1121
+2010-05-18 19:42:16: [status/BuildNewersions()]:: [15510] [DAEMON]::status/BuildNewersions:: status_nmap_version:: Local version is 5.21 in ressources/class.status.inc line 1121
+2010-05-18 19:42:16: [status/BuildNewersions()]:: [15510] [DAEMON]::status/BuildNewersions:: status_nmap_version:: remote version is 5.21 in ressources/class.status.inc line 1121
+2010-05-18 19:42:16: [status/BuildNewersions()]:: [15510] [DAEMON]::status/BuildNewersions:: status_nmap_version:: Local 5210 against 5210  in ressources/class.status.inc line 1121
+2010-05-18 19:42:16: [status/BuildNewersions()]:: [15510] [DAEMON]::status/BuildNewersions:: status_roundcube_version:: Local int version is 310 in ressources/class.status.inc line 1121
+2010-05-18 19:42:16: [status/BuildNewersions()]:: [15510] [DAEMON]::status/BuildNewersions:: status_roundcube_version:: Folder is /usr/share/roundcube in ressources/class.status.inc line 1121
+2010-05-18 19:42:16: [status/BuildNewersions()]:: [15510] [DAEMON]::status/BuildNewersions:: status_roundcube_version:: Local version is 310 in ressources/class.status.inc line 1121
+2010-05-18 19:42:16: [status/BuildNewersions()]:: [15510] [DAEMON]::status/BuildNewersions:: status_roundcube_version:: remote version is 0.3.1  in ressources/class.status.inc line 1121
+2010-05-18 19:42:16: [status/BuildNewersions()]:: [15510] [DAEMON]::status/BuildNewersions:: status_roundcube_version:: remote version (2) is 3.10  in ressources/class.status.inc line 1121
+2010-05-18 19:42:16: [status/BuildNewersions()]:: [15510] [DAEMON]::status/BuildNewersions:: status_roundcube_version:: Local 310 against 310  in ressources/class.status.inc line 1121
+2010-05-18 19:42:16: [status/BuildNewersions()]:: [15510] [DAEMON]::status/BuildNewersions:: status_assp_version:: ASSP "1.6.5.5" On web server in ressources/class.status.inc line 1121
+2010-05-18 19:42:16: [status/BuildNewersions()]:: [15510] [DAEMON]::status/BuildNewersions:: status_assp_version:: Local 1655 against 1655  in ressources/class.status.inc line 1121
+2010-05-18 19:42:16: [status/BuildNewersions()]:: [15510] [DAEMON]::status/BuildNewersions:: status_spamassassin:: Local version is 3.3.10 in ressources/class.status.inc line 1121
+2010-05-18 19:42:16: [status/BuildNewersions()]:: [15510] [DAEMON]::status/BuildNewersions:: status_spamassassin:: remote version is 3.3.10 in ressources/class.status.inc line 1121
+2010-05-18 19:42:16: [status/BuildNewersions()]:: [15510] [DAEMON]::status/BuildNewersions:: status_spamassassin:: Local 3310 against 3310  in ressources/class.status.inc line 1121
+2010-05-18 19:53:13: [status/BuildNewersions()]:: [28632] [DAEMON]::status/BuildNewersions:: front_page_notify():: front_page_notify=yes in ressources/class.status.inc line 1121
+2010-05-18 19:53:13: [status/BuildNewersions()]:: [28632] [DAEMON]::status/BuildNewersions:: status_fetchmail_version:: unable to stat fetchmail version in ressources/class.status.inc line 1121
+2010-05-18 19:53:13: [status/BuildNewersions()]:: [28632] [DAEMON]::status/BuildNewersions:: status_nmap_version:: Local version is 5.21 in ressources/class.status.inc line 1121
+2010-05-18 19:53:13: [status/BuildNewersions()]:: [28632] [DAEMON]::status/BuildNewersions:: status_nmap_version:: remote version is 5.21 in ressources/class.status.inc line 1121
+2010-05-18 19:53:13: [status/BuildNewersions()]:: [28632] [DAEMON]::status/BuildNewersions:: status_nmap_version:: Local 5210 against 5210  in ressources/class.status.inc line 1121
+2010-05-18 19:53:13: [status/BuildNewersions()]:: [28632] [DAEMON]::status/BuildNewersions:: status_roundcube_version:: Local int version is 310 in ressources/class.status.inc line 1121
+2010-05-18 19:53:13: [status/BuildNewersions()]:: [28632] [DAEMON]::status/BuildNewersions:: status_roundcube_version:: Folder is /usr/share/roundcube in ressources/class.status.inc line 1121
+2010-05-18 19:53:13: [status/BuildNewersions()]:: [28632] [DAEMON]::status/BuildNewersions:: status_roundcube_version:: Local version is 310 in ressources/class.status.inc line 1121
+2010-05-18 19:53:13: [status/BuildNewersions()]:: [28632] [DAEMON]::status/BuildNewersions:: status_roundcube_version:: remote version is 0.3.1  in ressources/class.status.inc line 1121
+2010-05-18 19:53:13: [status/BuildNewersions()]:: [28632] [DAEMON]::status/BuildNewersions:: status_roundcube_version:: remote version (2) is 3.10  in ressources/class.status.inc line 1121
+2010-05-18 19:53:13: [status/BuildNewersions()]:: [28632] [DAEMON]::status/BuildNewersions:: status_roundcube_version:: Local 310 against 310  in ressources/class.status.inc line 1121
+2010-05-18 19:53:13: [status/BuildNewersions()]:: [28632] [DAEMON]::status/BuildNewersions:: status_assp_version:: ASSP "1.6.5.5" On web server in ressources/class.status.inc line 1121
+2010-05-18 19:53:13: [status/BuildNewersions()]:: [28632] [DAEMON]::status/BuildNewersions:: status_assp_version:: Local 1655 against 1655  in ressources/class.status.inc line 1121
+2010-05-18 19:53:13: [status/BuildNewersions()]:: [28632] [DAEMON]::status/BuildNewersions:: status_spamassassin:: Local version is 3.3.10 in ressources/class.status.inc line 1121
+2010-05-18 19:53:13: [status/BuildNewersions()]:: [28632] [DAEMON]::status/BuildNewersions:: status_spamassassin:: remote version is 3.3.10 in ressources/class.status.inc line 1121
+2010-05-18 19:53:13: [status/BuildNewersions()]:: [28632] [DAEMON]::status/BuildNewersions:: status_spamassassin:: Local 3310 against 3310  in ressources/class.status.inc line 1121
+2010-05-18 20:03:10: [status/BuildNewersions()]:: [9661] [DAEMON]::status/BuildNewersions:: front_page_notify():: front_page_notify=yes in ressources/class.status.inc line 1121
+2010-05-18 20:03:10: [status/BuildNewersions()]:: [9661] [DAEMON]::status/BuildNewersions:: status_fetchmail_version:: unable to stat fetchmail version in ressources/class.status.inc line 1121
+2010-05-18 20:03:10: [status/BuildNewersions()]:: [9661] [DAEMON]::status/BuildNewersions:: status_nmap_version:: Local version is 5.21 in ressources/class.status.inc line 1121
+2010-05-18 20:03:10: [status/BuildNewersions()]:: [9661] [DAEMON]::status/BuildNewersions:: status_nmap_version:: remote version is 5.21 in ressources/class.status.inc line 1121
+2010-05-18 20:03:10: [status/BuildNewersions()]:: [9661] [DAEMON]::status/BuildNewersions:: status_nmap_version:: Local 5210 against 5210  in ressources/class.status.inc line 1121
+2010-05-18 20:03:10: [status/BuildNewersions()]:: [9661] [DAEMON]::status/BuildNewersions:: status_roundcube_version:: Local int version is 310 in ressources/class.status.inc line 1121
+2010-05-18 20:03:10: [status/BuildNewersions()]:: [9661] [DAEMON]::status/BuildNewersions:: status_roundcube_version:: Folder is /usr/share/roundcube in ressources/class.status.inc line 1121
+2010-05-18 20:03:10: [status/BuildNewersions()]:: [9661] [DAEMON]::status/BuildNewersions:: status_roundcube_version:: Local version is 310 in ressources/class.status.inc line 1121
+2010-05-18 20:03:10: [status/BuildNewersions()]:: [9661] [DAEMON]::status/BuildNewersions:: status_roundcube_version:: remote version is 0.3.1  in ressources/class.status.inc line 1121
+2010-05-18 20:03:10: [status/BuildNewersions()]:: [9661] [DAEMON]::status/BuildNewersions:: status_roundcube_version:: remote version (2) is 3.10  in ressources/class.status.inc line 1121
+2010-05-18 20:03:10: [status/BuildNewersions()]:: [9661] [DAEMON]::status/BuildNewersions:: status_roundcube_version:: Local 310 against 310  in ressources/class.status.inc line 1121
+2010-05-18 20:03:10: [status/BuildNewersions()]:: [9661] [DAEMON]::status/BuildNewersions:: status_assp_version:: ASSP "1.6.5.5" On web server in ressources/class.status.inc line 1121
+2010-05-18 20:03:10: [status/BuildNewersions()]:: [9661] [DAEMON]::status/BuildNewersions:: status_assp_version:: Local 1655 against 1655  in ressources/class.status.inc line 1121
+2010-05-18 20:03:10: [status/BuildNewersions()]:: [9661] [DAEMON]::status/BuildNewersions:: status_spamassassin:: Local version is 3.3.10 in ressources/class.status.inc line 1121
+2010-05-18 20:03:10: [status/BuildNewersions()]:: [9661] [DAEMON]::status/BuildNewersions:: status_spamassassin:: remote version is 3.3.10 in ressources/class.status.inc line 1121
+2010-05-18 20:03:10: [status/BuildNewersions()]:: [9661] [DAEMON]::status/BuildNewersions:: status_spamassassin:: Local 3310 against 3310  in ressources/class.status.inc line 1121
+2010-05-18 20:13:04: [status/BuildNewersions()]:: [21846] [DAEMON]::status/BuildNewersions:: front_page_notify():: front_page_notify=yes in ressources/class.status.inc line 1121
+2010-05-18 20:13:04: [status/BuildNewersions()]:: [21846] [DAEMON]::status/BuildNewersions:: status_fetchmail_version:: unable to stat fetchmail version in ressources/class.status.inc line 1121
+2010-05-18 20:13:04: [status/BuildNewersions()]:: [21846] [DAEMON]::status/BuildNewersions:: status_nmap_version:: Local version is 5.21 in ressources/class.status.inc line 1121
+2010-05-18 20:13:04: [status/BuildNewersions()]:: [21846] [DAEMON]::status/BuildNewersions:: status_nmap_version:: remote version is 5.21 in ressources/class.status.inc line 1121
+2010-05-18 20:13:04: [status/BuildNewersions()]:: [21846] [DAEMON]::status/BuildNewersions:: status_nmap_version:: Local 5210 against 5210  in ressources/class.status.inc line 1121
+2010-05-18 20:13:04: [status/BuildNewersions()]:: [21846] [DAEMON]::status/BuildNewersions:: status_roundcube_version:: Local int version is 310 in ressources/class.status.inc line 1121
+2010-05-18 20:13:04: [status/BuildNewersions()]:: [21846] [DAEMON]::status/BuildNewersions:: status_roundcube_version:: Folder is /usr/share/roundcube in ressources/class.status.inc line 1121
+2010-05-18 20:13:04: [status/BuildNewersions()]:: [21846] [DAEMON]::status/BuildNewersions:: status_roundcube_version:: Local version is 310 in ressources/class.status.inc line 1121
+2010-05-18 20:13:04: [status/BuildNewersions()]:: [21846] [DAEMON]::status/BuildNewersions:: status_roundcube_version:: remote version is 0.3.1  in ressources/class.status.inc line 1121
+2010-05-18 20:13:04: [status/BuildNewersions()]:: [21846] [DAEMON]::status/BuildNewersions:: status_roundcube_version:: remote version (2) is 3.10  in ressources/class.status.inc line 1121
+2010-05-18 20:13:04: [status/BuildNewersions()]:: [21846] [DAEMON]::status/BuildNewersions:: status_roundcube_version:: Local 310 against 310  in ressources/class.status.inc line 1121
+2010-05-18 20:13:04: [status/BuildNewersions()]:: [21846] [DAEMON]::status/BuildNewersions:: status_assp_version:: ASSP "1.6.5.5" On web server in ressources/class.status.inc line 1121
+2010-05-18 20:13:04: [status/BuildNewersions()]:: [21846] [DAEMON]::status/BuildNewersions:: status_assp_version:: Local 1655 against 1655  in ressources/class.status.inc line 1121
+2010-05-18 20:13:04: [status/BuildNewersions()]:: [21846] [DAEMON]::status/BuildNewersions:: status_spamassassin:: Local version is 3.3.10 in ressources/class.status.inc line 1121
+2010-05-18 20:13:04: [status/BuildNewersions()]:: [21846] [DAEMON]::status/BuildNewersions:: status_spamassassin:: remote version is 3.3.10 in ressources/class.status.inc line 1121
+2010-05-18 20:13:04: [status/BuildNewersions()]:: [21846] [DAEMON]::status/BuildNewersions:: status_spamassassin:: Local 3310 against 3310  in ressources/class.status.inc line 1121
+2010-05-18 20:23:08: [status/BuildNewersions()]:: [1975] [DAEMON]::status/BuildNewersions:: front_page_notify():: front_page_notify=yes in ressources/class.status.inc line 1121
+2010-05-18 20:23:08: [status/BuildNewersions()]:: [1975] [DAEMON]::status/BuildNewersions:: status_fetchmail_version:: unable to stat fetchmail version in ressources/class.status.inc line 1121
+2010-05-18 20:23:08: [status/BuildNewersions()]:: [1975] [DAEMON]::status/BuildNewersions:: status_nmap_version:: Local version is 5.21 in ressources/class.status.inc line 1121
+2010-05-18 20:23:08: [status/BuildNewersions()]:: [1975] [DAEMON]::status/BuildNewersions:: status_nmap_version:: remote version is 5.21 in ressources/class.status.inc line 1121
+2010-05-18 20:23:08: [status/BuildNewersions()]:: [1975] [DAEMON]::status/BuildNewersions:: status_nmap_version:: Local 5210 against 5210  in ressources/class.status.inc line 1121
+2010-05-18 20:23:08: [status/BuildNewersions()]:: [1975] [DAEMON]::status/BuildNewersions:: status_roundcube_version:: Local int version is 310 in ressources/class.status.inc line 1121
+2010-05-18 20:23:08: [status/BuildNewersions()]:: [1975] [DAEMON]::status/BuildNewersions:: status_roundcube_version:: Folder is /usr/share/roundcube in ressources/class.status.inc line 1121
+2010-05-18 20:23:08: [status/BuildNewersions()]:: [1975] [DAEMON]::status/BuildNewersions:: status_roundcube_version:: Local version is 310 in ressources/class.status.inc line 1121
+2010-05-18 20:23:08: [status/BuildNewersions()]:: [1975] [DAEMON]::status/BuildNewersions:: status_roundcube_version:: remote version is 0.3.1  in ressources/class.status.inc line 1121
+2010-05-18 20:23:08: [status/BuildNewersions()]:: [1975] [DAEMON]::status/BuildNewersions:: status_roundcube_version:: remote version (2) is 3.10  in ressources/class.status.inc line 1121
+2010-05-18 20:23:08: [status/BuildNewersions()]:: [1975] [DAEMON]::status/BuildNewersions:: status_roundcube_version:: Local 310 against 310  in ressources/class.status.inc line 1121
+2010-05-18 20:23:08: [status/BuildNewersions()]:: [1975] [DAEMON]::status/BuildNewersions:: status_assp_version:: ASSP "1.6.5.5" On web server in ressources/class.status.inc line 1121
+2010-05-18 20:23:08: [status/BuildNewersions()]:: [1975] [DAEMON]::status/BuildNewersions:: status_assp_version:: Local 1655 against 1655  in ressources/class.status.inc line 1121
+2010-05-18 20:23:08: [status/BuildNewersions()]:: [1975] [DAEMON]::status/BuildNewersions:: status_spamassassin:: Local version is 3.3.10 in ressources/class.status.inc line 1121
+2010-05-18 20:23:08: [status/BuildNewersions()]:: [1975] [DAEMON]::status/BuildNewersions:: status_spamassassin:: remote version is 3.3.10 in ressources/class.status.inc line 1121
+2010-05-18 20:23:08: [status/BuildNewersions()]:: [1975] [DAEMON]::status/BuildNewersions:: status_spamassassin:: Local 3310 against 3310  in ressources/class.status.inc line 1121

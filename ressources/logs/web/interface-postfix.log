@@ -1,0 +1,713 @@
+2010-05-18 18:51:50:(class.main_cf.inc) [main_cf/main_cf()][]:: **** initialize postfix class
+2010-05-18 18:51:50:(class.main_cf.inc) [main_cf/main_cf()][]:: **** parse_conf
+2010-05-18 18:51:50:(class.main_cf.inc) [main_cf/parse_conf()][]:: receive from postconf 140 parameters
+2010-05-18 18:51:50:(class.main_cf.inc) [main_cf/main_cf()][]:: **** Parse_hashs
+2010-05-18 18:51:50:(class.main_cf.inc) [main_cf/main_cf()][]:: **** FillDefaults
+2010-05-18 18:51:50:(class.main_cf.inc) [main_cf/main_cf()][]:: **** parse_my_networks
+2010-05-18 18:51:50:(class.main_cf.inc) [main_cf/Create_mynetworks_maps_ldap()][]:: Create the new branch cn=mynetworks_maps,cn=artica,dc=my-domain,dc=com
+2010-05-18 18:51:50:(class.main_cf.inc) [main_cf/main_cf()][]:: **** parse_inet_interfaces
+2010-05-18 18:51:50:(class.main_cf.inc) [main_cf/parse_inet_interfaces()][]:: inet_interfaces data -> all
+2010-05-18 18:51:50:(class.main_cf.inc) [main_cf/main_cf()][]:: **** ParseServicesNames
+2010-05-18 18:51:50:(class.main_cf.inc) [main_cf/main_cf()][]:: **** initialize postfix end...
+2010-05-18 18:51:50:(class.main_cf.inc) [main_cf/CheckMyNetwork()][]:: main->array_mynetworks is not an array, seems that postfix has no network set
+2010-05-18 18:52:20:(class.main_cf.inc) [main_cf/main_cf()][]:: **** initialize postfix class
+2010-05-18 18:52:20:(class.main_cf.inc) [main_cf/main_cf()][]:: **** parse_conf
+2010-05-18 18:52:20:(class.main_cf.inc) [main_cf/parse_conf()][]:: receive from postconf 140 parameters
+2010-05-18 18:52:20:(class.main_cf.inc) [main_cf/main_cf()][]:: **** Parse_hashs
+2010-05-18 18:52:20:(class.main_cf.inc) [main_cf/main_cf()][]:: **** FillDefaults
+2010-05-18 18:52:20:(class.main_cf.inc) [main_cf/main_cf()][]:: **** parse_my_networks
+2010-05-18 18:52:20:(class.main_cf.inc) [main_cf/Create_mynetworks_maps_ldap()][]:: Create the new branch cn=mynetworks_maps,cn=artica,dc=my-domain,dc=com
+2010-05-18 18:52:20:(class.main_cf.inc) [main_cf/main_cf()][]:: **** parse_inet_interfaces
+2010-05-18 18:52:20:(class.main_cf.inc) [main_cf/parse_inet_interfaces()][]:: inet_interfaces data -> all
+2010-05-18 18:52:20:(class.main_cf.inc) [main_cf/main_cf()][]:: **** ParseServicesNames
+2010-05-18 18:52:20:(class.main_cf.inc) [main_cf/main_cf()][]:: **** initialize postfix end...
+2010-05-18 18:52:20:(class.main_cf.inc) [main_cf/CheckMyNetwork()][]:: main->array_mynetworks is not an array, seems that postfix has no network set
+2010-05-18 18:52:29:(class.main_cf.inc) [main_cf/main_cf()][]:: **** initialize postfix class
+2010-05-18 18:52:29:(class.main_cf.inc) [main_cf/main_cf()][]:: **** parse_conf
+2010-05-18 18:52:29:(class.main_cf.inc) [main_cf/parse_conf()][]:: receive from postconf 140 parameters
+2010-05-18 18:52:29:(class.main_cf.inc) [main_cf/main_cf()][]:: **** Parse_hashs
+2010-05-18 18:52:29:(class.main_cf.inc) [main_cf/main_cf()][]:: **** FillDefaults
+2010-05-18 18:52:29:(class.main_cf.inc) [main_cf/main_cf()][]:: **** parse_my_networks
+2010-05-18 18:52:29:(class.main_cf.inc) [main_cf/Create_mynetworks_maps_ldap()][]:: Create the new branch cn=mynetworks_maps,cn=artica,dc=my-domain,dc=com
+2010-05-18 18:52:29:(class.main_cf.inc) [main_cf/main_cf()][]:: **** parse_inet_interfaces
+2010-05-18 18:52:29:(class.main_cf.inc) [main_cf/parse_inet_interfaces()][]:: inet_interfaces data -> all
+2010-05-18 18:52:29:(class.main_cf.inc) [main_cf/main_cf()][]:: **** ParseServicesNames
+2010-05-18 18:52:29:(class.main_cf.inc) [main_cf/main_cf()][]:: **** initialize postfix end...
+2010-05-18 18:52:29:(class.main_cf.inc) [main_cf/save_conf_to_server()][]:: ##################### SAVE CONF TO SERVER #######################
+2010-05-18 18:52:29:(logs.inc) [()][]:: Save main.cf configuration in LDAP ############################################
+2010-05-18 18:52:29:(class.main_cf.inc) [main_cf/save_conf()][]:: inet_interfaces=all
+2010-05-18 18:52:29:(class.main_cf.inc) [main_cf/header_checks()][]:: number of rules of header_checks:0
+2010-05-18 18:52:29:(class.main_cf.inc) [main_cf/save_conf()][]:: main array count 126 rows
+2010-05-18 18:52:29:(class.main_cf.inc) [main_cf/_SaveMainCf()][]:: main.cf 4650 lenght
+2010-05-18 18:52:29:(class.main_cf.inc) [main_cf/_SaveMainCf()][]:: cleaning main.cf builder
+2010-05-18 18:52:29:(class.main_cf.inc) [main_cf/_SaveMainCf()][]:: main.cf after cleaning 4650 lenght,PostfixMiltersBehavior=1
+2010-05-18 18:52:29:(class.main_cf.inc) [main_cf/save_conf()][]:: Save Postfix settings into Artica file storage
+2010-05-18 18:52:29:(class.main_cf.inc) [main_cf/save_conf_to_server()][]:: Current configuration in memory as 4650 caracters
+2010-05-18 18:52:29:(class.main_cf.inc) [main_cf/save_conf_to_server()][]:: Cleaning main.cf file
+2010-05-18 18:52:29:(class.main_cf.inc) [main_cf/save_conf_to_server()][]:: ***************** restrictions classes *****************
+2010-05-18 18:52:29:(class.main_cf.inc) [smtpd_restrictions/IfPolicyServerExists()][]:: Check policy services for artica and/or sqlgrey
+2010-05-18 18:52:29:(class.main_cf.inc) [smtpd_restrictions/IfPolicyServerSqlGreyExists()][]:: SqlGrey enabled ??? =0
+2010-05-18 18:52:29:(class.main_cf.inc) [smtpd_restrictions/IfPolicyServerSqlGreyExists()][]:: SqlGrey is disabled, remove it from the array list
+2010-05-18 18:52:29:(class.main_cf.inc) [main_cf/save_conf_to_server()][]:: Save rules restrictions
+2010-05-18 18:52:29:(class.main_cf.inc) [smtpd_restrictions/Build()][]:: return -----------------------
+2010-05-18 18:52:29:(class.main_cf.inc) [smtpd_restrictions/Build()][]:: 
+
+
+2010-05-18 18:52:29:(class.main_cf.inc) [smtpd_restrictions/Build()][]:: ------------------------------
+2010-05-18 18:52:29:(class.main_cf.inc) [main_cf/save_conf_to_server()][]:: rules->Build() return : 
+2010-05-18 18:52:29:(class.main_cf.inc) [main_cf/relay_clientcerts_conf()][]:: relay_clientcerts: no datas.. 
+2010-05-18 18:52:29:(class.main_cf.inc) [main_cf/save_conf_to_server()][]:: no array so mynetworks=127.0.0.0/8
+2010-05-18 18:52:30:(class.main_cf.inc) [main_cf/BuildMilters()][]:: KasxFilterEnabled=1
+2010-05-18 18:52:30:(class.main_cf.inc) [main_cf/BuildMilters()][]:: [] MimeDefang is not installed
+2010-05-18 18:52:30:(class.main_cf.inc) [main_cf/BuildMilters()][]:: milter_default_action=1 (accept)
+2010-05-18 18:52:30:(logs.inc) [()][]:: testing branch :cn=mailman,cn=artica,dc=my-domain,dc=com
+2010-05-18 18:52:30:(class.main_cf.inc) [main_cf/_FixTree()][]:: testing branch :cn=restrictions_classes,cn=artica,dc=my-domain,dc=com
+2010-05-18 18:52:30:(class.main_cf.inc) [main_cf/_FixTree()][]:: testing branch :cn=smtpd_client_restrictions,cn=restrictions_classes,cn=artica,dc=my-domain,dc=com
+2010-05-18 18:52:30:(class.main_cf.inc) [main_cf/_FixTree()][]:: testing branch :cn=check_client_access,cn=smtpd_client_restrictions,cn=restrictions_classes,cn=artica,dc=my-domain,dc=com
+2010-05-18 18:52:30:(class.main_cf.inc) [main_cf/_FixTree()][]:: testing branch :cn=Sender_Dependent_Relay_host_Maps,cn=artica,dc=my-domain,dc=com
+2010-05-18 18:52:30:(class.main_cf.inc) [main_cf/_FixTree()][]:: testing branch :cn=PostfixFilesStorage,cn=artica,dc=my-domain,dc=com
+2010-05-18 18:52:30:(class.main_cf.inc) [main_cf/_FixTree()][]:: testing branch :cn=smtp_sasl_password_maps,cn=artica,dc=my-domain,dc=com
+2010-05-18 18:52:30:(class.main_cf.inc) [main_cf/save_conf_to_server()][]:: MAINPERSO:: Replace configuration by users settings
+2010-05-18 18:52:30:(class.main_cf.inc) [main_perso/load_array()][]:: MAINPERSO: failed parsing new dn cn=maincf_perso,cn=artica,dc=my-domain,dc=com (objectclass=AdvancedMainCF)
+2010-05-18 18:52:30:(class.main_cf.inc) [main_cf/save_conf_to_server()][]:: MAINPERSO:: End
+2010-05-18 18:52:30:(class.main_cf.inc) [main_cf/save_conf_to_server()][]:: Save configuration file into Artica storage...
+2010-05-18 18:52:30:(class.main_cf.inc) [main_cf/save_conf_to_server()][]:: ###################### END ##############################
+2010-05-18 18:53:58:(class.main_cf.inc) [main_cf/main_cf()][]:: **** initialize postfix class
+2010-05-18 18:53:58:(class.main_cf.inc) [main_cf/main_cf()][]:: **** parse_conf
+2010-05-18 18:53:58:(class.main_cf.inc) [main_cf/parse_conf()][]:: receive from postconf 130 parameters
+2010-05-18 18:53:58:(class.main_cf.inc) [main_cf/main_cf()][]:: **** Parse_hashs
+2010-05-18 18:53:58:(class.main_cf.inc) [main_cf/main_cf()][]:: **** FillDefaults
+2010-05-18 18:53:58:(class.main_cf.inc) [main_cf/main_cf()][]:: **** parse_my_networks
+2010-05-18 18:53:58:(class.main_cf.inc) [main_cf/parse_my_networks()][]:: 0) 127.0.0.0/8 [::ffff:127.0.0.0]/104 [::1]/128
+2010-05-18 18:53:58:(class.main_cf.inc) [main_cf/parse_my_networks()][]:: 1) 192.168.1.0/24
+2010-05-18 18:53:58:(class.main_cf.inc) [main_cf/main_cf()][]:: **** parse_inet_interfaces
+2010-05-18 18:53:58:(class.main_cf.inc) [main_cf/parse_inet_interfaces()][]:: inet_interfaces data -> all
+2010-05-18 18:53:58:(class.main_cf.inc) [main_cf/main_cf()][]:: **** ParseServicesNames
+2010-05-18 18:53:58:(class.main_cf.inc) [main_cf/main_cf()][]:: **** initialize postfix end...
+2010-05-18 18:54:59:(class.main_cf.inc) [main_cf/main_cf()][]:: **** initialize postfix class
+2010-05-18 18:54:59:(class.main_cf.inc) [main_cf/main_cf()][]:: **** parse_conf
+2010-05-18 18:54:59:(class.main_cf.inc) [main_cf/parse_conf()][]:: receive from postconf 130 parameters
+2010-05-18 18:54:59:(class.main_cf.inc) [main_cf/main_cf()][]:: **** Parse_hashs
+2010-05-18 18:54:59:(class.main_cf.inc) [main_cf/main_cf()][]:: **** FillDefaults
+2010-05-18 18:54:59:(class.main_cf.inc) [main_cf/main_cf()][]:: **** parse_my_networks
+2010-05-18 18:54:59:(class.main_cf.inc) [main_cf/parse_my_networks()][]:: 0) 127.0.0.0/8 [::ffff:127.0.0.0]/104 [::1]/128
+2010-05-18 18:54:59:(class.main_cf.inc) [main_cf/parse_my_networks()][]:: 1) 192.168.1.0/24
+2010-05-18 18:54:59:(class.main_cf.inc) [main_cf/main_cf()][]:: **** parse_inet_interfaces
+2010-05-18 18:54:59:(class.main_cf.inc) [main_cf/parse_inet_interfaces()][]:: inet_interfaces data -> all
+2010-05-18 18:54:59:(class.main_cf.inc) [main_cf/main_cf()][]:: **** ParseServicesNames
+2010-05-18 18:54:59:(class.main_cf.inc) [main_cf/main_cf()][]:: **** initialize postfix end...
+2010-05-18 18:55:32:(class.main_cf.inc) [main_cf/main_cf()][]:: **** initialize postfix class
+2010-05-18 18:55:32:(class.main_cf.inc) [main_cf/main_cf()][]:: **** parse_conf
+2010-05-18 18:55:32:(class.main_cf.inc) [main_cf/parse_conf()][]:: receive from postconf 130 parameters
+2010-05-18 18:55:32:(class.main_cf.inc) [main_cf/main_cf()][]:: **** Parse_hashs
+2010-05-18 18:55:32:(class.main_cf.inc) [main_cf/main_cf()][]:: **** FillDefaults
+2010-05-18 18:55:32:(class.main_cf.inc) [main_cf/main_cf()][]:: **** parse_my_networks
+2010-05-18 18:55:32:(class.main_cf.inc) [main_cf/parse_my_networks()][]:: 0) 127.0.0.0/8 [::ffff:127.0.0.0]/104 [::1]/128
+2010-05-18 18:55:32:(class.main_cf.inc) [main_cf/parse_my_networks()][]:: 1) 192.168.1.0/24
+2010-05-18 18:55:32:(class.main_cf.inc) [main_cf/main_cf()][]:: **** parse_inet_interfaces
+2010-05-18 18:55:32:(class.main_cf.inc) [main_cf/parse_inet_interfaces()][]:: inet_interfaces data -> all
+2010-05-18 18:55:32:(class.main_cf.inc) [main_cf/main_cf()][]:: **** ParseServicesNames
+2010-05-18 18:55:32:(class.main_cf.inc) [main_cf/main_cf()][]:: **** initialize postfix end...
+2010-05-18 18:55:33:(class.main_cf.inc) [main_cf/main_cf()][]:: **** initialize postfix class
+2010-05-18 18:55:33:(class.main_cf.inc) [main_cf/main_cf()][]:: **** parse_conf
+2010-05-18 18:55:33:(class.main_cf.inc) [main_cf/parse_conf()][]:: receive from postconf 130 parameters
+2010-05-18 18:55:33:(class.main_cf.inc) [main_cf/main_cf()][]:: **** Parse_hashs
+2010-05-18 18:55:33:(class.main_cf.inc) [main_cf/main_cf()][]:: **** FillDefaults
+2010-05-18 18:55:33:(class.main_cf.inc) [main_cf/main_cf()][]:: **** parse_my_networks
+2010-05-18 18:55:33:(class.main_cf.inc) [main_cf/parse_my_networks()][]:: 0) 127.0.0.0/8 [::ffff:127.0.0.0]/104 [::1]/128
+2010-05-18 18:55:33:(class.main_cf.inc) [main_cf/parse_my_networks()][]:: 1) 192.168.1.0/24
+2010-05-18 18:55:33:(class.main_cf.inc) [main_cf/main_cf()][]:: **** parse_inet_interfaces
+2010-05-18 18:55:33:(class.main_cf.inc) [main_cf/parse_inet_interfaces()][]:: inet_interfaces data -> all
+2010-05-18 18:55:33:(class.main_cf.inc) [main_cf/main_cf()][]:: **** ParseServicesNames
+2010-05-18 18:55:33:(class.main_cf.inc) [main_cf/main_cf()][]:: **** initialize postfix end...
+2010-05-18 18:57:34:(class.main_cf.inc) [main_cf/main_cf()][]:: **** initialize postfix class
+2010-05-18 18:57:34:(class.main_cf.inc) [main_cf/main_cf()][]:: **** parse_conf
+2010-05-18 18:57:34:(class.main_cf.inc) [main_cf/parse_conf()][]:: receive from postconf 130 parameters
+2010-05-18 18:57:34:(class.main_cf.inc) [main_cf/main_cf()][]:: **** Parse_hashs
+2010-05-18 18:57:34:(class.main_cf.inc) [main_cf/main_cf()][]:: **** FillDefaults
+2010-05-18 18:57:34:(class.main_cf.inc) [main_cf/main_cf()][]:: **** parse_my_networks
+2010-05-18 18:57:34:(class.main_cf.inc) [main_cf/parse_my_networks()][]:: 0) 127.0.0.0/8 [::ffff:127.0.0.0]/104 [::1]/128
+2010-05-18 18:57:34:(class.main_cf.inc) [main_cf/parse_my_networks()][]:: 1) 192.168.1.0/24
+2010-05-18 18:57:34:(class.main_cf.inc) [main_cf/main_cf()][]:: **** parse_inet_interfaces
+2010-05-18 18:57:34:(class.main_cf.inc) [main_cf/parse_inet_interfaces()][]:: inet_interfaces data -> all
+2010-05-18 18:57:34:(class.main_cf.inc) [main_cf/main_cf()][]:: **** ParseServicesNames
+2010-05-18 18:57:34:(class.main_cf.inc) [main_cf/main_cf()][]:: **** initialize postfix end...
+2010-05-18 19:00:04:(class.main_cf.inc) [main_cf/main_cf()][]:: **** initialize postfix class
+2010-05-18 19:00:04:(class.main_cf.inc) [main_cf/main_cf()][]:: **** parse_conf
+2010-05-18 19:00:04:(class.main_cf.inc) [main_cf/parse_conf()][]:: receive from postconf 130 parameters
+2010-05-18 19:00:04:(class.main_cf.inc) [main_cf/main_cf()][]:: **** Parse_hashs
+2010-05-18 19:00:04:(class.main_cf.inc) [main_cf/main_cf()][]:: **** FillDefaults
+2010-05-18 19:00:04:(class.main_cf.inc) [main_cf/main_cf()][]:: **** parse_my_networks
+2010-05-18 19:00:04:(class.main_cf.inc) [main_cf/parse_my_networks()][]:: 0) 127.0.0.0/8 [::ffff:127.0.0.0]/104 [::1]/128
+2010-05-18 19:00:04:(class.main_cf.inc) [main_cf/parse_my_networks()][]:: 1) 192.168.1.0/24
+2010-05-18 19:00:04:(class.main_cf.inc) [main_cf/main_cf()][]:: **** parse_inet_interfaces
+2010-05-18 19:00:04:(class.main_cf.inc) [main_cf/parse_inet_interfaces()][]:: inet_interfaces data -> all
+2010-05-18 19:00:04:(class.main_cf.inc) [main_cf/main_cf()][]:: **** ParseServicesNames
+2010-05-18 19:00:04:(class.main_cf.inc) [main_cf/main_cf()][]:: **** initialize postfix end...
+2010-05-18 19:02:12:(class.main_cf.inc) [main_cf/main_cf()][]:: **** initialize postfix class
+2010-05-18 19:02:12:(class.main_cf.inc) [main_cf/main_cf()][]:: **** parse_conf
+2010-05-18 19:02:12:(class.main_cf.inc) [main_cf/parse_conf()][]:: receive from postconf 130 parameters
+2010-05-18 19:02:12:(class.main_cf.inc) [main_cf/main_cf()][]:: **** Parse_hashs
+2010-05-18 19:02:12:(class.main_cf.inc) [main_cf/main_cf()][]:: **** FillDefaults
+2010-05-18 19:02:12:(class.main_cf.inc) [main_cf/main_cf()][]:: **** parse_my_networks
+2010-05-18 19:02:12:(class.main_cf.inc) [main_cf/parse_my_networks()][]:: 0) 127.0.0.0/8 [::ffff:127.0.0.0]/104 [::1]/128
+2010-05-18 19:02:12:(class.main_cf.inc) [main_cf/parse_my_networks()][]:: 1) 192.168.1.0/24
+2010-05-18 19:02:12:(class.main_cf.inc) [main_cf/main_cf()][]:: **** parse_inet_interfaces
+2010-05-18 19:02:12:(class.main_cf.inc) [main_cf/parse_inet_interfaces()][]:: inet_interfaces data -> all
+2010-05-18 19:02:12:(class.main_cf.inc) [main_cf/main_cf()][]:: **** ParseServicesNames
+2010-05-18 19:02:12:(class.main_cf.inc) [main_cf/main_cf()][]:: **** initialize postfix end...
+2010-05-18 19:02:12:(class.main_cf.inc) [main_cf/CheckMyNetwork()][]:: main->array_mynetworks[0]=127.0.0.0/8 [::ffff:127.0.0.0]/104 [::1]/128
+2010-05-18 19:02:12:(class.main_cf.inc) [main_cf/CheckMyNetwork()][]:: main->array_mynetworks[1]=192.168.1.0/24
+2010-05-18 19:02:12:(class.main_cf.inc) [main_cf/CheckMyNetwork()][]:: return success, networks set
+2010-05-18 19:02:34:(class.main_cf.inc) [main_cf/main_cf()][]:: **** initialize postfix class
+2010-05-18 19:02:34:(class.main_cf.inc) [main_cf/main_cf()][]:: **** parse_conf
+2010-05-18 19:02:34:(class.main_cf.inc) [main_cf/parse_conf()][]:: receive from postconf 130 parameters
+2010-05-18 19:02:34:(class.main_cf.inc) [main_cf/main_cf()][]:: **** Parse_hashs
+2010-05-18 19:02:34:(class.main_cf.inc) [main_cf/main_cf()][]:: **** FillDefaults
+2010-05-18 19:02:34:(class.main_cf.inc) [main_cf/main_cf()][]:: **** parse_my_networks
+2010-05-18 19:02:34:(class.main_cf.inc) [main_cf/parse_my_networks()][]:: 0) 127.0.0.0/8 [::ffff:127.0.0.0]/104 [::1]/128
+2010-05-18 19:02:34:(class.main_cf.inc) [main_cf/parse_my_networks()][]:: 1) 192.168.1.0/24
+2010-05-18 19:02:34:(class.main_cf.inc) [main_cf/main_cf()][]:: **** parse_inet_interfaces
+2010-05-18 19:02:34:(class.main_cf.inc) [main_cf/parse_inet_interfaces()][]:: inet_interfaces data -> all
+2010-05-18 19:02:34:(class.main_cf.inc) [main_cf/main_cf()][]:: **** ParseServicesNames
+2010-05-18 19:02:34:(class.main_cf.inc) [main_cf/main_cf()][]:: **** initialize postfix end...
+2010-05-18 19:05:04:(class.main_cf.inc) [main_cf/main_cf()][]:: **** initialize postfix class
+2010-05-18 19:05:04:(class.main_cf.inc) [main_cf/main_cf()][]:: **** parse_conf
+2010-05-18 19:05:04:(class.main_cf.inc) [main_cf/parse_conf()][]:: receive from postconf 130 parameters
+2010-05-18 19:05:04:(class.main_cf.inc) [main_cf/main_cf()][]:: **** Parse_hashs
+2010-05-18 19:05:04:(class.main_cf.inc) [main_cf/main_cf()][]:: **** FillDefaults
+2010-05-18 19:05:04:(class.main_cf.inc) [main_cf/main_cf()][]:: **** parse_my_networks
+2010-05-18 19:05:04:(class.main_cf.inc) [main_cf/parse_my_networks()][]:: 0) 127.0.0.0/8 [::ffff:127.0.0.0]/104 [::1]/128
+2010-05-18 19:05:04:(class.main_cf.inc) [main_cf/parse_my_networks()][]:: 1) 192.168.1.0/24
+2010-05-18 19:05:04:(class.main_cf.inc) [main_cf/main_cf()][]:: **** parse_inet_interfaces
+2010-05-18 19:05:04:(class.main_cf.inc) [main_cf/parse_inet_interfaces()][]:: inet_interfaces data -> all
+2010-05-18 19:05:04:(class.main_cf.inc) [main_cf/main_cf()][]:: **** ParseServicesNames
+2010-05-18 19:05:04:(class.main_cf.inc) [main_cf/main_cf()][]:: **** initialize postfix end...
+2010-05-18 19:07:33:(class.main_cf.inc) [main_cf/main_cf()][]:: **** initialize postfix class
+2010-05-18 19:07:33:(class.main_cf.inc) [main_cf/main_cf()][]:: **** parse_conf
+2010-05-18 19:07:33:(class.main_cf.inc) [main_cf/parse_conf()][]:: receive from postconf 130 parameters
+2010-05-18 19:07:33:(class.main_cf.inc) [main_cf/main_cf()][]:: **** Parse_hashs
+2010-05-18 19:07:33:(class.main_cf.inc) [main_cf/main_cf()][]:: **** FillDefaults
+2010-05-18 19:07:33:(class.main_cf.inc) [main_cf/main_cf()][]:: **** parse_my_networks
+2010-05-18 19:07:33:(class.main_cf.inc) [main_cf/parse_my_networks()][]:: 0) 127.0.0.0/8 [::ffff:127.0.0.0]/104 [::1]/128
+2010-05-18 19:07:33:(class.main_cf.inc) [main_cf/parse_my_networks()][]:: 1) 192.168.1.0/24
+2010-05-18 19:07:33:(class.main_cf.inc) [main_cf/main_cf()][]:: **** parse_inet_interfaces
+2010-05-18 19:07:33:(class.main_cf.inc) [main_cf/parse_inet_interfaces()][]:: inet_interfaces data -> all
+2010-05-18 19:07:33:(class.main_cf.inc) [main_cf/main_cf()][]:: **** ParseServicesNames
+2010-05-18 19:07:33:(class.main_cf.inc) [main_cf/main_cf()][]:: **** initialize postfix end...
+2010-05-18 19:10:04:(class.main_cf.inc) [main_cf/main_cf()][]:: **** initialize postfix class
+2010-05-18 19:10:04:(class.main_cf.inc) [main_cf/main_cf()][]:: **** parse_conf
+2010-05-18 19:10:04:(class.main_cf.inc) [main_cf/parse_conf()][]:: receive from postconf 130 parameters
+2010-05-18 19:10:04:(class.main_cf.inc) [main_cf/main_cf()][]:: **** Parse_hashs
+2010-05-18 19:10:04:(class.main_cf.inc) [main_cf/main_cf()][]:: **** FillDefaults
+2010-05-18 19:10:04:(class.main_cf.inc) [main_cf/main_cf()][]:: **** parse_my_networks
+2010-05-18 19:10:04:(class.main_cf.inc) [main_cf/parse_my_networks()][]:: 0) 127.0.0.0/8 [::ffff:127.0.0.0]/104 [::1]/128
+2010-05-18 19:10:04:(class.main_cf.inc) [main_cf/parse_my_networks()][]:: 1) 192.168.1.0/24
+2010-05-18 19:10:04:(class.main_cf.inc) [main_cf/main_cf()][]:: **** parse_inet_interfaces
+2010-05-18 19:10:04:(class.main_cf.inc) [main_cf/parse_inet_interfaces()][]:: inet_interfaces data -> all
+2010-05-18 19:10:04:(class.main_cf.inc) [main_cf/main_cf()][]:: **** ParseServicesNames
+2010-05-18 19:10:04:(class.main_cf.inc) [main_cf/main_cf()][]:: **** initialize postfix end...
+2010-05-18 19:12:10:(class.main_cf.inc) [main_cf/main_cf()][]:: **** initialize postfix class
+2010-05-18 19:12:10:(class.main_cf.inc) [main_cf/main_cf()][]:: **** parse_conf
+2010-05-18 19:12:10:(class.main_cf.inc) [main_cf/parse_conf()][]:: receive from postconf 130 parameters
+2010-05-18 19:12:10:(class.main_cf.inc) [main_cf/main_cf()][]:: **** Parse_hashs
+2010-05-18 19:12:10:(class.main_cf.inc) [main_cf/main_cf()][]:: **** FillDefaults
+2010-05-18 19:12:10:(class.main_cf.inc) [main_cf/main_cf()][]:: **** parse_my_networks
+2010-05-18 19:12:10:(class.main_cf.inc) [main_cf/parse_my_networks()][]:: 0) 127.0.0.0/8 [::ffff:127.0.0.0]/104 [::1]/128
+2010-05-18 19:12:10:(class.main_cf.inc) [main_cf/parse_my_networks()][]:: 1) 192.168.1.0/24
+2010-05-18 19:12:10:(class.main_cf.inc) [main_cf/main_cf()][]:: **** parse_inet_interfaces
+2010-05-18 19:12:10:(class.main_cf.inc) [main_cf/parse_inet_interfaces()][]:: inet_interfaces data -> all
+2010-05-18 19:12:10:(class.main_cf.inc) [main_cf/main_cf()][]:: **** ParseServicesNames
+2010-05-18 19:12:10:(class.main_cf.inc) [main_cf/main_cf()][]:: **** initialize postfix end...
+2010-05-18 19:12:10:(class.main_cf.inc) [main_cf/CheckMyNetwork()][]:: main->array_mynetworks[0]=127.0.0.0/8 [::ffff:127.0.0.0]/104 [::1]/128
+2010-05-18 19:12:10:(class.main_cf.inc) [main_cf/CheckMyNetwork()][]:: main->array_mynetworks[1]=192.168.1.0/24
+2010-05-18 19:12:10:(class.main_cf.inc) [main_cf/CheckMyNetwork()][]:: return success, networks set
+2010-05-18 19:12:33:(class.main_cf.inc) [main_cf/main_cf()][]:: **** initialize postfix class
+2010-05-18 19:12:33:(class.main_cf.inc) [main_cf/main_cf()][]:: **** parse_conf
+2010-05-18 19:12:33:(class.main_cf.inc) [main_cf/parse_conf()][]:: receive from postconf 130 parameters
+2010-05-18 19:12:33:(class.main_cf.inc) [main_cf/main_cf()][]:: **** Parse_hashs
+2010-05-18 19:12:33:(class.main_cf.inc) [main_cf/main_cf()][]:: **** FillDefaults
+2010-05-18 19:12:33:(class.main_cf.inc) [main_cf/main_cf()][]:: **** parse_my_networks
+2010-05-18 19:12:33:(class.main_cf.inc) [main_cf/parse_my_networks()][]:: 0) 127.0.0.0/8 [::ffff:127.0.0.0]/104 [::1]/128
+2010-05-18 19:12:33:(class.main_cf.inc) [main_cf/parse_my_networks()][]:: 1) 192.168.1.0/24
+2010-05-18 19:12:33:(class.main_cf.inc) [main_cf/main_cf()][]:: **** parse_inet_interfaces
+2010-05-18 19:12:33:(class.main_cf.inc) [main_cf/parse_inet_interfaces()][]:: inet_interfaces data -> all
+2010-05-18 19:12:33:(class.main_cf.inc) [main_cf/main_cf()][]:: **** ParseServicesNames
+2010-05-18 19:12:33:(class.main_cf.inc) [main_cf/main_cf()][]:: **** initialize postfix end...
+2010-05-18 19:15:04:(class.main_cf.inc) [main_cf/main_cf()][]:: **** initialize postfix class
+2010-05-18 19:15:04:(class.main_cf.inc) [main_cf/main_cf()][]:: **** parse_conf
+2010-05-18 19:15:04:(class.main_cf.inc) [main_cf/parse_conf()][]:: receive from postconf 130 parameters
+2010-05-18 19:15:04:(class.main_cf.inc) [main_cf/main_cf()][]:: **** Parse_hashs
+2010-05-18 19:15:04:(class.main_cf.inc) [main_cf/main_cf()][]:: **** FillDefaults
+2010-05-18 19:15:04:(class.main_cf.inc) [main_cf/main_cf()][]:: **** parse_my_networks
+2010-05-18 19:15:04:(class.main_cf.inc) [main_cf/parse_my_networks()][]:: 0) 127.0.0.0/8 [::ffff:127.0.0.0]/104 [::1]/128
+2010-05-18 19:15:04:(class.main_cf.inc) [main_cf/parse_my_networks()][]:: 1) 192.168.1.0/24
+2010-05-18 19:15:04:(class.main_cf.inc) [main_cf/main_cf()][]:: **** parse_inet_interfaces
+2010-05-18 19:15:04:(class.main_cf.inc) [main_cf/parse_inet_interfaces()][]:: inet_interfaces data -> all
+2010-05-18 19:15:04:(class.main_cf.inc) [main_cf/main_cf()][]:: **** ParseServicesNames
+2010-05-18 19:15:04:(class.main_cf.inc) [main_cf/main_cf()][]:: **** initialize postfix end...
+2010-05-18 19:17:33:(class.main_cf.inc) [main_cf/main_cf()][]:: **** initialize postfix class
+2010-05-18 19:17:33:(class.main_cf.inc) [main_cf/main_cf()][]:: **** parse_conf
+2010-05-18 19:17:33:(class.main_cf.inc) [main_cf/parse_conf()][]:: receive from postconf 130 parameters
+2010-05-18 19:17:33:(class.main_cf.inc) [main_cf/main_cf()][]:: **** Parse_hashs
+2010-05-18 19:17:33:(class.main_cf.inc) [main_cf/main_cf()][]:: **** FillDefaults
+2010-05-18 19:17:33:(class.main_cf.inc) [main_cf/main_cf()][]:: **** parse_my_networks
+2010-05-18 19:17:33:(class.main_cf.inc) [main_cf/parse_my_networks()][]:: 0) 127.0.0.0/8 [::ffff:127.0.0.0]/104 [::1]/128
+2010-05-18 19:17:33:(class.main_cf.inc) [main_cf/parse_my_networks()][]:: 1) 192.168.1.0/24
+2010-05-18 19:17:33:(class.main_cf.inc) [main_cf/main_cf()][]:: **** parse_inet_interfaces
+2010-05-18 19:17:33:(class.main_cf.inc) [main_cf/parse_inet_interfaces()][]:: inet_interfaces data -> all
+2010-05-18 19:17:33:(class.main_cf.inc) [main_cf/main_cf()][]:: **** ParseServicesNames
+2010-05-18 19:17:33:(class.main_cf.inc) [main_cf/main_cf()][]:: **** initialize postfix end...
+2010-05-18 19:20:05:(class.main_cf.inc) [main_cf/main_cf()][]:: **** initialize postfix class
+2010-05-18 19:20:05:(class.main_cf.inc) [main_cf/main_cf()][]:: **** parse_conf
+2010-05-18 19:20:05:(class.main_cf.inc) [main_cf/parse_conf()][]:: receive from postconf 130 parameters
+2010-05-18 19:20:05:(class.main_cf.inc) [main_cf/main_cf()][]:: **** Parse_hashs
+2010-05-18 19:20:05:(class.main_cf.inc) [main_cf/main_cf()][]:: **** FillDefaults
+2010-05-18 19:20:05:(class.main_cf.inc) [main_cf/main_cf()][]:: **** parse_my_networks
+2010-05-18 19:20:05:(class.main_cf.inc) [main_cf/parse_my_networks()][]:: 0) 127.0.0.0/8 [::ffff:127.0.0.0]/104 [::1]/128
+2010-05-18 19:20:05:(class.main_cf.inc) [main_cf/parse_my_networks()][]:: 1) 192.168.1.0/24
+2010-05-18 19:20:05:(class.main_cf.inc) [main_cf/main_cf()][]:: **** parse_inet_interfaces
+2010-05-18 19:20:05:(class.main_cf.inc) [main_cf/parse_inet_interfaces()][]:: inet_interfaces data -> all
+2010-05-18 19:20:05:(class.main_cf.inc) [main_cf/main_cf()][]:: **** ParseServicesNames
+2010-05-18 19:20:05:(class.main_cf.inc) [main_cf/main_cf()][]:: **** initialize postfix end...
+2010-05-18 19:22:15:(class.main_cf.inc) [main_cf/main_cf()][]:: **** initialize postfix class
+2010-05-18 19:22:15:(class.main_cf.inc) [main_cf/main_cf()][]:: **** parse_conf
+2010-05-18 19:22:15:(class.main_cf.inc) [main_cf/parse_conf()][]:: receive from postconf 130 parameters
+2010-05-18 19:22:15:(class.main_cf.inc) [main_cf/main_cf()][]:: **** Parse_hashs
+2010-05-18 19:22:15:(class.main_cf.inc) [main_cf/main_cf()][]:: **** FillDefaults
+2010-05-18 19:22:15:(class.main_cf.inc) [main_cf/main_cf()][]:: **** parse_my_networks
+2010-05-18 19:22:15:(class.main_cf.inc) [main_cf/parse_my_networks()][]:: 0) 127.0.0.0/8 [::ffff:127.0.0.0]/104 [::1]/128
+2010-05-18 19:22:15:(class.main_cf.inc) [main_cf/parse_my_networks()][]:: 1) 192.168.1.0/24
+2010-05-18 19:22:15:(class.main_cf.inc) [main_cf/main_cf()][]:: **** parse_inet_interfaces
+2010-05-18 19:22:15:(class.main_cf.inc) [main_cf/parse_inet_interfaces()][]:: inet_interfaces data -> all
+2010-05-18 19:22:15:(class.main_cf.inc) [main_cf/main_cf()][]:: **** ParseServicesNames
+2010-05-18 19:22:15:(class.main_cf.inc) [main_cf/main_cf()][]:: **** initialize postfix end...
+2010-05-18 19:22:15:(class.main_cf.inc) [main_cf/CheckMyNetwork()][]:: main->array_mynetworks[0]=127.0.0.0/8 [::ffff:127.0.0.0]/104 [::1]/128
+2010-05-18 19:22:15:(class.main_cf.inc) [main_cf/CheckMyNetwork()][]:: main->array_mynetworks[1]=192.168.1.0/24
+2010-05-18 19:22:15:(class.main_cf.inc) [main_cf/CheckMyNetwork()][]:: return success, networks set
+2010-05-18 19:22:33:(class.main_cf.inc) [main_cf/main_cf()][]:: **** initialize postfix class
+2010-05-18 19:22:33:(class.main_cf.inc) [main_cf/main_cf()][]:: **** parse_conf
+2010-05-18 19:22:33:(class.main_cf.inc) [main_cf/parse_conf()][]:: receive from postconf 130 parameters
+2010-05-18 19:22:33:(class.main_cf.inc) [main_cf/main_cf()][]:: **** Parse_hashs
+2010-05-18 19:22:33:(class.main_cf.inc) [main_cf/main_cf()][]:: **** FillDefaults
+2010-05-18 19:22:33:(class.main_cf.inc) [main_cf/main_cf()][]:: **** parse_my_networks
+2010-05-18 19:22:33:(class.main_cf.inc) [main_cf/parse_my_networks()][]:: 0) 127.0.0.0/8 [::ffff:127.0.0.0]/104 [::1]/128
+2010-05-18 19:22:33:(class.main_cf.inc) [main_cf/parse_my_networks()][]:: 1) 192.168.1.0/24
+2010-05-18 19:22:33:(class.main_cf.inc) [main_cf/main_cf()][]:: **** parse_inet_interfaces
+2010-05-18 19:22:33:(class.main_cf.inc) [main_cf/parse_inet_interfaces()][]:: inet_interfaces data -> all
+2010-05-18 19:22:33:(class.main_cf.inc) [main_cf/main_cf()][]:: **** ParseServicesNames
+2010-05-18 19:22:33:(class.main_cf.inc) [main_cf/main_cf()][]:: **** initialize postfix end...
+2010-05-18 19:25:04:(class.main_cf.inc) [main_cf/main_cf()][]:: **** initialize postfix class
+2010-05-18 19:25:04:(class.main_cf.inc) [main_cf/main_cf()][]:: **** parse_conf
+2010-05-18 19:25:04:(class.main_cf.inc) [main_cf/parse_conf()][]:: receive from postconf 130 parameters
+2010-05-18 19:25:04:(class.main_cf.inc) [main_cf/main_cf()][]:: **** Parse_hashs
+2010-05-18 19:25:04:(class.main_cf.inc) [main_cf/main_cf()][]:: **** FillDefaults
+2010-05-18 19:25:04:(class.main_cf.inc) [main_cf/main_cf()][]:: **** parse_my_networks
+2010-05-18 19:25:04:(class.main_cf.inc) [main_cf/parse_my_networks()][]:: 0) 127.0.0.0/8 [::ffff:127.0.0.0]/104 [::1]/128
+2010-05-18 19:25:04:(class.main_cf.inc) [main_cf/parse_my_networks()][]:: 1) 192.168.1.0/24
+2010-05-18 19:25:04:(class.main_cf.inc) [main_cf/main_cf()][]:: **** parse_inet_interfaces
+2010-05-18 19:25:04:(class.main_cf.inc) [main_cf/parse_inet_interfaces()][]:: inet_interfaces data -> all
+2010-05-18 19:25:04:(class.main_cf.inc) [main_cf/main_cf()][]:: **** ParseServicesNames
+2010-05-18 19:25:04:(class.main_cf.inc) [main_cf/main_cf()][]:: **** initialize postfix end...
+2010-05-18 19:27:33:(class.main_cf.inc) [main_cf/main_cf()][]:: **** initialize postfix class
+2010-05-18 19:27:33:(class.main_cf.inc) [main_cf/main_cf()][]:: **** parse_conf
+2010-05-18 19:27:33:(class.main_cf.inc) [main_cf/parse_conf()][]:: receive from postconf 130 parameters
+2010-05-18 19:27:33:(class.main_cf.inc) [main_cf/main_cf()][]:: **** Parse_hashs
+2010-05-18 19:27:33:(class.main_cf.inc) [main_cf/main_cf()][]:: **** FillDefaults
+2010-05-18 19:27:33:(class.main_cf.inc) [main_cf/main_cf()][]:: **** parse_my_networks
+2010-05-18 19:27:33:(class.main_cf.inc) [main_cf/parse_my_networks()][]:: 0) 127.0.0.0/8 [::ffff:127.0.0.0]/104 [::1]/128
+2010-05-18 19:27:33:(class.main_cf.inc) [main_cf/parse_my_networks()][]:: 1) 192.168.1.0/24
+2010-05-18 19:27:33:(class.main_cf.inc) [main_cf/main_cf()][]:: **** parse_inet_interfaces
+2010-05-18 19:27:33:(class.main_cf.inc) [main_cf/parse_inet_interfaces()][]:: inet_interfaces data -> all
+2010-05-18 19:27:33:(class.main_cf.inc) [main_cf/main_cf()][]:: **** ParseServicesNames
+2010-05-18 19:27:33:(class.main_cf.inc) [main_cf/main_cf()][]:: **** initialize postfix end...
+2010-05-18 19:30:04:(class.main_cf.inc) [main_cf/main_cf()][]:: **** initialize postfix class
+2010-05-18 19:30:04:(class.main_cf.inc) [main_cf/main_cf()][]:: **** parse_conf
+2010-05-18 19:30:04:(class.main_cf.inc) [main_cf/parse_conf()][]:: receive from postconf 130 parameters
+2010-05-18 19:30:04:(class.main_cf.inc) [main_cf/main_cf()][]:: **** Parse_hashs
+2010-05-18 19:30:04:(class.main_cf.inc) [main_cf/main_cf()][]:: **** FillDefaults
+2010-05-18 19:30:04:(class.main_cf.inc) [main_cf/main_cf()][]:: **** parse_my_networks
+2010-05-18 19:30:04:(class.main_cf.inc) [main_cf/parse_my_networks()][]:: 0) 127.0.0.0/8 [::ffff:127.0.0.0]/104 [::1]/128
+2010-05-18 19:30:04:(class.main_cf.inc) [main_cf/parse_my_networks()][]:: 1) 192.168.1.0/24
+2010-05-18 19:30:04:(class.main_cf.inc) [main_cf/main_cf()][]:: **** parse_inet_interfaces
+2010-05-18 19:30:04:(class.main_cf.inc) [main_cf/parse_inet_interfaces()][]:: inet_interfaces data -> all
+2010-05-18 19:30:04:(class.main_cf.inc) [main_cf/main_cf()][]:: **** ParseServicesNames
+2010-05-18 19:30:04:(class.main_cf.inc) [main_cf/main_cf()][]:: **** initialize postfix end...
+2010-05-18 19:32:16:(class.main_cf.inc) [main_cf/main_cf()][]:: **** initialize postfix class
+2010-05-18 19:32:16:(class.main_cf.inc) [main_cf/main_cf()][]:: **** parse_conf
+2010-05-18 19:32:16:(class.main_cf.inc) [main_cf/parse_conf()][]:: receive from postconf 130 parameters
+2010-05-18 19:32:16:(class.main_cf.inc) [main_cf/main_cf()][]:: **** Parse_hashs
+2010-05-18 19:32:16:(class.main_cf.inc) [main_cf/main_cf()][]:: **** FillDefaults
+2010-05-18 19:32:16:(class.main_cf.inc) [main_cf/main_cf()][]:: **** parse_my_networks
+2010-05-18 19:32:16:(class.main_cf.inc) [main_cf/parse_my_networks()][]:: 0) 127.0.0.0/8 [::ffff:127.0.0.0]/104 [::1]/128
+2010-05-18 19:32:16:(class.main_cf.inc) [main_cf/parse_my_networks()][]:: 1) 192.168.1.0/24
+2010-05-18 19:32:16:(class.main_cf.inc) [main_cf/main_cf()][]:: **** parse_inet_interfaces
+2010-05-18 19:32:16:(class.main_cf.inc) [main_cf/parse_inet_interfaces()][]:: inet_interfaces data -> all
+2010-05-18 19:32:16:(class.main_cf.inc) [main_cf/main_cf()][]:: **** ParseServicesNames
+2010-05-18 19:32:16:(class.main_cf.inc) [main_cf/main_cf()][]:: **** initialize postfix end...
+2010-05-18 19:32:16:(class.main_cf.inc) [main_cf/CheckMyNetwork()][]:: main->array_mynetworks[0]=127.0.0.0/8 [::ffff:127.0.0.0]/104 [::1]/128
+2010-05-18 19:32:16:(class.main_cf.inc) [main_cf/CheckMyNetwork()][]:: main->array_mynetworks[1]=192.168.1.0/24
+2010-05-18 19:32:16:(class.main_cf.inc) [main_cf/CheckMyNetwork()][]:: return success, networks set
+2010-05-18 19:32:33:(class.main_cf.inc) [main_cf/main_cf()][]:: **** initialize postfix class
+2010-05-18 19:32:33:(class.main_cf.inc) [main_cf/main_cf()][]:: **** parse_conf
+2010-05-18 19:32:33:(class.main_cf.inc) [main_cf/parse_conf()][]:: receive from postconf 130 parameters
+2010-05-18 19:32:33:(class.main_cf.inc) [main_cf/main_cf()][]:: **** Parse_hashs
+2010-05-18 19:32:33:(class.main_cf.inc) [main_cf/main_cf()][]:: **** FillDefaults
+2010-05-18 19:32:33:(class.main_cf.inc) [main_cf/main_cf()][]:: **** parse_my_networks
+2010-05-18 19:32:33:(class.main_cf.inc) [main_cf/parse_my_networks()][]:: 0) 127.0.0.0/8 [::ffff:127.0.0.0]/104 [::1]/128
+2010-05-18 19:32:33:(class.main_cf.inc) [main_cf/parse_my_networks()][]:: 1) 192.168.1.0/24
+2010-05-18 19:32:33:(class.main_cf.inc) [main_cf/main_cf()][]:: **** parse_inet_interfaces
+2010-05-18 19:32:33:(class.main_cf.inc) [main_cf/parse_inet_interfaces()][]:: inet_interfaces data -> all
+2010-05-18 19:32:33:(class.main_cf.inc) [main_cf/main_cf()][]:: **** ParseServicesNames
+2010-05-18 19:32:33:(class.main_cf.inc) [main_cf/main_cf()][]:: **** initialize postfix end...
+2010-05-18 19:35:04:(class.main_cf.inc) [main_cf/main_cf()][]:: **** initialize postfix class
+2010-05-18 19:35:04:(class.main_cf.inc) [main_cf/main_cf()][]:: **** parse_conf
+2010-05-18 19:35:04:(class.main_cf.inc) [main_cf/parse_conf()][]:: receive from postconf 130 parameters
+2010-05-18 19:35:04:(class.main_cf.inc) [main_cf/main_cf()][]:: **** Parse_hashs
+2010-05-18 19:35:04:(class.main_cf.inc) [main_cf/main_cf()][]:: **** FillDefaults
+2010-05-18 19:35:04:(class.main_cf.inc) [main_cf/main_cf()][]:: **** parse_my_networks
+2010-05-18 19:35:04:(class.main_cf.inc) [main_cf/parse_my_networks()][]:: 0) 127.0.0.0/8 [::ffff:127.0.0.0]/104 [::1]/128
+2010-05-18 19:35:04:(class.main_cf.inc) [main_cf/parse_my_networks()][]:: 1) 192.168.1.0/24
+2010-05-18 19:35:04:(class.main_cf.inc) [main_cf/main_cf()][]:: **** parse_inet_interfaces
+2010-05-18 19:35:04:(class.main_cf.inc) [main_cf/parse_inet_interfaces()][]:: inet_interfaces data -> all
+2010-05-18 19:35:04:(class.main_cf.inc) [main_cf/main_cf()][]:: **** ParseServicesNames
+2010-05-18 19:35:04:(class.main_cf.inc) [main_cf/main_cf()][]:: **** initialize postfix end...
+2010-05-18 19:37:34:(class.main_cf.inc) [main_cf/main_cf()][]:: **** initialize postfix class
+2010-05-18 19:37:34:(class.main_cf.inc) [main_cf/main_cf()][]:: **** parse_conf
+2010-05-18 19:37:34:(class.main_cf.inc) [main_cf/parse_conf()][]:: receive from postconf 130 parameters
+2010-05-18 19:37:34:(class.main_cf.inc) [main_cf/main_cf()][]:: **** Parse_hashs
+2010-05-18 19:37:34:(class.main_cf.inc) [main_cf/main_cf()][]:: **** FillDefaults
+2010-05-18 19:37:34:(class.main_cf.inc) [main_cf/main_cf()][]:: **** parse_my_networks
+2010-05-18 19:37:34:(class.main_cf.inc) [main_cf/parse_my_networks()][]:: 0) 127.0.0.0/8 [::ffff:127.0.0.0]/104 [::1]/128
+2010-05-18 19:37:34:(class.main_cf.inc) [main_cf/parse_my_networks()][]:: 1) 192.168.1.0/24
+2010-05-18 19:37:34:(class.main_cf.inc) [main_cf/main_cf()][]:: **** parse_inet_interfaces
+2010-05-18 19:37:34:(class.main_cf.inc) [main_cf/parse_inet_interfaces()][]:: inet_interfaces data -> all
+2010-05-18 19:37:34:(class.main_cf.inc) [main_cf/main_cf()][]:: **** ParseServicesNames
+2010-05-18 19:37:34:(class.main_cf.inc) [main_cf/main_cf()][]:: **** initialize postfix end...
+2010-05-18 19:40:06:(class.main_cf.inc) [main_cf/main_cf()][]:: **** initialize postfix class
+2010-05-18 19:40:06:(class.main_cf.inc) [main_cf/main_cf()][]:: **** parse_conf
+2010-05-18 19:40:06:(class.main_cf.inc) [main_cf/parse_conf()][]:: receive from postconf 130 parameters
+2010-05-18 19:40:06:(class.main_cf.inc) [main_cf/main_cf()][]:: **** Parse_hashs
+2010-05-18 19:40:06:(class.main_cf.inc) [main_cf/main_cf()][]:: **** FillDefaults
+2010-05-18 19:40:06:(class.main_cf.inc) [main_cf/main_cf()][]:: **** parse_my_networks
+2010-05-18 19:40:06:(class.main_cf.inc) [main_cf/parse_my_networks()][]:: 0) 127.0.0.0/8 [::ffff:127.0.0.0]/104 [::1]/128
+2010-05-18 19:40:06:(class.main_cf.inc) [main_cf/parse_my_networks()][]:: 1) 192.168.1.0/24
+2010-05-18 19:40:06:(class.main_cf.inc) [main_cf/main_cf()][]:: **** parse_inet_interfaces
+2010-05-18 19:40:06:(class.main_cf.inc) [main_cf/parse_inet_interfaces()][]:: inet_interfaces data -> all
+2010-05-18 19:40:06:(class.main_cf.inc) [main_cf/main_cf()][]:: **** ParseServicesNames
+2010-05-18 19:40:06:(class.main_cf.inc) [main_cf/main_cf()][]:: **** initialize postfix end...
+2010-05-18 19:42:15:(class.main_cf.inc) [main_cf/main_cf()][]:: **** initialize postfix class
+2010-05-18 19:42:15:(class.main_cf.inc) [main_cf/main_cf()][]:: **** parse_conf
+2010-05-18 19:42:15:(class.main_cf.inc) [main_cf/parse_conf()][]:: receive from postconf 130 parameters
+2010-05-18 19:42:15:(class.main_cf.inc) [main_cf/main_cf()][]:: **** Parse_hashs
+2010-05-18 19:42:15:(class.main_cf.inc) [main_cf/main_cf()][]:: **** FillDefaults
+2010-05-18 19:42:15:(class.main_cf.inc) [main_cf/main_cf()][]:: **** parse_my_networks
+2010-05-18 19:42:15:(class.main_cf.inc) [main_cf/parse_my_networks()][]:: 0) 127.0.0.0/8 [::ffff:127.0.0.0]/104 [::1]/128
+2010-05-18 19:42:15:(class.main_cf.inc) [main_cf/parse_my_networks()][]:: 1) 192.168.1.0/24
+2010-05-18 19:42:15:(class.main_cf.inc) [main_cf/main_cf()][]:: **** parse_inet_interfaces
+2010-05-18 19:42:15:(class.main_cf.inc) [main_cf/parse_inet_interfaces()][]:: inet_interfaces data -> all
+2010-05-18 19:42:15:(class.main_cf.inc) [main_cf/main_cf()][]:: **** ParseServicesNames
+2010-05-18 19:42:15:(class.main_cf.inc) [main_cf/main_cf()][]:: **** initialize postfix end...
+2010-05-18 19:42:15:(class.main_cf.inc) [main_cf/CheckMyNetwork()][]:: main->array_mynetworks[0]=127.0.0.0/8 [::ffff:127.0.0.0]/104 [::1]/128
+2010-05-18 19:42:15:(class.main_cf.inc) [main_cf/CheckMyNetwork()][]:: main->array_mynetworks[1]=192.168.1.0/24
+2010-05-18 19:42:15:(class.main_cf.inc) [main_cf/CheckMyNetwork()][]:: return success, networks set
+2010-05-18 19:42:34:(class.main_cf.inc) [main_cf/main_cf()][]:: **** initialize postfix class
+2010-05-18 19:42:34:(class.main_cf.inc) [main_cf/main_cf()][]:: **** parse_conf
+2010-05-18 19:42:34:(class.main_cf.inc) [main_cf/parse_conf()][]:: receive from postconf 130 parameters
+2010-05-18 19:42:34:(class.main_cf.inc) [main_cf/main_cf()][]:: **** Parse_hashs
+2010-05-18 19:42:34:(class.main_cf.inc) [main_cf/main_cf()][]:: **** FillDefaults
+2010-05-18 19:42:34:(class.main_cf.inc) [main_cf/main_cf()][]:: **** parse_my_networks
+2010-05-18 19:42:34:(class.main_cf.inc) [main_cf/parse_my_networks()][]:: 0) 127.0.0.0/8 [::ffff:127.0.0.0]/104 [::1]/128
+2010-05-18 19:42:34:(class.main_cf.inc) [main_cf/parse_my_networks()][]:: 1) 192.168.1.0/24
+2010-05-18 19:42:34:(class.main_cf.inc) [main_cf/main_cf()][]:: **** parse_inet_interfaces
+2010-05-18 19:42:34:(class.main_cf.inc) [main_cf/parse_inet_interfaces()][]:: inet_interfaces data -> all
+2010-05-18 19:42:34:(class.main_cf.inc) [main_cf/main_cf()][]:: **** ParseServicesNames
+2010-05-18 19:42:34:(class.main_cf.inc) [main_cf/main_cf()][]:: **** initialize postfix end...
+2010-05-18 19:45:05:(class.main_cf.inc) [main_cf/main_cf()][]:: **** initialize postfix class
+2010-05-18 19:45:05:(class.main_cf.inc) [main_cf/main_cf()][]:: **** parse_conf
+2010-05-18 19:45:05:(class.main_cf.inc) [main_cf/parse_conf()][]:: receive from postconf 130 parameters
+2010-05-18 19:45:05:(class.main_cf.inc) [main_cf/main_cf()][]:: **** Parse_hashs
+2010-05-18 19:45:05:(class.main_cf.inc) [main_cf/main_cf()][]:: **** FillDefaults
+2010-05-18 19:45:05:(class.main_cf.inc) [main_cf/main_cf()][]:: **** parse_my_networks
+2010-05-18 19:45:05:(class.main_cf.inc) [main_cf/parse_my_networks()][]:: 0) 127.0.0.0/8 [::ffff:127.0.0.0]/104 [::1]/128
+2010-05-18 19:45:05:(class.main_cf.inc) [main_cf/parse_my_networks()][]:: 1) 192.168.1.0/24
+2010-05-18 19:45:05:(class.main_cf.inc) [main_cf/main_cf()][]:: **** parse_inet_interfaces
+2010-05-18 19:45:05:(class.main_cf.inc) [main_cf/parse_inet_interfaces()][]:: inet_interfaces data -> all
+2010-05-18 19:45:05:(class.main_cf.inc) [main_cf/main_cf()][]:: **** ParseServicesNames
+2010-05-18 19:45:05:(class.main_cf.inc) [main_cf/main_cf()][]:: **** initialize postfix end...
+2010-05-18 19:46:35:(class.main_cf.inc) [main_cf/main_cf()][]:: **** initialize postfix class
+2010-05-18 19:46:35:(class.main_cf.inc) [main_cf/main_cf()][]:: **** parse_conf
+2010-05-18 19:46:35:(class.main_cf.inc) [main_cf/parse_conf()][]:: receive from postconf 130 parameters
+2010-05-18 19:46:35:(class.main_cf.inc) [main_cf/main_cf()][]:: **** Parse_hashs
+2010-05-18 19:46:35:(class.main_cf.inc) [main_cf/main_cf()][]:: **** FillDefaults
+2010-05-18 19:46:35:(class.main_cf.inc) [main_cf/main_cf()][]:: **** parse_my_networks
+2010-05-18 19:46:35:(class.main_cf.inc) [main_cf/parse_my_networks()][]:: 0) 127.0.0.0/8 [::ffff:127.0.0.0]/104 [::1]/128
+2010-05-18 19:46:35:(class.main_cf.inc) [main_cf/parse_my_networks()][]:: 1) 192.168.1.0/24
+2010-05-18 19:46:35:(class.main_cf.inc) [main_cf/main_cf()][]:: **** parse_inet_interfaces
+2010-05-18 19:46:35:(class.main_cf.inc) [main_cf/parse_inet_interfaces()][]:: inet_interfaces data -> all
+2010-05-18 19:46:35:(class.main_cf.inc) [main_cf/main_cf()][]:: **** ParseServicesNames
+2010-05-18 19:46:35:(class.main_cf.inc) [main_cf/main_cf()][]:: **** initialize postfix end...
+2010-05-18 19:49:05:(class.main_cf.inc) [main_cf/main_cf()][]:: **** initialize postfix class
+2010-05-18 19:49:05:(class.main_cf.inc) [main_cf/main_cf()][]:: **** parse_conf
+2010-05-18 19:49:05:(class.main_cf.inc) [main_cf/parse_conf()][]:: receive from postconf 130 parameters
+2010-05-18 19:49:05:(class.main_cf.inc) [main_cf/main_cf()][]:: **** Parse_hashs
+2010-05-18 19:49:05:(class.main_cf.inc) [main_cf/main_cf()][]:: **** FillDefaults
+2010-05-18 19:49:05:(class.main_cf.inc) [main_cf/main_cf()][]:: **** parse_my_networks
+2010-05-18 19:49:05:(class.main_cf.inc) [main_cf/parse_my_networks()][]:: 0) 127.0.0.0/8 [::ffff:127.0.0.0]/104 [::1]/128
+2010-05-18 19:49:05:(class.main_cf.inc) [main_cf/parse_my_networks()][]:: 1) 192.168.1.0/24
+2010-05-18 19:49:05:(class.main_cf.inc) [main_cf/main_cf()][]:: **** parse_inet_interfaces
+2010-05-18 19:49:05:(class.main_cf.inc) [main_cf/parse_inet_interfaces()][]:: inet_interfaces data -> all
+2010-05-18 19:49:05:(class.main_cf.inc) [main_cf/main_cf()][]:: **** ParseServicesNames
+2010-05-18 19:49:05:(class.main_cf.inc) [main_cf/main_cf()][]:: **** initialize postfix end...
+2010-05-18 19:51:34:(class.main_cf.inc) [main_cf/main_cf()][]:: **** initialize postfix class
+2010-05-18 19:51:34:(class.main_cf.inc) [main_cf/main_cf()][]:: **** parse_conf
+2010-05-18 19:51:34:(class.main_cf.inc) [main_cf/parse_conf()][]:: receive from postconf 130 parameters
+2010-05-18 19:51:34:(class.main_cf.inc) [main_cf/main_cf()][]:: **** Parse_hashs
+2010-05-18 19:51:34:(class.main_cf.inc) [main_cf/main_cf()][]:: **** FillDefaults
+2010-05-18 19:51:34:(class.main_cf.inc) [main_cf/main_cf()][]:: **** parse_my_networks
+2010-05-18 19:51:34:(class.main_cf.inc) [main_cf/parse_my_networks()][]:: 0) 127.0.0.0/8 [::ffff:127.0.0.0]/104 [::1]/128
+2010-05-18 19:51:34:(class.main_cf.inc) [main_cf/parse_my_networks()][]:: 1) 192.168.1.0/24
+2010-05-18 19:51:34:(class.main_cf.inc) [main_cf/main_cf()][]:: **** parse_inet_interfaces
+2010-05-18 19:51:34:(class.main_cf.inc) [main_cf/parse_inet_interfaces()][]:: inet_interfaces data -> all
+2010-05-18 19:51:34:(class.main_cf.inc) [main_cf/main_cf()][]:: **** ParseServicesNames
+2010-05-18 19:51:34:(class.main_cf.inc) [main_cf/main_cf()][]:: **** initialize postfix end...
+2010-05-18 19:53:12:(class.main_cf.inc) [main_cf/main_cf()][]:: **** initialize postfix class
+2010-05-18 19:53:12:(class.main_cf.inc) [main_cf/main_cf()][]:: **** parse_conf
+2010-05-18 19:53:12:(class.main_cf.inc) [main_cf/parse_conf()][]:: receive from postconf 130 parameters
+2010-05-18 19:53:12:(class.main_cf.inc) [main_cf/main_cf()][]:: **** Parse_hashs
+2010-05-18 19:53:12:(class.main_cf.inc) [main_cf/main_cf()][]:: **** FillDefaults
+2010-05-18 19:53:12:(class.main_cf.inc) [main_cf/main_cf()][]:: **** parse_my_networks
+2010-05-18 19:53:12:(class.main_cf.inc) [main_cf/parse_my_networks()][]:: 0) 127.0.0.0/8 [::ffff:127.0.0.0]/104 [::1]/128
+2010-05-18 19:53:12:(class.main_cf.inc) [main_cf/parse_my_networks()][]:: 1) 192.168.1.0/24
+2010-05-18 19:53:12:(class.main_cf.inc) [main_cf/main_cf()][]:: **** parse_inet_interfaces
+2010-05-18 19:53:12:(class.main_cf.inc) [main_cf/parse_inet_interfaces()][]:: inet_interfaces data -> all
+2010-05-18 19:53:12:(class.main_cf.inc) [main_cf/main_cf()][]:: **** ParseServicesNames
+2010-05-18 19:53:12:(class.main_cf.inc) [main_cf/main_cf()][]:: **** initialize postfix end...
+2010-05-18 19:53:12:(class.main_cf.inc) [main_cf/CheckMyNetwork()][]:: main->array_mynetworks[0]=127.0.0.0/8 [::ffff:127.0.0.0]/104 [::1]/128
+2010-05-18 19:53:12:(class.main_cf.inc) [main_cf/CheckMyNetwork()][]:: main->array_mynetworks[1]=192.168.1.0/24
+2010-05-18 19:53:12:(class.main_cf.inc) [main_cf/CheckMyNetwork()][]:: return success, networks set
+2010-05-18 19:54:04:(class.main_cf.inc) [main_cf/main_cf()][]:: **** initialize postfix class
+2010-05-18 19:54:04:(class.main_cf.inc) [main_cf/main_cf()][]:: **** parse_conf
+2010-05-18 19:54:04:(class.main_cf.inc) [main_cf/parse_conf()][]:: receive from postconf 130 parameters
+2010-05-18 19:54:04:(class.main_cf.inc) [main_cf/main_cf()][]:: **** Parse_hashs
+2010-05-18 19:54:04:(class.main_cf.inc) [main_cf/main_cf()][]:: **** FillDefaults
+2010-05-18 19:54:04:(class.main_cf.inc) [main_cf/main_cf()][]:: **** parse_my_networks
+2010-05-18 19:54:04:(class.main_cf.inc) [main_cf/parse_my_networks()][]:: 0) 127.0.0.0/8 [::ffff:127.0.0.0]/104 [::1]/128
+2010-05-18 19:54:04:(class.main_cf.inc) [main_cf/parse_my_networks()][]:: 1) 192.168.1.0/24
+2010-05-18 19:54:04:(class.main_cf.inc) [main_cf/main_cf()][]:: **** parse_inet_interfaces
+2010-05-18 19:54:04:(class.main_cf.inc) [main_cf/parse_inet_interfaces()][]:: inet_interfaces data -> all
+2010-05-18 19:54:04:(class.main_cf.inc) [main_cf/main_cf()][]:: **** ParseServicesNames
+2010-05-18 19:54:04:(class.main_cf.inc) [main_cf/main_cf()][]:: **** initialize postfix end...
+2010-05-18 19:56:34:(class.main_cf.inc) [main_cf/main_cf()][]:: **** initialize postfix class
+2010-05-18 19:56:34:(class.main_cf.inc) [main_cf/main_cf()][]:: **** parse_conf
+2010-05-18 19:56:34:(class.main_cf.inc) [main_cf/parse_conf()][]:: receive from postconf 130 parameters
+2010-05-18 19:56:34:(class.main_cf.inc) [main_cf/main_cf()][]:: **** Parse_hashs
+2010-05-18 19:56:34:(class.main_cf.inc) [main_cf/main_cf()][]:: **** FillDefaults
+2010-05-18 19:56:34:(class.main_cf.inc) [main_cf/main_cf()][]:: **** parse_my_networks
+2010-05-18 19:56:34:(class.main_cf.inc) [main_cf/parse_my_networks()][]:: 0) 127.0.0.0/8 [::ffff:127.0.0.0]/104 [::1]/128
+2010-05-18 19:56:34:(class.main_cf.inc) [main_cf/parse_my_networks()][]:: 1) 192.168.1.0/24
+2010-05-18 19:56:34:(class.main_cf.inc) [main_cf/main_cf()][]:: **** parse_inet_interfaces
+2010-05-18 19:56:34:(class.main_cf.inc) [main_cf/parse_inet_interfaces()][]:: inet_interfaces data -> all
+2010-05-18 19:56:34:(class.main_cf.inc) [main_cf/main_cf()][]:: **** ParseServicesNames
+2010-05-18 19:56:34:(class.main_cf.inc) [main_cf/main_cf()][]:: **** initialize postfix end...
+2010-05-18 20:00:06:(class.main_cf.inc) [main_cf/main_cf()][]:: **** initialize postfix class
+2010-05-18 20:00:06:(class.main_cf.inc) [main_cf/main_cf()][]:: **** parse_conf
+2010-05-18 20:00:06:(class.main_cf.inc) [main_cf/parse_conf()][]:: receive from postconf 130 parameters
+2010-05-18 20:00:06:(class.main_cf.inc) [main_cf/main_cf()][]:: **** Parse_hashs
+2010-05-18 20:00:06:(class.main_cf.inc) [main_cf/main_cf()][]:: **** FillDefaults
+2010-05-18 20:00:06:(class.main_cf.inc) [main_cf/main_cf()][]:: **** parse_my_networks
+2010-05-18 20:00:06:(class.main_cf.inc) [main_cf/parse_my_networks()][]:: 0) 127.0.0.0/8 [::ffff:127.0.0.0]/104 [::1]/128
+2010-05-18 20:00:06:(class.main_cf.inc) [main_cf/parse_my_networks()][]:: 1) 192.168.1.0/24
+2010-05-18 20:00:06:(class.main_cf.inc) [main_cf/main_cf()][]:: **** parse_inet_interfaces
+2010-05-18 20:00:06:(class.main_cf.inc) [main_cf/parse_inet_interfaces()][]:: inet_interfaces data -> all
+2010-05-18 20:00:06:(class.main_cf.inc) [main_cf/main_cf()][]:: **** ParseServicesNames
+2010-05-18 20:00:06:(class.main_cf.inc) [main_cf/main_cf()][]:: **** initialize postfix end...
+2010-05-18 20:02:35:(class.main_cf.inc) [main_cf/main_cf()][]:: **** initialize postfix class
+2010-05-18 20:02:35:(class.main_cf.inc) [main_cf/main_cf()][]:: **** parse_conf
+2010-05-18 20:02:35:(class.main_cf.inc) [main_cf/parse_conf()][]:: receive from postconf 130 parameters
+2010-05-18 20:02:35:(class.main_cf.inc) [main_cf/main_cf()][]:: **** Parse_hashs
+2010-05-18 20:02:35:(class.main_cf.inc) [main_cf/main_cf()][]:: **** FillDefaults
+2010-05-18 20:02:35:(class.main_cf.inc) [main_cf/main_cf()][]:: **** parse_my_networks
+2010-05-18 20:02:35:(class.main_cf.inc) [main_cf/parse_my_networks()][]:: 0) 127.0.0.0/8 [::ffff:127.0.0.0]/104 [::1]/128
+2010-05-18 20:02:35:(class.main_cf.inc) [main_cf/parse_my_networks()][]:: 1) 192.168.1.0/24
+2010-05-18 20:02:35:(class.main_cf.inc) [main_cf/main_cf()][]:: **** parse_inet_interfaces
+2010-05-18 20:02:35:(class.main_cf.inc) [main_cf/parse_inet_interfaces()][]:: inet_interfaces data -> all
+2010-05-18 20:02:35:(class.main_cf.inc) [main_cf/main_cf()][]:: **** ParseServicesNames
+2010-05-18 20:02:35:(class.main_cf.inc) [main_cf/main_cf()][]:: **** initialize postfix end...
+2010-05-18 20:03:10:(class.main_cf.inc) [main_cf/main_cf()][]:: **** initialize postfix class
+2010-05-18 20:03:10:(class.main_cf.inc) [main_cf/main_cf()][]:: **** parse_conf
+2010-05-18 20:03:10:(class.main_cf.inc) [main_cf/parse_conf()][]:: receive from postconf 130 parameters
+2010-05-18 20:03:10:(class.main_cf.inc) [main_cf/main_cf()][]:: **** Parse_hashs
+2010-05-18 20:03:10:(class.main_cf.inc) [main_cf/main_cf()][]:: **** FillDefaults
+2010-05-18 20:03:10:(class.main_cf.inc) [main_cf/main_cf()][]:: **** parse_my_networks
+2010-05-18 20:03:10:(class.main_cf.inc) [main_cf/parse_my_networks()][]:: 0) 127.0.0.0/8 [::ffff:127.0.0.0]/104 [::1]/128
+2010-05-18 20:03:10:(class.main_cf.inc) [main_cf/parse_my_networks()][]:: 1) 192.168.1.0/24
+2010-05-18 20:03:10:(class.main_cf.inc) [main_cf/main_cf()][]:: **** parse_inet_interfaces
+2010-05-18 20:03:10:(class.main_cf.inc) [main_cf/parse_inet_interfaces()][]:: inet_interfaces data -> all
+2010-05-18 20:03:10:(class.main_cf.inc) [main_cf/main_cf()][]:: **** ParseServicesNames
+2010-05-18 20:03:10:(class.main_cf.inc) [main_cf/main_cf()][]:: **** initialize postfix end...
+2010-05-18 20:03:10:(class.main_cf.inc) [main_cf/CheckMyNetwork()][]:: main->array_mynetworks[0]=127.0.0.0/8 [::ffff:127.0.0.0]/104 [::1]/128
+2010-05-18 20:03:10:(class.main_cf.inc) [main_cf/CheckMyNetwork()][]:: main->array_mynetworks[1]=192.168.1.0/24
+2010-05-18 20:03:10:(class.main_cf.inc) [main_cf/CheckMyNetwork()][]:: return success, networks set
+2010-05-18 20:06:04:(class.main_cf.inc) [main_cf/main_cf()][]:: **** initialize postfix class
+2010-05-18 20:06:04:(class.main_cf.inc) [main_cf/main_cf()][]:: **** parse_conf
+2010-05-18 20:06:04:(class.main_cf.inc) [main_cf/parse_conf()][]:: receive from postconf 130 parameters
+2010-05-18 20:06:04:(class.main_cf.inc) [main_cf/main_cf()][]:: **** Parse_hashs
+2010-05-18 20:06:04:(class.main_cf.inc) [main_cf/main_cf()][]:: **** FillDefaults
+2010-05-18 20:06:04:(class.main_cf.inc) [main_cf/main_cf()][]:: **** parse_my_networks
+2010-05-18 20:06:04:(class.main_cf.inc) [main_cf/parse_my_networks()][]:: 0) 127.0.0.0/8 [::ffff:127.0.0.0]/104 [::1]/128
+2010-05-18 20:06:04:(class.main_cf.inc) [main_cf/parse_my_networks()][]:: 1) 192.168.1.0/24
+2010-05-18 20:06:04:(class.main_cf.inc) [main_cf/main_cf()][]:: **** parse_inet_interfaces
+2010-05-18 20:06:04:(class.main_cf.inc) [main_cf/parse_inet_interfaces()][]:: inet_interfaces data -> all
+2010-05-18 20:06:04:(class.main_cf.inc) [main_cf/main_cf()][]:: **** ParseServicesNames
+2010-05-18 20:06:04:(class.main_cf.inc) [main_cf/main_cf()][]:: **** initialize postfix end...
+2010-05-18 20:08:34:(class.main_cf.inc) [main_cf/main_cf()][]:: **** initialize postfix class
+2010-05-18 20:08:34:(class.main_cf.inc) [main_cf/main_cf()][]:: **** parse_conf
+2010-05-18 20:08:34:(class.main_cf.inc) [main_cf/parse_conf()][]:: receive from postconf 130 parameters
+2010-05-18 20:08:34:(class.main_cf.inc) [main_cf/main_cf()][]:: **** Parse_hashs
+2010-05-18 20:08:34:(class.main_cf.inc) [main_cf/main_cf()][]:: **** FillDefaults
+2010-05-18 20:08:34:(class.main_cf.inc) [main_cf/main_cf()][]:: **** parse_my_networks
+2010-05-18 20:08:34:(class.main_cf.inc) [main_cf/parse_my_networks()][]:: 0) 127.0.0.0/8 [::ffff:127.0.0.0]/104 [::1]/128
+2010-05-18 20:08:34:(class.main_cf.inc) [main_cf/parse_my_networks()][]:: 1) 192.168.1.0/24
+2010-05-18 20:08:34:(class.main_cf.inc) [main_cf/main_cf()][]:: **** parse_inet_interfaces
+2010-05-18 20:08:34:(class.main_cf.inc) [main_cf/parse_inet_interfaces()][]:: inet_interfaces data -> all
+2010-05-18 20:08:34:(class.main_cf.inc) [main_cf/main_cf()][]:: **** ParseServicesNames
+2010-05-18 20:08:34:(class.main_cf.inc) [main_cf/main_cf()][]:: **** initialize postfix end...
+2010-05-18 20:11:04:(class.main_cf.inc) [main_cf/main_cf()][]:: **** initialize postfix class
+2010-05-18 20:11:04:(class.main_cf.inc) [main_cf/main_cf()][]:: **** parse_conf
+2010-05-18 20:11:04:(class.main_cf.inc) [main_cf/parse_conf()][]:: receive from postconf 130 parameters
+2010-05-18 20:11:04:(class.main_cf.inc) [main_cf/main_cf()][]:: **** Parse_hashs
+2010-05-18 20:11:04:(class.main_cf.inc) [main_cf/main_cf()][]:: **** FillDefaults
+2010-05-18 20:11:04:(class.main_cf.inc) [main_cf/main_cf()][]:: **** parse_my_networks
+2010-05-18 20:11:04:(class.main_cf.inc) [main_cf/parse_my_networks()][]:: 0) 127.0.0.0/8 [::ffff:127.0.0.0]/104 [::1]/128
+2010-05-18 20:11:04:(class.main_cf.inc) [main_cf/parse_my_networks()][]:: 1) 192.168.1.0/24
+2010-05-18 20:11:04:(class.main_cf.inc) [main_cf/main_cf()][]:: **** parse_inet_interfaces
+2010-05-18 20:11:04:(class.main_cf.inc) [main_cf/parse_inet_interfaces()][]:: inet_interfaces data -> all
+2010-05-18 20:11:04:(class.main_cf.inc) [main_cf/main_cf()][]:: **** ParseServicesNames
+2010-05-18 20:11:04:(class.main_cf.inc) [main_cf/main_cf()][]:: **** initialize postfix end...
+2010-05-18 20:13:04:(class.main_cf.inc) [main_cf/main_cf()][]:: **** initialize postfix class
+2010-05-18 20:13:04:(class.main_cf.inc) [main_cf/main_cf()][]:: **** parse_conf
+2010-05-18 20:13:04:(class.main_cf.inc) [main_cf/parse_conf()][]:: receive from postconf 130 parameters
+2010-05-18 20:13:04:(class.main_cf.inc) [main_cf/main_cf()][]:: **** Parse_hashs
+2010-05-18 20:13:04:(class.main_cf.inc) [main_cf/main_cf()][]:: **** FillDefaults
+2010-05-18 20:13:04:(class.main_cf.inc) [main_cf/main_cf()][]:: **** parse_my_networks
+2010-05-18 20:13:04:(class.main_cf.inc) [main_cf/parse_my_networks()][]:: 0) 127.0.0.0/8 [::ffff:127.0.0.0]/104 [::1]/128
+2010-05-18 20:13:04:(class.main_cf.inc) [main_cf/parse_my_networks()][]:: 1) 192.168.1.0/24
+2010-05-18 20:13:04:(class.main_cf.inc) [main_cf/main_cf()][]:: **** parse_inet_interfaces
+2010-05-18 20:13:04:(class.main_cf.inc) [main_cf/parse_inet_interfaces()][]:: inet_interfaces data -> all
+2010-05-18 20:13:04:(class.main_cf.inc) [main_cf/main_cf()][]:: **** ParseServicesNames
+2010-05-18 20:13:04:(class.main_cf.inc) [main_cf/main_cf()][]:: **** initialize postfix end...
+2010-05-18 20:13:04:(class.main_cf.inc) [main_cf/CheckMyNetwork()][]:: main->array_mynetworks[0]=127.0.0.0/8 [::ffff:127.0.0.0]/104 [::1]/128
+2010-05-18 20:13:04:(class.main_cf.inc) [main_cf/CheckMyNetwork()][]:: main->array_mynetworks[1]=192.168.1.0/24
+2010-05-18 20:13:04:(class.main_cf.inc) [main_cf/CheckMyNetwork()][]:: return success, networks set
+2010-05-18 20:13:34:(class.main_cf.inc) [main_cf/main_cf()][]:: **** initialize postfix class
+2010-05-18 20:13:34:(class.main_cf.inc) [main_cf/main_cf()][]:: **** parse_conf
+2010-05-18 20:13:34:(class.main_cf.inc) [main_cf/parse_conf()][]:: receive from postconf 130 parameters
+2010-05-18 20:13:34:(class.main_cf.inc) [main_cf/main_cf()][]:: **** Parse_hashs
+2010-05-18 20:13:34:(class.main_cf.inc) [main_cf/main_cf()][]:: **** FillDefaults
+2010-05-18 20:13:34:(class.main_cf.inc) [main_cf/main_cf()][]:: **** parse_my_networks
+2010-05-18 20:13:34:(class.main_cf.inc) [main_cf/parse_my_networks()][]:: 0) 127.0.0.0/8 [::ffff:127.0.0.0]/104 [::1]/128
+2010-05-18 20:13:34:(class.main_cf.inc) [main_cf/parse_my_networks()][]:: 1) 192.168.1.0/24
+2010-05-18 20:13:34:(class.main_cf.inc) [main_cf/main_cf()][]:: **** parse_inet_interfaces
+2010-05-18 20:13:34:(class.main_cf.inc) [main_cf/parse_inet_interfaces()][]:: inet_interfaces data -> all
+2010-05-18 20:13:34:(class.main_cf.inc) [main_cf/main_cf()][]:: **** ParseServicesNames
+2010-05-18 20:13:34:(class.main_cf.inc) [main_cf/main_cf()][]:: **** initialize postfix end...
+2010-05-18 20:16:04:(class.main_cf.inc) [main_cf/main_cf()][]:: **** initialize postfix class
+2010-05-18 20:16:04:(class.main_cf.inc) [main_cf/main_cf()][]:: **** parse_conf
+2010-05-18 20:16:04:(class.main_cf.inc) [main_cf/parse_conf()][]:: receive from postconf 130 parameters
+2010-05-18 20:16:04:(class.main_cf.inc) [main_cf/main_cf()][]:: **** Parse_hashs
+2010-05-18 20:16:04:(class.main_cf.inc) [main_cf/main_cf()][]:: **** FillDefaults
+2010-05-18 20:16:04:(class.main_cf.inc) [main_cf/main_cf()][]:: **** parse_my_networks
+2010-05-18 20:16:04:(class.main_cf.inc) [main_cf/parse_my_networks()][]:: 0) 127.0.0.0/8 [::ffff:127.0.0.0]/104 [::1]/128
+2010-05-18 20:16:04:(class.main_cf.inc) [main_cf/parse_my_networks()][]:: 1) 192.168.1.0/24
+2010-05-18 20:16:04:(class.main_cf.inc) [main_cf/main_cf()][]:: **** parse_inet_interfaces
+2010-05-18 20:16:04:(class.main_cf.inc) [main_cf/parse_inet_interfaces()][]:: inet_interfaces data -> all
+2010-05-18 20:16:04:(class.main_cf.inc) [main_cf/main_cf()][]:: **** ParseServicesNames
+2010-05-18 20:16:04:(class.main_cf.inc) [main_cf/main_cf()][]:: **** initialize postfix end...
+2010-05-18 20:18:34:(class.main_cf.inc) [main_cf/main_cf()][]:: **** initialize postfix class
+2010-05-18 20:18:34:(class.main_cf.inc) [main_cf/main_cf()][]:: **** parse_conf
+2010-05-18 20:18:34:(class.main_cf.inc) [main_cf/parse_conf()][]:: receive from postconf 130 parameters
+2010-05-18 20:18:34:(class.main_cf.inc) [main_cf/main_cf()][]:: **** Parse_hashs
+2010-05-18 20:18:34:(class.main_cf.inc) [main_cf/main_cf()][]:: **** FillDefaults
+2010-05-18 20:18:34:(class.main_cf.inc) [main_cf/main_cf()][]:: **** parse_my_networks
+2010-05-18 20:18:34:(class.main_cf.inc) [main_cf/parse_my_networks()][]:: 0) 127.0.0.0/8 [::ffff:127.0.0.0]/104 [::1]/128
+2010-05-18 20:18:34:(class.main_cf.inc) [main_cf/parse_my_networks()][]:: 1) 192.168.1.0/24
+2010-05-18 20:18:34:(class.main_cf.inc) [main_cf/main_cf()][]:: **** parse_inet_interfaces
+2010-05-18 20:18:34:(class.main_cf.inc) [main_cf/parse_inet_interfaces()][]:: inet_interfaces data -> all
+2010-05-18 20:18:34:(class.main_cf.inc) [main_cf/main_cf()][]:: **** ParseServicesNames
+2010-05-18 20:18:34:(class.main_cf.inc) [main_cf/main_cf()][]:: **** initialize postfix end...
+2010-05-18 20:21:04:(class.main_cf.inc) [main_cf/main_cf()][]:: **** initialize postfix class
+2010-05-18 20:21:04:(class.main_cf.inc) [main_cf/main_cf()][]:: **** parse_conf
+2010-05-18 20:21:04:(class.main_cf.inc) [main_cf/parse_conf()][]:: receive from postconf 130 parameters
+2010-05-18 20:21:04:(class.main_cf.inc) [main_cf/main_cf()][]:: **** Parse_hashs
+2010-05-18 20:21:04:(class.main_cf.inc) [main_cf/main_cf()][]:: **** FillDefaults
+2010-05-18 20:21:04:(class.main_cf.inc) [main_cf/main_cf()][]:: **** parse_my_networks
+2010-05-18 20:21:04:(class.main_cf.inc) [main_cf/parse_my_networks()][]:: 0) 127.0.0.0/8 [::ffff:127.0.0.0]/104 [::1]/128
+2010-05-18 20:21:04:(class.main_cf.inc) [main_cf/parse_my_networks()][]:: 1) 192.168.1.0/24
+2010-05-18 20:21:04:(class.main_cf.inc) [main_cf/main_cf()][]:: **** parse_inet_interfaces
+2010-05-18 20:21:04:(class.main_cf.inc) [main_cf/parse_inet_interfaces()][]:: inet_interfaces data -> all
+2010-05-18 20:21:04:(class.main_cf.inc) [main_cf/main_cf()][]:: **** ParseServicesNames
+2010-05-18 20:21:04:(class.main_cf.inc) [main_cf/main_cf()][]:: **** initialize postfix end...
+2010-05-18 20:23:08:(class.main_cf.inc) [main_cf/main_cf()][]:: **** initialize postfix class
+2010-05-18 20:23:08:(class.main_cf.inc) [main_cf/main_cf()][]:: **** parse_conf
+2010-05-18 20:23:08:(class.main_cf.inc) [main_cf/parse_conf()][]:: receive from postconf 130 parameters
+2010-05-18 20:23:08:(class.main_cf.inc) [main_cf/main_cf()][]:: **** Parse_hashs
+2010-05-18 20:23:08:(class.main_cf.inc) [main_cf/main_cf()][]:: **** FillDefaults
+2010-05-18 20:23:08:(class.main_cf.inc) [main_cf/main_cf()][]:: **** parse_my_networks
+2010-05-18 20:23:08:(class.main_cf.inc) [main_cf/parse_my_networks()][]:: 0) 127.0.0.0/8 [::ffff:127.0.0.0]/104 [::1]/128
+2010-05-18 20:23:08:(class.main_cf.inc) [main_cf/parse_my_networks()][]:: 1) 192.168.1.0/24
+2010-05-18 20:23:08:(class.main_cf.inc) [main_cf/main_cf()][]:: **** parse_inet_interfaces
+2010-05-18 20:23:08:(class.main_cf.inc) [main_cf/parse_inet_interfaces()][]:: inet_interfaces data -> all
+2010-05-18 20:23:08:(class.main_cf.inc) [main_cf/main_cf()][]:: **** ParseServicesNames
+2010-05-18 20:23:08:(class.main_cf.inc) [main_cf/main_cf()][]:: **** initialize postfix end...
+2010-05-18 20:23:08:(class.main_cf.inc) [main_cf/CheckMyNetwork()][]:: main->array_mynetworks[0]=127.0.0.0/8 [::ffff:127.0.0.0]/104 [::1]/128
+2010-05-18 20:23:08:(class.main_cf.inc) [main_cf/CheckMyNetwork()][]:: main->array_mynetworks[1]=192.168.1.0/24
+2010-05-18 20:23:08:(class.main_cf.inc) [main_cf/CheckMyNetwork()][]:: return success, networks set
+2010-05-18 20:23:35:(class.main_cf.inc) [main_cf/main_cf()][]:: **** initialize postfix class
+2010-05-18 20:23:35:(class.main_cf.inc) [main_cf/main_cf()][]:: **** parse_conf
+2010-05-18 20:23:35:(class.main_cf.inc) [main_cf/parse_conf()][]:: receive from postconf 130 parameters
+2010-05-18 20:23:35:(class.main_cf.inc) [main_cf/main_cf()][]:: **** Parse_hashs
+2010-05-18 20:23:35:(class.main_cf.inc) [main_cf/main_cf()][]:: **** FillDefaults
+2010-05-18 20:23:35:(class.main_cf.inc) [main_cf/main_cf()][]:: **** parse_my_networks
+2010-05-18 20:23:35:(class.main_cf.inc) [main_cf/parse_my_networks()][]:: 0) 127.0.0.0/8 [::ffff:127.0.0.0]/104 [::1]/128
+2010-05-18 20:23:35:(class.main_cf.inc) [main_cf/parse_my_networks()][]:: 1) 192.168.1.0/24
+2010-05-18 20:23:35:(class.main_cf.inc) [main_cf/main_cf()][]:: **** parse_inet_interfaces
+2010-05-18 20:23:35:(class.main_cf.inc) [main_cf/parse_inet_interfaces()][]:: inet_interfaces data -> all
+2010-05-18 20:23:35:(class.main_cf.inc) [main_cf/main_cf()][]:: **** ParseServicesNames
+2010-05-18 20:23:35:(class.main_cf.inc) [main_cf/main_cf()][]:: **** initialize postfix end...
+2010-05-18 20:26:04:(class.main_cf.inc) [main_cf/main_cf()][]:: **** initialize postfix class
+2010-05-18 20:26:04:(class.main_cf.inc) [main_cf/main_cf()][]:: **** parse_conf
+2010-05-18 20:26:04:(class.main_cf.inc) [main_cf/parse_conf()][]:: receive from postconf 130 parameters
+2010-05-18 20:26:04:(class.main_cf.inc) [main_cf/main_cf()][]:: **** Parse_hashs
+2010-05-18 20:26:04:(class.main_cf.inc) [main_cf/main_cf()][]:: **** FillDefaults
+2010-05-18 20:26:04:(class.main_cf.inc) [main_cf/main_cf()][]:: **** parse_my_networks
+2010-05-18 20:26:04:(class.main_cf.inc) [main_cf/parse_my_networks()][]:: 0) 127.0.0.0/8 [::ffff:127.0.0.0]/104 [::1]/128
+2010-05-18 20:26:04:(class.main_cf.inc) [main_cf/parse_my_networks()][]:: 1) 192.168.1.0/24
+2010-05-18 20:26:04:(class.main_cf.inc) [main_cf/main_cf()][]:: **** parse_inet_interfaces
+2010-05-18 20:26:04:(class.main_cf.inc) [main_cf/parse_inet_interfaces()][]:: inet_interfaces data -> all
+2010-05-18 20:26:04:(class.main_cf.inc) [main_cf/main_cf()][]:: **** ParseServicesNames
+2010-05-18 20:26:04:(class.main_cf.inc) [main_cf/main_cf()][]:: **** initialize postfix end...
+2010-05-18 20:28:35:(class.main_cf.inc) [main_cf/main_cf()][]:: **** initialize postfix class
+2010-05-18 20:28:35:(class.main_cf.inc) [main_cf/main_cf()][]:: **** parse_conf
+2010-05-18 20:28:35:(class.main_cf.inc) [main_cf/parse_conf()][]:: receive from postconf 130 parameters
+2010-05-18 20:28:35:(class.main_cf.inc) [main_cf/main_cf()][]:: **** Parse_hashs
+2010-05-18 20:28:35:(class.main_cf.inc) [main_cf/main_cf()][]:: **** FillDefaults
+2010-05-18 20:28:35:(class.main_cf.inc) [main_cf/main_cf()][]:: **** parse_my_networks
+2010-05-18 20:28:35:(class.main_cf.inc) [main_cf/parse_my_networks()][]:: 0) 127.0.0.0/8 [::ffff:127.0.0.0]/104 [::1]/128
+2010-05-18 20:28:35:(class.main_cf.inc) [main_cf/parse_my_networks()][]:: 1) 192.168.1.0/24
+2010-05-18 20:28:35:(class.main_cf.inc) [main_cf/main_cf()][]:: **** parse_inet_interfaces
+2010-05-18 20:28:35:(class.main_cf.inc) [main_cf/parse_inet_interfaces()][]:: inet_interfaces data -> all
+2010-05-18 20:28:35:(class.main_cf.inc) [main_cf/main_cf()][]:: **** ParseServicesNames
+2010-05-18 20:28:35:(class.main_cf.inc) [main_cf/main_cf()][]:: **** initialize postfix end...
+2010-05-18 20:31:05:(class.main_cf.inc) [main_cf/main_cf()][]:: **** initialize postfix class
+2010-05-18 20:31:05:(class.main_cf.inc) [main_cf/main_cf()][]:: **** parse_conf
+2010-05-18 20:31:05:(class.main_cf.inc) [main_cf/parse_conf()][]:: receive from postconf 130 parameters
+2010-05-18 20:31:05:(class.main_cf.inc) [main_cf/main_cf()][]:: **** Parse_hashs
+2010-05-18 20:31:05:(class.main_cf.inc) [main_cf/main_cf()][]:: **** FillDefaults
+2010-05-18 20:31:05:(class.main_cf.inc) [main_cf/main_cf()][]:: **** parse_my_networks
+2010-05-18 20:31:05:(class.main_cf.inc) [main_cf/parse_my_networks()][]:: 0) 127.0.0.0/8 [::ffff:127.0.0.0]/104 [::1]/128
+2010-05-18 20:31:05:(class.main_cf.inc) [main_cf/parse_my_networks()][]:: 1) 192.168.1.0/24
+2010-05-18 20:31:05:(class.main_cf.inc) [main_cf/main_cf()][]:: **** parse_inet_interfaces
+2010-05-18 20:31:05:(class.main_cf.inc) [main_cf/parse_inet_interfaces()][]:: inet_interfaces data -> all
+2010-05-18 20:31:05:(class.main_cf.inc) [main_cf/main_cf()][]:: **** ParseServicesNames
+2010-05-18 20:31:05:(class.main_cf.inc) [main_cf/main_cf()][]:: **** initialize postfix end...
