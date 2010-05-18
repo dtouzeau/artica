@@ -1234,7 +1234,7 @@ private function roundcube_detect_version(){
 			$ldap=new clladp();
 			$ous=$ldap->hash_get_ou(true);
 			while (list ($num, $ligne) = each ($ous) ){
-				$array["{organizations}"]["SUB"][$num]="javascript:Loadjs('domains.manage.org.index.php?js=yes&ou=$OU');";
+				$array["{organizations}"]["SUB"][$num]="javascript:Loadjs('domains.manage.org.index.php?js=yes&ou=$num');";
 			}
 		
 		
