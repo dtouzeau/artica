@@ -1,3 +1,0 @@
-[18/May/2010:16:53:57 +0000] Before parse_debug, debug_level is: 0
-[18/May/2010:16:53:57 +0000] Enabling CGI Input debug level.
-[18/May/2010:16:53:57 +0000] After parse_debug, debug_level is: 4

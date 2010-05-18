@@ -1,4 +1,0 @@
-2010-05-18 18:55:33: [amavis/per_recip_blacklist_whitelist_sender_lookup_tables()]:: [18682] [DAEMON]::amavis/per_recip_blacklist_whitelist_sender_lookup_tables:: Search white list and black list for touzeau.com in ressources/class.amavis.inc
-2010-05-18 18:55:33: [amavis/per_recip_blacklist_whitelist_sender_lookup_tables()]:: [18682] [DAEMON]::amavis/per_recip_blacklist_whitelist_sender_lookup_tables:: Search white list and black list for gfi in ressources/class.amavis.inc
-2010-05-18 18:55:33: [amavis/per_recip_blacklist_whitelist_sender_lookup_tables()]:: [18701] [DAEMON]::amavis/per_recip_blacklist_whitelist_sender_lookup_tables:: Search white list and black list for touzeau.com in ressources/class.amavis.inc
-2010-05-18 18:55:33: [amavis/per_recip_blacklist_whitelist_sender_lookup_tables()]:: [18701] [DAEMON]::amavis/per_recip_blacklist_whitelist_sender_lookup_tables:: Search white list and black list for gfi in ressources/class.amavis.inc

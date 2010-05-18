@@ -1,1 +1,0 @@
-2010-05-18 18:52:29: [clladp/hash_get_smtp_connection_cache_destinations()]:: [13603] [DAEMON]::clladp/hash_get_smtp_connection_cache_destinations:: ERROR search :  cn=smtp_connection_cache_destinations,cn=artica,dc=my-domain,dc=com Success in ressources/class.ldap.inc
