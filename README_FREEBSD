@@ -1,0 +1,51 @@
+Freebsd
+The compatibility is under construction.
+You should encounter several bugs with Artica and FreeBSD during this construction.
+
+We looking for technical skills in order to create Artica-ISO with freeBSD system, if you want to participate, let me know !
+
+You must have "Linux binaries compatibilities" (linux_base-fc8)
+
+do
+mkdir /usr/ports
+portsnap fetch
+portsnap extract
+portsnap update
+Optional : pkg_add -r portaudit and run portaudit to see if there are securities holes on your system.
+
+Edit these files:
+----------------------------------------------------
+add compat.linux.osrelease=2.6.16 in /etc/sysctl.conf
+add OVERRIDE_LINUX_BASE_PORT=f8 in /etc/make.conf 
+
+
+Currently problem with
+error while loading shared libraries: /lib/libmysqlclient.so.15: ELF file OS ABI invalid
+#
+reboot
+cd  /usr/ports/emulators/linux_base-f8 && make
+ln -s /compat/linux/lib/librt.so.1 /compat/linux/usr/lib
+cd /usr/ports/databases/mysql51-client && make
+ln -s /usr/local/lib/mysql/libmysqlclient.so.15 /lib/libmysqlclient.so.15
+cd /usr/ports/emulators/linux_dist-gentoo-stage3 && make
+cd /usr/ports/databases/mysql51-server && make
+cd /usr/ports/www/lighttpd && make
+cd /usr/ports/sysutils/usbutils && make
+cd /usr/ports/sysutils/hal && make
+..to be continued...
+
+
+
+Installing Artica :
+
+tar -xf artica-xxxxx.tar.gz -C /usr/share
+
+/usr/share/artica-postfix/bin/artica-install --init-from-repos
+/usr/share/artica-postfix/bin/artica-install --perl-addons-repos
+/usr/share/artica-postfix/bin/artica-install -awstats-reconfigure
+/usr/share/artica-postfix/bin/artica-install -awstats generate
+
+
+Thanks
+The developper David Touzeau
+david@touzeau.eu

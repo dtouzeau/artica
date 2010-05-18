@@ -1,0 +1,174 @@
+Funding Cyrus High Availability
+http://www.mail-archive.com/info-cyrus@lists.andrew.cmu.edu/msg20731.html
+read: http://archives.free.net.ph/message/20061128.112802.117e2580.el.html
+David Lang
+Sun, 19 Sep 2004 01:24:56 -0700
+There are many ways of doing High Availability. 
+This is an attempt to outline the various methods with the advantages and disadvantages. 
+Ken and David (and anyne else who has thoughts on this) please feel free to add to this.
+ I'm attempting to outline them roughly in order of complexity.
+
+1. Active->Slave replication with manual failover
+------------------------------------------------------------------------------
+------------------------------------------------------------------------------
+
+This is where you can configure one machine to output all changes to a local daemon and another machine to implement the changes that are read from a local daemon.
+
+Pro:
+------------------------------------------------------------------------------
+simplist implementation, since it makes no assumptions about how you are going to use it, it also sets no limits on how it is used.
+
+This is the basic functionality that all other variations will need so it's not wasted work no matter what is done later
+
+   allows for multiple slaves from a single master
+
+
+allows for the propogation traffic pattern to be defined by the sysadmin (either master directly to all slaves or a tree-like propogation to save on WAN bandwidth when multiple slaves are co-located
+
+by involving a local daemon at each server there is a lot of flexibility in exactly how the replication takes place.
+for example you could
+use netcat as your daemon for instant transmission of the messages
+have a daemon that caches the messages so that if the link drops the messages are saved
+have a daemon that gets an acknowlegement from the far side that the message got through
+have a daemon that batches the messages up and compresses them for more efficiant transport
+have a daemon that delays all messages by a given time period to give you a way to recover from logical corruption without having to go to a backup
+have a daemon that filters the messages (say one that updates everything except it won't delete any messages so you have a known safe archive of all messages)
+etc
+
+Con:
+------------------------------------------------------------------------------
+since it makes no assumptions about how you are going to use it, it also gives you no help in useing it in any particular way
+
+
+2. Active->Slave replication with automatic failover
+------------------------------------------------------------------------------
+------------------------------------------------------------------------------
+
+This takes #1, limits it to a pair of boxes and through changes to murder or other parts of cyrus will swap the active/slave status of the two boxes
+
+  Pro:
+------------------------------------------------------------------------------
+   makes setting up of a HA pair of boxes easier
+
+
+   increases availability by decreasing downtime
+
+
+Con:
+------------------------------------------------------------------------------
+this functionality can be duplicated without changes to cyrus by the use of an external HA/cluster software package.
+
+Since this now assumes a particular mode of operation it starts to limit other uses (for example, if this is implemented as part of murder then it won't help much if you are trying to replicate to a DR datacenter several thousand miles away).
+
+Split-brain conditions are the responsibility of cyrus to prevent or solve. These are fundamentaly hard problems to get right in all cases
+
+
+3. Active->Slave replication with Slave able to accept client connections
+------------------------------------------------------------------------------
+------------------------------------------------------------------------------
+
+
+This takes #1 and then further modifies the slave so that requests that would change the contents of things get relayed to the active box and then the results of the change get propogated back down before they are visable to the client.
+
+Pro:
+------------------------------------------------------------------------------
+simulates active/active operation although it does cause longer delays when clients issue some commands.
+
+use of slaves for local access can reduce the load on the master resulting in higher performance.
+
+can be cascaded to multiple slaves and multiple tiers of slaves as needed
+
+in case of problems on the master the slaves can continue to operate as read-only servers providing degraded service while the master is fixed. depending on the problem with the master this may be very preferable to having to re-sync the master or recover from a split-brain situation
+
+Con:
+------------------------------------------------------------------------------
+more extensive modifications needed to trap all changes and propogate them up to the master
+
+how does the slave know when the master has implemented the change (so that it can give the result to the client)
+
+raises questions about the requirement to get confirmation og all updates before the slave can respond to the client (for example, if a slave decides to read a message that is flagged as new should the slave wait until the master confirms that it knows the message has been read before it gives it to the client, or should it give the message to the client and not worry if the update fails on the master)
+
+since the slave needs to send updates to the master the latency of the link between them can become a limiting factor in the performance that clients see when connecting to the slave
+
+4. #3 with automatic failover
+
+
+Since #3 supports multiple slaves the number of failover senerios grow significantly. you have multiple machines that could be the new master and you have the split-brain senerio to watch out for.
+
+  Pro:
+   increased availability by decreasing failover time
+
+
+   potentially easier to setup then with external clustering software
+
+
+  Con:
+   increased complexity
+
+
+runs the risk of breaking some deployment senerios in an attempt to simplify others
+
+5. Active/Active
+------------------------------------------------------------------------------
+------------------------------------------------------------------------------
+
+designate one of the boxes as primary and identify all items in the datastore that absolutly must not be subject to race conditions between the two boxes (message UUID for example). In addition to implementing the replication needed for #1 modify all functions that need to update these critical pieces of data to update them on the master and let the master update the other box.
+
+Pro:
+------------------------------------------------------------------------------
+best use of available hardware as the load is split almost evenly between the boxes.
+
+best availability becouse if there is a failure half of the clients won't see it at all
+
+  Con:
+------------------------------------------------------------------------------
+   significantly more complex then the other options.
+
+
+   behavior during a failure is less obvious
+
+
+split-brain recovery is not straightforward and if automatic failover is active the sysadmin will have no option to have things degraded slightly while a problem is fixed
+
+depending on the implementation this may be very sensitive to network latency between the machines and could be very suitable for working with machines in the same datacenter, but worthless for machines thousands of miles apart.
+
+6. active/active/active/...
+------------------------------------------------------------------------------
+------------------------------------------------------------------------------
+
+
+Take #5 and extend the idea to more then a pair of boxes. this makes the updates more complex to propogate (they now need to be sent to every other machine in the cluster)
+
+  Pro:
+------------------------------------------------------------------------------
+   better load balancing then #5
+
+
+allows for the ability to have a HA pair in a primary location and a backup in a remote location (i.e. your main HQ has two boxes, but your disaster recovery center has one as well)
+
+Con:
+------------------------------------------------------------------------------
+the complexity goes up significantly when you shift from 2 to n boxes in a cluster.
+
+   the bandwidth required for updates increases by a factor of roughly n!
+
+
+significantly more split-brain senerios become possible and need to be accounted for.
+
+
+
+-------------------------------------------------------------------------
+
+
+while #6 is the ideal option to have it can get very complex
+
+
+personally I would like to see #1 (with a sample daemon or two to provide basic functionality and leave the doors open for more creative uses) followed by #3 while people try and figure out all the problems with #5 and #6
+
+there are a lot of senerios that are possible with #1 or #3 that are not possible with #5 and very little of the work needed to release #1 and #3 as supported options is not work that needs to be done towards #5/6 anyway (the pieces need to be identified in the code and hooks put in place in the code at those locations. the details of the hooks will differ slightly
+
+David Lang
+
+
+-- There are two ways of constructing a software design. One way is to make it so simple that there are obviously no deficiencies. And the other way is to make it so complicated that there are no obvious deficiencies.
+-- C.A.R. Hoare

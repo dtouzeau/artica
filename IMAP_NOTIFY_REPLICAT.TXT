@@ -1,0 +1,20 @@
+
+cyrus.cluster.php send "CyrusNotifyReplica" to boa
+An schedule the command 
+bin/artica-install --cluster-replicat-send-ldap => using function tcyrus.CLUSTER_SEND_LDAP_DATABASE();
+
+if slave LDAP parameters is not set to 127.0.0.1 slave will run : 
+$sock->getfile("ChangeLDPSSET:127.0.0.1;389;$suffix;yes");
+
+slave will run in the background bin/artica-backup --instant-ldap-recover /path by the command ReplicateLDAP:/path
+
+//Launch replication process
+
+cyrus.sync.client.php send "CyrusMasterSyncClient" to boa 
+boa wil schedule /usr/bin/php5 /usr/share/artica-postfix/exec.cyrus.sync.client.php --silent
+
+Auto-delete the replica
+cyrus.cluster.php send "ClusterDisableSlave" to articacgi
+articacgi launch CLUSTER_DISABLE_MASTER() with MURDER_SEND_MASTER() http engined
+master parameters are saved in /etc/artica-postfix/settings/Daemons/CyrusReplicaLDAPConfig
+articacgi send disable-replica HTTP command to the master. 

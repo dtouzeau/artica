@@ -1,0 +1,86 @@
+
+  ARTICA INSTALLATION OVERVIEW
+  
+  
+  * For Ubuntu user, just run "ubuntu-setup" program.  
+
+  Quick Start - Unix
+  ------------------
+
+  For complete installation documentation, see web site http://www.artica.fr
+
+     $ cd artica-postfix/bin
+     $ ./artica-install setup and follow instructions
+   
+
+     NOTES: * This program requires to NOT have any program already running on 
+	      your system:
+		- postfix.
+		- cyrus-imapd
+		- OpenLdap server.
+	      
+              The installation program will install these components itself.
+
+           * This program is tested on majors Linux distributions using RPM and DEB packages
+		debian
+		ubuntu
+		fedora
+		centos
+		Mandriva
+		SuSe.
+		
+		If you use an other distribution and wanted to artica support it, please post request on the forum...
+
+
+  Add/Remove/Update Programs
+  ---------------------------
+  If you using source mode, run in a console this command line
+ 
+
+ /usr/share/artica-postfix/artica-install addons
+
+
+
+ This operation allows you to select which supported product to install
+
+  Artica Manage postfix and addons
+  --------------------------------
+  If you using repositories packages for debian or RedHat (dpkg or rpm):
+ 
+
+   You have 6 modules that you can download on sourceforge.
+
+    * artica-postfix-smtp-relay
+      This package convert artica to be an SMTP Relay using postfix main program,bogofilter anti-spam tool and saslauthd
+    * artica-opensource-security
+      This package convert artica to use OpenSource security mail programs eg SpamAssassin,clamav and amavis.
+    * artica-postfix-security
+      This package convert artica to a full SMTP security server using Kaspersky Anti-spam and Kaspersky Anti-virus (license with 30 days to evaluate them).
+    * artica-postfix-mailbox
+      This package convert artica to be a mailbox IMAP/POP3 server using cyrus-imap
+    * artica-postfix-webmail
+      This package add a webmail module in artica using RoundCube eMail and Mysql. 
+
+   There is an order to install these packages, for example, if you want to install a full mail server (mailbox and webmail) you must install in this direction :
+    artica-postfix-smtp-relay -> artica-opensource-security -> artica-postfix-security -> artica-postfix-mailbox ->artica-postfix-webmail
+
+  
+  Artica Manage Squid and addons
+  --------------------------------
+  
+
+  This section is currently on "beta stage"
+  if you want to test it, please let me know (david.touzeau@fr.kaspersky.com)
+
+  If you using repositories packages for debian or RedHat(dpkg or rpm) :
+  You have 2 modules that you can download on sourceforge.
+
+    * artica-squid-proxy
+      This package convert artica to be a proxy server using Squid 3.x
+    * artica-squid-security
+      This package add security modules for Squid 3.x using DansGuardian and Kaspersky Anti-Virus For Squid ICAP (license with 30 days to evaluate it). 
+
+  Thanks for using the artica postix, version 1.x
+
+                                     David Touzeau
+                                     http://www.artica.fr
