@@ -1,0 +1,691 @@
+unit cgi_actions;
+{$MODE DELPHI}
+//{$mode objfpc}{$H+}
+{$LONGSTRINGS ON}
+
+interface
+
+uses
+Classes, SysUtils,Process,strutils,IniFiles,oldlinux,BaseUnix,confiles,Logs,RegExpr in 'RegExpr.pas',md5,global_conf in 'global_conf.pas',zsystem;
+
+  type
+  Tcgi_actions=class
+
+
+private
+       GLOBAL_INI:myConf;
+       LOGS:Tlogs;
+       ArticaDirectory,jour,heure:string;
+       ArticaBuildPath:string;
+       version:string;
+       PHP_PATH:string;
+       function ReadFileIntoString(path:string):string;
+
+
+public
+      constructor Create();
+       procedure Free;
+       function DirectoryCountFiles(FilePath: string):integer;
+       function DirFiles(FilePath: string;pattern:string):TstringList;
+       DirListFiles:TstringList;
+       FA:TStringList;
+       function QuarantineDeletePattern(pathToFileList:string):boolean;
+       function KAS_SAVE_FILTER_CONF(PathToFile:string):boolean;
+       function KAS_SAVE_RBLS_XML(Path:string):boolean;
+       function KAS_GET_UPDATES_DATE():string;
+       function KAS_TRAP_UPDATES_ERROR(logsPath:string):string;
+       function KAS_FORCE_UPDATES_ERROR():string;
+       function KAS_SAVE_RULES(PathToFiles:string):boolean;
+       function KAS_TRAP_UPDATES_SUCCESS(logsPath:string):string;
+       function KAS_FORCE_UPDATES_NOW():string;
+       function KAS_GET_CRON_TASK_UPDATE():string;
+       procedure KAS_STATUS();
+
+       function KAV_PERFORM_UPDATE():string;
+       function KAV_TRAP_UPDATES_ERROR():string;
+       function KAV_TRAP_UPDATES_SUCCESS():string;
+       function KAV_TRAP_DAEMON_ERROR():string;
+       function KAV_TRAP_DAEMON_EVENTS():TStringList;
+       function KAV_GET_CRON_TASK_UPDATE():string;
+       function KAV_GET_DAEMON_INFOS():string;
+       
+       FUNCTION ARTICA_ALL_STATUS():string;
+       
+       function  POSTFIX_MAILLOG():string;
+       procedure POSTFIX_MAILLOG_HISTORY(filter:string);
+       
+       procedure SYSTEM_START_STOP_SERVICES(APPS:string;Start:boolean);
+       procedure APP_AUTOREMOVE(application_name:string);
+       procedure APP_AUTOINSTALL(application_name:string);
+       
+       function DNSMASQ_LOGS():string;
+       
+       procedure FETCHMAIL_SAVE_CONFIG();
+       
+       PROCEDURE SET_PARAMETERS_ARTICA_FILTER(key:string;value:string);
+       
+
+END;
+
+implementation
+
+constructor Tcgi_actions.Create();
+begin
+LOGS:=TLogs.Create;
+GLOBAL_INI:=MyConf.Create();
+PHP_PATH:=GLOBAL_INI.get_ARTICA_PHP_PATH();
+FA:=TstringList.Create;
+end;
+PROCEDURE Tcgi_actions.Free();
+begin
+DirListFiles.Free;
+GLOBAL_INI.Free;
+FA.free;
+Logs.Free;
+LOGS.Free;
+end;
+
+//#########################################################################################
+function Tcgi_actions.QuarantineDeletePattern(pathToFileList:string):boolean;
+var
+   i:integer;
+   ArrayDatas:TStringList;
+
+begin
+
+ArrayDatas:=TStringList.Create;
+  LOGS.logs('CGI_ACTIONS:: QuarantineDeletePattern:: LOAD ->"'+pathToFileList+'"');
+  if FileExists(pathToFileList) then begin
+          ArrayDatas:=TStringList.Create;
+          ArrayDatas.LoadFromFile(pathToFileList);
+            LOGS.logs('CGI_ACTIONS:: QuarantineDeletePattern:: LOAD ->"'+IntToStr(ArrayDatas.Count) +'" line(s)');
+          for i:=0 to ArrayDatas.Count -1 do begin
+               LOGS.logs('CGI_ACTIONS:: QuarantineDeletePattern:: file index [' + IntToStr(i) + ']="'+ArrayDatas.Strings[i]+'"');
+               if length(ArrayDatas.Strings[i])>0 then begin
+                     if FileExists(ArrayDatas.Strings[i]) then begin
+                        LOGS.logs('CGI_ACTIONS:: QuarantineDeletePattern ->' + trim(ArrayDatas.Strings[i]));
+                        Shell('/bin/rm -f ' + trim(ArrayDatas.Strings[i]));
+                     end else begin
+                       LOGS.logs('CGI_ACTIONS:: QuarantineDeletePattern:: (ERROR)  unable to stat file index [' + IntToStr(i) + ']="'+ArrayDatas.Strings[i]+'"');
+                       
+                     end;
+               end;
+
+          end;
+         shell('/bin/rm ' +  pathToFileList);
+         exit(true);
+      end else begin
+          LOGS.logs('CGI_ACTIONS:: QuarantineDeletePattern:: (ERROR) unable to stat ->"'+pathToFileList+'"');
+      
+      end;
+
+    exit(false);
+
+end;
+
+//#########################################################################################
+procedure Tcgi_actions.FETCHMAIL_SAVE_CONFIG();
+begin
+LOGS.logs('CGI_ACTIONS:: FETCHMAIL_SAVE_CONFIG:: start operation');
+ Shell(PHP_PATH + '/bin/artica-mime fetchmail save');
+ Shell('/bin/chown root:root /etc/fetchmailrc');
+ GLOBAL_INI.FETCHMAIL_DAEMON_STOP();
+ GLOBAL_INI.FETCHMAIL_START_DAEMON();
+end;
+//#########################################################################################
+
+function Tcgi_actions.KAS_SAVE_FILTER_CONF(PathToFile:string):boolean;
+var
+   i:integer;
+begin
+     LOGS.logs('CGI_ACTIONS:: KAS_SAVE_FILTER_CONF:: Replicate '+PathToFile);
+     if not fileExists(PathToFile) then begin
+          LOGS.logs('CGI_ACTIONS:: KAS_SAVE_FILTER_CONF:: unable to stat '+PathToFile);
+          exit(false);
+     end;
+
+     Shell('/bin/mv ' + PathToFile + ' /usr/local/ap-mailfilter3/etc/filter.conf');
+     LOGS.logs('CGI_ACTIONS:: KAS_SAVE_FILTER_CONF:: Replicate file done..');
+     GLOBAL_INI.THREAD_COMMAND_SET('/etc/init.d/kas3 restart');
+     exit(true);
+end;
+//#########################################################################################
+function Tcgi_actions.KAS_SAVE_RULES(PathToFiles:string):boolean;
+var
+   i:integer;
+begin
+     LOGS.logs('CGI_ACTIONS:: KAS_SAVE_RULES:: Replicate '+PathToFiles);
+     if not DirectoryExists(PathToFiles) then begin
+          LOGS.logs('CGI_ACTIONS:: KAS_SAVE_FILTER_CONF:: unable to stat folder '+PathToFiles);
+          exit(false);
+     end;
+
+     Shell('/bin/mv ' + PathToFiles + '/* /usr/local/ap-mailfilter3/conf/def/group/');
+     Shell('/bin/chown mailflt3:mailflt3 /usr/local/ap-mailfilter3/conf/def/group/*');
+     LOGS.logs('CGI_ACTIONS:: KAS_SAVE_RULES:: Replicate file done..');
+     GLOBAL_INI.THREAD_COMMAND_SET('/usr/local/ap-mailfilter3/bin/sfupdates -s -f');
+     exit(true);
+end;
+//#########################################################################################
+
+function Tcgi_actions.KAS_SAVE_RBLS_XML(Path:string):boolean;
+var
+   i:integer;
+begin
+     LOGS.logs('CGI_ACTIONS:: KAS_SAVE_RBLS_XML:: Replicate folder '+Path);
+     if not fileExists(Path + '/kas-rbl.1') then begin
+          LOGS.logs('CGI_ACTIONS:: KAS_SAVE_RBLS_XML:: unable to stat '+Path + '/kas-rbl.1');
+          exit(false);
+     end;
+
+     if not fileExists(Path + '/kas-rbl.2') then begin
+          LOGS.logs('CGI_ACTIONS:: KAS_SAVE_RBLS_XML:: unable to stat '+Path + '/kas-rbl.2');
+          exit(false);
+     end;
+     //2=conf/def/common/rbls.xml
+     //1=conf/src/dnsblacklists/rbls.xml
+     Shell('/bin/mv ' + Path + '/kas-rbl.1 /usr/local/ap-mailfilter3/conf/src/dnsblacklists/rbls.xml');
+     Shell('/bin/mv ' + Path + '/kas-rbl.2 /usr/local/ap-mailfilter3/conf/def/common/rbls.xml');
+     
+     Shell('/bin/chown mailflt3:mailflt3 /usr/local/ap-mailfilter3/conf/def/common/rbls.xml');
+     Shell('/bin/chown mailflt3:mailflt3 /usr/local/ap-mailfilter3/conf/src/dnsblacklists/rbls.xml');
+     
+     
+     LOGS.logs('CGI_ACTIONS:: KAS_SAVE_RBLS_XML:: Replicate file done..');
+     GLOBAL_INI.THREAD_COMMAND_SET('/etc/init.d/kas3 restart');
+     exit(true);
+end;
+//#########################################################################################
+
+function Tcgi_actions.KAS_GET_UPDATES_DATE():string;
+var
+   i:integer;
+   RegExpr:TRegExpr;
+   FD:TStringList;
+begin
+     LOGS.logs('CGI_ACTIONS:: KAS_GET_UPDATES_DATE:: /usr/local/ap-mailfilter3/cfdata/bases/kas300.xml');
+     if not fileExists('/usr/local/ap-mailfilter3/cfdata/bases/kas300.xml') then begin
+          LOGS.logs('CGI_ACTIONS:: KAS_SAVE_RBLS_XML:: unable to stat /usr/local/ap-mailfilter3/cfdata/bases/kas300.xml');
+          exit();
+     end;
+     RegExpr:=TRegExpr.Create;
+     RegExpr.Expression:='UpdateDate="([0-9]{1,2})([0-9]{1,2})([0-9]{1,4})\s+([0-9]{1,2})([0-9]{1,2})';
+     FD:=TStringList.Create;
+     FD.LoadFromFile('/usr/local/ap-mailfilter3/cfdata/bases/kas300.xml');
+     For i:=0 to FD.Count-1 do begin
+          if RegExpr.Exec(FD.Strings[i]) then begin
+                result:=RegExpr.Match[3] + '-' + RegExpr.Match[2] + '-' + RegExpr.Match[1] + ' ' + RegExpr.Match[4]+':' + RegExpr.Match[5]+ ':00';
+                RegExpr.Free;
+                FD.free;
+                exit;
+          end;
+     
+     end;
+end;
+PROCEDURE Tcgi_actions.SET_PARAMETERS_ARTICA_FILTER(key:string;value:string);
+Var
+   INIF:TIniFile;
+   P:Tprocess;
+begin
+     INIF:=TIniFile.Create('/etc/artica-postfix/artica-filter.conf');
+     INIF.WriteString('INFOS',key,value);
+     INIF.Free;
+     P:=TProcess.Create(nil);
+     P.Options:=[poWaitOnExit];
+     P.CommandLine:=GLOBAL_INI.get_ARTICA_PHP_PATH() + '/bin/process1';
+     P.Execute;
+     
+end;
+
+
+
+//#########################################################################################
+FUNCTION Tcgi_actions.ARTICA_ALL_STATUS():string;
+var
+   artica_sql_pid,artica_postfix_pid,artica_filter_pid,pidtemp,emailrelay_pid,articapolicy_pid:string;
+   i:integer;
+begin
+     artica_postfix_pid:=GLOBAL_INI.SYSTEM_GET_PID('/etc/artica-postfix/artica-agent.pid');
+     artica_filter_pid:=GLOBAL_INI.SYSTEM_GET_PID('/etc/artica-postfix/artica-filter.pid');
+     artica_sql_pid:=GLOBAL_INI.SYSTEM_GET_PID('/etc/artica-postfix/artica-sql.pid');
+     emailrelay_pid:=GLOBAL_INI.EMAILRELAY_PID();
+     articapolicy_pid:=GLOBAL_INI.ARTICA_POLICY_GET_PID();
+     
+     DirFiles('/etc/artica-postfix','artica-send.*');
+     
+     if GLOBAL_INI.SYSTEM_PROCESS_EXIST(artica_postfix_pid) then begin
+        FA.Add('artica-postfix;1;' + IntToStr(GLOBAL_INI.SYSTEM_PROCESS_MEMORY(artica_postfix_pid)));
+     end else begin
+       FA.Add('artica-postfix;0;0');
+     end;
+     
+     if GLOBAL_INI.SYSTEM_PROCESS_EXIST(articapolicy_pid) then begin
+        FA.Add('artica-policy;1;' + IntToStr(GLOBAL_INI.SYSTEM_PROCESS_MEMORY(articapolicy_pid)));
+     end else begin
+       FA.Add('artica-policy;0;0');
+     end;
+     
+if GLOBAL_INI.SYSTEM_PROCESS_EXIST(emailrelay_pid) then begin
+        FA.Add('emailrelay;1;' + IntToStr(GLOBAL_INI.SYSTEM_PROCESS_MEMORY(emailrelay_pid)));
+     end else begin
+       FA.Add('emailrelay;0;0');
+ if GLOBAL_INI.SYSTEM_PROCESS_EXIST(artica_filter_pid) then begin
+        FA.Add('artica-filter;1;' + IntToStr(GLOBAL_INI.SYSTEM_PROCESS_MEMORY(artica_filter_pid)));
+     end else begin
+       FA.Add('artica-filter;0;0');
+     end;
+
+     if GLOBAL_INI.SYSTEM_PROCESS_EXIST(artica_sql_pid) then begin
+        FA.Add('artica-sql;1;' + IntToStr(GLOBAL_INI.SYSTEM_PROCESS_MEMORY(artica_sql_pid)));
+     end else begin
+       FA.Add('artica-sql;0;0');
+     end;
+
+     for i:=0 to DirListFiles.Count-1 do begin
+            pidtemp:=GLOBAL_INI.SYSTEM_GET_PID(DirListFiles.Strings[i]);
+            if GLOBAL_INI.SYSTEM_PROCESS_EXIST(pidtemp) then begin
+                FA.Add('artica-send;1;' + IntToStr(GLOBAL_INI.SYSTEM_PROCESS_MEMORY(pidtemp)));
+            end;
+
+     end;
+     end;
+     
+
+end;
+//#########################################################################################
+
+
+procedure Tcgi_actions.SYSTEM_START_STOP_SERVICES(APPS:string;Start:boolean);
+var  cmd_Start:string;
+
+begin
+     if start then cmd_start:=' start' else cmd_start:=' stop';
+
+     logs.logs('CGI_ACTIONS:: SYSTEM_START_STOP_SERVICES:: ' + APPS + cmd_start);
+
+  if APPS='APP_MYSQL' then begin
+     logs.logs('CGI_ACTIONS:: SYSTEM_START_STOP_SERVICES:: ' + GLOBAL_INI.MYSQL_INIT_PATH + cmd_start);
+      Shell(GLOBAL_INI.MYSQL_INIT_PATH + cmd_start);
+      exit;
+  end;
+  
+  if APPS='APP_KAS3' then begin
+      Shell(GLOBAL_INI.KAS_INIT() + cmd_start);
+      exit;
+  end;
+  
+
+  if APPS='APP_POSTFIX' then begin
+      Shell('/etc/init.d/postfix' + cmd_start);
+      exit;
+  end;
+  if APPS='APP_AVESERVER' then begin
+      Shell('/etc/init.d/aveserver' + cmd_start);
+      exit;
+  end;
+  if APPS='APP_FETCHMAIL' then begin
+      Shell('/etc/init.d/fetchmail' + cmd_start);
+      exit;
+  end;
+  if APPS='APP_MAILGRAPH' then begin
+      Shell('/etc/init.d/mailgraph-init' + cmd_start);
+      exit;
+  end;
+  
+  if APPS='APP_CRON' then begin
+      Shell(GLOBAL_INI.CROND_INIT_PATH() + cmd_start);
+      exit;
+  end;
+
+
+end;
+
+
+function Tcgi_actions.KAS_GET_CRON_TASK_UPDATE():string;
+var
+   i,t:integer;
+   RegExpr:TRegExpr;
+   FD,FA:TStringList;
+
+begin
+     FD:=TstringList.Create;
+     FD.AddStrings(DirFiles('/etc/cron.d','*'));
+     RegExpr:=TRegExpr.Create;
+     FA:=TstringList.Create;
+     LOGS.logs('CGI_ACTIONS:: KAS_GET_CRON_TASK_UPDATE:: scanning ' + IntToStr(FD.Count) +' file(s)');
+     RegExpr.Expression:='^(.+/usr/local/ap-mailfilter3/bin/keepup2date)';
+
+     for i:=0 to FD.Count-1 do begin
+
+       FA.LoadFromFile('/etc/cron.d/' + FD.Strings[i]);
+       for t:=0 to FA.Count -1 do begin
+           if RegExpr.Exec(FA.Strings[t]) then begin
+              LOGS.logs('CGI_ACTIONS:: KAS_GET_CRON_TASK_UPDATE:: FOUND ' + RegExpr.Match[1] + ' in file ' + FD.Strings[i]);
+              FA.free;
+              FD.free;
+              result:=RegExpr.Match[1];
+              RegExpr.free;
+              exit;
+           end;
+       end;
+     end;
+
+
+
+end;
+//#########################################################################################
+function Tcgi_actions.KAV_GET_DAEMON_INFOS():string;
+var
+   pid,memory,version:string;
+
+begin
+
+pid:=GLOBAL_INI.AVESERVER_GET_PID();
+memory:=inttostr(GLOBAL_INI.SYSTEM_PROCESS_MEMORY(pid));
+version:=GLOBAL_INI.AVESERVER_GET_VERSION();
+result:=pid+';'+memory + ';' + version + ';';
+end;
+
+
+
+
+//#########################################################################################
+function Tcgi_actions.KAV_GET_CRON_TASK_UPDATE():string;
+var
+   i,t:integer;
+   RegExpr:TRegExpr;
+   FD,FA:TStringList;
+
+begin
+     FD:=TstringList.Create;
+     FD.AddStrings(DirFiles('/etc/cron.d','*'));
+     RegExpr:=TRegExpr.Create;
+     FA:=TstringList.Create;
+     LOGS.logs('CGI_ACTIONS:: KAV_GET_CRON_TASK_UPDATE:: scanning ' + IntToStr(FD.Count) +' file(s)');
+     RegExpr.Expression:='^(.+/opt/kav/5.5/kav4mailservers/bin/keepup2date).+';
+
+     for i:=0 to FD.Count-1 do begin
+
+       FA.LoadFromFile('/etc/cron.d/' + FD.Strings[i]);
+       for t:=0 to FA.Count -1 do begin
+           if RegExpr.Exec(FA.Strings[t]) then begin
+              LOGS.logs('CGI_ACTIONS:: KAV_GET_CRON_TASK_UPDATE:: FOUND ' + RegExpr.Match[1] + ' in file ' + FD.Strings[i]);
+              FA.free;
+              FD.free;
+              result:=RegExpr.Match[1];
+              RegExpr.free;
+              exit;
+           end;
+       end;
+     end;
+
+
+
+end;
+//#########################################################################################
+function Tcgi_actions.KAS_TRAP_UPDATES_ERROR(logsPath:string):string;
+         const
+            CR = #$0d;
+            LF = #$0a;
+            CRLF = CR + LF;
+var
+   i,start:integer;
+   RegExpr:TRegExpr;
+   FD:TStringList;
+   CMD:string;
+begin
+if length(logsPath)=0 then logsPath:='/usr/local/ap-mailfilter3/log/updater.log';
+if not FileExists(logsPath) then exit;
+
+CMD:='/usr/bin/tail -n 500 '+logsPath+'|grep -E ".+(E|F)\]" >/tmp/grep.txt';
+LOGS.LOGS('CGI_ACTIONS:: KAS_TRAP_UPDATES_ERROR:: -> ' + CMD);
+shell(CMD);
+FA.LoadFromFile('/tmp/grep.txt');
+exit(FA.Text);
+end;
+//#########################################################################################
+function Tcgi_actions.KAV_TRAP_UPDATES_ERROR():string;
+
+begin
+  result:=KAS_TRAP_UPDATES_ERROR(GLOBAL_INI.AVESERVER_GET_KEEPUP2DATE_LOGS_PATH());
+end;
+function Tcgi_actions.KAV_TRAP_UPDATES_SUCCESS():string;
+
+begin
+  result:=KAS_TRAP_UPDATES_SUCCESS(GLOBAL_INI.AVESERVER_GET_KEEPUP2DATE_LOGS_PATH());
+end;
+function Tcgi_actions.KAV_PERFORM_UPDATE():string;
+begin
+GLOBAL_INI.THREAD_COMMAND_SET('/opt/kav/5.5/kav4mailservers/bin/keepup2date -q &');
+end;
+function Tcgi_actions.KAV_TRAP_DAEMON_ERROR():string;
+begin
+  result:=KAS_TRAP_UPDATES_ERROR(GLOBAL_INI.AVESERVER_GET_LOGS_PATH());
+end;
+function Tcgi_actions.KAV_TRAP_DAEMON_EVENTS():TStringList;
+var
+   i,a:integer;
+   RegExpr:TRegExpr;
+   Path,mycmd:string;
+   
+begin
+
+     Path:=GLOBAL_INI.AVESERVER_GET_LOGS_PATH();
+     mycmd:='/usr/bin/tail '+ path + ' -n 100 >/tmp/grep_aveserver';
+     LOGS.LOGS('CGI_ACTIONS:: KAV_TRAP_DAEMON_EVENTS:: -> ' + mycmd);
+     shell(mycmd);
+     FA.LoadFromFile('/tmp/grep_aveserver');
+
+end;
+
+//#########################################################################################
+function Tcgi_actions.KAS_TRAP_UPDATES_SUCCESS(logsPath:string):string;
+         const
+            CR = #$0d;
+            LF = #$0a;
+            CRLF = CR + LF;
+var
+   i:integer;
+   RegExpr:TRegExpr;
+   FD:TStringList;
+begin
+if length(logsPath)=0 then logsPath:='/usr/local/ap-mailfilter3/log/updater.log';
+logs.logs('CGI_ACTIONS:: KAS_TRAP_UPDATES_SUCCESS:: -> ' + logsPath);
+if not FileExists(logsPath) then exit;
+ RegExpr:=TRegExpr.Create;
+     RegExpr.Expression:='.+completed successfully';
+     FD:=TStringList.Create;
+     FD.LoadFromFile(logsPath);
+For i:=0 to FD.Count-1 do begin
+          if RegExpr.Exec(FD.Strings[i]) then begin
+                result:=result + FD.Strings[i]+CRLF;
+          end;
+
+     end;
+
+     RegExpr.Free;
+     FD.free;
+
+
+end;
+//#########################################################################################
+function Tcgi_actions.KAS_FORCE_UPDATES_ERROR():string;
+         const
+            CR = #$0d;
+            LF = #$0a;
+            CRLF = CR + LF;
+var
+   i:integer;
+   RegExpr:TRegExpr;
+   FD:TStringList;
+begin
+
+shell('/bin/rm -rf /usr/local/ap-mailfilter3/cfdata/bases/*');
+shell('/bin/rm -rf /usr/local/ap-mailfilter3/cfdata/bases.backup');
+GLOBAL_INI.THREAD_COMMAND_SET('/usr/local/ap-mailfilter3/bin/sfupdates');
+
+end;
+//#########################################################################################
+function Tcgi_actions.KAS_FORCE_UPDATES_NOW():string;
+begin
+GLOBAL_INI.THREAD_COMMAND_SET('/usr/local/ap-mailfilter3/bin/sfupdates');
+
+end;
+//#########################################################################################
+
+function Tcgi_actions.ReadFileIntoString(path:string):string;
+         const
+            CR = #$0d;
+            LF = #$0a;
+            CRLF = CR + LF;
+var
+   Afile:text;
+   i:integer;
+   datas:string;
+   datas_file:string;
+begin
+
+      if not FileExists(path) then begin
+        writeln('Error:thProcThread.ReadFileIntoString -> file not found (' + path + ')');
+        exit;
+
+      end;
+      TRY
+     assign(Afile,path);
+     reset(Afile);
+     while not EOF(Afile) do
+           begin
+           readln(Afile,datas);
+           datas_file:=datas_file + datas +CRLF;
+           end;
+
+close(Afile);
+             EXCEPT
+              writeln('Error:thProcThread.ReadFileIntoString -> unable to read (' + path + ')');
+           end;
+result:=datas_file;
+
+
+end;
+//#########################################################################################
+procedure Tcgi_actions.KAS_STATUS();
+var
+   mstr:string;
+   RegExpr:TRegExpr;
+begin
+  FA:=TStringList.Create;
+  mstr:=GLOBAL_INI.KAS_STATUS();
+  RegExpr:=TRegExpr.Create;
+  RegExpr.Expression:='([0-9\-]+)-([0-9\-]+);([0-9\-]+)-([0-9\-]+);([0-9\-]+)-([0-9\-]+);([0-9\-]+)-([0-9\-]+)';
+  if RegExpr.Exec(mstr) then begin
+      FA.Add('ap-process-server;'+RegExpr.Match[1]+ ';' +RegExpr.Match[2]+';'+IntToStr(GLOBAL_INI.SYSTEM_PROCESS_MEMORY(RegExpr.Match[1])));
+      FA.Add('ap-spfd;'+RegExpr.Match[3]+ ';' +RegExpr.Match[4]+';'+IntToStr(GLOBAL_INI.SYSTEM_PROCESS_MEMORY(RegExpr.Match[3])));
+      FA.Add('kas-license;'+RegExpr.Match[5]+ ';' +RegExpr.Match[6]+';'+IntToStr(GLOBAL_INI.SYSTEM_PROCESS_MEMORY(RegExpr.Match[5])));
+      FA.Add('kas-thttpd;'+RegExpr.Match[7]+ ';' +RegExpr.Match[8]+';'+IntToStr(GLOBAL_INI.SYSTEM_PROCESS_MEMORY(RegExpr.Match[7])));
+  end;
+end;
+//#########################################################################################
+procedure Tcgi_actions.APP_AUTOREMOVE(application_name:string);
+begin
+FA:=TStringList.Create;
+shell(GLOBAL_INI.get_ARTICA_PHP_PATH() + '/bin/artica-install -autoremove ' + application_name + ' auto');
+if FileExists('/var/log/artica-postfix/artica-install-' + application_name + '.log') then FA.LoadFromFile('/var/log/artica-postfix/artica-install-' + application_name + '.log');
+end;
+//#########################################################################################
+procedure Tcgi_actions.APP_AUTOINSTALL(application_name:string);
+begin
+FA:=TStringList.Create;
+shell(GLOBAL_INI.get_ARTICA_PHP_PATH() + '/bin/artica-install -autoinstall ' + application_name + ' auto');
+if FileExists('/var/log/artica-postfix/artica-install-' + application_name + '.log') then  FA.LoadFromFile('/var/log/artica-postfix/artica-install-' + application_name + '.log');
+end;
+//#########################################################################################
+function Tcgi_actions.POSTFIX_MAILLOG():string;
+var maillog_path,cmdline:string;
+begin
+    maillog_path:=GLOBAL_INI.get_LINUX_MAILLOG_PATH();
+    FA:=TstringList.Create;
+    LOGS.logs('POSTFIX_MAILLOG: maillog_path=' + maillog_path);
+    if not FileExists(maillog_path) then begin
+       FA.Add('unable to stat ' + maillog_path);
+       exit;
+    end;
+
+    cmdline:='/usr/bin/tail -n 100 ' + maillog_path;
+    FA.LoadFromStream(GLOBAL_INI.ExecStream(cmdline,false));
+end;
+//#########################################################################################
+function Tcgi_actions.DNSMASQ_LOGS():string;
+var maillog_path,cmdline:string;
+begin
+    maillog_path:='/var/log/dnsmasq/dnsmasq.log';
+    if not FileExists(maillog_path) then exit;
+    FA:=TstringList.Create;
+    cmdline:='/usr/bin/tail -n 100 ' + maillog_path;
+    FA.LoadFromStream(GLOBAL_INI.ExecStream(cmdline,false));
+end;
+//#########################################################################################
+procedure Tcgi_actions.POSTFIX_MAILLOG_HISTORY(filter:string);
+var maillog_path,cmdline:string;
+begin
+    maillog_path:=GLOBAL_INI.get_LINUX_MAILLOG_PATH();
+    if not FileExists(maillog_path) then exit;
+    FA:=TstringList.Create;
+    cmdline:='/bin/cat ' + maillog_path + '|/bin/grep -E "' + filter + '" >/tmp/POSTFIX_MAILLOG_HISTORY.tmp';
+    LOGS.logs('POSTFIX_MAILLOG_HISTORY: ' + cmdline);
+    Shell(cmdline);
+    FA.LoadFromFile('/tmp/POSTFIX_MAILLOG_HISTORY.tmp');
+    LOGS.logs('POSTFIX_MAILLOG_HISTORY: ' + IntToStr(FA.Count) + ' lines');
+end;
+//#########################################################################################
+
+function Tcgi_actions.DirectoryCountFiles(FilePath: string):integer;
+Var Info : TSearchRec;
+    Count : Longint;
+
+Begin
+  Count:=0;
+  If FindFirst (FilePath+'/*',faAnyFile and faDirectory,Info)=0 then
+    begin
+    Repeat
+      if Info.Name<>'..' then begin
+         if Info.Name <>'.' then begin
+              if Info.Attr=48 then count:=count +  DirectoryCountFiles(FilePath + '/' +Info.Name);
+              if Info.Attr=16 then count:=count +  DirectoryCountFiles(FilePath + '/' +Info.Name);
+              if Info.Attr=32 then Inc(Count);
+              //Writeln (Info.Name:40,Info.Size:15);
+         end;
+      end;
+
+    Until FindNext(info)<>0;
+    end;
+  FindClose(Info);
+  exit(count);
+end;
+//#########################################################################################
+function Tcgi_actions.DirFiles(FilePath: string;pattern:string):TstringList;
+Var Info : TSearchRec;
+    Count : Longint;
+    D:boolean;
+Begin
+
+
+  Count:=0;
+   DirListFiles:=TstringList.Create();
+  If FindFirst (FilePath+'/'+ pattern,faAnyFile,Info)=0 then begin
+    Repeat
+      if Info.Name<>'..' then begin
+         if Info.Name <>'.' then begin
+           DirListFiles.Add(Info.Name);
+
+         end;
+      end;
+
+    Until FindNext(info)<>0;
+    end;
+  FindClose(Info);
+  DirFiles:=DirListFiles;
+  exit();
+end;
+//#########################################################################################
+
+end.

@@ -1,0 +1,1290 @@
+unit parsehttp;
+
+{$MODE DELPHI}
+//{$mode objfpc}{$H+}
+{$LONGSTRINGS ON}
+
+interface
+
+uses
+Classes, SysUtils,variants, Process,Linux,BaseUnix,IniFiles,oldlinux,strutils,md5,logs,common,process_infos,class_install,
+RegExpr in 'RegExpr.pas',
+confiles in 'confiles.pas',
+global_conf in 'global_conf.pas',
+cgi_actions in 'cgi_actions.pas';
+
+
+  type
+  Tparsehttp=class
+
+
+private
+     GLOBAL_INI:myconf;
+     LOGS:Tlogs;
+     COMMON:Tcommon;
+     PROC:Tprocessinfos;
+     install:Tclass_install;
+     maillog:string;
+     procedure tail_postfix_logs_filter(filter:string);
+     procedure tail_smtpscanner_logs();
+     procedure tail_keeup2datelog_kav_logs();
+     procedure ReloadPostfix();
+     procedure avestatus();
+     function Explode(const Separator, S: string; Limit: Integer = 0):TStringDynArray;
+     procedure QuarantineQueryPattern(userid:string;Patterns:string);
+     PP : PPchar;
+     S: String;
+
+     Explosed:TStringDynArray;
+
+public
+      Debug:boolean;
+      constructor Create;
+      procedure Free;
+      Enable_echo:boolean;
+      FileData:TstringList;
+           I,n,a : longint;
+
+      function ParseUri(uri:string):boolean;
+END;
+
+implementation
+//#####################################################################################
+constructor Tparsehttp.Create;
+begin
+       forcedirectories('/etc/artica-postfix');
+       GLOBAL_INI:=myconf.Create();
+       LOGS:=Tlogs.Create;
+       LOGS.Debug:=Debug;
+       LOGS.Enable_echo:=Enable_echo;
+       COMMON:=Tcommon.Create;
+       COMMON.debug:=Debug;
+       PROC:=Tprocessinfos.Create;
+       Debug:=GLOBAL_INI.get_DEBUG_DAEMON();
+       FileData:=TstringList.Create;
+       install:=Tclass_install.Create;
+
+end;
+procedure Tparsehttp.Free();
+begin
+   GLOBAL_INI.Free;
+   LOGS.Free;
+   COMMON.Free;
+   PROC.Free;
+   FileData.Free;
+end;
+
+//#####################################################################################
+function Tparsehttp.ParseUri(uri:string):boolean;
+var
+   RegExpr:TRegExpr;
+   datas,path,path2,command_line:string;
+   classInstall:Tclass_install;
+   ArrayDatas:TstringList;
+   Count_i:integer;
+   cgiOp:Tcgi_actions;
+   INIF:TIniFile;
+
+begin
+  LOGS.logs('Tparsehttp: parsing uri {' + uri + '}');
+  RegExpr:=TRegExpr.create;
+  classInstall:=Tclass_install.Create;
+  cgiOp:=Tcgi_actions.Create;
+  result:=false;
+
+   RegExpr.expression:='ARTICA_ALL_STATUS';
+   if RegExpr.Exec(uri) then begin
+      cgiop.ARTICA_ALL_STATUS();
+      FileData.AddStrings(cgiop.FA);
+      result:=true;
+      exit;
+   end;
+   
+   RegExpr.Expression:='SET_ARTICA_FILTER:(.+?)=(.+)';
+   if RegExpr.Exec(uri) then begin
+         cgiop.SET_PARAMETERS_ARTICA_FILTER(RegExpr.Match[1],RegExpr.Match[2]);
+         exit(true);
+   end;
+   
+   RegExpr.Expression:='MAILMAN_SINGLE:(.+)';
+   if RegExpr.Exec(uri) then begin
+         Shell(GLOBAL_INI.get_ARTICA_PHP_PATH() + '/bin/artica-mailman -single ' + RegExpr.Match[1]);
+         if FileExists('/tmp/mailman.txt') then FileData.LoadFromFile('/tmp/mailman.txt');
+         exit(true);
+   end;
+   
+   
+  RegExpr.Expression:='CLOCKS';
+  if RegExpr.Exec(uri) then begin
+      FileData.Add(GLOBAL_INI.SYSTEM_GET_SYS_DATE()+'|' + GLOBAL_INI.SYSTEM_GET_HARD_DATE());
+      exit(true);
+  end;
+  
+  RegExpr.Expression:='SetSystemTime:([0-9]+)';
+  if RegExpr.Exec(uri) then begin
+       LOGS.logs('Tparsehttp:: set time to ' + RegExpr.Match[1]);
+       shell('/bin/date ' +  RegExpr.Match[1]);
+       exit(true);
+  end;
+ RegExpr.Expression:='ConvertTimeSystemToHard';
+  if RegExpr.Exec(uri) then begin
+    LOGS.logs('Tparsehttp::  /sbin/hwclock --systohc --utc');
+     shell('/sbin/hwclock --systohc --utc');
+     exit(true);
+  end;
+ 
+   
+   
+RegExpr.Expression:='printenvpath';
+   if RegExpr.Exec(uri) then begin
+          FileData.Add(GLOBAL_INI.SYSTEM_ENV_PATHS());
+         exit(true);
+   end;
+
+RegExpr.Expression:='AUTOINSTALL:(.+)';
+   if RegExpr.Exec(uri) then begin
+         cgiop.APP_AUTOINSTALL(trim(RegExpr.Match[1]));
+         FileData.AddStrings(cgiop.FA);
+         exit(true);
+   end;
+RegExpr.Expression:='AUTOREMOVE:(.+)';
+   if RegExpr.Exec(uri) then begin
+         cgiop.APP_AUTOREMOVE(trim(RegExpr.Match[1]));
+         FileData.AddStrings(cgiop.FA);
+         exit(true);
+   end;
+   
+
+   RegExpr.expression:='getMyConf';
+   if RegExpr.Exec(uri) then begin
+      FileData.LoadFromFile('/etc/artica-postfix/artica-postfix.conf');
+      result:=true;
+   end;
+   
+   
+   RegExpr.expression:='PostFixChangeAutoInterface:([a-z0-9]+)';
+   if RegExpr.Exec(uri) then begin
+      LOGS.logs('ParseUri -> Save artica conf ChangeAutoInterface set to yes and follow nic : ' +trim(RegExpr.Match[1]));
+      GLOBAL_INI.set_INFOS('ChangeAutoInterface',trim(RegExpr.Match[1]));
+      GLOBAL_INI.THREAD_COMMAND_SET(GLOBAL_INI.get_ARTICA_PHP_PATH() + '/bin/artica-install -postfix inet');
+      result:=true;
+   end;
+   
+   RegExpr.expression:='getMyLdapConf';
+   if RegExpr.Exec(uri) then begin
+      if fileexists('/etc/artica-postfix/artica-postfix.conf') then FileData.LoadFromFile('/etc/artica-postfix/artica-postfix.conf');
+      result:=true;
+   end;
+   
+   RegExpr.expression:='SaveMyConf:(.+)';
+   if RegExpr.Exec(uri) then begin
+      LOGS.logs('articacgi:: ParseUri::  -> Save artica conf file : ' +trim(RegExpr.Match[1]));
+      shell('/bin/mv ' +  trim(RegExpr.Match[1]) + ' /etc/artica-postfix/');
+      result:=true;
+   end;
+   
+   
+   RegExpr.expression:='mailgraph_database:(.+)';
+   if RegExpr.Exec(uri) then begin
+      LOGS.logs('articacgi:: ParseUri::  -> Save MailGraph Postfix database Path : ' +trim(RegExpr.Match[1]));
+      GLOBAL_INI.set_MAILGRAPH_RRD(trim(RegExpr.Match[1]));
+      result:=true;
+   end;
+   
+   RegExpr.expression:='mailgraph_virus_database:(.+)';
+   if RegExpr.Exec(uri) then begin
+      LOGS.logs('articacgi:: ParseUri::  -> Save MailGraph Postfix database Path : ' +trim(RegExpr.Match[1]));
+      GLOBAL_INI.set_MAILGRAPH_RRD_VIRUS(trim(RegExpr.Match[1]));
+      result:=true;
+   end;
+   
+    RegExpr.expression:='SavePostfixHeaderCheck:(.+)';
+    if RegExpr.Exec(uri) then begin
+       path2:=GLOBAL_INI.POSTFIX_HEADERS_CHECKS();
+      LOGS.logs('articacgi:: ParseUri::  -> SavePostfixHeaderCheck (1): ' +trim(RegExpr.Match[1]));
+      LOGS.logs('articacgi:: ParseUri::  -> SavePostfixHeaderCheck (2): ' +path2);
+
+      if FileExists(trim(RegExpr.Match[1])) then shell('/bin/mv ' +  trim(RegExpr.Match[1]) + ' '+path2);
+      result:=true;
+   end;
+   
+   
+   RegExpr.expression:='GenerateCert:(.+)';
+   if RegExpr.Exec(uri) then begin
+     if not fileExists('/usr/bin/openssl') then begin
+        FileData.Add('unable to locate : /usr/bin/openssl');
+        result:=true;
+        exit;
+     end;
+        
+     path:=RegExpr.Match[1];
+     path2:=classInstall.GenerateCertificateFileName(path);
+     FileData.Add('ok');
+     result:=true;
+
+   end;
+   
+   RegExpr.expression:='StartPostfix';
+    if RegExpr.Exec(uri) then begin
+          cgiop.SYSTEM_START_STOP_SERVICES('APP_POSTFIX',true);
+          shell(GLOBAL_INI.get_ARTICA_PHP_PATH() + '/bin/process1');
+    end;
+    
+
+   
+   RegExpr.expression:='pid';
+   if RegExpr.Exec(uri) then begin
+      FileData.Add(intToStr(getpid));
+     result:=true;
+   end;
+   
+    RegExpr.expression:='psprocesses';
+    if RegExpr.Exec(uri) then begin
+         FileData.LoadFromStream(PROC.ExecStream('/bin/ps -eww -orss,vsz,comm',false));
+         result:=true;
+    end;
+    
+    RegExpr.expression:='getMainCF';
+    if RegExpr.Exec(uri) then begin
+         FileData.LoadFromFile('/etc/postfix/main.cf');
+         result:=true;
+    end;
+    
+    RegExpr.expression:='avestatus';
+    if RegExpr.Exec(uri) then begin
+         avestatus();
+         result:=true;
+    end;
+
+
+// ########################################### Postfix Logs ####################################"
+       
+    RegExpr.expression:='PostfixLogs';
+    if RegExpr.Exec(uri) then begin
+         cgiop.POSTFIX_MAILLOG();
+         FileData.AddStrings(cgiop.FA);
+         LOGS.logs('articacgi:: ParseUri:: PostfixLogs:: ' + IntTOstr(FileData.Count) + ' lines');
+         exit(true);
+    end;
+    
+    RegExpr.expression:='dnsmasqlogs';
+    if RegExpr.Exec(uri) then begin
+         cgiop.DNSMASQ_LOGS();
+         FileData.AddStrings(cgiop.FA);
+         exit(true);
+    end;
+    
+     RegExpr.expression:='PostfixErrorsLogs';
+     if RegExpr.Exec(uri) then begin
+          GLOBAL_INI.POSTFIX_LAST_ERRORS();
+          FileData.AddStrings(GLOBAL_INI.ArrayList);
+          LOGS.Logs('articacgi:: ParseUri:: PostfixErrorsLogs:: ' + IntTOstr(FileData.Count) + ' lines');
+          exit(true);
+     end;
+
+     RegExpr.expression:='mailmanevents';
+    if RegExpr.Exec(uri) then begin
+         if FileExists('/opt/artica/var/mailman/logs/smtp') then FileData.LoadFromFile('/opt/artica/var/mailman/logs/smtp');
+         LOGS.logs('articacgi:: ParseUri:: PostfixLogs:: ' + IntTOstr(FileData.Count) + ' lines');
+         exit(true);
+    end;
+    
+    
+    
+// ############################################################################################
+    
+    RegExpr.expression:='PostfixAllQueue';
+    if RegExpr.Exec(uri) then begin
+         FileData.Add(GLOBAL_INI.POSTFIX_QUEUE_FILE_NUMBER('all'));
+         exit(true);
+    end;
+    
+    
+    RegExpr.expression:='maillog:(.+)';
+    if RegExpr.Exec(uri) then begin
+         tail_postfix_logs_filter(RegExpr.Match[1]);
+         result:=true;
+         RegExpr.Free;
+         exit;
+    end;
+    
+ RegExpr.expression:='mailloghistory:(.+)';
+    if RegExpr.Exec(uri) then begin
+         cgiop.POSTFIX_MAILLOG_HISTORY(RegExpr.Match[1]);
+         FileData.AddStrings(cgiop.FA);
+         result:=true;
+         RegExpr.Free;
+         exit;
+    end;
+    
+
+    
+    RegExpr.expression:='GlobalApplicationsStatus';
+    if RegExpr.Exec(uri) then begin
+         path:=GLOBAL_INI.get_ARTICA_PHP_PATH();
+         GLOBAL_INI.CGI_ALL_APPLIS_INSTALLED();
+         FileData.AddStrings(GLOBAL_INI.ArrayList);
+         result:=true;
+    end;
+    
+
+     RegExpr.expression:='all_services';
+      if RegExpr.Exec(uri) then begin
+       LOGS.logs('articacgi:: ParseUri::  -> receive command to parse all services... : ');
+        FileData:=GLOBAL_INI.SYSTEM_DAEMONS_STATUS();
+         LOGS.logs('articacgi:: ParseUri::  -> buffer (' + IntTostr(FileData.Count) + ') Lines');
+        result:=true;
+    end;
+
+
+    RegExpr.expression:='TaskManager';
+    if RegExpr.Exec(uri) then begin
+       GLOBAL_INI.SYSTEM_PROCESS_PS();
+        FileData.AddStrings(GLOBAL_INI.ArrayList);
+        result:=true;
+        exit;
+    end;
+    RegExpr.expression:='KillProcessByid:([0-9]+)';
+    if RegExpr.Exec(uri) then begin
+        if Not FileExists('/bin/kill') then begin
+           LOGS.logs('articacgi:: ParseUri::  -> unable to stat /bin/kill');
+           result:=true;
+           exit;
+        end;
+        LOGS.logs('articacgi:: ParseUri::  -> /bin/kill -9 ' + RegExpr.Match[1]);
+        FileData.LoadFromStream(PROC.ExecStream('/bin/kill -9 ' + RegExpr.Match[1],false));
+        result:=true;
+        exit;
+    end;
+
+
+    
+//--------------------------------------- Network configurations ----------------------------------
+
+    RegExpr.expression:='ifconfig';
+    if RegExpr.Exec(uri) then begin
+        FileData.LoadFromStream(PROC.ExecStream('/sbin/ifconfig -a',false));
+        result:=true;
+    end;
+    RegExpr.expression:='allips';
+    if RegExpr.Exec(uri) then begin
+        GLOBAL_INI.SYSTEM_ALL_IPS();
+        FileData.AddStrings(GLOBAL_INI.ArrayList);
+        result:=true;
+    end;
+    
+
+    
+    RegExpr.expression:='NetWorkCardsInfos';
+    if RegExpr.Exec(uri) then begin
+        FileData.Add(GLOBAL_INI.SYSTEM_NETWORK_IFCONFIG());
+        result:=true;
+    end;
+    
+    RegExpr.expression:='SystemNetworkUse';
+    if RegExpr.Exec(uri) then begin
+        if FileExists('/etc/network/interfaces') then FileData.Add('DEBIAN');
+        if DirectoryExists('/etc/sysconfig/network-scripts') then FileData.Add('REDHAT');
+        result:=true;
+    end;
+    
+    RegExpr.expression:='nic-list';
+    if RegExpr.Exec(uri) then begin
+       GLOBAL_INI.SYSTEM_NETWORK_LIST_NICS();
+        FileData.AddStrings(GLOBAL_INI.ArrayList);
+        result:=true;
+        exit;
+    end;
+
+    RegExpr.expression:='InetInfos:(.+)';
+    if RegExpr.Exec(uri) then begin
+        FileData.LoadFromStream(PROC.ExecStream('/sbin/ifconfig ' + RegExpr.Match[1],false));
+        result:=true;
+        exit;
+    end;
+
+   RegExpr.expression:='nicinfos:([a-zA-Z0-9\:]+)';
+   if RegExpr.Exec(uri) then begin
+       GLOBAL_INI.SYSTEM_NETWORK_INFO_NIC(RegExpr.Match[1]);
+       FileData.AddStrings(GLOBAL_INI.ArrayList);
+       result:=true;
+       exit;
+   end;
+   
+    RegExpr.expression:='SaveNicsInfos';
+    if RegExpr.Exec(uri) then begin
+        path:=RegExpr.Match[1];
+        LOGS.logs('articacgi:: ParseUri::  -> Replicate NIC Configuration');
+        LOGS.logs('articacgi:: ParseUri::  -> invoking replicate configuration nic ');
+        GLOBAL_INI.THREAD_COMMAND_SET(GLOBAL_INI.get_ARTICA_PHP_PATH() + '/bin/artica-install -nic-configure');
+        result:=true;
+        exit;
+    end;
+    
+
+//---------------------------------------//---------------------------------------//----------------
+    
+    RegExpr.expression:='PerformAutoRemove:(.+)';
+    if RegExpr.Exec(uri) then begin
+         if trim(RegExpr.Match[1])='APP_MAILGRAPH' then begin
+             classInstall.MAILGRAPH_REMOVE();
+         end;
+         if trim(RegExpr.Match[1])='APP_QUEUEGRAPH' then begin
+             classInstall.QUEUEGRAPH_REMOVE();
+         end;
+         if trim(RegExpr.Match[1])='APP_YOREL' then begin
+             classInstall.YOREL_REMOVE();
+         end;
+         result:=true;
+    end;
+    
+
+    
+    
+    RegExpr.expression:='PerformAutoInstall:(.+)';
+    if RegExpr.Exec(uri) then begin
+         path:=GLOBAL_INI.get_ARTICA_PHP_PATH();
+
+         
+         if(RegExpr.Match[1]='APP_CYRUS') then begin
+             FileData.Add('{you must execute this operation manually}\nartica-install -autoinstall ' + RegExpr.Match[1]);
+             exit(true);
+         end;
+         
+         LOGS.logs('articacgi:: ParseUri::  -> invoking auto install : ' +RegExpr.Match[1]);
+         Shell(path + '/bin/artica-install -autoinstall ' + RegExpr.Match[1]);
+         LOGS.logs('Installation process could take long time, running installation in background mode...');
+         //FileData.Add('{install_wait_few_minutes}');
+         result:=true;
+         exit();
+     end;
+
+
+
+    RegExpr.expression:='SaveMaincf:(.+)';
+    if RegExpr.Exec(uri) then begin
+        path:=RegExpr.Match[1];
+        LOGS.logs('articacgi:: ParseUri::  -> Replicate Postfix Configuration  : "' +RegExpr.Match[1] + '"');
+        LOGS.logs('articacgi:: ParseUri::  -> invoking replicate main.cf file for second thread: ' +path);
+        shell(GLOBAL_INI.get_ARTICA_PHP_PATH() + '/bin/artica-install -postfix check-config ' + RegExpr.Match[1]);
+        result:=true;
+        exit;
+    end;
+    
+    RegExpr.expression:='Savefetchmailrc';
+    if RegExpr.Exec(uri) then begin
+        cgiop.FETCHMAIL_SAVE_CONFIG();
+        result:=true;
+        exit;
+    end;
+    
+
+    RegExpr.expression:='DeleteTheMainFilePostfixSettings:(.+)';
+    if RegExpr.Exec(uri) then begin
+        path:=RegExpr.Match[1];
+        shell('/etc/init.d/postfix stop 2>&1');
+        shell('/bin/rm ' + path);
+        shell('/etc/init.d/postfix start 2>&1');
+        result:=true;
+    end;
+    
+    RegExpr.expression:='SaveProcMailRules:(.+)';
+    if RegExpr.Exec(uri) then begin
+        path:=RegExpr.Match[1];
+        shell('/bin/mv ' + path + ' /etc/procmailrc');
+         LOGS.logs('saving procmail settings username will be ' + GLOBAL_INI.PROCMAIL_USER());
+        shell('/bin/chown ' +GLOBAL_INI.PROCMAIL_USER() + ' /etc/procmailrc');
+        Shell('/bin/chown ' + GLOBAL_INI.PROCMAIL_USER() +' ' +  GLOBAL_INI.PROCMAIL_QUARANTINE_PATH());
+        result:=true;
+    end;
+    
+     RegExpr.expression:='kav4mailservers\.conf';
+     if RegExpr.Exec(uri) then begin
+        FileData.LoadFromFile('/etc/kav/5.5/kav4mailservers/kav4mailservers.conf');
+        result:=true;
+    end;
+    
+    //AveTemplate
+   RegExpr.expression:='AveTemplate:([a-zA-Z]+)_([a-zA-Z]+)';
+   if RegExpr.Exec(uri) then begin
+       LOGS.logs('articacgi:: ParseUri::  -> Get template  : "' +RegExpr.Match[1] + '" "' +RegExpr.Match[2] + '"');
+       FileData.Add(GLOBAL_INI.AVESERVER_GET_TEMPLATE_DATAS(RegExpr.Match[1],RegExpr.Match[2]));
+       result:=true;
+   
+   end;
+    
+   RegExpr.expression:='filter\.conf';
+     if RegExpr.Exec(uri) then begin
+        FileData.Add(install.LinuxInfosDistri());
+        result:=true;
+        exit;
+    end;
+    
+ //------------------------------------------------------------------------------
+   RegExpr.expression:='MyOS';
+     if RegExpr.Exec(uri) then begin
+        FileData.Add(install.LinuxInfosDistri()+ ';' + GLOBAL_INI.SYSTEM_KERNEL_VERSION() + ';' + GLOBAL_INI.SYSTEM_LIBC_VERSION());
+        result:=true;
+        exit;
+    end;
+ //------------------------------------------------------------------------------
+ 
+ //------------------------------------------------------------------------------
+   RegExpr.expression:='CronDatas';
+     if RegExpr.Exec(uri) then begin
+        LOGS.logs('articacgi:: Get tasks saved in cron.d path');
+        GLOBAL_INI.SYSTEM_CRON_TASKS();
+        LOGS.logs('articacgi:: ' +  IntToStr(GLOBAL_INI.ArrayList.Count) + ' lines');
+        FileData.AddStrings(GLOBAL_INI.ArrayList);
+        result:=true;
+        exit;
+    end;
+ //------------------------------------------------------------------------------
+ 
+ //------------------------------------------------------------------------------
+   RegExpr.expression:='^resolv\.conf';
+     if RegExpr.Exec(uri) then begin
+        LOGS.logs('articacgi:: get /etc/resolv.conf datas');
+        FileData.LoadFromFile('/etc/resolv.conf');
+        result:=true;
+        exit;
+    end;
+ //------------------------------------------------------------------------------
+ 
+ //------------------------------------------------------------------------------
+   RegExpr.expression:='SaveResolve:(.+)?;(.+)';
+     if RegExpr.Exec(uri) then begin
+        LOGS.logs('articacgi:: DNS: From "' +  RegExpr.Match[1] + '" to "'   +RegExpr.Match[2]+'"');
+        shell('/bin/mv ' + RegExpr.Match[1] + ' ' +  RegExpr.Match[2]);
+        shell('/bin/chown root ' + RegExpr.Match[2]);
+        result:=true;
+        LOGS.logs('articacgi:: REPLICATE DNS Done..');
+        Shell(GLOBAL_INI.SYSTEM_NETWORK_INITD() + ' reload');
+        exit;
+    end;
+ //------------------------------------------------------------------------------
+ 
+ 
+ //------------------------------------------------------------------------------
+   RegExpr.expression:='dnsmasq\.conf';
+     if RegExpr.Exec(uri) then begin
+        LOGS.logs('articacgi:: get /etc/dnsmasq.conf datas');
+
+        if not FileExists('/etc/dnsmasq.conf') then begin
+           LOGS.logs('articacgi:: unable to stat /etc/dnsmasq.conf');
+           exit;
+        end;
+                 
+
+        FileData.LoadFromFile('/etc/dnsmasq.conf');
+        result:=true;
+        exit;
+    end;
+ //------------------------------------------------------------------------------
+ 
+  //------------------------------------------------------------------------------
+   RegExpr.expression:='fetchmailrc';
+     if RegExpr.Exec(uri) then begin
+        LOGS.logs('articacgi:: get /etc/fetchmailrc datas');
+
+        if not FileExists('/etc/fetchmailrc') then begin
+           LOGS.logs('articacgi:: unable to stat /etc/fetchmailrc');
+           exit;
+        end;
+
+
+        FileData.LoadFromFile('/etc/fetchmailrc');
+        result:=true;
+        exit;
+    end;
+ //------------------------------------------------------------------------------
+ 
+ //------------------------------------------------------------------------------
+   RegExpr.expression:='ReplicateCronTask';
+     if RegExpr.Exec(uri) then begin
+        LOGS.logs('articacgi:: replicate tasks in order to save them  in cron.d path');
+        GLOBAL_INI.SYSTEM_CRON_REPLIC_CONFIGS();
+        result:=true;
+        exit;
+    end;
+ //------------------------------------------------------------------------------
+   RegExpr.expression:='SavednsmasqConfigurationFile';
+     if RegExpr.Exec(uri) then begin
+        LOGS.logs('articacgi:: replicate dnsmasq.conf');
+        if FileExists(GLOBAL_INI.get_ARTICA_PHP_PATH() + '/ressources/conf/dnsmasq.conf') then begin
+           shell('/bin/mv ' + GLOBAL_INI.get_ARTICA_PHP_PATH() + '/ressources/conf/dnsmasq.conf /etc/dnsmasq.conf');
+           shell('/bin/chown root /etc/dnsmasq.conf');
+           shell('/etc/init.d/dnsmasq restart');
+        end;
+        result:=true;
+        exit;
+    end;
+
+ 
+  //------------------------------------------------------------------------------
+   RegExpr.expression:='GetUsersList';
+     if RegExpr.Exec(uri) then begin
+        LOGS.logs('articacgi:: Get users list on this system');
+        GLOBAL_INI.SYSTEM_USER_LIST();
+        LOGS.logs('articacgi:: ' +  IntToStr(GLOBAL_INI.ArrayList.Count) + ' lines');
+        FileData.AddStrings(GLOBAL_INI.ArrayList);
+        result:=true;
+        exit;
+    end;
+ //------------------------------------------------------------------------------
+ 
+   RegExpr.expression:='MyKernel';
+     if RegExpr.Exec(uri) then begin
+        FileData.Add(GLOBAL_INI.SYSTEM_KERNEL_VERSION());
+        result:=true;
+        exit;
+    end;
+ //------------------------------------------------------------------------------
+   RegExpr.expression:='lspci';
+     if RegExpr.Exec(uri) then begin
+        if FileExists('/sbin/lspci') then begin
+             FileData.LoadFromStream(GLOBAL_INI.ExecStream('/sbin/lspci',false));
+             result:=true;
+             exit;
+        end;
+        if FileExists('/bin/lspci') then begin
+             FileData.LoadFromStream(GLOBAL_INI.ExecStream('/bin/lspci',false));
+             result:=true;
+             exit;
+        end;
+        if FileExists('/usr/bin/lspci') then begin
+             FileData.LoadFromStream(GLOBAL_INI.ExecStream('/bin/lspci',false));
+             result:=true;
+             exit;
+        end;
+    end;
+ //------------------------------------------------------------------------------
+   RegExpr.expression:='dfmoinsh';
+     if RegExpr.Exec(uri) then begin
+        FileData.LoadFromStream(GLOBAL_INI.ExecStream('/bin/df -h',false));
+        result:=true;
+        exit;
+    end;
+ //------------------------------------------------------------------------------
+   RegExpr.expression:='freemem';
+     if RegExpr.Exec(uri) then begin
+        FileData.LoadFromStream(GLOBAL_INI.ExecStream('/usr/bin/free -m -o',false));
+        result:=true;
+        exit;
+    end;
+ //------------------------------------------------------------------------------
+
+
+     RegExpr.expression:='master\.cf';
+     if RegExpr.Exec(uri) then begin
+        FileData.LoadFromFile('/etc/postfix/master.cf');
+        result:=true;
+        exit;
+    end;
+    
+     RegExpr.expression:='main\.cf';
+     if RegExpr.Exec(uri) then begin
+        FileData.LoadFromFile('/etc/postfix/main.cf');
+        result:=true;
+    end;
+    RegExpr.expression:='resolv\.conf';
+  if RegExpr.Exec(uri) then begin
+        FileData.LoadFromFile('/etc/resolv.conf');
+        result:=true;
+    end;
+    
+     RegExpr.expression:='aveserver_version';
+     if RegExpr.Exec(uri) then begin
+        FileData.Add(GLOBAL_INI.AVESERVER_GET_VERSION());
+        result:=true;
+    end;
+     RegExpr.expression:='aveserver_licence';
+     if RegExpr.Exec(uri) then begin
+        FileData.Add(GLOBAL_INI.AVESERVER_GET_LICENCE());
+        result:=true;
+    end;
+    
+     RegExpr.expression:='aveserver_infos';
+     if RegExpr.Exec(uri) then begin
+        FileData.Add(cgiop.KAV_GET_DAEMON_INFOS());
+        result:=true;
+    end;
+
+    
+
+    
+     RegExpr.expression:='aveserver_licencemanager:(.+)';
+     if RegExpr.Exec(uri) then begin
+        FileData.LoadFromStream(PROC.ExecStream('/opt/kav/5.5/kav4mailservers/bin/licensemanager -a ' +  RegExpr.Match[1],false));
+        shell('/bin/rm ' +  RegExpr.Match[1]);
+        RegExpr.Free;
+        result:=true;
+        exit;
+    end;
+    
+    RegExpr.expression:='aveserver_licencemanager_remove:(.+)';
+     if RegExpr.Exec(uri) then begin
+        FileData.LoadFromStream(PROC.ExecStream('/opt/kav/5.5/kav4mailservers/bin/licensemanager -d ' +  RegExpr.Match[1],false));
+        RegExpr.Free;
+        result:=true;
+        exit;
+    end;
+    
+     RegExpr.expression:='aveserver_licence_extra';
+     if RegExpr.Exec(uri) then begin
+        FileData.LoadFromStream(PROC.ExecStream('/opt/kav/5.5/kav4mailservers/bin/licensemanager -i',false));
+        RegExpr.Free;
+        result:=true;
+        exit;
+    end;
+    
+    RegExpr.expression:='smtpscanner\.log';
+     if RegExpr.Exec(uri) then begin
+        tail_smtpscanner_logs();
+        result:=true;
+    end;
+    
+    RegExpr.expression:='articafilter\.log';
+     if RegExpr.Exec(uri) then begin
+        if FileExists('/var/log/artica-postfix/mail.log') then FileData.LoadFromFile('/var/log/artica-postfix/mail.log');
+        result:=true;
+    end;
+    
+    
+    RegExpr.expression:='keeup2datelog_kav';
+     if RegExpr.Exec(uri) then begin
+        tail_keeup2datelog_kav_logs();
+        exit(true);
+    end;
+//........................................... QUARANTINE ORDERS ......................................................................................
+RegExpr.expression:='quarantine_size:(.+)';
+     if RegExpr.Exec(uri) then begin
+        FileData.Add(GLOBAL_INI.PROCMAIL_QUARANTINE_SIZE(RegExpr.Match[1]) + ' ' +  GLOBAL_INI.PROCMAIL_QUARANTINE_USER_FILE_NUMBER(RegExpr.Match[1]));
+        exit(true);
+    end;
+    
+RegExpr.expression:='QuarantineMessageDelete:::(.+?):::(.+)';
+     if RegExpr.Exec(uri) then begin
+          if FileExists('/var/quarantines/procmail/' + RegExpr.Match[1] + '/new/' + RegExpr.Match[2]) then begin
+             command_line:='/bin/rm /var/quarantines/procmail/' + RegExpr.Match[1] + '/new/' + RegExpr.Match[2];
+             LOGS.logs('articacgi:: ParseUri::  ->' +command_line);
+             Shell(command_line);
+
+          end else begin
+            LOGS.logs('articacgi:: ParseUri::  Unable to stat ' +'/var/quarantines/procmail/' + RegExpr.Match[1] + '/new/' + RegExpr.Match[2]);
+          end;
+          exit(true);
+     end;
+    
+RegExpr.expression:='QuarantineDeletePattern:(.+)';
+     if RegExpr.Exec(uri) then begin
+      LOGS.logs('articacgi:: ParseUri::  QuarantineDeletePattern ->' +RegExpr.Match[1]);
+      if cgiOp.QuarantineDeletePattern(RegExpr.Match[1])=true then begin
+          FileData.Add('OK');
+          exit(true);
+      end;
+     exit(true);
+    end;
+//...............................................................................................;
+RegExpr.expression:='QuarantineQueryPattern:::(.+?):::(.+)';
+     if RegExpr.Exec(uri) then begin
+           LOGS.logs('articacgi:: ParseUri::  ->' +RegExpr.Match[2]);
+          QuarantineQueryPattern(RegExpr.Match[1],RegExpr.Match[2]);
+           FileData.Add('OK');
+          exit(true);
+    end;
+    
+
+    
+    
+RegExpr.expression:='QuarantineShowEmailFile:(.+)';
+    if RegExpr.Exec(uri) then begin
+        FileData.Clear;
+        command_line:=GLOBAL_INI.get_ARTICA_PHP_PATH()+ '/bin/artica-mime parse ' + trim(RegExpr.Match[1]) + '';
+        FileData.LoadFromStream(GLOBAL_INI.ExecStream(command_line,false));
+        LOGS.logs('articacgi:: ParseUri::  ->' +command_line);
+        LOGS.logs('articacgi:: ParseUri:: receive ' +IntToStr(FileData.Count) + ' lines');
+        exit(true);
+    end;
+    
+    
+RegExpr.expression:='deleteallmailfrommailtoother:(.+)';
+ if RegExpr.Exec(uri) then begin
+        FileData.Clear;
+        command_line:=GLOBAL_INI.get_ARTICA_PHP_PATH()+ '/bin/artica-quarantine deleteallmailfrommailtoother ' + trim(RegExpr.Match[1]);
+        FileData.LoadFromStream(GLOBAL_INI.ExecStream(command_line,false));
+        LOGS.logs('articacgi:: ParseUri::  ->' +command_line);
+        exit(true)
+     end;
+     
+RegExpr.expression:='deleteallmailfrommailtoyesterday:(.+)';
+ if RegExpr.Exec(uri) then begin
+        FileData.Clear;
+        command_line:=GLOBAL_INI.get_ARTICA_PHP_PATH()+ '/bin/artica-quarantine deleteallmailfrommailtoyesterday ' + trim(RegExpr.Match[1]);
+        FileData.LoadFromStream(GLOBAL_INI.ExecStream(command_line,false));
+        LOGS.logs('articacgi:: ParseUri::  ->' +command_line);
+        exit(true)
+     end;
+    
+RegExpr.expression:='releasemailmd5:(.+)';
+     if RegExpr.Exec(uri) then begin
+        FileData.Clear;
+        command_line:=GLOBAL_INI.get_ARTICA_PHP_PATH()+ '/bin/artica-mime releasemailmd5 ' + trim(RegExpr.Match[1]);
+        FileData.LoadFromStream(GLOBAL_INI.ExecStream(command_line,false));
+        LOGS.logs('articacgi:: ParseUri::  ->' +command_line);
+        exit(true)
+     end;
+    
+RegExpr.expression:='releaseallmailfrommd5:(.+)';
+     if RegExpr.Exec(uri) then begin
+        FileData.Clear;
+        command_line:=GLOBAL_INI.get_ARTICA_PHP_PATH()+ '/bin/artica-mime releaseallmailfrommd5 ' + trim(RegExpr.Match[1]);
+        FileData.LoadFromStream(GLOBAL_INI.ExecStream(command_line,false));
+        LOGS.logs('articacgi:: ParseUri::  ->' +command_line);
+        exit(true)
+     end;
+    
+
+    
+RegExpr.expression:='QuarantineReleaseMail:(.+?):(.+)';
+     if RegExpr.Exec(uri) then begin
+        FileData.Clear;
+        command_line:=GLOBAL_INI.get_ARTICA_PHP_PATH()+ '/bin/artica-mime send ' + trim(RegExpr.Match[2]) + ' ' +trim(RegExpr.Match[1]) + ' delete';
+        FileData.LoadFromStream(GLOBAL_INI.ExecStream(command_line,false));
+        LOGS.logs('articacgi:: ParseUri::  ->' +command_line);
+        LOGS.logs('articacgi:: ParseUri:: receive ' +IntToStr(FileData.Count) + ' lines');
+        exit(true)
+     end;
+        
+RegExpr.expression:='lastquanrantine:(.+)';
+    if RegExpr.Exec(uri) then begin
+        FileData.Clear;
+
+        if not FileExists(GLOBAL_INI.get_ARTICA_PHP_PATH()+ '/bin/artica-mime') then begin
+           LOGS.logs('articacgi:: unable to stat ' + GLOBAL_INI.get_ARTICA_PHP_PATH()+ '/bin/artica-mime');
+           exit(false);
+        end;
+        
+        command_line:=GLOBAL_INI.get_ARTICA_PHP_PATH()+ '/bin/artica-mime lasttenQuarFiles ' + trim(RegExpr.Match[1]);
+        LOGS.logs('articacgi:: ParseUri::  ->' +command_line);
+        FileData.LoadFromStream(GLOBAL_INI.ExecStream(command_line,false));
+        LOGS.logs('articacgi:: ParseUri:: receive ' +IntToStr(FileData.Count) + ' lines');
+        exit(true);
+    end;
+    
+    RegExpr.expression:='quarantine_list:([0-9]+)-([0-9]+)-(.+)';
+     if RegExpr.Exec(uri) then begin
+        LOGS.logs('articacgi:: ParseUri::  -> Get file list from : ' +RegExpr.Match[1] + ' to ' + RegExpr.Match[2] + ' from ' + RegExpr.Match[3]  + ' user');
+        FileData:=GLOBAL_INI.PROCMAIL_READ_QUARANTINE(StrToInt(RegExpr.Match[1]),StrToInt(RegExpr.Match[2]),RegExpr.Match[3]);
+        exit(true);
+    end;
+    
+    RegExpr.expression:='queue_list:([0-9]+)-([0-9]+)-(.+?)&file=(.+)';
+     if RegExpr.Exec(uri) then begin
+        LOGS.logs('articacgi:: ParseUri::  -> execute queue list from : ' +RegExpr.Match[1] + ' to ' + RegExpr.Match[2] + ' from ' + RegExpr.Match[3]  + ' queue and save if to '+RegExpr.Match[4] );
+         path:=GLOBAL_INI.get_ARTICA_PHP_PATH();
+         Shell(path + '/bin/artica-install -postfix queuelist '+RegExpr.Match[1]+ ' ' +RegExpr.Match[2]+ ' ' +RegExpr.Match[3] + ' ' + RegExpr.Match[4] );
+         exit(true);
+    end;
+    
+    
+     RegExpr.expression:='quarantine_delete_file:(.+):::(.+)';
+  if RegExpr.Exec(uri) then begin
+        path:=GLOBAL_INI.PROCMAIL_QUARANTINE_PATH() + '/' + RegExpr.Match[2] + '/new/' + RegExpr.Match[1];
+
+        LOGS.logs('articacgi:: ParseUri::  -> delete file ' + path);
+        if fileExists(path) then begin
+        shell('/bin/rm -f ' + path);
+        end else begin
+          LOGS.logs('articacgi:: ParseUri::  -> ' + path + ' does not exists');
+        end;
+        FileData.Add('ok');
+        exit(true);
+    end;
+
+     RegExpr.expression:='quarantine_delete_all:([a-zA-Z0-9\.\-_\@]+)';
+  if RegExpr.Exec(uri) then begin
+        path:=GLOBAL_INI.PROCMAIL_QUARANTINE_PATH();
+        if length(path)=0 then exit(false);
+        path:=GLOBAL_INI.PROCMAIL_QUARANTINE_PATH() + '/' + RegExpr.Match[1] + '/new';
+        LOGS.logs('articacgi:: ParseUri::  -> delete folder ' + path);
+        if DirectoryExists(path) then begin
+        shell('/bin/rm -rf ' + path);
+        end else begin
+          LOGS.logs('articacgi:: ParseUri::  -> ' + path + ' does not exists');
+        end;
+        FileData.Add('ok');
+        exit(true);
+    end;
+    
+    
+
+    RegExpr.expression:='view_queue_file:(.+)';
+    if RegExpr.Exec(uri) then begin
+         LOGS.logs('articacgi:: ParseUri::  -> load queue file ' + RegExpr.Match[1]);
+         FileData.LoadFromStream(GLOBAL_INI.ExecStream('/usr/sbin/postcat -q ' + RegExpr.Match[1],false));
+          exit(true);
+    end;
+    
+    RegExpr.expression:='postsuper_d:([A-Za-z0-9]+)';
+    if RegExpr.Exec(uri) then begin
+         LOGS.logs('articacgi:: ParseUri::  -> delete queue file ' + RegExpr.Match[1]);
+         LOGS.logs('articacgi:: ParseUri::  -> EXEC /usr/sbin/postsuper -d  ' + RegExpr.Match[1]);
+         Shell('/usr/sbin/postsuper -d  ' + RegExpr.Match[1]);
+         LOGS.logs('articacgi:: ParseUri::  -> DELETE FILE FROM CACHE');
+         GLOBAL_INI.POSFTIX_DELETE_FILE_FROM_CACHE(RegExpr.Match[1]);
+         exit(true);
+    end;
+    
+    RegExpr.expression:='postqueue_f';
+    if RegExpr.Exec(uri) then begin
+         LOGS.logs('articacgi:: ParseUri::  -> reprocess queue file');
+         FileData.LoadFromStream(GLOBAL_INI.ExecStream('/usr/sbin/postqueue -f',false));
+          exit(true);
+    end;
+
+    RegExpr.expression:='PostfixDeleteMailsQeue:([a-z]+)';
+    if RegExpr.Exec(uri) then begin
+         LOGS.logs('articacgi:: ParseUri::  -> delete queue files ' + RegExpr.Match[1]);
+         LOGS.logs('articacgi:: ParseUri::  -> EXEC /usr/sbin/postsuper -d  ALL ' + RegExpr.Match[1]);
+         Shell('/usr/sbin/postsuper -d  ALL ' + RegExpr.Match[1]);
+         exit(true);
+    end;
+
+
+ //##################### Apply Kas configuration ##########################################
+    RegExpr.expression:='kasconf:(.+)';
+    if RegExpr.Exec(uri) then begin
+       cgiOp.KAS_SAVE_FILTER_CONF(RegExpr.Match[1]);
+       exit(true);
+    end;
+
+    RegExpr.expression:='kasdnsbl:(.+)';
+    if RegExpr.Exec(uri) then begin
+       cgiOp.KAS_SAVE_RBLS_XML(RegExpr.Match[1]);
+       exit(true);
+    end;
+   RegExpr.expression:='KasPatternDate';
+   if RegExpr.Exec(uri) then begin
+      FileData.Add(cgiOp.KAS_GET_UPDATES_DATE());
+      exit(true);
+   end;
+   
+   RegExpr.expression:='KasTrapUpdatesErrors';
+   if RegExpr.Exec(uri) then begin
+      FileData.Add(cgiOp.KAS_TRAP_UPDATES_ERROR(''));
+      exit(true);
+   end;
+   
+   RegExpr.expression:='KasForceUpdatesFromErrors';
+   if RegExpr.Exec(uri) then begin
+     cgiOp.KAS_FORCE_UPDATES_ERROR();
+     exit(true);
+   end;
+   
+
+   RegExpr.expression:='KasUpdatesPatternNow';
+   if RegExpr.Exec(uri) then begin
+     cgiOp.KAS_FORCE_UPDATES_NOW();
+     exit(true);
+   end;
+   
+  RegExpr.expression:='KasTrapUpdatesSuccess';
+   if RegExpr.Exec(uri) then begin
+     FileData.Add(cgiOp.KAS_TRAP_UPDATES_SUCCESS(''));
+     exit(true);
+   end;
+   
+  RegExpr.expression:='KasGetCronTask';
+   if RegExpr.Exec(uri) then begin
+     FileData.Add(trim(cgiOp.KAS_GET_CRON_TASK_UPDATE()));
+     exit(true);
+   end;
+
+RegExpr.expression:='kasrules:(.+)';
+    if RegExpr.Exec(uri) then begin
+        cgiOp.KAS_SAVE_RULES(RegExpr.Match[1]);
+        result:=true;
+    end;
+    
+RegExpr.expression:='kasStatus';
+    if RegExpr.Exec(uri) then begin
+        cgiOp.KAS_STATUS();
+        FileData.AddStrings(cgiop.FA);
+        result:=true;
+    end;
+    
+    RegExpr.expression:='kasUpdaterConf:(.+)';
+    if RegExpr.Exec(uri) then begin
+        path:=RegExpr.Match[1];
+        if fileExists(path) then begin
+           LOGS.logs('articacgi:: ParseUri::  -> replicate Kaspersky Anti-Spam updater conf file : ' +path);
+           Shell('/bin/mv ' + path + ' /usr/local/ap-mailfilter3/etc/keepup2date.conf');
+           exit(true);
+        end;
+    end;
+    
+//####################################################################################
+
+    RegExpr.expression:='aveserver_updates_errors';
+    if RegExpr.Exec(uri) then begin
+         FileData.Add(cgiOp.KAV_TRAP_UPDATES_ERROR());
+         exit(true);
+       end;
+    RegExpr.expression:='aveserver_updates_success';
+    if RegExpr.Exec(uri) then begin
+         FileData.Add(cgiOp.KAV_TRAP_UPDATES_SUCCESS());
+         exit(true);
+       end;
+       
+    RegExpr.expression:='aveserver_daemon_error';
+    if RegExpr.Exec(uri) then begin
+         FileData.Add(cgiOp.KAV_TRAP_DAEMON_ERROR());
+         exit(true);
+       end;
+       
+   RegExpr.expression:='aveserver_daemon_lastlogs';
+    if RegExpr.Exec(uri) then begin
+         cgiOp.KAV_TRAP_DAEMON_EVENTS();
+         FileData:=cgiOp.FA;
+         exit(true);
+       end;
+       
+    RegExpr.expression:='aveserver_perform_udpates';
+    if RegExpr.Exec(uri) then begin
+         cgiOp.KAV_PERFORM_UPDATE();
+         exit(true);
+       end;
+
+  RegExpr.expression:='KavGetCronTask';
+   if RegExpr.Exec(uri) then begin
+     FileData.Add(trim(cgiOp.KAV_GET_CRON_TASK_UPDATE()));
+     exit(true);
+   end;
+       
+    
+    RegExpr.expression:='procmail_logs';
+       if RegExpr.Exec(uri) then begin
+         FileData.LoadFromStream(PROC.ExecStream('/usr/bin/tail '+ GLOBAL_INI.PROCMAIL_LOGS_PATH()+ ' -n 100',false));
+          result:=true;
+          exit;
+       end;
+    
+    RegExpr.expression:='kav4mailservers:(.+)';
+    if RegExpr.Exec(uri) then begin
+        path:=RegExpr.Match[1];
+        LOGS.logs('articacgi:: ParseUri::  -> replicate kav4mailservers.conf file : ');
+        command_line:=GLOBAL_INI.get_ARTICA_PHP_PATH() + '/bin/artica-install -mailav replicate '+ path;
+        LOGS.logs('articacgi:: ParseUri::  -> "'+ command_line + '"');
+        GLOBAL_INI.THREAD_COMMAND_SET(command_line);
+        result:=true;
+    end;
+    RegExpr.expression:='start_service:(.+)';
+    if RegExpr.Exec(uri) then begin
+        cgiop.SYSTEM_START_STOP_SERVICES(RegExpr.Match[1],true);
+        exit(true);
+    end;
+    
+    
+    RegExpr.expression:='stop_service:(.+)';
+    if RegExpr.Exec(uri) then begin
+        cgiop.SYSTEM_START_STOP_SERVICES(RegExpr.Match[1],false);
+        exit(true);
+    end;
+    
+    RegExpr.expression:='keepup2date';
+    if RegExpr.Exec(uri) then begin
+        GLOBAL_INI.THREAD_COMMAND_SET('/opt/kav/5.5/kav4mailservers/bin/keepup2date -q &');
+        result:=true;
+    end;
+    
+    RegExpr.expression:='kas3ViewUpdateConf';
+    if RegExpr.Exec(uri) then begin
+        if fileExists('/usr/local/ap-mailfilter3/etc/keepup2date.conf') then begin
+           LOGS.logs('articacgi:: ParseUri:: kas3keepup2dateconf -> Parsing /usr/local/ap-mailfilter3/etc/keepup2date.conf');
+           FileData.LoadFromFile('/usr/local/ap-mailfilter3/etc/keepup2date.conf');
+           exit(true);
+        end;
+    end;
+    
+    RegExpr.expression:='kas3ViewLicenceInfos';
+     if RegExpr.Exec(uri) then begin
+        if fileExists('/usr/local/ap-mailfilter3/bin/kas-show-license') then begin
+           LOGS.logs('kas3ViewLicenceInfos -> Load datas for /usr/local/ap-mailfilter3/bin/kas-show-license');
+           FileData.LoadFromStream(PROC.ExecStream('/usr/local/ap-mailfilter3/bin/kas-show-license',false));
+           exit(true);
+        end;
+     end;
+     
+     
+     RegExpr.expression:='kas_licencemanager:(.+)';
+     if RegExpr.Exec(uri) then begin
+        if fileExists('/usr/local/ap-mailfilter3/bin/kas-show-license') then begin
+           LOGS.logs('articacgi:: -> apply licence '+RegExpr.Match[1] );
+           if FileExists(RegExpr.Match[1]) then FileData.LoadFromStream(PROC.ExecStream('/usr/local/ap-mailfilter3/bin/install-key ' + RegExpr.Match[1],false));
+           exit(true);
+        end;
+     end;
+
+
+    
+  LOGS.logs('articacgi::Unable to understood ' + uri);
+    
+ RegExpr.Free;
+
+end;
+
+
+
+//#####################################################################################
+procedure Tparsehttp.tail_keeup2datelog_kav_logs();
+begin
+     maillog:=GLOBAL_INI.AVESERVER_GET_KEEPUP2DATE_LOGS_PATH();
+     FileData.LoadFromStream(PROC.ExecStream('/usr/bin/tail '+ maillog + ' -n 100',false));
+end;
+
+//#####################################################################################
+procedure Tparsehttp.tail_postfix_logs_filter(filter:string);
+
+var mycmd:string;
+begin
+     maillog:=GLOBAL_INI.get_LINUX_MAILLOG_PATH();
+     mycmd:='/usr/bin/tail '+ maillog + ' -n 100|grep '+ filter+' >/tmp/grep_' + filter;
+     logs.logs('tail_postfix_logs_filter->"' + filter + '"');
+     logs.logs('tail_postfix_logs_filter->"' + mycmd + '"');
+     shell(mycmd);
+     FileData.LoadFromFile('/tmp/grep_' + filter);
+end;
+//#####################################################################################
+
+
+procedure Tparsehttp.tail_smtpscanner_logs();
+
+begin
+     maillog:=GLOBAL_INI.AVESERVER_GET_VALUE('smtpscan.report','ReportFileName');
+     FileData.LoadFromStream(PROC.ExecStream('/usr/bin/tail '+ maillog + ' -n 100',false));
+end;
+
+
+
+
+
+//#####################################################################################
+procedure Tparsehttp.avestatus();
+var pid:string;
+begin
+   pid:=GLOBAL_INI.AVESERVER_GET_PID();
+   if length(pid)=0 then begin
+       if FileExists('/etc/init.d/aveserver') then begin
+          FileData.Add('0');
+          exit;
+       end;
+       FileData.Add('-1');
+       exit;
+   end;
+   if FileExists('/proc/' + pid + '/exe') then begin
+      FileData.Add('1');
+      exit;
+   end;
+ FileData.Add('0');
+   
+end;
+//#####################################################################################
+procedure Tparsehttp.ReloadPostfix();
+var pid:string;
+begin
+pid:=GLOBAL_INI.POSTFIX_PID();
+LOGS.logs('ReloadPostfix -> MASTER PID ' + pid );
+if FileExists('/proc/' + pid + '/exe') then begin
+   LOGS.logs('replicateMaincf -> Reload postfix  ');
+   shell('/etc/init.d/postfix reload 2>&1');
+   end
+   else begin
+       LOGS.logs('replicateMaincf -> start postfix  ');
+       shell('/etc/init.d/postfix start 2>&1');
+end;
+
+end;
+
+procedure Tparsehttp.QuarantineQueryPattern(userid:string;Patterns:string);
+var
+   regex,command_line,tempfile:string;
+   z:integer;
+begin
+ i:=0;
+ LOGS.logs('QuarantineQueryPattern:: userid:' + userid + ' ' + Patterns);
+ tempfile:='/tmp/list.'+ userid;
+         Explosed:=Explode(':::',Patterns);
+         LOGS.logs('QuarantineQueryPattern:: REGEX NUMBER ' + intToStr(length(Explosed)));
+         if length(Explosed)>0 then begin
+            for z:=0 to length(Explosed)-1 do begin
+               if length(Explosed[z])>0 then begin
+                  regex:=regex + ' -e''' +Explosed[z] + '''';
+
+               end;
+             end;
+         end;
+         LOGS.logs('QuarantineQueryPattern:: REGEX:' + regex);
+         if FileExists(tempfile) then shell('/bin/rm ' + tempfile);
+         command_line:='/bin/egrep -r -l ' + regex + ' /var/quarantines/procmail/' + userid + '/quarantine >' + tempfile;
+         GLOBAL_INI.THREAD_COMMAND_SET(command_line);
+
+         repeat
+            LOGS.logs('QuarantineQueryPattern:: ParseUri:: WAIT ->' + tempfile);
+            if FileExists(tempfile) then break;
+            Select(0,nil,nil,nil,10*100);
+         until not FileExists(tempfile);
+
+        command_line:=GLOBAL_INI.get_ARTICA_PHP_PATH()+ '/bin/artica-mime listMails ' + tempfile;
+        FileData.LoadFromStream(GLOBAL_INI.ExecStream(command_line,false));
+        LOGS.logs('QuarantineQueryPattern:: ParseUri::  ->' +command_line);
+        LOGS.logs('QuarantineQueryPattern:: ParseUri:: receive ' +IntToStr(FileData.Count) + ' lines');
+
+
+end;
+
+
+//#####################################################################################
+function Tparsehttp.Explode(const Separator, S: string; Limit: Integer = 0):TStringDynArray;
+var
+  SepLen       : Integer;
+  F, P         : PChar;
+  ALen, Index  : Integer;
+begin
+  SetLength(Result, 0);
+  if (S = '') or (Limit < 0) then
+    Exit;
+  if Separator = '' then
+  begin
+    SetLength(Result, 1);
+    Result[0] := S;
+    Exit;
+  end;
+  SepLen := Length(Separator);
+  ALen := Limit;
+  SetLength(Result, ALen);
+
+  Index := 0;
+  P := PChar(S);
+  while P^ <> #0 do
+  begin
+    F := P;
+    P := StrPos(P, PChar(Separator));
+    if (P = nil) or ((Limit > 0) and (Index = Limit - 1)) then
+      P := StrEnd(F);
+    if Index >= ALen then
+    begin
+      Inc(ALen, 5); // mehrere auf einmal um schneller arbeiten zu können
+      SetLength(Result, ALen);
+    end;
+    SetString(Result[Index], F, P - F);
+    Inc(Index);
+    if P^ <> #0 then
+      Inc(P, SepLen);
+  end;
+  if Index < ALen then
+    SetLength(Result, Index); // wirkliche Länge festlegen
+end;
+//##############################################################################
+end.
+
