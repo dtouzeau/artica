@@ -6,7 +6,7 @@ unit dansguardian;
 interface
 
 uses
-    Classes, SysUtils,variants,strutils, Process,logs,unix,RegExpr in 'RegExpr.pas',zsystem,kav4proxy,clamav,
+    Classes, SysUtils,variants,strutils, Process,logs,unix,RegExpr in 'RegExpr.pas',zsystem,kav4proxy,clamav,postfix_class,IniFiles,
     squid in '/home/dtouzeau/developpement/artica-postfix/bin/src/artica-install/squid.pas';
 
 type LDAP=record
@@ -27,34 +27,48 @@ private
      artica_path:string;
      kav4proxy:tkav4proxy;
      clamav:Tclamav;
-     procedure VERIFY_CONFFILE_FILE_2(conf:string;key:string;path:string);
-     procedure VERIFY_PARENT_PROXY();
-     procedure DANSGUARDIAN_TEMPLATE();
+     cicap_mem_pid:string;
+     dansguardian_mem_pid:string;
+     username:string;
+     postfix:tpostfix;
+     SQUIDEnable:integer;
+     TAIL_STARTUP:string;
+
+     function GET_VALUE_DATA(conf_path:string;key:string):string;
+     function CheckUserButton():boolean;
+     function DANSGUARDIAN_TAIL_PID():string;
 public
+    DansGuardianEnabled:integer;
+    kavicapserverEnabled:integer;
+    DansGuardianEnableUserFrontEnd:integer;
+    CicapEnabled:integer;
     procedure   Free;
     constructor Create(const zSYS:Tsystem);
     function    INITD_PATH():string;
     function    BIN_PATH():string;
     FUNCTION    DANSGUARDIAN_PID():string;
     procedure   DANSGUARDIAN_STOP();
-    procedure   DANSGUARDIAN_START();
+    procedure   DANSGUARDIAN_START(nottroubleshoot:boolean=false);
     procedure   DANSGUARDIAN_RELOAD();
     function    DANSGUARDIAN_STATUS():string;
     function    DANSGUARDIAN_CONFIG_VALUE(key:string):string;
     procedure   DANSGUARDIAN_CONFIG_VALUE_SET(key:string;value:string);
     function    DANSGUARDIAN_VERSION():string;
-    procedure   DANSGUARDIAN_FILE_IP_CONF();
+    function    DANSGUARDIAN_STATS():string;
+    procedure   DANSGUARDIAN_TAIL_START();
+    function    DANSGUARDIAN_TAIL_STATUS():string;
+    procedure   DANSGUARDIAN_TAIL_STOP();
+    procedure   DANSGUARDIAN_TROUBLESHOT();
     function    transparent_image_path():string;
     function    CONF_PATH():string;
     procedure   verify_content_scanners();
     function    filtergroupslist_path():string;
-    procedure   VERIFY_CONFFILE();
+    procedure   VERIFY_PARENT_PROXY();
     function    DANSGUARDIAN_DELETE_VALUE(key:string):string;
-    DansGuardianEnabled:integer;
     function    DANSGUARDIAN_BIN_VERSION(version:string):int64;
+    procedure   DANSGUARDIAN_TEMPLATE();
+    procedure   REMOVE();
 
-
-    
     function    C_ICAP_BIN_PATH():string;
     function    C_ICAP_CONF_PATH():string;
     procedure   C_ICAP_VALUE_SET(key:string;value:string);
@@ -63,6 +77,7 @@ public
     procedure   C_ICAP_START();
     procedure   C_ICAP_STOP();
     procedure   C_ICAP_CONFIGURE();
+    procedure   C_ICAP_RELOAD();
 END;
 
 implementation
@@ -74,8 +89,26 @@ begin
        SYS:=zSYS;
        kav4proxy:=tkav4proxy.Create(zSYS);
        clamav:=tclamav.Create;
-       
+       username:='squid';
+       if fileExists(clamav.CLAMD_BIN_PATH()) then begin
+          username:=clamav.CLAMD_GETINFO('User');
+       end;
+
+       DansGuardianEnableUserFrontEnd:=1;
+
+       kavicapserverEnabled:=0;
+       CicapEnabled:=0;
+       TAIL_STARTUP:=SYS.LOCATE_PHP5_BIN()+' /usr/share/artica-postfix/exec.dansguardian-tail.php';
        if not TryStrToInt(SYS.GET_INFO('DansGuardianEnabled'),DansGuardianEnabled) then DansGuardianEnabled:=0;
+       if not TryStrToInt(SYS.GET_INFO('kavicapserverEnabled'),kavicapserverEnabled) then kavicapserverEnabled:=0;
+       if not TryStrToInt(SYS.GET_INFO('CicapEnabled'),CicapEnabled) then CicapEnabled:=0;
+       if not TryStrToInt(SYS.GET_INFO('DansGuardianEnableUserFrontEnd'),DansGuardianEnableUserFrontEnd) then DansGuardianEnableUserFrontEnd:=1;
+       if not TryStrToInt(SYS.GET_INFO('SQUIDEnable'),SQUIDEnable) then SQUIDEnable:=1;
+
+       if SQUIDEnable=0 then begin
+          DansGuardianEnabled:=0;
+          CicapEnabled:=0;
+       end;
 
        if not DirectoryExists('/usr/share/artica-postfix') then begin
               artica_path:=ParamStr(0);
@@ -101,7 +134,7 @@ end;
 //##############################################################################
 function tdansguardian.BIN_PATH():string;
 begin
-    if FileExists('/usr/sbin/dansguardian') then exit('/usr/sbin/dansguardian');
+    exit(SYS.LOCATE_DANSGUARDIAN_BIN_PATH());
 end;
 //##############################################################################
 function tdansguardian.CONF_PATH():string;
@@ -132,6 +165,7 @@ procedure tdansguardian.verify_content_scanners();
 var
    icapuri:string;
    l:TstringList;
+   socketpath:string;
 begin
    forceDirectories('/etc/dansguardian/contentscanners');
    
@@ -147,7 +181,8 @@ begin
           l.Add('');
           l.Add('# Always specify the port');
           l.Add('#');
-          l.Add('icapurl = ''icap://'+icapuri+'/srv_clamav?allow204=on&sizelimit=off&mode=simple''');
+          l.Add('icapurl = ''icap://'+icapuri+'/srv_clamav''');
+          l.Add('icapsocket = ''localhost:1351''');
           l.Add('');
           l.Add('exceptionvirusmimetypelist = ''/etc/dansguardian/lists/contentscanners/exceptionvirusmimetypelist''');
           l.Add('exceptionvirusextensionlist = ''/etc/dansguardian/lists/contentscanners/exceptionvirusextensionlist''');
@@ -157,9 +192,42 @@ begin
           logs.Debuglogs('tdansguardian.verify_content_scanners()  Saving icap /etc/dansguardian/contentscanners/icapscan.conf '+icapuri);
        end;
    end;
-   
-   l.SaveToFile('/etc/dansguardian/contentscanners/icapscan.conf');
-   l.free;
+
+   logs.WriteToFile(l.Text,'/etc/dansguardian/contentscanners/icapscan.conf');
+
+   l.Clear;
+   l.Add('plugname = ''clamav''');
+   l.Add('scanbuffmethod = ''file''');
+   l.Add('maxfiles = 15000');
+   l.Add('maxreclevel = 10');
+   l.Add('maxscansize = 100000');
+   l.Add('exceptionvirusmimetypelist = ''/etc/dansguardian/lists/contentscanners/exceptionvirusmimetypelist''');
+   l.Add('exceptionvirusextensionlist = ''/etc/dansguardian/lists/contentscanners/exceptionvirusextensionlist''');
+   l.Add('exceptionvirussitelist = ''/etc/dansguardian/lists/contentscanners/exceptionvirussitelist''');
+   l.Add('exceptionvirusurllist = ''/etc/dansguardian/lists/contentscanners/exceptionvirusurllist''');
+   logs.Debuglogs('tdansguardian.verify_content_scanners()  Saving clamav /etc/dansguardian/contentscanners/clamav.conf ');
+   logs.WriteToFile(l.Text,'/etc/dansguardian/contentscanners/clamav.conf');
+
+
+
+
+
+   socketpath:=clamav.CLAMD_GETINFO('LocalSocket');
+   logs.Debuglogs('Starting......: DansGuardian Clamav socket path:'+ socketpath);
+   if length(socketpath)>0 then begin
+      l.Clear;
+      l.Add('plugname = ''clamdscan''');
+      l.Add('clamdudsfile = '''+socketpath+'''');
+      l.Add('exceptionvirusmimetypelist = ''/etc/dansguardian/lists/contentscanners/exceptionvirusmimetypelist''');
+      l.Add('exceptionvirusextensionlist = ''/etc/dansguardian/lists/contentscanners/exceptionvirusextensionlist''');
+      l.Add('exceptionvirussitelist = ''/etc/dansguardian/lists/contentscanners/exceptionvirussitelist''');
+      l.Add('exceptionvirusurllist = ''/etc/dansguardian/lists/contentscanners/exceptionvirusurllist''');
+      logs.Debuglogs('tdansguardian.verify_content_scanners()  Saving clamav /etc/dansguardian/contentscanners/clamdscan.conf ');
+      logs.WriteToFile(l.Text,'/etc/dansguardian/contentscanners/clamdscan.conf');
+   end;
+
+
+  l.free;
    
 
 end;
@@ -205,6 +273,7 @@ var
   i:integer;
   tmp:string;
 begin
+  if length(dansguardian_mem_pid)>0 then exit(dansguardian_mem_pid);
   tmp:=logs.FILE_TEMP();
   if FileExists(BIN_PATH()) then begin
      tmp:=SYS.ExecPipe(BIN_PATH()+' -s');
@@ -218,7 +287,9 @@ begin
        result:=RegExpr.Match[1];
   end else begin
        logs.Debuglogs(BIN_PATH()+' -s return null "'+tmp+'"');
+       result:=SYS.PIDOF(BIN_PATH());
   end;
+ dansguardian_mem_pid:=result;
  RegExpr.Free;
 
 
@@ -229,25 +300,31 @@ FUNCTION tdansguardian.C_ICAP_PID():string;
 var PID,PID2:string;
 begin
 
+ if length(cicap_mem_pid)>0 then exit(cicap_mem_pid);
+
+
  if not FileExists('/var/run/c-icap/c-icap.pid') then begin
     result:=SYS.PidByProcessPath(C_ICAP_BIN_PATH());
+    cicap_mem_pid:=result;
     exit;
  end;
  PID:=SYS.GET_PID_FROM_PATH('/var/run/c-icap/c-icap.pid');
  
  if (PID='0') OR (length(PID)=0) then begin
     result:=SYS.PidByProcessPath(C_ICAP_BIN_PATH());
+    cicap_mem_pid:=result;
     exit;
  end;
  
  PID2:=SYS.PidByProcessPath(C_ICAP_BIN_PATH());
  if SYS.PROCESS_EXIST(PID2) and not SYS.PROCESS_EXIST(PID) then begin
     result:=PID2;
+    cicap_mem_pid:=PID2;
     exit;
  end;
  
  result:=PID;
- 
+ cicap_mem_pid:=PID;
  
 
 end;
@@ -259,6 +336,25 @@ if Fileexists('/usr/share/dansguardian/transparent1x1.gif') then exit('/usr/shar
 end;
 
 //##############################################################################
+procedure tdansguardian.REMOVE();
+begin
+writeln('Uninstall Dansguardian');
+   DANSGUARDIAN_TAIL_STOP();
+   DANSGUARDIAN_STOP();
+   fpsystem('/usr/share/artica-postfix/bin/setup-ubuntu --remove "dansguardian"');
+   fpsystem(SYS.LOCATE_PHP5_BIN()+' /usr/share/artica-postfix/exec.dansguardian.compile.php --clean-db');
+   if FIleExists(INITD_PATH()) then logs.DeleteFile(INITD_PATH());
+   if FIleExists(BIN_PATH()) then logs.DeleteFile(BIN_PATH());
+   logs.DeleteFile('/etc/artica-postfix/versions.cache');
+   logs.OutputCmd('/usr/share/artica-postfix/bin/artica-install --write-versions');
+   logs.OutputCmd('/usr/share/artica-postfix/bin/process1 --force');
+   fpsystem(SYS.LOCATE_PHP5_BIN()+' /usr/share/artica-postfix/exec.squid.php --reconfigure');
+   writeln('Uninstall Dansguardian DONE');
+   end;
+//##############################################################################
+
+
+
 procedure tdansguardian.DANSGUARDIAN_RELOAD();
 var
    pid:string;
@@ -270,36 +366,39 @@ if not FileExists(BIN_PATH()) then begin
    exit;
 end;
 
-  pid:=DANSGUARDIAN_PID();
-  if length(pid)=0 then begin
-     pid:=SYS.PIDOF(BIN_PATH());
-     if length(pid)>0 then begin
-         logs.DebugLogs('Starting......: DansGuardian kill all bad pids ' + pid);
-         fpsystem('/bin/kill -9 ' + pid);
-         DANSGUARDIAN_START();
-         exit;
-     end;
-  end;
-
-
-  if length(pid)>0 then begin
-     verify_content_scanners();
-     VERIFY_CONFFILE();
-     VERIFY_PARENT_PROXY();
-     logs.Syslogs('Starting......: DansGuardian will be reloaded');
-     logs.OutputCmd(BIN_PATH() + ' -r');
+if DansGuardianEnabled=0 then begin
+     logs.Debuglogs('Starting......: DansGuardian is disabled, aborting');
+     DANSGUARDIAN_TAIL_STOP();
      exit;
-  end;
-   logs.Syslogs('Starting......: DansGuardian hugh !!!');
+end;
 
+  pid:=DANSGUARDIAN_PID();
+  fpsystem(SYS.LOCATE_PHP5_BIN()+' /usr/share/artica-postfix/exec.dansguardian.compile.php');
+
+if SYS.PROCESS_EXIST(pid) then begin
+     logs.Debuglogs('Starting......: DansGuardian reload dansgardian with PID '+ pid);
+     verify_content_scanners();
+     VERIFY_PARENT_PROXY();
+     DANSGUARDIAN_TEMPLATE();
+     logs.Syslogs('Starting......: DansGuardian will be reloaded with username "'+username+'"');
+     DANSGUARDIAN_CONFIG_VALUE_SET('daemonuser',username);
+     DANSGUARDIAN_CONFIG_VALUE_SET('daemongroup',username);
+     logs.OutputCmd(BIN_PATH() + ' -r');
+     DANSGUARDIAN_TAIL_START();
+     exit;
+end;
+
+
+DANSGUARDIAN_START();
 end;
 
 //##############################################################################
-procedure tdansguardian.DANSGUARDIAN_START();
+procedure tdansguardian.DANSGUARDIAN_START(nottroubleshoot:boolean);
 var
    count:integer;
    pid:string;
    FileTemp:string;
+   verb:string;
 begin
 count:=0;
 
@@ -313,6 +412,11 @@ end;
 
 if DansGuardianEnabled=0 then begin
    logs.Debuglogs('Starting......: DansGuardian is disabled');
+    DANSGUARDIAN_STOP();
+    exit;
+end;
+if SYS.isoverloadedTooMuch() then begin
+   logs.DebugLogs('Starting......: DansGuardian System is overloaded');
    exit;
 end;
 
@@ -323,9 +427,9 @@ if FileExists(transparent_image_path()) then logs.OutputCmd('/bin/ln -s --force 
 
 
 forcedirectories('/var/log/dansguardian');
-logs.OutputCmd('/bin/chown -R squid:squid /var/log/dansguardian');
-  C_ICAP_START();
-  pid:=DANSGUARDIAN_PID();
+logs.OutputCmd('/bin/chown -R '+username+':'+username+' /var/log/dansguardian');
+C_ICAP_START();
+pid:=DANSGUARDIAN_PID();
 
 
 
@@ -341,129 +445,155 @@ logs.OutputCmd('/bin/chown -R squid:squid /var/log/dansguardian');
  logs.Debuglogs('DANSGUARDIAN_START() -> PID='+ DANSGUARDIAN_PID());
  if SYS.PROCESS_EXIST(DANSGUARDIAN_PID()) then begin
     logs.DebugLogs('Starting......: DansGuardian already running using pid ' + DANSGUARDIAN_PID()+ '...');
-    C_ICAP_START();
     exit;
  end;
+ if SYS.COMMANDLINE_PARAMETERS('--verbose') then verb:=' --verbose';
+ fpsystem(SYS.LOCATE_PHP5_BIN()+' /usr/share/artica-postfix/exec.dansguardian.compile.php'+verb);
  verify_content_scanners();
- VERIFY_CONFFILE();
  VERIFY_PARENT_PROXY();
-
- fpsystem(BIN_PATH() + ' >'+FileTemp+' 2>&1');
+ DANSGUARDIAN_TEMPLATE();
+ logs.Debuglogs('Starting......: DansGuardian width username '+username);
  logs.Debuglogs('Starting......: DansGuardian...');
- logs.Debuglogs('Starting......: DansGuardian Results: ' + logs.ReadFromFile(FileTemp));
+ if Not FileExists('/var/log/dansguardian/dansguardian.log') then begin
+    forcedirectories('/var/log/dansguardian');
+    logs.OutputCmd('/bin/touch /var/log/dansguardian/dansguardian.log');
+ end;
+ logs.OutputCmd('/bin/chown -R '+username+':'+username+' /var/log/dansguardian');
+ DANSGUARDIAN_CONFIG_VALUE_SET('daemonuser',username);
+ DANSGUARDIAN_CONFIG_VALUE_SET('daemongroup',username);
 
+ if FileExists('/tmp/.dguardianipc') then logs.DeleteFile('/tmp/.dguardianipc');
+ if FileExists('/tmp/.dguardianurlipc') then logs.DeleteFile('/tmp/.dguardianurlipc');
+ logs.OutputCmd('/bin/chmod 777 /tmp');
 
+ logs.OutputCmd(BIN_PATH());
+     
 
  while not SYS.PROCESS_EXIST(DANSGUARDIAN_PID()) do begin
-
         sleep(100);
         inc(count);
-        if count>30 then begin
+        if count>10 then begin
            logs.DebugLogs('Starting......: DansGuardian (failed)');
-            C_ICAP_START();
+           break;
+        end;
+  end;
+
+ logs.Debuglogs('Starting......: DansGuardian...');
+ sleep(200);
+
+
+ logs.OutputCmd(BIN_PATH());
+
+ count:=0;
+ while not SYS.PROCESS_EXIST(DANSGUARDIAN_PID()) do begin
+        sleep(100);
+        inc(count);
+        if count>10 then begin
+           logs.DebugLogs('Starting......: DansGuardian (failed)');
+           if not nottroubleshoot then DANSGUARDIAN_TROUBLESHOT();
            exit;
         end;
   end;
 
  logs.DebugLogs('Starting......: DansGuardian started with new pid ' + DANSGUARDIAN_PID());
+ DANSGUARDIAN_TAIL_START();
 end;
 //##############################################################################
+procedure tdansguardian.DANSGUARDIAN_TROUBLESHOT();
+var
+   tmpstr:string;
+   RegExpr     :TRegExpr;
+   l:Tstringlist;
+   i:integer;
+begin
+   tmpstr:=logs.FILE_TEMP();
+   logs.DebugLogs('Starting......: DansGuardian investigate the problem...');
+   fpsystem(BIN_PATH() + ' >' + tmpstr +' 2>&1');
+
+   if not FileExists(tmpstr) then begin
+        logs.DebugLogs('Starting......: DansGuardian investigate failed');
+        exit;
+   end;
+
+
+   l:=Tstringlist.Create;
+   l.LoadFromFile(tmpstr);
+   logs.DeleteFile(tmpstr);
+   RegExpr:=TRegExpr.Create;
+
+
+   for i:=0 to l.Count-1 do begin
+
+
+   RegExpr.Expression:='Error binding ipc server file.+?rm\s+(.+?)''';
+   if RegExpr.Exec(l.Strings[i]) then begin
+       logs.DebugLogs('Starting......: DansGuardian found ipc server error on '+RegExpr.Match[1] +' file');
+       if FileExists(RegExpr.Match[1]) then logs.DeleteFile(RegExpr.Match[1]);
+       DANSGUARDIAN_START(true);
+       break;
+   end;
+
+
+   RegExpr.Expression:='Unable.+?plugin.+?clamdscan';
+     if RegExpr.Exec(l.Strings[i]) then begin
+         logs.DebugLogs('Starting......: DansGuardian found clamav error "'+l.Strings[i]+'" disable Clamav');
+         SYS.SET_INFO('DansGuardianEnableClamav','0');
+         fpsystem(SYS.LOCATE_PHP5_BIN()+' /usr/share/artica-postfix/exec.dansguardian.compile.php');
+         break;
+     end;
+
+     logs.DebugLogs('Starting......: '+l.Strings[i]);
+
+   end;
+
+ l.free;
+ RegExpr.free;
+
+end;
+//##############################################################################
+
+
 procedure tdansguardian.VERIFY_PARENT_PROXY();
 var
    squid:tsquid;
    http_port,tmp:string;
    RegExpr     :TRegExpr;
 begin
-squid:=tsquid.Create;
-http_port:=squid.SQUID_GET_CONFIG('http_port');
+   squid:=tsquid.Create;
+   http_port:=squid.SQUID_GET_CONFIG('http_port');
    RegExpr:=TRegExpr.Create;
    RegExpr.Expression:='([0-9]+)';
+
    if RegExpr.Exec(http_port) then http_port:=RegExpr.Match[1];
 logs.DebugLogs('Starting......: Squid configuration file:' + squid.SQUID_CONFIG_PATH());
 logs.DebugLogs('Starting......: Squid listen on port : 127.0.0.1:' + http_port);
+
 DANSGUARDIAN_CONFIG_VALUE_SET('proxyport',http_port);
 DANSGUARDIAN_CONFIG_VALUE_SET('proxyip','127.0.0.1');
-
-tmp:=DANSGUARDIAN_CONFIG_VALUE('maxchildren');
-if length(tmp)=0 then DANSGUARDIAN_CONFIG_VALUE_SET('maxchildren','120');
-
-tmp:=DANSGUARDIAN_CONFIG_VALUE('minchildren');
-if length(tmp)=0 then DANSGUARDIAN_CONFIG_VALUE_SET('minchildren','8');
-
-tmp:=DANSGUARDIAN_CONFIG_VALUE('minsparechildren');
-if length(tmp)=0 then DANSGUARDIAN_CONFIG_VALUE_SET('minsparechildren','4');
-
-tmp:=DANSGUARDIAN_CONFIG_VALUE('preforkchildren');
-if length(tmp)=0 then DANSGUARDIAN_CONFIG_VALUE_SET('preforkchildren','6');
-
-tmp:=DANSGUARDIAN_CONFIG_VALUE('maxsparechildren');
-if length(tmp)=0 then DANSGUARDIAN_CONFIG_VALUE_SET('maxsparechildren','32');
-
-tmp:=DANSGUARDIAN_CONFIG_VALUE('maxagechildren');
-if length(tmp)=0 then DANSGUARDIAN_CONFIG_VALUE_SET('maxagechildren','500');
-
-tmp:=DANSGUARDIAN_CONFIG_VALUE('maxcontentfiltersize');
-if length(tmp)=0 then DANSGUARDIAN_CONFIG_VALUE_SET('maxcontentfiltersize','256');
-
-tmp:=DANSGUARDIAN_CONFIG_VALUE('maxcontentramcachescansize');
-if length(tmp)=0 then DANSGUARDIAN_CONFIG_VALUE_SET('maxcontentramcachescansize','2000');
-
-tmp:=DANSGUARDIAN_CONFIG_VALUE('maxcontentfilecachescansize');
-if length(tmp)=0 then DANSGUARDIAN_CONFIG_VALUE_SET('maxcontentfilecachescansize','20000');
-
-tmp:=DANSGUARDIAN_CONFIG_VALUE('filterport');
-if length(tmp)=0 then DANSGUARDIAN_CONFIG_VALUE_SET('filterport','8080');
-
-tmp:=DANSGUARDIAN_CONFIG_VALUE('reportinglevel');
-if length(tmp)=0 then DANSGUARDIAN_CONFIG_VALUE_SET('reportinglevel','3');
-
-tmp:=DANSGUARDIAN_CONFIG_VALUE('LogLevel');
-if length(tmp)=0 then DANSGUARDIAN_CONFIG_VALUE_SET('LogLevel','2');
-
-tmp:=DANSGUARDIAN_CONFIG_VALUE('logexceptionhits');
-if length(tmp)=0 then DANSGUARDIAN_CONFIG_VALUE_SET('logexceptionhits','2');
-
-tmp:=DANSGUARDIAN_CONFIG_VALUE('logfileformat');
-if length(tmp)=0 then DANSGUARDIAN_CONFIG_VALUE_SET('logfileformat','1');
-
-tmp:=DANSGUARDIAN_CONFIG_VALUE('filtergroups');
-if length(tmp)=0 then DANSGUARDIAN_CONFIG_VALUE_SET('filtergroups','1');
-
-tmp:=DANSGUARDIAN_CONFIG_VALUE('custombannedimagefile');
-if length(tmp)=0 then DANSGUARDIAN_CONFIG_VALUE_SET('custombannedimagefile','/usr/share/dansguardian/transparent1x1.gif');
-
-tmp:=DANSGUARDIAN_CONFIG_VALUE('filtergroupslist');
-if length(tmp)=0 then DANSGUARDIAN_CONFIG_VALUE_SET('filtergroupslist','/etc/dansguardian/filtergroupslist');
-
-tmp:=DANSGUARDIAN_CONFIG_VALUE('bannediplist');
-if length(tmp)=0 then DANSGUARDIAN_CONFIG_VALUE_SET('bannediplist','/etc/dansguardian/bannediplist');
-
-tmp:=DANSGUARDIAN_CONFIG_VALUE('exceptioniplist');
-if length(tmp)=0 then DANSGUARDIAN_CONFIG_VALUE_SET('exceptioniplist','/etc/dansguardian/exceptioniplist');
-
-tmp:=DANSGUARDIAN_CONFIG_VALUE('languagedir');
-if length(tmp)=0 then DANSGUARDIAN_CONFIG_VALUE_SET('languagedir','/etc/dansguardian/languages');
-
-tmp:=DANSGUARDIAN_CONFIG_VALUE('language');
-if length(tmp)=0 then DANSGUARDIAN_CONFIG_VALUE_SET('language','ukenglish');
-//   = 'espagnol'
-tmp:=DANSGUARDIAN_CONFIG_VALUE('loglocation');
-if length(tmp)=0 then DANSGUARDIAN_CONFIG_VALUE_SET('loglocation','/var/log/dansguardian/access.log');
-
-tmp:=DANSGUARDIAN_CONFIG_VALUE('statlocation');
-if length(tmp)=0 then DANSGUARDIAN_CONFIG_VALUE_SET('statlocation','/var/log/dansguardian/stats');
-
-
-tmp:=DANSGUARDIAN_CONFIG_VALUE('daemonuser');
-if length(tmp)=0 then DANSGUARDIAN_CONFIG_VALUE_SET('daemonuser','squid');
-
-tmp:=DANSGUARDIAN_CONFIG_VALUE('daemongroup');
-if length(tmp)=0 then DANSGUARDIAN_CONFIG_VALUE_SET('daemongroup','squid');
-
-
-
+DANSGUARDIAN_CONFIG_VALUE_SET('originalip','off');
 end;
 //##############################################################################
+procedure tdansguardian.C_ICAP_RELOAD();
+var
+   pid:string;
+begin
+   if CicapEnabled=0 then begin
+     logs.Debuglogs('Starting......: c-icap is disabled by artica by "CicapEnabled" token...');
+     C_ICAP_STOP();
+     exit;
+   end;
+
+   PID:= C_ICAP_PID();
+   if not SYS.PROCESS_EXIST(pid) then begin
+        C_ICAP_START();
+        exit;
+   end;
+
+   logs.Debuglogs('Starting......: reloading c-icap pid '+PID);
+   logs.OutputCmd('/bin/kill -HUP ' + PID);
+end;
+//##############################################################################
+
 procedure tdansguardian.C_ICAP_START();
 var
    count:integer;
@@ -478,29 +608,38 @@ if not FileExists(C_ICAP_BIN_PATH()) then begin
 end;
 
 if not FileExists(clamav.CLAMSCAN_BIN_PATH()) then begin
-      logs.Debuglogs('Starting......: Unable to stat clamscan bin path, aborting...');
+      logs.Debuglogs('Starting......: c-icap Unable to stat clamscan bin path, aborting...');
       exit;
 end;
 
+if CicapEnabled=0 then begin
+     logs.Debuglogs('Starting......: c-icap is disabled by artica by "CicapEnabled" token...');
+     C_ICAP_STOP();
+     exit;
+end;
+
+
 PID:= C_ICAP_PID();
-C_ICAP_CONFIGURE();
+
+
 
  logs.Debuglogs('C_ICAP_START() -> PID='+ PID);
  if SYS.PROCESS_EXIST(PID) then begin
     logs.Debuglogs('Starting......: c-icap already running using pid ' + PID+ '...');
     exit;
  end;
- 
+  C_ICAP_CONFIGURE();
+ logs.Debuglogs('Starting......: c-icap...');
+ logs.Debuglogs(C_ICAP_BIN_PATH() + ' -f '+C_ICAP_CONF_PATH());
+ fpsystem(C_ICAP_BIN_PATH() + ' -f '+C_ICAP_CONF_PATH()+' -d 3');
 
- fpsystem(C_ICAP_BIN_PATH() + ' -f '+C_ICAP_CONF_PATH()+' &');
- //logs.Debuglogs('Starting......: c-icap Results: ' + logs.ReadFromFile(FileTemp));
  
 
  while not SYS.PROCESS_EXIST(C_ICAP_PID()) do begin
 
         sleep(100);
         inc(count);
-        if count>40 then begin
+        if count>50 then begin
            logs.DebugLogs('Starting......: c-icap (timeout)');
            break;
         end;
@@ -518,49 +657,64 @@ C_ICAP_CONFIGURE();
 end;
 //##############################################################################
 procedure tdansguardian.C_ICAP_CONFIGURE();
+var
+   user:string;
+   chown:string;
+   internal_conf:string;
+   VirSaveDir:string;
+   InternalConf:TiniFile;
 begin
+
+internal_conf:='/etc/artica-postfix/settings/Daemons/CicapInternalConfiguration';
+VirSaveDir:='/opt/artica/share/www/squid-attachments';
+ chown:=username+':'+username;
+ logs.DebugLogs('Starting......: c-icap using user: ' + username);
+ if FileExists(internal_conf) then begin
+       InternalConf:=TiniFile.Create(internal_conf);
+       VirSaveDir:=InternalConf.ReadString('CONF','VirSaveDir','/opt/artica/share/www/squid-attachments');
+       InternalConf.Free;
+ end;
+
 ForceDirectories('/var/log/squid');
 ForceDirectories('/var/log/squid');
 ForceDirectories('/var/lib/c_icap/temporary');
 ForceDirectories('/var/run/c-icap');
-ForceDirectories('/opt/artica/share/www/squid-attachments');
-logs.OutputCmd('/bin/chown -R squid:squid /var/log/squid');
-logs.OutputCmd('/bin/chown -R squid:squid /var/run/c-icap');
-logs.OutputCmd('/bin/chown -R squid:squid /var/lib/c_icap/temporary');
+if not FIleExists('/var/log/squid/c-icap_server.log') then logs.WriteToFile('','/var/log/squid/c-icap_server.log');
+if not FIleExists('/var/log/squid/c-icap_access.log') then logs.WriteToFile('','/var/log/squid/c-icap_access.log');
+ForceDirectories(VirSaveDir);
+logs.OutputCmd('/bin/chown -R '+chown+' /var/log/squid');
+logs.OutputCmd('/bin/chown -R '+chown+' /var/run/c-icap');
+logs.OutputCmd('/bin/chown -R '+chown+' /var/lib/c_icap/temporary');
+logs.OutputCmd('/bin/chown -R '+chown+' '+VirSaveDir);
+logs.OutputCmd('/bin/chmod -R 775 '+VirSaveDir);
 
-C_ICAP_VALUE_SET('ServerLog','/var/log/squid/c-icap_server.log');
-C_ICAP_VALUE_SET('AccessLog','/var/log/squid/c-icap_access.log');
-C_ICAP_VALUE_SET('User','squid');
-C_ICAP_VALUE_SET('Group','squid');
-C_ICAP_VALUE_SET('Port','1351');
-C_ICAP_VALUE_SET('PidFile','/var/run/c-icap/c-icap.pid');
-C_ICAP_VALUE_SET('CommandsSocket','/var/run/c-icap/c-icap.ctl');
-C_ICAP_VALUE_SET('Timeout','300');
-C_ICAP_VALUE_SET('KeepAlive','On');
-C_ICAP_VALUE_SET('MaxKeepAliveRequests','100');
-C_ICAP_VALUE_SET('KeepAliveTimeout','600');
-C_ICAP_VALUE_SET('StartServers','3');
-C_ICAP_VALUE_SET('MaxServers','10');
-C_ICAP_VALUE_SET('MinSpareThreads','10');
-C_ICAP_VALUE_SET('MaxSpareThreads','20');
-C_ICAP_VALUE_SET('ThreadsPerChild','10');
-C_ICAP_VALUE_SET('MaxRequestsPerChild','0');
-C_ICAP_VALUE_SET('TmpDir','/var/lib/c_icap/temporary');
-C_ICAP_VALUE_SET('ServicesDir','/usr/lib/c_icap');
-C_ICAP_VALUE_SET('Service','echo_module srv_echo.so');
-C_ICAP_VALUE_SET('Service','url_check_module srv_url_check.so');
-C_ICAP_VALUE_SET('Service','antivirus_module srv_clamav.so');
-C_ICAP_VALUE_SET('ModulesDir' ,'/usr/lib/c_icap');
-C_ICAP_VALUE_SET('Module logger','sys_logger.so');
-C_ICAP_VALUE_SET('ServiceAlias','avscan srv_clamav?allow204=on&sizelimit=off&mode=simple');
-C_ICAP_VALUE_SET('srv_clamav.ScanFileTypes','TEXT DATA EXECUTABLE ARCHIVE MSOFFICE');
-C_ICAP_VALUE_SET('srv_clamav.SendPercentData','5');
-C_ICAP_VALUE_SET('srv_clamav.StartSendPercentDataAfter','2M');
-C_ICAP_VALUE_SET('srv_clamav.MaxObjectSize','5M');
-C_ICAP_VALUE_SET('srv_clamav.ClamAvTmpDir','/tmp');
-C_ICAP_VALUE_SET('srv_clamav.ClamAvMaxFilesInArchive','0');
-C_ICAP_VALUE_SET('srv_clamav.ClamAvMaxFileSizeInArchive','100M');
-C_ICAP_VALUE_SET('srv_clamav.VirSaveDir','/opt/artica/share/www/squid-attachments');
+if FileExists('/etc/artica-postfix/settings/Daemons/CicapMainConfiguration') then begin
+   logs.OutputCmd('/bin/cp -f /etc/artica-postfix/settings/Daemons/CicapMainConfiguration ' + C_ICAP_CONF_PATH());
+end;
+
+
+
+
+
+   C_ICAP_VALUE_SET('ServerLog','/var/log/squid/c-icap_server.log');
+   C_ICAP_VALUE_SET('AccessLog','/var/log/squid/c-icap_access.log');
+   C_ICAP_VALUE_SET('User',username);
+   C_ICAP_VALUE_SET('Group',username);
+   C_ICAP_VALUE_SET('Port','1351');
+   C_ICAP_VALUE_SET('PidFile','/var/run/c-icap/c-icap.pid');
+   C_ICAP_VALUE_SET('CommandsSocket','/var/run/c-icap/c-icap.ctl');
+   C_ICAP_VALUE_SET('TmpDir','/var/lib/c_icap/temporary');
+   C_ICAP_VALUE_SET('ServicesDir','/usr/lib/c_icap');
+   C_ICAP_VALUE_SET('Service','echo_module srv_echo.so');
+   C_ICAP_VALUE_SET('Service','url_check_module srv_url_check.so');
+   C_ICAP_VALUE_SET('Service','antivirus_module srv_clamav.so');
+   C_ICAP_VALUE_SET('ModulesDir' ,'/usr/lib/c_icap');
+   C_ICAP_VALUE_SET('Module logger','sys_logger.so');
+   C_ICAP_VALUE_SET('ServiceAlias','avscan srv_clamav?allow204=on&sizelimit=off&mode=simple');
+   C_ICAP_VALUE_SET('srv_clamav.ClamAvTmpDir','/tmp');
+
+
+
 
 
 
@@ -568,40 +722,6 @@ C_ICAP_VALUE_SET('srv_clamav.VirSaveDir','/opt/artica/share/www/squid-attachment
 
 end;
 //##############################################################################
-procedure tdansguardian.DANSGUARDIAN_FILE_IP_CONF();
-var
-   l:TstringList;
-   DansGuardianAuthpluginsIP:string;
-begin
-l:=TstringList.Create;
-l.add('# IP-based auth plugin');
-l.add('#');
-l.add('# Maps client IPs to filter groups.');
-l.add('# If "usexforwardedfor" is enabled, grabs the IP from the X-Forwarded-For');
-l.add('# header, if available.');
-l.add('');
-l.add('plugname = ''ip''');
-l.add('');
-l.add('# ipgroups file');
-l.add('# List file assigning IP addresses, subnets and ranges to filter groups');
-l.add('ipgroups = ''/etc/dansguardian/lists/authplugins/ipgroups''');
-if not FileExists('/etc/dansguardian/lists/authplugins/ipgroups') then logs.OutputCmd('/bin/touch /etc/dansguardian/lists/authplugins/ipgroups');
-forceDirectories('/etc/dansguardian/authplugins');
-
-DansGuardianAuthpluginsIP:=SYS.GET_INFO('DansGuardianAuthpluginsIP');
-logs.WriteToFile(DansGuardianAuthpluginsIP,'/etc/dansguardian/lists/authplugins/ipgroups');
-
-try
-   l.SaveToFile('/etc/dansguardian/authplugins/ip.conf');
-except
-   logs.Syslogs('tdansguardian.FILE_IP_CONF() unable to save /etc/dansguardian/authplugins/ip.conf');
-   exit;
-end;
-l.free;
-end;
-//##############################################################################
-
-
 procedure tdansguardian.DANSGUARDIAN_STOP();
  var
     pid:string;
@@ -609,27 +729,50 @@ procedure tdansguardian.DANSGUARDIAN_STOP();
 begin
 count:=0;
   if not FileExists(BIN_pATH) then begin
-     writeln('Stopping DansGuardian........: Already stopped');
-     C_ICAP_STOP();
+     writeln('Stopping DansGuardian........: Not installed');
      exit;
   end;
   pid:=DANSGUARDIAN_PID();
-  if SYS.PROCESS_EXIST(pid) then begin
-   writeln('Stopping DansGuardian........: ' + pid + ' PID');
-  logs.OutputCmd(BIN_pATH()+' -q');
 
-       while SYS.PROCESS_EXIST(DANSGUARDIAN_PID()) do begin
+   if not SYS.PROCESS_EXIST(pid) then begin
+      writeln('Stopping DansGuardian........: Already stopped');
+      DANSGUARDIAN_TAIL_STOP();
+      exit;
+   end;
+
+  if SYS.PROCESS_EXIST(pid) then begin
+  writeln('Stopping DansGuardian........: ' + pid + ' PID');
+  logs.OutputCmd('/bin/kill '+pid);
+  logs.OutputCmd(BIN_pATH()+' -q');
+  pid:=trim(DANSGUARDIAN_PID());
+  if length(trim(pid))=0 then begin
+      writeln('Stopping DansGuardian........: Stopped success');
+       if FileExists('/tmp/.dguardianipc') then logs.DeleteFile('/tmp/.dguardianipc');
+       if FileExists('/tmp/.dguardianurlipc') then logs.DeleteFile('/tmp/.dguardianurlipc');
+       exit;
+  end;
+
+
+       while SYS.PROCESS_EXIST(pid) do begin
         sleep(100);
         inc(count);
+        if length(trim(pid))=0 then break;
+        logs.OutputCmd('/bin/kill '+pid);
         logs.OutputCmd(BIN_pATH()+' -q');
+        dansguardian_mem_pid:='';
         if count>30 then break;
+        pid:=trim(DANSGUARDIAN_PID());
        end;
   end;
 
   if not SYS.PROCESS_EXIST(DANSGUARDIAN_PID()) then begin
-     writeln('Stopping DansGuardian........: Stopped');
+     writeln('Stopping DansGuardian........: Stopped success');
+     if FileExists('/tmp/.dguardianipc') then logs.DeleteFile('/tmp/.dguardianipc');
+     if FileExists('/tmp/.dguardianurlipc') then logs.DeleteFile('/tmp/.dguardianurlipc');
   end;
-  C_ICAP_STOP();
+
+  DANSGUARDIAN_TAIL_STOP();
+
 end;
 //##############################################################################
 
@@ -667,6 +810,7 @@ if SYS.PROCESS_EXIST(pid) then begin
      fpsystem('/bin/kill -9 '+ allpids);
   end;
 
+  cicap_mem_pid:='';
   if not SYS.PROCESS_EXIST(C_ICAP_PID()) then begin
      writeln('Stopping C-icap..............: Stopped');
   end else begin
@@ -679,50 +823,361 @@ function tdansguardian.DANSGUARDIAN_STATUS():string;
 var
 ini:TstringList;
 begin
+if not FileExists(BIN_PATH()) then exit;
+
    ini:=TstringList.Create;
    ini.Add('[DANSGUARDIAN]');
-   if FileExists(BIN_PATH()) then  begin
+   ini.Add('service_name=APP_DANSGUARDIAN');
+   ini.Add('service_cmd=dansgardian');
+   ini.Add('remove_cmd=--dansguardian-remove');
+   ini.Add('master_version=' + DANSGUARDIAN_VERSION());
+
+
+   if SQUIDEnable=0 then begin
+      ini.Add('service_disabled=0');
+      result:=ini.Text;
+      SYS.MONIT_DELETE('APP_DANSGUARDIAN');
+      exit;
+   end;
+
+   if DansGuardianEnabled=0 then begin
+      ini.Add('service_disabled=0');
+      result:=ini.Text;
+      SYS.MONIT_DELETE('APP_DANSGUARDIAN');
+      exit;
+   end;
+
+
+   if SYS.MONIT_CONFIG('APP_DANSGUARDIAN','/var/run/dansguardian.pid','dansgardian') then begin
+   ini.Add('monit=1');
+   result:=ini.Text;
+   ini.free;
+   exit;
+   end;
+
+
+
       if SYS.PROCESS_EXIST(DANSGUARDIAN_PID()) then ini.Add('running=1') else  ini.Add('running=0');
       ini.Add('dansguardian_installed=1');
       ini.Add('application_installed=1');
       ini.Add('master_pid='+ DANSGUARDIAN_PID());
       ini.Add('master_memory=' + IntToStr(SYS.PROCESS_MEMORY(DANSGUARDIAN_PID())));
-      ini.Add('master_version=' + DANSGUARDIAN_VERSION());
       ini.Add('status='+SYS.PROCESS_STATUS(DANSGUARDIAN_PID()));
-      ini.Add('service_name=APP_DANSGUARDIAN');
       ini.Add('service_disabled='+ IntToStr(DansGuardianEnabled));
-      ini.Add('service_cmd=dansgardian');
-   end;
+
+
 
    result:=ini.Text;
    ini.free;
 
 end;
+//##############################################################################
+function tdansguardian.C_ICAP_VERSION():string;
+var
+    RegExpr:TRegExpr;
+    FileDatas:TStringList;
+    i:integer;
+    BinPath:string;
+    filetmp:string;
+    nocache:boolean;
+begin
+if not FIleExists('/usr/bin/c-icap-config') then result:='060708rc2';
+if not nocache then begin
+   result:=SYS.GET_CACHE_VERSION('APP_C_ICAP');
+   if length(result)>2 then exit;
+end;
+filetmp:=logs.FILE_TEMP();
+if not FileExists('/usr/bin/c-icap-config') then begin
+   logs.Debuglogs('unable to find /usr/bin/c-icap-config');
+   exit;
+end;
+
+logs.Debuglogs('/usr/bin/c-icap-config --version >'+filetmp+' 2>&1');
+fpsystem('/usr/bin/c-icap-config --version >'+filetmp+' 2>&1');
+result:=trim(logs.ReadFromFile(filetmp));
+logs.DeleteFile(filetmp);
+SYS.SET_CACHE_VERSION('APP_C_ICAP',result);
+end;
+
+
 //##############################################################################
 function tdansguardian.C_ICAP_STATUS():string;
 var
 ini:TstringList;
+pid:string;
+pidpath:string;
 begin
-   ini:=TstringList.Create;
-   ini.Add('[C-ICAP]');
-   if FileExists(C_ICAP_BIN_PATH()) then  begin
-      if SYS.PROCESS_EXIST(C_ICAP_PID()) then ini.Add('running=1') else  ini.Add('running=0');
-      ini.Add('application_installed=1');
-      ini.Add('master_pid='+ C_ICAP_PID());
-      ini.Add('master_memory=' + IntToStr(SYS.PROCESS_MEMORY(C_ICAP_PID())));
-      ini.Add('master_version=060708rc2');
-      ini.Add('status='+SYS.PROCESS_STATUS(C_ICAP_PID()));
-      ini.Add('service_name=APP_C_ICAP');
-   end else begin
-      ini.Add('application_installed=0');
-      ini.Add('service_name=APP_C_ICAP');
+if not FileExists(C_ICAP_BIN_PATH()) then exit;
+pidpath:='/var/run/c-icap/c-icap.pid';
+ini:=TstringList.Create;
+ini.Add('[C-ICAP]');
+ini.Add('master_version='+C_ICAP_VERSION());
+ini.Add('service_name=APP_C_ICAP');
+ini.Add('service_cmd=cicap');
+
+
+   if SQUIDEnable=0 then begin
+      ini.Add('service_disabled=0');
+      result:=ini.Text;
+      SYS.MONIT_DELETE('APP_C_ICAP');
+      exit;
    end;
 
+   if CicapEnabled=0 then begin
+      ini.Add('service_disabled=0');
+      result:=ini.Text;
+      SYS.MONIT_DELETE('APP_C_ICAP');
+      exit;
+   end;
+
+
+   if SYS.MONIT_CONFIG('APP_C_ICAP',pidpath,'cicap') then begin
+   ini.Add('monit=1');
    result:=ini.Text;
    ini.free;
+   exit;
+   end;
+
+
+
+      pid:=C_ICAP_PID();
+      if SYS.PROCESS_EXIST(pid) then ini.Add('running=1') else  ini.Add('running=0');
+      ini.Add('application_installed=1');
+      ini.Add('master_pid='+ pid);
+      ini.Add('master_memory=' + IntToStr(SYS.PROCESS_MEMORY(pid)));
+      ini.Add('status='+SYS.PROCESS_STATUS(pid));
+      ini.Add('service_disabled='+ IntToStr(CicapEnabled));
+      result:=ini.Text;
+      ini.free;
 
 end;
 //##############################################################################
+function tdansguardian.DANSGUARDIAN_STATS():string;
+var
+   tmpstr:string;
+   phpfile:string;
+begin
+if not FileExists(BIN_PATH) then exit;
+phpfile:=artica_path+'/cron.dansguardian.php';
+if not FileExists(phpfile) then begin
+   writeln('Unable to stat ' +phpfile);
+   logs.Syslogs('Unable to stat '+phpfile);
+   exit;
+end;
+
+DANSGUARDIAN_STOP();
+logs.OutputCmd('/bin/mv /var/log/dansguardian/access.log /var/log/dansguardian/access_work.log');
+logs.OutputCmd('/bin/touch /var/log/dansguardian/access.log');
+logs.OutputCmd('/bin/chown '+username+':'+username+' /var/log/dansguardian/access.log');
+DANSGUARDIAN_START();
+writeln('');
+logs.OutputCmd(SYS.EXEC_NICE()+SYS.LOCATE_PHP5_BIN() + ' ' +phpfile+ ' /var/log/dansguardian/access_work.log &');
+writeln('');
+end;
+//##############################################################################
+function tdansguardian.DANSGUARDIAN_TAIL_PID():string;
+var
+   pid:string;
+begin
+
+if FileExists('/etc/artica-postfix/exec.dansguardian-tail.php.pid') then begin
+   pid:=SYS.GET_PID_FROM_PATH('/etc/artica-postfix/exec.dansguardian-tail.php.pid');
+   logs.Debuglogs('DANSGUARDIAN_TAIL_PID /etc/artica-postfix/exec.dansguardian-tail.php.pid='+pid);
+   if SYS.PROCESS_EXIST(pid) then result:=pid;
+   exit;
+end;
+
+
+result:=SYS.PIDOF_PATTERN(TAIL_STARTUP);
+logs.Debuglogs(TAIL_STARTUP+' pid='+pid);
+end;
+//#####################################################################################
+
+
+procedure tdansguardian.DANSGUARDIAN_TAIL_START();
+var
+   pid:string;
+   pidint:integer;
+   log_path:string;
+   count:integer;
+   cmd:string;
+   CountTail:Tstringlist;
+begin
+
+if not FileExists(BIN_PATH()) then begin
+   logs.Debuglogs('Starting......: artica-dansguardian realtime logs:: DansGuardian is not installed');
+   exit;
+end;
+
+
+if DansGuardianEnabled=0 then begin
+    logs.Debuglogs('Starting......: artica-dansguardian realtime logs:: DansGuardian is disabled');
+    DANSGUARDIAN_TAIL_STOP();
+    exit;
+end;
+
+pid:=DANSGUARDIAN_TAIL_PID();
+if SYS.PROCESS_EXIST(pid) then begin
+      logs.DebugLogs('Starting......: artica-dansguardian realtime logs already running with pid '+pid);
+      if DansGuardianEnabled=0 then DANSGUARDIAN_TAIL_STOP();
+      CountTail:=Tstringlist.Create;
+      CountTail.AddStrings(SYS.PIDOF_PATTERN_PROCESS_LIST('/usr/bin/tail -f -n 0 /var/log/dansguardian/access.log'));
+      logs.DebugLogs('Starting......: artica-dansguardian realtime process number:'+IntToStr(CountTail.Count));
+      if CountTail.Count>3 then fpsystem('/etc/init.d/artica-postfix restart dansguardian-tail');
+      CountTail.free;
+      exit;
+end;
+log_path:='/var/log/dansguardian/access.log';
+
+if not FileExists(log_path) then begin
+   logs.DebugLogs('Starting......: artica-dansguardian realtime stats, unable to stats logfile');
+   exit;
+end;
+DANSGUARDIAN_TAIL_STOP();
+logs.DebugLogs('Starting......: artica-dansguardian realtime logs path: '+log_path);
+
+pid:=SYS.PIDOF_PATTERN('/usr/bin/tail -f -n 0 /var/log/dansguardian/access.log');
+count:=0;
+pidint:=0;
+      while SYS.PROCESS_EXIST(pid) do begin
+          if count>0 then break;
+          if not TryStrToInt(pid,pidint) then continue;
+          logs.DebugLogs('Starting......: artica-dansguardian realtime logs stop tail pid '+pid);
+          if pidint>0 then  fpsystem('/bin/kill '+pid);
+          sleep(200);
+          pid:=SYS.PIDOF_PATTERN('/usr/bin/tail -f -n 0 /var/log/dansguardian/access.log');
+          inc(count);
+      end;
+
+cmd:='/usr/bin/tail -f -n 0 '+log_path+'|'+TAIL_STARTUP+' >>/var/log/artica-postfix/dansguardian-logger-start.log 2>&1 &';
+logs.Debuglogs(cmd);
+fpsystem(cmd);
+pid:=DANSGUARDIAN_TAIL_PID();
+count:=0;
+while not SYS.PROCESS_EXIST(pid) do begin
+        sleep(100);
+        inc(count);
+        if count>40 then begin
+           logs.DebugLogs('Starting......: artica-dansguardian realtime logs (timeout)');
+           break;
+        end;
+        pid:=DANSGUARDIAN_TAIL_PID();
+  end;
+
+pid:=DANSGUARDIAN_TAIL_PID();
+
+if SYS.PROCESS_EXIST(pid) then begin
+      logs.DebugLogs('Starting......: artica-dansguardian realtime logs success with pid '+pid);
+      exit;
+end else begin
+    logs.DebugLogs('Starting......: artica-dansguardian realtime logs failed');
+end;
+end;
+//#####################################################################################
+function tdansguardian.DANSGUARDIAN_TAIL_STATUS():string;
+var
+ini:TstringList;
+pid:string;
+Enabled:integer;
+begin
+
+if not FileExists(BIN_PATH()) then begin
+ SYS.MONIT_DELETE('APP_ARTICA_DANSGUARDIAN_TAIL');
+ exit;
+end;
+
+
+   if DansGuardianEnabled=0 then begin
+      SYS.MONIT_DELETE('APP_ARTICA_DANSGUARDIAN_TAIL');
+       exit;
+   end;
+
+    ini:=TstringList.Create;
+    ini.Add('[ARTICA_DANS_TAIL]');
+    ini.Add('service_name=APP_ARTICA_DANSGUARDIAN_TAIL');
+    ini.Add('service_cmd=dansguardian-tail');
+    ini.Add('service_disabled='+ IntToStr(DansGuardianEnabled));
+    ini.Add('master_version=' + SYS.ReadFileIntoString(artica_path+'/VERSION'));
+
+     if SYS.MONIT_CONFIG('APP_ARTICA_DANSGUARDIAN_TAIL','/etc/artica-postfix/exec.dansguardian-tail.php.pid','dansguardian-tail') then begin
+       ini.Add('monit=1');
+        result:=ini.Text;
+        ini.free;
+        exit;
+     end;
+
+   pid:=DANSGUARDIAN_TAIL_PID();
+
+      if SYS.PROCESS_EXIST(pid) then ini.Add('running=1') else  ini.Add('running=0');
+      ini.Add('application_installed=1');
+      ini.Add('master_pid='+ pid);
+      ini.Add('master_memory=' + IntToStr(SYS.PROCESS_MEMORY(pid)));
+      ini.Add('status='+SYS.PROCESS_STATUS(pid));
+
+
+   result:=ini.Text;
+   ini.free;
+end;
+//#####################################################################################
+procedure tdansguardian.DANSGUARDIAN_TAIL_STOP();
+var
+   pid:string;
+   pidint,i:integer;
+   count:integer;
+   CountTail:Tstringlist;
+begin
+pid:=DANSGUARDIAN_TAIL_PID();
+if not SYS.PROCESS_EXIST(pid) then begin
+      writeln('Stopping DansGuardian RealTime log: Already stopped');
+      CountTail:=Tstringlist.Create;
+      try
+         CountTail.AddStrings(SYS.PIDOF_PATTERN_PROCESS_LIST('/usr/bin/tail -f -n 0 /var/log/dansguardian/access.log'));
+         writeln('Stopping DansGuardian RealTime log: Tail processe(s) number '+IntToStr(CountTail.Count));
+      except
+        logs.Debuglogs('Stopping DansGuardian RealTime log: fatal error on SYS.PIDOF_PATTERN_PROCESS_LIST() function');
+      end;
+
+      count:=0;
+     for i:=0 to CountTail.Count-1 do begin;
+          pid:=CountTail.Strings[i];
+          if count>100 then break;
+          if not TryStrToInt(pid,pidint) then continue;
+          writeln('Stopping DansGuardian RealTime log: Stop tail pid '+pid);
+          if pidint>0 then  fpsystem('/bin/kill '+pid);
+          sleep(100);
+          inc(count);
+      end;
+      exit;
+end;
+
+writeln('Stopping DansGuardian RealTime log: Stopping pid '+pid);
+fpsystem('/bin/kill '+pid);
+
+pid:=DANSGUARDIAN_TAIL_PID();
+if not SYS.PROCESS_EXIST(pid) then begin
+      writeln('Stopping DansGuardian RealTime log: Stopped');
+end;
+
+
+CountTail:=Tstringlist.Create;
+CountTail.AddStrings(SYS.PIDOF_PATTERN_PROCESS_LIST('/usr/bin/tail -f -n 0 /var/log/dansguardian/access.log'));
+writeln('Stopping DansGuardian RealTime log: Tail processe(s) number '+IntToStr(CountTail.Count));
+count:=0;
+     for i:=0 to CountTail.Count-1 do begin;
+          pid:=CountTail.Strings[i];
+          if count>100 then break;
+          if not TryStrToInt(pid,pidint) then continue;
+          writeln('Stopping DansGuardian RealTime log: Stop tail pid '+pid);
+          if pidint>0 then  fpsystem('/bin/kill '+pid);
+          sleep(100);
+          inc(count);
+      end;
+
+
+end;
+//#####################################################################################
+
+
 function tdansguardian.DANSGUARDIAN_CONFIG_VALUE(key:string):string;
 var
    l           :TstringList;
@@ -779,157 +1234,37 @@ begin
 
 end;
  //#############################################################################
- procedure tdansguardian.VERIFY_CONFFILE();
- var
-  l:TstringList;
-  i:Integer;
-  kavExists:boolean;
-  downloadmanager:string;
- begin
- kavExists:=false;
-  if FileExists(C_ICAP_BIN_PATH()) then begin
-       if FileExists(clamav.CLAMSCAN_BIN_PATH()) then begin
-          kavExists:=true;
-       end;
-  end;
-  DANSGUARDIAN_TEMPLATE();
-  DANSGUARDIAN_FILE_IP_CONF();
-  downloadmanager:=DANSGUARDIAN_CONFIG_VALUE('downloadmanager');
-  if length(downloadmanager)=0 then begin
-       logs.Debuglogs('Starting......: DansGuardian choosing default download manager');
-       DANSGUARDIAN_CONFIG_VALUE_SET('downloadmanager','/etc/dansguardian/downloadmanagers/default.conf');
-  end;
-  if DirectoryExists('/etc/dansguardian/lists/phraselists') then logs.OutputCmd('/bin/ln -s /etc/dansguardian/lists/phraselists /etc/dansguardian/phraselists');
-  if not FileExists('/etc/dansguardian/phraselists/goodphrases/exception') then fpsystem('/bin/touch /etc/dansguardian/phraselists/goodphrases/exception');
-  
-  if not FileExists('/etc/dansguardian/exceptioniplist') then begin
-     if FileExists('/etc/dansguardian/lists/exceptioniplist') then begin
-        logs.OutputCmd('/bin/ln -s /etc/dansguardian/lists/exceptioniplist /etc/dansguardian/exceptioniplist');
-     end;
-  end;
-  
-  if not FileExists('/etc/dansguardian/bannediplist') then begin
-     if FileExists('/etc/dansguardian/lists/bannediplist') then begin
-        logs.OutputCmd('/bin/ln -s /etc/dansguardian/lists/bannediplist /etc/dansguardian/bannediplist');
-     end;
-  end;
-  
-  if not DirectoryExists('/etc/dansguardian/languages') then begin
-     if DirectoryExists('/usr/share/dansguardian/languages') then begin
-        logs.OutputCmd('/bin/ln -s /usr/share/dansguardian/languages /etc/dansguardian/languages');
-     end;
-  end;
-  
-  if not FileExists('/etc/dansguardian/downloadmanagers/trickle.conf') then begin
-     logs.OutputCmd('/bin/ln -s /etc/dansguardian/downloadmanagers/default.conf /etc/dansguardian/downloadmanagers/trickle.conf');
-  end;
-  
-     l:=TstringList.Create;
-     l.AddStrings(SYS.DirFiles('/etc/dansguardian','dansguardian*.conf'));
 
-
-     for i:=0 to l.Count-1 do begin
-         logs.Debuglogs('Checking /etc/dansguardian/'+l.Strings[i]);
-         VERIFY_CONFFILE_FILE_2('/etc/dansguardian/'+l.Strings[i],'exceptionextensionlist','/etc/dansguardian/exceptionextensionlist');
-         VERIFY_CONFFILE_FILE_2('/etc/dansguardian/'+l.Strings[i],'exceptionmimetypelist' ,'/etc/dansguardian/exceptionmimetypelist');
-         VERIFY_CONFFILE_FILE_2('/etc/dansguardian/'+l.Strings[i],'exceptionphraselist'   ,'/etc/dansguardian/lists/exceptionphraselist');
-         VERIFY_CONFFILE_FILE_2('/etc/dansguardian/'+l.Strings[i],'exceptionurllist'      ,'/etc/dansguardian/lists/exceptionurllist');
-         VERIFY_CONFFILE_FILE_2('/etc/dansguardian/'+l.Strings[i],'weightedphraselist'    ,'/etc/dansguardian/lists/weightedphraselist');
-         VERIFY_CONFFILE_FILE_2('/etc/dansguardian/'+l.Strings[i],'exceptionphraselist'   ,'/etc/dansguardian/lists/exceptionphraselist');
-         VERIFY_CONFFILE_FILE_2('/etc/dansguardian/'+l.Strings[i],'bannedsitelist'        ,'/etc/dansguardian/lists/bannedsitelist');
-         VERIFY_CONFFILE_FILE_2('/etc/dansguardian/'+l.Strings[i],'greysitelist'          ,'/etc/dansguardian/lists/greysitelist');
-         VERIFY_CONFFILE_FILE_2('/etc/dansguardian/'+l.Strings[i],'exceptionsitelist'     ,'/etc/dansguardian/lists/exceptionsitelist');
-         VERIFY_CONFFILE_FILE_2('/etc/dansguardian/'+l.Strings[i],'bannedurllist'         ,'/etc/dansguardian/lists/bannedurllist');
-         VERIFY_CONFFILE_FILE_2('/etc/dansguardian/'+l.Strings[i],'greyurllist'           ,'/etc/dansguardian/lists/greyurllist');
-         VERIFY_CONFFILE_FILE_2('/etc/dansguardian/'+l.Strings[i],'exceptionurllist'      ,'/etc/dansguardian/lists/exceptionurllist');
-         VERIFY_CONFFILE_FILE_2('/etc/dansguardian/'+l.Strings[i],'exceptionregexpurllist','/etc/dansguardian/lists/exceptionregexpurllist');
-         VERIFY_CONFFILE_FILE_2('/etc/dansguardian/'+l.Strings[i],'bannedregexpurllist'   ,'/etc/dansguardian/lists/bannedregexpurllist');
-         VERIFY_CONFFILE_FILE_2('/etc/dansguardian/'+l.Strings[i],'bannedregexpheaderlist','/etc/dansguardian/lists/bannedregexpheaderlist');
-         VERIFY_CONFFILE_FILE_2('/etc/dansguardian/'+l.Strings[i],'picsfile'              ,'/etc/dansguardian/lists/pics');
-         VERIFY_CONFFILE_FILE_2('/etc/dansguardian/'+l.Strings[i],'contentregexplist'     ,'/etc/dansguardian/lists/contentregexplist');
-         VERIFY_CONFFILE_FILE_2('/etc/dansguardian/'+l.Strings[i],'urlregexplist'         ,'/etc/dansguardian/lists/urlregexplist');
-         VERIFY_CONFFILE_FILE_2('/etc/dansguardian/'+l.Strings[i],'exceptionextensionlist','/etc/dansguardian/lists/exceptionextensionlist');
-         VERIFY_CONFFILE_FILE_2('/etc/dansguardian/'+l.Strings[i],'exceptionmimetypelist' ,'/etc/dansguardian/lists/exceptionmimetypelist');
-         VERIFY_CONFFILE_FILE_2('/etc/dansguardian/'+l.Strings[i],'exceptionfilesitelist' ,'/etc/dansguardian/lists/exceptionfilesitelist');
-         VERIFY_CONFFILE_FILE_2('/etc/dansguardian/'+l.Strings[i],'exceptionfileurllist'  ,'/etc/dansguardian/lists/exceptionfileurllist');
-         VERIFY_CONFFILE_FILE_2('/etc/dansguardian/'+l.Strings[i],'bannedextensionlist'   ,'/etc/dansguardian/lists/bannedextensionlist');
-         VERIFY_CONFFILE_FILE_2('/etc/dansguardian/'+l.Strings[i],'bannedmimetypelist'    ,'/etc/dansguardian/lists/bannedmimetypelist');
-         VERIFY_CONFFILE_FILE_2('/etc/dansguardian/'+l.Strings[i],'logsitelist'           ,'/etc/dansguardian/lists/logsitelist');
-         VERIFY_CONFFILE_FILE_2('/etc/dansguardian/'+l.Strings[i],'logurllist'            ,'/etc/dansguardian/lists/logurllist');
-         VERIFY_CONFFILE_FILE_2('/etc/dansguardian/'+l.Strings[i],'logregexpurllist'      ,'/etc/dansguardian/lists/logregexpurllist');
-         VERIFY_CONFFILE_FILE_2('/etc/dansguardian/'+l.Strings[i],'headerregexplist'      ,'/etc/dansguardian/lists/headerregexplist');
-         VERIFY_CONFFILE_FILE_2('/etc/dansguardian/'+l.Strings[i],'bannedregexpheaderlist','/etc/dansguardian/lists/bannedregexpheaderlist');
-         VERIFY_CONFFILE_FILE_2('/etc/dansguardian/'+l.Strings[i],'headerregexplist'      ,'/etc/dansguardian/lists/headerregexplist');
-         
-
-
-         
-         if kavExists then begin
-            VERIFY_CONFFILE_FILE_2('/etc/dansguardian/'+l.Strings[i],'contentscanner','/etc/dansguardian/contentscanners/icapscan.conf');
-         end else begin
-             DANSGUARDIAN_DELETE_VALUE('contentscanner');
-         end;
-
-
-         end;
-         
-         
-         
-         
-    end;
  //#############################################################################
-procedure tdansguardian.VERIFY_CONFFILE_FILE_2(conf:string;key:string;path:string);
+function tdansguardian.GET_VALUE_DATA(conf_path:string;key:string):string;
 var
    l           :TstringList;
    RegExpr     :TRegExpr;
-   RegExpr2    :tRegExpr;
    i           :integer;
-   found       :boolean;
-   Ipath        :string;
-   confname     :string;
+   tmpstr:string;
 begin
-  found:=false;
-  if not FileExists(conf) then exit;
-  if not FileExists(path) then logs.OutputCmd('/bin/touch ' + path);
-  confname:=ExtractFileName(conf);
-  
-  
-  l:=TstringList.Create;
-  l.LoadFromFile(conf);
-  RegExpr:=TRegExpr.Create;
-  RegExpr2:=TRegExpr.Create;
-  RegExpr.Expression:='^'+key;
-  for i:=0 to l.Count-1 do begin
-     if RegExpr.Exec(l.Strings[i]) then begin
-          logs.Debuglogs('Found '+l.Strings[i] );
-          l.Strings[i]:=AnsiReplaceText(l.Strings[i],'''','');
-          RegExpr2.Expression:='(.+?)\s+=\s+(.+)';
-          if RegExpr2.Exec(l.Strings[i]) then begin
-             Ipath:=trim(RegExpr2.Match[2]);
-             Ipath:=AnsiReplaceText(Ipath,'"','');
-             if not FileExists(Ipath) then begin
-                if Not DirectoryExists(ExtractFilePath(Ipath)) then ForceDirectories(ExtractFilePath(Ipath));
-                logs.Debuglogs('VERIFY_CONFFILE_FILE_2::['+confname+'] "'+Ipath+'" doesn''t exist... create it');
-                logs.OutputCmd('/bin/touch '+Ipath);
-             end;
-          end;
-         found:=True;
-         break;
-     end;
-  end;
-
-  if not found then begin
-     logs.Debuglogs('VERIFY_CONFFILE_FILE_2::['+confname+'] Adding '+path);
-     l.Add(key + ' = '+''''+path+'''');
-     try
-     l.SaveToFile(conf);
-     except
-      logs.Syslogs('VERIFY_CONFFILE_FILE_2::['+confname+'] Fatal error while saving '+path);
+   if not FileExists(conf_path) then begin
+      logs.Debuglogs('tdansguardian.GET_VALUE_DATA: unable to stat "'+conf_path+'"');
       exit;
-     end;
-  end;
-  l.free;
-  RegExpr.free;
+   end;
+
+   l:=TstringList.Create;
+   l.LoadFromFile(conf_path);
+   RegExpr:=TRegExpr.Create;
+   RegExpr.Expression:='^'+key+'(.+)';
+   for i:=0 to l.Count-1 do begin
+       if RegExpr.Exec(l.Strings[i]) then begin
+          tmpstr:=RegExpr.Match[1];
+          tmpstr:=AnsiReplaceText(tmpstr,'''','');
+          tmpstr:=AnsiReplaceText(tmpstr,'=','');
+          result:=trim(tmpstr);
+          break;
+       end;
+   end;
+
+   l.free;
+   RegExpr.free;
+
 
 end;
  //#############################################################################
@@ -951,6 +1286,8 @@ if length(DansGuardianHTMLTemplate)<10 then begin
 
 end;
 
+
+DansGuardianHTMLTemplate:=SYS.GET_INFO('DansGuardianHTMLTemplate');
 l:=TstringList.Create;
 l.Add('/etc/dansguardian/languages/ukenglish/template.html');
 l.add('/etc/dansguardian/languageslithuanian/template.html');
@@ -988,11 +1325,51 @@ end;
 
 
 end;
+//##############################################################################
+function tdansguardian.CheckUserButton():boolean;
+var
+   l:TstringList;
+   RegExpr     :TRegExpr;
+   i:integer;
+   DansGuardianEnableUserArticaIP:string;
+   script:string;
+begin
+result:=false;
+DansGuardianEnableUserArticaIP:=trim(SYS.GET_INFO('DansGuardianEnableUserArticaIP'));
+
+if not FileExists('/etc/artica-postfix/settings/Daemons/DansGuardianHTMLTemplate') then exit();
+
+script:='<script>';
+script:=script+'function ljs(){';
+script:=script+'var myhostname="'+DansGuardianEnableUserArticaIP+'";';
+script:=script+'var myport="";var myurl="-URL-";';
+script:=script+'var myreason="-REASONLOGGED-";var hostname=location.hostname;';
+script:=script+'if(myhostname.length==0){myhostname=hostname;}if(myport.length==0){myport="9000";}';
+script:=script+'var src="https://"+myhostname+":"+myport+"/dansguardian.users.index.php?uri="+myurl+"&myreason="+myreason;';
+script:=script+'document.location.href=src;';
+script:=script+'}';
+script:=script+'</script><tr><td colspan=2 align="center"><input type="button" OnClick="javascript:ljs();" value="Continue..."></td></tr>';
 
 
 
-
- procedure tdansguardian.DANSGUARDIAN_CONFIG_VALUE_SET(key:string;value:string);
+   l:=TstringList.Create;
+   l.LoadFromFile('/etc/artica-postfix/settings/Daemons/DansGuardianHTMLTemplate');
+   RegExpr:=TRegExpr.Create;
+   RegExpr.Expression:='USER_BUTTON';
+   for i:=0 to l.Count-1 do begin
+      if RegExpr.Exec(l.Strings[i]) then begin
+         logs.DebugLogs('Starting......: Dansguardian Enable release banned site: ' + IntToStr(DansGuardianEnableUserFrontEnd));
+         if DansGuardianEnableUserFrontEnd=1 then l.Strings[i]:='<!-- USER_BUTTON -->'+ script else l.Strings[i]:='<!-- USER_BUTTON -->';
+         result:=true;
+         break;
+      end;
+   end;
+   l.SaveToFile('/etc/artica-postfix/settings/Daemons/DansGuardianHTMLTemplate');
+   RegExpr.free;
+   l.free;
+end;
+//#############################################################################
+procedure tdansguardian.DANSGUARDIAN_CONFIG_VALUE_SET(key:string;value:string);
 var
    l           :TstringList;
    RegExpr     :TRegExpr;
@@ -1004,10 +1381,10 @@ begin
     RegExpr:=TRegExpr.Create;
     l:=TstringList.create;
 
-    RegExpr.Expression:='^'+key+'[\s=]+(.*)';
+    RegExpr.Expression:='^'+Lowercase(key)+'[\s=]+(.*)';
     l.LoadFromFile(CONF_PATH());
     For i:=0 to l.Count-1 do begin
-      if RegExpr.Exec(l.Strings[i]) then begin
+      if RegExpr.Exec(Lowercase(l.Strings[i])) then begin
               found:=true;
               l.Strings[i]:=key + ' = ' + value;
               break;
@@ -1020,7 +1397,7 @@ begin
         l.Add(key + ' = ' + value);
     end;
 
-    l.SaveToFile(CONF_PATH());
+    logs.WriteToFile(l.Text,CONF_PATH());
     RegExpr.free;
     l.free;
 
@@ -1035,6 +1412,7 @@ var
    i           :integer;
    found       :boolean;
    keyF        :string;
+   D           :boolean;
 begin
     found:=false;
     if not FileExists(C_ICAP_CONF_PATH()) then begin
@@ -1045,7 +1423,7 @@ begin
     l:=TstringList.create;
     keyF:=key;
     keyF:=AnsiReplaceText(keyF,'.','\.');
-
+    D:=SYS.COMMANDLINE_PARAMETERS('debug');
     RegExpr.Expression:='^'+keyF+'\s+(.*)';
     l.LoadFromFile(C_ICAP_CONF_PATH());
     For i:=0 to l.Count-1 do begin
@@ -1054,6 +1432,9 @@ begin
               logs.Debuglogs('C_ICAP_VALUE_SET:: (modify) '+key + ' ' + value);
               l.Strings[i]:=key + ' ' + value;
               break;
+         end else begin
+
+
          end;
 
     end;
@@ -1088,6 +1469,4 @@ begin
    if not TryStrToInt64(tmp2,result) then writeln('int64 failed');
 end;
 //#############################################################################
-
-
 end.

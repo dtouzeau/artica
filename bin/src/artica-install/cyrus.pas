@@ -1739,6 +1739,7 @@ procedure Tcyrus.CheckRightsAndConfig();
 var
    config_directory:string;
    partition_default:string;
+   lmtpsocket:string;
 begin
 
 if SYS.COMMANDLINE_PARAMETERS('--force') then logs.DeleteFile('/etc/artica-postfix/cyrus.check.time');
@@ -1759,6 +1760,7 @@ end;
 
    config_directory:=IMAPD_GET('configdirectory');
    partition_default:=IMAPD_GET('partition-default');
+
 
    logs.Debuglogs('TCyrus.CheckRightsAndConfig():: Configure start...');
    logs.DebugLogs('Starting......: reconfigure cyrus-imapd');
@@ -1989,6 +1991,7 @@ var
    cmd_daemon:string;
    ldap_member_base:string;
    ldap_member_base_config:string;
+   lmtpsocket:string;
 begin
 
    if not FIleExists(CYRUS_DAEMON_BIN_PATH()) then begin
@@ -2123,7 +2126,18 @@ begin
       if ExtractFileName(ParamStr(0))<>'artica-backup' then logs.NOTIFICATION('[ARTICA]: ('+sys.HOSTNAME_g()+'): cyrus-imap was successfully started','Service is now running PID number '+CYRUS_PID(),'system');
   end;
 
-     logs.OutputCmd('/bin/chown -R postfix:postfix /var/run/cyrus');
+  forceDirectories('/var/spool/postfix/var/run/cyrus/socket');
+  lmtpsocket:=IMAPD_GET('lmtpsocket');
+  logs.DebugLogs('Starting......: cyrus-imapd lmtpsocket:'+lmtpsocket);
+
+
+  if lmtpsocket<>'/var/spool/postfix/var/run/cyrus/socket/lmtp' then begin
+     logs.DebugLogs('Starting......: Linking mtp socket');
+     if not FileExists('/var/spool/postfix/var/run/cyrus/socket/lmtp') then logs.OutputCmd('/bin/ln -s '+lmtpsocket+' /var/spool/postfix/var/run/cyrus/socket/lmtp');
+  end;
+
+
+  logs.OutputCmd('/bin/chown -R postfix:postfix /var/run/cyrus');
 
 
 end;

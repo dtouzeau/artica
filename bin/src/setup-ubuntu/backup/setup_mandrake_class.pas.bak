@@ -437,6 +437,8 @@ l.add('libclamav-devel');
 l.add('libmysql-devel');
 l.add('libmysql-static-devel');
 l.add('monit');
+l.add('libncurses-devel'); // curses.h -> ClamAV
+l.add('libltdl-devel'); //clamav
 
 l.add('lvm2');
 

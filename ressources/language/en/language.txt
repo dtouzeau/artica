@@ -3677,3 +3677,15 @@ Note that unwriteable directories are shown as usual.</hide_unwriteable_files_te
 <display_statistics_of_this_website>Display statistics of this website</display_statistics_of_this_website>
 <display_statistics_of_this_user>Display statistics of this user</display_statistics_of_this_user>
 <display_queries_list>Display queries</display_queries_list>
+<add_new_cached_web_site>Add a new website cache parameters</add_new_cached_web_site>
+<expire_time>Expire time</expire_time>
+<limit>limit</limit>
+<squid_refresh_pattern_explain>This is the way how the websites objects in the cache be refreshed</squid_refresh_pattern_explain>
+<website_name>Website name</website_name>
+<refresh_pattern_site>Give the webiste name that enable the rule.[br]Should be www.company.tm or company.tm or company.*</refresh_pattern_site>
+<minimal_time>Minimal time</minimal_time>
+<refresh_pattern_min>Time (in minutes), an object without an explicit expire time should be considered fresh.</refresh_pattern_min>
+<percentage>percentage</percentage>
+<refresh_pattern_pourc>percentage of the objects age (time since last modification age) an object without explicit expire time will be considered fresh.</refresh_pattern_pourc>
+<maximal_time>Maximal time</maximal_time>
+<refresh_pattern_max>upper limit on how long objects without an explicit expiry time will be considered fresh</refresh_pattern_max>

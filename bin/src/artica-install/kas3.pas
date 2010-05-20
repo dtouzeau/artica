@@ -55,6 +55,7 @@ public
     procedure   RESTART();
     procedure   RELOAD();
     procedure   mailflt3();
+    procedure   REMOVE();
 END;
 
 implementation
@@ -377,6 +378,8 @@ ini:=TstringList.Create;
       ini.Add('service_disabled='+ IntToStr(KasxFilterEnabled));
       ini.Add('service_cmd=kas3');
       ini.Add('master_version=' + VERSION());
+      ini.Add('remove_cmd=--kas3-remove');
+
 
       if KasxFilterEnabled=0 then begin
       SYS.MONIT_DELETE('APP_KAS3');
@@ -422,6 +425,7 @@ ini:=TstringList.Create;
       ini.Add('service_disabled='+ IntToStr(KasxFilterEnabled));
       ini.Add('service_cmd=kas3');
       ini.Add('master_version=' + VERSION());
+      ini.Add('remove_cmd=--kas3-remove');
 
       if KasxFilterEnabled=0 then begin
       SYS.MONIT_DELETE('APP_KAS3_MILTER');
@@ -630,5 +634,18 @@ begin
 
 end;
 //##############################################################################
+procedure tkas3.REMOVE();
+begin
+     STOP();
+     if FileExists('/usr/local/ap-mailfilter3/bin/scripts/pre-uninstall') then fpsystem('/usr/local/ap-mailfilter3/bin/scripts/pre-uninstall');
+     if DirectoryExists('/usr/local/ap-mailfilter3') then fpsystem('/bin/rm -rf /usr/local/ap-mailfilter3');
+     fpsystem('/usr/share/artica-postfix/bin/artica-make --empty-cache');
+end;
+
+
+
+
+
+
 
 end.

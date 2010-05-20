@@ -197,10 +197,8 @@ function AjaxSquidDemarre(){
 		
 		
 	function AddCache(folder){
-		document.getElementById('cache_graph').innerHTML='';
 		YahooWin(570,'$page?add-cache=yes&cache='+folder);
-		
-	}
+		}
 	
 var x_DeleteCache= function (obj) {
 	var tempvalue=obj.responseText;
@@ -569,7 +567,11 @@ function main_cache(){
 			";
 		}
 		
-		$stats=$stats."</table>";
+		$stats=$stats."
+		<tr>
+			<td align='right' colspan=2>". imgtootltip("database-48-add.png","{add_cache_dir}","AddCache('');")."</td>
+		</tr>		
+		</table>";
 		
 	}
 	
@@ -638,15 +640,12 @@ $cache_settings="
 		</tr>
 		<tr>
 			<td align='right' colspan=3><hr>". button('{edit}',"SaveCacheSettingsInfos()")."</td>
-		</tr>
-		<tr>
-			<td colspan=3><div id='cache_list'>" . cache_list()."</div></td>
 		</tr>		
-		<tr>
-			<td align='right' colspan=3><input type='button' value='{add_cache_dir}&nbsp;' OnClick=\"javascript:AddCache('');\"></td>
-		</tr>							
+								
 </table>
 </div>
+<div id='cached_sites_infos' style='width:100%;height:250px;overflow:auto'></div>
+
 
 	<script>
 	
@@ -671,8 +670,10 @@ $cache_settings="
 		document.getElementById('cachesettingsinfo').innerHTML='<center><img src=\"img/wait_verybig.gif\"></center>';
 		XHR.sendAndLoad('$page', 'GET',x_SaveCacheSettingsInfos);
 		}
+		
+	LoadAjax('cached_sites_infos','squid.cached.sitesinfos.php?sites-list=yes');	
 	</script>
-
+	
 
 "	;
 

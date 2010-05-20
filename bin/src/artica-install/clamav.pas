@@ -1442,6 +1442,7 @@ fpsystem(Binpath+' --version >'+tmpstr);
 
 if strversion='' then strversion:='0';
 strversion:=AnsiReplaceText(strversion,'.','');
+
 TryStrToInt(strversion,result);
 RegExpr.free;
 FileDatas.Free;

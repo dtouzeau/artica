@@ -12,7 +12,7 @@
       <MainUnit Value="0"/>
       <TargetFileExt Value=""/>
       <Title Value="setup-ubuntu"/>
-      <ActiveEditorIndexAtStart Value="3"/>
+      <ActiveEditorIndexAtStart Value="8"/>
     </General>
     <VersionInfo>
       <ProjectVersion Value=""/>
@@ -111,8 +111,8 @@
         <Filename Value="setup_libs.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="setup_libs"/>
-        <CursorPos X="19" Y="38"/>
-        <TopLine Value="1"/>
+        <CursorPos X="61" Y="1377"/>
+        <TopLine Value="1361"/>
         <EditorIndex Value="8"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
@@ -168,8 +168,8 @@
         <Filename Value="setup_mandrake_class.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="setup_mandrake_class"/>
-        <CursorPos X="63" Y="255"/>
-        <TopLine Value="205"/>
+        <CursorPos X="3" Y="709"/>
+        <TopLine Value="664"/>
         <EditorIndex Value="3"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>

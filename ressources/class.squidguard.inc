@@ -92,23 +92,23 @@ class squidguard{
 	private function BUILD_SRC(){
 		$rules=$this->GetRules();
 		$this->loadusers();
-		if(!is_array($this->groupsofRule)){
+		if(is_array($this->groupsofRule)){
 			echo "Starting......: squidGuard no source rules set\n";
-			return;
-		}
-		reset($this->groupsofRule);
-		while (list ($ruleID, $sources) = each ($this->groupsofRule)){
-			while (list ($a, $b) = each ($sources)){
-				$c[$b]=$b;
+			reset($this->groupsofRule);
+			while (list ($ruleID, $sources) = each ($this->groupsofRule)){
+				while (list ($a, $b) = each ($sources)){
+					$c[$b]=$b;
+				}
+				$this->rulesOK[$ruleID]=true;
+				$t[]="\nsrc {$rules[$ruleID]} {";
+				$t[]=implode("\n",$c);
+				$t[]="}\n";
+				unset($c);
 			}
-			$this->rulesOK[$ruleID]=true;
-			$t[]="\nsrc {$rules[$ruleID]} {";
-			$t[]=implode("\n",$c);
-			$t[]="}\n";
-			unset($c);
 		}
 		
 		$whitelisted=$this->WhiteList();
+		$whitelisted[]="\tip 127.0.0.1";
 		echo "Starting......: squidGuard ". count($whitelisted)." whitelisted IP(s)\n";
 		if(is_array($whitelisted)){
 			
@@ -240,7 +240,7 @@ class squidguard{
 		$results=$q->QUERY_SQL($sql,"artica_backup");
 		while($ligne=@mysql_fetch_array($results,MYSQL_ASSOC)){
 			
-			$this->groupsofRule[$RuleID][]="\tldapusersearch  \"ldap://localhost/ou=organizations,$suffix?memberUid?sub?(&(objectclass=posixGroup)(gidNumber={$ligne["group_id"]})(memberUid=%s))\"";
+			$this->groupsofRule[$RuleID][]="\tldapusersearch  \"ldap://localhost/ou=organizations,$this->ldap_suffix?memberUid?sub?(&(objectclass=posixGroup)(gidNumber={$ligne["group_id"]})(memberUid=%s))\"";
 			
 			
 		}

@@ -57,13 +57,10 @@ end;
 //#########################################################################################      e
 procedure cicap.configure();
 var
-dans:tdansguardian;
-begin
- dans:=tdansguardian.Create(SYS);
- dans.C_ICAP_STOP();
 
- dans.C_ICAP_CONFIGURE();
- dans.C_ICAP_START();
+begin
+     fpsystem('/etc/init.d/artica-postfix restart cicap');
+     fpsystem('/etc/init.d/artica-postfix restart squid-cache');
 end;
 //#########################################################################################
 
@@ -112,7 +109,7 @@ begin
 
 
   SetCurrentDir(source_folder);
-  cmd:='./configure --enable-static --with-clamav --prefix=/usr --includedir="\${prefix}/include"';
+  cmd:='./configure --enable-static --prefix=/usr --includedir="\${prefix}/include"';
   cmd:=cmd+' --mandir="\${prefix}/share/man" --infodir="\${prefix}/share/info" --sysconfdir=/etc --localstatedir=/var --libexecdir="\${prefix}/lib/c-icap"';
   fpsystem(cmd);
   fpsystem('make');
@@ -129,8 +126,20 @@ end;
 
 
      writeln('Install c-icap success...');
-     install.INSTALL_PROGRESS('APP_C_ICAP','{installed}');
-     install.INSTALL_STATUS('APP_C_ICAP',110);
+     install.INSTALL_PROGRESS('APP_C_ICAP','check modules');
+     install.INSTALL_STATUS('APP_C_ICAP',60);
+
+   source_folder:=libs.COMPILE_GENERIC_APPS('c-icap-modules');
+   SetCurrentDir(source_folder);
+  cmd:='./configure --enable-static --prefix=/usr --includedir="\${prefix}/include"';
+  cmd:=cmd+' --mandir="\${prefix}/share/man" --infodir="\${prefix}/share/info" --sysconfdir=/etc --localstatedir=/var --libexecdir="\${prefix}/lib/c-icap" --with-clamav';
+  fpsystem(cmd);
+  fpsystem('make');
+  fpsystem('make install');
+  SetCurrentDir('/root');
+  install.INSTALL_PROGRESS('APP_C_ICAP','{success}');
+  install.INSTALL_STATUS('APP_C_ICAP',100);
+
      configure();
 
 end;

@@ -12,7 +12,7 @@
       <MainUnit Value="0"/>
       <TargetFileExt Value=""/>
       <Title Value="artica-install"/>
-      <ActiveEditorIndexAtStart Value="10"/>
+      <ActiveEditorIndexAtStart Value="8"/>
     </General>
     <VersionInfo>
       <ProjectVersion Value=""/>
@@ -34,12 +34,12 @@
         <Filename Value="artica_install.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="artica_install"/>
-        <CursorPos X="51" Y="198"/>
-        <TopLine Value="175"/>
+        <CursorPos X="112" Y="2458"/>
+        <TopLine Value="2424"/>
         <EditorIndex Value="0"/>
         <UsageCount Value="200"/>
         <Bookmarks Count="1">
-          <Item0 X="24" Y="2752" ID="1"/>
+          <Item0 X="24" Y="2755" ID="1"/>
         </Bookmarks>
         <Loaded Value="True"/>
       </Unit0>
@@ -48,7 +48,7 @@
         <UnitName Value="zsystem"/>
         <CursorPos X="27" Y="4085"/>
         <TopLine Value="4031"/>
-        <EditorIndex Value="12"/>
+        <EditorIndex Value="13"/>
         <UsageCount Value="102"/>
         <Bookmarks Count="1">
           <Item0 X="25" Y="53" ID="0"/>
@@ -66,9 +66,9 @@
         <Filename Value="artica_menus.pas"/>
         <UnitName Value="artica_menus"/>
         <CursorPos X="27" Y="10"/>
-        <TopLine Value="1"/>
-        <EditorIndex Value="1"/>
-        <UsageCount Value="75"/>
+        <TopLine Value="120"/>
+        <EditorIndex Value="2"/>
+        <UsageCount Value="76"/>
         <Loaded Value="True"/>
       </Unit3>
       <Unit4>
@@ -81,9 +81,9 @@
       <Unit5>
         <Filename Value="global_conf.pas"/>
         <UnitName Value="global_conf"/>
-        <CursorPos X="86" Y="2906"/>
-        <TopLine Value="2857"/>
-        <EditorIndex Value="6"/>
+        <CursorPos X="42" Y="2970"/>
+        <TopLine Value="2936"/>
+        <EditorIndex Value="7"/>
         <UsageCount Value="102"/>
         <Bookmarks Count="1">
           <Item0 X="1" Y="6400" ID="2"/>
@@ -95,7 +95,7 @@
         <UnitName Value="class_install"/>
         <CursorPos X="72" Y="1475"/>
         <TopLine Value="1469"/>
-        <EditorIndex Value="4"/>
+        <EditorIndex Value="5"/>
         <UsageCount Value="101"/>
         <Bookmarks Count="1">
           <Item0 X="1" Y="7189" ID="3"/>
@@ -145,9 +145,9 @@
       <Unit12>
         <Filename Value="cyrus.pas"/>
         <UnitName Value="cyrus"/>
-        <CursorPos X="45" Y="54"/>
-        <TopLine Value="29"/>
-        <EditorIndex Value="3"/>
+        <CursorPos X="101" Y="2110"/>
+        <TopLine Value="2076"/>
+        <EditorIndex Value="4"/>
         <UsageCount Value="116"/>
         <Loaded Value="True"/>
       </Unit12>
@@ -156,8 +156,8 @@
         <IsPartOfProject Value="True"/>
         <UnitName Value="clamav"/>
         <CursorPos X="10" Y="1519"/>
-        <TopLine Value="1483"/>
-        <EditorIndex Value="10"/>
+        <TopLine Value="1449"/>
+        <EditorIndex Value="11"/>
         <UsageCount Value="203"/>
         <Loaded Value="True"/>
       </Unit13>
@@ -173,9 +173,11 @@
         <Filename Value="pureftpd.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="pureftpd"/>
-        <CursorPos X="1" Y="1"/>
-        <TopLine Value="1"/>
+        <CursorPos X="1" Y="221"/>
+        <TopLine Value="174"/>
+        <EditorIndex Value="1"/>
         <UsageCount Value="206"/>
+        <Loaded Value="True"/>
       </Unit15>
       <Unit16>
         <Filename Value="openldap.pas"/>
@@ -220,10 +222,8 @@
         <Filename Value="squid.pas"/>
         <UnitName Value="squid"/>
         <CursorPos X="17" Y="74"/>
-        <TopLine Value="4"/>
-        <EditorIndex Value="14"/>
+        <TopLine Value="1106"/>
         <UsageCount Value="100"/>
-        <Loaded Value="True"/>
       </Unit21>
       <Unit22>
         <Filename Value="stunnel4.pas"/>
@@ -239,7 +239,7 @@
         <UnitName Value="dkimfilter"/>
         <CursorPos X="59" Y="9"/>
         <TopLine Value="1"/>
-        <EditorIndex Value="2"/>
+        <EditorIndex Value="3"/>
         <UsageCount Value="203"/>
         <Loaded Value="True"/>
       </Unit23>
@@ -273,7 +273,7 @@
         <UnitName Value="lighttpd"/>
         <CursorPos X="27" Y="368"/>
         <TopLine Value="336"/>
-        <EditorIndex Value="11"/>
+        <EditorIndex Value="12"/>
         <UsageCount Value="203"/>
         <Loaded Value="True"/>
       </Unit27>
@@ -296,9 +296,9 @@
       <Unit30>
         <Filename Value="dansguardian.pas"/>
         <UnitName Value="dansguardian"/>
-        <CursorPos X="1" Y="1045"/>
-        <TopLine Value="1028"/>
-        <EditorIndex Value="9"/>
+        <CursorPos X="47" Y="598"/>
+        <TopLine Value="560"/>
+        <EditorIndex Value="8"/>
         <UsageCount Value="100"/>
         <Loaded Value="True"/>
       </Unit30>
@@ -364,7 +364,7 @@
         <CursorPos X="50" Y="264"/>
         <TopLine Value="224"/>
         <EditorIndex Value="17"/>
-        <UsageCount Value="92"/>
+        <UsageCount Value="93"/>
         <Loaded Value="True"/>
       </Unit38>
       <Unit39>
@@ -415,7 +415,7 @@
         <UnitName Value="artica_cron"/>
         <CursorPos X="51" Y="523"/>
         <TopLine Value="511"/>
-        <EditorIndex Value="13"/>
+        <EditorIndex Value="14"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
       </Unit44>
@@ -439,9 +439,11 @@
         <Filename Value="kas3.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="kas3"/>
-        <CursorPos X="1" Y="371"/>
-        <TopLine Value="341"/>
+        <CursorPos X="82" Y="427"/>
+        <TopLine Value="378"/>
+        <EditorIndex Value="9"/>
         <UsageCount Value="210"/>
+        <Loaded Value="True"/>
       </Unit47>
       <Unit48>
         <Filename Value="dnsmasq.pas"/>
@@ -769,9 +771,7 @@
         <UnitName Value="zabbix"/>
         <CursorPos X="38" Y="177"/>
         <TopLine Value="137"/>
-        <EditorIndex Value="7"/>
         <UsageCount Value="208"/>
-        <Loaded Value="True"/>
       </Unit88>
       <Unit89>
         <Filename Value="hamachi.pas"/>
@@ -787,7 +787,7 @@
         <UnitName Value="kavm4mls"/>
         <CursorPos X="47" Y="458"/>
         <TopLine Value="423"/>
-        <EditorIndex Value="8"/>
+        <EditorIndex Value="10"/>
         <UsageCount Value="201"/>
         <Loaded Value="True"/>
       </Unit90>
@@ -843,8 +843,8 @@
         <UnitName Value="install_common"/>
         <CursorPos X="27" Y="19"/>
         <TopLine Value="1"/>
-        <EditorIndex Value="5"/>
-        <UsageCount Value="52"/>
+        <EditorIndex Value="6"/>
+        <UsageCount Value="53"/>
         <Loaded Value="True"/>
       </Unit97>
       <Unit98>
@@ -864,133 +864,133 @@
         <Filename Value="squidguard.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="squidguard"/>
-        <CursorPos X="50" Y="92"/>
+        <CursorPos X="51" Y="105"/>
         <TopLine Value="52"/>
         <EditorIndex Value="16"/>
-        <UsageCount Value="36"/>
+        <UsageCount Value="39"/>
         <Loaded Value="True"/>
       </Unit100>
     </Units>
     <JumpHistory Count="30" HistoryIndex="29">
       <Position1>
-        <Filename Value="global_conf.pas"/>
-        <Caret Line="11833" Column="1" TopLine="11809"/>
+        <Filename Value="dansguardian.pas"/>
+        <Caret Line="699" Column="17" TopLine="668"/>
       </Position1>
       <Position2>
-        <Filename Value="global_conf.pas"/>
-        <Caret Line="115" Column="36" TopLine="86"/>
+        <Filename Value="dansguardian.pas"/>
+        <Caret Line="700" Column="17" TopLine="668"/>
       </Position2>
       <Position3>
-        <Filename Value="global_conf.pas"/>
-        <Caret Line="134" Column="40" TopLine="86"/>
+        <Filename Value="dansguardian.pas"/>
+        <Caret Line="701" Column="17" TopLine="668"/>
       </Position3>
       <Position4>
-        <Filename Value="global_conf.pas"/>
-        <Caret Line="2906" Column="60" TopLine="2857"/>
+        <Filename Value="dansguardian.pas"/>
+        <Caret Line="702" Column="17" TopLine="668"/>
       </Position4>
       <Position5>
-        <Filename Value="global_conf.pas"/>
-        <Caret Line="11833" Column="35" TopLine="11799"/>
+        <Filename Value="dansguardian.pas"/>
+        <Caret Line="703" Column="17" TopLine="668"/>
       </Position5>
       <Position6>
-        <Filename Value="global_conf.pas"/>
-        <Caret Line="1" Column="1" TopLine="1"/>
+        <Filename Value="dansguardian.pas"/>
+        <Caret Line="704" Column="17" TopLine="668"/>
       </Position6>
       <Position7>
-        <Filename Value="artica_install.pas"/>
-        <Caret Line="198" Column="51" TopLine="175"/>
+        <Filename Value="dansguardian.pas"/>
+        <Caret Line="705" Column="17" TopLine="668"/>
       </Position7>
       <Position8>
-        <Filename Value="global_conf.pas"/>
-        <Caret Line="219" Column="40" TopLine="185"/>
+        <Filename Value="dansguardian.pas"/>
+        <Caret Line="706" Column="17" TopLine="668"/>
       </Position8>
       <Position9>
-        <Filename Value="global_conf.pas"/>
-        <Caret Line="2906" Column="60" TopLine="2872"/>
+        <Filename Value="dansguardian.pas"/>
+        <Caret Line="707" Column="17" TopLine="668"/>
       </Position9>
       <Position10>
-        <Filename Value="global_conf.pas"/>
-        <Caret Line="11857" Column="34" TopLine="11813"/>
+        <Filename Value="dansguardian.pas"/>
+        <Caret Line="708" Column="17" TopLine="668"/>
       </Position10>
       <Position11>
-        <Filename Value="lighttpd.pas"/>
-        <Caret Line="547" Column="76" TopLine="467"/>
+        <Filename Value="dansguardian.pas"/>
+        <Caret Line="709" Column="17" TopLine="668"/>
       </Position11>
       <Position12>
-        <Filename Value="lighttpd.pas"/>
-        <Caret Line="1" Column="1" TopLine="1"/>
+        <Filename Value="dansguardian.pas"/>
+        <Caret Line="710" Column="17" TopLine="668"/>
       </Position12>
       <Position13>
-        <Filename Value="lighttpd.pas"/>
-        <Caret Line="63" Column="30" TopLine="1"/>
+        <Filename Value="dansguardian.pas"/>
+        <Caret Line="711" Column="17" TopLine="668"/>
       </Position13>
       <Position14>
-        <Filename Value="lighttpd.pas"/>
-        <Caret Line="370" Column="24" TopLine="336"/>
+        <Filename Value="dansguardian.pas"/>
+        <Caret Line="712" Column="17" TopLine="668"/>
       </Position14>
       <Position15>
-        <Filename Value="lighttpd.pas"/>
-        <Caret Line="986" Column="37" TopLine="956"/>
+        <Filename Value="dansguardian.pas"/>
+        <Caret Line="1444" Column="34" TopLine="1027"/>
       </Position15>
       <Position16>
-        <Filename Value="lighttpd.pas"/>
+        <Filename Value="dansguardian.pas"/>
         <Caret Line="1" Column="1" TopLine="1"/>
       </Position16>
       <Position17>
-        <Filename Value="lighttpd.pas"/>
-        <Caret Line="52" Column="35" TopLine="1"/>
+        <Filename Value="dansguardian.pas"/>
+        <Caret Line="73" Column="33" TopLine="39"/>
       </Position17>
       <Position18>
-        <Filename Value="lighttpd.pas"/>
-        <Caret Line="467" Column="96" TopLine="410"/>
+        <Filename Value="dansguardian.pas"/>
+        <Caret Line="152" Column="40" TopLine="118"/>
       </Position18>
       <Position19>
-        <Filename Value="lighttpd.pas"/>
-        <Caret Line="481" Column="114" TopLine="447"/>
+        <Filename Value="dansguardian.pas"/>
+        <Caret Line="633" Column="60" TopLine="599"/>
       </Position19>
       <Position20>
-        <Filename Value="lighttpd.pas"/>
-        <Caret Line="993" Column="50" TopLine="215"/>
+        <Filename Value="dansguardian.pas"/>
+        <Caret Line="634" Column="54" TopLine="599"/>
       </Position20>
       <Position21>
-        <Filename Value="lighttpd.pas"/>
-        <Caret Line="1052" Column="77" TopLine="1020"/>
+        <Filename Value="artica_install.pas"/>
+        <Caret Line="341" Column="23" TopLine="307"/>
       </Position21>
       <Position22>
-        <Filename Value="lighttpd.pas"/>
-        <Caret Line="63" Column="40" TopLine="30"/>
+        <Filename Value="artica_install.pas"/>
+        <Caret Line="1" Column="1" TopLine="1"/>
       </Position22>
       <Position23>
-        <Filename Value="class_install.pas"/>
-        <Caret Line="1936" Column="116" TopLine="1902"/>
+        <Filename Value="artica_install.pas"/>
+        <Caret Line="7" Column="71" TopLine="1"/>
       </Position23>
       <Position24>
-        <Filename Value="global_conf.pas"/>
-        <Caret Line="11861" Column="54" TopLine="11813"/>
+        <Filename Value="artica_install.pas"/>
+        <Caret Line="35" Column="17" TopLine="1"/>
       </Position24>
       <Position25>
-        <Filename Value="global_conf.pas"/>
-        <Caret Line="1" Column="1" TopLine="1"/>
+        <Filename Value="artica_install.pas"/>
+        <Caret Line="101" Column="19" TopLine="67"/>
       </Position25>
       <Position26>
-        <Filename Value="artica_cron.pas"/>
-        <Caret Line="516" Column="1" TopLine="487"/>
+        <Filename Value="artica_install.pas"/>
+        <Caret Line="1154" Column="27" TopLine="1120"/>
       </Position26>
       <Position27>
-        <Filename Value="clamav.pas"/>
-        <Caret Line="785" Column="1" TopLine="747"/>
+        <Filename Value="artica_install.pas"/>
+        <Caret Line="1155" Column="26" TopLine="1120"/>
       </Position27>
       <Position28>
-        <Filename Value="clamav.pas"/>
-        <Caret Line="1" Column="1" TopLine="1"/>
+        <Filename Value="artica_install.pas"/>
+        <Caret Line="2458" Column="136" TopLine="2424"/>
       </Position28>
       <Position29>
-        <Filename Value="clamav.pas"/>
-        <Caret Line="66" Column="28" TopLine="1"/>
+        <Filename Value="dansguardian.pas"/>
+        <Caret Line="658" Column="2" TopLine="525"/>
       </Position29>
       <Position30>
-        <Filename Value="clamav.pas"/>
-        <Caret Line="167" Column="22" TopLine="133"/>
+        <Filename Value="dansguardian.pas"/>
+        <Caret Line="647" Column="28" TopLine="596"/>
       </Position30>
     </JumpHistory>
   </ProjectOptions>
@@ -1075,11 +1075,11 @@
       </Item14>
       <Item15>
         <Source Value="artica_install.pas"/>
-        <Line Value="1966"/>
+        <Line Value="1969"/>
       </Item15>
       <Item16>
         <Source Value="artica_install.pas"/>
-        <Line Value="2279"/>
+        <Line Value="2282"/>
       </Item16>
     </BreakPoints>
     <Exceptions Count="2">

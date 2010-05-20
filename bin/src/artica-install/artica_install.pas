@@ -286,10 +286,6 @@ end;
    end;
 
 
-
-
-
-
    if ParamStr(1)='--myos' then begin
       GLOBAL_INI:=myconf.Create();
       writeln(install.LinuxInfosDistri()+ ';' + GLOBAL_INI.SYSTEM_KERNEL_VERSION() + ';' + GLOBAL_INI.SYSTEM_LIBC_VERSION());
@@ -351,6 +347,13 @@ end;
         zpostfilter.REMOVE();
         halt(0);
     end;
+
+    if ParamStr(1)='--kas3-remove' then begin
+        zkas3:=tkas3.Create(SYS);
+        zkas3.REMOVE();
+        halt(0);
+    end;
+
 
 
    if ParamStr(1)='--kavmilter-mem' then begin
@@ -2452,7 +2455,7 @@ end;
 
 if ParamStr(1)='--clamver' then begin
     GLOBAL_INI:=MyConf.Create();
-   writeln('Spamassassin version:',  zClam.CLAMAV_VERSION(),' ',zClam.CLAMAV_PATTERN_VERSION());
+   writeln('Spamassassin version:',  zClam.CLAMAV_VERSION(),' Pattern:',zClam.CLAMAV_PATTERN_VERSION(),' bin:',zclam.CLAMAV_BINVERSION());
    halt(0);
 end;
 

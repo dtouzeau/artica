@@ -82,6 +82,17 @@ begin
 
   SetCurrentDir('/root');
   zinstall:=tinstall.Create;
+
+
+   if ParamStr(1)='--empty-cache' then begin
+      zinstall.EMPTY_CACHE();
+      halt(0);
+   end;
+
+
+
+
+
   zinstall.INSTALL_PROGRESS(ParamStr(1),'{checking}');
   zinstall.INSTALL_STATUS(ParamStr(1),5);
   sys:=Tsystem.Create;

@@ -352,7 +352,7 @@ l.Add('php-imap ');
 l.Add('php-pear');
 l.add('php-gd');
 l.add('php-curl');
-l.add('php5-xapian');
+l.add('xapian-bindings-php');
 l.add('php-geoip');
 
 //l.Add('php-pear-Log');
@@ -437,6 +437,7 @@ l.add('libclamav-devel');
 l.add('libmysql-devel');
 l.add('libmysql-static-devel');
 l.add('monit');
+l.add('libncurses-devel'); // curses.h -> ClamAV
 l.add('libltdl-devel'); //clamav
 
 l.add('lvm2');

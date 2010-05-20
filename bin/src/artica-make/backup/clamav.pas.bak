@@ -25,11 +25,7 @@ private
      LOGS:Tlogs;
      SYS:Tsystem;
      GLOBAL_INI:TiniFIle;
-     function COMMANDLINE_PARAMETERS(FoundWhatPattern:string):boolean;
-     procedure FRESHCLAM_REWRITE_INITD();
-     function ReadFileIntoString(path:string):string;
      artica_path:string;
-     procedure SENDMAIL_CF_AND_MILTER();
      postfix:tpostfix;
      FreshClam_pidpath:string;
      Clamd_PidPath:string;
@@ -38,9 +34,15 @@ private
      EnableClamavDaemon:integer;
      EnableFreshClam:integer;
      CLAMD_BIN_PATH_MEM:string;
+     function COMMANDLINE_PARAMETERS(FoundWhatPattern:string):boolean;
+     procedure FRESHCLAM_REWRITE_INITD();
+     function ReadFileIntoString(path:string):string;
+     procedure SENDMAIL_CF_AND_MILTER();
      procedure WRITE_CLAMAV_MILTER();
 
 public
+    DEBUG:Boolean;
+    NotEngoughMemory:boolean;
     procedure   Free;
     constructor Create;
     function  MILTER_PID():string;
@@ -90,8 +92,7 @@ public
     function  CLAMAV_BINVERSION():integer;
     function  AMAVISD_PID() :string;
     function  clamd_LocalSocket():string;
-    DEBUG:Boolean;
-    NotEngoughMemory:boolean;
+
 
 
 END;
@@ -359,7 +360,7 @@ begin
 end;
 
 
-
+//##############################################################################
 function TClamav.FRESHCLAM_GETINFO(Key:String):string;
 var
 RegExpr:TRegExpr;
@@ -479,7 +480,7 @@ begin
          logs.OutputCmd('/bin/chown -R '+user_daemon+':'+user_daemon+' /var/run/clamav');
          logs.OutputCmd('/bin/chown -R '+user_daemon+':'+user_daemon+' '+DatabaseDirectory);
          logs.OutputCmd('/bin/chown -R '+user_daemon+':'+user_daemon+' /var/clamav');
-
+         logs.OutputCmd('/bin/chmod 775 /var/run/clamav');
 
 
          if DirectoryExists(LogFile) then fpsystem('/bin/rm -rf ' + LogFile);
@@ -768,6 +769,24 @@ begin
         continue;
      end;
 
+    RegExpr.Expression:='^#';
+     if RegExpr.Exec(l.Strings[t]) then begin
+        l.Delete(t);
+        continue;
+     end;
+
+    RegExpr.Expression:='^\s+WARNING:';
+     if RegExpr.Exec(l.Strings[t]) then begin
+        l.Delete(t);
+        continue;
+     end;
+
+     RegExpr.Expression:='Bytecode';
+     if RegExpr.Exec(l.Strings[t]) then begin
+        l.Delete(t);
+        continue;
+     end;
+
      RegExpr.Expression:='([a-zA-Z]+)\s+(.+)';
      if not RegExpr.Exec(l.Strings[t]) then begin
         logs.Debuglogs('Starting......: Cleaning line '+intToStr(t));
@@ -817,7 +836,15 @@ begin
      
      
      DatabaseDirectory:=CLAMD_GETINFO('DatabaseDirectory');
-     if FileExists(postfix.POSFTIX_POSTCONF_PATH()) then user:='postfix' else user:='clamav';
+     if fileExists(postfix.POSFTIX_POSTCONF_PATH()) then begin
+        user:='postfix';
+     end else begin
+         if FIleExists(SYS.LOCATE_DANSGUARDIAN_BIN_PATH()) then begin
+              user:='squid';
+          end else begin
+              user:='clamav';
+          end;
+     end;
 
 
      if FileExists('/etc/artica-postfix/settings/Daemons/freshclamConfig') then begin
@@ -1413,7 +1440,7 @@ fpsystem(Binpath+' --version >'+tmpstr);
         end;
     end;
 
-if strversion:='' then strversion:='0';
+if strversion='' then strversion:='0';
 strversion:=AnsiReplaceText(strversion,'.','');
 TryStrToInt(strversion,result);
 RegExpr.free;
@@ -1485,7 +1512,12 @@ begin
  l:=TStringList.Create;
  
  RegExpr:=TRegExpr.Create;
- l.LoadFromFile(CLAMD_CONF_PATH());
+ try
+    l.LoadFromFile(CLAMD_CONF_PATH());
+ except
+    logs.Debuglogs('CLAMD_GETINFO:: Fatal error');
+    exit;
+ end;
  RegExpr.Expression:='^' + Key + '\s+(.+)';
  For i:=0 to l.Count-1 do begin
      if RegExpr.Exec(l.Strings[i]) then begin

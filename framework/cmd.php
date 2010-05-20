@@ -328,6 +328,8 @@ if(isset($_GET["home-single-user"])){samba_build_home_single();exit;}
 
 //squid;
 if(isset($_GET["squidnewbee"])){squid_config();exit;}
+if(isset($_GET["cicap-reconfigure"])){cicap_reconfigure();exit;}
+if(isset($_GET["cicap-reload"])){cicap_reload();exit;}
 if(isset($_GET["MalwarePatrolDatabasesCount"])){MalwarePatrolDatabasesCount();exit;}
 
 if(isset($_GET["artica-filter-reload"])){ReloadArticaFilter();exit;}
@@ -3317,6 +3319,14 @@ function SQUID_CACHE_INFOS(){
 	echo "<articadatascgi>".  base64_encode(serialize($array))."</articadatascgi>";	
 }
 
+
+function cicap_reconfigure(){
+	sys_THREAD_COMMAND_SET(LOCATE_PHP5_BIN2()." /usr/share/artica-postfix/exec.c-icap.php --build");
+}
+
+function cicap_reload(){
+	sys_THREAD_COMMAND_SET("/usr/share/artica-postfix/bin/artica-install --c-icap-reload");
+}
 
 
 

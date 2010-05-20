@@ -2525,6 +2525,20 @@ private	function CheckTables_repositories(){
 			`uri` VARCHAR( 255 ) NOT NULL ,`task_type` VARCHAR( 90 ) NOT NULL ,
 			`zDate` DATETIME NOT NULL ,INDEX ( `task_type` , `zDate` ) ,UNIQUE (`uri`))";
 		$this->QUERY_SQL($sql,"artica_backup");
+		
+		}
+		
+		
+		if(!$this->TABLE_EXISTS('squid_speed','artica_backup')){		
+		$sql="CREATE TABLE `artica_backup`.`squid_speed` (
+			`ID` INT( 10 ) NOT NULL AUTO_INCREMENT PRIMARY KEY ,
+			`domain` VARCHAR( 255 ) NOT NULL ,
+			`refresh_pattern_min` INT( 5 ) NOT NULL DEFAULT '0',
+			`refresh_pattern_perc` INT( 2 ) NOT NULL DEFAULT '20',
+			`refresh_pattern_max` INT( 5 ) NOT NULL DEFAULT '4320',
+			`refresh_pattern_options` VARCHAR( 255 ) NOT NULL ,
+			INDEX ( `domain` ));";
+		$this->QUERY_SQL($sql,"artica_backup");	
 		}
 		
 		if(!$this->TABLE_EXISTS('kav4Proxy','artica_backup')){		

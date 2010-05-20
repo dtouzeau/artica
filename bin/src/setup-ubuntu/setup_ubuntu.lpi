@@ -12,7 +12,7 @@
       <MainUnit Value="0"/>
       <TargetFileExt Value=""/>
       <Title Value="setup-ubuntu"/>
-      <ActiveEditorIndexAtStart Value="8"/>
+      <ActiveEditorIndexAtStart Value="3"/>
     </General>
     <VersionInfo>
       <ProjectVersion Value=""/>
@@ -168,8 +168,8 @@
         <Filename Value="setup_mandrake_class.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="setup_mandrake_class"/>
-        <CursorPos X="3" Y="709"/>
-        <TopLine Value="664"/>
+        <CursorPos X="62" Y="357"/>
+        <TopLine Value="324"/>
         <EditorIndex Value="3"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>

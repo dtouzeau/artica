@@ -66,7 +66,7 @@ public
     procedure   VERIFY_PARENT_PROXY();
     function    DANSGUARDIAN_DELETE_VALUE(key:string):string;
     function    DANSGUARDIAN_BIN_VERSION(version:string):int64;
-    procedure DANSGUARDIAN_TEMPLATE();
+    procedure   DANSGUARDIAN_TEMPLATE();
     procedure   REMOVE();
 
     function    C_ICAP_BIN_PATH():string;
@@ -78,6 +78,7 @@ public
     procedure   C_ICAP_STOP();
     procedure   C_ICAP_CONFIGURE();
     procedure   C_ICAP_RELOAD();
+    function    C_ICAP_VERSION():string;
 END;
 
 implementation
@@ -576,6 +577,7 @@ end;
 procedure tdansguardian.C_ICAP_RELOAD();
 var
    pid:string;
+   squid:tsquid;
 begin
    if CicapEnabled=0 then begin
      logs.Debuglogs('Starting......: c-icap is disabled by artica by "CicapEnabled" token...');
@@ -590,7 +592,14 @@ begin
    end;
 
    logs.Debuglogs('Starting......: reloading c-icap pid '+PID);
-   logs.OutputCmd('/bin/kill -HUP ' + PID);
+
+   if FileExists('/var/run/c-icap/c-icap.ctl') then begin
+   squid:=tsquid.Create;
+   logs.OutputCmd('echo -n "reconfigure"  > /var/run/c-icap/c-icap.ctl');
+   fpsystem(squid.SQUID_BIN_PATH()+' -k reconfigure');
+   end else begin
+      logs.OutputCmd('/bin/kill -HUP ' + PID);
+   end;
 end;
 //##############################################################################
 
@@ -598,7 +607,7 @@ procedure tdansguardian.C_ICAP_START();
 var
    count:integer;
    pid:string;
-
+   squid:tsquid;
 
 begin
 count:=0;
@@ -635,88 +644,35 @@ PID:= C_ICAP_PID();
 
  
 
- while not SYS.PROCESS_EXIST(C_ICAP_PID()) do begin
+ while not SYS.PROCESS_EXIST(PID) do begin
 
         sleep(100);
         inc(count);
-        if count>50 then begin
+        if count>80 then begin
            logs.DebugLogs('Starting......: c-icap (timeout)');
            break;
         end;
+        PID:= C_ICAP_PID();
   end;
 
  
  PID:= C_ICAP_PID();
  
  if length(PID)>0 then begin
+    squid:=tsquid.Create;
     logs.DebugLogs('Starting......: c-icap started with new pid ' + PID);
+    logs.DebugLogs('Starting......: c-icap reconfigure SQUID '+squid.SQUID_BIN_PATH());
+    fpsystem(squid.SQUID_BIN_PATH()+' -k reconfigure');
  end else begin
     writeln('Starting......: c-icap failed');
  end;
- 
+
+
 end;
 //##############################################################################
 procedure tdansguardian.C_ICAP_CONFIGURE();
-var
-   user:string;
-   chown:string;
-   internal_conf:string;
-   VirSaveDir:string;
-   InternalConf:TiniFile;
 begin
-
-internal_conf:='/etc/artica-postfix/settings/Daemons/CicapInternalConfiguration';
-VirSaveDir:='/opt/artica/share/www/squid-attachments';
- chown:=username+':'+username;
- logs.DebugLogs('Starting......: c-icap using user: ' + username);
- if FileExists(internal_conf) then begin
-       InternalConf:=TiniFile.Create(internal_conf);
-       VirSaveDir:=InternalConf.ReadString('CONF','VirSaveDir','/opt/artica/share/www/squid-attachments');
-       InternalConf.Free;
- end;
-
-ForceDirectories('/var/log/squid');
-ForceDirectories('/var/log/squid');
-ForceDirectories('/var/lib/c_icap/temporary');
-ForceDirectories('/var/run/c-icap');
-if not FIleExists('/var/log/squid/c-icap_server.log') then logs.WriteToFile('','/var/log/squid/c-icap_server.log');
-if not FIleExists('/var/log/squid/c-icap_access.log') then logs.WriteToFile('','/var/log/squid/c-icap_access.log');
-ForceDirectories(VirSaveDir);
-logs.OutputCmd('/bin/chown -R '+chown+' /var/log/squid');
-logs.OutputCmd('/bin/chown -R '+chown+' /var/run/c-icap');
-logs.OutputCmd('/bin/chown -R '+chown+' /var/lib/c_icap/temporary');
-logs.OutputCmd('/bin/chown -R '+chown+' '+VirSaveDir);
-logs.OutputCmd('/bin/chmod -R 775 '+VirSaveDir);
-
-if FileExists('/etc/artica-postfix/settings/Daemons/CicapMainConfiguration') then begin
-   logs.OutputCmd('/bin/cp -f /etc/artica-postfix/settings/Daemons/CicapMainConfiguration ' + C_ICAP_CONF_PATH());
-end;
-
-
-
-C_ICAP_VALUE_SET('ServerLog','/var/log/squid/c-icap_server.log');
-C_ICAP_VALUE_SET('AccessLog','/var/log/squid/c-icap_access.log');
-C_ICAP_VALUE_SET('User',username);
-C_ICAP_VALUE_SET('Group',username);
-C_ICAP_VALUE_SET('Port','1351');
-C_ICAP_VALUE_SET('PidFile','/var/run/c-icap/c-icap.pid');
-C_ICAP_VALUE_SET('CommandsSocket','/var/run/c-icap/c-icap.ctl');
-C_ICAP_VALUE_SET('TmpDir','/var/lib/c_icap/temporary');
-C_ICAP_VALUE_SET('ServicesDir','/usr/lib/c_icap');
-C_ICAP_VALUE_SET('Service','echo_module srv_echo.so');
-C_ICAP_VALUE_SET('Service','url_check_module srv_url_check.so');
-C_ICAP_VALUE_SET('Service','antivirus_module srv_clamav.so');
-C_ICAP_VALUE_SET('ModulesDir' ,'/usr/lib/c_icap');
-C_ICAP_VALUE_SET('Module logger','sys_logger.so');
-C_ICAP_VALUE_SET('ServiceAlias','avscan srv_clamav?allow204=on&sizelimit=off&mode=simple');
-C_ICAP_VALUE_SET('srv_clamav.ClamAvTmpDir','/tmp');
-
-
-
-
-
-
-
+fpsystem(SYS.LOCATE_PHP5_BIN()+' /usr/share/artica-postfix/exec.c-icap.php --build');
 end;
 //##############################################################################
 procedure tdansguardian.DANSGUARDIAN_STOP();
@@ -791,27 +747,42 @@ count:=0;
   end;
   
 if SYS.PROCESS_EXIST(pid) then begin
-   writeln('Stopping C-icap..............: ' + pid + ' PID');
+   writeln('Stopping C-icap..............: Stopping smoothly ' + pid + ' PID');
+   fpsystem('/bin/echo -n "stop"  > /var/run/c-icap/c-icap.ctl');
+     while SYS.PROCESS_EXIST(pid) do begin
+        sleep(100);
+        inc(count);
+        if count>30 then break;
+        pid:=C_ICAP_PID();
+    end;
+end;
+
+pid:=C_ICAP_PID();
+if SYS.PROCESS_EXIST(pid) then begin
+   writeln('Stopping C-icap..............: Stopping must kill ' + pid + ' PID');
    logs.OutputCmd('/bin/kill '+ pid);
 
   while SYS.PROCESS_EXIST(pid) do begin
         sleep(100);
         inc(count);
+        pid:=C_ICAP_PID();
         if count>30 then break;
   end;
-  end;
+
+end;
 
   allpids:=SYS.PidAllByProcessPath(C_ICAP_BIN_PATH());
   if length(allpids)>0 then begin
-     writeln('Stopping C-icap..............: ' + allpids + ' PIDs');
+     writeln('Stopping C-icap..............: chilrends: ' + allpids + ' PIDs');
      fpsystem('/bin/kill -9 '+ allpids);
   end;
 
   cicap_mem_pid:='';
-  if not SYS.PROCESS_EXIST(C_ICAP_PID()) then begin
+  pid:=C_ICAP_PID();
+  if not SYS.PROCESS_EXIST(pid) then begin
      writeln('Stopping C-icap..............: Stopped');
   end else begin
-     writeln('Stopping C-icap..............: Failed');
+     writeln('Stopping C-icap..............: Failed pid '+pid);
   end;
 end;
 //##############################################################################
@@ -869,6 +840,35 @@ if not FileExists(BIN_PATH()) then exit;
 
 end;
 //##############################################################################
+function tdansguardian.C_ICAP_VERSION():string;
+var
+    RegExpr:TRegExpr;
+    FileDatas:TStringList;
+    i:integer;
+    BinPath:string;
+    filetmp:string;
+    nocache:boolean;
+begin
+if not FIleExists('/usr/bin/c-icap-config') then result:='060708rc2';
+if not nocache then begin
+   result:=SYS.GET_CACHE_VERSION('APP_C_ICAP');
+   if length(result)>2 then exit;
+end;
+filetmp:=logs.FILE_TEMP();
+if not FileExists('/usr/bin/c-icap-config') then begin
+   logs.Debuglogs('unable to find /usr/bin/c-icap-config');
+   exit;
+end;
+
+logs.Debuglogs('/usr/bin/c-icap-config --version >'+filetmp+' 2>&1');
+fpsystem('/usr/bin/c-icap-config --version >'+filetmp+' 2>&1');
+result:=trim(logs.ReadFromFile(filetmp));
+logs.DeleteFile(filetmp);
+SYS.SET_CACHE_VERSION('APP_C_ICAP',result);
+end;
+
+
+//##############################################################################
 function tdansguardian.C_ICAP_STATUS():string;
 var
 ini:TstringList;
@@ -879,7 +879,7 @@ if not FileExists(C_ICAP_BIN_PATH()) then exit;
 pidpath:='/var/run/c-icap/c-icap.pid';
 ini:=TstringList.Create;
 ini.Add('[C-ICAP]');
-ini.Add('master_version=060708rc2');
+ini.Add('master_version='+C_ICAP_VERSION());
 ini.Add('service_name=APP_C_ICAP');
 ini.Add('service_cmd=cicap');
 

@@ -1749,8 +1749,6 @@ function SaveToLdap(){
 			if($kaspersky==1){
 				$conf[]="icap_preview_enable off";
 				$conf[]="icap_preview_size 128";			
-			}else{
-				$conf[]="icap_preview_enable off";
 			}
 			$conf[]="icap_send_client_ip on";
 			$conf[]="icap_send_client_username on";
@@ -1875,6 +1873,7 @@ public function SquidGuardDatabasesStatus(){
 		$kav_rules[]="icap_access\tic_kav_resp allow all";
 		$kav_rules[]="icap_access\tic_kav_req allow all !acl_kav_GET";			
 		$kav_rules[]="";	
+
 		return implode("\n",$kav_rules);	
 	}
 	
@@ -1906,12 +1905,12 @@ public function SquidGuardDatabasesStatus(){
 		if($this->SQUID_BIN_VERSION>310000000000){return $this->icap_cicap_services_31();}
 		if($this->ASROOT){echo "Starting......: Squid activating C-ICAP\n";}
 		$kav_rules[]="# --------- icap_service C-ICAP";
-		$kav_rules[]="icap_service\tservice_avi_req reqmod_precache 0 icap://localhost:1351/srv_clamav";
-		$kav_rules[]="icap_service\tservice_avi respmod_precache 1 icap://localhost:1351/srv_clamav";
+		$kav_rules[]="icap_service\tservice_req reqmod_precache bypass=1 icap://127.0.0.1:1344/srv_clamav";
+		$kav_rules[]="icap_service\tservice_avi respmod_precache bypass=0 icap://127.0.0.1:1344/srv_clamav";
 		$kav_rules[]=$this->ICAP_HEADERS();
 		$kav_rules[]="";
 		$kav_rules[]="icap_class\tclass_antivirus service_avi";
-		$kav_rules[]="icap_class\tclass_antivirus_req service_avi_req";		
+		$kav_rules[]="icap_class\tclass_antivirus_req service_req";		
 		$kav_rules[]="icap_access\tclass_antivirus allow all";
 		$kav_rules[]="icap_access\tclass_antivirus_req allow all";
 		$kav_rules[]="";
@@ -1921,14 +1920,20 @@ public function SquidGuardDatabasesStatus(){
 	
 	private function icap_cicap_services_31(){
 		if($this->ASROOT){echo "Starting......: Squid activating C-ICAP\n";}
+		$kav_rules[]="";
 		$kav_rules[]="# --------- icap_service C-ICAP mode 3.1.x";
-		$kav_rules[]="icap_service\tservice_avi_req reqmod_precache 0 icap://localhost:1351/srv_clamav";
-		$kav_rules[]="icap_service\tservice_avi respmod_precache 1 icap://localhost:1351/srv_clamav";
+		$kav_rules[]="icap_service service_req reqmod_precache bypass=1 icap://127.0.0.1:1344/srv_clamav";
+		$kav_rules[]="adaptation_access service_req allow all";
+		$kav_rules[]="icap_service service_resp respmod_precache bypass=0 icap://127.0.0.1:1344/srv_clamav";
+		$kav_rules[]="adaptation_access service_resp allow all";
+		$kav_rules[]="";
+		$kav_rules[]="icap_preview_enable on";
+		$kav_rules[]="icap_preview_size 128";
+		$kav_rules[]="icap_service_failure_limit -1";	
 		$kav_rules[]=$this->ICAP_HEADERS();
 		$kav_rules[]="";
-		$kav_rules[]="adaptation_access service_avi_req allow all";
-		$kav_rules[]="adaptation_access service_avi allow all";	
 		$kav_rules[]="";
+		
 		return implode("\n",$kav_rules);		
 		}	
 		
@@ -2010,8 +2015,8 @@ function BuildSquidConf(){
 			$conf=$conf  ."acl malware_block_list url_regex -i \"/etc/squid3/malwares.acl\"\n";
 		}
 		$conf=$conf  .$acl_blocked_sites;
-		$conf=$conf ."acl localhost src 127.0.0.1/8\n";
-		$conf=$conf ."acl to_localhost dst 127.0.0.0/8\n";
+		$conf=$conf ."acl localhost src 127.0.0.1/32\n";
+		$conf=$conf ."acl to_localhost dst 127.0.0.0/32\n";
 		$conf=$conf. "acl CONNECT method CONNECT\n";
 		
 		
@@ -2117,8 +2122,8 @@ function BuildSquidConf(){
 		$conf=$conf .$access_blocked_sites;
 		$conf=$conf .$acl_ldap_auth;
 		$conf=$conf .$acl_access_time;
-		$conf=$conf .$office_network;
 		$conf=$conf ."http_access allow localhost\n";
+		$conf=$conf .$office_network;
 		$conf=$conf ."http_access deny !Safe_ports\n";
 		//$conf=$conf ."http_access deny !SSL_ports\n";
 		$conf=$conf ."http_access deny all\n";
@@ -2180,7 +2185,8 @@ function BuildSquidConf(){
 		//$conf=$conf."cache deny QUERY\n";
 		$conf=$conf."refresh_pattern ^ftp:		1440	20%	10080\n";
 		$conf=$conf."refresh_pattern ^gopher:	1440	0%	1440\n";
-		$conf=$conf."refresh_pattern .		0	20%	4320\n";
+		$conf=$conf.$this->refresh_pattern_list();
+		$conf=$conf."refresh_pattern .		   0	20%	4320\n";
 		$conf=$conf."icp_port 3130\n";
 		$conf=$conf."\n";
 		$conf=$conf."\n";
@@ -2210,6 +2216,23 @@ function BuildSquidConf(){
 		return $conf;	
 		
 		}
+		
+private function refresh_pattern_list(){
+	$sql="SELECT * FROM `squid_speed` WHERE `domain` IS NOT NULL";
+	$q=new mysql();
+	$results=$q->QUERY_SQL($sql,"artica_backup");
+	while($ligne=@mysql_fetch_array($results,MYSQL_ASSOC)){
+		$pattern=$ligne["domain"];
+		$pattern=str_replace(".","\.",$pattern);
+		$pattern=str_replace("*",".*?",$pattern);
+		$conf[]="refresh_pattern $pattern  {$ligne["refresh_pattern_min"]}    {$ligne["refresh_pattern_perc"]}%     {$ligne["refresh_pattern_max"]}";
+		
+	}
+	if(is_array($conf)){return implode("\n",$conf)."\n";}
+	
+}
+		
+		
 		
 function SAFE_PORTS(){
 	$ports["80"]="http";
@@ -2324,52 +2347,128 @@ class cicap{
 	
 	}
 	
-	function buildconf(){
+	private function LOCATE_CLAMD_CONF(){
+		if(is_file("/etc/clamav/clamd.conf")){return "/etc/clamav/clamd.conf";}
+		if(is_file("/etc/clamd.conf")){return "/etc/clamd.conf";}
+	}
+	
+	public function LOCATE_MODULES_DIR(){
+		if(is_file("/usr/lib/c_icap/sys_logger.so")){return "/usr/lib/c_icap";}
+		if(is_file("/var/lib/c_icap/sys_logger.so")){return "/var/lib/c_icap";}
+	}
+	
+	private function CLAMAV_USER(){
+		$tbl=@explode("\n",@file_get_contents($this->LOCATE_CLAMD_CONF()));
+		while (list ($num, $val) = each ($tbl)){	
+			if(preg_match("#User\s+(.+)#",$val,$re)){return trim($re[1]);}
+		}
+	}
+	
+	
+	public function buildconf(){
 		$this->BuildDefaults();
-		$conf=$conf . "PidFile /var/run/c-icap/c-icap.pid\n";
-		$conf=$conf . "CommandsSocket /var/run/c-icap/c-icap.ctl\n";
-		$conf=$conf . "Timeout {$this->main_array["CONF"]["Timeout"]}\n";
-		$conf=$conf . "KeepAlive {$this->main_array["CONF"]["KeepAlive"]}\n";
-		$conf=$conf . "MaxKeepAliveRequests {$this->main_array["CONF"]["MaxKeepAliveRequests"]}\n";
-		$conf=$conf . "KeepAliveTimeout {$this->main_array["CONF"]["KeepAliveTimeout"]}\n";
-		$conf=$conf . "MaxServers {$this->main_array["CONF"]["MaxServers"]}\n";
-		$conf=$conf . "MinSpareThreads {$this->main_array["CONF"]["MinSpareThreads"]}\n";
-		$conf=$conf . "MaxSpareThreads {$this->main_array["CONF"]["MaxSpareThreads"]}\n";
-		$conf=$conf . "ThreadsPerChild {$this->main_array["CONF"]["ThreadsPerChild"]}\n";
-		$conf=$conf . "MaxRequestsPerChild {$this->main_array["CONF"]["MaxRequestsPerChild"]}\n";
-		$conf=$conf . "Port 1351\n";
-		$conf=$conf . "User squid\n";
-		$conf=$conf . "Group squid\n";
-		$conf=$conf . "TmpDir /var/lib/c_icap/temporary\n";
-		$conf=$conf . "MaxMemObject 131072\n";
-		$conf=$conf . "ServerLog /var/log/squid/c-icap_server.log\n";
-		$conf=$conf . "AccessLog /var/log/squid/c-icap_access.log\n";
-		$conf=$conf . "DebugLevel 5\n";
-		$conf=$conf . "ModulesDir /usr/lib/c_icap\n";
-		$conf=$conf . "Module logger sys_logger.so\n";
-		//$conf=$conf . "Module perl_handler perl_handler.so\n";
-		$conf=$conf . "sys_logger.Prefix \"C-ICAP:\"\n";
-		$conf=$conf . "sys_logger.Facility local1\n";
-		$conf=$conf . "Logger sys_logger\n";
-		$conf=$conf . "Logger file_logger\n";
-		$conf=$conf . "ServicesDir /usr/lib/c_icap\n";
-		$conf=$conf . "Service antivirus_module srv_clamav.so\n";
-		$conf=$conf . "Service url_check_module srv_url_check.so\n";
-		$conf=$conf . "Service antivirus_module srv_clamav.so\n";
-		$conf=$conf . "ServiceAlias avscan srv_clamav?allow204=on&sizelimit=off&mode=simple\n";
-		$conf=$conf . "srv_clamav.SendPercentData {$this->main_array["CONF"]["srv_clamav.SendPercentData"]}\n";
-		$conf=$conf . "srv_clamav.StartSendPercentDataAfter {$this->main_array["CONF"]["srv_clamav.StartSendPercentDataAfter"]}M\n";
-		$conf=$conf . "srv_clamav.MaxObjectSize {$this->main_array["CONF"]["srv_clamav.MaxObjectSize"]}M\n";
-		$conf=$conf . "srv_clamav.ClamAvMaxFilesInArchive {$this->main_array["CONF"]["srv_clamav.ClamAvMaxFilesInArchive"]}\n";
-		$conf=$conf . "srv_clamav.ClamAvMaxFileSizeInArchive {$this->main_array["CONF"]["srv_clamav.ClamAvMaxFileSizeInArchive"]}M\n";
-		$conf=$conf . "srv_clamav.ClamAvMaxRecLevel {$this->main_array["CONF"]["srv_clamav.ClamAvMaxRecLevel"]}\n";
-		$conf=$conf . "srv_clamav.VirSaveDir {$this->main_array["CONF"]["VirSaveDir"]}\n";
-		$conf=$conf . "srv_clamav.VirHTTPServer  \"{$this->main_array["CONF"]["VirHTTPServer"]}\"\n";
-		$conf=$conf . "srv_clamav.VirUpdateTime   15\n";
-		$conf=$conf . "srv_clamav.ScanFileTypes TEXT DATA EXECUTABLE ARCHIVE GRAPHICS STREAM DOCUMENT\n";
-		$conf=$conf . "srv_clamav.VirScanFileTypes ARCHIVE EXECUTABLE\n";
-		$conf=$conf . "srv_clamav.ClamAvTmpDir /tmp\n";		
-		return $conf;	
+			$usermenus=new usersMenus();
+			$user="squid";
+			$modules_path=$this->LOCATE_MODULES_DIR();
+			echo "Starting......: c-icap using modules path in $modules_path\n";
+			if(is_file("$modules_path/srv_clamav.so")){
+				echo "Starting......: c-icap using ClamAV antivirus\n";
+				$user=$this->CLAMAV_USER();
+				
+			}
+			
+			echo "Starting......: c-icap using User $user ($usermenus->hostname)\n";
+			$conf[]="PidFile /var/run/c-icap.pid";
+			$conf[]="CommandsSocket /var/run/c-icap/c-icap.ctl";
+			$conf[]="Timeout {$this->main_array["CONF"]["Timeout"]}";
+			$conf[]="MaxKeepAliveRequests {$this->main_array["CONF"]["MaxKeepAliveRequests"]}";
+			$conf[]="KeepAliveTimeout {$this->main_array["CONF"]["KeepAliveTimeout"]}";
+			$conf[]="StartServers {$this->main_array["CONF"]["StartServers"]}";
+			$conf[]="MaxServers {$this->main_array["CONF"]["MaxServers"]}";
+			$conf[]="MinSpareThreads     {$this->main_array["CONF"]["MinSpareThreads"]}";
+			$conf[]="MaxSpareThreads     {$this->main_array["CONF"]["MaxSpareThreads"]}";
+			$conf[]="ThreadsPerChild     {$this->main_array["CONF"]["ThreadsPerChild"]}";
+			$conf[]="MaxRequestsPerChild  {$this->main_array["CONF"]["MaxRequestsPerChild"]}";
+			$conf[]="MaxMemObject 131072";
+			$conf[]="Port 1344 ";
+			$conf[]="User $user";
+			$conf[]="Group $user";
+			$conf[]="ServerAdmin you@your.address";
+			$conf[]="ServerName $usermenus->hostname";
+			$conf[]="TmpDir /var/lib/c_icap/temporary";
+			$conf[]="DebugLevel 5";
+			$conf[]="ModulesDir $modules_path";
+			$conf[]="ServicesDir $modules_path";
+			$conf[]="TemplateDir /usr/share/c_icap/templates/";		
+			$conf[]="LoadMagicFile /etc/c-icap.magic";
+			$conf[]="TemplateDefaultLanguage en";
+			$conf[]="#TemplateReloadTime 360";
+			$conf[]="#TemplateCacheSize 20";
+			$conf[]="#TemplateMemBufSize 8192";
+			
+			$conf[]="RemoteProxyUsers off";
+			$conf[]="RemoteProxyUserHeader X-Authenticated-User";
+			$conf[]="RemoteProxyUserHeaderEncoded on";
+			$conf[]="ServerLog /var/log/c-icap/server.log";
+			$conf[]="AccessLog /var/log/c-icap/access.log";
+			//$conf[]="echo.PreviewSize 512";
+			//$conf[]="echo.TransferIgnore gif, jpeg";
+			
+			if(is_file("$modules_path/sys_logger.so")){
+				echo "Starting......: c-icap using Sysloger\n";
+				$conf[]="#Sysloger";
+				$conf[]="Module logger sys_logger.so\n";
+				$conf[]="sys_logger.Prefix \"C-ICAP:\"";
+				$conf[]="sys_logger.Facility local1";
+				$conf[]="Logger file_logger";
+				$conf[]="";	
+			}
+	
+			
+			
+			
+			if(is_file("$modules_path/srv_clamav.so")){
+				$conf[]="";
+				$conf[]="#Clamav";
+				$conf[]="Service antivirus_module srv_clamav.so";
+				$conf[]="ServiceAlias  avscan srv_clamav?allow204=off&sizelimit=off&mode=simple";
+				$conf[]="srv_clamav.ScanFileTypes TEXT DATA EXECUTABLE ARCHIVE MSOFFICE";
+				$conf[]="srv_clamav.VirScanFileTypes ARCHIVE EXECUTABLE";
+				$conf[]="srv_clamav.SendPercentData {$this->main_array["CONF"]["srv_clamav.SendPercentData"]}";
+				$conf[]="srv_clamav.StartSendPercentDataAfter {$this->main_array["CONF"]["srv_clamav.StartSendPercentDataAfter"]}M";
+				$conf[]="srv_clamav.Allow204Responces off";
+				$conf[]="srv_clamav.MaxObjectSize  {$this->main_array["CONF"]["srv_clamav.MaxObjectSize"]}M";
+				$conf[]="srv_clamav.ClamAvTmpDir /var/tmp";
+				$conf[]="srv_clamav.ClamAvMaxFilesInArchive {$this->main_array["CONF"]["srv_clamav.ClamAvMaxFilesInArchive"]}";
+				$conf[]="srv_clamav.ClamAvMaxFileSizeInArchive {$this->main_array["CONF"]["srv_clamav.ClamAvMaxFileSizeInArchive"]}M";
+				$conf[]="srv_clamav.ClamAvMaxRecLevel {$this->main_array["CONF"]["srv_clamav.ClamAvMaxRecLevel"]}";
+				$conf[]="srv_clamav.VirSaveDir {$this->main_array["CONF"]["VirSaveDir"]}";
+				$conf[]="srv_clamav.VirHTTPServer  \"{$this->main_array["CONF"]["VirHTTPServer"]}\"";
+				$conf[]="srv_clamav.VirUpdateTime   15";
+				
+			}	
+	
+		@mkdir("/var/log/c-icap",0666,true);
+		@mkdir("/var/lib/c_icap/temporary",0666,true);
+		@mkdir("/var/run/c-icap",0666,true);
+		@mkdir("/var/tmp",0666,true);
+		@mkdir("/usr/share/c_icap/templates",0666,true);
+		//if(!is_file("/var/log/c-icap/server.log")){@file_put_contents("/var/log/c-icap/server.log"," ");}
+		//if(!is_file("/var/log/c-icap/access.log")){@file_put_contents("/var/log/c-icap/access.log"," ");}
+		
+		shell_exec("/bin/chmod -R 0755 /var/log/c-icap");
+		shell_exec("/bin/chmod -R 0755 /var/run/c-icap");
+		shell_exec("/bin/chmod -R 0755 /var/lib/c_icap");
+		shell_exec("/bin/chmod -R 0755 /var/tmp");
+		shell_exec("/bin/chmod -R 0755 /usr/share/c_icap");
+		
+		shell_exec("/bin/chown -R $user:$user /var/log/c-icap");
+		shell_exec("/bin/chown -R $user:$user /var/run/c-icap");
+		shell_exec("/bin/chown -R $user:$user /var/lib/c_icap");
+		shell_exec("/bin/chown -R $user:$user /var/tmp");
+		shell_exec("/bin/chown -R $user:$user /usr/share/c_icap");
+		echo "Starting......: c-icap apply securities on user \"$user\" done\n";
+		@file_put_contents("/etc/c-icap.conf",@implode("\n",$conf));
 		
 	}
 	
@@ -2379,8 +2478,8 @@ class cicap{
 		$confArtica=$ini->toString();
 		$sock=new sockets();
 		$sock->SaveConfigFile($confArtica,'CicapInternalConfiguration');
-		$sock->SaveConfigFile($this->buildconf(),'CicapMainConfiguration');
-		$sock->getFrameWork("cmd.php?squidnewbee=yes");
+		$sock->getFrameWork("cmd.php?cicap-reconfigure=yes");
+		$sock->getFrameWork("cmd.php?cicap-reload=yes");
 		}
 	
 }
