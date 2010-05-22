@@ -58,9 +58,13 @@
 	if(isset($_GET["end_time_hour"])){time_save();exit;}
 	if(isset($_GET["time-rule-list"])){echo time_rule_list($_GET["gpid"],$_GET["ou"]);exit;}
 	if(isset($_GET["ConnectionTimeDelete"])){time_rule_delete();exit;}
+	
 	if(isset($_GET["changecache-js"])){changecache_js();exit;}
 	if(isset($_GET["changecache-popup"])){changecache_popup();exit;}
 	if(isset($_GET["SaveNewChache"])){changecache_save();exit;}
+	if(isset($_GET["liste-des-caches"])){main_cache_list();exit;}
+	
+	
 	if(isset($_GET["squid-net-loupe-js"])){net_control_center_js();exit;}
 	if(isset($_GET["squid-net-loupe-popup"])){net_control_center_popup();exit;}
 	if(isset($_GET["squid-transparent-js"])){transparent_js();exit;}
@@ -203,17 +207,16 @@ function AjaxSquidDemarre(){
 var x_DeleteCache= function (obj) {
 	var tempvalue=obj.responseText;
 	if(tempvalue.length>0){alert(tempvalue)};
-    cachelist();  
+    RefreshTab('squid_main_config');
 	}	
 	
-function cachelist(){
-	LoadAjax('cache_list','$page?cache-list=yes');   
-}
+
 	
 function DeleteCache(folder){
+	    if(folder.length<5){return;}
 		var XHR = new XHRConnection();
 		XHR.appendData('DeleteCache',folder);
-		document.getElementById('cache_list').innerHTML='<center><img src=\"img/wait_verybig.gif\"></center>';
+		document.getElementById('liste-des-caches').innerHTML='<center><img src=\"img/wait_verybig.gif\"></center>';
 		XHR.sendAndLoad('$page', 'GET',x_DeleteCache);
 }
 
@@ -533,13 +536,11 @@ function main_enableETDisable_save(){
 	$sock->getFrameWork('cmd.php?squid-reconfigure=yes');
 }
 
-
-function main_cache(){
-	include_once('ressources/charts.php');
-	
+function main_cache_list(){
 	$squid=new squidbee();
 	$usermenus=new usersMenus();
 	$page=CurrentPageName();
+	$tpl=new templates();
 	$sock=new sockets();
 	$cacheinfo=unserialize(base64_decode($sock->getFrameWork("cmd.php?squid-cache-infos=yes")));
 	
@@ -559,7 +560,14 @@ function main_cache(){
 				<td valign='top'>$pourc</td>
 			</tr>
 			<tr>
-				<td valign='top' style='font-size:10px' align='right'><i>{used}:$currentsize</i></td>
+				<td valign='top' style='font-size:10px' align='right'>
+					<table style='width:100%'>
+					<tr>
+					<td align='right'><i>{used}:$currentsize</i>&nbsp;</td>
+					<td width=1%>".imgtootltip("ed_delete.gif","{delete}","DeleteCache('$path')")."</td>
+					</tr>
+					</table>
+				</td>
 			</tr>			
 			<tr>
 				<td valign='top'><hr></td>
@@ -573,8 +581,21 @@ function main_cache(){
 		</tr>		
 		</table>";
 		
-	}
+	}	
 	
+	
+	echo $tpl->_ENGINE_parse_body($stats);
+	
+}
+
+
+function main_cache(){
+	
+	
+
+$squid=new squidbee();
+	$usermenus=new usersMenus();
+	$page=CurrentPageName();	
 						
 
 
@@ -672,6 +693,7 @@ $cache_settings="
 		}
 		
 	LoadAjax('cached_sites_infos','squid.cached.sitesinfos.php?sites-list=yes');	
+	LoadAjax('liste-des-caches','$page?liste-des-caches=yes');
 	</script>
 	
 
@@ -682,7 +704,7 @@ $html="$tab
 <H5>{cache_title}</H5>
 <table style='width:100%'>
 <tr>
-<td valign='top'>$stats</td>
+<td valign='top'><div id='liste-des-caches'>$stats</div></td>
 <td valign='top'>$cache_settings</td>
 </tr>
 </table>";
@@ -1304,22 +1326,20 @@ function changecache_js(){
 	$tpl=new templates();
 	$title=$tpl->_ENGINE_parse_body('{change_main_cache_path}','squid.index.php');
 	$html="
-	
 	var Original_path='$main_path';
+	
+	
 	function changeCacheIndex(){
-		document.getElementById('cache_graph').innerHTML='';
 		YahooWin(500,'$page?changecache-popup=$main_path','$title');
+		}
 	
-	}
 	
-	changeCacheIndex();
 	
-var x_SaveNewChache= function (obj) {
-	var tempvalue=obj.responseText;
-	if(tempvalue.length>0){alert(tempvalue)};
-	YAHOO.example.container.dialog1.hide();
-	LoadAjax('squid_main_config','squid.newbee.php?main=cache&hostname=')
-}	
+	var x_SaveNewChache= function (obj) {
+		var tempvalue=obj.responseText;
+		if(tempvalue.length>0){alert(tempvalue)};
+		RefreshTab('squid_main_config');
+	}	
 	
 	function SaveNewChache(){
 		var XHR = new XHRConnection();
@@ -1327,7 +1347,10 @@ var x_SaveNewChache= function (obj) {
 		XHR.appendData('OldCache','$main_path');
 		document.getElementById('changecachediv').innerHTML='<center><img src=\"img/wait_verybig.gif\"></center>';
 		XHR.sendAndLoad('$page', 'GET',x_SaveNewChache);		
-		}";
+		}
+		
+		
+changeCacheIndex();";
 	echo $html;
 }
 
@@ -1811,6 +1834,8 @@ function cache_delete(){
 	unset($squid->cache_list[$_GET["DeleteCache"]]);
 	$squid->SaveToLdap();
 	$squid->SaveToServer();
+	$sock=new sockets();
+	$sock->getFrameWork("cmd.php?squid-restart-now=yes");
 	
 }
 

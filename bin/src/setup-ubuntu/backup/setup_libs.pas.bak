@@ -1383,11 +1383,12 @@ begin
 
     l:=TstringList.Create;
     if not FileExists('/tmp/packages.list') then begin
-         writeln('Checking.............: something wrong export file is under 10 rows ??! restart again...');
+       writeln('Checking.............: something wrong export file is under 10 rows ??! restart again...');
        fpsystem('/bin/rm -rf /tmp/packages.list');
        result:=RPM_is_application_installed(appname);
        exit;
     end;
+
     l.LoadFromFile('/tmp/packages.list');
 
 

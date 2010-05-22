@@ -104,6 +104,7 @@ class usersMenus {
 	var $HAMACHI_INSTALLED=true;
 	var $phpldapadmin_installed=false;
 	var $phpmyadmin_installed=false;
+	var $HOSTAPD_INSTALLED=false;
 	/* This licence must be used Only with Artica-for postfix */
 	var $ChartLicence="D1XFWGMEW9L.HSK5T4Q79KLYCK07EK";
 	/*you cannot use it without any authorizations of maani.us.
@@ -594,6 +595,8 @@ class usersMenus {
 			$this->SQUIDGUARD_BINVER=$_GLOBAL["SQUIDGUARD_BINVER"];
 			$this->SQUIDGUARD_BIN_PATH=$_GLOBAL["SQUIDGUARD_BIN_PATH"];
 			$this->SQUID_BIN_PATH=$_GLOBAL["SQUID_BIN_PATH"];
+			$this->HOSTAPD_INSTALLED=$_GLOBAL["HOSTAPD_INSTALLED"];
+			$this->WPA_SUPPLIANT_INSTALLED=$_GLOBAL["WPA_SUPPLIANT_INSTALLED"];
 			
 			if($this->SAMBA_INSTALLED){
 				if($this->LOCAL_SID==null){
@@ -1244,7 +1247,16 @@ private function roundcube_detect_version(){
 		if(($this->AsOrgAdmin) or ($this->AllowAddUsers)){
 			if($OU<>null){
 				if(strlen($OU)>13){$OU_TEXT=substr($OU,0,10).'...';}else{$OU_TEXT=$OU;}
-				$array[$OU_TEXT]="javascript:Loadjs('domains.manage.org.index.php?js=yes&ou=$OU');";}
+				$array[$OU_TEXT]["MAIN"]="javascript:Loadjs('domains.manage.org.index.php?js=yes&ou=$OU');";
+				$array[$OU_TEXT]["SUB"]["{main_parameters}"]="javascript:Loadjs('domains.manage.org.index.php?js=yes&ou=$OU');";
+				$array[$OU_TEXT]["SUB"]["{add_user}"]="javascript:Loadjs('domains.add.user.php?ou=$OU');";
+				$array[$OU_TEXT]["SUB"]["{members}"]="javascript:Loadjs('domains.manage.org.index.php?finduser-js=es&ou=$OU');";
+				$array[$OU_TEXT]["SUB"]["{groups}"]="javascript:Loadjs('domains.edit.group.php?ou=$OU&js=yes');";
+				$array[$OU_TEXT]["SUB"]["{search}"]="javascript:Loadjs('domains.find.user.php?ou=$OU');";
+			}
+				
+				
+				
 			
 		}
 		
@@ -1252,6 +1264,7 @@ private function roundcube_detect_version(){
 			$array["system"]["MAIN"]="javascript:Loadjs('system.index.php?js=yes')";
 			$array["system"]["SUB"]["{left_menu_internal_hard_drives}"]="javascript:Loadjs('system.internal.disks.php')";
 			$array["system"]["SUB"]["{left_menu_net_settings}"]="javascript:Loadjs('system.nic.config.php?js=yes')";
+			if($sock->GET_INFO("WifiCardOk")==1){$array["system"]["SUB"]["WIFI"]="javascript:Loadjs('system.wifi.php')";}
 			if($this->dhcp_installed){
 				$array["system"]["SUB"]["{APP_DHCP}"]="javascript:Loadjs('index.gateway.php?index_dhcp=yes')";
 			}
@@ -1262,13 +1275,14 @@ private function roundcube_detect_version(){
 			
 		if($this->AsSambaAdministrator==true){if($this->SAMBA_INSTALLED){
 			$array["{fileshare}"]["MAIN"]="javascript:Loadjs('fileshares.index.php?js=yes')";}
-			$array["{fileshare}"]["SUB"]["{main_settings}"]="javascript:Loadjs('samba.index.php?script=smbpop');";
+			$array["{fileshare}"]["SUB"]["{main_parameters}"]="javascript:Loadjs('samba.index.php?script=smbpop');";
 			$array["{fileshare}"]["SUB"]["{SHARE_FOLDER}"]="javascript:Loadjs('SambaBrowse.php');";
 			$array["{fileshare}"]["SUB"]["{computers}"]="javascript:Loadjs('computer-browse.php');";
 		}
 		if($this->AsSystemAdministrator==true){if($this->PUREFTP_INSTALLED){$array["{fileshare}"]="javascript:Loadjs('fileshares.index.php?js=yes')";}}
 		if($this->SQUID_INSTALLED==true){if($this->AsSquidAdministrator==true){
 			$array["{web_proxy}"]["MAIN"]="javascript:Loadjs('squid.newbee.php?yes')";
+			$array["{web_proxy}"]["SUB"]["{main_parameters}"]="javascript:Loadjs('squid.newbee.php?yes')";
 			if($this->DANSGUARDIAN_INSTALLED){
 				$array["{web_proxy}"]["SUB"]["{DANSGUARDIAN_RULES}"]="javascript:Loadjs('dansguardian.index.php?js=yes')";
 
@@ -1289,13 +1303,14 @@ private function roundcube_detect_version(){
 		if($this->POSTFIX_INSTALLED){
 			if($this->AsPostfixAdministrator==true){
 				$array["{messaging}"]["MAIN"]="javascript:Loadjs('postfix.index.php')";
-				$array["{messaging}"]["SUB"]["{postfix_events}"]="s_PopUp(\"postfix.events.php?pop=true\",450,400)";
+				$array["{messaging}"]["SUB"]["{main_parameters}"]="javascript:Loadjs('postfix.index.php')";
+				
 				if($this->AMAVIS_INSTALLED){
 					if($sock->GET_INFO("EnableAmavisDaemon")==1){
 						$array["{messaging}"]["SUB"]["{APP_AMAVIS}"]="javascript:Loadjs('amavis.index.php?ajax=yes')";
 					}
 				}
-				
+				$array["{messaging}"]["SUB"]["{postfix_events}"]="s_PopUp(\"postfix.events.php?pop=true\",450,400)";
 				
 			}
 		
@@ -1381,7 +1396,7 @@ private function roundcube_detect_version(){
 		}
 		
 		$html[]="</u></div>
-				<script>
+		<script>
 		jQuery().ready(function(){	
 			jQuery('#navigation').accordion({
 			active: false,
@@ -1395,121 +1410,7 @@ private function roundcube_detect_version(){
 		</script>";
 		return implode("\n",$html);
 		
-		$html[]="<div>
-<ul id=\"navigation\">
-
-				<li>
-					<a class=\"head\" href=\"?p=1.1.1\">Guitar</a>
-					<ul>
-						<li><a href=\"?p=1.1.1.1\">Electric</a></li>
-						<li><a href=\"?p=1.1.1.2\">Acoustic</a></li>
-						<li><a href=\"?p=1.1.1.3\">Amps</a></li>
-						<li><a href=\"?p=1.1.1.4.1\">Effects A</a></li>
-
-						<li><a href=\"?p=1.1.1.4.2\">Effects B</a></li>
-						<li><a href=\"?p=1.1.1.4.3\">Effects C</a></li>
-						<li><a href=\"?p=1.1.1.4.4\">Effects D</a></li>
-						<li><a href=\"?p=1.1.1.5\">Accessories</a></li>
-					</ul> 
-				</li>
-				<li>
-
-					<a class=\"head\" href=\"?p=1.1.2\">Bass</a>
-					<ul>
-						<li><a href=\"?p=1.1.2.1\">Electric</a></li>
-						<li><a href=\"?p=1.1.2.2\">Acoustic</a></li>
-						<li><a href=\"?p=1.1.2.3\">Amps</a></li>
-						<li><a href=\"?p=1.1.2.4\">Effects</a></li>
-
-						<li><a href=\"?p=1.1.2.5\">Accessories</a></li>
-					</ul> 
-				</li>
-				<li>
-					<a class=\"head\" href=\"?p=1.1.3\">Drums</a>
-					<ul>
-						<li><a href=\"?p=1.1.3.2\">Acoustic Drums</a></li>
-						<li><a href=\"?p=1.1.3.3\">Electronic Drums</a></li>
-
-						<li><a href=\"?p=1.1.3.4\">Cymbals</a></li>
-						<li><a href=\"?p=1.1.3.5\">Hardware</a></li>
-						<li><a href=\"?p=1.1.3.6\">Accessories</a></li>
-					</ul> 
-				</li>
-			</ul>
-		</div>		
-		
-
-		
-		";
-		return implode("\n",$html);
-		
-		
-		
-		$w="100%";
-		$html="<div class=navig>";
-		$html=$html . "<table width=\"$w\" cellspacing=\"0\" cellpadding=\"10\" border=\"0\">";
-		$tpl=new templates();
-		while (list ($num, $ligne) = each ($master_array) ){
-			
-			
-			$id=md5($num.$ligne);
-			
-			
-			
-			$master_js="onclick=\"LeftMenusSwitch('{$id}_menubox', '{$id}_menubullet')\"";
-			if(strpos($ligne,'vascript')>0){
-				$ligne=str_replace("javascript:","",$ligne);
-				$master_js="onclick=\"javascript:document.getElementById('{$id}_menubullet').src='ajax-menus-loader.gif';
-				$ligne;setTimeout('Rebullet(\'{$id}_menubullet\')',1800)\"";
-				$master_js=str_replace("#bullet#","&bullet-id=$id",$master_js);
-			}
-			
-			$num=$tpl->_ENGINE_parse_body($num);
-			$num=str_replace(" ","&nbsp;",$num);
-			$html=$html. "
-			<tr>
-			<td id='nav'>
-				<div align=\"left\" style='width:$w'>
-					<input type='hidden' id='{$id}_menubox_link' value='$ligne'>
-					<a title=\"{$num}\" href=\"#\" $master_js>
-						<img src=\"img/fullbullet.gif\" name=\"{$id}_menubullet\" border=\"0\" id=\"{$id}_menubullet\"/ style='margin-right:5px'>{$num}</a>
-				</div>
-				<div id=\"{$id}_menubox\" align=\"left\" style='display:none;width:$w'>
-					<table width=\"$w\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\">
-				 	";
-			
-				$key=$this->BuildLefetMenusFoundSubmenubyPage($subarray,$ligne);
-				if($subarray[$key][$ligne]<>null){
-					while (list ($s_num, $s_ligne) = each ($subarray[$key] )){
-						$target="";
-						$s_ligne=str_replace("MAIN","{menus_left_main}",$s_ligne);
-						if(preg_match('#popup:(.+)#',$s_num,$re)){
-							$target=" target='_new'";
-							$s_num=$re[1];
-						}
-						
-
-						$html=$html . 
 	
-						"<tr>
-                    		<td id=\"subnav\"><a href='$s_num' $target>{$s_ligne}</a></td>
-                 		</tr>";
-					
-					
-					}}
-					
-				$html=$html . "
-				
-				</table>
-				</div>
-				</td>
-				</tr>";
-			
-		}
-		
-		$html=$html . "</table>
-		</div>";
-		return $html;
 	}
 	
 	

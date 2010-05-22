@@ -241,12 +241,17 @@ function logonForm(){
 	
 	$sock=new sockets();
 	$_SESSION["DisableSSHControl"]=trim($sock->GET_INFO("DisableSSHControl"));
-	$lang=DirFolders('ressources/language');
+	
 	unset($list["default"]);
 	unset($lang["po"]);
 	unset($lang["language"]);
-	$lang["po"]="Po-PT";
 	
+	$lang["en"]="English";
+	$lang["fr"]="Francais";
+	$lang["po"]="Portugues";
+	$lang["de"]="Deutsch";
+	$lang["es"]="Espanol";
+	$lang["it"]="Italiano";
 	
 	if($_COOKIE["artica-language"]==null){
 		$languageClass=new articaLang();

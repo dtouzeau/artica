@@ -17,6 +17,7 @@ if(preg_match("#--reload#",implode(" ",$argv))){$GLOBALS["RELOAD"]=true;}
 if(preg_match("#--only-test#",implode(" ",$argv))){$GLOBALS["ONLY_TESTS"]=true;}
 if(preg_match("#--no-umount#",implode(" ",$argv))){$GLOBALS["NO_UMOUNT"]=true;}
 if(preg_match("#--no-standard-backup#",implode(" ",$argv))){$GLOBALS["NO_STANDARD_BACKUP"]=true;}
+if(preg_match("#--no-reload#",implode(" ",$argv))){$GLOBALS["NO_RELOAD"]=true;}
 $GLOBALS["USE_RSYNC"]=false;
 
 if($argv[1]=="--restore-mbx"){
@@ -85,12 +86,15 @@ function buildcron(){
 	
 	while($ligne=@mysql_fetch_array($results,MYSQL_ASSOC)){
 		$schedule=$ligne["schedule"];
+		echo "Starting......: Backup $schedule\n";
 		$f[]="$schedule  ". LOCATE_PHP5_BIN()." ". __FILE__." {$ligne["ID"]} >/dev/null 2>&1";
 		
 	}
 	
-	@file_put_contents("/etc/artica/backup.tasks",@implode("\n",$f));
-	system("/etc/init.d/artica-postfix restart daemon");
+	@file_put_contents("/etc/artica-postfix/backup.tasks",@implode("\n",$f));
+	if(!$GLOBALS["NO_RELOAD"]){
+		system("/etc/init.d/artica-postfix restart daemon");
+	}
 	
 }
 

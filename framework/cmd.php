@@ -163,11 +163,21 @@ if(isset($_GET["cyr-restore-container"])){cyr_restore_container();;exit;}
 if(isset($_GET["cyr-restore-mailbox"])){cyr_restore_mailbox();;exit;}
 
 
+//WIFI
+
+if(isset($_GET["wifi-ini-status"])){WIFI_INI_STATUS();exit;}
+if(isset($_GET["wifi-connect-point"])){WIFI_CONNECT_AP();exit;}
+if(isset($_GET["wifi-eth-status"])){WIFI_ETH_STATUS();exit;}
+if(isset($_GET["wifi-eth-client-check"])){WIFI_ETH_CHECK();exit;}
+
 
 
 //SQUID
 
 if(isset($_GET["squid-status"])){SQUID_STATUS();exit;}
+if(isset($_GET["squid-ini-status"])){SQUID_INI_STATUS();exit;}
+if(isset($_GET["squid-restart-now"])){SQUID_RESTART_NOW();exit;}
+
 if(isset($_GET["Sarg-Scan"])){SQUID_SARG_SCAN();exit;}
 if(isset($_GET["squid-GetOrginalSquidConf"])){squid_originalconf();exit;}
 if(isset($_GET["MalwarePatrol"])){MalwarePatrol();exit;}
@@ -258,6 +268,10 @@ if(isset($_GET["restart-apache-no-timeout"])){RestartApacheNow();exit;}
 //network
 if(isset($_GET["SaveNic"])){Reconfigure_nic();exit;}
 if(isset($_GET["dnslist"])){DNS_LIST();exit;}
+
+//WIFI
+if(isset($_GET["iwlist"])){iwlist();exit;}
+if(isset($_GET["start-wifi"])){start_wifi();exit;}
 
 //imapSYnc
 
@@ -657,6 +671,15 @@ function SQUID_STATUS(){
 	exec("/usr/share/artica-postfix/bin/artica-install --squid-status",$results);
 	echo "<articadatascgi>". implode("\n",$results)."</articadatascgi>";
 }
+function SQUID_INI_STATUS(){
+	exec(LOCATE_PHP5_BIN2()." /usr/share/artica-postfix/exec.status.php --all-squid",$results);
+	echo "<articadatascgi>". base64_encode(implode("\n",$results))."</articadatascgi>";
+}
+function WIFI_INI_STATUS(){
+	exec(LOCATE_PHP5_BIN2()." /usr/share/artica-postfix/exec.status.php --wifi",$results);
+	echo "<articadatascgi>". base64_encode(implode("\n",$results))."</articadatascgi>";	
+}
+
 
 function SQUID_FORCE_UPGRADE(){
 	sys_THREAD_COMMAND_SET( "/usr/share/artica-postfix/bin/artica-make APP_SQUID --reconfigure");
@@ -3328,7 +3351,42 @@ function cicap_reload(){
 	sys_THREAD_COMMAND_SET("/usr/share/artica-postfix/bin/artica-install --c-icap-reload");
 }
 
+function SQUID_RESTART_NOW(){
+	shell_exec("/etc/init.d/artica-postfix restart squid-cache");
+}
 
+function iwlist(){
+	shell_exec(LOCATE_PHP5_BIN2()." /usr/share/artica-postfix/exec.wifi.detect.cards.php --iwlist");
+}
+function WIFI_CONNECT_AP(){
+	exec(LOCATE_PHP5_BIN2()." /usr/share/artica-postfix/exec.wifi.detect.cards.php --ap",$r);	
+	echo "<articadatascgi>".  base64_encode(implode("\n",$r))."</articadatascgi>";	
+}
+function start_wifi(){
+	shell_exec("/etc/init.d/artica-postfix start wifi");
+}
+
+function WIFI_ETH_STATUS(){
+	$unix=new unix();
+	$eth=$unix->GET_WIRELESS_CARD();
+	if($eth==null){
+		writelogs_framework("NO eth card found",__FUNCTION__,__FILE__,__LINE__);
+		return null;
+	}
+	$wpa_cli=$unix->find_program("wpa_cli");
+	if($wpa_cli==null){
+		writelogs_framework("NO wpa_cli found",__FUNCTION__,__FILE__,__LINE__);
+		return null;
+	}
+	exec("$wpa_cli -p/var/run/wpa_supplicant status -i{$eth}",$results);
+	writelogs_framework(count($results)." lines",__FUNCTION__,__FILE__,__LINE__);
+	$conf="[IF]\neth=$eth\n".implode("\n",$results);
+	echo "<articadatascgi>".  base64_encode($conf)."</articadatascgi>";	
+}
+function WIFI_ETH_CHECK(){
+	exec(LOCATE_PHP5_BIN2()." /usr/share/artica-postfix/exec.wifi.detect.cards.php --checkap",$r);
+	echo "<articadatascgi>".  base64_encode(implode("\n",$r))."</articadatascgi>";	
+}
 
 
 ?>

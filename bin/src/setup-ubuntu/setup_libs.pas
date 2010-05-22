@@ -1358,8 +1358,10 @@ fpsystem('/usr/share/artica-postfix/bin/artica-install -awstats-reconfigure');
 fpsystem('/usr/share/artica-postfix/bin/artica-install -awstats generate');
 fpsystem('/etc/init.d/artica-postfix stop');
 fpsystem('/etc/init.d/artica-postfix start');
+fpsystem('/etc/init.d/artica-postfix start all');
 fpsystem('/etc/init.d/artica-postfix stop');
 fpsystem('/etc/init.d/artica-postfix start');
+fpsystem('/etc/init.d/artica-postfix start all');
 fpsystem('/usr/share/artica-postfix/bin/artica-install --init-from-repos');
 end;
 //#########################################################################################

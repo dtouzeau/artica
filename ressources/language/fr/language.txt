@@ -132,6 +132,7 @@ Ajouter une liste : exe,pif,bat,doc</add_attachment_blocking_text_explain>
 <add_member>Ajouter un membre</add_member>
 <add_member_to_group>Ajouter un membre &agrave; ce groupe</add_member_to_group>
 <add_new_account>Ajouter un nouveau compte</add_new_account>
+<add_new_cached_web_site>Ajouter un nouveau site web en cache</add_new_cached_web_site>
 <add_new_class>Ajoutez une nouvelle classe de restriction</add_new_class>
 <add_new_contact>Ajouter un nouveau contact</add_new_contact>
 <add_new_contact_text>D&eacute;finir un nouveau contact dans votre carnet d'adresses</add_new_contact_text>
@@ -326,7 +327,7 @@ Contrairement aux autres syt&egrave;mes de r&eacute;partition de charge, l'agg&e
 <APP_DAR_MANAGER>Gestionnaire d'Archive de disques</APP_DAR_MANAGER>
 <APP_DHCP>Serveur DHCP</APP_DHCP>
 <APP_DHCP_EVENTS>Ev&egrave;nements du serveur DHCP</APP_DHCP_EVENTS>
-<APP_DHCP_MAIN_CONF>fichier de configuration principal du serveur DHCP</APP_DHCP_MAIN_CONF>
+<APP_DHCP_MAIN_CONF>Configuration principale du serveur DHCP</APP_DHCP_MAIN_CONF>
 <APP_DHCP_MAIN_CONF_TEXT>Afficher le fichier g&eacute;n&eacute;r&eacute;</APP_DHCP_MAIN_CONF_TEXT>
 <APP_DHCP_ROUTES_CONF>Information de routage dans DHCP</APP_DHCP_ROUTES_CONF>
 <APP_DHCP_ROUTES_CONF_TEXT>Ajoutez les informations de routage dans les param&egrave;tres du serveur DHCP afin de les attribuer aux clients</APP_DHCP_ROUTES_CONF_TEXT>
@@ -504,6 +505,7 @@ Squid optimise donc de fa&ccedil;on cons&eacute;quente le flux de donn&eacute;es
 <APP_USB>Stockage Usb</APP_USB>
 <APP_VMTOOLS>Outils VMWare</APP_VMTOOLS>
 <APP_WINEXE>Ex&eacute;cution windows distante</APP_WINEXE>
+<APP_WPA_SUPPLIANT>WPA Supplicant</APP_WPA_SUPPLIANT>
 <APP_XAPIAN>Librairie de recherche Xapian</APP_XAPIAN>
 <APP_XAPIAN_OMEGA>Indexeur Xapian</APP_XAPIAN_OMEGA>
 <APP_XAPIAN_PHP>Librairie PHP Xapian</APP_XAPIAN_PHP>
@@ -666,6 +668,7 @@ Si un chemin d'acc&egrave;s est fix&eacute; artica ex&eacute;cute r&eacute;guli&
 <BCC_help>Envoyez une copie du message au destinataire sp&eacute;cifi&eacute;.[br]
 Si de multiples actions BCC sont pr&eacute;cis&eacute;es dans la m&ecirc;me transaction SMTP MAIL, [br]seule la derni&egrave;re sera utilis&eacute;e.</BCC_help>
 <birthDate>date anniversaire</birthDate>
+<bits_rate>Taux de transferts</bits_rate>
 <black list>Liste Noire</black list>
 <black list explain>G&eacute;rer la liste de groupe des adresses interdites. [br]Les messages de ces adresses sont automatiquement v&eacute;rifi&eacute;es comme Spam</black list explain>
 <black_lists>Moteurs de listes noires</black_lists>
@@ -786,6 +789,7 @@ The relay_domains_reject_code parameter specifies the response code for rejected
 <check_sender_ns_access>v&eacute;rifier l'acc&egrave;s dns de l'exp&eacute;diteur</check_sender_ns_access>
 <check_sender_ns_access_text>Search the specified rule for the DNS servers for the MAIL FROM address, and execute the corresponding action. [br]
 [strong]Note: a result of "ACCEPT" is not allowed for safety reasons. Instead, use DUNNO in order to exclude specific hosts from blacklists[/strong]</check_sender_ns_access_text>
+<check_wifi_card>Check WIFI Network settings</check_wifi_card>
 <choose>Choisir</choose>
 <choose_org>Choisir l'organisation</choose_org>
 <city>Ville</city>
@@ -849,6 +853,7 @@ The default is accept message.
 <compile_statistics>Statistiques de compilation</compile_statistics>
 <compile_statistics_text>Ex&eacute;cuter des statistiques en vue d'obtenir les derniers &eacute;v&eacute;nements et graphiques</compile_statistics_text>
 <compiling>Compiler</compiling>
+<COMPLETED>Connect&eacute;</COMPLETED>
 <computer>ordinateur</computer>
 <computers>ordinateurs</computers>
 <computers_management>Administration des ordinateurs</computers_management>
@@ -926,6 +931,7 @@ Vous avez besoin de tester cette fonctionnalit&eacute;.[br]Parfois cpulimit effe
 <credentials_informations>Compte utilisateur et mots de passe</credentials_informations>
 <credentials_informations_text>Indiquez le compte et les mots de passe afin d'autoriser cet ordinateur &agrave; ce connecter au domaine ou d'autoriser Artica &agrave; se connecter dessus.</credentials_informations_text>
 <cron>cron</cron>
+<crypted>Chiffr&eacute;</crypted>
 <Cured>Courant</Cured>
 <CURLE_COULDNT_CONNECT>Impossible de se connecter au serveur distant ou au proxy</CURLE_COULDNT_CONNECT>
 <CURLE_COULDNT_RESOLVE_HOST>Impossible de r&eacute;soudre l'ordinateur distant</CURLE_COULDNT_RESOLVE_HOST>
@@ -1070,6 +1076,7 @@ Vous pouvez ajouter des privil&egrave;ges de groupe afin d'autoriser certains ut
 <disk>Disque dur</disk>
 <disks_usage>Utilisation disque</disks_usage>
 <disk_name>Nom du disque</disk_name>
+<display>display</display>
 <displayname>nom d'affichage</displayname>
 <display_product_events>Affichage du produit &eacute;v&eacute;nements</display_product_events>
 <display_queries_list>Afficher les requ&ecirc;tes</display_queries_list>
@@ -1219,6 +1226,7 @@ Cette fonctionnalit&eacute; est &quot;ergonomique&quot;. [br]Si vous la rendez i
 <enable_ssl>Activer SSL</enable_ssl>
 <enable_this_filter>Activer ce filtre</enable_this_filter>
 <enable_this_option>Activer cette fonctionnalit&eacute;</enable_this_option>
+<enable_wifi_ap>Activez le mode client WIFI</enable_wifi_ap>
 <enable_xapian_indexing>Activez le moteur d'indexation Xapian</enable_xapian_indexing>
 <enable_xapian_indexing_text>Si cette fonctionnalit&eacute; est activ&eacute;e, Artica va indexer les fichiers sauvegard&eacute;s dans les dossiers partag&eacute;s afin de fournir une moteur de recherche &agrave; vos utilisateurs comme Google.</enable_xapian_indexing_text>
 <ENABLE_ZARAFA_COMPANY>Activer Zarafa pour cette organisation</ENABLE_ZARAFA_COMPANY>
@@ -1340,6 +1348,8 @@ L'op&eacute;ration d'affichage est annul&eacute;e.</error_no_datas>
 <ERR_NO_PASS_MATCH>Erreur: les mots de passe des champs ne correspondent pas.</ERR_NO_PASS_MATCH>
 <ERR_NO_USERNAME>Erreur: Indiquez un nom d'utilisateur avant de soumettre</ERR_NO_USERNAME>
 <ERR_SET_QUOTA_SUCCESS>Quota d&eacute;finie avec succ&egrave;s</ERR_SET_QUOTA_SUCCESS>
+<ESSID>Point d'acc&egrave;s</ESSID>
+<ESSID_CONNECT_PASSWORD>Donnez le mot de passe pour la clef de chiffrement ou laissez le champ vide dans le cas contraire.[br]D&eacute;finissez les param&egrave;tres r&eacute;seaux de la carte WIFI afin d'&eacute;tablir la connexion au point d'acc&egrave;s.</ESSID_CONNECT_PASSWORD>
 <etc_hosts>Fichier d'h&ocirc;tes</etc_hosts>
 <etc_hosts_explain>Le fichier hosts est un fichier utilis&eacute; par le syst&egrave;me d'exploitation d'un ordinateur lors de l'acc&egrave;s &agrave; Internet. [br]Son r&ocirc;le est d'associer des noms d'h&ocirc;tes &agrave; des adresses IP.[br] Lors de l'acc&egrave;s &agrave; un ressource r&eacute;seau par nom de domaine, ce fichier est consult&eacute; avant l'acc&egrave;s au serveur DNS et permet au syst&egrave;me de conna&icirc;tre l'adresse IP associ&eacute;e au nom de domaine sans avoir recours &agrave; une requ&ecirc;te DNS.</etc_hosts_explain>
 <etc_hosts_text>Le fichier hosts est un fichier utilis&eacute; par le syst&egrave;me d'exploitation d'un ordinateur lors de l'acc&egrave;s &agrave; Internet.</etc_hosts_text>
@@ -1358,6 +1368,7 @@ L'op&eacute;ration d'affichage est annul&eacute;e.</error_no_datas>
 <Exit_delay_in_seconds>D&eacute;lais  de sortie (en secondes)</Exit_delay_in_seconds>
 <expired>Expir&eacute;e</expired>
 <expire_date>Date d'expiration</expire_date>
+<expire_time>Temps expir&eacute;</expire_time>
 <explain 1>Donner le domaine de messagerie (apr&egrave;s @ de vos boites aux lettres)</explain 1>
 <explorer>explorateur</explorer>
 <explorer_browse_yours_files>Parcourez vos fichiers et vos ressources autoris&eacute;es</explorer_browse_yours_files>
@@ -1516,7 +1527,7 @@ activer ou d&eacute;sactiver cette fonctionnalit&eacute;.</group_behavior_text>
 <hd_stat>Performances Disque</hd_stat>
 <Header Field>Champ d'en-t&ecirc;te</Header Field>
 <header_address_token_limit>Nombre Max d'adresses autoris&eacute;es</header_address_token_limit>
-<header_address_token_limit_text>Nombre maximum d'adresses autoris&eacute;es dans une en-t&ecirc;te SMTP. Les adresses au-del&agrave; de cette limite seront effac&eacute;es.</header_address_token_limit_text>
+<header_address_token_limit_text>Nombre maximum d'adresses autoris&eacute;es dans une en-t&ecirc;te SMTP.</header_address_token_limit_text>
 <header_rule>r&egrave;gle d'en-t&ecirc;te</header_rule>
 <help>aide</help>
 <HELP_ME_RETRANSLATOR>Aidez moi &agrave; configurer</HELP_ME_RETRANSLATOR>
@@ -1577,6 +1588,7 @@ It send notifications to recipients in order to allow them to "download" attache
 <import_artica_computers_list_text>Importer une liste d'ordinateur depuis une liste texte</import_artica_computers_list_text>
 <import_sub_branch>D&eacute;marrer l'importation &agrave; partir de la sous-branche</import_sub_branch>
 <in>dans</in>
+<INACTIVE>Inactif</INACTIVE>
 <inbox_junk>Courriers ind&eacute;sirables</inbox_junk>
 <inbox_sent>&eacute;l&eacute;ments envoy&eacute;s</inbox_sent>
 <inbox_trash>Corbeille</inbox_trash>
@@ -1847,6 +1859,7 @@ With the default 100 SMTP server process limit, "in flow delay as 1s" limits the
 <license_expired>La licence est expir&eacute;e</license_expired>
 <license_info>Information de Licence</license_info>
 <license_info_text>Afficher la licence et mettez la &agrave; jour</license_info_text>
+<limit>limite</limit>
 <lines>lignes</lines>
 <link_hard_drive>Connecter un disque dur</link_hard_drive>
 <link_hard_drive_confirm>Confirmez-vous la connexion de ce disque dur &agrave; cet objet ?</link_hard_drive_confirm>
@@ -1944,6 +1957,7 @@ The message delivery transport name is the first field in the entry in the maste
 <main.cf_explain>Lire le  fichier principal de configuration g&eacute;n&eacute;r&eacute; et ex&eacute;cut&eacute; par Postfix</main.cf_explain>
 <maintenance>maintenance</maintenance>
 <main_interfaces>Interfaces principales</main_interfaces>
+<main_parameters>Config. g&eacute;n&eacute;rale</main_parameters>
 <main_settings>Configuration g&eacute;n&eacute;rale</main_settings>
 <main_settings_samba>Param&egrave;tres globaux</main_settings_samba>
 <main_settings_text>D&eacute;finir les param&egrave;tres principaux du logiciel, personnaliser les d&eacute;mons et r&eacute;gler les performances des processus</main_settings_text>
@@ -2010,6 +2024,7 @@ See also "queue run delay".[/i]
 <maximal_queue_lifetime_text>Le temps maximal qu'un message est mis en fil d'attente avant qu'il ne soit renvoy&eacute; comme &quot;non-d&eacute;livrable&quot;.[br]
 [strong]Unit&eacute;s: s (secondes), m (minutes),h (heures), d (jours),w (semaines).[/strong].[br]
 La valeur par d&eacute;faut est d.[br]Sp&eacute;cifiez 0 si vous d&eacute;sirez que le message ne soit mise en attente qu'une seule fois.</maximal_queue_lifetime_text>
+<maximal_time>Temps Max</maximal_time>
 <maximum>Maximum</maximum>
 <MaxReqLength>Limite du scan par taille</MaxReqLength>
 <MaxReqLength_text>Taille maximum des objets &agrave; analyser (defaut: 5Mb = 5120000)</MaxReqLength_text>
@@ -2039,8 +2054,8 @@ La valeur par d&eacute;faut est d.[br]Sp&eacute;cifiez 0 si vous d&eacute;sirez 
 <messages_restriction_text>Tous les param&egrave;tres qui limitent les e-mails sur des formats, taille ...</messages_restriction_text>
 <message_id>ID de Message</message_id>
 <message_limit>Limite de Messages</message_limit>
-<message_size_limit>taille limite de message</message_size_limit>
-<message_size_limit_text>Taille maximale en octets d'un message, y compris les informations d'enveloppe</message_size_limit_text>
+<message_size_limit>Taille maximale des messages</message_size_limit>
+<message_size_limit_text>C'est Taille maximale d'un message, y compris les informations d'enveloppe que le relais accepte</message_size_limit_text>
 <message_usage>Utilisation de Messagerie</message_usage>
 <messaging>Messagerie</messaging>
 <messaging_service>Service de messagerie</messaging_service>
@@ -2055,6 +2070,7 @@ This parameter also limits the time an unreachable destination is kept in the sh
 [i]This parameter should be set greater than or equal to  "queue run delay".[br] See also "maximal backoff time".[/i]
 [strong]Time units: s (seconds), m (minutes), h (hours), d (days), w (weeks). The default time unit is s (seconds).[/strong]
 </minimal_backoff_time_text>
+<minimal_time>Temps minimum</minimal_time>
 <minutes>minutes</minutes>
 <missing>il manque</missing>
 <mobile>t&eacute;l&eacute;phone portable</mobile>
@@ -2197,6 +2213,7 @@ The default is to use the local machine name, $myhostname, which defaults to the
 <no_backup>Pas de conteneur de sauvegarde</no_backup>
 <NO_CONFIG_FILE>Pas de configuration trouv&eacute;e</NO_CONFIG_FILE>
 <no_errors>Actuellement, il n'y a pas d'erreurs</no_errors>
+<NO_ESSID>Pas de Points d'acc&egrave;s d&eacute;tect&eacute;s !</NO_ESSID>
 <no_group>Pas de groupe</no_group>
 <no_group_affected>Aucun groupe affect&eacute;</no_group_affected>
 <no_icap_support>Pas de Support ICAP</no_icap_support>
@@ -2331,6 +2348,7 @@ or until further truncation is not possible.(eg:192.168.1.0/24)
 <pcfg_title1>Configuration de base</pcfg_title1>
 <pcfg_title2>Voir main.cf</pcfg_title2>
 <pcfg_title3>Voir master.cf</pcfg_title3>
+<percentage>Pourcentage</percentage>
 <performances_settings>Performances</performances_settings>
 <performances_settings_text>Tous les param&egrave;tres qui pourrait acc&eacute;l&eacute;rer les processus postfix</performances_settings_text>
 <perform_operation_ask>Ex&eacute;cuter cette op&eacute;ration ?</perform_operation_ask>
@@ -2399,7 +2417,7 @@ or when the address is an authorized destination (see "permit auth destination" 
 <POSTFIX_FILTERS>Filtres postfix</POSTFIX_FILTERS>
 <postfix_last_error>Dernier erreur postfix trouv&eacute;e</postfix_last_error>
 <postfix_last_errors>Derniers erreurs postfix/cyrus</postfix_last_errors>
-<postfix_main_settings>Param&egrave;tres main de Postfix</postfix_main_settings>
+<postfix_main_settings>Param&egrave;tres Postfix</postfix_main_settings>
 <POSTFIX_MULTI_INSTANCE>Multiples instances Postfix</POSTFIX_MULTI_INSTANCE>
 <POSTFIX_MULTI_INSTANCE_HOWTO>Lors de l'activation d'instances multiples Postfix, le processus principal sera d&eacute;sactiv&eacute; et n'&eacute;coutera que l'interface r&eacute;seau locale (127.0.0.1) afin de servir uniquement les services web.[br]
 Chaque organisation sera en mesure d'administrer leur propre instance serveur et la console web sera modifi&eacute;e afin de fournir cette fonctionnalit&eacute;</POSTFIX_MULTI_INSTANCE_HOWTO>
@@ -2464,6 +2482,7 @@ This is because Postfix needs to open lookup tables ahead of time, but the reade
 <qmgr_message_recipient_minimum>qmgr message recipient minimum</qmgr_message_recipient_minimum>
 <qmgr_message_recipient_minimum_text>The minimal number of in-memory recipients for any message. This takes priority over any other in-memory recipient limits (i.e., the global "qmgr message recipient limit" and the per "transport recipient limit") if necessary.[br]
 [strong]The minimum value allowed for this parameter is 1.[/strong]</qmgr_message_recipient_minimum_text>
+<quality>Qualit&eacute;</quality>
 <Quarantine>Quarantaine</Quarantine>
 <quarantine>Quarantaine</quarantine>
 <quarantinem>quarantaine</quarantinem>
@@ -2540,6 +2559,10 @@ Les bo&icirc;tes aux lettres d&eacute;j&agrave; cr&eacute;es ne seront pas impac
 <refresh>Rafraichir</refresh>
 <refresh time>temps de rafraichissement</refresh time>
 <refresh_database_each>Rafra&icirc;chir la base de donn&eacute;es toutes les</refresh_database_each>
+<refresh_pattern_max>Limite maximale d'un objet conserv&eacute; dans le cache</refresh_pattern_max>
+<refresh_pattern_min>Temps en minutes de r&eacute;tention o&ugrave; un objet qui n'a pas de temps d'expiration d&eacute;fini par le serveur web</refresh_pattern_min>
+<refresh_pattern_pourc>Pourcentage de r&eacute;tention de l'age des objets (calcul&eacute; sur temps depuis le dernier rafra&icirc;chissement)</refresh_pattern_pourc>
+<refresh_pattern_site>Donnez le nom du site web. Cela peut &ecirc;tre www.company.tm ou company.tm ou company.*</refresh_pattern_site>
 <regex_filter_explain> * caracter is supported. If you want to use regex operation, prepend the line width [code][b]REGEX:[b][/code]</regex_filter_explain>
 <region>R&eacute;gion</region>
 <register>Registre</register>
@@ -2730,6 +2753,7 @@ Lorsqu'un message arrive, Postfix enregistre le nom d'utilisateur fournit, la m&
 <saved_settings>Configuration sauvegard&eacute;e</saved_settings>
 <save_configuration_file>Sauvegarde de la configuration</save_configuration_file>
 <save_task>Sauvegarder la t&acirc;che</save_task>
+<SCANNING>Analyse</SCANNING>
 <scanning_your_network>Analyse en cours de vos r&eacute;seaux</scanning_your_network>
 <schedule>planification</schedule>
 <scheduled>planifi&eacute;</scheduled>
@@ -2762,7 +2786,7 @@ You can enable RBL RHSBL features in order to prevent spams
 <SECURITY_MODULES>Modules de s&eacute;curit&eacute;</SECURITY_MODULES>
 <security_rules>r&egrave;gles de s&eacute;curit&eacute;</security_rules>
 <security_rules_explain>Cette zone vous montre toutes les r&egrave;gles actives lorsque des mails passent par Postfix avant d'&ecirc;tre  envoy&eacute; au stockage du syst&egrave;me de messagerie</security_rules_explain>
-<security_rules_text>Edit your synthesis's [strong]SMTP rules[/strong] in one single page in order to view the scanning flow.</security_rules_text>
+<security_rules_text>Ouvrez la synth&egrave;se [b] des r&egrave;gles SMTP[/b] en une seule page afin de voir l'ordre du flux d'analyse.</security_rules_text>
 <see_conf>Voir la configuration cr&eacute;e</see_conf>
 <see_config>Voir le fichier cr&eacute;e</see_config>
 <select>s&eacute;lectionner</select>
@@ -3158,6 +3182,7 @@ by changing 5xx reply codes into 4xx. However, this option is no cure for addres
 <SQUID_NEWVERSION_TEXT>Une nouvelle version du proxy Internet SQUID est disponible. Il est conseill&eacute; de la mettre &agrave; jour.</SQUID_NEWVERSION_TEXT>
 <SQUID_NOT_COMPILED_NTLM_RUN_RECONFIGURE>Le proxy principale (SQUID) n'est pas compil&eacute; avec la directive NTLM, si vous voulez utiliser l'authentification &agrave; travers un domaine NT, vous devez mettre &agrave; jour SQUID.[br]
 Cliquez sur le bouton ci-dessous afin d'ordonner cette op&eacute;ration.</SQUID_NOT_COMPILED_NTLM_RUN_RECONFIGURE>
+<squid_refresh_pattern_explain>C'est la section permettant de d&eacute;finir la r&eacute;tention du cache pour un site web</squid_refresh_pattern_explain>
 <squid_sizelimit>Limite des requ&ecirc;tes</squid_sizelimit>
 <squid_status>Statut de Squid</squid_status>
 <srv_artica>Services d'Artica</srv_artica>
@@ -3607,6 +3632,7 @@ In the url the "%f" can be used to specify the real name of downloaded file</Vir
 <VirSaveDir_text>Le r&eacute;pertoire o&ugrave; se situent les fichiers t&eacute;l&eacute;charg&eacute;s[br]DOit &ecirc;tre un r&eacute;pertoire o&ugrave; le serveur web dispose d'un acc&egrave;s</VirSaveDir_text>
 <virtual_disks>Disques virtuels</virtual_disks>
 <virtual_interfaces>Interfaces virtuelles</virtual_interfaces>
+<virtual_memory>m&eacute;moire virtuelle</virtual_memory>
 <virus>virus</virus>
 <VIRUSES_FOUND>Codes malicieux trouv&eacute;(s) !</VIRUSES_FOUND>
 <VIRUSES_FOUND_TEXT>Des codes malicieux ont &eacute;t&eacute;s trouv&eacute;s dans votre serveur, v&eacute;rifiez les &eacute;v&egrave;nements afin d'afficher les d&eacute;tections.</VIRUSES_FOUND_TEXT>
@@ -3632,6 +3658,7 @@ Il offre aussi le filtrage de contenu avec un antivirus et le filtrage des pages
 <webserver_parameters_text>Activer/d&eacute;sactiver, personnalisez le serveur web d&eacute;di&eacute;</webserver_parameters_text>
 <website>Site Web</website>
 <websites>Sites Web</websites>
+<website_name>Nom du site</website_name>
 <web_filter>Filtrage web</web_filter>
 <web_proxy>Proxy Web</web_proxy>
 <web_proxy_text>Param&eacute;trer votre serveur Proxy</web_proxy_text>
@@ -3648,6 +3675,9 @@ Il offre aussi le filtrage de contenu avec un antivirus et le filtrage des pages
 <white list explain>Gestion de la liste des adresses.[br] Les messages de ces adresses ne sont pas v&eacute;rifi&eacute;es pour la pr&eacute;sence de spam</white list explain>
 <width>largeur</width>
 <width_action>largeur</width_action>
+<WifiConnectAPDisabled>Le mode client Wifi est d&eacute;sactiv&eacute;, aucune op&eacute;ration cliente n'est permise</WifiConnectAPDisabled>
+<WIFI_ARTICA_EXPLAIN>Cette section vous permet de configurer votre r&eacute;seau WIFI.[br]Si tous les modules n&eacute;cessaires sont install&eacute;s, vous serez en mesure de connecter ce serveur &agrave; un point d'acc&egrave;s ou le transformer en point d'acc&egrave;s.</WIFI_ARTICA_EXPLAIN>
+<wifi_networks>Points d'acc&egrave;s WIFI</wifi_networks>
 <will_deleted_apply_config>Effacer apr&egrave;s application de la configuration</will_deleted_apply_config>
 <winbindd_installed>D&eacute;mon Winbindd install&eacute;</winbindd_installed>
 <with>avec</with>

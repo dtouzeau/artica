@@ -14,12 +14,12 @@
 <i4>Supprimer les objets infect&eacute;s et leur conteneur</i4>
 <MailBases>Bases de mails</MailBases>
 <MailPlain>Plain text messages</MailPlain>
-<Recursion>Recursion scanning</Recursion>
+<Recursion>Analyse r&eacute;cursive</Recursion>
 <SCAN_ARCHIVES>Archives files</SCAN_ARCHIVES>
 <SCAN_PACKED>Scan packed files</SCAN_PACKED>
 <SelfExtArchives>Self-Extracting files</SelfExtArchives>
 <shares_access>Information d'acc&egrave;s</shares_access>
 <shares_access_text>D&eacute;finissez le compte utilisateur et le mot de passe afin d'&eacute;tablir une connexion r&eacute;seau sur l'ordinateur cible</shares_access_text>
-<START_SCAN_COMPUTER>Perfom scanning</START_SCAN_COMPUTER>
+<START_SCAN_COMPUTER>Lancer l'analyse</START_SCAN_COMPUTER>
 <START_SCAN_COMPUTER_TEXT>Lancez l'analyse antivirale sur l'ordinateur cible et tentez de d&eacute;tecter des codes malicieux.</START_SCAN_COMPUTER_TEXT>
 <SUCCESS_LAUNCH_SCAN_PC>The order has been successfully sent to the daemon to perform a background scan of this computer</SUCCESS_LAUNCH_SCAN_PC>

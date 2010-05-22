@@ -594,9 +594,9 @@ begin
    logs.Debuglogs('Starting......: reloading c-icap pid '+PID);
 
    if FileExists('/var/run/c-icap/c-icap.ctl') then begin
-   squid:=tsquid.Create;
-   logs.OutputCmd('echo -n "reconfigure"  > /var/run/c-icap/c-icap.ctl');
-   fpsystem(squid.SQUID_BIN_PATH()+' -k reconfigure');
+      squid:=tsquid.Create;
+      logs.OutputCmd('echo -n "reconfigure"  > /var/run/c-icap/c-icap.ctl');
+      fpsystem(squid.SQUID_BIN_PATH()+' -k reconfigure');
    end else begin
       logs.OutputCmd('/bin/kill -HUP ' + PID);
    end;
@@ -789,54 +789,14 @@ end;
 
 function tdansguardian.DANSGUARDIAN_STATUS():string;
 var
-ini:TstringList;
+  pidpath:string;
 begin
 if not FileExists(BIN_PATH()) then exit;
-
-   ini:=TstringList.Create;
-   ini.Add('[DANSGUARDIAN]');
-   ini.Add('service_name=APP_DANSGUARDIAN');
-   ini.Add('service_cmd=dansgardian');
-   ini.Add('remove_cmd=--dansguardian-remove');
-   ini.Add('master_version=' + DANSGUARDIAN_VERSION());
-
-
-   if SQUIDEnable=0 then begin
-      ini.Add('service_disabled=0');
-      result:=ini.Text;
-      SYS.MONIT_DELETE('APP_DANSGUARDIAN');
-      exit;
-   end;
-
-   if DansGuardianEnabled=0 then begin
-      ini.Add('service_disabled=0');
-      result:=ini.Text;
-      SYS.MONIT_DELETE('APP_DANSGUARDIAN');
-      exit;
-   end;
-
-
-   if SYS.MONIT_CONFIG('APP_DANSGUARDIAN','/var/run/dansguardian.pid','dansgardian') then begin
-   ini.Add('monit=1');
-   result:=ini.Text;
-   ini.free;
-   exit;
-   end;
-
-
-
-      if SYS.PROCESS_EXIST(DANSGUARDIAN_PID()) then ini.Add('running=1') else  ini.Add('running=0');
-      ini.Add('dansguardian_installed=1');
-      ini.Add('application_installed=1');
-      ini.Add('master_pid='+ DANSGUARDIAN_PID());
-      ini.Add('master_memory=' + IntToStr(SYS.PROCESS_MEMORY(DANSGUARDIAN_PID())));
-      ini.Add('status='+SYS.PROCESS_STATUS(DANSGUARDIAN_PID()));
-      ini.Add('service_disabled='+ IntToStr(DansGuardianEnabled));
-
-
-
-   result:=ini.Text;
-   ini.free;
+SYS.MONIT_CONFIG('APP_DANSGUARDIAN','/var/run/dansguardian.pid','dansgardian');
+pidpath:=logs.FILE_TEMP();
+fpsystem(SYS.LOCATE_PHP5_BIN()+' /usr/share/artica-postfix/exec.status.php --dansguardian >'+pidpath +' 2>&1');
+result:=logs.ReadFromFile(pidpath);
+logs.DeleteFile(pidpath);
 
 end;
 //##############################################################################
@@ -871,52 +831,20 @@ end;
 //##############################################################################
 function tdansguardian.C_ICAP_STATUS():string;
 var
-ini:TstringList;
-pid:string;
 pidpath:string;
 begin
-if not FileExists(C_ICAP_BIN_PATH()) then exit;
-pidpath:='/var/run/c-icap/c-icap.pid';
-ini:=TstringList.Create;
-ini.Add('[C-ICAP]');
-ini.Add('master_version='+C_ICAP_VERSION());
-ini.Add('service_name=APP_C_ICAP');
-ini.Add('service_cmd=cicap');
+ if not FileExists(C_ICAP_BIN_PATH()) then exit;
 
+  pidpath:=logs.FILE_TEMP();
+ fpsystem(SYS.LOCATE_PHP5_BIN()+' /usr/share/artica-postfix/exec.status.php --c-icap >'+pidpath +' 2>&1');
+ result:=logs.ReadFromFile(pidpath);
+ logs.DeleteFile(pidpath);
 
-   if SQUIDEnable=0 then begin
-      ini.Add('service_disabled=0');
-      result:=ini.Text;
-      SYS.MONIT_DELETE('APP_C_ICAP');
-      exit;
-   end;
-
-   if CicapEnabled=0 then begin
-      ini.Add('service_disabled=0');
-      result:=ini.Text;
-      SYS.MONIT_DELETE('APP_C_ICAP');
-      exit;
-   end;
-
-
-   if SYS.MONIT_CONFIG('APP_C_ICAP',pidpath,'cicap') then begin
-   ini.Add('monit=1');
-   result:=ini.Text;
-   ini.free;
-   exit;
-   end;
-
-
-
-      pid:=C_ICAP_PID();
-      if SYS.PROCESS_EXIST(pid) then ini.Add('running=1') else  ini.Add('running=0');
-      ini.Add('application_installed=1');
-      ini.Add('master_pid='+ pid);
-      ini.Add('master_memory=' + IntToStr(SYS.PROCESS_MEMORY(pid)));
-      ini.Add('status='+SYS.PROCESS_STATUS(pid));
-      ini.Add('service_disabled='+ IntToStr(CicapEnabled));
-      result:=ini.Text;
-      ini.free;
+ if CicapEnabled=0 then begin
+ SYS.MONIT_DELETE('APP_C_ICAP');
+ exit;
+ end;
+ SYS.MONIT_CONFIG('APP_C_ICAP','/var/run/c-icap/c-icap.pid','cicap');
 
 end;
 //##############################################################################

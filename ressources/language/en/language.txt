@@ -3689,3 +3689,22 @@ Note that unwriteable directories are shown as usual.</hide_unwriteable_files_te
 <refresh_pattern_pourc>percentage of the objects age (time since last modification age) an object without explicit expire time will be considered fresh.</refresh_pattern_pourc>
 <maximal_time>Maximal time</maximal_time>
 <refresh_pattern_max>upper limit on how long objects without an explicit expiry time will be considered fresh</refresh_pattern_max>
+<virtual_memory>Virtual Memory</virtual_memory>
+<main_parameters>Main parameters</main_parameters>
+<wifi_networks>WIFI Network Access Points</wifi_networks>
+<NO_ESSID>No Access Points or Ad-Hoc cells</NO_ESSID>
+<ESSID>Access Point</ESSID>
+<crypted>crypted</crypted>
+<quality>quality</quality>
+<bits_rate>Bits rate</bits_rate>
+<WIFI_ARTICA_EXPLAIN>This is the section that helps you to set your WIFI network[br]
+If necessaries modules are installed you will be able to create a Wireless Access Point or to connect this server to a Wifi network</WIFI_ARTICA_EXPLAIN>
+<APP_WPA_SUPPLIANT>WPA Supplicant</APP_WPA_SUPPLIANT>
+<ESSID_CONNECT_PASSWORD>Give the password key of your remote Access point or keep it blanck if no password key is required.[br]Define the Network parameters of your Wireless card when connecting to the Acess Point</ESSID_CONNECT_PASSWORD>
+<enable_wifi_ap>Activate Wifi Access Point Client mode</enable_wifi_ap>
+<WifiConnectAPDisabled>Wifi Access Point Client mode is not activated</WifiConnectAPDisabled>
+<INACTIVE>Inactive</INACTIVE>
+<COMPLETED>Connected</COMPLETED>
+<SCANNING>Scanning</SCANNING>
+<check_wifi_card>Check WIFI Network settings</check_wifi_card>
+<display>display</display>

@@ -575,7 +575,7 @@ var
    phpldap               :tphpldapadmin;
    zarafa                :tzarafa_server;
    squidguard            :tsquidguard;
-
+   WifiCardOk            :integer;
    
 
 begin
@@ -608,6 +608,7 @@ begin
 
 
        arrayqueue:='';
+       WifiCardOk:=0;
        kas3:=Tkas3.Create(SYS);
        dnsmasq:=tdnsmasq.Create(SYS);
        kavmilter:=tkavmilter.Create(SYS);
@@ -618,7 +619,11 @@ begin
           logs.Syslogs('Kill security hole found by no-root: see http://nonroot.blogspot.com/2008/10/i-have-reason-artica-case.html');
           logs.DeleteFile(GLOBAL_INI.get_ARTICA_PHP_PATH()+'/upload.php')
        end;
-       
+
+
+       fpsystem(SYS.LOCATE_PHP5_BIN() +' /usr/share/artica-postfix/exec.wifi.detect.cards.php --detect');
+       tryStrToInt(SYS.GET_INFO('WifiCardOk'),WifiCardOk);
+       if WifiCardOk=1 then  fpsystem(SYS.LOCATE_PHP5_BIN()+ ' /usr/share/artica-postfix/exec.wifi.detect.cards.php --iwlist &');
 
        
        if FileExists('/etc/artica-postfix/crossroads.indentities.conf') then begin
@@ -717,6 +722,13 @@ begin
    //cpu,mem...
    list.Add('$_GLOBAL["CPU_NUMBER"]="'+ IntToStr(sys.CPU_NUMBER())+'";');
    list.Add('$_GLOBAL["LOAD_AVERAGE"]="'+ sys.LOAD_AVERAGE()+'";');
+
+   //hostapd
+
+
+   if FileExists(SYS.LOCATE_GENERIC_BIN('wpa_supplicant')) then list.Add('$_GLOBAL["WPA_SUPPLIANT_INSTALLED"]=True;') else list.Add('$_GLOBAL["WPA_SUPPLIANT_INSTALLED"]=False;');
+   if FileExists(SYS.LOCATE_GENERIC_BIN('hostapd')) then list.Add('$_GLOBAL["HOSTAPD_INSTALLED"]=True;') else list.Add('$_GLOBAL["HOSTAPD_INSTALLED"]=False;');
+
 
    //smartd
    if FileExists('/usr/sbin/smartctl') then list.Add('$_GLOBAL["SMARTMONTOOLS_INSTALLED"]=True;') else list.Add('$_GLOBAL["SMARTMONTOOLS_INSTALLED"]=False;');

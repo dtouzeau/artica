@@ -16,7 +16,8 @@ uses
   artica_cron, kretranslator, isoqlog, obm, openvpn, jcheckmail, mailmanctl,
   imapsync, dhcp_server, samba4, obm2, xapian, opengoo, dstat, rsync, tcpip,
   nfsserver, lvm, assp, pdns, gluster, kav4proxy, zabbix, hamachi, kavmilter,
-  kavm4mls, postfilter,fetchmail, vmwaretools,zarafa_server, monit, squidguard;
+  kavm4mls, postfilter, fetchmail, vmwaretools, zarafa_server, monit,
+  squidguard, wifi;
 
 var
    install:Tclass_install;
@@ -94,6 +95,7 @@ var
    zZarafa:tzarafa_server;
    zmonit:tmonit;
    zsquidguard:tsquidguard;
+   zwifi:twifi;
 
  begin
     SYS:=Tsystem.Create;
@@ -225,6 +227,47 @@ end;
       writeln('Binary version of SquidGuard: ',zsquidguard.VERSIONNUM());
       halt(0);
    end;
+
+    if ParamStr(1)='--export-version' then begin
+         if ParamStr(2)='squid' then begin
+              zsquid:=Tsquid.Create;
+              writeln(zsquid.SQUID_VERSION());
+              halt(0);
+         end;
+
+         if ParamStr(2)='c-icap' then begin
+              zdansguardian:=Tdansguardian.Create(SYS);
+              writeln(zdansguardian.C_ICAP_VERSION());
+              halt(0);
+         end;
+
+         if ParamStr(2)='dansguardian' then begin
+              zdansguardian:=Tdansguardian.Create(SYS);
+              writeln(zdansguardian.DANSGUARDIAN_VERSION());
+              halt(0);
+         end;
+         if ParamStr(2)='kav4proxy' then begin
+              zkav4proxy:=tkav4proxy.Create(SYS);
+              writeln(zkav4proxy.VERSION());
+              halt(0);
+         end;
+
+         if ParamStr(2)='wpa_suppliant' then begin
+              zwifi:=twifi.Create(SYS);
+              writeln(zwifi.WPA_SUPPLIANT_VERSION());
+              halt(0);
+         end;
+
+
+
+         writeln('help:');
+         writeln('--export-version squid');
+         writeln('--export-version c-icap');
+         writeln('--export-version dansguardian');
+         writeln('--export-version kav4proxy');
+         writeln('--export-version wpa_suppliant');
+         halt(0);
+    end;
 
 
 
@@ -826,14 +869,6 @@ end;
     writeln('Global memory of '+ParamStr(2),' ',SYS.PROCESS_MEMORY(ParamStr(2)),' kb');
     halt(0);
  end;
-
-  if ParamStr(1)='--bad-du' then begin
-    GLOBAL_INI:=myconf.Create;
-    GLOBAL_INI.KILL_BAD_DU();
-    halt(0);
- end;
-
-
 
 
  if paramStr(1)='--obm2-version' then begin

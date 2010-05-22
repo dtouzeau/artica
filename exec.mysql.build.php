@@ -9,7 +9,7 @@ include_once(dirname(__FILE__)."/framework/class.unix.inc");
 include_once(dirname(__FILE__)."/framework/frame.class.inc");
 
 cpulimit();
-
+if(preg_match("#--verbose#",implode(" ",$argv))){$GLOBALS["DEBUG"]=true;$GLOBALS["VERBOSE"]=true;}
 if(posix_getuid()<>0){die("Cannot be used in web server mode\n\n");}
 
 if(!Build_pid_func(__FILE__,"MAIN")){

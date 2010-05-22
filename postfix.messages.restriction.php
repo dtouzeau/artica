@@ -55,6 +55,7 @@ function SaveMessagesRestrictions(){
 function save(){
 	$sock=new sockets();
 	$_GET["message_size_limit"]=($_GET["message_size_limit"]*1000)*1024;
+	$_GET["virtual_mailbox_limit"]=($_GET["virtual_mailbox_limit"]*1000)*1024;
 	$sock->SET_INFO("message_size_limit",$_GET["message_size_limit"]);
 	$sock->SET_INFO("default_destination_recipient_limit",$_GET["default_destination_recipient_limit"]);
 	$sock->SET_INFO("smtpd_recipient_limit",$_GET["smtpd_recipient_limit"]);
@@ -71,52 +72,53 @@ function ajax_pop(){
 		
 		
 		$main=new main_cf();
+		$main->FillDefaults();
+		
 		$main->main_array["message_size_limit"]=$sock->GET_INFO("message_size_limit");
 		$main->main_array["default_destination_recipient_limit"]=$sock->GET_INFO("default_destination_recipient_limit");
 		$main->main_array["smtpd_recipient_limit"]=$sock->GET_INFO("smtpd_recipient_limit");
 		$main->main_array["mime_nesting_limit"]=$sock->GET_INFO("mime_nesting_limit");
 		$main->main_array["header_address_token_limit"]=$sock->GET_INFO("header_address_token_limit");
 		$main->main_array["virtual_mailbox_limit"]=$sock->GET_INFO("virtual_mailbox_limit");
-		$main->FillDefaults();
-		
 		$main->main_array["message_size_limit"]=($main->main_array["message_size_limit"]/1024)/1000;
+		$main->main_array["virtual_mailbox_limit"]=($main->main_array["virtual_mailbox_limit"]/1024)/1000;
 		$html="
 		
 		<div id='messages_restriction_id'>
 		<table style='width:100%'>
 		<tr>
-			    <td nowrap class=legend>{message_size_limit}</strong>:</td>
-			    <td>" . Field_text('message_size_limit',$main->main_array["message_size_limit"],'width:60px')." (Mb)</td>
+			    <td nowrap class=legend style='font-size:13px'>{message_size_limit}</strong>:</td>
+			    <td style='font-size:13px'>" . Field_text('message_size_limit',$main->main_array["message_size_limit"],'width:60px;font-size:13px;padding:3px;text-align:right')."&nbsp;MB</td>
 			    <td>". help_icon('{message_size_limit_text}')."</td>
 		</tr>
 		
 		
 	<tr>
-			    <td nowrap class=legend>{default_destination_recipient_limit}</strong>:</td>
-			    <td>" . Field_text('default_destination_recipient_limit',$main->main_array["default_destination_recipient_limit"],'width:60px')."</td>
+			    <td nowrap class=legend style='font-size:13px'>{default_destination_recipient_limit}</strong>:</td>
+			    <td>" . Field_text('default_destination_recipient_limit',$main->main_array["default_destination_recipient_limit"],'width:60px;font-size:13px;padding:3px;text-align:right')."</td>
 			     <td>". help_icon('{default_destination_recipient_limit_text}')."</td>
 	</tr>
 	
 	<tr>
-			    <td nowrap class=legend>{smtpd_recipient_limit}</strong>:</td>
-			    <td>" . Field_text('smtpd_recipient_limit',$main->main_array["smtpd_recipient_limit"],'width:60px')."</td>
+			    <td nowrap class=legend style='font-size:13px'>{smtpd_recipient_limit}</strong>:</td>
+			    <td>" . Field_text('smtpd_recipient_limit',$main->main_array["smtpd_recipient_limit"],'width:60px;font-size:13px;padding:3px;text-align:right')."</td>
 			     <td>". help_icon('{smtpd_recipient_limit_text}')."</td>
 		</tr>
 
 		<tr>
-			    <td nowrap class=legend>{mime_nesting_limit}</strong>:</td>
-			    <td>" . Field_text('mime_nesting_limit',$main->main_array["mime_nesting_limit"],'width:60px')." </td>
+			    <td nowrap class=legend style='font-size:13px'>{mime_nesting_limit}</strong>:</td>
+			    <td>" . Field_text('mime_nesting_limit',$main->main_array["mime_nesting_limit"],'width:60px;font-size:13px;padding:3px;text-align:right')." </td>
 			     <td>". help_icon('{mime_nesting_limit_text}')."</td>
 		</tr>
 		
 		<tr>
-			    <td nowrap class=legend>{header_address_token_limit}</strong>:</td>
-			    <td>" . Field_text('header_address_token_limit',$main->main_array["header_address_token_limit"],'width:60px')." </td>
+			    <td nowrap class=legend style='font-size:13px'>{header_address_token_limit}</strong>:</td>
+			    <td>" . Field_text('header_address_token_limit',$main->main_array["header_address_token_limit"],'width:60px;font-size:13px;padding:3px;text-align:right')." </td>
 			     <td>". help_icon('{header_address_token_limit_text}')."</td>
 		</tr>
 		<tr>
-			    <td nowrap class=legend>{virtual_mailbox_limit}</strong>:</td>
-			    <td>" . Field_text('virtual_mailbox_limit',$main->main_array["virtual_mailbox_limit"],'width:40%')." </td>
+			    <td nowrap class=legend style='font-size:13px'>{virtual_mailbox_limit}</strong>:</td>
+			    <td style='font-size:13px'>" . Field_text('virtual_mailbox_limit',$main->main_array["virtual_mailbox_limit"],'width:60px;font-size:13px;padding:3px;text-align:right')."&nbsp;MB </td>
 			    <td>". help_icon('{virtual_mailbox_limit_text}')."</td>
 		</tr>
 		<tr><td colspan=2 align='rigth' style='padding-right:10px;text-align:right'>

@@ -16,4 +16,4 @@ Laissez le vide si vous ne voulez pas le remettre</root_password_text>
 <server_name>Nom du serveur qui sera affich&eacute; dans l'explorateur du r&eacute;seau</server_name>
 <welcome>Bienvenue sur l'assistant du Contr&ocirc;leur de domaine</welcome>
 <welcome_text>Cet assistant vous aide &agrave; cr&eacute;er un CPD (Contr&ocirc;leur Principal de Domaine), afin de servir les stations de travail MS Windows qui s'y connectent.</welcome_text>
-<workgroup>Nom du domaine NT lors de la navigation r&eacute;seau</workgroup>
+<workgroup>Domaine Windows</workgroup>

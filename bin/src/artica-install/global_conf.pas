@@ -8,7 +8,7 @@ interface
 uses
 //depreciated oldlinux -> linux
 Classes, SysUtils,Process,strutils,IniFiles,RegExpr in 'RegExpr.pas',unix,logs,dateutils,uHashList,Geoip,BaseUnix,md5,dhcp_server,openvpn,cups,pdns, obm2,
-samba,smartd,xapian,opengoo,dstat,sugarcrm,rsync,tcpip,policyd_weight,apache_artica, autofs,nfsserver,framework,ocsi,assp,gluster,zabbix,hamachi,vmwaretools,phpldapadmin,monit,zarafa_server,squidguard,
+samba,smartd,xapian,opengoo,dstat,sugarcrm,rsync,tcpip,policyd_weight,apache_artica, autofs,nfsserver,framework,ocsi,assp,gluster,zabbix,hamachi,vmwaretools,phpldapadmin,monit,zarafa_server,squidguard,wifi,
 mailarchiver in '/home/dtouzeau/developpement/artica-postfix/bin/src/artica-install/mailarchiver.pas',
 kavmilter    in '/home/dtouzeau/developpement/artica-postfix/bin/src/artica-install/kavmilter.pas',
 kas3         in '/home/dtouzeau/developpement/artica-postfix/bin/src/artica-install/kas3.pas',
@@ -422,8 +422,8 @@ public
       function  SYSTEM_START_ARTICA_ALL_DAEMON():boolean;
       procedure SYSTEM_START_MINIMUM_DAEMON();
       procedure LDAP_VERIFY_PASSWORD();
-
-      procedure ARTICA_START();
+      procedure START_ALL_DAEMONS();
+      procedure START_MYSQL();
       procedure ARTICA_STOP();
 
       function  SYSTEM_PROCESS_EXISTS(processname:string):boolean;
@@ -654,7 +654,7 @@ public
       procedure PERL_CREATE_DEFAULT_SCRIPTS();
       function  STATUS_PATTERN_DATABASES():string;
       procedure INSTANT_SEARCH();
-      procedure KILL_BAD_DU();
+
 
       function Explode(const Separator, S: string; Limit: Integer = 0):TStringDynArray;
       procedure splitexample(s:string;sep:string);
@@ -5479,7 +5479,6 @@ begin
      if FileExists('/opt/artica/license.expired.conf') then DeleteFile('/opt/artica/license.expired.conf');
      writeln('Starting......: Kernel version ' + kernel_version);
      logs.DebugLogs('Starting......: Distribution "' + LINUX_DISTRIBUTION() + '" i' + SYSTEM_GET_PLATEFORM());
-     KILL_BAD_DU();
      lighttpd.LIGHTTPD_START();
      ldap.LDAP_START();
      Rootpath:=get_ARTICA_PHP_PATH();
@@ -5512,20 +5511,47 @@ end;
 
 //##############################################################################
 procedure MyConf.SYSTEM_START_MINIMUM_DAEMON();
+var
+   cron:tcron;
 begin
+
+    if not FileExists('/bin/pidof') then begin
+       if FileExists('/sbin/pidof') then logs.OutputCmd('/bin/ln -s /bin/pidof /sbin/pidof');
+    end;
+
+    if SYS.PROCESS_EXIST(SYS.PIDOF('artica-backup')) then begin
+          logs.Syslogs('A backup process is currently in execution, stop process');
+          fpsystem(get_ARTICA_PHP_PATH()+'/bin/process1');
+    end;
+
+    if SYS.PROCESS_EXIST(SYS.PIDOF('artica-update')) then begin
+          logs.Syslogs('An update process is currently in execution, stop process');
+          fpsystem(get_ARTICA_PHP_PATH()+'/bin/process1');
+    end;
+
 INSTANT_SEARCH();
-logs.Debuglogs('###################### SYSTEM_START_MINIMUM_DAEMON ######################');
 if FileExists('/etc/init.d/keymap.sh') then fpsystem('/etc/init.d/keymap.sh start');
 SYSTEM_CHANGE_MOTD();
+cron:=tcron.Create(SYS);
+cron.START();
+cron.free;
 ldap.LDAP_START();
-
+START_MYSQL();
 APACHE_ARTICA_START();
 BOA_START();
-logs.Debuglogs('###################### SYSTEM_START_MINIMUM_DAEMON END ######################');
+fpsystem(SYS.LOCATE_PHP5_BIN()+' /usr/share/artica-postfix/exec.virtuals-ip.php --just-add &');
+
+
 end;
 //##############################################################################
 
 function MyConf.SYSTEM_START_ARTICA_ALL_DAEMON():boolean;
+begin
+     SYSTEM_START_MINIMUM_DAEMON()
+end;
+//##############################################################################
+
+procedure MyConf.START_ALL_DAEMONS();
 var
    Rootpath:string;
    D:boolean;
@@ -5582,7 +5608,6 @@ begin
 
 
      logs.Debuglogs('SYSTEM_START_ARTICA_ALL_DAEMON:: kernel version is '+kernel_version);
-     result:=true;
      knel:=StrToInt(AnsiReplaceStr(kernel_version,'.',''));
      if knel<26 then begin
         writeln('Your kernel version '+ kernel_version + ' is not supported');
@@ -5604,9 +5629,7 @@ begin
       logs.Debuglogs('SYSTEM_START_ARTICA_ALL_DAEMON:: fatal error on gluster');
     end;
 
-    if not FileExists('/bin/pidof') then begin
-       if FileExists('/sbin/pidof') then fpsystem('/bin/ln -s /bin/pidof /sbin/pidof');
-    end;
+
 
     if SYS.PROCESS_EXIST(SYS.PIDOF('artica-backup')) then begin
           logs.Syslogs('A backup process is currently in execution, stop process');
@@ -5643,54 +5666,7 @@ begin
     MAIL_IMAP_CLIENT_CHECK();
 
 
-    logs.Debuglogs('############ mysql ##################');
-        //Mysql:
-      zmysql:=tmysql_daemon.Create(SYS);
-      try
-         zmysql.SERVICE_START();
-      except
-         logs.Syslogs('FATAL ERROR WHILE EXEC zmysql.SERVICE_START();');
-      end;
 
-    if NetWorkAvailable then begin
-       if not SYS.isoverloadedTooMuch() then begin
-       logs.Debuglogs('############ Zabbix ##################');
-       try
-          zabbix:=tzabbix.Create(SYS);
-          zabbix.START();
-          zabbix.free;
-          except
-          logs.Debuglogs('SYSTEM_START_ARTICA_ALL_DAEMON:: fatal error on Zabbix');
-       end;
-    end;
-    end;
-
-      try
-      zmysql.CLUSTER_MANAGEMENT_START();
-      except
-         logs.Syslogs('FATAL ERROR WHILE EXEC zmysql.CLUSTER_MANAGEMENT_START();');
-      end;
-
-      try
-      zmysql.CLUSTER_REPLICA_START();
-       except
-         logs.Syslogs('FATAL ERROR WHILE EXEC zmysql.CLUSTER_REPLICA_START();');
-      end;
-      try
-      zmysql.Free;
-      except
-        logs.Syslogs('FATAL ERROR WHILE EXEC zmysql.Free;');
-      end;
-
-    logs.Debuglogs('############ ldap ##################');
-     //LDAP:
-      ldap.LDAP_START();
-
-
-    logs.Debuglogs('############ lighttpd ##################');
-     //lighttpd
-      lighttpd:=Tlighttpd.Create(SYS);
-      lighttpd.LIGHTTPD_START();
 
 
       logs.Debuglogs('############ apache groupware ##################');
@@ -5972,10 +5948,6 @@ end;
      SYS.THREAD_COMMAND_SET(get_ARTICA_PHP_PATH() + '/bin/artica-ldap -inadyn');
      logs.Debuglogs('############ PURE_FTPD_START ##################');
      Cpureftpd.PURE_FTPD_START();
-     logs.Debuglogs('############ BOA_START ##################');
-     BOA_START();
-     logs.Debuglogs('############ ARTICA_START ##################');
-     ARTICA_START();
 
      logs.Debuglogs('############ PDNS ##################');
      pdns:=tpdns.Create(SYS);
@@ -6002,11 +5974,22 @@ end;
      SYS.THREAD_COMMAND_SET(SYS.LOCATE_PHP5_BIN()+ ' /usr/share/artica-postfix/exec.first.settings.php');
 
 
-      if NetWorkAvailable then fpsystem(Paramstr(0) +' --status >/dev/null 2>&1 &');
+    if NetWorkAvailable then begin
+       if not SYS.isoverloadedTooMuch() then begin
+          logs.Debuglogs('############ Zabbix ##################');
+          try
+             zabbix:=tzabbix.Create(SYS);
+             zabbix.START();
+             zabbix.free;
+          except
+                logs.Debuglogs('SYSTEM_START_ARTICA_ALL_DAEMON:: fatal error on Zabbix');
+          end;
+       end;
+    end;
 
 
-
-     logs.Debuglogs('SYSTEM_START_ARTICA_ALL_DAEMON:: finish');
+ if NetWorkAvailable then fpsystem(Paramstr(0) +' --status >/dev/null 2>&1 &');
+  logs.Debuglogs('SYSTEM_START_ARTICA_ALL_DAEMON:: finish');
 
 
      if FileExists('/etc/artica-postfix/FROM_ISO') then begin
@@ -6021,6 +6004,41 @@ end;
 
 end;
 //##############################################################################
+procedure myconf.START_MYSQL();
+var
+zmysql:tmysql_daemon;
+begin
+    logs.Debuglogs('############ mysql ##################');
+        //Mysql:
+      zmysql:=tmysql_daemon.Create(SYS);
+      try
+         zmysql.SERVICE_START();
+      except
+         logs.Syslogs('FATAL ERROR WHILE EXEC zmysql.SERVICE_START();');
+      end;
+
+
+      try
+      zmysql.CLUSTER_MANAGEMENT_START();
+      except
+         logs.Syslogs('FATAL ERROR WHILE EXEC zmysql.CLUSTER_MANAGEMENT_START();');
+      end;
+
+      try
+      zmysql.CLUSTER_REPLICA_START();
+       except
+         logs.Syslogs('FATAL ERROR WHILE EXEC zmysql.CLUSTER_REPLICA_START();');
+      end;
+      try
+      zmysql.Free;
+      except
+        logs.Syslogs('FATAL ERROR WHILE EXEC zmysql.Free;');
+      end;
+
+
+end;
+
+
 procedure myconf.BOA_TESTS_INIT_D();
 var
 l:TstringList;
@@ -6292,17 +6310,6 @@ begin
   if FileExists('/usr/sbin/saslpasswd2') then exit('/usr/sbin/saslpasswd2');
 end;
 //##############################################################################
-
-
-procedure myconf.ARTICA_START();
-var
-   cron:tcron;
-begin
-cron:=tcron.Create(SYS);
-cron.START();
-cron.free;
-end;
-//#############################################################################
 function myconf.ROUNDCUBE_DEFAULT_CONFIG():string;
 var
    l:TstringList;
@@ -9201,25 +9208,6 @@ begin
 
 end;
 //##############################################################################
-procedure myconf.KILL_BAD_DU();
-var
-l:Tstringlist;
-i:integer;
-begin
-   l:=TstringList.Create;
-   l.AddStrings(SYS.PIDOF_PATTERN_PROCESS_LIST('/usr/bin/du -s /opt/artica'));
-   logs.Debuglogs('KILL_BAD_DU:: '+IntTOStr(l.Count)+' bad DU instances');
-   if l.Count>0 then begin
-      for i:=0 to l.Count-1 do begin;
-          if length(trim(l.Strings[i]))>0 then begin
-                logs.Syslogs('/usr/bin/du -s /opt/artica ('+l.Strings[i]+') Kill this process');
-                if SYS.PROCESS_EXIST(l.Strings[i]) then logs.OutputCmd('/bin/kill -9 '+l.Strings[i]);
-          end;
-      end;
-   end;
-end;
-//##############################################################################
-
 procedure myconf.DeleteFile(Path:string);
 begin
 if PathIsDirectory(Path) then exit;
@@ -9690,6 +9678,7 @@ FUNCTION myconf.GLOBAL_STATUS():string;
  cpulimit_string:string;
  monit:tmonit;
  zarafa_server:tzarafa_server;
+ zwifi:twifi;
 
 begin
 LSHW_TIME:=0;
@@ -9763,6 +9752,15 @@ end;
       hamachi.free;
    except
          logs.Syslogs('GLOBAL_STATUS():: FATAL ERROR WHILE TESTING HAMACHI');
+   end;
+
+   logs.Debuglogs('WIFI STATUS ----------------------------------');
+   try
+      zwifi:=twifi.Create(SYS);
+      ini:=ini+zwifi.STATUS();
+      zwifi.free;
+   except
+         logs.Syslogs('GLOBAL_STATUS():: FATAL ERROR WHILE TESTING WIFI');
    end;
 
        logs.Debuglogs('zvmtools STATUS ----------------------------------');

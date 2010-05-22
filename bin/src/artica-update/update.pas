@@ -215,6 +215,13 @@ begin
      logs.Debuglogs('tupdate.clamav_engine_update():: Clamav is not installed...');
      exit;
   end;
+
+  if(SYS.FILE_TIME_BETWEEN_MIN('/etc/artica-postfix/clamav.update.check')<1440) then begin
+     logs.Debuglogs('tupdate.clamav_engine_update():: not early to check updates, waiting 1440 minutes');
+  end;
+
+  logs.DeleteFile('/etc/artica-postfix/clamav.update.check');
+
   clamav_version:=clamav.CLAMAV_VERSION();
   MasterIndexFileIni:=TiniFile.Create(MasterIndexFile);
   clamav_remove_version:=MasterIndexFileIni.ReadString('NEXT','clamav','0');
@@ -257,6 +264,7 @@ begin
        end;
   end;
 
+  fpsystem('/bin/touch /etc/artica-postfix/clamav.update.check');
 
 end;
 //#############################################################################

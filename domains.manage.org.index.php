@@ -29,6 +29,8 @@ if(isset($_GET["org_section"])){organization_sections();exit;}
 if(isset($_GET["js"])){js();exit;}
 if(isset($_GET["js-pop"])){popup_tabs();exit;}
 if(isset($_GET["ORG_VHOSTS_LIST"])){echo organization_vhostslist($_GET["ORG_VHOSTS_LIST"]);exit;}
+
+if(isset($_GET["finduser-js"])){organization_users_find_member_js();exit;}
 if(isset($_GET["finduser"])){organization_users_find_member();exit;}
 
 js();	
@@ -62,6 +64,24 @@ function js(){
 	
 	echo $html;
 	}
+	
+function organization_users_find_member_js(){
+	$ou=$_GET["ou"];
+	$tpl=new templates();
+	$title=$tpl->_ENGINE_parse_body("{organization}:: {$_GET["ou"]}");
+	$page=CurrentPageName();
+	
+	$html="
+	
+	function organization_users_find_member_js_start(){
+		YahooSearchUser(770,'$page?finduser=&ou=$ou');
+	}
+	organization_users_find_member_js_start();
+	";
+	echo $html;
+	
+	
+}
 
 function popup(){
 
@@ -1217,39 +1237,45 @@ function organization_users_find_member(){
 	$users=new user();
 	
 	$number=$hash["count"];
-	
+	$bg="#FFFFFF";
 	
 	$html="
 	
-	
+	<div style='width:100%;height:500px;overflow:auto'>
 	<table style='width:100%;>";
 		$over="OnMouseOut=\"javascript:this.style.cursor='auto'\"";
 		$out="OnMouseOver=\"javascript:this.style.cursor='pointer'\"";
+		
+		
 	for($i=0;$i<$number;$i++){
 		$userARR=$hash[$i];
-		$js=MEMBER_JS($userARR["uid"][0]);
+		$uid=$userARR["uid"][0];
+		$js=MEMBER_JS($uid,1,1);
+		
+		$sn=texttooltip($userARR["sn"][0],"{display}:$uid",$js,null,0,"font-size:13px");
+		$givenname=texttooltip($userARR["givenname"][0],"{display}:$uid",$js,null,0,"font-size:13px");
+		$title=texttooltip($userARR["title"][0],"{display}:$uid",$js,null,0,"font-size:13px");
+		$mail=texttooltip($userARR["mail"][0],"{display}:$uid",$js,null,0,"font-size:13px");
+		$telephonenumber=texttooltip($userARR["telephonenumber"][0],"{display}:$uid",$js,null,0,"font-size:13px");
+		
+		
 		if($bg=="#cce0df"){$bg="#FFFFFF";}else{$bg="#cce0df";}
-		$html=$html ."<tr style='background-color:$bg' $js $over $out>
+		$html=$html ."<tr style='background-color:$bg' $over $out>
 			<td width=1%><img src='img/contact-32.png'></td>
-			<td style='font-size:13px;color:black;padding:8px' $over $out>{$userARR["sn"][0]}</td>
-			<td style='font-size:13px;color:black;padding:8px' $over $out>{$userARR["givenname"][0]}</td>
-			<td style='font-size:13px;color:black;padding:8px' $over $out>{$userARR["title"][0]}</td>
-			<td style='font-size:13px;color:black;padding:8px' $over $out>{$userARR["mail"][0]}</td>
-			<td style='font-size:13px;color:black;padding:8px' $over $out>{$userARR["telephonenumber"][0]}</td>
+			<td style='font-size:13px;color:black;padding:8px' $over $out>$sn</td>
+			<td style='font-size:13px;color:black;padding:8px' $over $out>$givenname</td>
+			<td style='font-size:13px;color:black;padding:8px' $over $out>$title</td>
+			<td style='font-size:13px;color:black;padding:8px' $over $out>$mail</td>
+			<td style='font-size:13px;color:black;padding:8px' $over $out>$telephonenumber</td>
 		</tr>
 		";
 		
 	}
-	$html=$html ."</table>";
+	$html=$html ."</table></div>";
 
 	$tpl=new templates();
 	echo $tpl->_ENGINE_parse_body($html);
-	
-	//print_r($hash);
-	
-	
-	
-	
+
 }
 
 

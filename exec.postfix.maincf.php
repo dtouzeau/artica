@@ -813,24 +813,38 @@ function sender_bcc_maps(){
 function OthersValues(){
 	$main=new main_cf();
 	$sock=new sockets();
+	$main->FillDefaults();	
 	echo "Starting......: Fix others settings\n";
+	
+	
 	$main->main_array["message_size_limit"]=$sock->GET_INFO("message_size_limit");
 	$main->main_array["default_destination_recipient_limit"]=$sock->GET_INFO("default_destination_recipient_limit");
 	$main->main_array["smtpd_recipient_limit"]=$sock->GET_INFO("smtpd_recipient_limit");
 	$main->main_array["mime_nesting_limit"]=$sock->GET_INFO("mime_nesting_limit");
 	$main->main_array["header_address_token_limit"]=$sock->GET_INFO("header_address_token_limit");
 	$main->main_array["virtual_mailbox_limit"]=$sock->GET_INFO("virtual_mailbox_limit");
-	$main->FillDefaults();	
+	
+	if($main->main_array["message_size_limit"]==null){$main->main_array["message_size_limit"]=102400000;}
+	if($main->main_array["virtual_mailbox_limit"]==null){$main->main_array["virtual_mailbox_limit"]=102400000;}
+	if($main->main_array["default_destination_recipient_limit"]==null){$main->main_array["default_destination_recipient_limit"]=50;}
+	if($main->main_array["smtpd_recipient_limit"]==null){$main->main_array["smtpd_recipient_limit"]=1000;}
+	if($main->main_array["mime_nesting_limit"]==null){$main->main_array["mime_nesting_limit"]=100;}
+	if($main->main_array["header_address_token_limit"]==null){$main->main_array["header_address_token_limit"]=10240;}
+	
+	echo "Starting......: message_size_limit={$main->main_array["message_size_limit"]}\n";
+	echo "Starting......: virtual_mailbox_limit={$main->main_array["virtual_mailbox_limit"]}\n";
+	echo "Starting......: default_destination_recipient_limit={$main->main_array["default_destination_recipient_limit"]}\n";
+	echo "Starting......: smtpd_recipient_limit={$main->main_array["smtpd_recipient_limit"]}\n";
+	echo "Starting......: mime_nesting_limit={$main->main_array["mime_nesting_limit"]}\n";
+	echo "Starting......: header_address_token_limit={$main->main_array["header_address_token_limit"]}\n";
+	
 	system("{$GLOBALS["postconf"]} -e \"message_size_limit = {$main->main_array["message_size_limit"]}\" >/dev/null 2>&1");
 	system("{$GLOBALS["postconf"]} -e \"default_destination_recipient_limit = {$main->main_array["default_destination_recipient_limit"]}\" >/dev/null 2>&1");
 	system("{$GLOBALS["postconf"]} -e \"smtpd_recipient_limit = {$main->main_array["smtpd_recipient_limit"]}\" >/dev/null 2>&1");
 	system("{$GLOBALS["postconf"]} -e \"mime_nesting_limit = {$main->main_array["mime_nesting_limit"]}\" >/dev/null 2>&1");
 	system("{$GLOBALS["postconf"]} -e \"header_address_token_limit = {$main->main_array["header_address_token_limit"]}\" >/dev/null 2>&1");
-	system("{$GLOBALS["postconf"]} -e \"virtual_mailbox_limit = {$main->main_array["message_size_limit"]}\" >/dev/null 2>&1");
-	
-	
-	
-	
+	system("{$GLOBALS["postconf"]} -e \"virtual_mailbox_limit = {$main->main_array["virtual_mailbox_limit"]}\" >/dev/null 2>&1");
+
 }
 
 function inet_interfaces(){

@@ -317,7 +317,7 @@ but don't put in carriage returns except where you mean to separate paragraphs.[
 And review your changes - bad html (like some unterminated HTML constructs)[br]
 can prevent display of the entire listinfo page.</info_text>
 <language_options>Options de la langue</language_options>
-<limits>limits</limits>
+<limits>limites</limits>
 <linked_newsgroup>Usenet group</linked_newsgroup>
 <linked_newsgroup_text>The name of the Usenet group to gateway to and/or from.</linked_newsgroup_text>
 <list_admin_only>List admin only</list_admin_only>
@@ -498,7 +498,7 @@ directive. eg.; [ul][li][listname %d] -> [listname 123][/li][li] (listname %05d)
 This prevents mischievous (or malicious) people from creating subscriptions for others without their consent.</subscribe_policy_text>
 <thislist>Cette liste</thislist>
 <topics>Topics</topics>
-<topics_bodylines_limit>Max line scanning</topics_bodylines_limit>
+<topics_bodylines_limit>Lignes Max d'analyse</topics_bodylines_limit>
 <topics_bodylines_limit_text>How many body lines should the topic matcher scan?[br]
 The topic matcher will scan this many lines of the message body looking for topic keyword matches.
 [br]Body scanning stops when either this many lines have been looked at, or a non-header-like body line is encountered.

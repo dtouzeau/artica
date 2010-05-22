@@ -9,7 +9,7 @@ uses
   Classes, SysUtils,Process,strutils,IniFiles,RegExpr in 'RegExpr.pas',artica_cron,opengoo,
   BaseUnix,unix,global_conf,zsystem,logs,geoip,debian,spamass,openldap,clamav,cyrus,squid,postfix_class,samba,awstats,process_infos,pureftpd,ntpd,spfmilter,
   mailgraph_daemon, miltergreylist,lighttpd, roundcube,dansguardian,kav4samba,mimedefang,stunnel4,dkimfilter,kav4proxy,bind9,obm,mysql_daemon,p3scan,syslogng,openvpn,cups,
-  jcheckmail,dhcp_server,obm2,dstat,rsync,smartd,tcpip,policyd_weight,apache_artica,autofs,framework,assp,pdns,gluster,nfsserver,zabbix,hamachi,postfilter, vmwaretools,zarafa_server,monit,
+  jcheckmail,dhcp_server,obm2,dstat,rsync,smartd,tcpip,policyd_weight,apache_artica,autofs,framework,assp,pdns,gluster,nfsserver,zabbix,hamachi,postfilter, vmwaretools,zarafa_server,monit,wifi,
   mailarchiver in '/home/dtouzeau/developpement/artica-postfix/bin/src/artica-install/mailarchiver.pas',
   kas3         in '/home/dtouzeau/developpement/artica-postfix/bin/src/artica-install/kas3.pas',
   kavmilter    in '/home/dtouzeau/developpement/artica-postfix/bin/src/artica-install/kavmilter.pas',
@@ -601,7 +601,7 @@ var
    zvmwaretools:tvmtools;
    zarafa:tzarafa_server;
    monit:tmonit;
-
+   zwifi:twifi;
 begin
     GLOBAL_INI:=myconf.Create;
     Zclam:=TClamav.Create;
@@ -777,6 +777,12 @@ begin
                  policydw:=tpolicyd_weight.Create(SYS);
                  policydw.STOP();
                  policydw.Free;
+                 exit();
+              end;
+
+              if ParamStr(2)='wifi' then begin
+                 zwifi:=twifi.Create(SYS);
+                 zwifi.STOP();
                  exit();
               end;
 
@@ -1182,7 +1188,7 @@ begin
                writeln('|tail|daemon|clammilter|dnsmasq|stunnel|dkim|postfix|mailgraph|mimedefang|roundcube|kav4samba|bind9|obm|p3scan|syslogng|mailarchiver|bogom');
                writeln('|collectd|fetchmail|mailspy|amavis|retranslator|retranslator-tsk|watchdog|dotclear|jcheckmail|mailman|kas3|dhcp|cicap|openvpn|postfix-logger');
                writeln('|dansguardian-tail|cups|dstat|dstat-top-mem|dstat-top-cpu|rsync|smartd|policydw|mysql-cluster|assp|pdns|gluster|gluster-cli|sysloger');
-               writeln('|zabbix|hamachi|kav4proxy|postfilter|vmtools|zarafa|zarafa-web|monit');
+               writeln('|zabbix|hamachi|kav4proxy|postfilter|vmtools|zarafa|zarafa-web|monit|wifi');
                exit();
             end;
 
@@ -1271,6 +1277,7 @@ var
    zvmwaretools:tvmtools;
    zarafa:tzarafa_server;
    monit:tmonit;
+   zwifi:twifi;
 begin
     GLOBAL_INI:=myconf.Create;
     SYS:=Tsystem.Create;
@@ -1322,7 +1329,6 @@ begin
     
              if ParamStr(2)='ldap' then begin
                  zldap.LDAP_START();
-                 GLOBAL_INI.ARTICA_START();
                  exit();
               end;
               
@@ -1333,8 +1339,6 @@ begin
 
               if ParamStr(2)='postfix' then begin
                  if not NetWorkAvailable then exit();
-                 GLOBAL_INI.ARTICA_START();
-
                  zspf.SPFMILTER_START();
                  zmiltergreylist.MILTER_GREYLIST_START();
                  zmimedefang.MIMEDEFANG_START();
@@ -1388,6 +1392,12 @@ begin
               if ParamStr(2)='hamachi' then begin
                  hamachi:=thamachi.Create(SYS);
                  hamachi.START();
+                 exit();
+              end;
+
+              if ParamStr(2)='wifi' then begin
+                 zwifi:=twifi.Create(SYS);
+                 zwifi.START();
                  exit();
               end;
 
@@ -1461,14 +1471,12 @@ begin
               if ParamStr(2)='mgreylist' then begin
                  if not NetWorkAvailable then exit();
                  zmiltergreylist.MILTER_GREYLIST_START();
-                 GLOBAL_INI.ARTICA_START();
                  exit();
               end;
 
               if ParamStr(2)='ntpd' then begin
                  if not NetWorkAvailable then exit();
                  zntpd.NTPD_START();
-                 GLOBAL_INI.ARTICA_START();
                  exit();
               end;
 
@@ -1500,7 +1508,6 @@ begin
               if ParamStr(2)='pommo' then begin
                  lighttpd:=Tlighttpd.Create(SYS);
                  lighttpd.POMMO_ALIASES();
-                 lighttpd.POMMO_CONFIG();
                  exit();
               end;
 
@@ -1612,8 +1619,6 @@ begin
                  zdansguardian.C_ICAP_START();
                  zsquid.SQUID_START();
                  zdansguardian.DANSGUARDIAN_START();
-
-                 GLOBAL_INI.ARTICA_START();
                  zClam.CLAMD_START();
                  exit();
               end;
@@ -1645,14 +1650,12 @@ begin
               if ParamStr(2)='stunnel' then begin
                  if not NetWorkAvailable then exit();
                  zstunnel.STUNNEL_START();
-                 GLOBAL_INI.ARTICA_START();
                  exit();
               end;
 
               if ParamStr(2)='dkim' then begin
                  if not NetWorkAvailable then exit();
                  zdkim.DKIM_FILTER_START();
-                 GLOBAL_INI.ARTICA_START();
                  exit();
               end;
 
@@ -1678,14 +1681,11 @@ begin
               if ParamStr(2)='mysql' then begin
                  zmysql.SERVICE_START();
                  syslogng.START();
-                 GLOBAL_INI.ARTICA_START();
-                 
                  exit();
               end;
               
               if ParamStr(2)='p3scan' then begin
                  p3scan.START();
-                 GLOBAL_INI.ARTICA_START();
                  exit();
               end;
               
@@ -1694,7 +1694,7 @@ begin
                  bogom:=tbogom.Create(GLOBAL_INI.SYS);
                  bogom.START();
                  bogom.FRee;
-                 GLOBAL_INI.ARTICA_START();
+
                  exit();
               end;
               
@@ -1703,7 +1703,7 @@ begin
                  collectd:=tcollectd.Create(GLOBAL_INI.SYS);
                  collectd.START();
                  collectd.FRee;
-                 GLOBAL_INI.ARTICA_START();
+
                  exit();
               end;
 
@@ -1749,7 +1749,7 @@ begin
 
               if ParamStr(2)='daemon' then begin
                  if not SYS.BuildPids() then exit();
-                 GLOBAL_INI.ARTICA_START();
+
                  monit.START();
                  exit();
               end;
@@ -1800,7 +1800,7 @@ begin
               if ParamStr(2)='saslauthd' then begin
                  saslauthd:=tsaslauthd.Create(GLOBAL_INI.SYS);
                  saslauthd.START();
-                 GLOBAL_INI.ARTICA_START();
+
                  saslauthd.FRee;
                  exit();
               end;
@@ -1815,53 +1815,53 @@ begin
               if ParamStr(2)='dnsmasq' then begin
                  if not NetWorkAvailable then exit();
                  dnsmasq.DNSMASQ_START_DAEMON();
-                 GLOBAL_INI.ARTICA_START();
+
                  exit();
               end;
 
               if ParamStr(2)='postfix' then begin
                  if not NetWorkAvailable then exit();
                  zpostfix.POSTFIX_START();
-                 GLOBAL_INI.ARTICA_START();
+
                  exit();
               end;
 
               if ParamStr(2)='mailgraph' then begin
                  mailgraph.MAILGRAPH_START();
-                 GLOBAL_INI.ARTICA_START();
+
                  exit();
               end;
 
               if ParamStr(2)='mimedefang' then begin
                  if not NetWorkAvailable then exit();
                  zmimedefang.MIMEDEFANG_START();
-                 GLOBAL_INI.ARTICA_START();
+
                  exit();
               end;
               if ParamStr(2)='roundcube' then begin
                  zroundcube.ROUNDCUBE_START_SERVICE();
-                 GLOBAL_INI.ARTICA_START();
+
                  exit();
               end;
 
               if ParamStr(2)='kav4samba' then begin
                  if not NetWorkAvailable then exit();
                  zkav4samba.SERVICE_START();
-                 GLOBAL_INI.ARTICA_START();
+
                  exit();
               end;
 
               if ParamStr(2)='bind9' then begin
                  if not NetWorkAvailable then exit();
                  bind9.START();
-                 GLOBAL_INI.ARTICA_START();
+
                  exit();
               end;
               
               if ParamStr(2)='obm' then begin
                  obm:=tobm.Create(GLOBAL_INI.SYS);
                  obm.SERVICE_START();
-                 GLOBAL_INI.ARTICA_START();
+
                  exit();
               end;
               
@@ -1937,7 +1937,7 @@ begin
                writeln('|daemon|clammilter|dnsmasq|stunnel|postfix|mailgraph|mimedefang|roundcube|kav4samba|bind9|obm|yorel|p3scan|syslogng|mailarchive|bogom');
                writeln('|collectd|mysql|fetchmail|mailspy|amavis|retranslator|spfmilter|dotclear|jcheckmail|mailman|kas3|dhcp|cicap[openvpn|postfix-logger');
                writeln('|dansguardian-tail|apache-groupware|cups|dstat|dstat-top-mem|dstat-top-cpu|rsync|policydw|autofs|mysql-cluster|assp|pdns|gluster|gluster-cli');
-               writeln('|syslogger|zabbix|kav4proxy|postfilter|vmtools|zarafa|zarafa-web|monit');
+               writeln('|syslogger|zabbix|kav4proxy|postfilter|vmtools|zarafa|zarafa-web|monit|wifi');
                exit();
             end;
 

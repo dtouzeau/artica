@@ -624,8 +624,9 @@ l.Add('php5-mcrypt');
 l.Add('php-log');
 l.add('php-apc');
 l.Add('php-pear');
-l.Add('lighttpd');
 l.add('php5-dev'); // To compile PHP5
+l.Add('lighttpd');
+
 
 //process limitations
 L.add('cpulimit');

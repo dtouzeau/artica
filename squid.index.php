@@ -141,15 +141,10 @@ function main_little_status(){
 			break;
 	}
 	
-	
-$tpl=new templates();
-	if(is_file("ressources/logs/global.status.ini")){
-		$ini=new Bs_IniHandler("ressources/logs/global.status.ini");
-	}else{
 		$sock=new sockets();
-		$datas=base64_decode($sock->getFrameWork('cmd.php?Global-Applications-Status=yes'));
+		$datas=base64_decode($sock->getFrameWork('cmd.php?squid-ini-status=yes'));
 		$ini=new Bs_IniHandler($datas);
-	}
+	
 	
 	$array[]="SQUID";
 	$array[]="KAV4PROXY";
@@ -203,7 +198,7 @@ function main_status(){
 	$squid=new squid($_GET["hostname"]);
 	$ini=new Bs_IniHandler();
 	$sock=new sockets();
-	$ini->loadString($sock->getFrameWork('cmd.php?squid-status=yes'));
+	$ini->loadString(base64_decode($sock->getFrameWork('cmd.php?squid-ini-status=yes')));
 	
 
 	$squid_status=DAEMON_STATUS_ROUND("SQUID",$ini);
@@ -214,9 +209,11 @@ function main_status(){
 
 	$html="<table style='width:99%'>
 	<tr>
-		<td valign='top'>$squid_status<br>$kav</td>
-		<td valign='top'>$dansguardian_status<br>$cicap</td>
+		<td valign='top'>$squid_status$kav</td>
+		<td valign='top'>$dansguardian_status$cicap</td>
 	</tr>
+	
+	
 	</table>
 	<center style='margin:15px'><hr><img src='images.listener.php?uri=squid/rrd/connections.hour.png&hostname={$_GET["hostname"]}&md=$md'></center>
 	";

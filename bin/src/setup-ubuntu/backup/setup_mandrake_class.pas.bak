@@ -352,7 +352,7 @@ l.Add('php-imap ');
 l.Add('php-pear');
 l.add('php-gd');
 l.add('php-curl');
-l.add('php5-xapian');
+l.add('xapian-bindings-php');
 l.add('php-geoip');
 
 //l.Add('php-pear-Log');

@@ -2911,21 +2911,6 @@ if($bsini->_params[$key]["pattern_date"]<>null){
 	</tr>";
 }
 
-
-
-
-
-if($key=="SQUID"){
-if($bsini->_params["SQUID"]["icap_enabled"]<>'1'){
-	$icap="
-		<tr>
-			<td align='right'><img src='img/status_warning.gif'></td>
-			<td><strong style='font-size:11px'>{no_icap_support}</td>
-		</tr>";
-	
-		}
-	}
-	
 if($bsini->_params["$key"]["service_disabled"]=="0"){	
 	$img="warning42.png";
 	$js_service="StartStopService('".$bsini->_params["$key"]["service_cmd"]."','1','$title');";
@@ -2945,7 +2930,27 @@ if($bsini->_params["$key"]["master_pid"]<>null){
 			<td><strong>".FormatBytes($bsini->_params["$key"]["master_memory"])."</strong></td>
 		</tr>		
 		";
+			
+			if(trim($bsini->_params[$key]["master_cached_memory"])<>null){	
+			$pid=$pid."
+				<tr>
+					<td align='right'><strong>{virtual_memory}:</strong></td>
+					<td><strong>".FormatBytes($bsini->_params["$key"]["master_cached_memory"])."</strong></td>
+				</tr>	
+			";		
+			}
+			
 }
+
+if(trim($bsini->_params[$key]["processes_number"])<>null){
+	if($bsini->_params[$key]["processes_number"]>0){
+		$processes="<tr>
+						<td align='right'><strong>{processes}:</strong></td>
+						<td><strong>".$bsini->_params["$key"]["processes_number"]."</strong></td>
+				</tr>";
+	}
+}
+
 
 if(trim($bsini->_params[$key]["license_error"])<>null){
 	$img="warning42.png";
@@ -2994,6 +2999,7 @@ $html="<table style='width:1OO%'>
 		<td><strong><span style='font-size:12px'>$status</span>$pid_text</strong></td>
 		</tr>
 		$pid
+		$processes
 		$license_error
 		$version
 		$icap$pattern$textoadd$textoadd2$disabled
@@ -3001,7 +3007,7 @@ $html="<table style='width:1OO%'>
 	</td>
 </table>";		
 	
-return RoundedLightGreen($html);
+return RoundedLightGreen($html)."<br>";
 }
 
 function ASCII_TO_HTML($data){

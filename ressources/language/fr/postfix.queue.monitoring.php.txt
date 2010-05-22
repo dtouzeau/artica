@@ -15,14 +15,11 @@ Once a queue file is ready for further processing the cleanup service changes th
 The queue manager ignores incomplete queue files whose mode is 0600, as these are still being written by cleanup. 
 </incoming_text>
 <maildrop>File d'attente &quot;maildrop&quot;</maildrop>
-<maildrop_text>
-Messages that have been submitted via the Postfix sendmail command, but not yet brought into the main Postfix queue by the pickup service, await processing in the "maildrop" queue.[br]
-Messages can be added to the "maildrop" queue even when the Postfix system is not running.[br]
-They will begin to be processed once Postfix is started.
-The "maildrop" queue is drained by the single threaded pickup service scanning the queue directory periodically or when notified of new message arrival by the postdrop program.[br]
-The postdrop program is a setgid helper that allows the unprivileged Postfix sendmail program to inject mail into the "maildrop" queue and to notify the pickup(8) service of its arrival.[br]
-All mail that enters the main Postfix queue does so via the cleanup service.[br] The cleanup service is responsible for envelope and header rewriting, header and body regular expression checks, automatic bcc recipient processing, milter content processing, and reliable insertion of the message into the Postfix "incoming" queue. 
-</maildrop_text>
+<maildrop_text>Cette section repr&eacute;sente les message qui sont pass&eacute;s &agrave; travers Postfix.[br]Les messages peuvent &ecirc;tre ajout&eacute; dans la file d'attente &quot;maildrop&quot;.[br]
+M&ecirc;me si le service postfix est stopp&eacute;.[br]Ils seront analys&eacute;s au d&eacute;marrage de Postfix.[br]
+La file d'attente Maildrop est trait&eacute; par le service &quot;pickup&quot; qui l'analyse de fa&ccedil;on p&eacute;riodique ou lorsqu'il &agrave; &eacute;t&eacute; notifi&eacute; d'un nouveau message par le service postdrop.[br]
+Le service postdrop est en charge d'injecter des messages dans la file d'attente &quot;maildrop&quot; et de notifier le service &quot;pickup&quot;.[br]
+Tous les messages qui rentrent &agrave; travers Postfix le font &agrave; travers le service cleanup.[br]Le service cleanup est responsable de la r&eacute;&eacute;criture des adresses et des enveloppes, de l'analyse des regex dans les corps de texte, des ajouts automatique bcc et de la liaison entre les plugins et la file d'attente entrante</maildrop_text>
 <message_arrival_time>Horaire d'arriv&eacute;e du message</message_arrival_time>
 <message_size>Taille du message</message_size>
 <named_attribute>Nom attribu&eacute;</named_attribute>

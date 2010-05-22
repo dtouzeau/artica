@@ -15,7 +15,7 @@ $_GLOBAL["usb_list"]=array(
 			"DEVTYPE"=>"partition",
 			"ID_FS_TYPE"=>"ext4",
 			"ID_FS_LABEL_SAFE"=>"",
-			"SIZE"=>"141G;28G;106G;21%"),
+			"SIZE"=>"141G;29G;106G;22%"),
 		"d94fe4f9-8543-48d7-bce2-46ecc52ea9f5"=>array(
 			"PATH"=>"/dev/sdb1",
 			"UUID"=>"d94fe4f9-8543-48d7-bce2-46ecc52ea9f5",
@@ -31,7 +31,7 @@ $_GLOBAL["usb_list"]=array(
 			"DEVTYPE"=>"partition",
 			"ID_FS_TYPE"=>"ext4",
 			"ID_FS_LABEL_SAFE"=>"",
-			"SIZE"=>"147G;67G;74G;48%"),
+			"SIZE"=>"147G;67G;73G;48%"),
 		);
 
 
@@ -52,7 +52,7 @@ $_GLOBAL["disks_list"]=array(
 					"MOUNTED"=>"/",
 					"ID_FS_LABEL"=>"",
 					"ID_FS_TYPE"=>"",
-					"free_size"=>"141G;28G;106G;21%",
+					"free_size"=>"141G;29G;106G;22%",
 					"SIZE"=>"153.5 GB"
 				),
 				"/dev/sda2"=>array(
@@ -97,7 +97,7 @@ $_GLOBAL["disks_list"]=array(
 					"MOUNTED"=>"/media/hd2",
 					"ID_FS_LABEL"=>"vmwares",
 					"ID_FS_TYPE"=>"",
-					"free_size"=>"147G;67G;74G;48%",
+					"free_size"=>"147G;67G;73G;48%",
 					"SIZE"=>"160.0 GB"
 				),
 			)

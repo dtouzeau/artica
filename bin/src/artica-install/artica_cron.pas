@@ -368,6 +368,7 @@ SalearnSchedule:string;
 i:integer;
 systemMaxOverloaded:integer;
 squid:Tsquid;
+WifiAPEnable:integer;
 begin
       nolog:=',nolog(true)';
       l:=TstringList.Create;
@@ -525,18 +526,24 @@ logs.DeleteFile('/etc/cron.d/artica-cron-executor-300');
 
      squid.free;
 
+// ---------------------------------- BACKUP ---------------------------------------------------------------------------------------------------------
 
-
-      if FileExists('/etc/artica/backup.tasks') then begin
+      fpsystem(SYS.LOCATE_PHP5_BIN()+' /usr/share/artica-postfix/exec.backup.php --no-reload');
+      if FileExists('/etc/artica-postfix/backup.tasks') then begin
           backups:=Tstringlist.Create;
-          backups.LoadFromFile('/etc/artica/backup.tasks');
-          for i:=0 to backups.Count-1 do begin
-              l.Add(backups.Strings[i]);
+          try
+             backups.LoadFromFile('/etc/artica-postfix/backup.tasks');
+             for i:=0 to backups.Count-1 do begin
+                  l.Add(backups.Strings[i]);
+             end;
+          except
+            logs.DebugLogs('Starting......: Daemon (cron) Error set backup tasks');
           end;
           logs.DebugLogs('Starting......: Daemon (cron) set ' +IntToStr(backups.Count)+' backup tasks');
           backups.free;
-
       end;
+
+// -------------------------------------------------------------------------------------------------------------------------------------------
 
       SYS.DirFiles('/etc/artica-postfix/ad-import','import-ad-*');
       for i:=0 to SYS.DirListFiles.Count-1 do begin
@@ -544,6 +551,14 @@ logs.DeleteFile('/etc/cron.d/artica-cron-executor-300');
           l.Add(trim(logs.ReadFromFile('/etc/artica-postfix/ad-import/'+SYS.DirListFiles.Strings[i])));
       end;
 
+// ---------------------------------- WIFI ---------------------------------------------------------------------------------------------------------
+if not TryStrToInt(SYS.GET_INFO('WifiAPEnable'),WifiAPEnable) then WifiAPEnable:=0;
+if WifiAPEnable=1 then begin
+      logs.DebugLogs('Starting......: Daemon (cron) Activate WIFI Client connection watchdog');
+      l.Add('@'+Nicet+',lavg1('+IntToStr(systemMaxOverloaded)+') 5 '+cmdnice+SYS.LOCATE_PHP5_BIN()+ ' ' +artica_path+'/exec.wifi.detect.cards.php --checkap');
+end;
+
+l.add('@first(1),lavg1('+IntToStr(systemMaxOverloaded)+') 10   /etc/init.d/artica-postfix start all');
 
 
       if EnableMilterSpyDaemon=1 then begin
@@ -561,7 +576,7 @@ logs.DeleteFile('/etc/cron.d/artica-cron-executor-300');
 
       if RetranslatorEnabled=1 then begin
            logs.DebugLogs('Starting......: artica-postfix daemon (fcron) enable kaspersky retranslator each '+IntToStr(RetranslatorCronMinutes)+' minutes');
-           l.Add('@'+Nicet+nolog+' '+IntToStr(RetranslatorCronMinutes) +' '+ artica_path+'/bin/artica-update --retranslator');
+           l.Add('@'+Nicet+' '+IntToStr(RetranslatorCronMinutes) +' '+ artica_path+'/bin/artica-update --retranslator');
       end;
 
       //tous les 5 jours Ã 2H30 

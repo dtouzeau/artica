@@ -68,15 +68,11 @@ Note: to replace a deleted part with a notice, turn on Use Place holder Notice.
 [li][b]skip[/b] - ne fait rien[/li]
 [/ul]</ErrorAction_text>
 <ExcludeMimeType>Par Type Mime</ExcludeMimeType>
-<ExcludeMimeTypeExplain>
-Set an exception mask for filtering by MIME type (regular
-expressions can be used). The application will not perform
-anti-virus scanning of objects with MIME type, which does not
-match the specified mask.
-        • ^audio/mpeg$
-        • ^application/vnd.ms.wms-hdr.asfv1$
-        • ^application/x-mms-framed$
-</ExcludeMimeTypeExplain>
+<ExcludeMimeTypeExplain>D&eacute;finition d'un masque d'exception par type MIME (des expressions r&eacute;guli&egrave;res peuvent &ecirc;tre utilis&eacute;s).
+Le programme n'effectuera pas de scan antivirus sur ces objets MIME exclus.[br]
+[li]^audio/mpeg$[/li]
+[li]^application/x-mms-framed$[/li]
+[li]^application/vnd.ms.wms-hdr.asfv1$[/li]</ExcludeMimeTypeExplain>
 <excludes>Exclusions</excludes>
 <ExcludeURL>Par URL</ExcludeURL>
 <ExcludeURLExplain>
@@ -122,9 +118,9 @@ If set, then Max-Connections header is added in the OPTIONS response.[br] If zer
 If number of antiviral engines reaches the limit, then new check requests are queued until the number of engines became less then the limit.</MaxEnginesPerChild_text>
 <MaxReqsPerChild>Max requests per child</MaxReqsPerChild>
 <MaxReqsPerChild_text>The maximal number of requests processes by one child.[br] If it exeeded, than child proceess shutdown.[br]The shutdown procedure works in the following manner:[ul][li]In this way all the current requests are handled properly.After all the requests[/li][li]handled - connection is closed. No new connections accepted by this child.[/li][/ul]</MaxReqsPerChild_text>
-<MaxScanRequests>Max scanning request</MaxScanRequests>
-<MaxScanRequests_text>How many concurrent scanning requests to perform (0 means unlimited.)</MaxScanRequests_text>
-<MaxScanTime>Max Scanning time</MaxScanTime>
+<MaxScanRequests>Requ&ecirc;te d'analyse MAX</MaxScanRequests>
+<MaxScanRequests_text>Combien de requ&ecirc;tes d'analyse peuvent &ecirc;tre ex&eacute;cut&eacute;e en m&ecirc;me temps (0 veut dire illimit&eacute;).</MaxScanRequests_text>
+<MaxScanTime>Temps MAX d'analyse</MaxScanTime>
 <MaxScanTime_text>Limits the number of seconds to spend on a message or part scan.[br]If exceeded, an error is issued.</MaxScanTime_text>
 <MaxSendDelayTime>Max delay time in seconds</MaxSendDelayTime>
 <MaxSendDelayTime_text>
@@ -198,12 +194,10 @@ environment variable http_proxy is searched for it.</ProxyAddress_text>
 <ScanPacked>analyse des ex&eacute;cutables compress&eacute;s</ScanPacked>
 <ScanPacked_text>Scan des ex&eacute;cutables compress&eacute;s</ScanPacked_text>
 <ScanPolicy>Politiques de Messagerie</ScanPolicy>
-<ScanPolicy_text>Scanning policy defines how a message should be analyzed:[ul]
-[li]message - scan the whole message for viruses, and if found infected, scan each part;[/li]
-[li]combined - first scan the whole message, then scan each part regardless of message scan result.[/li]
-[/ul]
-
-</ScanPolicy_text>
+<ScanPolicy_text>Les r&egrave;gles d'analyses d&eacute;finissent comment un message doit &ecirc;tre trait&eacute;:[ul]
+ [li]message - Analyse tout le message et si trouv&eacute;, analyser chaque partie;[/li]
+[li]Combin&eacute; - Analyser tout le message puis chaque partie du message en fonction de la premi&egrave;re analyse.[/li]
+[/ul]</ScanPolicy_text>
 <scan_options>Options de Scan</scan_options>
 <scan_options_text>This section contains the settings for actions over scanned</scan_options_text>
 <SenderSubject>Sujet d'exp&eacute;diteur</SenderSubject>

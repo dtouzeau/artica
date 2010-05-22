@@ -364,9 +364,11 @@ function StatusSamba(){
 function StatusSquid(){
 	$ini=new Bs_IniHandler();
 	$sock=new sockets();
-	$ini->loadString($sock->getFrameWork("cmd.php?squid-status=yes"));
-	$status_squid=DAEMON_STATUS_ROUND("SQUID",$ini);
-	$status_dansguardian=DAEMON_STATUS_ROUND("DANSGUARDIAN",$ini);
+	$ini->loadString($sock->getFrameWork("cmd.php?squid-ini-status=yes"));
+	$status_squid=DAEMON_STATUS_ROUND("SQUID",$ini,null,1);
+	$status_dansguardian=DAEMON_STATUS_ROUND("DANSGUARDIAN",$ini,null,1);
+	$status_kav4proxy=DAEMON_STATUS_ROUND("KAV4PROXY",$ini,null,1);
+	$cicap=DAEMON_STATUS_ROUND("C-ICAP",$ini,null,1);
 	$html="
 		<table style='width:100%'>
 			<tr>
@@ -374,7 +376,7 @@ function StatusSquid(){
 					<table style='width:100%'>
 						<tr>
 							<td valign='top' width=1%>" . imgtootltip('64-samba.png','{APP_SQUID}',"javascript:Loadjs('squid.newbee.php?yes=yes')")."</td>
-							<td valign='top' ><br>$status_squid<br>$status_dansguardian</td>
+							<td valign='top' >$status_squid$status_dansguardian$status_kav4proxy$cicap</td>
 						</tr>
 					</table>
 				</td>

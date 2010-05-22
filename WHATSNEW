@@ -1,19 +1,35 @@
+1.4.052216:
+========================================================================================
+
+Interface Changes
+-------------------------------------------------
+1.4.052216: Adding more left menus.
+1.4.052216: Fix users list allow to display only the first table row user.
+1.4.052216: Improve Wifi client mode visibility.
+
 Messaging Changes:
 -----------------------------------------------
-Adding possibility to remove Kaspersky Anti-Spam trough Setup Center
-
-
-
-
+1.4.052020: Adding possibility to remove Kaspersky Anti-Spam trough Setup Center.
+1.4.052113: Fix unable to save Messages Size limit configuration in production.
 
 
 Proxy Changes:
 -------------------------------------------------
-Adding possibility to change cache performance for et dedicated website.
+1.4.052020: Adding possibility to change cache performance for et dedicated website.
+1.4.052020: Support new c-icap version.
+1.4.052020: Fix wrong services status in panels.
 
 
-
-
+System Changes
+-------------------------------------------------
+1.4.052113: Fix unable to schedule backup tasks.
+1.4.052113: Introduce WIFI management.
+1.4.052202: Finish WIFI in client mode.
+1.4.052202: Fix unable to select language in logon form.
+1.4.052216: Change the startup process, now only LDAP/Mysql/lighttpd/artica-cron services are started when performing "/etc/init.d/artica-postfix start" command.
+	The scheduler artica-cron process tis in charge of run all others services one minute after it started.
+	This to speedup the boot time when restart the computer and to not wait for a long time to display Artica Interface.
+	This feature prepare appliances...
 
 
 https://forum.debian-fr.org/viewtopic.php?f=3&t=7164&start=0&st=0&sk=t&sd=a

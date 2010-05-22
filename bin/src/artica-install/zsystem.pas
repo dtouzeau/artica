@@ -410,7 +410,7 @@ public
         function LIGHTTPD_GET_USER():string;
         function LIGHTTPD_CONF_PATH:string;
         function LIGHTTPD_LISTEN_PORT():string;
-
+       function WIRELESS_CARD():string;
 END;
 
 implementation
@@ -1856,9 +1856,13 @@ begin
         exit;
      end;
   end;
+  try
   ini:=TiniFile.Create('/etc/artica-postfix/versions.cache');
   result:=ini.ReadString(APP_NAME,'VERSION','');
-  ini.Free;
+  finally
+    ini.Free;
+  end;
+
 end;
 //#########################################################################################
 procedure Tsystem.SET_CACHE_VERSION(APP_NAME:string;version:string);
@@ -7703,6 +7707,30 @@ for i:=0 to l.Count-1 do begin
 
    if RegExpr.Exec(l.Strings[i]) then begin
    result:=RegExpr.Match[1];
+   break;
+   end;
+end;
+
+   RegExpr.Free;
+   l.free;
+
+end;
+//##############################################################################
+function Tsystem.WIRELESS_CARD():string;
+var
+RegExpr:TRegExpr;
+l:TStringList;
+i:integer;
+begin
+if not FileExists('/proc/net/wireless') then exit;
+l:=TstringList.Create;
+l.LoadFromFile('/proc/net/wireless');
+RegExpr:=TRegExpr.Create;
+RegExpr.Expression:='(.+?):\s+([0-9]+)';
+for i:=0 to l.Count-1 do begin
+
+   if RegExpr.Exec(l.Strings[i]) then begin
+   result:=trim(RegExpr.Match[1]);
    break;
    end;
 end;

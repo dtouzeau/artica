@@ -132,9 +132,17 @@ for( $i = 0; $i < count($GLOBALS["recipients"]); $i++ ) {
 	}
 
 //X_ReplaceTo($tmpfname);
+$mailsize=@filesize($tmpfname);
 $cmd="/usr/share/artica-postfix/bin/artica-msmtp --host 127.0.0.1 --port 33559 --read-envelope-from --logfile=$send_result_file -- {$GLOBALS["original_recipient"]} < $tmpfname";
+events("Mailsize:$mailsize","main",__LINE__);
 events($cmd,"main",__LINE__);
-shell_exec($cmd);
+exec($cmd,$results);
+if(count($results)>0){
+	while (list ($num, $ligne) = each ($results) ){
+		events("mstmp_results:$ligne","main",__LINE__);
+	}
+}
+
 @unlink($tmpfname);
 if(!SendResultOK($send_result_file)){exit(EX_TEMPFAIL);}
 events("Success", "main",__LINE__);
@@ -384,8 +392,12 @@ function CheckDisclaimerTestUid($uid){
 function SendResultOK($file){
 	$datas=explode("\n",@file_get_contents($file));
 	@unlink($file);
+	$length=strlen($datas);
+	$filename=basename($file);
 	while (list ($num, $val) = each ($datas) ){
+		events("$filename:$length bytes:$num. $val");
 		if(preg_match("#exitcode=EX_OK#",$val)){
+			events("$filename: OK -> return back");
 			return true;
 		}
 	}

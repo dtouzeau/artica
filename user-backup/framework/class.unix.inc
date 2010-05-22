@@ -92,7 +92,15 @@ class unix {
 		 }
 		}
 		
-	}	
+	}
+
+	public function GET_WIRELESS_CARD(){
+		$t=explode("\n",@file_get_contents("/proc/net/wireless"));
+		while (list ($index, $line) = each ($t)){
+			if(preg_match("#(.+?):\s+([0-9]+)#",$line,$re)){return $re[1];}
+		}
+		
+	}
 	
 	
 	
@@ -289,17 +297,50 @@ public function alt_stat($file) {
 		return 0;
 	}
 	
-	public function PROCESS_MEMORY($pid){
+	public function PROCESS_MEMORY($pid,$noMo=false){
+		//$PPID=$this->PROCESS_PPID();
+		//if($PPID>1)
+		
 		if(!is_file("/proc/$pid/status")){return 0;}
 		$f=@explode("\n",@file_get_contents("/proc/$pid/status"));
 		$pattern="#^VmRSS:\s+([0-9]+)#";
 		while (list ($num, $ligne) = each ($f) ){
 			if(preg_match($pattern,$ligne,$re)){
-				return round($re[1]/1024);
+				if($noMo){return $re[1];}
+				return round($re[1]/1024,2);
 			}
 		}
 		
 	}
+	
+	public function PROCESS_CACHE_MEMORY($pid,$noMo=false){
+		//$PPID=$this->PROCESS_PPID();
+		//if($PPID>1)
+		
+		if(!is_file("/proc/$pid/status")){return 0;}
+		$f=@explode("\n",@file_get_contents("/proc/$pid/status"));
+		$pattern="#^VmSize:\s+([0-9]+)#";
+		while (list ($num, $ligne) = each ($f) ){
+			if(preg_match($pattern,$ligne,$re)){
+				if($noMo){return $re[1];}
+				return round($re[1]/1024,2);
+			}
+		}
+		
+	}	
+	
+	private function PROCESS_PPID($pid){
+	if(!is_file("/proc/$pid/status")){return 0;}
+		$f=@explode("\n",@file_get_contents("/proc/$pid/status"));
+		$pattern="#^PPid:\s+([0-9]+)#";
+		while (list ($num, $ligne) = each ($f) ){
+			if(preg_match($pattern,$ligne,$re)){
+				return intval($re[1]);
+			}
+		}
+		
+	}
+	
 	
 	public function PROCESS_STATUS($pid){
 		$datas=explode("\n",@file_get_contents("/proc/$pid/status"));
@@ -415,13 +456,10 @@ public function alt_stat($file) {
 
 	
 	public function process_exists($pid){
-		if(!preg_match("#([0-9]+)#",$pid,$re)){
-			writelogs_framework("Unable to preg_match \"$pid\"",__CLASS__.'/'.__FUNCTION__,__FILE__,__LINE__);
-			return false;}
+		if(!preg_match("#([0-9]+)#",$pid,$re)){return false;}
 		$pid=$re[1];
 		if(is_file("/proc/$pid/exe")){return true;}
 		if(is_file("/proc/$pid/cmdline")){return true;}
-		writelogs_framework("$pid: false",__CLASS__.'/'.__FUNCTION__,__FILE__,__LINE__);
 		return false;
 	}
 	
@@ -1280,6 +1318,8 @@ class services_status{
 	}
 	
 }
+
+
 
 
 ?>
