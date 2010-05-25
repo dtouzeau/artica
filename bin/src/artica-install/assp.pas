@@ -23,7 +23,7 @@ private
      EnableASSPBackup:integer;
      NotASSPRemovePass:integer;
      EnablePostfixMultiInstance:integer;
-     procedure CHECK_POSTFIX();
+
      function PID_NUM():string;
      procedure REMOVEPASSWORD();
      procedure allowAdminConnectionsFrom();
@@ -37,6 +37,7 @@ public
     function    VERSION():string;
     procedure   START();
     procedure   STOP();
+    procedure   CHECK_POSTFIX();
     FUNCTION    STATUS():string;
     function    RELOAD():string;
 END;
@@ -125,6 +126,7 @@ begin
    end;
 
    LDAP_CONFIG();
+   CHECK_POSTFIX();
    logs.OutputCmd('/bin/kill -HUP '+pid);
 
 end;

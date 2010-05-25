@@ -258,7 +258,11 @@ end;
               halt(0);
          end;
 
-
+         if ParamStr(2)='hostapd' then begin
+              zwifi:=twifi.Create(SYS);
+              writeln(zwifi.HOSTAPD_VERSION());
+              halt(0);
+         end;
 
          writeln('help:');
          writeln('--export-version squid');
@@ -870,14 +874,6 @@ end;
     halt(0);
  end;
 
-  if ParamStr(1)='--bad-du' then begin
-    GLOBAL_INI:=myconf.Create;
-    GLOBAL_INI.KILL_BAD_DU();
-    halt(0);
- end;
-
-
-
 
  if paramStr(1)='--obm2-version' then begin
     zobm2:=tobm2.Create(SYS);
@@ -1017,6 +1013,13 @@ if paramStr(1)='--kavmilter-reload' then begin
 
  if ParamStr(1)='--cyrus-checkconfig' then begin
     CCYRUS.CheckRightsAndConfig();
+    halt(0);
+ end;
+
+
+
+ if ParamStr(1)='--cyrus-ctl-cyrusdb' then begin
+    CCYRUS.RECOVER_CYRUS_DB_SINGLE();
     halt(0);
  end;
   if ParamStr(1)='--cyrus-recoverdb' then begin

@@ -39,7 +39,7 @@ private
      dnsmasq:tdnsmasq;
      SYS:Tsystem;
      fetchmail:tfetchmail;
-     function ExecPipe(commandline:string;ShowOut:boolean=false):string;
+//     function ExecPipe(commandline:string;ShowOut:boolean=false):string;
      function MD5FromFile(path:string):string;
      function ReadFileIntoString(path:string):string;
      function COMMANDLINE_PARAMETERS(FoundWhatPattern:string):boolean;
@@ -47,9 +47,10 @@ private
 
 
 public
+    Enable_echo:boolean;
     procedure Free;
     constructor Create;
-    Enable_echo:boolean;
+
 
     function get_file_permission(path:string):string;
     function ExecPipe2(commandline:string;ShowOut:boolean=false):string;
@@ -116,14 +117,6 @@ begin
     ArrDatas.Free;
 end;
 //##############################################################################
-function Tprocessinfos.ExecPipe(commandline:string;ShowOut:boolean):string;
-begin
-if debug then LOGS.logs('Tprocessinfos.ExecPipe ->' + commandline);
-fpsystem(commandline + ' >/tmp/artica.cmdLines.tmp');
-result:=ReadFileIntoString('/tmp/artica.cmdLines.tmp');
-end;
-//##############################################################################
-
 function Tprocessinfos.ExecStream(commandline:string;ShowOut:boolean):TMemoryStream;
 const
   READ_BYTES = 2048;
@@ -409,7 +402,6 @@ jcheckmail.free;
 
 ccyrus.CYRUS_DAEMON_STOP();
 syslogng.STOP();
-zmysql.SERVICE_STOP();
 squid.SQUID_STOP();
 dansguardian.DANSGUARDIAN_STOP();
 

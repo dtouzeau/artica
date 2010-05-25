@@ -31,10 +31,12 @@ public
     function    STATUS:string;
     function    INITD_PATH():string;
     function    SCAN_DISKS():string;
+    function    SCAN_DEV():string;
     function    SCAN_VG():string;
     procedure   RELOAD();
     procedure   pvcreate_dev(dev:string);
     procedure   vgcreate_dev(dev:string;groupname:string);
+
 END;
 
 implementation
@@ -115,9 +117,6 @@ SYS.SET_CACHE_VERSION('APP_NFS',result);
 end;
 //#############################################################################
 procedure tlvm.RELOAD();
-var
-   count:integer;
-   pid:string;
 begin
     if not FileExists('/etc/artica-postfix/settings/Daemons/NFSExportConfig') then exit;
     fpsystem('/bin/cp /etc/artica-postfix/settings/Daemons/NFSExportConfig /etc/exports');
@@ -147,7 +146,7 @@ begin
     fpsystem(INITD_PATH()+' start');
     if FileExists('/etc/init.d/nfs-common') then fpsystem('/etc/init.d/nfs-common start');
 
-
+count:=0;
  while not SYS.PROCESS_EXIST(PID_NUM()) do begin
 
         sleep(100);
@@ -171,15 +170,6 @@ end;
 
 //#############################################################################
 procedure tlvm.STOP();
-var
-   count:integer;
-   pid:string;
-   tmp:string;
-   l:Tstringlist;
-   i:integer;
-   tt:integer;
-   path:string;
-    RegExpr:TRegExpr;
 begin
   fpsystem(INITD_PATH()+' stop');
   if FileExists('/etc/init.d/nfs-common') then fpsystem('/etc/init.d/nfs-common stop');
@@ -276,7 +266,7 @@ begin
    for i:=0 to l.Count-1 do begin
       if RegExpr.Exec(l.Strings[i]) then begin
           logs.Debuglogs('Match[1]='+trim(RegExpr.Match[1])+' Match[2]='+trim(RegExpr.Match[2])+' Match[3]='+trim(RegExpr.Match[3])+' Match[4]='+trim(RegExpr.Match[4]));
-          php.Add('$lvm_gdev["'+trim(RegExpr.Match[1])+'"]["+'+trim(RegExpr.Match[2])+'"]="'+trim(RegExpr.Match[4])+'";');
+          php.Add('$lvm_gdev["'+trim(RegExpr.Match[2])+'"]["'+trim(RegExpr.Match[1])+'"]="'+trim(RegExpr.Match[4])+'";');
       end;
 
    end;
@@ -291,6 +281,49 @@ begin
 end;
 
 //#############################################################################
+function tlvm.SCAN_DEV():string;
+var
+   l:Tstringlist;
+   php:tstringlist;
+   tmpstr:string;
+   RegExpr:TRegExpr;
+   cmd:string;
+   i:integer;
+begin
+   if not FileExists(SYS.LOCATE_LVMDISKSCAN()) then begin
+      logs.Debuglogs('tlvm.SCAN_VG():: Unable to stat lvmdiskscan');
+      exit;
+   end;
+   tmpstr:=logs.FILE_TEMP();
+   cmd:=SYS.LOCATE_LVMDISKSCAN()+' -l >'+tmpstr+' 2>&1';
+   logs.Debuglogs(cmd);
+   fpsystem(cmd);
+   RegExpr:=TRegExpr.Create;
+   l:=Tstringlist.Create;
+   l.LoadFromFile(tmpstr);
+   RegExpr.Expression:='(.+?)\s+.+?\[([0-9A-Z\s]+)\]\s+LVM';
+   php:=Tstringlist.Create;
+   for i:=0 to l.Count-1 do begin
+      if RegExpr.Exec(l.Strings[i]) then begin
+          logs.Debuglogs('Match[1]='+trim(RegExpr.Match[1])+' Match[2]='+trim(RegExpr.Match[2]));
+          php.Add('$lvm_disks["'+trim(RegExpr.Match[1])+'"]["'+trim(RegExpr.Match[2])+'"]=True;');
+      end;
+
+   end;
+
+   result:=php.Text;
+   php.free;
+   l.free;
+   RegExpr.free;
+   logs.DeleteFile(tmpstr);
+
+
+end;
+
+//#############################################################################
+
+
+
 
 function tlvm.STATUS:string;
 var

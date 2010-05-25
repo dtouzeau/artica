@@ -256,6 +256,7 @@ public
        function LOCATE_SU():string;
        function LOCATE_cyrreconstruct():string;
        function LOCATE_ctl_mboxlist():string;
+       function LOCATE_ctl_cyrusdb():string;
        function LOCATE_DF():string;
        function LOCATE_PRELOAD():string;
        function LOCATE_POSTFIX_MAILDROP():string;
@@ -4323,8 +4324,15 @@ begin
     if FileExists('/usr/sbin/accept') then exit('/usr/sbin/accept');
 end;
  //#############################################################################
+ function Tsystem.LOCATE_ctl_cyrusdb():string;
+begin
+ if FileExists('/usr/sbin/ctl_cyrusdb') then exit('/usr/sbin/ctl_cyrusdb');
+ if FileExists('/usr/lib/cyrus/bin/ctl_cyrusdb') then exit('/usr/lib/cyrus/bin/ctl_cyrusdb');
+ if FileExists('/usr/lib/cyrus-imapd/ctl_cyrusdb') then exit('/usr/lib/cyrus-imapd/ctl_cyrusdb');
+end;
 
- function Tsystem.LOCATE_ctl_mboxlist():string;
+ //#############################################################################
+  function Tsystem.LOCATE_ctl_mboxlist():string;
 begin
 
  if FileExists('/usr/sbin/ctl_mboxlist') then exit('/usr/sbin/ctl_mboxlist');

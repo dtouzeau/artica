@@ -7,7 +7,7 @@ uses
   Classes, SysUtils,variants, Process,unix,logs,
   RegExpr,zsystem,IniFiles,
   global_conf in 'global_conf.pas',common,process_infos,cyrus,clamav,spamass,pureftpd,roundcube,openldap,spfmilter,samba,mimedefang,bogofilter,squid,stunnel4,dkimfilter,
-  postfix_class,mailgraph_daemon,lighttpd,miltergreylist,dansguardian,monitorix,kav4samba,awstats,ntpd,kav4proxy,bind9,fdm,p3scan,syslogng,kas3,isoqlog,dhcp_server,cups,
+  postfix_class,mailgraph_daemon,lighttpd,miltergreylist,dansguardian,monitorix,kav4samba,awstats,ntpd,kav4proxy,bind9,fdm,p3scan,syslogng,kas3,isoqlog,dhcp_server,cups,wifi,
   dnsmasq,kavmilter,  jcheckmail, rdiffbackup,openvpn,strutils,xapian,dstat,BaseUnix,nfsserver,policyd_weight,tcpip,pdns,mysql_daemon,zabbix,assp,postfilter, vmwaretools,phpldapadmin,zarafa_server,squidguard,
   collectd         in '/home/dtouzeau/developpement/artica-postfix/bin/src/artica-install/collectd.pas',
   fetchmail        in '/home/dtouzeau/developpement/artica-postfix/bin/src/artica-install/fetchmail.pas',
@@ -576,6 +576,7 @@ var
    zarafa                :tzarafa_server;
    squidguard            :tsquidguard;
    WifiCardOk            :integer;
+   wifi                  :twifi;
    
 
 begin
@@ -727,7 +728,15 @@ begin
 
 
    if FileExists(SYS.LOCATE_GENERIC_BIN('wpa_supplicant')) then list.Add('$_GLOBAL["WPA_SUPPLIANT_INSTALLED"]=True;') else list.Add('$_GLOBAL["WPA_SUPPLIANT_INSTALLED"]=False;');
-   if FileExists(SYS.LOCATE_GENERIC_BIN('hostapd')) then list.Add('$_GLOBAL["HOSTAPD_INSTALLED"]=True;') else list.Add('$_GLOBAL["HOSTAPD_INSTALLED"]=False;');
+
+   if FileExists(SYS.LOCATE_GENERIC_BIN('hostapd')) then begin
+      wifi:=twifi.Create(SYS);
+      list.Add('$_GLOBAL["HOSTAPD_INSTALLED"]=True;');
+      list.Add('$_GLOBAL["HOSTAPD_BINVER"]="'+IntTOSTr(wifi.HOSTAPD_BINVER())+'";');
+   end else begin
+    list.Add('$_GLOBAL["HOSTAPD_INSTALLED"]=False;');
+   end;
+
 
 
    //smartd
@@ -1625,8 +1634,6 @@ end;
 procedure Tprocess1.CleanCpulimit();
 var
    min:integer;
-   pid:string;
-   CountPid:integer;
    CpuPOurc:integer;
    l:Tstringlist;
    i:Integer;
@@ -1871,7 +1878,7 @@ logs.Debuglogs('CleanBadProcesses():: /usr/bin/mhonarc -attachmentdir ('+pid+')'
       logs.Debuglogs('CleanBadProcesses():: /usr/bin/mhonarc -attachmentdir ('+pid+') does not exists in memory');
    end;
 
-GLOBAL_INI.KILL_BAD_DU();
+
 
 
 
@@ -1934,7 +1941,7 @@ end;
 //##############################################################################
 procedure Tprocess1.CleanFetchMailLogs();
 var
-zdate,tmp:string;
+tmp:string;
 ArticaMaxLogsSize,FileSize:Integer;
 begin
 ArticaMaxLogsSize:=0;
@@ -2161,7 +2168,6 @@ var
 l:TstringList;
 i:Integer;
 pid:string;
-minutes:integer;
 begin
 if not FileExists('/usr/local/ap-mailfilter3/bin/sfupdates') then exit;
 l:=TstringList.Create;

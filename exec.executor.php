@@ -371,6 +371,7 @@ if($GLOBALS["DANSGUARDIAN_INSTALLED"]){
 	$array2[]="artica-update";
 	$array2[]="artica-install --cups-drivers";
 	$array2[]="artica-update --spamassassin-bl";
+	$array2[]="artica-install -watchdog daemon";
 	
 	if($GLOBALS["EnableArticaWatchDog"]==1){
 		$array2[]="artica-install --urgency-start";

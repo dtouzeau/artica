@@ -1,4 +1,4 @@
-1.4.052216:
+1.4.052511:
 ========================================================================================
 
 Interface Changes
@@ -11,7 +11,7 @@ Messaging Changes:
 -----------------------------------------------
 1.4.052020: Adding possibility to remove Kaspersky Anti-Spam trough Setup Center.
 1.4.052113: Fix unable to save Messages Size limit configuration in production.
-
+1.4.052417: Add a new watchdog action on "DBERROR db4: DB_AUTO_COMMIT may not be specified in non-transactional environment" in Cyrus-imap
 
 Proxy Changes:
 -------------------------------------------------
@@ -30,10 +30,10 @@ System Changes
 	The scheduler artica-cron process tis in charge of run all others services one minute after it started.
 	This to speedup the boot time when restart the computer and to not wait for a long time to display Artica Interface.
 	This feature prepare appliances...
+	
+1.4.052417: Fix default Mysql databases are not installed on a fresh Artica install on CentOS systems.
+1.4.052417: Adding ATrpms repostpry for setup-centos http://atrpms.net/
 
-
-https://forum.debian-fr.org/viewtopic.php?f=3&t=7164&start=0&st=0&sk=t&sd=a
-http://www.shallalist.de/licence.html
 
 
 1.4.051818:
@@ -51,6 +51,7 @@ Messaging Changes:
 1.4.051623: Fix unable to set multiple listen Interfaces in postfix.
 1.4.051623: Fix wrong transport rules when transfert messages to domains.
 1.4.051717: Consolidating PoMMo starting process.
+
 
 
 Proxy Changes:

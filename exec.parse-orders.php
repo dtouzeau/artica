@@ -59,7 +59,7 @@ if(count($orders)==0){return null;}
 	$orders_number=count($orders);
 	$count_max=$orders_number;
 	if($count_max>2){$count_max=2;}
-	
+	if($orders_number>10){if(!$GLOBALS["OVERLOAD"]){$count_max=10;}}
 	
 	while (list ($num, $cmd) = each ($orders) ){
 		$count=$count+1;

@@ -127,8 +127,8 @@ procedure tkavm4mls.RELOAD();
 var
     pidlists:string;
     RegExpr:TRegExpr;
-    l:TstringList;
-    i:Integer;
+
+
 begin
   pidlists:=KAV_MILTER_PID();
   if length(pidlists)=0 then begin
@@ -205,6 +205,11 @@ ini.WriteString('1043','INSTROOT','/opt/kaspersky/kav4lms');
 ini.WriteString('1043','NAME','Kaspersky Anti-Virus for Linux Mail Server');
 ini.WriteString('1043','PATH_BASES','/var/opt/kaspersky/kav4lms/bases');
 ini.WriteString('1043','PATH_LICENSES','/var/opt/kaspersky/kav4lms/licenses');
+ini.WriteString('1043','FILTER_SERVICE','true');
+ini.WriteString('1043','FILTER_PROGRAM','kav4lms-milter');
+ini.WriteString('1043','INITD_kav4lms','true');
+ini.WriteString('1043','INITD_kav4lms_filters','true');
+ini.WriteString('1043','PATH_LICENSES','/var/opt/kaspersky/kav4lms/licenses');
 ini.WriteString('1043','USED_PKGMGR','deb');
 ini.WriteString('1043','VERSION','5.6.42');
 ini.UpdateFile;
@@ -215,13 +220,9 @@ end;
 procedure tkavm4mls.START();
 var
     pidlists:string;
-    RegExpr:TRegExpr;
-    l:TstringList;
-    i:Integer;
-    Expired:boolean;
     count:integer;
 begin
-Expired:=false;
+
 
 logs.Debuglogs('###################### kav4mls ######################');
 
@@ -460,6 +461,7 @@ spattern_date:string;
 pids:string;
 ini:TiniFile;
 begin
+result:='';
 if not FileExists('/opt/kav/5.6/kavmilter/bin/keepup2date') then exit;
 logs.Debuglogs('tkavm4mls.PERFORM_UPDATE() kavmilterEnable='+SYS.GET_INFO('kavmilterEnable'));
 if SYS.GET_INFO('kavmilterEnable')<>'1' then begin

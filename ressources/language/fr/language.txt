@@ -120,6 +120,7 @@ Ajouter une liste : exe,pif,bat,doc</add_attachment_blocking_text_explain>
 <add_computer_access>Ajouter un acc&egrave;s ordinateur</add_computer_access>
 <ADD_COMPUTER_TEXT>Ajoute un nouvel ordianteur dans la base d'Artica</ADD_COMPUTER_TEXT>
 <add_default_rules>Ajouter les r&egrave;gles par d&eacute;faut</add_default_rules>
+<add_default_settings>Ajouter des param&egrave;tres par d&eacute;faut</add_default_settings>
 <add_edit_rule>Ajouter &amp; &eacute;diter une r&egrave;gle</add_edit_rule>
 <add_entry>Ajouter une entr&eacute;e</add_entry>
 <add_every>Ajouter toujours</add_every>
@@ -254,6 +255,7 @@ Si un ordinateur d&eacute;passe la limite des X &eacute;v&eacute;nements, Artica
 <apply config text>Cette op&eacute;ration va compiler tous vos r&eacute;glages sur le serveur et les mettre en mode de production.</apply config text>
 <apply_pureftpd>Appliquer FTP</apply_pureftpd>
 <apply_pureftpd_text>Reconstruire la base de donn&eacute;es des utilisateurs et red&eacute;marrer le serveur ftp</apply_pureftpd_text>
+<apply_rules_for_local_users>Appliquer les r&egrave;gles pour les utilisateurs locaux aussi</apply_rules_for_local_users>
 <apply_scripts_mailbox>appliquer les r&egrave;gles vers votre boite aux lettres</apply_scripts_mailbox>
 <apply_settings>Appliquer ces param&egrave;tres au serveur et les mettre en mode de production</apply_settings>
 <apply_settings_bind9>Compilez les Param&egrave;tres Bind9</apply_settings_bind9>
@@ -1567,6 +1569,7 @@ It send notifications to recipients in order to allow them to "download" attache
 <identity>Identit&eacute;</identity>
 <if>si</if>
 <if_in>si dans</if_in>
+<ignore_all>Tout ignorer</ignore_all>
 <illimited>illimit&eacute;</illimited>
 <imap_connection_broken>La connexion Imap est actuellement rompu et les informations ne peuvent pas &ecirc;tre lus</imap_connection_broken>
 <imap_connection_locked>La connexion imap est actuellement verrouill&eacute; car le serveur imap n'a pas r&eacute;pondu &agrave; temps</imap_connection_locked>
@@ -2233,6 +2236,7 @@ The default is to use the local machine name, $myhostname, which defaults to the
 <nsICQid>ICQ</nsICQid>
 <nsMSNid>MSN</nsMSNid>
 <nsYahooid>Yahoo</nsYahooid>
+<ntp_about>NTPD est utilis&eacute; pour synchroniser l'horloge de l'ordinateur avec une base de temps commune (habituellement UTC) gr&acirc;ce au protocole NTP</ntp_about>
 <nt_acl_support>Support des ACLs NT</nt_acl_support>
 <nt_acl_support_text>Traduire les permissions Unix en ACL Windows</nt_acl_support_text>
 <NT_STATUS_ACCESS_DENIED>Erreur: Acc&egrave;s refus&eacute;</NT_STATUS_ACCESS_DENIED>
@@ -2559,8 +2563,21 @@ Les bo&icirc;tes aux lettres d&eacute;j&agrave; cr&eacute;es ne seront pas impac
 <refresh>Rafraichir</refresh>
 <refresh time>temps de rafraichissement</refresh time>
 <refresh_database_each>Rafra&icirc;chir la base de donn&eacute;es toutes les</refresh_database_each>
+<refresh_pattern_intro>Cette section contr&ocirc;le de mani&egrave;re indirecte la m&eacute;moire cache du disque. [br]
+Elle aide Squid &agrave; d&eacute;cider si oui ou non une demande peut &ecirc;tre mise en cache ou doit &ecirc;tre trait&eacute;e en directe. [br]
+Ceci vous permet de modifier le ratio du cache  mais aussi d'augmenter les chances que les utilisateurs re&ccedil;oivent une r&eacute;ponse vici&eacute;e.</refresh_pattern_intro>
 <refresh_pattern_max>Limite maximale d'un objet conserv&eacute; dans le cache</refresh_pattern_max>
 <refresh_pattern_min>Temps en minutes de r&eacute;tention o&ugrave; un objet qui n'a pas de temps d'expiration d&eacute;fini par le serveur web</refresh_pattern_min>
+<refresh_pattern_option>[ul]
+[li][b]override-expire[/b][br]
+Cette option indique &agrave;  Squid de v&eacute;rifier la valeur minimale avant de v&eacute;rifier l'en-t&ecirc;te Expires.[br]
+Ainsi, un temps minimal non nul oblige Squid &agrave; retourner un cache non valide m&ecirc;me si la r&eacute;ponse est pr&eacute;-expir&eacute;e.[br][/li]
+[li][b]override-lastmod[/b][br]
+Cette option indique &agrave; Squid de v&eacute;rifier la valeur minimale avant le pourcentage LM-factor[br][/li]
+[li][b]reload-into-ims[/b][br]
+Lorsqu'elle est activ&eacute;e, cette option permet de transformer une demande de Squid avec une directive no-cache dans la validation (If-Modified-Since) d'une demande. En d'autres termes, Squid ajoute un If-Modified-Since dans l'ent&ecirc;te avant de l'envoyer.[br][i] Notez que cela ne fonctionne que pour les objets qui ont un horodatage de derni&egrave;re mise &agrave; jour. La demande sortante conserve la directive no-cache, de sorte qu'il atteigne le serveur d'origine[/i][br][/li]
+[li][b]ignore-reload[/b][br]
+Cette option indique &agrave; Squid d'ignorer l&quot;attribut no-cache.[br][/li][/ul]</refresh_pattern_option>
 <refresh_pattern_pourc>Pourcentage de r&eacute;tention de l'age des objets (calcul&eacute; sur temps depuis le dernier rafra&icirc;chissement)</refresh_pattern_pourc>
 <refresh_pattern_site>Donnez le nom du site web. Cela peut &ecirc;tre www.company.tm ou company.tm ou company.*</refresh_pattern_site>
 <regex_filter_explain> * caracter is supported. If you want to use regex operation, prepend the line width [code][b]REGEX:[b][/code]</regex_filter_explain>

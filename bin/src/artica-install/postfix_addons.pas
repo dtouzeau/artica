@@ -7,7 +7,7 @@ unit postfix_addons;
 interface
 
 uses
-Classes, SysUtils,Process,unix,global_conf,RegExpr in 'RegExpr.pas',install_common,class_install,logs,cyrus,openldap;
+Classes, SysUtils,Process,unix,global_conf,RegExpr in 'RegExpr.pas',install_common,logs,cyrus,openldap;
 
   type
   Tpostfix_addon=class
@@ -563,16 +563,11 @@ begin
 end;
 //###############################################################################
 procedure Tpostfix_addon.install_kaspersky_mail_servers();
-var
-    install:Tclass_install;
-
-    
 begin
 writeln('INSTALLING KASPERSKY FOR UNIX MAIL SERVERS....');
 
 if FileExists('/usr/bin/dpkg') then KAV_INSTALL_DEBIAN();
 if FileExists('/bin/rpm') then KAV_INSTALL_READHAT();
-   install:=Tclass_install.Create;
    if FileExists('/opt/kav/5.5/kav4mailservers/bin/keepup2date') then begin
       writeln('updating av databases please wait for few minutes');
       fpsystem('/opt/kav/5.5/kav4mailservers/bin/keepup2date >/tmp/keepUp2Date.log &');

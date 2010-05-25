@@ -31,10 +31,15 @@ if(!$GLOBALS["NO_DELETE"]){
 }
 
 
-$configs=explode("\n",@file_get_contents("/etc/artica-postfix/settings/Daemons/VirtualsIPs"));
-if(!is_array($configs)){
-	die();
+$configs_exploded=explode("\n",@file_get_contents("/etc/artica-postfix/settings/Daemons/VirtualsIPs"));
+
+while (list ($index, $line) = each ($configs_exploded) ){
+	if(trim($line)==null){continue;}
+	$configs[]=$line;
 }
+
+
+if(!is_array($configs)){die();}
 
 while (list ($index, $line) = each ($configs) ){
 	if(trim($line)==null){continue;}

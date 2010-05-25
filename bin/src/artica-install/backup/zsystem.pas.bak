@@ -1856,9 +1856,13 @@ begin
         exit;
      end;
   end;
+  try
   ini:=TiniFile.Create('/etc/artica-postfix/versions.cache');
   result:=ini.ReadString(APP_NAME,'VERSION','');
-  ini.Free;
+  finally
+    ini.Free;
+  end;
+
 end;
 //#########################################################################################
 procedure Tsystem.SET_CACHE_VERSION(APP_NAME:string;version:string);
@@ -4319,8 +4323,15 @@ begin
     if FileExists('/usr/sbin/accept') then exit('/usr/sbin/accept');
 end;
  //#############################################################################
+ function Tsystem.LOCATE_ctl_cyrusdb():string;
+begin
+ if FileExists('/usr/sbin/ctl_cyrusdb') then exit('/usr/sbin/ctl_cyrusdb');
+ if FileExists('/usr/lib/cyrus/bin/ctl_cyrusdb') then exit('/usr/lib/cyrus/bin/ctl_cyrusdb');
+ if FileExists('/usr/lib/cyrus-imapd/ctl_cyrusdb') then exit('/usr/lib/cyrus-imapd/ctl_cyrusdb');
+end;
 
- function Tsystem.LOCATE_ctl_mboxlist():string;
+ //#############################################################################
+  function Tsystem.LOCATE_ctl_mboxlist():string;
 begin
 
  if FileExists('/usr/sbin/ctl_mboxlist') then exit('/usr/sbin/ctl_mboxlist');

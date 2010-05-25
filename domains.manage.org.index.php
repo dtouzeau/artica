@@ -647,9 +647,7 @@ if($usersmenus->AsOrgAdmin){
 	if($usersmenus->POSTFIX_INSTALLED){$sendmail="<div style='float:left'>".Buildicon64('DEF_ICO_SENDTOALL',210,100,"?ou=$ou")."</div>";}	
 }
 	
-if(!$usersmenus->POSTFIX_INSTALLED){
-	if($usersmenus->SQUID_INSTALLED){$transport=null;}	
-}
+if($usersmenus->POSTFIX_INSTALLED){$transport=null;	}
 	
 	if($usersmenus->SMTP_LEVEL>0){
 		$quarantine=null;

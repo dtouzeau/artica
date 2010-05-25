@@ -665,7 +665,7 @@ $cache_settings="
 								
 </table>
 </div>
-<div id='cached_sites_infos' style='width:100%;height:250px;overflow:auto'></div>
+<div id='cached_sites_infos' style='width:100%;height:350px;overflow:auto'></div>
 
 
 	<script>

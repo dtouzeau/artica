@@ -105,6 +105,7 @@ class usersMenus {
 	var $phpldapadmin_installed=false;
 	var $phpmyadmin_installed=false;
 	var $HOSTAPD_INSTALLED=false;
+	var $HOSTAPD_BINVER=0;
 	/* This licence must be used Only with Artica-for postfix */
 	var $ChartLicence="D1XFWGMEW9L.HSK5T4Q79KLYCK07EK";
 	/*you cannot use it without any authorizations of maani.us.
@@ -597,7 +598,7 @@ class usersMenus {
 			$this->SQUID_BIN_PATH=$_GLOBAL["SQUID_BIN_PATH"];
 			$this->HOSTAPD_INSTALLED=$_GLOBAL["HOSTAPD_INSTALLED"];
 			$this->WPA_SUPPLIANT_INSTALLED=$_GLOBAL["WPA_SUPPLIANT_INSTALLED"];
-			
+			$this->HOSTAPD_BINVER=$_GLOBAL["HOSTAPD_BINVER"];
 			if($this->SAMBA_INSTALLED){
 				if($this->LOCAL_SID==null){
 					$sock=new sockets();
@@ -1239,6 +1240,9 @@ private function roundcube_detect_version(){
 			while (list ($num, $ligne) = each ($ous) ){
 				$array["{organizations}"]["SUB"][$num]="javascript:Loadjs('domains.manage.org.index.php?js=yes&ou=$num');";
 			}
+			
+			$array["{organizations}"]["SUB"]["{add}"]="javascript:TreeAddNewOrganisation();";
+			
 		
 		
 		}
@@ -1249,6 +1253,7 @@ private function roundcube_detect_version(){
 				if(strlen($OU)>13){$OU_TEXT=substr($OU,0,10).'...';}else{$OU_TEXT=$OU;}
 				$array[$OU_TEXT]["MAIN"]="javascript:Loadjs('domains.manage.org.index.php?js=yes&ou=$OU');";
 				$array[$OU_TEXT]["SUB"]["{main_parameters}"]="javascript:Loadjs('domains.manage.org.index.php?js=yes&ou=$OU');";
+				$array[$OU_TEXT]["SUB"]["{domains}"]="javascript:Loadjs('domains.edit.domains.php?js=yes&ou=$OU');";
 				$array[$OU_TEXT]["SUB"]["{add_user}"]="javascript:Loadjs('domains.add.user.php?ou=$OU');";
 				$array[$OU_TEXT]["SUB"]["{members}"]="javascript:Loadjs('domains.manage.org.index.php?finduser-js=es&ou=$OU');";
 				$array[$OU_TEXT]["SUB"]["{groups}"]="javascript:Loadjs('domains.edit.group.php?ou=$OU&js=yes');";
@@ -1262,6 +1267,7 @@ private function roundcube_detect_version(){
 		
 		if($this->AsArticaAdministrator==true){
 			$array["system"]["MAIN"]="javascript:Loadjs('system.index.php?js=yes')";
+			$array["system"]["SUB"]["{main_parameters}"]="javascript:Loadjs('system.index.php?js=yes')";
 			$array["system"]["SUB"]["{left_menu_internal_hard_drives}"]="javascript:Loadjs('system.internal.disks.php')";
 			$array["system"]["SUB"]["{left_menu_net_settings}"]="javascript:Loadjs('system.nic.config.php?js=yes')";
 			if($sock->GET_INFO("WifiCardOk")==1){$array["system"]["SUB"]["WIFI"]="javascript:Loadjs('system.wifi.php')";}
@@ -1276,6 +1282,7 @@ private function roundcube_detect_version(){
 		if($this->AsSambaAdministrator==true){if($this->SAMBA_INSTALLED){
 			$array["{fileshare}"]["MAIN"]="javascript:Loadjs('fileshares.index.php?js=yes')";}
 			$array["{fileshare}"]["SUB"]["{main_parameters}"]="javascript:Loadjs('samba.index.php?script=smbpop');";
+			$array["{fileshare}"]["SUB"]["{explorer}"]="javascript:Loadjs('tree.php');";
 			$array["{fileshare}"]["SUB"]["{SHARE_FOLDER}"]="javascript:Loadjs('SambaBrowse.php');";
 			$array["{fileshare}"]["SUB"]["{computers}"]="javascript:Loadjs('computer-browse.php');";
 		}

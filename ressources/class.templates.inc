@@ -608,6 +608,12 @@ function _get_env_var($Var){
 function _detect_lang(){
 		$currentPage=CurrentPageName();
 		if($currentPage=="logon.php"){error_log("Logon.php=> language: _COOKIE={$_COOKIE["artica-language"]} ".__FUNCTION__." in " . __FILE__. " line ".__LINE__);}
+		
+		if($_SESSION["detected_lang"]<>null){
+			$this->language=$_SESSION["detected_lang"];
+			return $_SESSION["detected_lang"];
+		}
+		
 		if($_COOKIE["artica-language"]<>null){
 			$this->language=$_COOKIE["artica-language"];
 			return $_COOKIE["artica-language"];
@@ -1618,7 +1624,7 @@ class template_users{
 		$template=str_replace("{TEMPLATE_SEARCH}",$tpl->search_menus(),$template);
 		if($cuurentpage=="logon.php"){error_log("$cuurentpage:: index.html =>{TEMPLATE_SEARCH} done ".__FUNCTION__.' in '.__FILE__. " in line ". __LINE__);}
 		$template=str_replace("{TEMPLATE_HEAD}",$this->head,$template);
-		$template=str_replace("{TEMPLATE_LEFT_MENUS}",$tpl->_ENGINE_parse_body($menus->BuildLeftMenus()),$template);
+		$template=str_replace("{TEMPLATE_LEFT_MENUS}","<div id='TEMPLATE_LEFT_MENUS'></div><script>LoadAjax('TEMPLATE_LEFT_MENUS','admin.tabs.php?left-menus=yes');</script>",$template);
 		if($cuurentpage=="logon.php"){error_log("$cuurentpage:: index.html =>{TEMPLATE_LEFT_MENUS} done ".__FUNCTION__.' in '.__FILE__. " in line ". __LINE__);}
 		$template=str_replace("{TEMPLATE_TOP_MENUS}",$top_menus,$template);
 		$template=str_replace('{TEMPLATE_RIGHT_MENUS}',$tpl->_ENGINE_parse_body($menus->menusright),$template);

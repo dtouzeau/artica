@@ -365,7 +365,7 @@ if length(paramstr(1))>0 then begin
      halt(0);
 end;
 writeln('initialize... ');
-writeln('Detected:',distri.DISTRINAME_CODE+' "' + distri.DISTRINAME_VERSION+'"... Major version:', distri.DISTRI_MAJOR,' Minor:', distri.DISTRI_MINOR);
+writeln('Detected:',distri.DISTRINAME_CODE+' "' + distri.DISTRINAME_VERSION+'"... Major version:', distri.DISTRI_MAJOR,' Minor:', distri.DISTRI_MINOR,' Arch:',libs.ArchStruct(),'bits');
 
      if distri.DISTRINAME_CODE='UBUNTU' then begin
         install:=tubuntu.Create;

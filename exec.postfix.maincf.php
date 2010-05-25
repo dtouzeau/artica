@@ -206,6 +206,9 @@ function ReloadPostfix(){
 	appliSecu();
 	echo "Starting......: Compiling tables\n";
 	system(LOCATE_PHP5_BIN2()." /usr/share/artica-postfix/exec.postfix.hashtables.php");
+	system("/usr/share/artica-postfix/bin/artica-install --reload-assp");
+	
+	
 	
 	echo "Starting......: reloading postfix\n";
 	if(is_file("/usr/sbin/postfix")){

@@ -5617,7 +5617,7 @@ begin
      end;
 
 
-
+     fpsystem('/etc/init.d/artica-postfix start wifi');
 
     
     logs.Debuglogs('############ gluster ##################');
@@ -10935,7 +10935,6 @@ var
    rootExists:boolean;
    servername:string;
    syslog:tsyslogng;
-   logerror:string;
    obm:tobm;
    count:integer;
    mysqld_safe:string;
@@ -10974,7 +10973,6 @@ begin
 
      logs:=Tlogs.Create;
      tempfile:=logs.FILE_TEMP();
-     logerror:=logs.FILE_TEMP();
 
    writeln('Stopping Artica daemon');
    fpsystem('/etc/init.d/artica-postfix stop daemon');
@@ -11516,12 +11514,10 @@ end;
 
  var
     ini:string;
-    D:Boolean;
     pid:string;
  begin
       //
-      D:=SYS.COMMANDLINE_PARAMETERS('--boa-status');
-
+  ini:='';
   logs.Debuglogs('starting status BOA');
   ini:=ini+ '[BOA]'+CRLF;
   ini:=ini+ 'service_name=APP_BOA'+CRLF;
@@ -11552,22 +11548,20 @@ function myconf.LMB_LUNDIMATIN_VERSION():string;
 
  var
     ini:string;
-    D:Boolean;
     pid:string;
  begin
-
-      D:=SYS.COMMANDLINE_PARAMETERS('--boa-status');
-      pid:=BOA_DAEMON_GET_PID();
-   logs.Debuglogs('starting status BOA');
-   ini:=ini+ '[BOA]'+CRLF;
-  if SYS.PROCESS_EXIST(pid) then ini:=ini+ 'running=1'+CRLF else  ini:=ini+ 'running=0'+CRLF;
-  ini:=ini+ 'application_installed=1'+CRLF;
-  ini:=ini+ 'master_pid='+ pid+CRLF;
-  ini:=ini+ 'master_memory=' + IntToStr(SYS.PROCESS_MEMORY(pid))+CRLF;
-  ini:=ini+ 'master_version=0.94.13'+CRLF;
-  ini:=ini+ 'status='+SYS.PROCESS_STATUS(pid)+CRLF;
-  ini:=ini+ 'service_name=APP_BOA'+CRLF;
-  ini:=ini+ 'service_cmd=boa'+CRLF;
+    ini:='';
+    pid:=BOA_DAEMON_GET_PID();
+    logs.Debuglogs('starting status BOA');
+    ini:=ini+ '[BOA]'+CRLF;
+    if SYS.PROCESS_EXIST(pid) then ini:=ini+ 'running=1'+CRLF else  ini:=ini+ 'running=0'+CRLF;
+   ini:=ini+ 'application_installed=1'+CRLF;
+   ini:=ini+ 'master_pid='+ pid+CRLF;
+   ini:=ini+ 'master_memory=' + IntToStr(SYS.PROCESS_MEMORY(pid))+CRLF;
+   ini:=ini+ 'master_version=0.94.13'+CRLF;
+   ini:=ini+ 'status='+SYS.PROCESS_STATUS(pid)+CRLF;
+   ini:=ini+ 'service_name=APP_BOA'+CRLF;
+   ini:=ini+ 'service_cmd=boa'+CRLF;
   result:=ini;
 end;
 //#############################################################################
@@ -11663,7 +11657,6 @@ function myconf.SYSLOGER_STATUS():string;
 var
 ini:TstringList;
 pid:string;
-Enabled:integer;
 begin
 
    ini:=TstringList.Create;
@@ -11754,9 +11747,8 @@ function myconf.LMB_VERSION():string;
 var
    l:Tstringlist;
    tmpstr:string;
-   mailcount:integer;
-    RegExpr:TRegExpr;
-    i:integer;
+   RegExpr:TRegExpr;
+   i:integer;
 begin
 tmpstr:='/usr/local/share/artica/lmb_src/config/config_serveur.inc.php';
 if not FileExists(tmpstr) then exit;
@@ -11779,9 +11771,8 @@ function myconf.GROUPOFFICE_VERSION():string;
 var
    l:Tstringlist;
    tmpstr:string;
-   mailcount:integer;
-    RegExpr:TRegExpr;
-    i:integer;
+   RegExpr:TRegExpr;
+   i:integer;
 begin
 tmpstr:='/usr/local/share/artica/group-office/classes/base/config.class.inc.php';
 if not FileExists(tmpstr) then exit;
@@ -11804,9 +11795,8 @@ function myconf.hpinlinux_VERSION():string;
 var
    l:Tstringlist;
    tmpstr:string;
-   mailcount:integer;
-    RegExpr:TRegExpr;
-    i:integer;
+   RegExpr:TRegExpr;
+   i:integer;
 begin
 
      result:=SYS.GET_CACHE_VERSION('APP_HPINLINUX');

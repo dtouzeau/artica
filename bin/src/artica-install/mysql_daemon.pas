@@ -575,10 +575,12 @@ var
    mysql_user:string;
    logpathstring:string;
    ldap:topenldap;
+   mysql_install_db:string;
 begin
 i:=0;
 logpathstring:='';
  FileTemp:=artica_path+'/ressources/logs/mysql.start.daemon';
+ mysql_install_db:=SYS.LOCATE_GENERIC_BIN('mysql_install_db');
  processname:=ExtractFileName(ParamStr(0));
 if not FileExists(SYS.LOCATE_mysqld_bin()) then begin
    logs.DebugLogs('Starting......: Mysql is not installed, abort');
@@ -647,6 +649,13 @@ ForceDirectories('/var/log/mysql');
 
 
    datadir:=SERVER_PARAMETERS('datadir');
+   if not FileExists(datadir+'/mysql/host.frm') then begin
+     if FileExists(mysql_install_db) then begin
+        logs.Debuglogs('Starting......: Mysql installing default databases.');
+        fpsystem(mysql_install_db);
+     end;
+   end;
+
    logbin:=SERVER_PARAMETERS('log_bin');
    mysql_user:=SERVER_PARAMETERS('user');
    fpsystem('/bin/chmod 777 /tmp');

@@ -3708,3 +3708,23 @@ If necessaries modules are installed you will be able to create a Wireless Acces
 <SCANNING>Scanning</SCANNING>
 <check_wifi_card>Check WIFI Network settings</check_wifi_card>
 <display>display</display>
+<apply_rules_for_local_users>Apply rules for local users too</apply_rules_for_local_users>
+<ntp_about>NTPD is designed to synchronize the clocks of computers over a network to a common timebase (usually UTC) via NTP Protocol</ntp_about>
+<refresh_pattern_option>[ul]
+[li][b]override-expire[/b][br]
+ When set, this option causes Squid to check the min value before checking the Expires header.[br]
+Thus, a non-zero min time makes Squid return an unvalidated cache hit even if the response is preexpired.[br][/li]
+[li][b]override-lastmod[/b][br]
+When set, this option causes Squid to check the min value before the LM-factor percentage.[br][/li]
+[li][b]reload-into-ims[/b][br]
+When set, this option makes Squid transform a request with a no-cache directive into a validation (If-Modified-Since) request. In other words, Squid adds an If-Modified-Since header to the request before forwarding it on. Note that this only works for objects that have a Last-Modified timestamp. The outbound request retains the no-cache directive, so that it reaches the origin server.[br][/li]
+[li][b]ignore-reload[/b][br]
+When set, this option causes Squid to ignore the no-cache directive, if any, in the request.[br][/li][/ul]
+</refresh_pattern_option>
+<refresh_pattern_intro>This section controls the disk cache only indirectly.[br]
+ It helps Squid decide whether or not a given request can be a cache hit or must be treated as a miss.[br]
+ Liberal settings increase your cache hit ratio but also increase the chance that users receive a stale response.[br]
+ Conservative settings, on the other hand, decrease hit ratios and stale responses.
+ </refresh_pattern_intro>
+ <add_default_settings>Add default settings</add_default_settings>
+ <ignore_all>Ignore all</ignore_all>

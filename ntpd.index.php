@@ -108,7 +108,7 @@ exit;
 	"
 	
 
-	<p class=caption>{about}</p>
+	<p class=caption>{ntp_about}</p>
 	<table style='width:100%'>
 	<tr>
 	<td valign='top'>".Paragraphe('connection-add-64.png','{add_title_server}','{add_text_server}',"javascript:ntpdAdd();",'add_title_server')."</td>

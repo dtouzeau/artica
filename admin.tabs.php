@@ -21,6 +21,7 @@ if(isset($_GET["show-manage"])){echo manage_icon_page();exit;}
 if(isset($_GET["move-widget"])){echo manage_icon_move();exit;}
 if(isset($_GET["widget-manage-list"])){echo manage_icons_list($_GET["widget-manage-list"]);exit;}
 if(isset($_GET["main"])){switch_main();exit;}
+if(isset($_GET["left-menus"])){left_menus();exit;}
 
 
 
@@ -948,6 +949,17 @@ if($re[3]=='M'){$f='Messages';}
 	
 	$tpl=new templates();
 	echo $tpl->_ENGINE_parse_body($p);	
+}
+
+function left_menus(){
+	if(!isset($_SESSION["uid"])){return null;}
+	$menus=new usersMenus();
+	$tpl=new templates();
+	$menus=$menus->BuildLeftMenus();
+	$html="$menus<input type='hidden' id='add_new_organisation_text' value='{add_new_organisation_text}'>";
+		
+	echo $tpl->_ENGINE_parse_body($html);
+	
 }
 
 ?>

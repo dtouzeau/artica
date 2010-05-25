@@ -258,7 +258,11 @@ end;
               halt(0);
          end;
 
-
+         if ParamStr(2)='hostapd' then begin
+              zwifi:=twifi.Create(SYS);
+              writeln(zwifi.HOSTAPD_VERSION());
+              halt(0);
+         end;
 
          writeln('help:');
          writeln('--export-version squid');
@@ -266,6 +270,7 @@ end;
          writeln('--export-version dansguardian');
          writeln('--export-version kav4proxy');
          writeln('--export-version wpa_suppliant');
+         writeln('--export-version hostapd');
          halt(0);
     end;
 
@@ -1009,6 +1014,13 @@ if paramStr(1)='--kavmilter-reload' then begin
 
  if ParamStr(1)='--cyrus-checkconfig' then begin
     CCYRUS.CheckRightsAndConfig();
+    halt(0);
+ end;
+
+
+
+ if ParamStr(1)='--cyrus-ctl-cyrusdb' then begin
+    CCYRUS.RECOVER_CYRUS_DB_SINGLE();
     halt(0);
  end;
   if ParamStr(1)='--cyrus-recoverdb' then begin

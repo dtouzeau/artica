@@ -23,7 +23,7 @@ include_once(dirname(__FILE__)."/framework/frame.class.inc");
 	if(preg_match("#--verbose#",implode(" ",$argv))){$GLOBALS["VERBOSE"]=true;}
 	
 writelogs("Start running statistics for dansGuardian",basename(__FILE__),__FILE__,__LINE__);	
-$sql="SELECT sitename,country,uri,uid,remote_ip,CLIENT,TYPE,REASON,DATE_FORMAT(zDate,'%H:%i:%s') as tdate FROM dansguardian_events ORDER BY zDate DESC LIMIT 0,100";
+$sql="SELECT sitename,country,uri,uid,remote_ip,CLIENT,TYPE,REASON,DATE_FORMAT(zDate,'%H:%i:%s') as tdate,QuerySize FROM dansguardian_events ORDER BY zDate DESC LIMIT 0,100";
 $html=GetToday()."
 <div style='width:100%;height:300px;overflow:auto'>
 <table style='width:100%'>";
@@ -39,20 +39,24 @@ if(!$q->ok){die("Wrong query");}
 		$Country=$ligne["country"];
 		$country_img=GetFlags($Country);
 		
+		
+		
 		if($ligne["TYPE"]==null){$ligne["TYPE"]="PASS";}
 		if(preg_match("#EXCEPTION#",$ligne["TYPE"])){$ligne["TYPE"]="PASS";}
 		
-		if($ligne["TYPE"]=="PASS"){
-			$roll=CellRollOver();
-			$color="black";
-		}else{
-			$roll=CellRollOver_jaune() ." style='color:#B70C25'";
-			$color="#B70C25";
+		switch (strtolower($ligne["TYPE"])) {
+			case "pass":$roll=CellRollOver();$color="black";break;
+			case "not modified":$roll=CellRollOver();$color="black";break;
+			case "moved temporarily":$roll=CellRollOver();$color="black";break;
+			default:$roll=CellRollOver_jaune() ." style='color:#B70C25'";$color="#B70C25";break;
 		}
 		
 		$sitename=texttooltip($ligne["sitename"],"{$ligne["uri"]}<br>{$ligne["remote_ip"]}",null,null,0,"font-weight:bold;color:$color");
 		$ligne["TYPE"]=texttooltip($ligne["TYPE"],$ligne["REASON"],null,null,0,"font-weight:bold;color:$color");		
 		$time=$ligne["tdate"];
+		$QuerySize=$ligne["QuerySize"];
+		if($QuerySize==null){$QuerySize="-";}else{$QuerySize=FormatBytes($QuerySize/1024);}
+		
 		$mailfrom=$ligne["CLIENT"];
 		if($ligne["remote_ip"]==null){$ligne["remote_ip"]=$ligne["sitename"];}
 		$flag_infos="$Country {$ligne["remote_ip"]}";
@@ -68,6 +72,7 @@ if(!$q->ok){die("Wrong query");}
 		<td nowrap><strong>$sitename</td>
 		<td nowrap><strong>{$ligne["TYPE"]}</td>
 		<td nowrap><strong>{$ligne["REASON"]}</td>
+		<td nowrap><strong>$QuerySize</td>
 		</tr>";
 		
 	}

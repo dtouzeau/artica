@@ -83,6 +83,13 @@ if(preg_match("#cyrus\/.+?\[.+?:\s+\=>\s+compressed to#",$buffer)){return null;}
 if(preg_match("#filter-module\[.+?:\s+KASINFO#",$buffer)){return null;}
 if(preg_match("#exec\.mailbackup\.php#",$buffer)){return null;}
 if(preg_match("#kavmilter\[.+?\]:\s+Loading#",$buffer)){return null;}
+if(preg_match("#DBERROR: init.+?on berkeley#",$buffer)){return null;}
+if(preg_match("#FATAL: lmtpd: unable to init duplicate delivery database#",$buffer)){return null;}
+if(preg_match("#skiplist: checkpointed.+?annotations\.db#",$buffer)){return null;}
+if(preg_match("#duplicate_prune#",$buffer)){return null;}
+if(preg_match("#cyrus\/cyr_expire\[[0-9]+#",$buffer)){return null;}
+
+
 
 
 if(preg_match("#smtp.+?status=deferred.+?connect.+?\[127\.0\.0\.1\]:10024: Connection refused#",$buffer,$re)){
@@ -381,6 +388,25 @@ if(preg_match('#cyrus\/notify.+?DBERROR db[0-9]: PANIC: fatal region error detec
 	}
 	return null;	
 }
+
+
+if(preg_match("#cyrus.+?DBERROR\s+db[0-9]+:\s+DB_AUTO_COMMIT may not be specified in non-transactional environment#",$buffer,$re)){
+	$file="/etc/artica-postfix/croned.1/cyrus.db.error";
+	if(file_time_min($file)>10){
+		$buffer="Artica has detected a fatal error on cyrus\n$buffer\nArtica will try to repair it but it should not working\n";
+		$buffer=$buffer."Perhaps you need to contact your support to correctly recover cyrus databases\n";
+		$buffer=$buffer."Notice,read this topic : http://www.gradstein.info/software/how-to-recover-from-cyrus-when-you-have-some-db-errors/\n";
+		THREAD_COMMAND_SET('/usr/share/artica-postfix/bin/artica-install --cyrus-ctl-cyrusdb');
+		email_events("Cyrus database error !!",$buffer,"mailbox");
+		events("DBERROR detected, take action");
+		@unlink($file);
+		file_put_contents($file,"#");
+	}else{
+		events("DBERROR detected, but take action after 10mn");
+	}
+	return null;
+}
+
 
 if(preg_match('#cyrus\/imap.+?DBERROR db[0-9]: PANIC: fatal region error detected; run recovery#',$buffer)){
 	$file="/etc/artica-postfix/croned.1/cyrus.db.error";

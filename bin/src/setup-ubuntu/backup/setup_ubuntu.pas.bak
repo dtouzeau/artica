@@ -231,7 +231,7 @@ begin
      end;
 
      if ParamStr(1)='--check-squid' then begin
-         writeln('check-samba Starting checking base system on ' +distri.DISTRINAME + ' ' + distri.DISTRINAME_VERSION+' CODE=' +distri.DISTRINAME_CODE );
+         writeln('check-squid Starting checking base system on ' +distri.DISTRINAME + ' ' + distri.DISTRINAME_VERSION+' CODE=' +distri.DISTRINAME_CODE );
          if distri.DISTRINAME_CODE='UBUNTU' then begin
             install:=tubuntu.Create;
             install.InstallPackageListssilent(install.checkSQuid());
@@ -365,7 +365,7 @@ if length(paramstr(1))>0 then begin
      halt(0);
 end;
 writeln('initialize... ');
-writeln('Detected:',distri.DISTRINAME_CODE+' "' + distri.DISTRINAME_VERSION+'"... Major version:', distri.DISTRI_MAJOR,' Minor:', distri.DISTRI_MINOR);
+writeln('Detected:',distri.DISTRINAME_CODE+' "' + distri.DISTRINAME_VERSION+'"... Major version:', distri.DISTRI_MAJOR,' Minor:', distri.DISTRI_MINOR,' Arch:',libs.ArchStruct());
 
      if distri.DISTRINAME_CODE='UBUNTU' then begin
         install:=tubuntu.Create;

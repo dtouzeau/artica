@@ -6,7 +6,7 @@ unit p3scan;
 interface
 
 uses
-    Classes, SysUtils,variants,strutils,IniFiles, Process,md5,logs,unix,RegExpr in 'RegExpr.pas',zsystem;
+    Classes, SysUtils,variants,strutils, Process,logs,unix,RegExpr in 'RegExpr.pas',zsystem;
 
 type LDAP=record
       admin:string;
@@ -22,8 +22,6 @@ type LDAP=record
 
 private
      LOGS:Tlogs;
-     D:boolean;
-     GLOBAL_INI:TiniFIle;
      SYS:TSystem;
      artica_path:string;
 
@@ -123,12 +121,10 @@ end;
 
 procedure tp3scan.START();
  var
-    count      :integer;
-    cmdline    :string;
     logs       :Tlogs;
     FileTemp   :string;
 begin
-     count:=0;
+
      logs:=Tlogs.Create;
       FileTemp:=artica_path+'/ressources/logs/p3scan.start.daemon';
      if not FileExists(DEAMON_BIN_PATH()) then begin
@@ -213,6 +209,7 @@ var
    user_id:string;
 
 begin
+result:='';
   if not FileExists('/sbin/iptables') then begin
      Logs.DebugLogs('Starting......: P3scan iptables is not installed in this system');
      exit;

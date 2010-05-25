@@ -880,6 +880,7 @@ l.Add('telnet');
 l.Add('lsof');
 l.Add('dar');
 l.add('hostapd');
+l.add('hostap-utils');
 
 
 

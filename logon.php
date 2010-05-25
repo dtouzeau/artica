@@ -258,8 +258,8 @@ function logonForm(){
 		$defaultlanguage=$languageClass->get_languages();
 		if($defaultlanguage=="pt"){$defaultlanguage="po";}
 		if($lang[$defaultlanguage]==null){$defaultlanguage="en";}
-		$_COOKIE["artica-language"]=$defaultlanguage;
-		
+		setcookie("artica-language", $defaultlanguage, time()+172800);
+	
 	}else{$defaultlanguage=$_COOKIE["artica-language"];}
 	
 	
@@ -427,6 +427,7 @@ function logon(){
 			$_SESSION["uid"]='-100';
 			$_SESSION["groupid"]='-100';
 			$_SESSION["passwd"]=$_POST["artica_password"];
+			setcookie("artica-language", $_POST["lang"], time()+172800);
 			$_SESSION["detected_lang"]=$_POST["lang"];
 			$_SESSION["privileges"]='
 			[AllowAddGroup]="yes"
@@ -471,7 +472,9 @@ function logon(){
 			writelogs("default organization language={$_SESSION["OU_LANG"]}",__FUNCTION__,__FILE__);
 			if(trim($_SESSION["OU_LANG"])<>null){
 				$_SESSION["detected_lang"]=$_SESSION["OU_LANG"];
+				setcookie("artica-language", $_SESSION["OU_LANG"], time()+172800);
 			}else{
+				setcookie("artica-language", $_POST["lang"], time()+172800);
 				$_SESSION["detected_lang"]=$lang->get_languages();
 			}
 			$tpl=new templates();

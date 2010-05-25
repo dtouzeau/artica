@@ -287,6 +287,7 @@ if(!is_array($_GLOBAL["disks_list"])){return null;}
 
 $artmp=$_GLOBAL["disks_list"];
 while (list ($num, $line) = each ($d)){
+	if($num=="size (logical/physical)"){continue;}
 	if(!is_array($_GLOBAL["disks_list"][$num])){
 		$_GLOBAL["disks_list"][$num]=array("SIZE"=>$line,"ID_MODEL_1"=>"unknown");
 	}
@@ -297,7 +298,7 @@ while (list ($num, $line) = each ($d)){
 $html="<table style='width:99%'>";
 $count=0;
 	while (list ($num, $line) = each ($_GLOBAL["disks_list"])){
-		
+		if($num=="size (logical/physical)"){continue;}
 		if($count==2){$tr="</tr><tr>";$count=0;}else{$tr=null;}
 		$html=$html . "$tr<td valign='top'>". ParseHDline($num,$line)."</td>";
 		$count=$count+1;
@@ -322,6 +323,17 @@ function ParseHDline($dev,$array){
 		$title="$ID_FS_LABEL ($SIZE)";
 		if(strlen($ID_MODEL)>14){$ID_MODEL=substr($ID_MODEL,0,11).'...';}
 		$part_number=count($array["PARTITIONS"]);
+		
+		
+		if($ID_VENDOR<>null){
+			$ID_VENDOR="<tr>
+			<td class=legend nowrap>{vendor}:</td>
+			<td><strong>$ID_VENDOR</strong></td>
+		</tr>";
+		}
+		
+		
+		
 		$tableau="
 		<table style='width:99%'>
 		<tr>
@@ -332,10 +344,7 @@ function ParseHDline($dev,$array){
 			<td class=legend>{model}:</td>
 			<td><strong>$ID_MODEL</strong></td>
 		</tr>
-		<tr>
-			<td class=legend nowrap>{vendor}:</td>
-			<td><strong>$ID_VENDOR</strong></td>
-		</tr>
+		$ID_VENDOR
 		<tr>
 			<td class=legend nowrap>Bus:</td>
 			<td><strong>$ID_BUS</strong></td>

@@ -143,6 +143,7 @@ Add a list:exe,pif,bat,pdf,doc</add_attachment_blocking_text_explain>
 <add_computer_access>Add computer access</add_computer_access>
 <ADD_COMPUTER_TEXT>Add a new computer in Artica Database</ADD_COMPUTER_TEXT>
 <add_default_rules>Add default rules</add_default_rules>
+<add_default_settings>Add default settings</add_default_settings>
 <add_edit_rule>Add & edit a rule</add_edit_rule>
 <add_entry>Add an entry</add_entry>
 <add_every>Add every</add_every>
@@ -278,6 +279,7 @@ If a computer reach X events, Artica will automatically create a FireWall rule t
 <apply config text>This operation will compile all your settings on the server and make them in production mode.</apply config text>
 <apply_pureftpd>Apply FTP</apply_pureftpd>
 <apply_pureftpd_text>Rebuild users database and restart ftp server</apply_pureftpd_text>
+<apply_rules_for_local_users>Apply rules for local users too</apply_rules_for_local_users>
 <apply_scripts_mailbox>apply rules to your mailbox</apply_scripts_mailbox>
 <apply_settings>Apply these settings to the server and put them in production mode</apply_settings>
 <apply_settings_bind9>Compile Bind9 Settings</apply_settings_bind9>
@@ -1622,6 +1624,7 @@ It send notifications to recipients in order to allow them to "download" attache
 <identity>Identity</identity>
 <if>if</if>
 <if_in>if in</if_in>
+<ignore_all>Ignore all</ignore_all>
 <illimited>illimited</illimited>
 <imap_connection_broken>Imap connection is currently broken and informations could not be read</imap_connection_broken>
 <imap_connection_locked>The imap connection is currently locked cause the imap server didn't respond on time</imap_connection_locked>
@@ -2292,6 +2295,7 @@ don't forget to - Save & Apply settings - to make them in production mode</notif
 <nsICQid>ICQ</nsICQid>
 <nsMSNid>MSN</nsMSNid>
 <nsYahooid>Yahoo</nsYahooid>
+<ntp_about>NTPD is designed to synchronize the clocks of computers over a network to a common timebase (usually UTC) via NTP Protocol</ntp_about>
 <nt_acl_support>NT ACL support</nt_acl_support>
 <nt_acl_support_text>map UNIX permissions into Windows NT access control lists</nt_acl_support_text>
 <NT_STATUS_ACCESS_DENIED>Error:Access Denied</NT_STATUS_ACCESS_DENIED>
@@ -2622,8 +2626,24 @@ See also "maximal backoff time".
 <refresh>Refresh</refresh>
 <refresh time>refresh time</refresh time>
 <refresh_database_each>Refresh the database each</refresh_database_each>
+<refresh_pattern_intro>This section controls the disk cache only indirectly.[br]
+ It helps Squid decide whether or not a given request can be a cache hit or must be treated as a miss.[br]
+ Liberal settings increase your cache hit ratio but also increase the chance that users receive a stale response.[br]
+ Conservative settings, on the other hand, decrease hit ratios and stale responses.
+ </refresh_pattern_intro>
 <refresh_pattern_max>upper limit on how long objects without an explicit expiry time will be considered fresh</refresh_pattern_max>
 <refresh_pattern_min>Time (in minutes), an object without an explicit expire time should be considered fresh.</refresh_pattern_min>
+<refresh_pattern_option>[ul]
+[li][b]override-expire[/b][br]
+ When set, this option causes Squid to check the min value before checking the Expires header.[br]
+Thus, a non-zero min time makes Squid return an unvalidated cache hit even if the response is preexpired.[br][/li]
+[li][b]override-lastmod[/b][br]
+When set, this option causes Squid to check the min value before the LM-factor percentage.[br][/li]
+[li][b]reload-into-ims[/b][br]
+When set, this option makes Squid transform a request with a no-cache directive into a validation (If-Modified-Since) request. In other words, Squid adds an If-Modified-Since header to the request before forwarding it on. Note that this only works for objects that have a Last-Modified timestamp. The outbound request retains the no-cache directive, so that it reaches the origin server.[br][/li]
+[li][b]ignore-reload[/b][br]
+When set, this option causes Squid to ignore the no-cache directive, if any, in the request.[br][/li][/ul]
+</refresh_pattern_option>
 <refresh_pattern_pourc>percentage of the objects age (time since last modification age) an object without explicit expire time will be considered fresh.</refresh_pattern_pourc>
 <refresh_pattern_site>Give the webiste name that enable the rule.[br]Should be www.company.tm or company.tm or company.*</refresh_pattern_site>
 <regex_filter_explain> * caracter is supported. If you want to use regex operation, prepend the line width [code][b]REGEX:[b][/code]</regex_filter_explain>

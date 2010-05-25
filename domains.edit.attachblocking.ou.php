@@ -267,12 +267,20 @@ function attachmentslist(){
 function IncludeByNameDelete(){
 	$sql="DELETE FROM smtp_attachments_blocking  WHERE ou='{$_GET["ou"]}' AND ID='{$_GET["IncludeByNameDelete"]}'";
 	$q=new mysql();
+	$ou=$_GET["ou"];
 	$results=$q->QUERY_SQL($sql,"artica_backup");
 	$sock=new sockets();
 	$users=new usersMenus();
+	writelogs("OU->$ou",__FUNCTION__,__FILE__,__LINE__);
 	if($ou<>"_Global"){
-		if($users->KAV_MILTER_INSTALLED){$sock->getFrameWork("cmd.php?kavmilter-configure=yes");}
+		if($users->KAV_MILTER_INSTALLED){
+			$sock->getFrameWork("cmd.php?kavmilter-configure=yes");
+		}
+		
+		
+		
 	}else{
+		writelogs("->cmd.php?postfix-mime-header-checks=yes",__FUNCTION__,__FILE__,__LINE__);
 		$sock->getFrameWork("cmd.php?postfix-mime-header-checks=yes");
 	}
 	

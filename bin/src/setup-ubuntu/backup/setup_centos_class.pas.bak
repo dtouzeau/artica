@@ -15,6 +15,7 @@ type
 
 private
        libs:tlibs;
+       ARCH:Integer;
        without_clamav:boolean;
        function CheckCyrus():string;
        function CheckDevcollectd():string;
@@ -22,7 +23,7 @@ private
        function DisableSeLinux():string;
        function Explode(const Separator, S: string; Limit: Integer = 0):TStringDynArray;
        function RPMFORGE():boolean;
-
+       function ATRPMS():boolean;
 
 
 
@@ -56,6 +57,8 @@ begin
  without_clamav:=false;
 libs:=tlibs.Create;
 libs.COMMANDLINE_PARAMETERS('--without-clamav');
+ARCH:=libs.ArchStruct();
+
 end;
 //#########################################################################################
 procedure tcentos.Free();
@@ -100,6 +103,10 @@ begin
        exit;
     end;
     EPEL();
+    ATRPMS();
+
+
+
 
     writeln('Checking.............: Base system...');
     base:=CheckBaseSystem();
@@ -346,7 +353,8 @@ l.add('nfs-utils-lib');
 l.add('nfswatch');
 l.add('gfs2-utils');
 
-
+//wifi
+l.add('hostapd');
 
 //DRDB
 //l.Add('drbd83');
@@ -454,7 +462,7 @@ l.add('GeoIP');
 l.add('GeoIP-devel');
 
 
-
+l.add('kernel-devel');
 l.add('aspell-devel');
 l.add('curl-devel');
 l.add('e2fsprogs-devel');
@@ -766,7 +774,7 @@ l.add('libtiff-devel');
 l.add('libjpeg-devel');
 l.add('e2fsprogs-devel');
 l.add('pam-devel');
-L;add('acl');
+L.add('acl');
 for i:=0 to l.Count-1 do begin
      if not libs.RPM_is_application_installed(l.Strings[i]) then begin
           f:=f + ',' + l.Strings[i];
@@ -933,6 +941,65 @@ if not libs.RPM_is_application_installed('wv') then begin
    fpsystem('rpm -Uvh http://repo.fossmart.net/artica/artica-centos-addons-5-3.noarch.rpm');}
    
    fpsystem('rpm --import http://dag.wieers.com/rpm/packages/RPM-GPG-KEY.dag.txt');
+   fpsystem('yum check-update');
+   exit(true);
+end;
+//#########################################################################################
+function tcentos.ATRPMS():boolean;
+var u,uri:string;
+
+begin
+   result:=false;
+   if libs.RPM_is_application_installed('atrpms-package-config') then exit(true);
+   writeln('Some required packages need to turn you distribution into atrpms');
+   writeln('Do want to make this operation ?[Y]');
+   readln(u);
+   if length(u)=0 then u:='Y';
+   if u<>'Y' then exit;
+   writeln('Checking.............: retrieve atrpms Architecture: ',ARCH);
+
+
+   if ARCH=32 then fpsystem('rpm -iv http://dl.atrpms.net/el5-i386/atrpms/stable/atrpms-package-config-120-3.el5.i386.rpm');
+   if ARCH=64 then fpsystem('rpm -iv http://dl.atrpms.net/el5-x86_64/atrpms/stable/atrpms-package-config-120-3.el5.x86_64.rpm');
+
+   fpsystem('/bin/rm -rf /tmp/packages.list');
+   if not libs.RPM_is_application_installed('atrpms-package-config') then begin
+      writeln('Unable to install atrpms');
+      exit;
+   end;
+
+   fpsystem('rpm --import http://ATrpms.net/RPM-GPG-KEY.atrpms');
+
+
+   fpsystem('yum check-update');
+   exit(true);
+end;
+//#########################################################################################
+function tcentos.ELREPO():boolean;
+var u,uri:string;
+
+begin
+   result:=false;
+   if libs.RPM_is_application_installed('elrepo-release') then exit(true);
+   writeln('Some required packages need to turn you distribution into elrepo');
+   writeln('Do want to make this operation ?[Y]');
+   readln(u);
+   if length(u)=0 then u:='Y';
+   if u<>'Y' then exit;
+   writeln('Checking.............: retrieve elrepo Architecture: ',ARCH);
+
+   fpsystem('rpm -Uvh http://elrepo.org/elrepo-release-0.1-1.el5.elrepo.noarch.rpm');
+
+
+   fpsystem('/bin/rm -rf /tmp/packages.list');
+   if not libs.RPM_is_application_installed('elrepo-release') then begin
+      writeln('Unable to install elrepo');
+      exit;
+   end;
+
+   fpsystem('rpm --import http://ATrpms.net/RPM-GPG-KEY.atrpms');
+
+
    fpsystem('yum check-update');
    exit(true);
 end;

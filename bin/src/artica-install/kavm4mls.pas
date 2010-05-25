@@ -126,9 +126,6 @@ end;
 procedure tkavm4mls.RELOAD();
 var
     pidlists:string;
-    RegExpr:TRegExpr;
-    l:TstringList;
-    i:Integer;
 begin
   pidlists:=KAV_MILTER_PID();
   if length(pidlists)=0 then begin
@@ -220,13 +217,9 @@ end;
 procedure tkavm4mls.START();
 var
     pidlists:string;
-    RegExpr:TRegExpr;
-    l:TstringList;
-    i:Integer;
-    Expired:boolean;
     count:integer;
 begin
-Expired:=false;
+
 
 logs.Debuglogs('###################### kav4mls ######################');
 
@@ -465,6 +458,7 @@ spattern_date:string;
 pids:string;
 ini:TiniFile;
 begin
+result:='';
 if not FileExists('/opt/kav/5.6/kavmilter/bin/keepup2date') then exit;
 logs.Debuglogs('tkavm4mls.PERFORM_UPDATE() kavmilterEnable='+SYS.GET_INFO('kavmilterEnable'));
 if SYS.GET_INFO('kavmilterEnable')<>'1' then begin

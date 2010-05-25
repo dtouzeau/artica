@@ -1408,6 +1408,7 @@ function SelectTabID(tabid,num){
 var x_CacheOff= function (obj) {
 	var response=obj.responseText;
 	if(response){alert(response);}
+	LoadAjax('TEMPLATE_LEFT_MENUS','admin.tabs.php?left-menus=yes');
 }
 
 function CacheOff(){
@@ -1709,16 +1710,16 @@ function LoadTree(params){
 var x_TreeAddNewOrganisation= function (obj) {
 	var response=obj.responseText;
 	if(response){alert(response);}
-        if(document.getElementById('orgs')){
-                if(document.getElementById('ajaxmenu')){
-                     YahooWin5(750,'domains.index.php?ajaxmenu=yes');
-                     return;
-                        
-                }
-                LoadAjax('orgs','domains.index.php?ShowOrganizations=yes');
-        }       
-        
 	
+    if(document.getElementById('TEMPLATE_LEFT_MENUS')){LoadAjax('TEMPLATE_LEFT_MENUS','admin.tabs.php?left-menus=yes');}	
+	
+    if(document.getElementById('orgs')){
+             if(document.getElementById('ajaxmenu')){
+                 YahooWin5(750,'domains.index.php?ajaxmenu=yes');
+                 return;
+             }
+            LoadAjax('orgs','domains.index.php?ShowOrganizations=yes');
+        }
 }
 
 function TreeAddNewOrganisation(){
@@ -1727,7 +1728,8 @@ function TreeAddNewOrganisation(){
 	if(org){
 		var XHR = new XHRConnection();
 		XHR.appendData('TreeAddNewOrganisation',org);
-		document.getElementById('orgs').innerHTML='<center style="width:100%"><img src=img/wait_verybig.gif></center>';
+		if(document.getElementById('orgs')){document.getElementById('orgs').innerHTML='<center style="width:100%"><img src=img/wait_verybig.gif></center>';}
+		if(document.getElementById('TEMPLATE_LEFT_MENUS')){document.getElementById('TEMPLATE_LEFT_MENUS').innerHTML='<center style="width:100%"><img src=img/wait_verybig.gif></center>'; }
 		XHR.sendAndLoad('domains.php', 'GET',x_TreeAddNewOrganisation);
 		}
 	

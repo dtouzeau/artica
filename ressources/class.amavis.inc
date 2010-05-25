@@ -451,6 +451,9 @@ if($EnableAmavisInMasterCF){
 }
 
 $conf=$conf."\n";
+$conf=$conf.$this->banned_rules_maps()."\n";
+$conf=$conf."\n";
+
 $conf=$conf."\$policy_bank{'MYNETS'} = {   # mail originating from @mynetworks\n";
 $conf=$conf."\toriginating => 1,  # is true in MYNETS by default, but let's make it explicit\n";
 $conf=$conf."\tos_fingerprint_method => undef,  # don't query p0f for internal clients\n";
@@ -461,16 +464,27 @@ if($EnableAmavisInMasterCF){
 
 if($altermime){
 	$conf=$conf."\tallow_disclaimers => 1,\n";
-}
+	}
 
 if($this->main_array["BEHAVIORS"]["trust_my_net"]==1){
 	$conf=$conf ."\tbypass_spam_checks_maps => [1], # don't spam-check internal mail\n";
-	$conf=$conf ."\tbypass_banned_checks_maps => [1], # don't banned-check internal mail\n";
-	$conf=$conf ."\tbypass_header_checks_maps => [1], # don't header-check internal mail\n";	
+	if($this->main_array["NETWORK"]["banned_extensions_include_local_net"]==0){
+		$conf=$conf ."\tbypass_banned_checks_maps => [1], # don't banned-check internal mail\n";
 	}
+	$conf=$conf ."\tbypass_header_checks_maps => [1], # don't header-check internal mail\n";
+}
+if($this->main_array["NETWORK"]["banned_extensions_include_local_net"]==1){
+	if(is_array($this->extensions)){
+		$conf=$conf."\tbanned_filename_maps => ['GENERAL'],\n";
+	}
+}	
+
 
 $conf=$conf."};\n";
 $conf=$conf."\n";
+
+
+
 $conf=$conf."\$interface_policy{'SOCK'} = 'AM.PDP-SOCK'; # only applies with \$unix_socketname\n";
 $conf=$conf."\n";
 $conf=$conf."# Use with amavis-release over a socket or with Petr Rehor's amavis-milter.c\n";
@@ -481,8 +495,9 @@ $conf=$conf."  notify_method  => 'pipe:flags=q argv=/usr/sbin/sendmail -Ac -i -f
 $conf=$conf."  auth_required_release => 0,  # do not require secret_id for amavisd-release\n";
 
 if($this->main_array["NETWORK"]["banned_extensions_include_local_net"]==1){
-	$conf=$conf."  bypass_banned_checks_maps => [0],\n";
-	//$conf=$conf.$this->banned_filename_maps().",\n";
+	if(is_array($this->extensions)){
+		$conf=$conf."  banned_filename_maps => ['GENERAL'],\n";
+	}
 }
 $conf=$conf."};\n";
 
@@ -757,7 +772,13 @@ private  function banned_filename_maps(){
 	reset($this->extensions);
 	$pattern=implode('|',$this->extensions);
 	return "banned_filename_re = new_RE(\qr'.\.($pattern)$'i)";
-	
+}
+
+private function banned_rules_maps(){
+	if(!is_array($this->extensions)){return null;}
+	reset($this->extensions);
+	$pattern=implode('|',$this->extensions);
+	return "%banned_rules = ('GENERAL' => new_RE(\qr'.\.($pattern)$'i));\n";
 	
 }
 

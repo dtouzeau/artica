@@ -23,7 +23,7 @@ private
      EnableASSPBackup:integer;
      NotASSPRemovePass:integer;
      EnablePostfixMultiInstance:integer;
-     procedure CHECK_POSTFIX();
+
      function PID_NUM():string;
      procedure REMOVEPASSWORD();
      procedure allowAdminConnectionsFrom();
@@ -37,6 +37,7 @@ public
     function    VERSION():string;
     procedure   START();
     procedure   STOP();
+    procedure   CHECK_POSTFIX();
     FUNCTION    STATUS():string;
     function    RELOAD():string;
 END;
@@ -240,8 +241,9 @@ if FileExists('/etc/artica-postfix/mynetworks') then begin
           logs.DebugLogs('tassp.InternalsIPs() reject mynetworks ='+z.Strings[i]);
           continue;
        end;
-       logs.DebugLogs('tassp.InternalsIPs() math mynetworks ='+z.Strings[i]);
+
        if SYS.ArrayAlreadyUsed(t,RegExpr.Match[1]+'.'+RegExpr.Match[2]+'.'+RegExpr.Match[3]) then continue;
+       logs.DebugLogs('tassp.InternalsIPs() math mynetworks ='+z.Strings[i]);
         matchedIp:=RegExpr.Match[1]+'.'+RegExpr.Match[2]+'.'+RegExpr.Match[3];
         noSpoofingCheckIP:=noSpoofingCheckIP+ matchedIp+'|';
         mynets:=mynets+matchedIp+'|';

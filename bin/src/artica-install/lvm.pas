@@ -117,15 +117,10 @@ SYS.SET_CACHE_VERSION('APP_NFS',result);
 end;
 //#############################################################################
 procedure tlvm.RELOAD();
-var
-   count:integer;
-   pid:string;
 begin
     if not FileExists('/etc/artica-postfix/settings/Daemons/NFSExportConfig') then exit;
     fpsystem('/bin/cp /etc/artica-postfix/settings/Daemons/NFSExportConfig /etc/exports');
-
     fpsystem(INITD_PATH()+' reload');
-
 end;
 
 procedure tlvm.START();
@@ -149,7 +144,7 @@ begin
     fpsystem(INITD_PATH()+' start');
     if FileExists('/etc/init.d/nfs-common') then fpsystem('/etc/init.d/nfs-common start');
 
-
+count:=0;
  while not SYS.PROCESS_EXIST(PID_NUM()) do begin
 
         sleep(100);
@@ -173,15 +168,6 @@ end;
 
 //#############################################################################
 procedure tlvm.STOP();
-var
-   count:integer;
-   pid:string;
-   tmp:string;
-   l:Tstringlist;
-   i:integer;
-   tt:integer;
-   path:string;
-    RegExpr:TRegExpr;
 begin
   fpsystem(INITD_PATH()+' stop');
   if FileExists('/etc/init.d/nfs-common') then fpsystem('/etc/init.d/nfs-common stop');

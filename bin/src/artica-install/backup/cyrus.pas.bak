@@ -112,6 +112,7 @@ public
     procedure   CheckRightsAndConfig();
     function    TestingMailBox(username:string;password:string):string;
     procedure   MASTER_RECOVER();
+    procedure   RECOVER_CYRUS_DB_SINGLE();
 
 
     //murder
@@ -420,7 +421,18 @@ begin
     fpsystem(SYS.LOCATE_PHP5_BIN()+ ' ' + artica_path+'/exec.check-cyrus-account.php cyrus & >/dev/null 2>&1 &');
 end;
 //##############################################################################
+procedure Tcyrus.RECOVER_CYRUS_DB_SINGLE();
+var
+   configdirectory:string;
+begin
 
+
+if FileExists(SYS.LOCATE_ctl_cyrusdb()) then begin
+   CYRUS_DAEMON_STOP();
+   fpsystem('su - cyrus -c "'+SYS.LOCATE_ctl_cyrusdb()+' -r"');
+   CYRUS_DAEMON_START();
+end;
+//##############################################################################
 procedure Tcyrus.MASTER_RECOVER();
 var
    configdirectory:string;
@@ -1991,6 +2003,7 @@ var
    cmd_daemon:string;
    ldap_member_base:string;
    ldap_member_base_config:string;
+   lmtpsocket:string;
 begin
 
    if not FIleExists(CYRUS_DAEMON_BIN_PATH()) then begin
@@ -2135,7 +2148,7 @@ begin
      if not FileExists('/var/spool/postfix/var/run/cyrus/socket/lmtp') then logs.OutputCmd('/bin/ln -s '+lmtpsocket+' /var/spool/postfix/var/run/cyrus/socket/lmtp');
   end;
 
-  if lmtpsocket<>
+
   logs.OutputCmd('/bin/chown -R postfix:postfix /var/run/cyrus');
 
 

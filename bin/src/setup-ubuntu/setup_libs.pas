@@ -76,12 +76,14 @@ public
       function  GET_FIRMWARE_PATH():string;
       function  ExtractLocalPackage(filepath:string):string;
       function  VersionToInteger(version:string):integer;
+      function  ArchStruct():integer;
 END;
 
 implementation
 
 constructor tlibs.Create();
 begin
+if not DirectoryExists('/opt/artica/tmp') then forceDirectories('/opt/artica/tmp');
 index_file:='http://www.artica.fr/auto.update.php';
 local_folder:='';
 end;
@@ -166,6 +168,34 @@ CACHE_KERNEL_VERSION:=kernelversion;
 
 end;
 //##############################################################################
+function tlibs.ArchStruct():integer;
+var
+   tmpstr,data:string;
+   RegExpr:TRegExpr;
+begin
+tmpstr:=FILE_TEMP();
+fpsystem('uname -m >'+tmpstr +' 2>&1');
+data:=trim(ReadFromFile(tmpstr));
+fpsystem('/bin/rm '+tmpstr+' >/dev/null 2>&1');
+RegExpr:=TRegExpr.Create;
+RegExpr.Expression:='i[0-9]86';
+if RegExpr.Exec(data) then begin
+   RegExpr.free;
+   result:=32;
+   exit;
+end;
+
+RegExpr.Expression:='x86_64';
+if RegExpr.Exec(data) then begin
+   RegExpr.free;
+   result:=64;
+   exit;
+end;
+end;
+//##############################################################################
+
+
+
 function tlibs.CheckReposKernel():string;
 var
    tmpstr:string;
@@ -1356,12 +1386,15 @@ fpsystem('/usr/share/artica-postfix/bin/artica-install --init-from-repos');
 fpsystem('/usr/share/artica-postfix/bin/artica-install --perl-addons-repos');
 fpsystem('/usr/share/artica-postfix/bin/artica-install -awstats-reconfigure');
 fpsystem('/usr/share/artica-postfix/bin/artica-install -awstats generate');
+fpsystem('/etc/init.d/artica-postfix stop daemon');
+fpsystem('/etc/init.d/artica-postfix start daemon');
 fpsystem('/etc/init.d/artica-postfix stop');
 fpsystem('/etc/init.d/artica-postfix start');
 fpsystem('/etc/init.d/artica-postfix start all');
-fpsystem('/etc/init.d/artica-postfix stop');
-fpsystem('/etc/init.d/artica-postfix start');
-fpsystem('/etc/init.d/artica-postfix start all');
+fpsystem('/etc/init.d/artica-postfix stop mysql');
+fpsystem('/etc/init.d/artica-postfix start mysql');
+
+
 fpsystem('/usr/share/artica-postfix/bin/artica-install --init-from-repos');
 end;
 //#########################################################################################

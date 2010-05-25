@@ -9,7 +9,7 @@ uses
   Classes, SysUtils,Process,strutils,IniFiles,RegExpr in 'RegExpr.pas',artica_cron,opengoo,
   BaseUnix,unix,global_conf,zsystem,logs,geoip,debian,spamass,openldap,clamav,cyrus,squid,postfix_class,samba,awstats,process_infos,pureftpd,ntpd,spfmilter,
   mailgraph_daemon, miltergreylist,lighttpd, roundcube,dansguardian,kav4samba,mimedefang,stunnel4,dkimfilter,kav4proxy,bind9,obm,mysql_daemon,p3scan,syslogng,openvpn,cups,
-  jcheckmail,dhcp_server,obm2,dstat,rsync,smartd,tcpip,policyd_weight,apache_artica,autofs,framework,assp,pdns,gluster,nfsserver,zabbix,hamachi,postfilter, vmwaretools,zarafa_server,monit,wifi,
+  jcheckmail,dhcp_server,dstat,rsync,smartd,tcpip,policyd_weight,apache_artica,autofs,assp,pdns,gluster,nfsserver,zabbix,hamachi,postfilter, vmwaretools,zarafa_server,monit,wifi,
   mailarchiver in '/home/dtouzeau/developpement/artica-postfix/bin/src/artica-install/mailarchiver.pas',
   kas3         in '/home/dtouzeau/developpement/artica-postfix/bin/src/artica-install/kas3.pas',
   kavmilter    in '/home/dtouzeau/developpement/artica-postfix/bin/src/artica-install/kavmilter.pas',
@@ -581,7 +581,6 @@ var
    jcheckmail:tjcheckmail;
    dhcp3:tdhcp3;
    logs:tlogs;
-   zobm2:tobm2;
    opengoo:topengoo;
    cups:tcups;
    dtstat:tdstat;
@@ -590,7 +589,6 @@ var
    policydw:tpolicyd_weight;
    autofs:tautofs;
    mysql:tmysql_daemon;
-   framework:tframework;
    assp:tassp;
    pdns:tpdns;
    gluster:tgluster;
@@ -1254,7 +1252,6 @@ var
    dhcp3:tdhcp3;
    cron:tcron;
    lighttpd:Tlighttpd;
-   zobm2:tobm2;
    opengoo:topengoo;
    cups:tcups;
    dstat:tdstat;
@@ -1749,7 +1746,7 @@ begin
 
               if ParamStr(2)='daemon' then begin
                  if not SYS.BuildPids() then exit();
-
+                 GLOBAL_INI.SYSTEM_START_MINIMUM_DAEMON();
                  monit.START();
                  exit();
               end;
@@ -1923,7 +1920,7 @@ begin
 
            if ParamStr(2)='all' then begin
                 fpsystem(GLOBAL_INI.get_ARTICA_PHP_PATH()+'/bin/process1 --force &');
-                GLOBAL_INI.SYSTEM_START_ARTICA_DAEMON();
+                GLOBAL_INI.SYSTEM_START_MINIMUM_DAEMON();
                 GLOBAL_INI.START_ALL_DAEMONS();
                 fpsystem(SYS.LOCATE_PHP5_BIN() +' ' + GLOBAL_INI.get_ARTICA_PHP_PATH() +'/exec.ldap.rebuild.php >/dev/null &');
                 exit();
@@ -1944,8 +1941,7 @@ begin
             
 
               fpsystem(GLOBAL_INI.get_ARTICA_PHP_PATH()+'/bin/process1 --force &');
-              GLOBAL_INI.SYSTEM_START_ARTICA_DAEMON();
-              GLOBAL_INI.SYSTEM_START_ARTICA_ALL_DAEMON();
+              GLOBAL_INI.SYSTEM_START_MINIMUM_DAEMON();
               fpsystem(SYS.LOCATE_PHP5_BIN() +' ' + GLOBAL_INI.get_ARTICA_PHP_PATH() +'/exec.ldap.rebuild.php >/dev/null &');
               writeln('');
               writeln('');

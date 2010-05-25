@@ -354,7 +354,10 @@ private function GetMyDNS(){
 		$eth_IP=$mip["IPADDR"];
 		
 
-		$conf=$conf."ddns-domainname \"$this->ddns_domainname\";\n";
+		if($this->ddns_domainname<>null){
+			$conf=$conf."ddns-domainname \"$this->ddns_domainname\";\n";
+		}
+		
 		if($users->BIND9_INSTALLED){
 			$sock=new sockets();
 			$Bind9GlobalKey=$sock->GET_INFO('Bind9GlobalKey');
@@ -379,7 +382,7 @@ private function GetMyDNS(){
 		$conf=$conf."authoritative;\n";
 		$conf=$conf."max-lease-time $this->max_lease_time;\n";
 		$conf=$conf."default-lease-time $this->max_lease_time;\n";
-		$conf=$conf."option domain-name \"$this->ddns_domainname\";\n";
+
 		
 		if($this->gateway<>null){
 			$gateway_array[]=$this->gateway;
@@ -401,15 +404,10 @@ private function GetMyDNS(){
 		}
 		
 		
-		if(is_array($gateway_array)){	
-				$conf=$conf."option routers ". implode(",",$gateway_array). ";\n";
-		}	
+
 		
 		$arrayNameServers=$this->GetMyDNS();
-		
-		if(is_array($ip->arrayNameServers)){
-			$conf=$conf ."option domain-name-servers ". implode(",",$arrayNameServers).";\n";
-		}
+
 			
 		
 		if(!preg_match('#([0-9]+)\.([0-9]+)\.([0-9]+)#',$this->range1,$re)){
@@ -430,10 +428,22 @@ private function GetMyDNS(){
 			}
 		}
 		
+		if(is_array($gateway_array)){	
+				$conf=$conf."option routers ". implode(",",$gateway_array). ";\n";
+		}			
+		
+		if(is_array($ip->arrayNameServers)){
+			reset($ip->arrayNameServers);
+			$conf=$conf ."\toption domain-name-servers ". implode(",",$arrayNameServers).";\n";
+		}		
+		
+		if($this->ddns_domainname<>null){
+			$conf=$conf."\toption domain-name \"$this->ddns_domainname\";\n";
+		}		
+		
 		
 		if($users->BIND9_INSTALLED){
-			
-			$conf=$conf."\tddns-domainname \"$this->ddns_domainname\";\n";
+			if($this->ddns_domainname<>null){
 			$conf=$conf."\tddns-rev-domainname \"in-addr.arpa\";\n\n";
 			$conf=$conf."\tzone $this->ddns_domainname. {\n";
 			$conf=$conf."\t\tprimary 127.0.0.1;\n";
@@ -445,7 +455,7 @@ private function GetMyDNS(){
 			$conf=$conf."\t\tkey globalkey;\n";
 			$conf=$conf."\t}\n";	
 			$this->SetBind9Zone();
-			
+			}			
 			
 		}else{
 			$conf=$conf."\tddns-updates off;\n"; 

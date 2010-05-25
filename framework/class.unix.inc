@@ -95,9 +95,26 @@ class unix {
 	}
 
 	public function GET_WIRELESS_CARD(){
+		
 		$t=explode("\n",@file_get_contents("/proc/net/wireless"));
 		while (list ($index, $line) = each ($t)){
 			if(preg_match("#(.+?):\s+([0-9]+)#",$line,$re)){return $re[1];}
+		}
+		
+		$iwconfig=$this->find_program("iwconfig");
+		if($iwconfig==null){
+			if($GLOBALS["VERBOSE"]){echo "Unable to find iwconfig...\n";}
+			return;
+		}
+		
+		exec("$iwconfig 2>&1",$results);
+		
+		while (list ($index, $line) = each ($results)){
+			if(preg_match("#^(.+?)\s+.+?ESSID#",$line,$re)){
+				return $re[1];
+			}else{
+				if($GLOBALS["VERBOSE"]){echo "$line NO MATCH...\n";}
+			}
 		}
 		
 	}
