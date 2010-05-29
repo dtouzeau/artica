@@ -150,6 +150,12 @@ function main_little_status(){
 	$array[]="KAV4PROXY";
 	$array[]="DANSGUARDIAN";
 	$array[]="C-ICAP";
+	echo "hhh";
+	$squid=new squidbee();
+	print_r($squid->network_array);
+	if(!is_array($squid->network_array)){
+		$net=Paragraphe("warning64.png","{no_squid_network}","{no_squid_network_text}","javascript:Loadjs('squid.popups.php?script=network')");
+	}
 	
 	
 	
@@ -158,8 +164,12 @@ function main_little_status(){
 		if($st==null){continue;}
 		$status=$status .$st."\n";
 	}
+	
+	
+	
+	
 	$tabs=main_status_tab();
-	echo  $tpl->_ENGINE_parse_body(RoundedLightWhite($tabs.$status.$refresh));	
+	echo  $tpl->_ENGINE_parse_body($net.$tabs.$status.$refresh);	
 
 	
 		
@@ -206,10 +216,17 @@ function main_status(){
 	$kav=DAEMON_STATUS_ROUND("KAV4PROXY",$ini);
 	$cicap=DAEMON_STATUS_ROUND("C-ICAP",$ini);
 	$md=md5(date('Ymhis'));
+	
+	$squid=new squidbee();
+
+	if(count($squid->network_array)==0){
+		
+		$net=Paragraphe("warning64.png","{no_squid_network}","{no_squid_network_text}","javascript:Loadjs('squid.popups.php?script=network')");
+	}	
 
 	$html="<table style='width:99%'>
 	<tr>
-		<td valign='top'>$squid_status$kav</td>
+		<td valign='top'>$net$squid_status$kav</td>
 		<td valign='top'>$dansguardian_status$cicap</td>
 	</tr>
 	
@@ -217,7 +234,7 @@ function main_status(){
 	</table>
 	<center style='margin:15px'><hr><img src='images.listener.php?uri=squid/rrd/connections.hour.png&hostname={$_GET["hostname"]}&md=$md'></center>
 	";
-	echo $status;
+	
 	$tpl=new templates();
 	echo $tpl->_parse_body($html);
 	}

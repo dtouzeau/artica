@@ -1,3 +1,29 @@
+1.4.052919:
+========================================================================================
+
+Interface Changes
+-------------------------------------------------
+1.4.052911: Change left menu behavior.
+1.4.052911: Add a new language : brazilian.
+
+Messaging Changes:
+-----------------------------------------------
+1.4.052911: Fix artica is unable to create fetchmail statistics.
+1.4.052911: Adding fetchmail statistics.
+
+Proxy Changes:
+-------------------------------------------------
+1.4.052911: Improve the category section in filter area.
+
+System Changes
+-------------------------------------------------
+1.4.052919: Improve feature to find the right hostname and domain name.
+
+File Sharing changes:
+-----------------------------------------------
+1.4.052919: Introduce possibility to link Artica server to an Active Directory server.
+
+
 1.4.052511:
 ========================================================================================
 

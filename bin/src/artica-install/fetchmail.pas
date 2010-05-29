@@ -45,7 +45,7 @@ public
     procedure FETCHMAIL_LOGGER_STOP();
     function  FETCHMAIL_LOGGER_PID():string;
     procedure FETCHMAIL_LOGGER_START();
-    function LOGGER_STATUS():string;
+
 END;
 
 implementation
@@ -309,12 +309,15 @@ result:=SYS.GET_INFO('FetchMailDaemonPostmaster');
 end;
 //#############################################################################
 function tfetchmail.FETCHMAIL_BIN_PATH():string;
+var
+   path:string;
 begin
     if FileExists('/opt/artica/bin/fetchmail') then exit('/opt/artica/bin/fetchmail');
     if FileExists('/usr/local/bin/fetchmail') then exit('/usr/local/bin/fetchmail');
     if FileExists('/usr/bin/fetchmail') then exit('/usr/bin/fetchmail');
     if FileExists('/usr/local/bin/fetchmail') then exit('/usr/local/bin/fetchmail');
-
+    path:=SYS.LOCATE_GENERIC_BIN('fetchmail');
+    if FileExists(path) then exit(path);
 end;
 //#############################################################################
 function tfetchmail.FETCHMAIL_PID():string;
@@ -593,83 +596,28 @@ end;
 //##############################################################################
 function tfetchmail.STATUS();
 var
-   ini:TstringList;
-   pid:string;
+pidpath:string;
+pid:string;
 begin
-if not FileExists(FETCHMAIL_BIN_PATH()) then exit;
- ini:=TstringList.Create;
-  ini.Add('[FETCHMAIL]');
- if not  FileExists('/etc/fetchmailrc') then EnableFetchmail:=0;
- ini.Add('service_disabled='+ IntTOStr(EnableFetchmail));
- ini.Add('master_version=' + FETCHMAIL_VERSION());
- ini.Add('service_name=APP_FETCHMAIL');
- ini.Add('service_cmd=fetchmail');
 
+   if not FileExists(FETCHMAIL_BIN_PATH()) then  begin
+      SYS.MONIT_DELETE('APP_FETCHMAIL');
+      SYS.MONIT_DELETE('APP_FETCHMAIL_LOGGER');
+      exit;
+   end;
+
+ pidpath:=logs.FILE_TEMP();
+ fpsystem(SYS.LOCATE_PHP5_BIN()+' /usr/share/artica-postfix/exec.status.php --fetchmail >'+pidpath +' 2>&1');
+ result:=logs.ReadFromFile(pidpath);
+ logs.DeleteFile(pidpath);
 
  if EnableFetchmail=0 then begin
-    result:=ini.Text;
-    ini.free;
     SYS.MONIT_DELETE('APP_FETCHMAIL');
+    SYS.MONIT_DELETE('APP_FETCHMAIL_LOGGER');
     exit;
- end;
-
-
- if SYS.MONIT_CONFIG('APP_FETCHMAIL','/var/run/fetchmail.pid','fetchmail') then begin
-    result:=ini.Text;
-    ini.free;
-    exit;
- end;
-
-      pid:=FETCHMAIL_PID();
-      if SYS.PROCESS_EXIST(pid) then ini.Add('running=1') else  ini.Add('running=0');
-      ini.Add('application_installed=1');
-      ini.Add('master_pid='+ pid);
-      ini.Add('master_memory=' + IntToStr(SYS.PROCESS_MEMORY(pid)));
-      ini.Add('status='+SYS.PROCESS_STATUS(pid));
-      result:=ini.Text;
-      ini.free;
 end;
-//##############################################################################
-function tfetchmail.LOGGER_STATUS();
-var
-   ini:TstringList;
-   pid:string;
-begin
-if not FileExists(FETCHMAIL_BIN_PATH()) then exit;
- ini:=TstringList.Create;
-  ini.Add('[FETCHMAIL_LOGGER]');
- if not  FileExists('/etc/fetchmailrc') then EnableFetchmail:=0;
- if not FileExists('/var/log/fetchmail.log') then EnableFetchmail:=0;
- ini.Add('service_disabled='+ IntTOStr(EnableFetchmail));
- ini.Add('master_version=' + FETCHMAIL_VERSION());
- ini.Add('service_name=APP_FETCHMAIL_LOGGER');
- ini.Add('service_cmd=fetchmail');
-
- if EnableFetchmail=0 then begin
-    result:=ini.Text;
-    ini.free;
-    SYS.MONIT_DELETE('FETCHMAIL_LOGGER');
-    exit;
- end;
-
-
- if SYS.MONIT_CONFIG('APP_FETCHMAIL_LOGGER','/etc/artica-postfix/exec.fetmaillog.php.pid','fetchmail') then begin
-    ini.Add('monit=1');
-    result:=ini.Text;
-    ini.free;
-    exit;
- end;
-
-
-       pid:=FETCHMAIL_LOGGER_PID();
-      if SYS.PROCESS_EXIST(pid) then ini.Add('running=1') else  ini.Add('running=0');
-      ini.Add('application_installed=1');
-      ini.Add('master_pid='+ pid);
-      ini.Add('master_memory=' + IntToStr(SYS.PROCESS_MEMORY(pid)));
-      ini.Add('status='+SYS.PROCESS_STATUS(pid));
-      result:=ini.Text;
-      ini.free;
-
+SYS.MONIT_CONFIG('APP_FETCHMAIL_LOGGER','/etc/artica-postfix/exec.fetmaillog.php.pid','fetchmail');
+SYS.MONIT_CONFIG('APP_FETCHMAIL','/var/run/fetchmail.pid','fetchmail');
 end;
 //##############################################################################
 

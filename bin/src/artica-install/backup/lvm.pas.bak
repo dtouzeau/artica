@@ -120,9 +120,7 @@ procedure tlvm.RELOAD();
 begin
     if not FileExists('/etc/artica-postfix/settings/Daemons/NFSExportConfig') then exit;
     fpsystem('/bin/cp /etc/artica-postfix/settings/Daemons/NFSExportConfig /etc/exports');
-
     fpsystem(INITD_PATH()+' reload');
-
 end;
 
 procedure tlvm.START();

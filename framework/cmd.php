@@ -268,6 +268,7 @@ if(isset($_GET["restart-apache-no-timeout"])){RestartApacheNow();exit;}
 //network
 if(isset($_GET["SaveNic"])){Reconfigure_nic();exit;}
 if(isset($_GET["dnslist"])){DNS_LIST();exit;}
+if(isset($_GET["ChangeHostName"])){ChangeHostName();exit;}
 
 //WIFI
 if(isset($_GET["iwlist"])){iwlist();exit;}
@@ -414,6 +415,7 @@ if(isset($_GET["sync-remote-smtp-artica"])){postfix_sync_artica();exit;}
 if(isset($_GET["etc-hosts-open"])){etc_hosts_open();exit;}
 if(isset($_GET["etc-hosts-add"])){etc_hosts_add();exit;}
 if(isset($_GET["etc-hosts-del"])){etc_hosts_del();exit;}
+if(isset($_GET["full-hostname"])){hostname_full();exit;}
 
 //tcp
 if(isset($_GET["ifconfig-interfaces"])){ifconfig_interfaces();exit;}
@@ -3386,6 +3388,30 @@ function WIFI_ETH_STATUS(){
 function WIFI_ETH_CHECK(){
 	exec(LOCATE_PHP5_BIN2()." /usr/share/artica-postfix/exec.wifi.detect.cards.php --checkap",$r);
 	echo "<articadatascgi>".  base64_encode(implode("\n",$r))."</articadatascgi>";	
+}
+function ChangeHostName(){
+	$servername=$_GET["ChangeHostName"];
+	shell_exec("/usr/share/artica-postfix/bin/artica-install --change-hostname $servername");
+	
+}
+function hostname_full(){
+	$unix=new unix();
+	$ypdomainname=$unix->find_program("ypdomainname");
+	$hostname=$unix->find_program("hostname");
+	$sysctl=$unix->find_program("sysctl");
+	if($ypdomainname<>null){
+		exec("$ypdomainname",$results);
+		$domain=trim(@implode(" ",$results));
+	}else{
+		exec("$sysctl -n kernel.domainname",$results);
+		$domain=trim(@implode(" ",$results));
+	}
+	unset($results);
+	exec("$hostname -s",$results);
+	$host=trim(@implode(" ",$results));
+	if(strlen($domain)>0){$host="$host.$domain";}
+	echo "<articadatascgi>$host</articadatascgi>";	
+	
 }
 
 

@@ -201,7 +201,11 @@ end;
       halt(0);
    end;
 
-
+    if ParamStr(1)='--change-hostname' then begin
+      GLOBAL_INI:=myconf.Create();
+      GLOBAL_INI.SYSTEM_NETWORKS_SET_HOSTNAME(ParamStr(2));
+      halt(0);
+   end;
 
 
 
@@ -264,6 +268,12 @@ end;
               halt(0);
          end;
 
+         if ParamStr(2)='fetchmail' then begin
+              zfetchmail:=tfetchmail.Create(SYS);
+              writeln(zfetchmail.FETCHMAIL_VERSION());
+              halt(0);
+         end;
+
          writeln('help:');
          writeln('--export-version squid');
          writeln('--export-version c-icap');
@@ -271,6 +281,7 @@ end;
          writeln('--export-version kav4proxy');
          writeln('--export-version wpa_suppliant');
          writeln('--export-version hostapd');
+         writeln('--export-version fetchmail');
          halt(0);
     end;
 

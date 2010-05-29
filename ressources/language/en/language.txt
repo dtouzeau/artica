@@ -3725,6 +3725,24 @@ When set, this option causes Squid to ignore the no-cache directive, if any, in 
  It helps Squid decide whether or not a given request can be a cache hit or must be treated as a miss.[br]
  Liberal settings increase your cache hit ratio but also increase the chance that users receive a stale response.[br]
  Conservative settings, on the other hand, decrease hit ratios and stale responses.
- </refresh_pattern_intro>
- <add_default_settings>Add default settings</add_default_settings>
- <ignore_all>Ignore all</ignore_all>
+</refresh_pattern_intro>
+<add_default_settings>Add default settings</add_default_settings>
+<ignore_all>Ignore all</ignore_all>
+<nb_fetchmails>Number of fetched emails</nb_fetchmails>
+<nb_fetchmails_size>Size of fetched emails</nb_fetchmails_size>
+<emails_number>eMails number</emails_number>
+<master_panel>Master panel</master_panel>
+<no_squid_network>No network set</no_squid_network>
+<no_squid_network_text>Currently, no network set in the main configuration, Squid will refuse any connexion</no_squid_network_text>
+<sender>sender</sender>
+<CICAP_DNSBL>DNS black list lookup</CICAP_DNSBL>
+<CICAP_DNSBL_TEXT>Use dynamics DNS black lists servers in order to ban websites</CICAP_DNSBL_TEXT>
+<uri_dnsbl>DNSBL uri</uri_dnsbl>
+<ad_samba_member>Active Directory Member</ad_samba_member>
+<ad_samba_member_text>Make this server has a member of a Microsoft Active Directory domain</ad_samba_member_text>
+<make_samba_ad_text>If enabled, this server will be a member of your Active Directory server.[br]In this case Active Directory members will have access to this server services eg Proxy, File sharing...</make_samba_ad_text> 
+<activedirectory_server>Active Directory server name</activedirectory_server>
+<activedirectory_domain>Active Directory domain</activedirectory_domain>
+<activedirectory_admin>Active Directory Administrator</activedirectory_admin>
+<this_server_is_an_ad_member>This server is currently a member of an Active Directory server</this_server_is_an_ad_member>
+<WINBINDD_NOT_INSTALLED_TEXT>Winbindd daemon is not installed, until this daemon does not exists, you will not allowed to enable the feature.[br]Go to setup Center and upgrade Samba daemon</WINBINDD_NOT_INSTALLED_TEXT>

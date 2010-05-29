@@ -5,7 +5,7 @@ interface
 
 uses
 Classes, SysUtils,variants,strutils,unix, Process,md5,logs,baseunix,RegExpr in 'RegExpr.pas',global_conf in 'global_conf.pas',spamass,clamav,spfmilter,openldap,zsystem,cyrus,squid,
-dkimfilter,postfix_class,mailgraph_daemon,miltergreylist,roundcube,dansguardian,kav4samba,kav4proxy,bind9,mysql_daemon,autofs,zarafa_server,
+dkimfilter,postfix_class,mailgraph_daemon,miltergreylist,roundcube,dansguardian,kav4samba,kav4proxy,bind9,mysql_daemon,zarafa_server,
 kavmilter in '/home/dtouzeau/developpement/artica-postfix/bin/src/artica-install/kavmilter.pas',
 dnsmasq   in   '/home/dtouzeau/developpement/artica-postfix/bin/src/artica-install/dnsmasq.pas',
 saslauthd in '/home/dtouzeau/developpement/artica-postfix/bin/src/artica-install/saslauthd.pas',
@@ -282,7 +282,6 @@ var PID,INADYN_PID:string;
    amavis:tamavis;
    jcheckmail:tjcheckmail;
    syslogng:Tsyslogng;
-   autofs:tautofs;
    zarafa_server:tzarafa_server;
 
 begin

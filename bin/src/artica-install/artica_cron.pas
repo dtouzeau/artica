@@ -6,7 +6,7 @@ unit artica_cron;
 interface
 
 uses
-    Classes, SysUtils,variants,strutils,IniFiles, Process,md5,logs,unix,RegExpr in 'RegExpr.pas',zsystem,postfix_class,kas3,isoqlog,squid;
+    Classes, SysUtils,variants,strutils,IniFiles, Process,md5,logs,unix,RegExpr in 'RegExpr.pas',zsystem,postfix_class,kas3,isoqlog,squid,fetchmail;
 
 
 
@@ -151,8 +151,8 @@ begin
   fpsystem('/bin/chown root:root /etc/artica-cron/artica-cron.conf');
   fpsystem('/bin/chown root:root /etc/artica-cron/fcron.conf');
   fpsystem('/bin/chown -R root:root /etc/artica-cron/spool');
-  fpsystem('/bin/chmod 644 /etc/artica-cron/artica-cron.conf');
-  fpsystem('/bin/chmod 644 /etc/artica-cron/fcron.conf');
+  fpsystem('/bin/chmod 600 /etc/artica-cron/artica-cron.conf');
+  fpsystem('/bin/chmod 600 /etc/artica-cron/fcron.conf');
 
   mem:=SYS.MEM_TOTAL_INSTALLEE();
   cpunum:=SYS.CPU_NUMBER();
@@ -369,11 +369,14 @@ i:integer;
 systemMaxOverloaded:integer;
 squid:Tsquid;
 WifiAPEnable:integer;
+EnableFetchmail:integer;
+fetchmail:tfetchmail;
 begin
       nolog:=',nolog(true)';
       l:=TstringList.Create;
       backup_command:='';
       postfix:=tpostfix.Create(SYS);
+       if not TryStrToInt(SYS.GET_INFO('EnableFetchmail'),EnableFetchmail) then EnableFetchmail:=0;
 
       tmp:=SYS.GET_PERFS('ProcessNice');
       if not TryStrToInt(tmp,Nice) then Nice:=19;
@@ -514,6 +517,16 @@ logs.DeleteFile('/etc/cron.d/artica-cron-executor-300');
       l.Add('@'+Nicet+nolog+',lavg1('+IntToStr(systemMaxOverloaded)+')  10s '+cmdnice+SYS.LOCATE_PHP5_BIN()+ ' ' +artica_path+'/exec.parse-orders.php');
       l.Add('@'+Nicet+nolog+',lavg1('+IntToStr(systemMaxOverloaded)+') 12s '+cmdnice+SYS.LOCATE_PHP5_BIN()+ ' ' +artica_path+'/exec.executor.php --group10s');
       l.Add('@'+Nicet+nolog+',lavg1('+IntToStr(systemMaxOverloaded)+') 30s '+cmdnice+SYS.LOCATE_PHP5_BIN()+ ' ' +artica_path+'/exec.executor.php --group30s');
+
+
+// ---------------------------------- fetchmail ---------------------------------------------------------------------------------------------------------
+      fetchmail:=tfetchmail.Create(SYS);
+      if FileExists(fetchmail.FETCHMAIL_BIN_PATH()) then begin
+         logs.DebugLogs('Starting......: Daemon (fcron) set fetchmail injector schedule');
+         l.Add('@'+Nicet+',lavg1('+IntToStr(systemMaxOverloaded)+') 2 '+cmdnice+SYS.LOCATE_PHP5_BIN()+ ' ' +artica_path+'/exec.fetchmail.sql.php');
+      end;
+      fetchmail.free;
+// -------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
       squid:=Tsquid.Create;

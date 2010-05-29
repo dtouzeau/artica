@@ -1262,12 +1262,7 @@ RegExpr.expression:='^WBLReplicNow';
 
 
 
-  RegExpr.expression:='^RoundCubeSynchronize';
-  if RegExpr.Exec(uri) then begin
-      logs.Debuglogs('Schedule '+SYS.LOCATE_PHP5_BIN() + ' '+GLOBAL_INI.get_ARTICA_PHP_PATH() + '/exec.roundcube.php');
-      GLOBAL_INI.THREAD_COMMAND_SET(SYS.LOCATE_PHP5_BIN() + ' '+GLOBAL_INI.get_ARTICA_PHP_PATH() + '/exec.roundcube.php');
-      exit(true);
-  end;
+
 
 
   RegExpr.expression:='^SynchronizeRsyncDaemon';

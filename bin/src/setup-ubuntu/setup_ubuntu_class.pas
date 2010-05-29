@@ -1146,6 +1146,7 @@ l.add('libtiff4-dev');
 l.add('libjpeg62-dev');
 l.add('libpam0g-dev');
 l.add('uuid-dev');
+l.add('krb5-user');
 
 for i:=0 to l.Count-1 do begin
      if not is_application_installed(l.Strings[i]) then begin

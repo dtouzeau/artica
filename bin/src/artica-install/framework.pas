@@ -120,7 +120,6 @@ logs.Debuglogs('###################### FRAMEWORK #####################');
    end;
 
     DEFAULT_CONF();
-    logs.Debuglogs('Starting framework............');
     logs.OutputCmd(LIGHTTPD_BIN_PATH()+ ' -f /etc/artica-postfix/framework.conf');
 
 

@@ -7,8 +7,8 @@ interface
 
 uses
 //depreciated oldlinux -> linux
-Classes, SysUtils,Process,strutils,IniFiles,RegExpr in 'RegExpr.pas',unix,logs,dateutils,uHashList,Geoip,BaseUnix,md5,dhcp_server,openvpn,cups, obm2,
-samba,smartd,xapian,opengoo,dstat,sugarcrm,rsync,tcpip,policyd_weight,apache_artica, autofs,nfsserver,lvm,framework,ocsi,assp,pdns,gluster,
+Classes, SysUtils,Process,strutils,IniFiles,RegExpr in 'RegExpr.pas',unix,logs,dateutils,uHashList,Geoip,BaseUnix,md5,dhcp_server,openvpn,cups,pdns, obm2,
+samba,smartd,xapian,opengoo,dstat,sugarcrm,rsync,tcpip,policyd_weight,apache_artica, autofs,nfsserver,framework,ocsi,assp,gluster,zabbix,hamachi,vmwaretools,phpldapadmin,monit,zarafa_server,squidguard,wifi,
 mailarchiver in '/home/dtouzeau/developpement/artica-postfix/bin/src/artica-install/mailarchiver.pas',
 kavmilter    in '/home/dtouzeau/developpement/artica-postfix/bin/src/artica-install/kavmilter.pas',
 kas3         in '/home/dtouzeau/developpement/artica-postfix/bin/src/artica-install/kas3.pas',
@@ -17,7 +17,6 @@ zsystem      in '/home/dtouzeau/developpement/artica-postfix/bin/src/artica-inst
 obm          in '/home/dtouzeau/developpement/artica-postfix/bin/src/artica-install/obm.pas',
 mysql_daemon in '/home/dtouzeau/developpement/artica-postfix/bin/src/artica-install/mysql_daemon.pas',
 fdm          in '/home/dtouzeau/developpement/artica-postfix/bin/src/artica-install/fdm.pas',
-p3scan       in '/home/dtouzeau/developpement/artica-postfix/bin/src/artica-install/p3scan.pas',
 syslogng     in '/home/dtouzeau/developpement/artica-postfix/bin/src/artica-install/syslogng.pas',
 rdiffbackup  in '/home/dtouzeau/developpement/artica-postfix/bin/src/artica-install/rdiffbackup.pas',
 artica_cron  in '/home/dtouzeau/developpement/artica-postfix/bin/src/artica-install/artica_cron.pas',
@@ -69,15 +68,9 @@ type
 
 private
        GLOBAL_INI:TIniFile;
-       procedure  killfile(path:string);
-       function   GetIPAddressOfInterface( if_name:ansistring):ansistring;
-       procedure  ShowScreen(line:string);
-       function   POSTFIX_EXTRAINFOS_PATH(filename:string):string;
-       procedure  SYSTEM_NETWORKS_SET_NIC_DEBIAN(nicname:string;ipadress:string;netmask:string;gateway:string;dhcp:string);
        LOGS                :tlogs;
        notdebug2           :boolean;
        download_silent     :boolean;
-       function FileSize_ko(path:string):longint;
        CCYRUS:Tcyrus;
        clamav:Tclamav;
        spamass:Tspamass;
@@ -112,6 +105,14 @@ private
        mailman:tmailman;
        tcpip:ttcpip;
        apache_artica:tapache_artica;
+       procedure  killfile(path:string);
+
+       function   GetIPAddressOfInterface( if_name:ansistring):ansistring;
+       procedure  ShowScreen(line:string);
+       function   POSTFIX_EXTRAINFOS_PATH(filename:string):string;
+       procedure  SYSTEM_NETWORKS_SET_NIC_DEBIAN(nicname:string;ipadress:string;netmask:string;gateway:string;dhcp:string);
+       function FileSize_ko(path:string):longint;
+
 
 
        procedure MAIL_IMAP_CLIENT_CHECK();
@@ -124,6 +125,9 @@ private
 
 public
       SYS:Tsystem;
+      debug:boolean;
+      echo_local:boolean;
+      ArrayList:TStringList;
        function  USB_DEV_INFO(dev:string;key:string):string;
       FUNCTION ADD_PROCESS_QUEUE(command:string):string;
       FUNCTION GLOBAL_STATUS():string;
@@ -181,10 +185,6 @@ public
       FUNCTION       PRELOAD_PID():string;
       FUNCTION       PRELOAD_STATUS():string;
 
-      //MONIT
-      procedure      MONIT_STOP();
-      function       MONIT_PID():string;
-
       //CYRUS
       procedure      CYRUS_SET_V2(val:string);
       function       CYRUS_GET_V2():string;
@@ -212,11 +212,11 @@ public
       function       UsbExists(uuid:string):boolean;
       function       usbMountPoint(target_uuid:string):string;
       procedure      BACKUP_USB();
-      function       SCAN_DISK_PHP():string;
+      function       SCAN_DISK_PHP(norecheck:boolean=false):string;
       function       SCAN_DISK_PARTITIONS_PHP(dev:string):string;
 
       function       LMB_LUNDIMATIN_VERSION():string;
-
+      function       PHPMYADMIN_VERSION():string;
       //CLAMAV
 
       function       CLAMD_GETINFO(Key:String):string;
@@ -412,19 +412,18 @@ public
 
 
 
-      function  SYSTEM_DAEMONS_STATUS():TstringList;
+      function  SYSTEM_DAEMONS_STATUS():string;
       function  SYSTEM_DAEMONS_STOP_START(APPS:string;mode:string;return_string:boolean):string;
       procedure SYSTEM_CHDIR(path:string);
       function  IsWireless(ifname:string): boolean;
 
       //start the service
-      procedure BUILD_WATCHDOG_CONF();
       function  SYSTEM_START_ARTICA_DAEMON():boolean;
       function  SYSTEM_START_ARTICA_ALL_DAEMON():boolean;
       procedure SYSTEM_START_MINIMUM_DAEMON();
       procedure LDAP_VERIFY_PASSWORD();
-
-      procedure ARTICA_START();
+      procedure START_ALL_DAEMONS();
+      procedure START_MYSQL();
       procedure ARTICA_STOP();
 
       function  SYSTEM_PROCESS_EXISTS(processname:string):boolean;
@@ -476,6 +475,7 @@ public
       procedure PATCHING_PERL_TO_ARTICA(TargetPath:string);
       function  PathIsDirectory(path:string):boolean;
       procedure SYSTEM_CHANGE_MOTD();
+      procedure LISTDIRS_RECURSIVE(path:string);
 
       function  ExecPipe(commandline:string):string;
       function  WGET_DOWNLOAD_FILE(uri:string;file_path:string):boolean;
@@ -499,6 +499,7 @@ public
       FUNCTION         CROSSROADS_POOLING_TIME():integer;
 
       function GEOIP_VERSION():string;
+      function hpinlinux_VERSION():string;
 
       function  SASLAUTHD_PATH_GET():string;
       function  SASLAUTHD_VALUE_GET(key:string):string;
@@ -515,6 +516,7 @@ public
 
       //LMB
       function LMB_VERSION():string;
+      function GROUPOFFICE_VERSION():string;
 
       function get_POSTFIX_HASH_FOLDER():string;
       function get_INSTALL_PATH():string;
@@ -618,7 +620,6 @@ public
       function  ARTICA_SEND_MAX_SUBQUEUE_NUMBER:integer;
       function  ARTICA_FILTER_CHECK_PERMISSIONS():string;
       function  ARTICA_SEND_QUEUE_NUMBER():integer;
-      procedure ARTICA_SEND_WATCHDOG_QUEUE();
 
       function  ARTICA_FILTER_QUEUEPATH():string;
 
@@ -653,12 +654,9 @@ public
       procedure PERL_CREATE_DEFAULT_SCRIPTS();
       function  STATUS_PATTERN_DATABASES():string;
       procedure INSTANT_SEARCH();
-      procedure KILL_BAD_DU();
+
 
       function Explode(const Separator, S: string; Limit: Integer = 0):TStringDynArray;
-      debug:boolean;
-      echo_local:boolean;
-      ArrayList:TStringList;
       procedure splitexample(s:string;sep:string);
       constructor Create();
       destructor Free;
@@ -714,7 +712,12 @@ begin
   //LOGS.Free;
   CCYRUS.Free;
   SYS.Free;
-  fetchmail.Free;
+  try
+      fetchmail.Free;
+  except
+  exit;
+  end;
+
 end;
 //##############################################################################
 function myconf.SYSTEM_MARK_DEB_CDROM():string;
@@ -841,12 +844,21 @@ end;
 
 function myconf.SYSTEM_FQDN():string;
  var D:boolean;
+ ypdomainname:string;
+ domainname:string;
 begin
     D:=COMMANDLINE_PARAMETERS('debug');
-    fpsystem('/bin/hostname >/opt/artica/logs/hostname.txt');
+    fpsystem(SYS.LOCATE_GENERIC_BIN('hostname')+' -s >/opt/artica/logs/hostname.txt');
     result:=ReadFileIntoString('/opt/artica/logs/hostname.txt');
     result:=trim(result);
-    if D then writeln('hostname=',result);
+    ypdomainname:=SYS.LOCATE_GENERIC_BIN('ypdomainname');
+    if FIleExists(ypdomainname) then begin
+         fpsystem(ypdomainname +' >/tmp/domain.name.txt 2>&1');
+    end else begin
+         fpsystem(SYS.LOCATE_GENERIC_BIN('sysctl')+' -n kernel.domainname >/tmp/domain.name.txt 2>&1');
+    end;
+             domainname:=trim(ReadFileIntoString('/tmp/domain.name.txt'));
+
 end;
 
 
@@ -1099,7 +1111,7 @@ begin
 
 end;
 //##############################################################################
-function myconf.SCAN_DISK_PHP():string;
+function myconf.SCAN_DISK_PHP(norecheck:boolean):string;
    var
    l,s:TstringList;
    i:integer;
@@ -1108,12 +1120,20 @@ function myconf.SCAN_DISK_PHP():string;
    SIZE:string;
    ID_BUS:string;
    MOUNTED_HD:string;
+   proc_partition:boolean;
 
 begin
 
-
+    proc_partition:=false;
     if not FileExists('/etc/artica-postfix/fdisk.info') then begin
-       fpsystem('/sbin/fdisk -l > /etc/artica-postfix/fdisk.info 2>&1');
+       if FileExists('/proc/partitions') then begin
+          proc_partition:=true;
+          fpsystem('/sbin/fdisk -l > /etc/artica-postfix/fdisk.info 2>&1');
+       end else begin
+
+          fpsystem('/bin/df -h > /etc/artica-postfix/fdisk.info 2>&1');
+       end;
+
     end;
 
 
@@ -1128,15 +1148,27 @@ begin
 
      l:=TstringList.Create;
      RegExpr:=TRegExpr.Create;
-     RegExpr.Expression:='^[A-Za-z]+\s+(.+?):\s+([0-9\.]+)\s+([A-Za-z]+)';
+
      l.LoadFromFile('/etc/artica-postfix/fdisk.info');
      for i:=0 to l.Count-1 do begin
+         RegExpr.Expression:='cannot open.+?partitions';
+         if RegExpr.Exec(l.Strings[i]) then begin
+            if not norecheck then begin
+               logs.DeleteFile('/etc/artica-postfix/fdisk.info');
+               SCAN_DISK_PHP(true);
+            end;
+         end;
+
+        RegExpr.Expression:='(.+?)\s+([0-9\.A-Z]+)\s+([0-9\.A-Z]+)\s+([0-9\.A-Z]+)\s+([0-9\.\%]+)\s+';
+        if proc_partition then RegExpr.Expression:='^[A-Za-z]+\s+(.+?):\s+([0-9\.]+)\s+([A-Za-z]+)';
          if RegExpr.Exec(l.Strings[i]) then begin
                   DiskDev:=RegExpr.Match[1];
+                  if DiskDev='none' then continue;
+                  logs.Debuglogs('SCAN_DISK_PHP:: Found "'+DiskDev+'"');
                   ID_BUS:=usb_devinfo_query(DiskDev,'SUBSYSTEMS');
                   if length(ID_BUS)=0 then  ID_BUS:=USB_DEV_INFO(DiskDev,'ID_BUS');
                   if ID_BUS='usb' then continue;
-                  SIZE:=RegExpr.Match[2]+' '+RegExpr.Match[3] ;
+                  if proc_partition then SIZE:=RegExpr.Match[2]+' '+RegExpr.Match[3] else SIZE:=RegExpr.Match[2];
                   s.Add(chr(9)+chr(9)+'"'+DiskDev+'"=>array(');
                   s.Add(chr(9)+chr(9)+chr(9)+'"SIZE"=>"'+SIZE+'",');
                   s.add(chr(9)+chr(9)+chr(9)+'"ID_FS_LABEL"=>"'+sys.usbLabel(DiskDev)+'",');
@@ -2784,7 +2816,6 @@ function MyConf.CGI_ALL_APPLIS_INSTALLED():string;
 var
    AVE_VER,KASVER,SQUID_VER,DANS_VER,PUREFTP,AMAVISDVERSION,ASVer,tmpver:string;
    CROSSROADSVERSION:string;
-   p3scan:tp3scan;
    rdiffbackup:trdiffbackup;
    xxfce:txfce;
    kavmilter:Tkavmilter;
@@ -2815,6 +2846,12 @@ var
    pdns:tpdns;
    gluster:tgluster;
    debug:boolean;
+   zabbix:tzabbix;
+   hamachi:thamachi;
+   vmwaretools:tvmtools;
+   zphpldapadmin:tphpldapadmin;
+   zarafa_server:tzarafa_server;
+   zsquidguard:tsquidguard;
 begin
 
    debug:=false;
@@ -2837,9 +2874,9 @@ begin
     ASVer:=spamass.SPAMASSASSIN_VERSION();
     ArrayList.Clear;
     result:='';
-    p3scan:=tp3scan.Create(SYS);
     rdiffbackup:=trdiffbackup.Create;
     xxfce:=txfce.Create;
+
 
 
     ArrayList.Add('<SECURITY_MODULES>');
@@ -2864,9 +2901,21 @@ begin
     end;
     pdns.free;
 
+    try
+       zphpldapadmin:=Tphpldapadmin.Create(SYS);
+       ArrayList.Add('[APP_PHPLDAPADMIN] "'+zphpldapadmin.VERSION()+'"');
+       zphpldapadmin.free;
+    except
+          logs.Syslogs('FATAL ERROR on CGI_ALL_APPLIS_INSTALLED after zphpldapadmin.VERSION()');
+    end;
 
+
+
+     //phpmyadmin
+    ArrayList.Add('[APP_PHPMYADMIN] "' + PHPMYADMIN_VERSION() + '"');
 
     ArrayList.Add('[APP_CLAMAV_MILTER] "' + clamav.CLAMAV_VERSION() + '"');
+    ArrayList.Add('[APP_CLAMAV] "' + clamav.CLAMAV_VERSION() + '"');
 
     //kavmilter
     ArrayList.Add('[APP_KAVMILTER] "' + AVE_VER + '"');
@@ -2939,6 +2988,25 @@ begin
     retranslator:=tkretranslator.Create(SYS);
     ArrayList.Add('[APP_KRETRANSLATOR] "' + retranslator.VERSION() + '"');
 
+
+    //squidguard
+    zsquidguard:=tsquidguard.CReate(SYS);
+    try
+     ArrayList.Add('[APP_SQUIDGUARD] "' + zsquidguard.VERSION() + '"');
+     ocsi.free;
+    except
+          logs.Syslogs('FATAL ERROR on CGI_ALL_APPLIS_INSTALLED after zsquidguard.VERSION()');
+    end;
+
+    hamachi:=thamachi.Create(SYS);
+    ArrayList.Add('[APP_HAMACHI] "' + hamachi.VERSION() + '"');
+    hamachi.free;
+
+
+
+
+
+
     ArrayList.Add('</SECURITY_MODULES>');
 
     ArrayList.Add('<CORE_MODULES>');
@@ -2959,6 +3027,21 @@ begin
     ArrayList.Add('[APP_ANTIWORD] "' + xapian.APP_ANTIWORD_VERSION() + '"');
     xapian.free;
 
+    try
+       zabbix:=tzabbix.Create(SYS);
+       ArrayList.Add('[APP_ZABBIX_SERVER] "' + zabbix.SERVER_VERSION() + '"');
+       ArrayList.Add('[APP_ZABBIX_AGENT] "' + zabbix.AGENT_VERSION() + '"');
+       zabbix.free;
+    except
+       logs.Syslogs('FATAL ERROR on APP_ZABBIX_SERVER after zabbix.VERSION()');
+    end;
+
+    try
+    zarafa_server:=tzarafa_server.Create(SYS);
+    ArrayList.Add('[APP_ZARAFA] "' + zarafa_server.VERSION() + '"');
+    except
+       logs.Syslogs('FATAL ERROR on APP_ZARAFA after zarafa_server.VERSION()');
+    end;
     dotclear:=tdotclear.CReate(SYS);
     ArrayList.Add('[APP_DOTCLEAR] "' + dotclear.VERSION() + '"');
 
@@ -2976,8 +3059,6 @@ begin
 
     opengoo:=topengoo.Create(SYS);
     sugarcrm:=tsugarcrm.Create(SYS);
-    ArrayList.Add('[APP_GROUPWARE_APACHE] "' + opengoo.APACHE_VERSION() + '"');
-    ArrayList.Add('[APP_GROUPWARE_PHP] "' + opengoo.PHP_VERSION() + '"');
     ArrayList.Add('[APP_OPENGOO] "' + opengoo.OPENGOO_VERSION() + '"');
     ArrayList.Add('[APP_JOOMLA] "' + opengoo.JOOMLA_VERSION() + '"');
     ArrayList.Add('[APP_EACCELERATOR] "' + opengoo.EACCELERATOR_VERSION() + '"');
@@ -3042,9 +3123,7 @@ begin
     cups:=Tcups.Create;
     ArrayList.Add('[APP_CUPS] "' +    cups.VERSION()+ '"');
     ArrayList.Add('[APP_CUPS_BROTHER] "' +    cups.BROTHER_DRIVER_VERSION()+ '"');
-
-
-
+    ArrayList.Add('[APP_HPINLINUX] "' +    hpinlinux_VERSION()+ '"');
 
     ArrayList.Add('</CORE_MODULES>');
 
@@ -3052,6 +3131,11 @@ begin
     ArrayList.Add('[APP_RRDTOOL] "' + RRDTOOL_VERSION() + '"');
     ArrayList.Add('[APP_AWSTATS] "' + awstats.AWSTATS_VERSION() + '"');
     ArrayList.Add('[APP_MAILGRAPH] "' + mailgraph.MAILGRAPH_VERSION() + '"');
+
+    vmwaretools:=tvmtools.Create(SYS);
+    ArrayList.Add('[APP_VMTOOLS] "' + vmwaretools.VERSION() + '"');
+
+
 
     zsmartd:=Tsmartd.Create(SYS);
     ArrayList.Add('[APP_SMARTMONTOOLS] "' + zsmartd.VERSION() + '"');
@@ -3090,6 +3174,7 @@ begin
     lighttpd:=tlighttpd.Create(SYS);
      ArrayList.Add('[APP_POMMO] "' +lighttpd.POMMO_VERSION() + '"');
      ArrayList.Add('[APP_LMB] "' +LMB_VERSION() + '"');
+     ArrayList.Add('[APP_GROUPOFFICE] "' +GROUPOFFICE_VERSION() + '"');
 
 
 
@@ -3098,7 +3183,6 @@ begin
     mailman:=tmailman.Create(SYS);
     ArrayList.Add('[APP_MAILMAN] "' +  mailman.VERSION() + '"');
     mailman.free;
-    ArrayList.Add('[APP_P3SCAN] "' +  p3scan.VERSION() + '"');
     ArrayList.Add('</MAIL_MODULES>');
 
     ArrayList.Add('<SAMBA_MODULES>');
@@ -5404,7 +5488,6 @@ begin
      if FileExists('/opt/artica/license.expired.conf') then DeleteFile('/opt/artica/license.expired.conf');
      writeln('Starting......: Kernel version ' + kernel_version);
      logs.DebugLogs('Starting......: Distribution "' + LINUX_DISTRIBUTION() + '" i' + SYSTEM_GET_PLATEFORM());
-     KILL_BAD_DU();
      lighttpd.LIGHTTPD_START();
      ldap.LDAP_START();
      Rootpath:=get_ARTICA_PHP_PATH();
@@ -5412,6 +5495,7 @@ begin
   ForceDirectories('/usr/share/artica-postfix/ressources/profiles');
   ForceDirectories('/var/log/artica-postfix/RTM');
   logs.OutputCmd('/bin/chmod 777 /usr/share/artica-postfix/ressources/profiles');
+  logs.OutputCmd('/bin/chmod 777 /tmp');
 
      artica_cron:=tcron.Create(SYS);
      artica_cron.START();
@@ -5436,23 +5520,49 @@ end;
 
 //##############################################################################
 procedure MyConf.SYSTEM_START_MINIMUM_DAEMON();
+var
+   cron:tcron;
 begin
+
+    if not FileExists('/bin/pidof') then begin
+       if FileExists('/sbin/pidof') then logs.OutputCmd('/bin/ln -s /bin/pidof /sbin/pidof');
+    end;
+
+    if SYS.PROCESS_EXIST(SYS.PIDOF('artica-backup')) then begin
+          logs.Syslogs('A backup process is currently in execution, stop process');
+          fpsystem(get_ARTICA_PHP_PATH()+'/bin/process1');
+    end;
+
+    if SYS.PROCESS_EXIST(SYS.PIDOF('artica-update')) then begin
+          logs.Syslogs('An update process is currently in execution, stop process');
+          fpsystem(get_ARTICA_PHP_PATH()+'/bin/process1');
+    end;
+
 INSTANT_SEARCH();
-logs.Debuglogs('###################### SYSTEM_START_MINIMUM_DAEMON ######################');
 if FileExists('/etc/init.d/keymap.sh') then fpsystem('/etc/init.d/keymap.sh start');
 SYSTEM_CHANGE_MOTD();
+cron:=tcron.Create(SYS);
+cron.START();
+cron.free;
 ldap.LDAP_START();
-
+START_MYSQL();
 APACHE_ARTICA_START();
 BOA_START();
-logs.Debuglogs('###################### SYSTEM_START_MINIMUM_DAEMON END ######################');
+fpsystem(SYS.LOCATE_PHP5_BIN()+' /usr/share/artica-postfix/exec.virtuals-ip.php --just-add &');
+
+
 end;
 //##############################################################################
 
 function MyConf.SYSTEM_START_ARTICA_ALL_DAEMON():boolean;
+begin
+     SYSTEM_START_MINIMUM_DAEMON()
+end;
+//##############################################################################
+
+procedure MyConf.START_ALL_DAEMONS();
 var
    Rootpath:string;
-   D:boolean;
    knel:integer;
    kernel_version:string;
    spfm:tspf;
@@ -5464,14 +5574,11 @@ var
    saslauthd:tsaslauthd;
    collectd:tcollectd;
    mailspy:tmailspy;
-   amavis:tamavis;
    retranslator:tkretranslator;
    dotclear:tdotclear;
    jcheckmail:tjcheckmail;
    dhcp3:tdhcp3;
-   lighttpd:Tlighttpd;
    cups:tcups;
-   obm2:Tobm2;
    zsmartd:Tsmartd;
    opengoo:topengoo;
    dstat:tdstat;
@@ -5482,10 +5589,10 @@ var
    policydw:tpolicyd_weight;
    autofs:tautofs;
    nfs:tnfs;
-   framework:tframework;
    assp:tassp;
    pdns:tpdns;
    gluster:tgluster;
+   zabbix:tzabbix;
 
 begin
      logs:=Tlogs.Create;
@@ -5497,6 +5604,7 @@ begin
      kernel_version:=trim(SYSTEM_KERNEL_VERSION());
      kernel_version:=Copy(kernel_version,0,3);
 
+     fpsystem(SYS.LOCATE_PHP5_BIN()+' /usr/share/artica-postfix/exec.virtuals-ip.php --just-add &');
      tcpip:=ttcpip.Create;
      NetWorkAvailable:=tcpip.isNetAvailable;
      if NoBootWithoutIP=0 then NetWorkAvailable:=true;
@@ -5504,7 +5612,6 @@ begin
 
 
      logs.Debuglogs('SYSTEM_START_ARTICA_ALL_DAEMON:: kernel version is '+kernel_version);
-     result:=true;
      knel:=StrToInt(AnsiReplaceStr(kernel_version,'.',''));
      if knel<26 then begin
         writeln('Your kernel version '+ kernel_version + ' is not supported');
@@ -5514,14 +5621,19 @@ begin
      end;
 
 
+     fpsystem('/etc/init.d/artica-postfix start wifi');
+
+    
     logs.Debuglogs('############ gluster ##################');
+    try
     gluster:=tgluster.Create(SYS);
     gluster.START();
     gluster.free;
-
-    if not FileExists('/bin/pidof') then begin
-       if FileExists('/sbin/pidof') then fpsystem('/bin/ln -s /bin/pidof /sbin/pidof');
+    except
+      logs.Debuglogs('SYSTEM_START_ARTICA_ALL_DAEMON:: fatal error on gluster');
     end;
+
+
 
     if SYS.PROCESS_EXIST(SYS.PIDOF('artica-backup')) then begin
           logs.Syslogs('A backup process is currently in execution, stop process');
@@ -5544,54 +5656,21 @@ begin
     autofs.START();
     autofs.free;
 
-    logs.Debuglogs('############ nfs ##################');
-    nfs:=tnfs.Create(SYS);
-    nfs.START();
-    nfs.free;
+    if NetWorkAvailable then begin
+       logs.Debuglogs('############ nfs ##################');
+       nfs:=tnfs.Create(SYS);
+       nfs.START();
+       nfs.free;
+    end;
 
 
-    BUILD_WATCHDOG_CONF();
     logs.Debuglogs('############ Gayteway mode ##################');
     ARTICA_HAS_GAYTEWAY();
     logs.Debuglogs('############ imap client ##################');
     MAIL_IMAP_CLIENT_CHECK();
 
 
-    logs.Debuglogs('############ mysql ##################');
-        //Mysql:
-      zmysql:=tmysql_daemon.Create(SYS);
-      try
-         zmysql.SERVICE_START();
-      except
-         logs.Syslogs('FATAL ERROR WHILE EXEC zmysql.SERVICE_START();');
-      end;
 
-      try
-      zmysql.CLUSTER_MANAGEMENT_START();
-      except
-         logs.Syslogs('FATAL ERROR WHILE EXEC zmysql.CLUSTER_MANAGEMENT_START();');
-      end;
-
-      try
-      zmysql.CLUSTER_REPLICA_START();
-       except
-         logs.Syslogs('FATAL ERROR WHILE EXEC zmysql.CLUSTER_REPLICA_START();');
-      end;
-      try
-      zmysql.Free;
-      except
-        logs.Syslogs('FATAL ERROR WHILE EXEC zmysql.Free;');
-      end;
-
-    logs.Debuglogs('############ ldap ##################');
-     //LDAP:
-      ldap.LDAP_START();
-
-
-    logs.Debuglogs('############ lighttpd ##################');
-     //lighttpd
-      lighttpd:=Tlighttpd.Create(SYS);
-      lighttpd.LIGHTTPD_START();
 
 
       logs.Debuglogs('############ apache groupware ##################');
@@ -5659,7 +5738,6 @@ begin
 
 
      PERL_CREATE_DEFAULT_SCRIPTS();
-     D:=COMMANDLINE_PARAMETERS('debug');
      Rootpath:=get_ARTICA_PHP_PATH();
      logs.Debuglogs('SYSTEM_START_ARTICA_ALL_DAEMON:: Rootpath='+ Rootpath);
 
@@ -5684,10 +5762,12 @@ begin
      RRDTOOL_FIX();
      SYSTEM_VERIFY_CRON_TASKS();
 
-
-     logs.Debuglogs('############ roundcube ##################');
-     roundcube.START();
+     if NetWorkAvailable then begin
+        logs.Debuglogs('############ roundcube ##################');
+        roundcube.START();
+     end;
      YOREL_VERIFY_START();
+
 
      //saslauthd
      logs.Debuglogs('############ saslauthd ##################');
@@ -5713,14 +5793,7 @@ begin
      clamav.CLAMD_START();
 
 
-      //assp
-      logs.Debuglogs('############ ASSP ##################');
-      assp:=Tassp.CReate(SYS);
-      assp.START();
-      assp.free;
-
-
-
+ if NetWorkAvailable then begin
      if FileExists(postfix.POSFTIX_POSTCONF_PATH()) then begin
         if FileExists('/etc/init.d/sendmail') then fpsystem('/etc/init.d/sendmail stop');
         logs.Debuglogs('Postfix exists... start and verify all daemons');
@@ -5741,6 +5814,11 @@ begin
         policydw.START();
         policydw.Free;
 
+        //assp
+        logs.Debuglogs('############ ASSP ##################');
+        assp:=Tassp.CReate(SYS);
+        assp.START();
+        assp.free;
 
 
         logs.Debuglogs('############ postfix ##################');
@@ -5831,7 +5909,7 @@ begin
         fetchmail.FETCHMAIL_START_DAEMON();
 
     end;
-
+end;
      if FileExists(samba.SMBD_PATH()) then begin
      logs.Debuglogs('############ SAMBA ##################');
         samba.SAMBA_START();
@@ -5873,10 +5951,6 @@ begin
      SYS.THREAD_COMMAND_SET(get_ARTICA_PHP_PATH() + '/bin/artica-ldap -inadyn');
      logs.Debuglogs('############ PURE_FTPD_START ##################');
      Cpureftpd.PURE_FTPD_START();
-     logs.Debuglogs('############ BOA_START ##################');
-     BOA_START();
-     logs.Debuglogs('############ ARTICA_START ##################');
-     ARTICA_START();
 
      logs.Debuglogs('############ PDNS ##################');
      pdns:=tpdns.Create(SYS);
@@ -5902,7 +5976,23 @@ begin
      SYS.THREAD_COMMAND_SET(SYS.LOCATE_PHP5_BIN()+ ' /usr/share/artica-postfix/exec.homeDirectoryBinded.php');
      SYS.THREAD_COMMAND_SET(SYS.LOCATE_PHP5_BIN()+ ' /usr/share/artica-postfix/exec.first.settings.php');
 
-     logs.Debuglogs('SYSTEM_START_ARTICA_ALL_DAEMON:: finish');
+
+    if NetWorkAvailable then begin
+       if not SYS.isoverloadedTooMuch() then begin
+          logs.Debuglogs('############ Zabbix ##################');
+          try
+             zabbix:=tzabbix.Create(SYS);
+             zabbix.START();
+             zabbix.free;
+          except
+                logs.Debuglogs('SYSTEM_START_ARTICA_ALL_DAEMON:: fatal error on Zabbix');
+          end;
+       end;
+    end;
+
+
+ if NetWorkAvailable then fpsystem(Paramstr(0) +' --status >/dev/null 2>&1 &');
+  logs.Debuglogs('SYSTEM_START_ARTICA_ALL_DAEMON:: finish');
 
 
      if FileExists('/etc/artica-postfix/FROM_ISO') then begin
@@ -5917,144 +6007,39 @@ begin
 
 end;
 //##############################################################################
-procedure myconf.BUILD_WATCHDOG_CONF();
+procedure myconf.START_MYSQL();
 var
-  watchdog:Tstringlist;
-  lighttpd:Tlighttpd;
-  zmysql:tmysql_daemon;
-  syslogng:Tsyslogng;
-  conffile:string;
-  RootPath:string;
-  CCYRUS:TCYRUS;
-  postfix:Tpostfix;
-  EnableArticaWatchDog:integer;
+zmysql:tmysql_daemon;
 begin
-
-    TryStrToInt(SYS.GET_INFO('EnableArticaWatchDog'),EnableArticaWatchDog);
-    if SYS.PROCESS_EXIST(SYS.GET_PID_FROM_PATH('/etc/artica-postfix/mon.pid')) then begin
-            if EnableArticaWatchDog=0 then  MONIT_STOP();
-            exit;
-    end;
-
-    if EnableArticaWatchDog=0 then exit;
-
-    conffile:='/usr/local/etc/artica-monit.cf';
-    watchdog:=Tstringlist.Create;
-     if FileExists('/usr/sbin/boa') then RootPath:='/usr/sbin/boa';
-     if length(Rootpath)=0 then Rootpath:=get_ARTICA_PHP_PATH()+'/bin/boa';
-    watchdog.Add('set daemon 60 with start delay 60');
-    watchdog.Add('set logfile syslog facility log_daemon');
-    watchdog.Add('set mailserver 127.0.0.1');
+    logs.Debuglogs('############ mysql ##################');
+        //Mysql:
+      zmysql:=tmysql_daemon.Create(SYS);
+      try
+         zmysql.SERVICE_START();
+      except
+         logs.Syslogs('FATAL ERROR WHILE EXEC zmysql.SERVICE_START();');
+      end;
 
 
-    watchdog.Add('set httpd port 2812 and use the address 127.0.0.1');
-    watchdog.Add(chr(9)+'allow localhost');
-    watchdog.Add(chr(9)+'allow 127.0.0.1');
-    watchdog.Add('');
-    watchdog.Add('set mail-format { from: alert@artica.localdomain');
-    watchdog.Add('subject: $SERVICE $EVENT at $DATE');
-    watchdog.Add('message: Monit $ACTION $SERVICE at $DATE on $HOST: $DESCRIPTION.');
-    watchdog.Add('}');
-    watchdog.Add('');
-    watchdog.Add('check process '+ExtractFileName(RootPath)+' with pidfile /etc/artica-postfix/boa.pid');
-    watchdog.Add('group daemons');
-    watchdog.Add('start program = "/etc/init.d/artica-postfix start boa"');
-    watchdog.Add('stop program = "/etc/init.d/artica-postfix stop boa"');
-    watchdog.Add('if 5 restarts within 5 cycles then timeout');
-    watchdog.Add('');
+      try
+      zmysql.CLUSTER_MANAGEMENT_START();
+      except
+         logs.Syslogs('FATAL ERROR WHILE EXEC zmysql.CLUSTER_MANAGEMENT_START();');
+      end;
 
-
-
-    watchdog.Add('check process artica-cron with pidfile /etc/artica-postfix/artica-postfix.pid');
-    watchdog.Add('group daemons');
-    watchdog.Add('start program = "/etc/init.d/artica-postfix start daemon"');
-    watchdog.Add('stop program = "/etc/init.d/artica-postfix stop daemon"');
-    watchdog.Add('if 5 restarts within 5 cycles then timeout');
-    watchdog.Add('');
-
-    //lighttpd
-    lighttpd:=Tlighttpd.Create(SYS);
-    watchdog.Add(lighttpd.MON());
-    watchdog.Add('');
-    //LDAP:
-    watchdog.Add(ldap.MON());
-    watchdog.Add('');
-
-     //Mysql:
-     zmysql:=tmysql_daemon.Create(SYS);
-     watchdog.Add(zmysql.MON());
-     watchdog.Add('');
-     zmysql.Free;
-
-     //Syslog-ng
-     syslogng:=Tsyslogng.Create(SYS);
-     watchdog.Add(syslogng.MON());
-     watchdog.Add('');
-
-     //postfix
-     postfix:=Tpostfix.Create(SYS);
-     watchdog.ADD(postfix.MON());
-     watchdog.Add('');
-
-     //cyrus
-     CCYRUS:=TCYRUS.Create(SYS);
-     watchdog.ADD(CCYRUS.MON());
-     watchdog.Add('');
-     CCYRUS.Free;
-
-     forceDirectories('/usr/local/etc');
-     watchdog.SaveToFile(conffile);
-     logs.OutputCmd('/bin/chmod 600 '+conffile);
-     logs.OutputCmd('/bin/chown root:root '+conffile);
-     logs.OutputCmd('/usr/share/artica-postfix/bin/artica-monit -c '+conffile+' -p /etc/artica-postfix/mon.pid -s /etc/artica-postfix/mon.stat');
-     watchdog.Free;
+      try
+      zmysql.CLUSTER_REPLICA_START();
+       except
+         logs.Syslogs('FATAL ERROR WHILE EXEC zmysql.CLUSTER_REPLICA_START();');
+      end;
+      try
+      zmysql.Free;
+      except
+        logs.Syslogs('FATAL ERROR WHILE EXEC zmysql.Free;');
+      end;
 
 
 end;
-//##############################################################################
-procedure myconf.MONIT_STOP();
-var
-   pid:string;
-   count:integer;
-
-begin
-   if not SYS.PROCESS_EXIST(MONIT_PID()) then begin
-         writeln('Stopping artica-monit watchdog........: Already stopped');
-         exit;
-   end;
-
-
-pid:=MONIT_PID();
-count:=0;
-if SYS.PROCESS_EXIST(pid) then begin
-   writeln('Stopping artica-monit watchdog........: ' + pid + ' PID..');
-   fpsystem('/bin/kill ' + pid);
-end;
-  while SYS.PROCESS_EXIST(pid) do begin
-        sleep(100);
-        count:=count+1;
-        if count>20 then begin
-            fpsystem('/bin/kill -9 ' + pid);
-            break;
-        end;
-  end;
-pid:=SYS.AllPidsByPatternInPath('bin/artica-monit');
-if length(pid)>0 then begin
-   writeln('Stopping artica-monit watchdog........: ' + pid + ' PID..');
-   fpsystem('/bin/kill ' + pid);
-end;
-
-end;
-//##############################################################################
-function myconf.MONIT_PID():string;
-var
-   pid:string;
-begin
-pid:=SYS.GET_PID_FROM_PATH('/etc/artica-postfix/mon.pid');
-if not SYS.PROCESS_EXIST(pid) then result:=SYS.PIDOF('/usr/share/artica-postfix/bin/artica-monit');
-end;
-//##############################################################################
-
 
 
 procedure myconf.BOA_TESTS_INIT_D();
@@ -6185,11 +6170,21 @@ procedure myconf.APACHE_ARTICA_START();
  var
     ApacheEnabled:integer;
     framework:tframework;
+    zphpldapadmin:tphpldapadmin;
 begin
      ApacheEnabled:=0;
-     if not TryStrToInt(APACHE_ARTICA_ENABLED(),ApacheEnabled) then ApacheEnabled:=0;
+  if not TryStrToInt(APACHE_ARTICA_ENABLED(),ApacheEnabled) then ApacheEnabled:=0;
    ForceDirectories('/usr/share/artica-postfix/ressources/sessions');
    fpsystem('/bin/chmod 755 /usr/share/artica-postfix/ressources/sessions');
+
+  try
+     zphpldapadmin:=Tphpldapadmin.Create(SYS);
+     zphpldapadmin.CONFIG();
+  finally
+
+  end;
+
+
   Try
    framework:=Tframework.Create(SYS);
    framework.START();
@@ -6197,6 +6192,12 @@ begin
   except
     logs.Debuglogs('APACHE_ARTICA_START:: Error while loading framework function');
   end;
+
+
+  logs.Debuglogs('Starting Apache..............: Apache bin: '+SYS.LOCATE_APACHE_BIN_PATH());
+  logs.Debuglogs('Starting Apache..............: LibPhp5...: '+SYS.LOCATE_APACHE_LIBPHP5());
+  logs.Debuglogs('Starting Apache..............: ModSSL....: '+SYS.LOCATE_APACHE_MODSSLSO());
+  logs.Debuglogs('Starting Apache..............: lighttpd..: '+lighttpd.LIGHTTPD_BIN_PATH());
 
 
      if ApacheEnabled=0 then begin
@@ -6312,17 +6313,6 @@ begin
   if FileExists('/usr/sbin/saslpasswd2') then exit('/usr/sbin/saslpasswd2');
 end;
 //##############################################################################
-
-
-procedure myconf.ARTICA_START();
-var
-   cron:tcron;
-begin
-cron:=tcron.Create(SYS);
-cron.START();
-cron.free;
-end;
-//#############################################################################
 function myconf.ROUNDCUBE_DEFAULT_CONFIG():string;
 var
    l:TstringList;
@@ -7112,78 +7102,8 @@ TRY
 end;
 //##############################################################################
 function MyConf.get_LINUX_MAILLOG_PATH():string;
-var filedatas,logconfig,ExpressionGrep:string;
-D:boolean;
-RegExpr:TRegExpr;
-syslogng:Tsyslogng;
-l:TstringList;
-i:integer;
 begin
-if FileExists('/var/log/mail.log') then exit('/var/log/mail.log');
-if FileExists('/var/log/maillog') then exit('/var/log/maillog');
-syslogng:=Tsyslogng.Create(SYS);
-if FileExists(syslogng.DEAMON_BIN_PATH()) then begin
-         if not FileExists('/etc/syslog-ng/syslog-ng.conf') then exit;
-         l:=TstringList.Create;
-         RegExpr:=TRegExpr.create;
-         RegExpr.Expression:='^destination\s+df_mail\s+\{\s+file\("(.+?)"';
-         l.LoadFromFile('/etc/syslog-ng/syslog-ng.conf');
-         For i:=0 to l.Count-1 do begin
-              if RegExpr.Exec(l.Strings[i]) then begin
-                  result:=RegExpr.Match[1];
-                  break;
-              end;
-
-         end;
-    l.free;
-    RegExpr.free;
-    exit;
-end else begin
-    logs.Debuglogs('get_LINUX_MAILLOG_PATH:: Syslog-ng seems not be installed');
-
-end;
-
-
-
-
-
-
- D:=COMMANDLINE_PARAMETERS('debug');
-if FileExists('/etc/syslog.conf') then logconfig:='/etc/syslog.conf';
-if FileExists('/etc/syslog-ng/syslog-ng.conf') then logconfig:='/etc/syslog-ng/syslog-ng.conf';
-if FileExists('/etc/rsyslog.conf') then logconfig:='/etc/rsyslog.conf';
-
-logs.Debuglogs('get_LINUX_MAILLOG_PATH:: Master config is :"'+logconfig+'"');
-
-filedatas:=ReadFileIntoString(logconfig);
-   ExpressionGrep:='mail\.=info.+?-([\/a-zA-Z_0-9\.]+)?';
-   RegExpr:=TRegExpr.create;
-   RegExpr.ModifierI:=True;
-   RegExpr.expression:=ExpressionGrep;
-   if RegExpr.Exec(filedatas) then  begin
-     result:=RegExpr.Match[1];
-     RegExpr.Free;
-     exit;
-   end;
-
-
-   ExpressionGrep:='mail\.\*.+?-([\/a-zA-Z_0-9\.]+)?';
-   RegExpr.expression:=ExpressionGrep;
-   if RegExpr.Exec(filedatas) then   begin
-     result:=RegExpr.Match[1];
-     RegExpr.Free;
-     exit;
-   end;
-
-   ExpressionGrep:='destination mailinfo[\s\{a-z]+\("(.+?)"';
-   RegExpr.expression:=ExpressionGrep;
-   if RegExpr.Exec(filedatas) then   begin
-     result:=RegExpr.Match[1];
-     RegExpr.Free;
-     exit;
-   end;
-
-  RegExpr.Free;
+exit(SYS.MAILLOG_PATH());
 end;
 //##############################################################################
 function MyConf.POSTFIX_LAST_ERRORS():string;
@@ -7673,7 +7593,7 @@ begin
   lOGS.logs('SYSTEM_CRON_REPLIC_CONFIGS:: Replicate cron task list done...');
 end;
 //##############################################################################
-function MyConf.SYSTEM_DAEMONS_STATUS():TstringList;
+function MyConf.SYSTEM_DAEMONS_STATUS():string;
 var RegExpr:TRegExpr;
 mstr:string;
 list:TstringList;
@@ -7744,7 +7664,7 @@ begin
     end;
 
     RegExpr.free;
-    exit(list);
+    result:=list.Text;
     list.free;
 
 
@@ -8341,7 +8261,7 @@ procedure MyConf.ShowScreen(line:string);
 //##############################################################################
 function MyConf.SYSTEM_KERNEL_VERSION():string;
 begin
-    exit(ExecPipe('/bin/uname -r'));
+    exit(trim(ExecPipe('/bin/uname -r')));
 end;
 //##############################################################################
 function MyConf.SYSTEM_LIBC_VERSION():string;
@@ -8574,7 +8494,20 @@ begin
 end;
 //##############################################################################
 procedure myconf.SYSTEM_NETWORKS_SET_HOSTNAME(name:string);
+var
+   RegExpr:TRegExpr;
+   domainName:string;
+   sysctl:string;
 begin
+    name:=trim(name);
+    if length(name)=0 then exit;
+    RegExpr:=TRegExpr.Create;
+    RegExpr.Expression:='^(.+?)\.';
+    if RegExpr.Exec(name) then begin
+       name:=RegExpr.Match[1];
+       domainName:=RegExpr.Match[2];
+    end;
+
     if FileExists('/etc/hostname') then begin
        logs.Debuglogs('SYSTEM_NETWORKS_SET_HOSTANME:: Change hostname is debian mode');
        logs.WriteToFile(trim(name),'/etc/hostname');
@@ -8586,7 +8519,17 @@ begin
        logs.WriteToFile(trim(name),'/etc/HOSTNAME');
     end;
 
-       SYSTEM_NETWORKS_SET_HOSTNAME_IN_HOSTS(name);
+    if FileExists('/etc/hostname') then begin
+       logs.Debuglogs('SYSTEM_NETWORKS_SET_HOSTANME:: Change hostname is ubuntu');
+       logs.WriteToFile(trim(name),'/etc/HOSTNAME');
+    end;
+
+    sysctl:=SYS.LOCATE_GENERIC_BIN('sysctl');
+    if length(domainName)>0 then fpsystem(sysctl+' -w kernel.domainname='+domainName);
+    fpsystem(sysctl+' -w kernel.hostname='+name);
+    fpsystem(sysctl+' -p');
+
+    SYSTEM_NETWORKS_SET_HOSTNAME_IN_HOSTS(name);
     if FileExists('/etc/init.d/hostname.sh') then fpsystem('/etc/init.d/hostname.sh start &');
 
 
@@ -9291,25 +9234,6 @@ begin
 
 end;
 //##############################################################################
-procedure myconf.KILL_BAD_DU();
-var
-l:Tstringlist;
-i:integer;
-begin
-   l:=TstringList.Create;
-   l.AddStrings(SYS.PIDOF_PATTERN_PROCESS_LIST('/usr/bin/du -s /opt/artica'));
-   logs.Debuglogs('KILL_BAD_DU:: '+IntTOStr(l.Count)+' bad DU instances');
-   if l.Count>0 then begin
-      for i:=0 to l.Count-1 do begin;
-          if length(trim(l.Strings[i]))>0 then begin
-                logs.Syslogs('/usr/bin/du -s /opt/artica ('+l.Strings[i]+') Kill this process');
-                if SYS.PROCESS_EXIST(l.Strings[i]) then logs.OutputCmd('/bin/kill -9 '+l.Strings[i]);
-          end;
-      end;
-   end;
-end;
-//##############################################################################
-
 procedure myconf.DeleteFile(Path:string);
 begin
 if PathIsDirectory(Path) then exit;
@@ -9742,7 +9666,6 @@ FUNCTION myconf.GLOBAL_STATUS():string;
 
  var
  ini:string;
- p3:Tp3scan;
  syslogng:Tsyslogng;
  cron:tcron;
  ldap:Topenldap;
@@ -9757,13 +9680,11 @@ FUNCTION myconf.GLOBAL_STATUS():string;
  amavis:tamavis;
  retranslator:tkretranslator;
  dotclear:tdotclear;
- jcheckmail:tjcheckmail;
  dhcp:tdhcp3;
  Messagerie:boolean;
  POSFTIX_POSTCONF_PATH:string;
  openvpn:Topenvpn;
  cups:tcups;
- obm2:Tobm2;
  smartd:Tsmartd;
  rsync:trsync;
  policyd_weight:tpolicyd_weight;
@@ -9774,21 +9695,31 @@ FUNCTION myconf.GLOBAL_STATUS():string;
  assp:tassp;
  pdns:tpdns;
  gluster:tgluster;
+ zabbix:tzabbix;
+ hamachi:thamachi;
+ zvmtools:tvmtools;
+ monit:tmonit;
+ zarafa_server:tzarafa_server;
+ zwifi:twifi;
+
 begin
 LSHW_TIME:=0;
 INSTANT_SEARCH();
 
+
    if FileExists(SYS.LOCATE_LSHW()) then begin
       LSHW_TIME:=SYS.FILE_TIME_BETWEEN_MIN('/usr/share/artica-postfix/ressources/logs/LSHW.NET.HTML');
-      if LSHW_TIME=0 then LSHW_TIME:=6000;
-      if LSHW_TIME>240 then begin
+      if LSHW_TIME=0 then LSHW_TIME:=10000;
+      if LSHW_TIME>6000 then begin
          //http://ezix.org/project/wiki/HardwareLiSter
          logs.DeleteFile('/usr/share/artica-postfix/ressources/logs/LSHW.NET.HTML');
          logs.DeleteFile('/usr/share/artica-postfix/ressources/logs/LSHW.PROC.HTML');
-         fpsystem(SYS.LOCATE_LSHW()+' -html -C network >/usr/share/artica-postfix/ressources/logs/LSHW.NET.HTML 2>&1 &');
-         fpsystem(SYS.LOCATE_LSHW()+' -html -C processor >/usr/share/artica-postfix/ressources/logs/LSHW.PROC.HTML 2>&1 &');
+         if not SYS.PROCESS_EXIST(SYS.PIDOF(SYS.LOCATE_LSHW())) then begin
+            fpsystem(SYS.LOCATE_LSHW()+' -html -C network >/usr/share/artica-postfix/ressources/logs/LSHW.NET.HTML 2>&1 &');
+            fpsystem(SYS.LOCATE_LSHW()+' -html -C processor >/usr/share/artica-postfix/ressources/logs/LSHW.PROC.HTML 2>&1 &');
+         end;
       end else begin
-         logs.Debuglogs('GLOBAL_STATUS():: LSHW -> '+ IntToStr(LSHW_TIME)+ ' minutes, needs more than 240 to update...');
+         logs.Debuglogs('GLOBAL_STATUS():: LSHW -> '+ IntToStr(LSHW_TIME)+ ' minutes, needs more than 6000 to update...');
       end;
    end else begin
 
@@ -9799,14 +9730,17 @@ INSTANT_SEARCH();
 
    Messagerie:=true;
    ini:='';
+
+// ------------------------------------ SQUID ------------------------------------
+
    if FileExists(squid.SQUID_BIN_PATH()) then begin
       ini:=ini+ squid.SQUID_STATUS() + CRLF;
       ini:=ini+ kav4proxy.KAV4PROXY_STATUS()+ CRLF;
       ini:=ini+dansguardian.C_ICAP_STATUS()+CRLF;
-      logs.Debuglogs('status DANSUGARDIAN tail status');
-      if FileExists(dansguardian.BIN_PATH()) then ini:=ini+dansguardian.DANSGUARDIAN_TAIL_STATUS()+CRLF;
-      logs.Debuglogs('status DANSGUARDIAN');
+      ini:=ini+dansguardian.DANSGUARDIAN_TAIL_STATUS()+CRLF;
       ini:=ini+dansguardian.DANSGUARDIAN_STATUS()+CRLF;
+      ini:=ini+SYSLOGER_STATUS()+CRLF;
+      ini:=ini+squid.TAIL_STATUS()+CRLF;
    end;
 
    POSFTIX_POSTCONF_PATH:=postfix.POSFTIX_POSTCONF_PATH();
@@ -9819,115 +9753,184 @@ end;
    ini:=ini+ ARTICA_MAKE_STATUS()+CRLF;
 
    //retranslator
+    logs.Debuglogs('retranslator STATUS ----------------------------------');
    retranslator:=tkretranslator.Create(SYS);
    ini:=ini+ retranslator.STATUS()+CRLF;
    retranslator.Free;
 
-   //boa
+   //boa [monit ok]
+    logs.Debuglogs('boa STATUS ----------------------------------');
    try
       ini:=ini+BOA_DAEMON_STATUS();
    except
          logs.Syslogs('GLOBAL_STATUS():: FATAL ERROR WHILE TESTING BOA');
    end;
 
+   //hamachi
+    logs.Debuglogs('hamachi STATUS ----------------------------------');
+   try
+      hamachi:=thamachi.Create(SYS);
+      ini:=ini+hamachi.STATUS();
+      hamachi.free;
+   except
+         logs.Syslogs('GLOBAL_STATUS():: FATAL ERROR WHILE TESTING HAMACHI');
+   end;
+
+   logs.Debuglogs('WIFI STATUS ----------------------------------');
+   try
+      zwifi:=twifi.Create(SYS);
+      ini:=ini+zwifi.STATUS();
+      zwifi.free;
+   except
+         logs.Syslogs('GLOBAL_STATUS():: FATAL ERROR WHILE TESTING WIFI');
+   end;
+
+       logs.Debuglogs('zvmtools STATUS ----------------------------------');
+   //vmtools
+   try
+      zvmtools:=tvmtools.Create(SYS);
+      ini:=ini+zvmtools.STATUS();
+      zvmtools.free;
+   except
+         logs.Syslogs('GLOBAL_STATUS():: FATAL ERROR WHILE TESTING VMTOOLS');
+   end;
 
    //dhcp
+   logs.Debuglogs('DHCP STATUS ----------------------------------');
    dhcp:=tdhcp3.Create(SYS);
    ini:=ini+ dhcp.STATUS()+CRLF;
 
    //dotclear
+   logs.Debuglogs('dotclear STATUS ----------------------------------');
+   SYS:=Tsystem.Create();
    dotclear:=tdotclear.Create(SYS);
    ini:=ini+ dotclear.STATUS()+CRLF;
    dotclear.Free;
 
+   //monit
+   logs.Debuglogs('MONIT STATUS ----------------------------------');
+   monit:=tmonit.Create(SYS);
+   ini:=ini+monit.STATUS()+CRLF;
+
+
+   //pdns
+   logs.Debuglogs('PDNS STATUS ----------------------------------');
    pdns:=tpdns.Create(SYS);
    ini:=ini+ pdns.STATUS()+CRLF;
+   ini:=ini+ pdns.STATUS_RECURSOR()+CRLF;
    pdns.Free;
 
    //openvpn
+   logs.Debuglogs('OPENVPN STATUS ----------------------------------');
    openvpn:=Topenvpn.Create(SYS);
    ini:=ini+ openvpn.STATUS()+CRLF;
    openvpn.free;
 
   //smartd
+  logs.Debuglogs('SMARTD STATUS ----------------------------------');
   smartd:=Tsmartd.Create(SYS);
   ini:=ini+smartd.STATUS()+CRLF;
   smartd.Free;
 
   //rsync
-
+  logs.Debuglogs('RSYNC STATUS ----------------------------------');
   rsync:=trsync.Create(SYS);
   ini:=ini+rsync.STATUS()+CRLF;
+  ini:=ini+rsync.STATUS_STUNNEL()+CRLF;
   rsync.free;
+  logs.Debuglogs('----------------------------------');
 
   //autofs
+  logs.Debuglogs('autofs STATUS ----------------------------------');
   autofs:=tautofs.CReate(SYS);
   ini:=ini+autofs.STATUS()+CRLF;
   autofs.FRee;
+  logs.Debuglogs('----------------------------------');
 
   //nfs
+  logs.Debuglogs('NFS STATUS ----------------------------------');
   nfs:=tnfs.Create(SYS);
   ini:=ini+nfs.STATUS()+CRLF;
   nfs.FRee;
+  logs.Debuglogs('----------------------------------');
+
+  //zabbix
+  logs.Debuglogs('ZABBIX STATUS ----------------------------------');
+  zabbix:=tzabbix.Create(SYS);
+  ini:=ini+zabbix.STATUS()+CRLF;
+  ini:=ini+zabbix.STATUS_AGENT()+CRLF;
+  zabbix.FRee;
+  logs.Debuglogs('----------------------------------');
 
   //gluster
+  logs.Debuglogs('GLUSTER STATUS ----------------------------------');
   gluster:=tgluster.Create(SYS);
   ini:=ini+gluster.STATUS()+CRLF;
   gluster.FRee;
 
   //framework
   try
+     logs.Debuglogs('framework STATUS ----------------------------------');
      framework:=tframework.Create(SYS);
      ini:=ini+framework.STATUS()+CRLF;
   except
         logs.Syslogs('framework:=tframework.Create(SYS), FATAL ERROR');
   end;
 
-   if Messagerie then begin
 
+// ------------------------------------ POSTFIX ------------------------------------
+
+
+
+   if Messagerie then begin
+     logs.Debuglogs('MYSQMAIL_STATUS STATUS ----------------------------------');
      ini:=ini+ postfix.MYSQMAIL_STATUS();
 
 
 
      //mailspy
+     logs.Debuglogs('mailspy STATUS ----------------------------------');
      mailspy:=tmailspy.Create(SYS);
      ini:=ini+ mailspy.STATUS()+CRLF;
      mailspy.free;
 
      //postfix
+     logs.Debuglogs('postfix STATUS ----------------------------------');
      ini:=ini+ postfix.STATUS()+CRLF;
 
      //kavmilter
+     logs.Debuglogs('kavmilter STATUS ----------------------------------');
      kavmilter:=Tkavmilter.Create(SYS);
      ini:=ini+ kavmilter.STATUS()+CRLF;
      kavmilter.Free;
 
      //amavis
+     logs.Debuglogs('amavis STATUS ----------------------------------');
      amavis:=tamavis.Create(SYS);
      ini:=ini+ amavis.STATUS()+CRLF;
      amavis.Free;
 
-     //jcheckmail
-     jcheckmail:=tjcheckmail.Create(SYS);
-     ini:=ini+ jcheckmail.STATUS()+CRLF;
-     jcheckmail.free;
 
      //mailman
+     logs.Debuglogs('mailman STATUS ----------------------------------');
      mailman:=tmailman.Create(SYS);
      ini:=ini+ mailman.STATUS();
      mailman.free;
 
      //policyd-weight
+     logs.Debuglogs('policyd-weight STATUS ----------------------------------');
      policyd_weight:=tpolicyd_weight.Create(SYS);
      ini:=ini+ policyd_weight.STATUS();
      policyd_weight.free;
 
      //assp
+     logs.Debuglogs('ASSP STATUS ----------------------------------');
      assp:=Tassp.Create(SYS);
      ini:=ini+ assp.STATUS();
      assp.free;
 
      //kas3
+     logs.Debuglogs('kas3 STATUS ----------------------------------');
      kas3:=tkas3.Create(SYS);
      ini:=ini+ kas3.STATUS()+CRLF;
      kas3.free;
@@ -9940,20 +9943,22 @@ end;
      bogom.Free;
 
      //fetchmail
+     logs.Debuglogs('fetchmail STATUS ----------------------------------');
      logs.Debuglogs('starting status FETCHMAIL');
      ini:=ini+fetchmail.STATUS()+CRLF;
 
+
      //clamav-milter
-     logs.Debuglogs('starting status clamav milter');
+     logs.Debuglogs('clamav milter STATUS ----------------------------------');
      ini:=ini+clamav.MILTER_STATUS()+CRLF;
 
      //spamassassin
-     logs.Debuglogs('starting status spamassassin');
+     logs.Debuglogs('SPAMASSASSIN_STATUS STATUS ----------------------------------');
      ini:=ini+spamass.SPAMASSASSIN_STATUS()+CRLF;
      ini:=ini+spamass.MILTER_STATUS()+CRLF;
 
      //milter-greylist
-     logs.Debuglogs('starting status miltergreylist');
+     logs.Debuglogs('SPAMASSASSIN_STATUS STATUS ----------------------------------');
      ini:=ini+miltergreylist.STATUS()+CRLF;
 
      //DKIM
@@ -9961,11 +9966,13 @@ end;
      ini:=ini+dkim.STATUS()+CRLF;
 
      //Mailgraph
-     logs.Debuglogs('starting status mailgraph');
+     logs.Debuglogs('mailgraph STATUS ----------------------------------');
      ini:=ini+mailgraph.STATUS()+CRLF;
 
+
+
      //Mailarchive
-     logs.Debuglogs('starting status mailarchive');
+     logs.Debuglogs('Mailarchive STATUS ----------------------------------');
      mailarchive:=Tmailarchive.Create(SYS);
      ini:=ini+ mailarchive.STATUS()+CRLF;
      mailarchive.free;
@@ -9979,7 +9986,18 @@ end;
      ini:=ini+mimedef.MIMEDEFANG_STATUS()+CRLF;
 
      //roundcube
+     logs.Debuglogs('roundcube STATUS ---------------------------------- (monit)');
      ini:=ini+roundcube.STATUS()+CRLF;
+
+     //zarafa
+     logs.Debuglogs('Zarafa STATUS ---------------------------------- (monit)');
+     try
+        zarafa_server:=tzarafa_server.Create(SYS);
+        ini:=ini+zarafa_server.STATUS()+CRLF;
+     except
+       logs.Debuglogs('ERROR !! Zarafa STATUS ----------------------------------');
+     end;
+
 
    end;
 
@@ -9989,35 +10007,30 @@ ini:=ini+ bind9.STATUS()+CRLF;
 logs.Debuglogs('starting status FDM');
 ini:=ini+ fdm.STATUS()+CRLF;
 
-  //P3scan
-   logs.Debuglogs('starting status P3scan');
-   p3:=Tp3scan.Create(SYS);
-   ini:=ini+ p3.STATUS()+CRLF;
-   p3.free;
+ logs.Debuglogs('starting status preload');
+ ini:=ini+ PRELOAD_STATUS()+CRLF;
+
+ logs.Debuglogs('starting status gdm');
+ ini:=ini+ GDM_STATUS()+CRLF;
+
+ //XFCE
+ logs.Debuglogs('starting status xfce');
+ xffce:=txfce.Create;
+ ini:=ini+ xffce.XFCE_STATUS()+CRLF;
 
 
-      logs.Debuglogs('starting status preload');
-   ini:=ini+ PRELOAD_STATUS()+CRLF;
-      logs.Debuglogs('starting status gdm');
-   ini:=ini+ GDM_STATUS()+CRLF;
-
-   //XFCE
-   logs.Debuglogs('starting status xfce');
-   xffce:=txfce.Create;
-   ini:=ini+ xffce.XFCE_STATUS()+CRLF;
+ logs.Debuglogs('starting status inetd');
+ ini:=ini+ SYS.INETD_STATUS()+CRLF;
 
 
-   logs.Debuglogs('starting status inetd');
-   ini:=ini+ SYS.INETD_STATUS()+CRLF;
+ //syslog-ng
+ syslogng:=Tsyslogng.Create(SYS);
+ ini:=ini+ syslogng.STATUS()+CRLF;
 
-
-   //syslog-ng
-   syslogng:=Tsyslogng.Create(SYS);
-   ini:=ini+ syslogng.STATUS()+CRLF;
-
-   //Artica-cron
-   cron:=Tcron.Create(SYS);
-   ini:=ini+ cron.STATUS()+CRLF;
+ //Artica-cron
+  logs.Debuglogs('roundcube STATUS ---------------------------------- (monit)');
+ cron:=Tcron.Create(SYS);
+ ini:=ini+ cron.STATUS()+CRLF;
 
    ini:=ini+ Cpureftpd.PURE_FTPD_STATUS()+CRLF;
 
@@ -10026,69 +10039,92 @@ ini:=ini+ fdm.STATUS()+CRLF;
    xffce:=txfce.Create;
 
    //dnsmasq
+   logs.Debuglogs('dnsmasq STATUS ---------------------------------- (monit)');
    dnsmasq:=tdnsmasq.Create(SYS);
    ini:=ini+ dnsmasq.STATUS()+CRLF;
 
 
 
    //saslauthd
+   logs.Debuglogs('dnsmasq STATUS ---------------------------------- (monit)');
    saslauthd:=tsaslauthd.Create(SYS);
    ini:=ini+ saslauthd.STATUS()+CRLF;
    saslauthd.FRee;
 
 
-
-logs.Debuglogs('starting status Mysql');
-ini:=ini+ zmysql.STATUS()+CRLF;
-
-logs.Debuglogs('starting status LDAP');
-ini:=ini+ ldap.STATUS()+CRLF;
-
-   logs.Debuglogs('starting status collectd');
-   collectd:=tcollectd.Create(SYS);
-   ini:=ini+ collectd.STATUS()+CRLF;
-   collectd.Free;
-
-      ini:=ini+Cpureftpd.PURE_FTPD_STATUS()+CRLF;
-      ini:=ini+CCYRUS.CYRUS_STATUS()+CRLF;
-      ini:=ini+obm.STATUS()+CRLF;
-      ini:=ini+ntpd.NTPD_STATUS()+CRLF;
-      ini:=ini+IPTABLES_STATUS()+CRLF;
-      ini:=ini+lighttpd.STATUS()+CRLF;
-      ini:=ini+clamav.CLAMAV_STATUS()+CRLF;
-
-      logs.Debuglogs('starting status FRESHCLAM_STATUS');
-      ini:=ini+clamav.FRESHCLAM_STATUS()+CRLF;
+//mysql
+  logs.Debuglogs('mysql STATUS ---------------------------------- (monit)');
+  ini:=ini+ zmysql.STATUS()+CRLF;
 
 
-      if fileExists(samba.SMBD_PATH()) then begin
-      logs.Debuglogs('starting status SAMBA_STATUS');
-      ini:=ini+samba.SAMBA_STATUS()+CRLF;
-      ini:=ini+ kav4samba.STATUS()+CRLF;
-      cups:=tcups.Create;
-      ini:=ini+ cups.STATUS()+CRLF;
-      cups.free;
+//ldap
+  logs.Debuglogs('LDAP STATUS ---------------------------------- (monit)');
+  ini:=ini+ ldap.STATUS()+CRLF;
 
-      end;
+//collected
+  logs.Debuglogs('collectd STATUS ---------------------------------- (monit)');
+  collectd:=tcollectd.Create(SYS);
+  ini:=ini+ collectd.STATUS()+CRLF;
+  collectd.Free;
 
+//pureftpd
+   logs.Debuglogs('pureftpd STATUS ---------------------------------- (monit)');
+   ini:=ini+Cpureftpd.PURE_FTPD_STATUS()+CRLF;
 
-
-      //console-kit
-      ini:=ini+CONSOLEKIT_STATUS()+CRLF;
-
-
-      //stunnel;
-      logs.Debuglogs('starting status STUNNEL_STATUS');
-      stunnel:=tstunnel.CReate(SYS);
-      ini:=ini+stunnel.STUNNEL_STATUS()+CRLF;
-      stunnel.Free;
-
-     //dansguardian logger
-     ini:=ini+SYSLOGER_STATUS()+CRLF;
+//cyrus-imap
+   logs.Debuglogs('CYRUS STATUS ---------------------------------- (monit)');
+   ini:=ini+CCYRUS.CYRUS_STATUS()+CRLF;
 
 
+   ini:=ini+obm.STATUS()+CRLF;
 
-   result:=ini;
+//ntpd
+   logs.Debuglogs('ntpd STATUS ---------------------------------- (monit)');
+   ini:=ini+ntpd.NTPD_STATUS()+CRLF;
+
+   ini:=ini+IPTABLES_STATUS()+CRLF;
+
+//lighttpd
+   logs.Debuglogs('lighttpd STATUS ---------------------------------- (monit)');
+   ini:=ini+lighttpd.STATUS()+CRLF;
+
+
+//clamav
+   logs.Debuglogs('CLAMAV_STATUS STATUS ---------------------------------- (monit)');
+   ini:=ini+clamav.CLAMAV_STATUS()+CRLF;
+   ini:=ini+clamav.CLAMSCAN_STATUS()+CRLF;
+   logs.Debuglogs('starting status FRESHCLAM_STATUS');
+   ini:=ini+clamav.FRESHCLAM_STATUS()+CRLF;
+
+// ------------------------------------ SAMBA ------------------------------------
+if fileExists(samba.SMBD_PATH()) then begin
+   logs.Debuglogs('CLAMAV_STATUS STATUS ---------------------------------- (monit)');
+   ini:=ini+samba.SAMBA_STATUS()+CRLF;
+
+   ini:=ini+ kav4samba.STATUS()+CRLF;
+
+//cups
+   logs.Debuglogs('CUPS STATUS ---------------------------------- (monit)');
+   cups:=tcups.Create;
+   ini:=ini+ cups.STATUS()+CRLF;
+   cups.free;
+end;
+
+
+
+//console-kit
+ini:=ini+CONSOLEKIT_STATUS()+CRLF;
+
+
+//stunnel;
+logs.Debuglogs('starting status STUNNEL_STATUS');
+stunnel:=tstunnel.CReate(SYS);
+ini:=ini+stunnel.STUNNEL_STATUS()+CRLF;
+stunnel.Free;
+result:=ini;
+monit:=tmonit.Create(SYS);
+monit.wakeup();
+monit.free;
    logs.Debuglogs('end status....');
    xffce.free;
 end;
@@ -10552,7 +10588,7 @@ begin
      exit;
   end;
   except
-  writeln('Fatal error while get  SYS.PROCESS_LIST_PID('+ParamStr(0) + ' --ParseMyqlQueue)');
+
   exit;
   end;
 
@@ -10921,7 +10957,6 @@ var
    rootExists:boolean;
    servername:string;
    syslog:tsyslogng;
-   logerror:string;
    obm:tobm;
    count:integer;
    mysqld_safe:string;
@@ -10960,7 +10995,6 @@ begin
 
      logs:=Tlogs.Create;
      tempfile:=logs.FILE_TEMP();
-     logerror:=logs.FILE_TEMP();
 
    writeln('Stopping Artica daemon');
    fpsystem('/etc/init.d/artica-postfix stop daemon');
@@ -11029,12 +11063,18 @@ begin
       sqlstring:='UPDATE user SET password=PASSWORD("' + password+'") WHERE user="'+root+'"';
       commandline:=SYS.LOCATE_mysql_bin() + ' -N -S '+socket+' -s -X -e '''+sqlstring+''' mysql >' + tempfile + ' ';
       fpsystem(commandline);
+      writeln('Results:');
       writeln(SYS.ReadFileIntoString(tempfile));
       logs.DeleteFile(tempfile);
+      writeln('FLUSH PRIVILEGES:');
+
       sqlstring:='FLUSH PRIVILEGES;';
       commandline:=SYS.LOCATE_mysql_bin() + ' -N -S '+socket+' -s -X -e '''+sqlstring+''' mysql >' + tempfile + ' ';
       fpsystem(commandline);
+      writeln('Results:');
+      writeln(SYS.ReadFileIntoString(tempfile));
       logs.DeleteFile(tempfile);
+
    end else begin
       servername:=SYS.HOSTNAME_g();
       writeln(root +' did not exists in database, Adding user with hostname "'+servername+'"');
@@ -11135,6 +11175,8 @@ SYS.set_MYSQL('database_admin',root);
 SYS.set_MYSQL('database_password',password);
 fpsystem(get_ARTICA_PHP_PATH()+'/bin/process1 --force &');
 SYS.THREAD_COMMAND_SET('/etc/init.d/artica-postfix restart apache-groupware &');
+SYS.THREAD_COMMAND_SET('/etc/init.d/artica-postfix restart zarafa &');
+SYS.THREAD_COMMAND_SET('/etc/init.d/artica-postfix restart roundcube &');
 writeln('Done....');
 
 end;
@@ -11494,22 +11536,28 @@ end;
 
  var
     ini:string;
-    D:Boolean;
     pid:string;
  begin
+      //
+  ini:='';
+  logs.Debuglogs('starting status BOA');
+  ini:=ini+ '[BOA]'+CRLF;
+  ini:=ini+ 'service_name=APP_BOA'+CRLF;
+  ini:=ini+ 'service_cmd=boa'+CRLF;
+  ini:=ini+ 'master_version=0.94.13'+CRLF;
+  if SYS.MONIT_CONFIG('APP_BOA','/etc/artica-postfix/boa.pid','boa') then begin
+   ini:=ini+ 'monit=1'+CRLF;
+   exit(ini);
+  end;
 
-      D:=SYS.COMMANDLINE_PARAMETERS('--boa-status');
-      pid:=BOA_DAEMON_GET_PID();
-   logs.Debuglogs('starting status BOA');
-   ini:=ini+ '[BOA]'+CRLF;
+  pid:=BOA_DAEMON_GET_PID();
   if SYS.PROCESS_EXIST(pid) then ini:=ini+ 'running=1'+CRLF else  ini:=ini+ 'running=0'+CRLF;
   ini:=ini+ 'application_installed=1'+CRLF;
   ini:=ini+ 'master_pid='+ pid+CRLF;
   ini:=ini+ 'master_memory=' + IntToStr(SYS.PROCESS_MEMORY(pid))+CRLF;
-  ini:=ini+ 'master_version=0.94.13'+CRLF;
+
   ini:=ini+ 'status='+SYS.PROCESS_STATUS(pid)+CRLF;
-  ini:=ini+ 'service_name=APP_BOA'+CRLF;
-  ini:=ini+ 'service_cmd=boa'+CRLF;
+
   result:=ini;
 end;
 //#############################################################################
@@ -11522,22 +11570,20 @@ function myconf.LMB_LUNDIMATIN_VERSION():string;
 
  var
     ini:string;
-    D:Boolean;
     pid:string;
  begin
-
-      D:=SYS.COMMANDLINE_PARAMETERS('--boa-status');
-      pid:=BOA_DAEMON_GET_PID();
-   logs.Debuglogs('starting status BOA');
-   ini:=ini+ '[BOA]'+CRLF;
-  if SYS.PROCESS_EXIST(pid) then ini:=ini+ 'running=1'+CRLF else  ini:=ini+ 'running=0'+CRLF;
-  ini:=ini+ 'application_installed=1'+CRLF;
-  ini:=ini+ 'master_pid='+ pid+CRLF;
-  ini:=ini+ 'master_memory=' + IntToStr(SYS.PROCESS_MEMORY(pid))+CRLF;
-  ini:=ini+ 'master_version=0.94.13'+CRLF;
-  ini:=ini+ 'status='+SYS.PROCESS_STATUS(pid)+CRLF;
-  ini:=ini+ 'service_name=APP_BOA'+CRLF;
-  ini:=ini+ 'service_cmd=boa'+CRLF;
+    ini:='';
+    pid:=BOA_DAEMON_GET_PID();
+    logs.Debuglogs('starting status BOA');
+    ini:=ini+ '[BOA]'+CRLF;
+    if SYS.PROCESS_EXIST(pid) then ini:=ini+ 'running=1'+CRLF else  ini:=ini+ 'running=0'+CRLF;
+   ini:=ini+ 'application_installed=1'+CRLF;
+   ini:=ini+ 'master_pid='+ pid+CRLF;
+   ini:=ini+ 'master_memory=' + IntToStr(SYS.PROCESS_MEMORY(pid))+CRLF;
+   ini:=ini+ 'master_version=0.94.13'+CRLF;
+   ini:=ini+ 'status='+SYS.PROCESS_STATUS(pid)+CRLF;
+   ini:=ini+ 'service_name=APP_BOA'+CRLF;
+   ini:=ini+ 'service_cmd=boa'+CRLF;
   result:=ini;
 end;
 //#############################################################################
@@ -11633,23 +11679,32 @@ function myconf.SYSLOGER_STATUS():string;
 var
 ini:TstringList;
 pid:string;
-Enabled:integer;
 begin
-  pid:=SYSLOGER_PID();
+
    ini:=TstringList.Create;
    ini.Add('[APP_SYSLOGER]');
+   ini.Add('service_name=APP_SYSLOGER');
+   ini.Add('service_cmd=sysloger');
+   ini.Add('service_disabled=1');
+   ini.Add('master_version=' + SYS.ReadFileIntoString('/usr/share/artica-postfix/VERSION'));
+
+
+
+      if SYS.MONIT_CONFIG('APP_SYSLOGER','/etc/artica-postfix/exec.syslog.php.pid','sysloger') then begin
+         ini.Add('monit=1');
+         result:=ini.Text;
+         ini.free;
+         exit;
+      end;
+
+      pid:=SYSLOGER_PID();
       if SYS.PROCESS_EXIST(pid) then ini.Add('running=1') else  ini.Add('running=0');
       ini.Add('application_installed=1');
       ini.Add('master_pid='+ pid);
       ini.Add('master_memory=' + IntToStr(SYS.PROCESS_MEMORY(pid)));
-      ini.Add('master_version=' + SYS.ReadFileIntoString('/usr/share/artica-postfix/VERSION'));
       ini.Add('status='+SYS.PROCESS_STATUS(pid));
-      ini.Add('service_name=APP_SYSLOGER');
-      ini.Add('service_cmd=sysloger');
-      ini.Add('service_disabled=1');
-
-   result:=ini.Text;
-   ini.free;
+      result:=ini.Text;
+      ini.free;
 end;
 //#####################################################################################
 procedure myconf.SYSLOGER_STOP();
@@ -11714,9 +11769,8 @@ function myconf.LMB_VERSION():string;
 var
    l:Tstringlist;
    tmpstr:string;
-   mailcount:integer;
-    RegExpr:TRegExpr;
-    i:integer;
+   RegExpr:TRegExpr;
+   i:integer;
 begin
 tmpstr:='/usr/local/share/artica/lmb_src/config/config_serveur.inc.php';
 if not FileExists(tmpstr) then exit;
@@ -11735,4 +11789,108 @@ end;
     RegExpr.free;
 end;
 //#####################################################################################
+function myconf.GROUPOFFICE_VERSION():string;
+var
+   l:Tstringlist;
+   tmpstr:string;
+   RegExpr:TRegExpr;
+   i:integer;
+begin
+tmpstr:='/usr/local/share/artica/group-office/classes/base/config.class.inc.php';
+if not FileExists(tmpstr) then exit;
+l:=Tstringlist.Create;
+l.LoadFromFile(tmpstr);
+RegExpr:=TRegExpr.Create;
+RegExpr.Expression:='var\s+\$version.+?([0-9\.]+)';
+for i:=0 to l.Count-1 do begin
+    if RegExpr.Exec(l.Strings[i]) then begin
+       result:=RegExpr.Match[1];
+       break;
+    end;
+
+end;
+    l.free;
+    RegExpr.free;
+end;
+//#####################################################################################
+function myconf.hpinlinux_VERSION():string;
+var
+   l:Tstringlist;
+   tmpstr:string;
+   RegExpr:TRegExpr;
+   i:integer;
+begin
+
+     result:=SYS.GET_CACHE_VERSION('APP_HPINLINUX');
+     if length(result)>1 then exit;
+
+tmpstr:='/usr/local/share/hpinlinux/getweb';
+if not FileExists(tmpstr) then exit;
+l:=Tstringlist.Create;
+l.LoadFromFile(tmpstr);
+RegExpr:=TRegExpr.Create;
+RegExpr.Expression:='VERSION=.+?v\s+([0-9\.]+)';
+for i:=0 to l.Count-1 do begin
+    if RegExpr.Exec(l.Strings[i]) then begin
+       result:=RegExpr.Match[1];
+       break;
+    end;
+end;
+     SYS.SET_CACHE_VERSION('APP_HPINLINUX',result);
+    l.free;
+    RegExpr.free;
+end;
+//#####################################################################################
+function myconf.PHPMYADMIN_VERSION():string;
+var
+   l:Tstringlist;
+   tmpstr:string;
+   RegExpr:TRegExpr;
+   i:integer;
+   D:boolean;
+begin
+
+     D:=false;
+     result:=SYS.GET_CACHE_VERSION('APP_PHPMYADMIN');
+     if length(result)>2 then exit;
+     D:=SYS.COMMANDLINE_PARAMETERS('--phpmyadmin');
+     tmpstr:='/usr/share/phpmyadmin/libraries/Config.class.php';
+     if not FileExists(tmpstr) then tmpstr:='/usr/share/artica-postfix/mysql/libraries/Config.class.php';
+
+
+     if not FileExists(tmpstr) then begin
+        if D then writeln('Unable to stat '+tmpstr);
+        exit;
+     end;
+l:=Tstringlist.Create;
+l.LoadFromFile(tmpstr);
+
+if D then writeln('File:',tmpstr);
+
+RegExpr:=TRegExpr.Create;
+if D then writeln('Lines:',l.Count);
+RegExpr.Expression:='\(.+?PMA_VERSION.+?([0-9\.]+).*?\)';
+for i:=0 to l.Count-1 do begin
+    if RegExpr.Exec(l.Strings[i]) then begin
+       result:=RegExpr.Match[1];
+       break;
+    end;
+end;
+     SYS.SET_CACHE_VERSION('APP_PHPMYADMIN',result);
+    l.free;
+    RegExpr.free;
+end;
+//#####################################################################################
+procedure myconf.LISTDIRS_RECURSIVE(path:string);
+var
+   i:integer;
+begin
+   SYS.DirDir(path);
+   for i:=0 to SYS.DirListFiles.Count-1 do begin
+     writeln( SYS.DirListFiles.Strings[i]);
+
+   end;
+end;
+
 end.
+

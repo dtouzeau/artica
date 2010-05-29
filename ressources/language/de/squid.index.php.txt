@@ -482,10 +482,8 @@ but if you download the same file again, the time it takes for download will be 
 This indicates that, the file comes from the Cache.
 </maximum_object_size_text>
 <minimum_object_size>Minimum object size</minimum_object_size>
-<minimum_object_size_text>Defines maximum size of the object to be kept in memory cache[br]
-Objects greater than the size specified in this tag will not be kept in the memory cache.[br]
-This should be set high enough to keep objects accessed frequently in memory to improve performance at the same time low enough to [br]
-keep larger objects from hoarding "ideal amount of memory".
+<minimum_object_size_text>Objects smaller than this size will NOT be saved on disk.  The value is specified in kilobytes, and the default is 0 KB, which means there is no minimum.
+
 </minimum_object_size_text>
 <miss_access>Miss restrictions</miss_access>
 <miss_access_text>

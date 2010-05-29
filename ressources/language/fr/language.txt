@@ -47,6 +47,9 @@ Cette op&eacute;ration va activer le service et la sauvegarde &agrave; distance 
 <ACTIVATE_HD_ORG_DEFAULT_EXPLAIN>Le stockage choisi sera aussi le chemin par d&eacute;faut des r&eacute;pertoires utilisateurs (home).</ACTIVATE_HD_ORG_DEFAULT_EXPLAIN>
 <ActiveDirectorySettings>Param&egrave;tres Active Directory</ActiveDirectorySettings>
 <ActiveDirectorySettings_text>Indiquez le compte utilisateur et les coordonn&eacute;es du serveur afin de connecter Artica a votre serveur Active Directory</ActiveDirectorySettings_text>
+<activedirectory_admin>Administrateur Active Directory</activedirectory_admin>
+<activedirectory_domain>Domaine Active Directory</activedirectory_domain>
+<activedirectory_server>Nom du serveur AD</activedirectory_server>
 <active_queue>En activit&eacute;</active_queue>
 <add>ajouter</add>
 <add aliase>Ajouter un alias</add aliase>
@@ -191,6 +194,8 @@ exemples[br]
 <advanced_infos>Avanc&eacute;</advanced_infos>
 <advanced_mode>Mode avanc&eacute;</advanced_mode>
 <advanced_options>Options avanc&eacute;es</advanced_options>
+<ad_samba_member>Membre Active Directory</ad_samba_member>
+<ad_samba_member_text>Faire de ce serveur un membre d'un domaine Microsoft Active Directory</ad_samba_member_text>
 <alias>Alias</alias>
 <aliases>Alias</aliases>
 <all>Tout</all>
@@ -794,6 +799,8 @@ The relay_domains_reject_code parameter specifies the response code for rejected
 <check_wifi_card>Check WIFI Network settings</check_wifi_card>
 <choose>Choisir</choose>
 <choose_org>Choisir l'organisation</choose_org>
+<CICAP_DNSBL>Listes Noires DNSBL</CICAP_DNSBL>
+<CICAP_DNSBL_TEXT>Utilisez les listes noires dynamiques afin d'interdire l'acc&egrave;s &agrave; certains sites web</CICAP_DNSBL_TEXT>
 <city>Ville</city>
 <CLAMD_NOT_INSTALLED>Le d&eacute;mon Clamd est manquant</CLAMD_NOT_INSTALLED>
 <CLAMD_NOT_INSTALLED_TEXT>Il semble que le d&eacute;mon Clamd n'est pas install&eacute;, des fonctionnalit&eacute;s antivirus ne seront pas disponibles</CLAMD_NOT_INSTALLED_TEXT>
@@ -1159,6 +1166,7 @@ supports the X-Forward extension for Postfix protocol only if [b]smtp[/b] is use
 <emails_flow_month>Envoy&eacute; et re&ccedil;us par mois</emails_flow_month>
 <emails_flow_text>Voir l'historique des eMails envoy&eacute;s et re&ccedil;us sur votre serveur</emails_flow_text>
 <emails_flow_week>Envoy&eacute; et re&ccedil;us par semaine</emails_flow_week>
+<emails_number>Nombre de messages</emails_number>
 <emails_recieved>emails re&ccedil;us</emails_recieved>
 <email_number>nombre d'emails</email_number>
 <email_scenarios>Sc&eacute;narios eMail</email_scenarios>
@@ -1964,6 +1972,7 @@ The message delivery transport name is the first field in the entry in the maste
 <main_settings>Configuration g&eacute;n&eacute;rale</main_settings>
 <main_settings_samba>Param&egrave;tres globaux</main_settings_samba>
 <main_settings_text>D&eacute;finir les param&egrave;tres principaux du logiciel, personnaliser les d&eacute;mons et r&eacute;gler les performances des processus</main_settings_text>
+<make_samba_ad_text>Si activ&eacute;, ce serveur sera un membre de votre domaine Microsoft Active Directory.[br]Dans ce cas, les membres Windows pourront avoir acc&egrave;s au services de ce serveur tels que le partage de fichiers, le proxy internet....</make_samba_ad_text>
 <MalwarePatrol>Malware Patrol</MalwarePatrol>
 <MalwarePatrol_text>Malware Patrol est une base de donn&eacute;es gratuite permettant de bloquer des pages web si une pr&eacute;sence de code malicieux &agrave; &eacute;t&eacute; d&eacute;tect&eacute;e par la communaut&eacute;.</MalwarePatrol_text>
 <manage>Gerer</manage>
@@ -2009,6 +2018,7 @@ SI vous utilisez le proxy en mode transparent, seul la correspondance par adress
 Le cas &eacute;ch&eacute;ant, si vous avez activ&eacute; l'authentification LDAP, vous serez amen&eacute; &agrave; faire une correspondance avec les groupes stock&eacute;s dans les organisations.</MAP_USERS_RULES_DANSGUARDIAN_TEXT>
 <mark_all_events_has_read>Marquez tous les &eacute;v&egrave;nements comme lus</mark_all_events_has_read>
 <mark_has_read>Marquer cet &eacute;v&egrave;nement comme lu</mark_has_read>
+<master_panel>panneau principal</master_panel>
 <match>correspondre</match>
 <Matches>correspond</Matches>
 <match_in>correspond dans</match_in>
@@ -2160,6 +2170,8 @@ The default is to use the local machine name, $myhostname, which defaults to the
 <name_the_new_account_field>Type de l'identificateur unique du nouveau compte</name_the_new_account_field>
 <name_the_new_account_title>Le nouvel identifiant unique</name_the_new_account_title>
 <nb_domains>Nombre de domaines</nb_domains>
+<nb_fetchmails>NB de messages r&eacute;cup&eacute;r&eacute;s</nb_fetchmails>
+<nb_fetchmails_size>Poids des messages</nb_fetchmails_size>
 <need>besoin</need>
 <netbiosname>Nom netbios</netbiosname>
 <netbiosname_text>Le nom netbios que va utiliser Samba n'a pas de relation avec le vrai nom de la machine.[br]C'est le nom de machine que les postes Windows verront toujours dans le parcours r&eacute;seau.</netbiosname_text>
@@ -2231,6 +2243,8 @@ The default is to use the local machine name, $myhostname, which defaults to the
 <no_privileges>Vous n'avez pas assez de privil&egrave;ges pour effectuer cette op&eacute;ration</no_privileges>
 <no_rules>Aucune r&egrave;gle sauvegard&eacute;es..</no_rules>
 <NO_RULESNUMBER_DANS_EXPLAIN>Vous devez au moins cr&eacute;er un r&egrave;gle DansGuardian afin d'utiliser cette option</NO_RULESNUMBER_DANS_EXPLAIN>
+<no_squid_network>Pas de r&eacute;seau d&eacute;finit</no_squid_network>
+<no_squid_network_text>Pour l'instant, aucun r&eacute;seau n'a &eacute;t&eacute; d&eacute;finit, Squid refusera toutes les connections</no_squid_network_text>
 <no_usb_devices_connected>Il n'y a pas de p&eacute;riph&eacute;rique USB connect&eacute; &agrave; cet ordinateur</no_usb_devices_connected>
 <nsAIMid>AOL Instant Messenger (AIM)</nsAIMid>
 <nsICQid>ICQ</nsICQid>
@@ -3317,6 +3331,7 @@ Exemple: user.name@domain.tlb -&gt; domain.tlb</text_add_domain_entity>
 <this_month>Ce mois</this_month>
 <this_not_a_samba_user>Cette utilisateur n'a pas d'acc&egrave;s r&eacute;seau sur ce serveur</this_not_a_samba_user>
 <this_not_a_samba_user_explain>Actuellement, cet utilisateur ne peut pas parcourir le serveur via les partages de fichiers tant que son acc&egrave;s r&eacute;seau n'a pas &eacute;t&eacute; activ&eacute;[br]Cliquez sur le bouton ci-dessous afin d'activer son profil.</this_not_a_samba_user_explain>
+<this_server_is_an_ad_member>Ce serveur en actuellement membre d'un serveur Microsoft Active Directory</this_server_is_an_ad_member>
 <this_server_store>ce serveur stocke</this_server_store>
 <this_week>Cette semaine</this_week>
 <thursday>Jeudi</thursday>
@@ -3591,6 +3606,7 @@ Si il est en rouge, vous allez devoir maintenir la base des utilisateurs.[br]Cet
 <upload_max_filesize>Taille Max du fichier de t&eacute;l&eacute;chargement</upload_max_filesize>
 <upload_new_license>T&eacute;l&eacute;charger une nouvel licence</upload_new_license>
 <uptime>temps de vie</uptime>
+<uri_dnsbl>Lien DNSBL</uri_dnsbl>
 <urls>Urls</urls>
 <url_regex_popup_import_explain>Copiez et collez dans le champs ci-dessous les sites web que vous d&eacute;sirez interdire.[br]Chaque site web devra &ecirc;tre s&eacute;par&eacute; par un retour chariot</url_regex_popup_import_explain>
 <usb_external_drive>Disque dur externe USB</usb_external_drive>
@@ -3697,6 +3713,7 @@ Il offre aussi le filtrage de contenu avec un antivirus et le filtrage des pages
 <wifi_networks>Points d'acc&egrave;s WIFI</wifi_networks>
 <will_deleted_apply_config>Effacer apr&egrave;s application de la configuration</will_deleted_apply_config>
 <winbindd_installed>D&eacute;mon Winbindd install&eacute;</winbindd_installed>
+<WINBINDD_NOT_INSTALLED_TEXT>Le d&eacute;mon Winbindd n'est pas install&eacute;, Tant que celui est inexistant vous ne serez pas en mesure d'utiliser la fonctionnalit&eacute;.[br]Allez dans le gestionnaire de logiciels et mettez &agrave; jour la version de Samba.</WINBINDD_NOT_INSTALLED_TEXT>
 <with>avec</with>
 <with_error>avec l'erreur</with_error>
 <wizard1_welcome>Bienvenue dans vos premiers r&eacute;glages 

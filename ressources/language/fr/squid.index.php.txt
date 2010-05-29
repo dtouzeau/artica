@@ -262,7 +262,7 @@ Rejeter contient la totalit&eacute; de l'URL http://www.google.co.in/index.html<
 <add_icap_service>Ajouter un nouveau service ICAP</add_icap_service>
 <add_rule_here>Ajouter une r&egrave;gle de restriction apr&egrave;s cette r&egrave;gle</add_rule_here>
 <allow_all_days>Autoriser tout le temps ... Pas de restriction</allow_all_days>
-<allow_network>Autoriser des ordinateurs &agrave; travers le proxy par adresses IP</allow_network>
+<allow_network>Autoriser des adresses IP &agrave; utiliser ce service Proxy</allow_network>
 <apply_squid>Appliquer les param&egrave;tres</apply_squid>
 <apply_squid_text>Enregistrez vos param&egrave;tres et passez les en mode production</apply_squid_text>
 <authenticate_users>Utilisateurs authentifi&eacute;s</authenticate_users>

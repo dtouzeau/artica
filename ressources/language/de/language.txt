@@ -59,6 +59,9 @@ This operation will activate service and enable remote backup trough Artica Netw
 <ACTIVATE_HD_ORG_DEFAULT_EXPLAIN>The selected storage will be the default storage for your user's home directory</ACTIVATE_HD_ORG_DEFAULT_EXPLAIN>
 <ActiveDirectorySettings>ActiveDirectory Parameters</ActiveDirectorySettings>
 <ActiveDirectorySettings_text>Define credentials in order to help Artica connecting to the remote ActiveDirectory parameters</ActiveDirectorySettings_text>
+<activedirectory_admin>Active Directory Administrator</activedirectory_admin>
+<activedirectory_domain>Active Directory domain</activedirectory_domain>
+<activedirectory_server>Active Directory server name</activedirectory_server>
 <active_queue>Active</active_queue>
 <add>add</add>
 <add aliase>Add new aliase</add aliase>
@@ -143,6 +146,7 @@ Add a list:exe,pif,bat,pdf,doc</add_attachment_blocking_text_explain>
 <add_computer_access>Add computer access</add_computer_access>
 <ADD_COMPUTER_TEXT>Add a new computer in Artica Database</ADD_COMPUTER_TEXT>
 <add_default_rules>Add default rules</add_default_rules>
+<add_default_settings>Add default settings</add_default_settings>
 <add_edit_rule>Add & edit a rule</add_edit_rule>
 <add_entry>Add an entry</add_entry>
 <add_every>Add every</add_every>
@@ -155,6 +159,7 @@ Add a list:exe,pif,bat,pdf,doc</add_attachment_blocking_text_explain>
 <add_member>Add a new member</add_member>
 <add_member_to_group>Add member to this group</add_member_to_group>
 <add_new_account>Add a new account</add_new_account>
+<add_new_cached_web_site>Add a new website cache parameters</add_new_cached_web_site>
 <add_new_class>Add a new restriction class</add_new_class>
 <add_new_contact>Add a new contact</add_new_contact>
 <add_new_contact_text>Create a new contact in you address Book</add_new_contact_text>
@@ -213,6 +218,8 @@ examples[br]
 <advanced_infos>Advanced</advanced_infos>
 <advanced_mode>Advanced mode</advanced_mode>
 <advanced_options>Advanced options</advanced_options>
+<ad_samba_member>Active Directory Member</ad_samba_member>
+<ad_samba_member_text>Make this server has a member of a Microsoft Active Directory domain</ad_samba_member_text>
 <alias>Alias</alias>
 <aliases>Aliases</aliases>
 <all>all</all>
@@ -277,6 +284,7 @@ If a computer reach X events, Artica will automatically create a FireWall rule t
 <apply config text>This operation will compile all your settings on the server and make them in production mode.</apply config text>
 <apply_pureftpd>Apply FTP</apply_pureftpd>
 <apply_pureftpd_text>Rebuild users database and restart ftp server</apply_pureftpd_text>
+<apply_rules_for_local_users>Apply rules for local users too</apply_rules_for_local_users>
 <apply_scripts_mailbox>apply rules to your mailbox</apply_scripts_mailbox>
 <apply_settings>Apply these settings to the server and put them in production mode</apply_settings>
 <apply_settings_bind9>Compile Bind9 Settings</apply_settings_bind9>
@@ -461,6 +469,8 @@ This feature will help you to concentrate and factorize internet updates.</APP_K
 <APP_PHILESIGHT_TEXT>browse your filesystem and see where the diskspace is being used at a glance</APP_PHILESIGHT_TEXT>
 <APP_PHPLDAPADMIN>phpLDAPadmin</APP_PHPLDAPADMIN>
 <APP_PHPLDAPADMIN_TEXT>Browse the LDAP directory using phpLDAPAdmin front-end</APP_PHPLDAPADMIN_TEXT>
+<APP_PHPMYADMIN>PhpMyAdmin</APP_PHPMYADMIN>
+<APP_PHPMYADMIN_TEXT>Manage, display and browse Mysql databases</APP_PHPMYADMIN_TEXT>
 <APP_PHP_APC>Alternative PHP Cache</APP_PHP_APC>
 <APP_POLICYD_WEIGHT>Policy Daemon for Postfix</APP_POLICYD_WEIGHT>
 <APP_POLICYD_WEIGHT_EXPLAIN>policyd-weight is a Policy daemon for the Postfix MTA intended to eliminate forged envelope senders and HELOs (i.e. in bogus mails).[br]
@@ -530,6 +540,7 @@ If you enable this feature, you will be able to share folders trough the explore
 <APP_USB>Usb storage</APP_USB>
 <APP_VMTOOLS>VMWare Tools</APP_VMTOOLS>
 <APP_WINEXE>Windows remote execution</APP_WINEXE>
+<APP_WPA_SUPPLIANT>WPA Supplicant</APP_WPA_SUPPLIANT>
 <APP_XAPIAN>Xapian search library</APP_XAPIAN>
 <APP_XAPIAN_OMEGA>Xapian indexer</APP_XAPIAN_OMEGA>
 <APP_XAPIAN_PHP>Xapian PHP Library</APP_XAPIAN_PHP>
@@ -693,6 +704,7 @@ If a path is set artica will execute at regular time statistics generation.
 <BCC_help>Send  one  copy  of  the  message  to the specified recipient.[br]
 If multiple BCC actions are  specified  within  the same  SMTP  MAIL  transaction,[br] only the last action will be used.</BCC_help>
 <birthDate>birth date</birthDate>
+<bits_rate>Bits rate</bits_rate>
 <black list>Black List</black list>
 <black list explain>Managing thegroup list of banned addresses.[br] Messages from these addresses are automatically checked as Spam</black list explain>
 <black_lists>Black lists engines</black_lists>
@@ -815,8 +827,11 @@ The relay_domains_reject_code parameter specifies the response code for rejected
 <check_sender_ns_access>check sender dns access</check_sender_ns_access>
 <check_sender_ns_access_text>Search the specified rule for the DNS servers for the MAIL FROM address, and execute the corresponding action. [br]
 [strong]Note: a result of "ACCEPT" is not allowed for safety reasons. Instead, use DUNNO in order to exclude specific hosts from blacklists[/strong]</check_sender_ns_access_text>
+<check_wifi_card>Check WIFI Network settings</check_wifi_card>
 <choose>choose</choose>
 <choose_org>Choose organization</choose_org>
+<CICAP_DNSBL>DNS black list lookup</CICAP_DNSBL>
+<CICAP_DNSBL_TEXT>Use dynamics DNS black lists servers in order to ban websites</CICAP_DNSBL_TEXT>
 <city>City</city>
 <CLAMD_NOT_INSTALLED>Clamd Deamon missing</CLAMD_NOT_INSTALLED>
 <CLAMD_NOT_INSTALLED_TEXT>It seems that Clamd Daemon is not installed, antivirus checking will not be available</CLAMD_NOT_INSTALLED_TEXT>
@@ -879,6 +894,7 @@ The default is accept message.
 <compile_statistics>Compile statistics</compile_statistics>
 <compile_statistics_text>Run statistics process in order to obtain last events and graphs</compile_statistics_text>
 <compiling>Compiling</compiling>
+<COMPLETED>Connected</COMPLETED>
 <computer>computer</computer>
 <computers>computers</computers>
 <computers_management>Computers management</computers_management>
@@ -959,6 +975,7 @@ You need to test this feature.[br]Sometimes cpulimit is bugged and do the opposi
 <credentials_informations>Username & passwords</credentials_informations>
 <credentials_informations_text>Define accounts and passwords in order to allow this computer to connect to this domain or to allow artica to connecting to this computer</credentials_informations_text>
 <cron>cron</cron>
+<crypted>crypted</crypted>
 <Cured>Cured</Cured>
 <CURLE_COULDNT_CONNECT>Failed to connect() to host or proxy.</CURLE_COULDNT_CONNECT>
 <CURLE_COULDNT_RESOLVE_HOST>Couldn't resolve host. The given remote host was not resolved</CURLE_COULDNT_RESOLVE_HOST>
@@ -1109,8 +1126,12 @@ Setting this parameter to a value of 1 changes the meaning of the corresponding 
 <disk>disk</disk>
 <disks_usage>Disks usage</disks_usage>
 <disk_name>Disk name</disk_name>
+<display>display</display>
 <displayname>Display name</displayname>
 <display_product_events>Display product's events</display_product_events>
+<display_queries_list>Display queries</display_queries_list>
+<display_statistics_of_this_user>Display statistics of this user</display_statistics_of_this_user>
+<display_statistics_of_this_website>Display statistics of this website</display_statistics_of_this_website>
 <dmidecode>DMI BIOS Informations</dmidecode>
 <dmidecode_text>Contains a description  of  the  system’s  hardware  components,  as well as other useful pieces of information such as serial numbers and BIOS revision</dmidecode_text>
 <dnsmasq_DNS_records>MX Records</dnsmasq_DNS_records>
@@ -1186,6 +1207,7 @@ supports the X-Forward extension for Postfix protocol only if [b]smtp[/b] is use
 <emails_flow_month>Send & receive per month</emails_flow_month>
 <emails_flow_text>View history of eMails sended and received on your server</emails_flow_text>
 <emails_flow_week>Send & receive per week</emails_flow_week>
+<emails_number>eMails number</emails_number>
 <emails_recieved>emails recieved</emails_recieved>
 <email_number>email number</email_number>
 <email_scenarios>eMail Scenarios</email_scenarios>
@@ -1259,6 +1281,7 @@ disabling it just safe performances... </enable_philesight_text>
 <enable_ssl>Enable SSL</enable_ssl>
 <enable_this_filter>Enable this filter</enable_this_filter>
 <enable_this_option>Enable this feature</enable_this_option>
+<enable_wifi_ap>Activate Wifi Access Point Client mode</enable_wifi_ap>
 <enable_xapian_indexing>Activate Xapian search indexing</enable_xapian_indexing>
 <enable_xapian_indexing_text>If enabled, Artica will indexing all saved files trough shared directories in order to provide a full search engine like google trough Artica web Interface</enable_xapian_indexing_text>
 <ENABLE_ZARAFA_COMPANY>Enable Zarafa for this organization</ENABLE_ZARAFA_COMPANY>
@@ -1378,6 +1401,8 @@ disabling it just safe performances... </enable_philesight_text>
 <ERR_NO_PASS_MATCH>Error: passwords fields did not match.</ERR_NO_PASS_MATCH>
 <ERR_NO_USERNAME>Error: please set username before submit</ERR_NO_USERNAME>
 <ERR_SET_QUOTA_SUCCESS>Set quota success</ERR_SET_QUOTA_SUCCESS>
+<ESSID>Access Point</ESSID>
+<ESSID_CONNECT_PASSWORD>Give the password key of your remote Access point or keep it blanck if no password key is required.[br]Define the Network parameters of your Wireless card when connecting to the Acess Point</ESSID_CONNECT_PASSWORD>
 <etc_hosts>Hosts file</etc_hosts>
 <etc_hosts_explain>The hosts file is a computer file used in an operating system to map hostnames to IP addresses.[br]
 This method is one of several system facilities to address network nodes on a computer network.[br]
@@ -1400,6 +1425,7 @@ Exception mask for filtering by MIME type. The plugin will not perform anti-viru
 <Exit_delay_in_seconds>Exit delay (in seconds)</Exit_delay_in_seconds>
 <expired>Expired</expired>
 <expire_date>Expiration date</expire_date>
+<expire_time>Expire time</expire_time>
 <explain 1>Give the email domain (after the @ of your mailboxes)</explain 1>
 <explorer>explorer</explorer>
 <explorer_browse_yours_files>Browse your files and your allowed storages</explorer_browse_yours_files>
@@ -1606,6 +1632,7 @@ It send notifications to recipients in order to allow them to "download" attache
 <identity>Identity</identity>
 <if>if</if>
 <if_in>if in</if_in>
+<ignore_all>Ignore all</ignore_all>
 <illimited>illimited</illimited>
 <imap_connection_broken>Imap connection is currently broken and informations could not be read</imap_connection_broken>
 <imap_connection_locked>The imap connection is currently locked cause the imap server didn't respond on time</imap_connection_locked>
@@ -1630,6 +1657,7 @@ This form allows you to put a csv file in order to import users in this organiza
 <import_artica_computers_list_text>Import computer from a text list</import_artica_computers_list_text>
 <import_sub_branch>Start importation from this sub-branch</import_sub_branch>
 <in>in</in>
+<INACTIVE>Inactive</INACTIVE>
 <inbox_junk>Junk mailbox</inbox_junk>
 <inbox_sent>Sent mailbox</inbox_sent>
 <inbox_trash>Trash mailbox</inbox_trash>
@@ -1876,10 +1904,13 @@ With the default 100 SMTP server process limit, "in flow delay as 1s" limits the
 <language>language</language>
 <lastname>Last Name</lastname>
 <last_100_mails>last 100 emails</last_100_mails>
+<last_24_h>last 24 hours</last_24_h>
+<last_48_h>last 48 hours</last_48_h>
 <last_logoff>Last logoff</last_logoff>
 <last_logon>Last logon</last_logon>
 <last_mails>Last routing mails</last_mails>
 <last_update>last update</last_update>
+<last_week>last week</last_week>
 <launch>Launch</launch>
 <launch_ad_import_now>Run ActiveDirectory importation task now</launch_ad_import_now>
 <ldap admin>LDAP Administrator</ldap admin>
@@ -1898,6 +1929,7 @@ With the default 100 SMTP server process limit, "in flow delay as 1s" limits the
 <license_expired>The license is expired</license_expired>
 <license_info>License information</license_info>
 <license_info_text>Display license and update it</license_info_text>
+<limit>limit</limit>
 <lines>lines</lines>
 <link_hard_drive>Link hard drive</link_hard_drive>
 <link_hard_drive_confirm>Confirm link this hard drive to this object ?</link_hard_drive_confirm>
@@ -1995,9 +2027,11 @@ The message delivery transport name is the first field in the entry in the maste
 <main.cf_explain>Read the main configuration file generated and executed by Postfix</main.cf_explain>
 <maintenance>maintenance</maintenance>
 <main_interfaces>Main Interfaces</main_interfaces>
+<main_parameters>Main parameters</main_parameters>
 <main_settings>Main settings</main_settings>
 <main_settings_samba>Global configuration</main_settings_samba>
 <main_settings_text>Define global parameters of the software, personalize daemons processes and tune performances</main_settings_text>
+<make_samba_ad_text>If enabled, this server will be a member of your Active Directory server.[br]In this case Active Directory members will have access to this server services eg Proxy, File sharing...</make_samba_ad_text>
 <MalwarePatrol>Malware Patrol</MalwarePatrol>
 <MalwarePatrol_text>Malware Patrol is a free, automated and user contributed system for verifying URLs for the presence of Viruses, Trojans, Worms, or any other software considered Malware.</MalwarePatrol_text>
 <manage>Manage</manage>
@@ -2043,6 +2077,7 @@ It allows the Windows 2000 ACL editor to correctly use inheritance with the Samb
 If you use normal proxy with LDAP Authentication you will be able to match organizations groups to your filtering rules.</MAP_USERS_RULES_DANSGUARDIAN_TEXT>
 <mark_all_events_has_read>Mark all events has read</mark_all_events_has_read>
 <mark_has_read>Mak this event has read</mark_has_read>
+<master_panel>Master panel</master_panel>
 <match>match</match>
 <Matches>Matches</Matches>
 <match_in>Match in</match_in>
@@ -2060,6 +2095,7 @@ See also "queue run delay".[/i]
 <maximal_queue_lifetime_text>The maximal time a message is queued before it is sent back as undeliverable.[br]
 [strong]Time units: s (seconds), m (minutes), h (hours), d (days), w (weeks).[/strong]
 The default time unit is d (days).[br]Specify 0 when mail delivery should be tried only once</maximal_queue_lifetime_text>
+<maximal_time>Maximal time</maximal_time>
 <maximum>Maximum</maximum>
 <MaxReqLength>Scan size limit</MaxReqLength>
 <MaxReqLength_text>maximum size of the objects to be scanned (default 5Mb = 5120000)</MaxReqLength_text>
@@ -2104,6 +2140,7 @@ This parameter also limits the time an unreachable destination is kept in the sh
 [i]This parameter should be set greater than or equal to  "queue run delay".[br] See also "maximal backoff time".[/i]
 [strong]Time units: s (seconds), m (minutes), h (hours), d (days), w (weeks). The default time unit is s (seconds).[/strong]
 </minimal_backoff_time_text>
+<minimal_time>Minimal time</minimal_time>
 <minutes>minutes</minutes>
 <missing>missing</missing>
 <mobile>mobile phone</mobile>
@@ -2190,6 +2227,8 @@ The default is to use the local machine name, $myhostname, which defaults to the
 <name_the_new_account_field>Type the unique identifier of the new account</name_the_new_account_field>
 <name_the_new_account_title>The new unique identifier</name_the_new_account_title>
 <nb_domains>domains num.</nb_domains>
+<nb_fetchmails>Number of fetched emails</nb_fetchmails>
+<nb_fetchmails_size>Size of fetched emails</nb_fetchmails_size>
 <need>need</need>
 <netbiosname>Netbios name</netbiosname>
 <netbiosname_text>The NetBIOS name that samba uses doesn't really have anything to do with the hostname of the system,
@@ -2248,6 +2287,7 @@ don't forget to - Save & Apply settings - to make them in production mode</notif
 <no_backup>No backup container</no_backup>
 <NO_CONFIG_FILE>No configuration file found</NO_CONFIG_FILE>
 <no_errors>Currently, there are no errors</no_errors>
+<NO_ESSID>No Access Points or Ad-Hoc cells</NO_ESSID>
 <no_group>No group</no_group>
 <no_group_affected>Not affected group</no_group_affected>
 <no_icap_support>No ICAP Support</no_icap_support>
@@ -2262,11 +2302,14 @@ don't forget to - Save & Apply settings - to make them in production mode</notif
 <no_privileges>You have not enough privileges to perform this operation</no_privileges>
 <no_rules>No rules saved..</no_rules>
 <NO_RULESNUMBER_DANS_EXPLAIN>You need to create at least one Dansguardian rule to use this option</NO_RULESNUMBER_DANS_EXPLAIN>
+<no_squid_network>No network set</no_squid_network>
+<no_squid_network_text>Currently, no network set in the main configuration, Squid will refuse any connexion</no_squid_network_text>
 <no_usb_devices_connected>There is no USB devices connected on this computer</no_usb_devices_connected>
 <nsAIMid>AOL Instant Messenger (AIM)</nsAIMid>
 <nsICQid>ICQ</nsICQid>
 <nsMSNid>MSN</nsMSNid>
 <nsYahooid>Yahoo</nsYahooid>
+<ntp_about>NTPD is designed to synchronize the clocks of computers over a network to a common timebase (usually UTC) via NTP Protocol</ntp_about>
 <nt_acl_support>NT ACL support</nt_acl_support>
 <nt_acl_support_text>map UNIX permissions into Windows NT access control lists</nt_acl_support_text>
 <NT_STATUS_ACCESS_DENIED>Error:Access Denied</NT_STATUS_ACCESS_DENIED>
@@ -2382,6 +2425,7 @@ or until further truncation is not possible.(eg:192.168.1.0/24)
 <pcfg_title1>Basic Configuration</pcfg_title1>
 <pcfg_title2>View main.cf</pcfg_title2>
 <pcfg_title3>View master.cf</pcfg_title3>
+<percentage>percentage</percentage>
 <performances_settings>Performances</performances_settings>
 <performances_settings_text>All settings that could accelerate postfix processes</performances_settings_text>
 <perform_operation_ask>Perform this operation ?</perform_operation_ask>
@@ -2520,6 +2564,7 @@ This is because Postfix needs to open lookup tables ahead of time, but the reade
 <qmgr_message_recipient_minimum>qmgr message recipient minimum</qmgr_message_recipient_minimum>
 <qmgr_message_recipient_minimum_text>The minimal number of in-memory recipients for any message. This takes priority over any other in-memory recipient limits (i.e., the global "qmgr message recipient limit" and the per "transport recipient limit") if necessary.[br]
 [strong]The minimum value allowed for this parameter is 1.[/strong]</qmgr_message_recipient_minimum_text>
+<quality>quality</quality>
 <Quarantine>Quarantine</Quarantine>
 <quarantine>quarantine</quarantine>
 <quarantinem>quarantine</quarantinem>
@@ -2536,6 +2581,7 @@ This is because Postfix needs to open lookup tables ahead of time, but the reade
 <quarantine_reports>Quarantine reports</quarantine_reports>
 <quarantine_size>Storage size</quarantine_size>
 <quarterly>Quartely</quarterly>
+<queries>Queries</queries>
 <query>query</query>
 <query_quarantine>Query your quarantine</query_quarantine>
 <query_quarantine_text>Find mails stored in a specific area and release them.</query_quarantine_text>
@@ -2594,6 +2640,26 @@ See also "maximal backoff time".
 <refresh>Refresh</refresh>
 <refresh time>refresh time</refresh time>
 <refresh_database_each>Refresh the database each</refresh_database_each>
+<refresh_pattern_intro>This section controls the disk cache only indirectly.[br]
+ It helps Squid decide whether or not a given request can be a cache hit or must be treated as a miss.[br]
+ Liberal settings increase your cache hit ratio but also increase the chance that users receive a stale response.[br]
+ Conservative settings, on the other hand, decrease hit ratios and stale responses.
+ </refresh_pattern_intro>
+<refresh_pattern_max>upper limit on how long objects without an explicit expiry time will be considered fresh</refresh_pattern_max>
+<refresh_pattern_min>Time (in minutes), an object without an explicit expire time should be considered fresh.</refresh_pattern_min>
+<refresh_pattern_option>[ul]
+[li][b]override-expire[/b][br]
+ When set, this option causes Squid to check the min value before checking the Expires header.[br]
+Thus, a non-zero min time makes Squid return an unvalidated cache hit even if the response is preexpired.[br][/li]
+[li][b]override-lastmod[/b][br]
+When set, this option causes Squid to check the min value before the LM-factor percentage.[br][/li]
+[li][b]reload-into-ims[/b][br]
+When set, this option makes Squid transform a request with a no-cache directive into a validation (If-Modified-Since) request. In other words, Squid adds an If-Modified-Since header to the request before forwarding it on. Note that this only works for objects that have a Last-Modified timestamp. The outbound request retains the no-cache directive, so that it reaches the origin server.[br][/li]
+[li][b]ignore-reload[/b][br]
+When set, this option causes Squid to ignore the no-cache directive, if any, in the request.[br][/li][/ul]
+</refresh_pattern_option>
+<refresh_pattern_pourc>percentage of the objects age (time since last modification age) an object without explicit expire time will be considered fresh.</refresh_pattern_pourc>
+<refresh_pattern_site>Give the webiste name that enable the rule.[br]Should be www.company.tm or company.tm or company.*</refresh_pattern_site>
 <regex_filter_explain> * caracter is supported. If you want to use regex operation, prepend the line width [code][b]REGEX:[b][/code]</regex_filter_explain>
 <region>Region</region>
 <register>Register</register>
@@ -2798,6 +2864,7 @@ in a SASL password LDAP, and if a username/password is found, it will use that u
 <saved_settings>Saved configuration</saved_settings>
 <save_configuration_file>Saving configuration</save_configuration_file>
 <save_task>Save task</save_task>
+<SCANNING>Scanning</SCANNING>
 <scanning_your_network>Scanning your network</scanning_your_network>
 <schedule>schedule</schedule>
 <scheduled>Scheduled</scheduled>
@@ -3224,11 +3291,13 @@ by changing 5xx reply codes into 4xx. However, this option is no cure for addres
 <squid_advanced_parameters>Squid Advanced settings</squid_advanced_parameters>
 <squid_advanced_parameters_text>Tweaks and tunings about SQUID Advanced settings</squid_advanced_parameters_text>
 <squid_events>Squid Events</squid_events>
+<squid_filter_stats_text>Create filter in order to display specifics events</squid_filter_stats_text>
 <squid_main_settings>Squid-cache settings</squid_main_settings>
 <SQUID_NEWVERSION>New Squid-cache version</SQUID_NEWVERSION>
 <SQUID_NEWVERSION_TEXT>A new squid cache version is vailable in artica update server,it is recommended to upgrade to this version</SQUID_NEWVERSION_TEXT>
 <SQUID_NOT_COMPILED_NTLM_RUN_RECONFIGURE>Squid is not compiled with NTLM directive, if you want to use authentication trough NT Domain, you must upgrade SQUID[br]
 Click on the button below in ordre to perform this operation</SQUID_NOT_COMPILED_NTLM_RUN_RECONFIGURE>
+<squid_refresh_pattern_explain>This is the way how the websites objects in the cache be refreshed</squid_refresh_pattern_explain>
 <squid_sizelimit>Headers/Page size limits</squid_sizelimit>
 <squid_status>Squid Status</squid_status>
 <srv_artica>Artica service</srv_artica>
@@ -3348,10 +3417,13 @@ example : user.name@domain.tlb -> domain.tlb
 <text_add_entity>Give the name of the new entity:</text_add_entity>
 <text_logs>This is realtime logs of the current daemon of Kaspersky For Mail server[br]These page is refresh every 5 seconds</text_logs>
 <then>then</then>
+<this_month>This month</this_month>
 <this_not_a_samba_user>This user did not have share access</this_not_a_samba_user>
 <this_not_a_samba_user_explain>Currently this user cannot browse local shared folders until Share access is not activated.[br]
 If you want to activate share access, click on the button bellow.</this_not_a_samba_user_explain>
+<this_server_is_an_ad_member>This server is currently a member of an Active Directory server</this_server_is_an_ad_member>
 <this_server_store>This server store</this_server_store>
+<this_week>this week</this_week>
 <thursday>Thursday</thursday>
 <time>time</time>
 <Timeout for receiving response from UDS server>Timeout for receiving response from UDS server (in seconds)</Timeout for receiving response from UDS server>
@@ -3623,6 +3695,7 @@ The rules for transferring (routing) are set in this section.[br]
 <upload_max_filesize>Max uploading files size</upload_max_filesize>
 <upload_new_license>Upload a new license</upload_new_license>
 <uptime>UpTime</uptime>
+<uri_dnsbl>DNSBL uri</uri_dnsbl>
 <urls>urls</urls>
 <url_regex_popup_import_explain>Copy and Paste on the text area below all web sites you want to block.[br]Each web site must be separated by a carriage return</url_regex_popup_import_explain>
 <usb_external_drive>External USB disk</usb_external_drive>
@@ -3681,6 +3754,7 @@ In the url the "%f" can be used to specify the real name of downloaded file</Vir
 <VirSaveDir_text>The directory where the downloaded files stored.[br]Must be a directory where a web server has access.</VirSaveDir_text>
 <virtual_disks>Virtual disks</virtual_disks>
 <virtual_interfaces>Virtual Network Interfaces</virtual_interfaces>
+<virtual_memory>Virtual Memory</virtual_memory>
 <virus>virus</virus>
 <VIRUSES_FOUND>Viruse(s) found!</VIRUSES_FOUND>
 <VIRUSES_FOUND_TEXT>Viruses are found on your server or computers, check events to display threats</VIRUSES_FOUND_TEXT>
@@ -3705,6 +3779,7 @@ In the url the "%f" can be used to specify the real name of downloaded file</Vir
 <webserver_parameters_text>Enable/Disable personalize the dedicated web server engine</webserver_parameters_text>
 <website>Web site</website>
 <websites>Web sites</websites>
+<website_name>Website name</website_name>
 <web_filter>Web filter</web_filter>
 <web_proxy>Web Proxy</web_proxy>
 <web_proxy_text>Configure your web proxy server</web_proxy_text>
@@ -3714,14 +3789,20 @@ In the url the "%f" can be used to specify the real name of downloaded file</Vir
 <weekly>Weekly</weekly>
 <WELCOME>Welcome on Artica-Postfix</WELCOME>
 <welcomeb>welcome</welcomeb>
+<when>when</when>
 <WHEN_TO_BACKUP>When to backup ?</WHEN_TO_BACKUP>
 <WHEN_TO_BACKUP_TEXT>Define the schedule of the backup execution</WHEN_TO_BACKUP_TEXT>
 <white list>White List</white list>
 <white list explain>Managing the list of trusted addresses.[br] Messages from these addresses are not checked for the presence of spam signs</white list explain>
 <width>width</width>
 <width_action>width</width_action>
+<WifiConnectAPDisabled>Wifi Access Point Client mode is not activated</WifiConnectAPDisabled>
+<WIFI_ARTICA_EXPLAIN>This is the section that helps you to set your WIFI network[br]
+If necessaries modules are installed you will be able to create a Wireless Access Point or to connect this server to a Wifi network</WIFI_ARTICA_EXPLAIN>
+<wifi_networks>WIFI Network Access Points</wifi_networks>
 <will_deleted_apply_config>Delete after apply configuration</will_deleted_apply_config>
 <winbindd_installed>Winbind daemon installed</winbindd_installed>
+<WINBINDD_NOT_INSTALLED_TEXT>Winbindd daemon is not installed, until this daemon does not exists, you will not allowed to enable the feature.[br]Go to setup Center and upgrade Samba daemon</WINBINDD_NOT_INSTALLED_TEXT>
 <with>with</with>
 <with_error>with the error</with_error>
 <wizard1_welcome>Welcome on artica-postfix first settings</wizard1_welcome>

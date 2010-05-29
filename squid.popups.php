@@ -8,8 +8,7 @@
 	include_once('ressources/class.tcpip.inc');
 	
 	$user=new usersMenus();
-	
-	$user=new usersMenus();
+
 	if($user->SQUID_INSTALLED==false){
 		$tpl=new templates();
 		echo "alert('". $tpl->javascript_parse_text("{ERROR_NO_PRIVS}")."');";
@@ -73,27 +72,35 @@
 	
 	function network_js(){
 		$page=CurrentPageName();
+		$tpl=new templates();
+		$your_network=$tpl->_ENGINE_parse_body("{your_network}");
 		echo "
-		YahooWin2(450,'$page?content=network','Network...','');
+		YahooWin2(500,'$page?content=network','$your_network','');
 		
 		
 		var x_netadd= function (obj) {
 			var results=obj.responseText;
-			alert(results);
-			YahooWin2(450,'$page?content=network','Network...','');
+			if(results.length>0){alert(results);}
+			YahooWin2(500,'$page?content=network','$your_network','');
 		}
 		
 		function netadd(){
 			var XHR = new XHRConnection();
 			XHR.appendData('addipfrom',document.getElementById('from_ip').value);
 			XHR.appendData('addipto',document.getElementById('to_ip').value);
+			document.getElementById('squid_network_id').innerHTML='<center style=\"width:100%\"><img src=img/wait_verybig.gif></center>';
 			XHR.sendAndLoad('$page', 'GET',x_netadd);	
 		}
 		
 		function NetDelete(num){
 			var XHR = new XHRConnection();
 			XHR.appendData('NetDelete',num);
+			document.getElementById('squid_network_id').innerHTML='<center style=\"width:100%\"><img src=img/wait_verybig.gif></center>';
 			XHR.sendAndLoad('$page', 'GET',x_netadd);	
+		}
+		
+		function SquidnetaddCheck(e){
+			if(checkEnter(e)){netadd();}
 		}
 		";
 		
@@ -626,6 +633,7 @@ echo $tpl->_ENGINE_parse_body($html,'squid.index.php');
 			if(results.length>0){alert(results);}
 			YahooWin2Hide();
 			RefreshTab('squid_main_config');
+			RefreshLeftMenu();
 			}		
 		
 		function save_plugins(){
@@ -698,7 +706,7 @@ function plugins_popup(){
 	$squid=new squidbee();
 	$users=new usersMenus();
 	
-	$kav=Paragraphe_switch_disable('{enable_kavproxy}',"{feature_not_installed}<br><strong style='color:red'>$squid->kav_accept_why</strong>",'{feature_not_installed}');
+	
 	$dans=Paragraphe_switch_disable('{enable_dansguardian}','{feature_not_installed}','{feature_not_installed}');	
 	$cicap=Paragraphe_switch_disable('{enable_c_icap}','{feature_not_installed}','{feature_not_installed}');
 	$squidguard=Paragraphe_switch_disable('{enable_squidguard}','{feature_not_installed}','{feature_not_installed}');
@@ -706,8 +714,10 @@ function plugins_popup(){
 	
 	//C_ICAP_INSTALLED
 	
-	if($squid->kav_accept){
+	if($squid->isicap()){
 		$kav=Paragraphe_switch_img("{enable_kavproxy}","{enable_kavproxy_text}",'enable_kavproxy',$squid->enable_kavproxy,'{enable_disable}',250);
+	}else{
+		$kav=Paragraphe_switch_disable('{enable_kavproxy}',"{feature_not_installed}<br><strong style='color:red'>$squid->kav_accept_why</strong>",'{feature_not_installed}');		
 	}
 		
 	if($users->C_ICAP_INSTALLED){
@@ -911,11 +921,7 @@ function CalculCDR(){
 	if(!$squid->SaveToLdap()){
 		echo $squid->ldap_error;
 		exit;
-	}else{
-		$tpl=new templates();
-		echo $tpl->_ENGINE_parse_body('Network:{success}');
 	}
-	
 	}
 
 	
@@ -925,10 +931,7 @@ function CalculCDR(){
 		if(!$squid->SaveToLdap()){
 			echo $squid->ldap_error;
 			exit;
-		}else{
-			$tpl=new templates();
-			echo $tpl->_ENGINE_parse_body('Network:{success}');
-		}		
+		}	
 		
 	}
 	
@@ -957,45 +960,52 @@ $squid=new squidbee();
 				<td><strong style='font-size:13px'>$ligne</strong></td>
 				<td width=1%>" . imgtootltip('ed_delete.gif','{delete}',"NetDelete($num)")."</td>
 			</tr>
-			
+			<tr>
+				<td colspan=3><hr></td>
+			</tr>
 			";
 			
 			
 		}
 		
 		
-		$list=RoundedLightGreen("<table style='width:100%'>$list</table>");
+		$list="<table style='width:100%;'>$list</table>";
 		
 		
 		$form="
-		<H3>{allow_network}</H3><br>
+		<div id='squid_network_id'>
+		<p class=caption style='font-size:13px'>{your_network_text}</p>
+		<div style='font-size:13px;font-weight:bold'>{allow_network}:</div><br>
 		<table style='width:100%'>
 			<tr>
-			<td class=legend nowrap>{from_ip}:</td>
-			<td>" . Field_text('from_ip',null,'width:95px')."</td>
+			<td valign='top' style='padding:4xp'>
+			<div style='padding:2px;border:1px solid #CCCCCC;height:225px;overflow:auto'>$list</div></td>
+			<td valign='top' style='padding:4xp'>
+				<table style='width:100%;padding:3px;border:1px solid #CCCCCC'>
+					<tr>
+					<td class=legend nowrap style='font-size:13px'>{from_ip}:</td>
+					<td>" . Field_text('from_ip',null,'width:120px;font-size:13px;padding:3px',null,null,null,false,"SquidnetaddCheck(event)")."</td>
+					</tr>
+					<tr>
+					<td class=legend style='font-size:13px'>{to_ip}:</td>
+					<td>" . Field_text('to_ip',null,'width:120px;font-size:13px;padding:3px',null,null,null,false,"SquidnetaddCheck(event)")."</td>
+					</tr>
+					<tr>
+					<td colspan=2 align='right'>
+					<hr>
+						". button("{add}","netadd()")."
+					</tr>
+					</table>	
+				</td>		
 			</tr>
-			<tr>
-			<td class=legend>{to_ip}:</td>
-			<td>" . Field_text('to_ip',null,'width:95px')."</td>
-			</tr>
-			<tr>
-			<td colspan=2 align='right'><input type='button' OnClick=\"javascript:netadd();\" value='{add}&nbsp;&raquo;'></td>
-			</tr>
-			
-			
-		</table>			
-		
+		</table>
+		</div>
 		";
 		
-		$form=RoundedLightWhite($form);
 		
 		
-		$html="<H1>{your_network}</H1>
-			<p class=caption>{your_network_text}</p>
-				$form
-			<br>
-			$list
-		";
+		
+		$html=$form;
 		
 		$tpl=new templates();
 		echo $tpl->_ENGINE_parse_body($html,'squid.index.php');

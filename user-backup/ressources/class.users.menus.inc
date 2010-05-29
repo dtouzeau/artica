@@ -276,6 +276,7 @@ class usersMenus {
 	var $ALTERMIME_INSTALLED=false;
 	var $POMMO_INSTALLED=false;
 	var $C_ICAP_INSTALLED=false;
+	var $C_ICAP_DNSBL=false;
 	var $MILTERGREYLIST_SOCKET="";
 	var $OPENVPN_INSTALLED=false;
 	var $spamassassin_conf_path="";
@@ -510,6 +511,7 @@ class usersMenus {
 			$this->dar_installed=$_GLOBAL["dar_installed"];
 			$this->SAMBA_VERSION=$_GLOBAL["SAMBA_VERSION"];
 			$this->C_ICAP_INSTALLED=$_GLOBAL["C_ICAP_INSTALLED"];
+			$this->C_ICAP_DNSBL=$_GLOBAL["C_ICAP_DNSBL"];
 			$this->MILTERGREYLIST_SOCKET=$_GLOBAL["MILTERGREYLIST_SOCKET"];
 			$this->OPENVPN_INSTALLED=$_GLOBAL["OPENVPN_INSTALLED"];
 			$this->GNARWL_INSTALLED=$_GLOBAL["GNARWL_INSTALLED"];
@@ -1202,7 +1204,8 @@ private function roundcube_detect_version(){
 			
 
 		
-		$array["{index page}"]="javascript:document.location.href='users.index.php'";
+		$array["{index page}"]["MAIN"]="javascript:document.location.href='users.index.php'";
+		$array["{index page}"]["SUB"]["{master_panel}"]="javascript:document.location.href='users.index.php';";
 	
 
 			
@@ -1281,7 +1284,8 @@ private function roundcube_detect_version(){
 			
 		if($this->AsSambaAdministrator==true){if($this->SAMBA_INSTALLED){
 			$array["{fileshare}"]["MAIN"]="javascript:Loadjs('fileshares.index.php?js=yes')";}
-			$array["{fileshare}"]["SUB"]["{main_parameters}"]="javascript:Loadjs('samba.index.php?script=smbpop');";
+			$array["{fileshare}"]["SUB"]["{main_parameters}"]="javascript:Loadjs('fileshares.index.php?js=yes');";
+			$array["{fileshare}"]["SUB"]["{APP_SAMBA}"]="javascript:Loadjs('samba.index.php?script=smbpop');";
 			$array["{fileshare}"]["SUB"]["{explorer}"]="javascript:Loadjs('tree.php');";
 			$array["{fileshare}"]["SUB"]["{SHARE_FOLDER}"]="javascript:Loadjs('SambaBrowse.php');";
 			$array["{fileshare}"]["SUB"]["{computers}"]="javascript:Loadjs('computer-browse.php');";
@@ -1298,6 +1302,10 @@ private function roundcube_detect_version(){
 			if($this->SQUIDGUARD_INSTALLED){
 				$array["{web_proxy}"]["SUB"]["{DANSGUARDIAN_RULES}"]="javascript:Loadjs('dansguardian.index.php?js=yes')";
 
+			}
+			
+			if($this->C_ICAP_INSTALLED){
+				$array["{web_proxy}"]["SUB"]["{DANSGUARDIAN_RULES}"]="javascript:Loadjs('dansguardian.index.php?js=yes')";
 			}
 
 			$array["{web_proxy}"]["SUB"]["{statistics}"]="javascript:Loadjs('squid.statistics.php')";
@@ -1317,7 +1325,7 @@ private function roundcube_detect_version(){
 						$array["{messaging}"]["SUB"]["{APP_AMAVIS}"]="javascript:Loadjs('amavis.index.php?ajax=yes')";
 					}
 				}
-				$array["{messaging}"]["SUB"]["{postfix_events}"]="s_PopUp(\"postfix.events.php?pop=true\",450,400)";
+				$array["{messaging}"]["SUB"]["{postfix_events}"]="javascript:s_PopUp(\"postfix.events.php?pop=true\",450,400)";
 				
 			}
 		
@@ -1329,9 +1337,24 @@ private function roundcube_detect_version(){
 		if($this->POSTFIX_INSTALLED){if($this->AsPostfixAdministrator==true && $this->mailgraph_installed==true){$array["Mailman"]="mailman.index.php";}}
 		if($this->AllowViewStatistics==true){
 			$array["{statistics}"]["MAIN"]="javascript:Loadjs('statistics.index.php')";
-			$array["{statistics}"]["SUB"]["{web_proxy}"]="javascript:Loadjs('squid.statistics.php')";
+			$array["{statistics}"]["SUB"]["{master_panel}"]="javascript:Loadjs('statistics.index.php')";
+
+			if($this->SQUID_INSTALLED){
+				$array["{statistics}"]["SUB"]["{web_proxy}"]="javascript:Loadjs('squid.statistics.php')";
+			}
 		
-		}		
+		}	
+
+		if($this->AsAnAdministratorGeneric){
+			$array["{events}"]["MAIN"]="";
+			if($this->POSTFIX_INSTALLED){
+				$array["{events}"]["SUB"]["{messaging}"]="javascript:s_PopUp(\"postfix.events.php?pop=true\",450,400";
+			}
+			if($this->fetchmail_installed){
+				$array["{events}"]["SUB"]["fetchmail"]="javascript:Loadjs('fetchmail.events.php');";
+			}
+		}
+		
 		$menus=$this->BuildArticaMenus($array,$sub_array_pages);
 		$this->toplinks=$menus;
 		return $menus;
@@ -1409,15 +1432,16 @@ private function roundcube_detect_version(){
 			active: false,
 			header: '.head',
 			navigation: true,
-			event: 'mouseover',
+			event: 'click',
 			fillSpace: true,
 			clearStyle: true,
-			animated: 'easeslide'});
+			animated: 'bounceslide'});
 		});
 		</script>";
 		return implode("\n",$html);
 		
-	
+	 //animated: 'bounceslide'
+	 // animated: 'easeslide'  
 	}
 	
 	

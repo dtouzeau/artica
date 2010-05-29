@@ -1319,12 +1319,6 @@ RegExpr.expression:='^MailBoxRemoteSync:(.+)';
     end;
 
 
-     RegExpr.expression:='ChangeHostName:(.+)';
-     if RegExpr.Exec(uri) then begin
-         GLOBAL_INI.SYSTEM_NETWORKS_SET_HOSTNAME(RegExpr.Match[1]);
-         exit(true);
-     end;
-
 
 
    RegExpr.expression:='install_app:(.+)';

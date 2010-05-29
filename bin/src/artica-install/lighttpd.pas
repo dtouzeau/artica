@@ -183,9 +183,9 @@ begin
  exit;
  php_path:=SYS.LOCATE_PHP5_SESSION_PATH();
  if not DirectoryExists(php_path) then exit;
-      logs.Debuglogs('Starting lighttpd............: Cleaning php sessions');
+      logs.Debuglogs('Starting......: lighttpd: Cleaning php sessions');
       SYS.DirFiles(php_path,'sess_*');
-      logs.Debuglogs('Starting lighttpd............: '+ INtTOstr(SYS.DirListFiles.Count)+' files to clean');
+      logs.Debuglogs('Starting......: lighttpd: '+ INtTOstr(SYS.DirListFiles.Count)+' files to clean');
       for i:=0 to SYS.DirListFiles.Count-1 do begin
           logs.DeleteFile(php_path+'/'+SYS.DirListFiles.Strings[i]);
       end;
@@ -360,15 +360,15 @@ begin
    end;
 
           if not SET_PHP_CGI_BINPATH() then begin
-             logs.Debuglogs('Starting lighttpd............:  fatal error while setting lighttpd.conf');
+             logs.Debuglogs('Starting......: lighttpd:  fatal error while setting lighttpd.conf');
              exit;
           end;
 
-          logs.Debuglogs('Starting lighttpd............:  Checking pommo aliases');
+          logs.Debuglogs('Starting......: lighttpd:  Checking pommo aliases');
           POMMO_ALIASES();
           forcedirectories('/var/run/lighttpd');
           if length(logs_path)>0 then forcedirectories(logs_path);
-          logs.Debuglogs('Starting lighttpd............:  Checking securities on '+user+':'+group);
+          logs.Debuglogs('Starting......: lighttpd:  Checking securities on '+user+':'+group);
           logs.OutputCmd('/bin/chown -R '+user+':'+group+' /var/run/lighttpd');
           logs.OutputCmd('/bin/chown -R '+user+':'+group+' '+ logs_path);
 
@@ -408,7 +408,7 @@ logs.Debuglogs('###################### LIGHTTPD #####################');
    end;
 
 
-   logs.Debuglogs('Starting lighttpd............: lighttpd launching process1 for writing settings');
+   logs.Debuglogs('Starting......: lighttpd: lighttpd launching process1 for writing settings');
    fpsystem('/usr/share/artica-postfix/bin/process1 --force &');
    logs.DeleteFile('/var/log/lighttpd/error.log');
 
@@ -441,7 +441,7 @@ logs.Debuglogs('###################### LIGHTTPD #####################');
    fpsystem('/bin/chown -R '+user+':'+group+' /usr/share/artica-postfix/user-backup/ressources');
 
    if DirectoryExists('/usr/share/zarafa-webaccess') then begin
-        logs.Debuglogs('Starting lighttpd............: fixing permissions on Zarafa');
+        logs.Debuglogs('Starting......: lighttpd: fixing permissions on Zarafa');
         ForceDirectories('/var/lib/zarafa-webaccess/tmp');
         fpsystem('/bin/chmod -R 755 /usr/share/zarafa-webaccess');
         fpsystem('/bin/chmod -R 755 /var/lib/zarafa-webaccess/tmp');
@@ -457,25 +457,25 @@ logs.Debuglogs('###################### LIGHTTPD #####################');
    if FileExists(LIGHTTPD_INITD()) then begin
        if not SYS.PROCESS_EXIST(pid) then begin
           LIGHTTPD_VERIF_CONFIG();
-          logs.Debuglogs('Starting lighttpd............: user.........:'+user);
-          logs.Debuglogs('Starting lighttpd............: group........:'+group);
-          logs.Debuglogs('Starting lighttpd............: pid..........:'+pid);
-          logs.Debuglogs('Starting lighttpd............: Port.........:' + LIGHTTPD_LISTEN_PORT());
-          logs.Debuglogs('Starting lighttpd............: logs path....:'+LIGHTTPD_LOG_PATH());
-          logs.Debuglogs('Starting lighttpd............: Socket path..:'+LIGHTTPD_SOCKET_PATH());
-          logs.Debuglogs('Starting lighttpd............: php5-cgi path:'+PHP5_CGI_BIN_PATH());
-          logs.Debuglogs('Starting lighttpd............: php client...:' + SYS.LOCATE_PHP5_BIN());
-          logs.Debuglogs('Starting lighttpd............: certificate..:'+LIGHTTPD_CERTIFICATE_PATH());
-          logs.Debuglogs('Starting lighttpd............: php ext dir..:' + SYS.LOCATE_PHP5_EXTENSION_DIR());
-          logs.Debuglogs('Starting lighttpd............: php ext conf.:' + SYS.LOCATE_PHP5_EXTCONF_DIR());
-          logs.Debuglogs('Starting lighttpd............: php session.:' + SYS.LOCATE_PHP5_SESSION_PATH());
+          logs.Debuglogs('Starting......: lighttpd: user.........:'+user);
+          logs.Debuglogs('Starting......: lighttpd: group........:'+group);
+          logs.Debuglogs('Starting......: lighttpd: pid..........:'+pid);
+          logs.Debuglogs('Starting......: lighttpd: Port.........:' + LIGHTTPD_LISTEN_PORT());
+          logs.Debuglogs('Starting......: lighttpd: logs path....:'+LIGHTTPD_LOG_PATH());
+          logs.Debuglogs('Starting......: lighttpd: Socket path..:'+LIGHTTPD_SOCKET_PATH());
+          logs.Debuglogs('Starting......: lighttpd: php5-cgi path:'+PHP5_CGI_BIN_PATH());
+          logs.Debuglogs('Starting......: lighttpd: php client...:' + SYS.LOCATE_PHP5_BIN());
+          logs.Debuglogs('Starting......: lighttpd: certificate..:'+LIGHTTPD_CERTIFICATE_PATH());
+          logs.Debuglogs('Starting......: lighttpd: php ext dir..:' + SYS.LOCATE_PHP5_EXTENSION_DIR());
+          logs.Debuglogs('Starting......: lighttpd: php ext conf.:' + SYS.LOCATE_PHP5_EXTCONF_DIR());
+          logs.Debuglogs('Starting......: lighttpd: php session.:' + SYS.LOCATE_PHP5_SESSION_PATH());
 
           if IS_IPTABLES_INPUT_RULES() then begin
-              logs.Debuglogs('Starting lighttpd............: this just an information that you have some');
-              logs.Debuglogs('Starting lighttpd............: Firewall rules activated (iptables)');
-              logs.Debuglogs('Starting lighttpd............: If you want to access to web page');
-              logs.Debuglogs('Starting lighttpd............: Be sure that you have enabled '+LIGHTTPD_LISTEN_PORT() + ' port');
-              logs.Debuglogs('Starting lighttpd............: In your firwall....');
+              logs.Debuglogs('Starting......: lighttpd: this just an information that you have some');
+              logs.Debuglogs('Starting......: lighttpd: Firewall rules activated (iptables)');
+              logs.Debuglogs('Starting......: lighttpd: If you want to access to web page');
+              logs.Debuglogs('Starting......: lighttpd: Be sure that you have enabled '+LIGHTTPD_LISTEN_PORT() + ' port');
+              logs.Debuglogs('Starting......: lighttpd: In your firwall....');
           end;
 
 
@@ -491,11 +491,11 @@ logs.Debuglogs('###################### LIGHTTPD #####################');
 
 
    if not SYS.PROCESS_EXIST(LIGHTTPD_PID()) then begin
-      logs.Debuglogs('Starting lighttpd............: Failed');
+      logs.Debuglogs('Starting......: lighttpd: Failed');
       if not notroubleshoot then TROUBLESHOTLIGHTTPD();
       end else begin
       fpsystem(SYS.LOCATE_PHP5_BIN()+' /usr/share/artica-postfix/exec.apc.compile.php');
-      logs.Debuglogs('Starting lighttpd............: Success (PID ' + LIGHTTPD_PID() + ')');
+      logs.Debuglogs('Starting......: lighttpd: Success (PID ' + LIGHTTPD_PID() + ')');
       IS_CGI_SPAWNED();
 
       end;
@@ -537,7 +537,7 @@ l.add('$cfg["SaveDir"] = "";');
 l.add('?>');
 logs.WriteToFile(l.Text,'/usr/share/phpmyadmin/config.inc.php');
 l.free;
-logs.Debuglogs('Starting lighttpd............: Success writing phpmyadmin configuration');
+logs.Debuglogs('Starting......: lighttpd: Success writing phpmyadmin configuration');
 if DirectoryExists('/usr/share/phpmyadmin/setup') then fpsystem('/bin/rm -rf /usr/share/phpmyadmin/setup');
 if DirectoryExists('/usr/share/phpmyadmin/config') then fpsystem('/bin/rm -rf /usr/share/phpmyadmin/config');
 
@@ -557,18 +557,18 @@ var
    i:integer;
 begin
     if not FileExists('/var/log/lighttpd/error.log') then begin
-       logs.Debuglogs('Starting lighttpd............: unable to stat /var/log/lighttpd/error.log (line 454)');
+       logs.Debuglogs('Starting......: lighttpd: unable to stat /var/log/lighttpd/error.log (line 454)');
        exit;
     end;
     sleep(1000);
     tmpstr:=logs.FILE_TEMP();
     fpsystem('tail -n 2 /var/log/lighttpd/error.log >'+tmpstr +' 2>&1');
     if not fileExists(tmpstr) then begin
-       logs.Debuglogs('Starting lighttpd............: unable to stat '+tmpstr+' (line 461)');
+       logs.Debuglogs('Starting......: lighttpd: unable to stat '+tmpstr+' (line 461)');
        exit;
     end;
 
-    logs.Debuglogs('Starting lighttpd............: testing if cgi is spawned');
+    logs.Debuglogs('Starting......: lighttpd: testing if cgi is spawned');
 
     l:=Tstringlist.Create;
     l.LoadFromFile(tmpstr);
@@ -577,15 +577,15 @@ begin
     RegExpr.Expression:='mod_fastcgi.+?spawning fcgi failed';
     for i:=0 to l.Count-1 do begin
         if RegExpr.Exec(l.Strings[i]) then begin
-            logs.Debuglogs('Starting lighttpd............: spawning fcgi failed !!');
-            logs.Debuglogs('Starting lighttpd............: '+l.Strings[i]);
+            logs.Debuglogs('Starting......: lighttpd: spawning fcgi failed !!');
+            logs.Debuglogs('Starting......: lighttpd: '+l.Strings[i]);
             if SYS.PROCESS_EXIST(SYS.PIDOF('artica-make')) then begin
-               logs.Debuglogs('Starting lighttpd............: stopping artica-make already running');
+               logs.Debuglogs('Starting......: lighttpd: stopping artica-make already running');
                exit;
             end;
             if FIleExists('/usr/share/artica-postfix/ressources/install/APP_PHP.time') then begin
                if SYS.FILE_TIME_BETWEEN_MIN('/usr/share/artica-postfix/ressources/install/APP_PHP.time')<120 then begin
-                    logs.Debuglogs('Starting lighttpd............: need more than 60mn to restart operation');
+                    logs.Debuglogs('Starting......: lighttpd: need more than 60mn to restart operation');
                     exit;
                end;
             end;
@@ -610,13 +610,13 @@ var
    RegExpr:TRegExpr;
    i:integer;
 begin
-logs.Debuglogs('Starting lighttpd............: Try to understand why is doesn''t start');
+logs.Debuglogs('Starting......: lighttpd: Try to understand why is doesn''t start');
 tmpstr:=logs.FILE_TEMP();
 cmd:=LIGHTTPD_BIN_PATH()+ ' -f /etc/lighttpd/lighttpd.conf >' +tmpstr +' 2>&1';
 fpsystem(cmd);
 // SSL: Private key does not match the certificate public key
 if not FileExists(tmpstr) then begin
-        logs.Debuglogs('Starting lighttpd............: could not stat '+ tmpstr);
+        logs.Debuglogs('Starting......: lighttpd: could not stat '+ tmpstr);
         exit;
 end;
 
@@ -628,7 +628,7 @@ for i:=0 to l.Count-1 do begin
     RegExpr.Expression:='SSL.+?Private key does not match the certificate public';
 
     if RegExpr.Exec(l.Strings[i]) then begin
-        logs.Debuglogs('Starting lighttpd............: detecting SSL key error generate new certificat');
+        logs.Debuglogs('Starting......: lighttpd: detecting SSL key error generate new certificat');
         LIGHTTPD_CERTIFICATE();
         LIGHTTPD_START(true);
         break;
@@ -636,7 +636,7 @@ for i:=0 to l.Count-1 do begin
 
     RegExpr.Expression:='can.+?find username\s+';
     if RegExpr.Exec(l.Strings[i]) then begin
-        logs.Debuglogs('Starting lighttpd............: detecting username error generate new configuration file');
+        logs.Debuglogs('Starting......: lighttpd: detecting username error generate new configuration file');
         LIGHTTPD_DEFAULT_CONF_SAVE();
         LIGHTTPD_START(true);
         break;
@@ -646,10 +646,10 @@ for i:=0 to l.Count-1 do begin
     if RegExpr.Exec(l.Strings[i]) then begin
        port:=RegExpr.Match[1];
        tmpstr:=SYS.WHO_LISTEN_PORT(port);
-       logs.Debuglogs('Starting lighttpd............: Another process already using Port: "' + port+'" ('+tmpstr+')');
+       logs.Debuglogs('Starting......: lighttpd: Another process already using Port: "' + port+'" ('+tmpstr+')');
        RegExpr.Expression:='Pid:([0-9]+);';
        if  RegExpr.Exec(tmpstr) then begin
-           logs.Debuglogs('Starting lighttpd............: kill process Pid:'+tmpstr);
+           logs.Debuglogs('Starting......: lighttpd: kill process Pid:'+tmpstr);
            fpsystem('/bin/kill -9 '+RegExpr.Match[1]);
             LIGHTTPD_START(true);
             break;
@@ -659,8 +659,8 @@ for i:=0 to l.Count-1 do begin
 
        RegExpr.Expression:='network.+?SSL.+?error';
        if  RegExpr.Exec(l.Strings[i]) then begin
-           logs.Debuglogs('Starting lighttpd............: FATAL Bug in lighttpd (especially in CentOS 5.4), turn to Apache mode');
-           logs.Debuglogs('Starting lighttpd............: '+l.Strings[i]);
+           logs.Debuglogs('Starting......: lighttpd: FATAL Bug in lighttpd (especially in CentOS 5.4), turn to Apache mode');
+           logs.Debuglogs('Starting......: lighttpd: '+l.Strings[i]);
            SYS.set_INFO('ApacheArticaEnabled','1');
            halt(0);
            break;
@@ -670,7 +670,7 @@ for i:=0 to l.Count-1 do begin
 
 
 
-    logs.Debuglogs('Starting lighttpd............: no error found in "'+l.Strings[i]+'"');
+    logs.Debuglogs('Starting......: lighttpd: no error found in "'+l.Strings[i]+'"');
 
 end;
 
@@ -707,14 +707,14 @@ begin
 
      logs.DeleteFile('/etc/artica-postfix/cache.global.status');
      if SYS.PROCESS_EXIST(LIGHTTPD_PID()) then begin
-        writeln('Stopping lighttpd............: ' + LIGHTTPD_PID() + ' PID..');
+        writeln('Stopping lighttpd: ' + LIGHTTPD_PID() + ' PID..');
         logs.OutputCmd('/bin/kill ' + LIGHTTPD_PID());
         LIGHTTPD_VERIF_CONFIG();
         while SYS.PROCESS_EXIST(LIGHTTPD_PID()) do begin
               sleep(100);
               inc(count);
               if count>100 then begin
-                 writeln('Stopping lighttpd............: Failed force kill');
+                 writeln('Stopping lighttpd: Failed force kill');
                  logs.OutputCmd('/bin/kill -9 '+LIGHTTPD_PID());
                  exit;
               end;
@@ -723,12 +723,12 @@ begin
 
         sleep(1000);
         if not SYS.PROCESS_EXIST(LIGHTTPD_PID()) then begin
-           writeln('Stopping lighttpd............: success');
+           writeln('Stopping lighttpd: success');
         end;
 
       end else begin
         LIGHTTPD_VERIF_CONFIG();
-        writeln('Stopping lighttpd............: Already stopped');
+        writeln('Stopping lighttpd: Already stopped');
      end;
 
 end;
@@ -787,7 +787,7 @@ var
 begin
     result:=false;
     if not FileExists(SYS.LOCATE_IPTABLES()) then begin
-         logs.Debuglogs('Starting lighttpd............: IpTables is not installed');
+         logs.Debuglogs('Starting......: lighttpd: IpTables is not installed');
          exit;
     end;
 tmpstr:=LOGS.FILE_TEMP();
@@ -863,14 +863,14 @@ SYS.OPENSSL_CERTIFCATE_CONFIG();
 
 if Not FileExists('/etc/artica-postfix/ssl.certificate.conf') then begin
    logs.Debuglogs('LIGHTTPD_CERTIFICATE():: unable to stat /etc/artica-postfix/ssl.certificate.conf');
-   logs.Debuglogs('Starting lighttpd............: unable to stat default certificate infos');
+   logs.Debuglogs('Starting......: lighttpd: unable to stat default certificate infos');
    exit;
 end;
 if length(SYS.OPENSSL_CERTIFCATE_HOSTS())>0 then extensions:=' -extensions HOSTS_ADDONS ';
 
 
 
-logs.Debuglogs('starting lighttpd............: Creating certificate using /etc/artica-postfix/ssl.certificate.conf');
+logs.Debuglogs('Starting......: lighttpd: Creating certificate using /etc/artica-postfix/ssl.certificate.conf');
 forcedirectories('/opt/artica/ssl/certs');
 cmd:=openssl_path+' req -new -passin pass:artica -x509 -batch -config /etc/artica-postfix/ssl.certificate.conf '+extensions+'-keyout /opt/artica/ssl/certs/lighttpd.pem -out /opt/artica/ssl/certs/lighttpd.pem -days '+CertificateMaxDays+' -nodes';
 logs.OutputCmd(cmd);
@@ -1041,7 +1041,7 @@ version:string;
 begin
 
 if not DirectoryExists('/usr/share/pommo') then begin
-      Logs.Debuglogs('Starting lighttpd............: PoMMo is not installed, skipping aliases');
+      Logs.Debuglogs('Starting......: lighttpd: PoMMo is not installed, skipping aliases');
       exit;
 end;
 
@@ -1065,16 +1065,16 @@ For i:=0 to l.Count-1 do begin
 end;
 
 if not f then begin
-   Logs.Debuglogs('Starting lighttpd............: PoMMo '+POMMO_VERSION()+' is installed, adding aliases');
+   Logs.Debuglogs('Starting......: lighttpd: PoMMo '+POMMO_VERSION()+' is installed, adding aliases');
    l.Add('alias.url +=("/mailing"  => "/usr/share/pommo/")');
    try
       l.SaveToFile(LIGHTTPD_CONF_PATH());
    except
-      Logs.Syslogs('Starting lighttpd............: PoMMo FATAL ERROR !');
+      Logs.Syslogs('Starting......: lighttpd: PoMMo FATAL ERROR !');
       exit;
    end;
 end else begin
-   Logs.Debuglogs('Starting lighttpd............: PoMMo is installed, aliases already added');
+   Logs.Debuglogs('Starting......: lighttpd: PoMMo is installed, aliases already added');
 end;
  l.free;
  RegExpr.Free;
@@ -1260,7 +1260,7 @@ if not tryStrToint(SYS.GET_INFO('php5UploadMaxFileSize'),php5UploadMaxFileSize) 
    SYS.set_INFO('php5UploadMaxFileSize','256');
 end;
 
-logs.Debuglogs('Starting lighttpd............: Max upload size set to '+IntToStr(php5UploadMaxFileSize)+'M');
+logs.Debuglogs('Starting......: lighttpd: Max upload size set to '+IntToStr(php5UploadMaxFileSize)+'M');
 
 l.Add('upload_max_filesize = '+IntToStr(php5UploadMaxFileSize)+'M');
 l.Add('allow_url_fopen = On');
@@ -1416,12 +1416,12 @@ if DisableEaccelerator=0 then begin
       l.Add('eaccelerator.compress_level="9"');
    end;
 end else begin
-    logs.Debuglogs('Starting lighttpd............: php.ini key eaccelerator is disabled');
+    logs.Debuglogs('Starting......: lighttpd: php.ini key eaccelerator is disabled');
 end;
 
 if FileExists(SYS.LOCATE_APC_SO()) then begin
    if ApcEnabledInPhp=1 then begin
-      logs.Debuglogs('Starting lighttpd............: php.ini enable APC client');
+      logs.Debuglogs('Starting......: lighttpd: php.ini enable APC client');
       l.Add('');
       l.Add('extension=apc.so');
       l.Add('[APC]');
@@ -1432,12 +1432,12 @@ if FileExists(SYS.LOCATE_APC_SO()) then begin
       l.add('apc.filters = "-(\.php|\.inc)"');
       l.Add('');
    end else begin
-      logs.Debuglogs('Starting lighttpd............: php.ini disable APC client');
+      logs.Debuglogs('Starting......: lighttpd: php.ini disable APC client');
    end;
 end;
 
 if FileExists(SYS.LOCATE_MAPI_SO()) then begin
-     logs.Debuglogs('Starting lighttpd............: register mapi.so');
+     logs.Debuglogs('Starting......: lighttpd: register mapi.so');
      l.Add('extension=mapi.so');
 end;
 
@@ -1452,7 +1452,7 @@ end;
 
   for i:=0 to t.Count-1 do begin
       if FileExists(t.Strings[i]) then begin
-         logs.Debuglogs('Starting lighttpd............: registers key in '+t.Strings[i]);
+         logs.Debuglogs('Starting......: lighttpd: registers key in '+t.Strings[i]);
          logs.WriteToFile(l.Text,t.Strings[i]);
       end;
   end;
@@ -1464,7 +1464,7 @@ end;
   l.free;
   ForceDirectories('/usr/share/artica-postfix/ressources/profiles');
   fpsystem('/bin/chmod 755 /usr/share/artica-postfix/ressources/profiles');
-  logs.Debuglogs('Starting lighttpd............: Compile languages');
+  logs.Debuglogs('Starting......: lighttpd: Compile languages');
   fpsystem(SYS.LOCATE_PHP5_BIN()+' /usr/share/artica-postfix/exec.shm.php --parse-langs');
 
 
@@ -1506,14 +1506,14 @@ begin
 confdir:=SYS.LOCATE_PHP5_EXTCONF_DIR();
 LOCATE_PHP5_EXTENSION_DIR:=sys.LOCATE_PHP5_EXTENSION_DIR();
 if not DirectoryExists(confdir) then begin
-    logs.Debuglogs('Starting lighttpd............: Unable to stat php5 additional ini files path');
+    logs.Debuglogs('Starting......: lighttpd: Unable to stat php5 additional ini files path');
     exit;
 end;
 
 
 sys.DirFiles(confdir,'*.ini');
 
-logs.Debuglogs('Starting lighttpd............: Ext dir: '+confdir +'('+ intToSTr(sys.DirListFiles.Count)+' ini files)');
+logs.Debuglogs('Starting......: lighttpd: Ext dir: '+confdir +'('+ intToSTr(sys.DirListFiles.Count)+' ini files)');
 for i:=0 to sys.DirListFiles.Count-1 do begin
     logs.DeleteFile(confdir+'/'+sys.DirListFiles.Strings[i]);
 
@@ -1607,7 +1607,7 @@ z.add('json.so');
 
 
 if DisableEaccelerator=1 then begin
-    logs.Debuglogs('Starting lighttpd............: eAccelerator is disabled');
+    logs.Debuglogs('Starting......: lighttpd: eAccelerator is disabled');
 end else begin
    z.add('eaccelerator.so');
 end;
@@ -1620,7 +1620,7 @@ for i:=0 to z.Count-1 do begin
 
      if not FileExists(sofile) then begin
         if FIleExists('/usr/lib/php/modules/'+z.Strings[i]) then begin
-           logs.Debuglogs('Starting lighttpd............: linking '+z.Strings[i]+' from /usr/lib/php/modules');
+           logs.Debuglogs('Starting......: lighttpd: linking '+z.Strings[i]+' from /usr/lib/php/modules');
            fpsystem('/bin/ln -s /usr/lib/php/modules/'+z.Strings[i] +' '+LOCATE_PHP5_EXTENSION_DIR+'/'+z.Strings[i]);
         end;
      end;
@@ -1633,7 +1633,7 @@ for i:=0 to z.Count-1 do begin
 
         l.Clear;
      end else begin
-        logs.Debuglogs('Starting lighttpd............: '+sofile+' didn''t exists..');
+        logs.Debuglogs('Starting......: lighttpd: '+sofile+' didn''t exists..');
      end;
 end;
 
@@ -1695,14 +1695,14 @@ var
 begin
 result:=true;
    if not FileExists(LIGHTTPD_CONF_PATH()) then begin
-      logs.Debuglogs('Starting lighttpd............: unable to locate lighttpd.conf');
+      logs.Debuglogs('Starting......: lighttpd: unable to locate lighttpd.conf');
       exit;
    end;
 
    php_cgi:=PHP5_CGI_BIN_PATH();
 
    if length(php_cgi)=0 then begin
-      logs.Debuglogs('Starting lighttpd............: unable to stat php-cgi,php5-cgi...');
+      logs.Debuglogs('Starting......: lighttpd: unable to stat php-cgi,php5-cgi...');
       exit;
    end;
 
@@ -1724,7 +1724,7 @@ for i:=0 to l.Count-1 do begin
 end;
 
 if found then begin
-       logs.Debuglogs('Starting lighttpd............: set ' + php_cgi + ' in line ('+IntToStr(line_f)+')');
+       logs.Debuglogs('Starting......: lighttpd: set ' + php_cgi + ' in line ('+IntToStr(line_f)+')');
        l.SaveToFile(LIGHTTPD_CONF_PATH());
        l.free;
        RegExpr.free;
@@ -1903,14 +1903,14 @@ l.Add('status.status-url          = "/server-status"');
 l.Add('status.config-url          = "/server-config"');
 
 if DirectoryExists(roundcube_folder) then begin
-logs.Debuglogs('Starting lighttpd............: roundcube is installed on '+roundcube_folder);
+logs.Debuglogs('Starting......: lighttpd: roundcube is installed on '+roundcube_folder);
 l.Add('alias.url += (	"/webmail" 			 => "'+roundcube_folder+'")');
 l.Add('$HTTP["url"] =~ "^/webmail/config|/webmail/temp|/webmail/logs" { url.access-deny = ( "" )}');
 end;
 
 zarafa:=tzarafa_server.Create(SYS);
 if FileExists(zarafa.SERVER_BIN_PATH()) then begin
-logs.Debuglogs('Starting lighttpd............: zarafa is installed');
+logs.Debuglogs('Starting......: lighttpd: zarafa is installed');
 l.Add('alias.url += (	"/webaccess" 			 => "/usr/share/zarafa-webaccess")');
 zarafa.WEB_ACCESS_CONFIG();
 //l.Add('$HTTP["url"] =~ "^/webmail/config|/webmail/temp|/webmail/logs" { url.access-deny = ( "" )}');
@@ -1950,7 +1950,7 @@ l.Add(')');
 l.Add('');
 if Not FileExists('/etc/lighttpd/lighttpd.conf') then begin
    forceDirectories('/etc/lighttpd');
-   logs.Debuglogs('Starting lighttpd............: save /etc/lighttpd/lighttpd.conf');
+   logs.Debuglogs('Starting......: lighttpd: save /etc/lighttpd/lighttpd.conf');
    logs.WriteToFile(l.Text,'/etc/lighttpd/lighttpd.conf');
 end;
 result:=l.text;

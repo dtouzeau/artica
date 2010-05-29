@@ -1405,10 +1405,14 @@ function SelectTabID(tabid,num){
 	$tabs.tabs( 'select' , num );
 }
 
+function RefreshLeftMenu(){
+	LoadAjax('TEMPLATE_LEFT_MENUS','admin.tabs.php?left-menus=yes');	
+}
+
 var x_CacheOff= function (obj) {
 	var response=obj.responseText;
 	if(response){alert(response);}
-	LoadAjax('TEMPLATE_LEFT_MENUS','admin.tabs.php?left-menus=yes');
+	RefreshLeftMenu();
 }
 
 function CacheOff(){

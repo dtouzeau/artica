@@ -59,6 +59,9 @@ This operation will activate service and enable remote backup trough Artica Netw
 <ACTIVATE_HD_ORG_DEFAULT_EXPLAIN>The selected storage will be the default storage for your user's home directory</ACTIVATE_HD_ORG_DEFAULT_EXPLAIN>
 <ActiveDirectorySettings>ActiveDirectory Parameters</ActiveDirectorySettings>
 <ActiveDirectorySettings_text>Define credentials in order to help Artica connecting to the remote ActiveDirectory parameters</ActiveDirectorySettings_text>
+<activedirectory_admin>Active Directory Administrator</activedirectory_admin>
+<activedirectory_domain>Active Directory domain</activedirectory_domain>
+<activedirectory_server>Active Directory server name</activedirectory_server>
 <active_queue>Active</active_queue>
 <add>Agregar</add>
 <add aliase>Add new aliase</add aliase>
@@ -215,6 +218,8 @@ examples[br]
 <advanced_infos>Advanced</advanced_infos>
 <advanced_mode>Advanced mode</advanced_mode>
 <advanced_options>Advanced options</advanced_options>
+<ad_samba_member>Active Directory Member</ad_samba_member>
+<ad_samba_member_text>Make this server has a member of a Microsoft Active Directory domain</ad_samba_member_text>
 <alias>Alias</alias>
 <aliases>Aliases</aliases>
 <all>all</all>
@@ -825,6 +830,8 @@ The relay_domains_reject_code parameter specifies the response code for rejected
 <check_wifi_card>Check WIFI Network settings</check_wifi_card>
 <choose>choose</choose>
 <choose_org>Choose organization</choose_org>
+<CICAP_DNSBL>DNS black list lookup</CICAP_DNSBL>
+<CICAP_DNSBL_TEXT>Use dynamics DNS black lists servers in order to ban websites</CICAP_DNSBL_TEXT>
 <city>City</city>
 <CLAMD_NOT_INSTALLED>Clamd Deamon missing</CLAMD_NOT_INSTALLED>
 <CLAMD_NOT_INSTALLED_TEXT>It seems that Clamd Daemon is not installed, antivirus checking will not be available</CLAMD_NOT_INSTALLED_TEXT>
@@ -1200,6 +1207,7 @@ supports the X-Forward extension for Postfix protocol only if [b]smtp[/b] is use
 <emails_flow_month>Send & receive per month</emails_flow_month>
 <emails_flow_text>View history of eMails sended and received on your server</emails_flow_text>
 <emails_flow_week>Send & receive per week</emails_flow_week>
+<emails_number>eMails number</emails_number>
 <emails_recieved>emails recieved</emails_recieved>
 <email_number>email number</email_number>
 <email_scenarios>eMail Scenarios</email_scenarios>
@@ -2023,6 +2031,7 @@ The message delivery transport name is the first field in the entry in the maste
 <main_settings>Main settings</main_settings>
 <main_settings_samba>Global configuration</main_settings_samba>
 <main_settings_text>Define global parameters of the software, personalize daemons processes and tune performances</main_settings_text>
+<make_samba_ad_text>If enabled, this server will be a member of your Active Directory server.[br]In this case Active Directory members will have access to this server services eg Proxy, File sharing...</make_samba_ad_text>
 <MalwarePatrol>Malware Patrol</MalwarePatrol>
 <MalwarePatrol_text>Malware Patrol is a free, automated and user contributed system for verifying URLs for the presence of Viruses, Trojans, Worms, or any other software considered Malware.</MalwarePatrol_text>
 <manage>Manage</manage>
@@ -2068,6 +2077,7 @@ It allows the Windows 2000 ACL editor to correctly use inheritance with the Samb
 If you use normal proxy with LDAP Authentication you will be able to match organizations groups to your filtering rules.</MAP_USERS_RULES_DANSGUARDIAN_TEXT>
 <mark_all_events_has_read>Mark all events has read</mark_all_events_has_read>
 <mark_has_read>Mak this event has read</mark_has_read>
+<master_panel>Master panel</master_panel>
 <match>match</match>
 <Matches>Matches</Matches>
 <match_in>Match in</match_in>
@@ -2217,6 +2227,8 @@ The default is to use the local machine name, $myhostname, which defaults to the
 <name_the_new_account_field>Type the unique identifier of the new account</name_the_new_account_field>
 <name_the_new_account_title>The new unique identifier</name_the_new_account_title>
 <nb_domains>domains num.</nb_domains>
+<nb_fetchmails>Number of fetched emails</nb_fetchmails>
+<nb_fetchmails_size>Size of fetched emails</nb_fetchmails_size>
 <need>need</need>
 <netbiosname>Netbios name</netbiosname>
 <netbiosname_text>The NetBIOS name that samba uses doesn't really have anything to do with the hostname of the system,
@@ -2290,6 +2302,8 @@ don't forget to - Save & Apply settings - to make them in production mode</notif
 <no_privileges>You have not enough privileges to perform this operation</no_privileges>
 <no_rules>No rules saved..</no_rules>
 <NO_RULESNUMBER_DANS_EXPLAIN>You need to create at least one Dansguardian rule to use this option</NO_RULESNUMBER_DANS_EXPLAIN>
+<no_squid_network>No network set</no_squid_network>
+<no_squid_network_text>Currently, no network set in the main configuration, Squid will refuse any connexion</no_squid_network_text>
 <no_usb_devices_connected>There is no USB devices connected on this computer</no_usb_devices_connected>
 <nsAIMid>AOL Instant Messenger (AIM)</nsAIMid>
 <nsICQid>ICQ</nsICQid>
@@ -3407,6 +3421,7 @@ example : user.name@domain.tlb -> domain.tlb
 <this_not_a_samba_user>This user did not have share access</this_not_a_samba_user>
 <this_not_a_samba_user_explain>Currently this user cannot browse local shared folders until Share access is not activated.[br]
 If you want to activate share access, click on the button bellow.</this_not_a_samba_user_explain>
+<this_server_is_an_ad_member>This server is currently a member of an Active Directory server</this_server_is_an_ad_member>
 <this_server_store>This server store</this_server_store>
 <this_week>this week</this_week>
 <thursday>Thursday</thursday>
@@ -3680,6 +3695,7 @@ The rules for transferring (routing) are set in this section.[br]
 <upload_max_filesize>Max uploading files size</upload_max_filesize>
 <upload_new_license>Upload a new license</upload_new_license>
 <uptime>UpTime</uptime>
+<uri_dnsbl>DNSBL uri</uri_dnsbl>
 <urls>urls</urls>
 <url_regex_popup_import_explain>Copy and Paste on the text area below all web sites you want to block.[br]Each web site must be separated by a carriage return</url_regex_popup_import_explain>
 <usb_external_drive>External USB disk</usb_external_drive>
@@ -3786,6 +3802,7 @@ If necessaries modules are installed you will be able to create a Wireless Acces
 <wifi_networks>WIFI Network Access Points</wifi_networks>
 <will_deleted_apply_config>Delete after apply configuration</will_deleted_apply_config>
 <winbindd_installed>Winbind daemon installed</winbindd_installed>
+<WINBINDD_NOT_INSTALLED_TEXT>Winbindd daemon is not installed, until this daemon does not exists, you will not allowed to enable the feature.[br]Go to setup Center and upgrade Samba daemon</WINBINDD_NOT_INSTALLED_TEXT>
 <with>with</with>
 <with_error>with the error</with_error>
 <wizard1_welcome>Welcome on artica-postfix first settings</wizard1_welcome>

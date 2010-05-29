@@ -18,6 +18,9 @@ if(isset($_GET["FetchmailAddAliase"])){page_fetchmail_aliases_add();exit;}
 if(isset($_GET["FetchmailDeleteAliase"])){page_fetchmail_aliases_del();exit;}
 
 
+if(isset($_GET["enable-js-rule"])){page_list_js_enable();exit;}
+if(isset($_GET["enable-fetch-rule"])){page_list_js_save();exit;}
+
 if(isset($_GET["find-isp-popup"])){find_isp_popup();exit;}
 if(isset($_GET["isp-choose-proto"])){find_isp_proto();exit;}
 if(isset($_GET["isp-end"])){find_isp_end();exit;}
@@ -241,11 +244,51 @@ function page_index(){
 	
 }
 
+function page_list_js_enable(){
+	$page=CurrentPageName();
+	$html="
+		var fetchmailRule='{$_GET["enable-js-rule"]}';
+		var uid='{$_GET["uid"]}';
+		
+		var x_page_list_js_enable= function (obj) {
+			var results=trim(obj.responseText);
+			if(results.length>0){alert(results);}
+			DisplayAccount();
+		}		
+		
+		function page_list_js_enable(){
+			var XHR = new XHRConnection();
+			if(document.getElementById('{$_GET["enable-js-rule"]}_enabled').checked){
+				XHR.appendData('enable-fetch-rule',1);
+			}else{
+			 XHR.appendData('enable-fetch-rule',0);
+			}
+			XHR.appendData('fetchmail-rule-id','{$_GET["enable-js-rule"]}');
+			document.getElementById('fetchmail-rules-js').innerHTML='<center><img src=\"img/wait_verybig.gif\"></center>';
+			XHR.sendAndLoad('$page', 'GET',x_page_list_js_enable);		
+		}
+	
+	page_list_js_enable();
+	";
+	echo $html;
+}
+
+function page_list_js_save(){
+	
+	$sql="UPDATE fetchmail_rules SET enabled='{$_GET["enable-fetch-rule"]}' WHERE ID='{$_GET["fetchmail-rule-id"]}'"; 
+	$q=new mysql();
+	$q->QUERY_SQL($sql,"artica_backup");
+	if(!$q->ok){echo $q->mysql_error."\n$sql";return;}
+	$sock=new sockets();
+	$sock->getFrameWork('cmd.php?restart-fetchmail=yes');
+	
+}
+
 function page_list(){
 	$fetch=new Fetchmail_settings();
-	
+	$page=CurrentPageName();
 	$rules=$fetch->LoadUsersRules($_GET["page-display"]);
-	
+	$user=new user($_GET["page-display"]);
 	
 	
 	if(count($rules)>0){
@@ -261,25 +304,30 @@ function page_list(){
 	if(is_array($rules)){
 		$tbl="<table style='width:98%'>
 		<tr>
-			<td style='text-align:left;color:#4C535C;font-size:12px'><strong>{server_name}</strong></td>
-			<td class=legend><strong>{protocol}</td>
+			<th<strong>{imap_server_name}</strong></th>
+			<th><strong>{protocol}</th>
+			<th><strong>{enabled}</th>
+			
+			
 		</tr>";
 		while (list ($num, $ligne) = each ($rules) ){
 			
-			
+			$enabled=Field_checkbox("{$num}_enabled",1,$ligne["enabled"],"Loadjs('$page?enable-js-rule=$num&uid={$_GET["page-display"]}')");
+			if($enabled==0){$color="#E60B03";}else{$color="black";}
 			$tbl=$tbl."
 				<tr ". CellRollOver("SelectRule($num)").">
-				<td style='font-size:14px' align='left' nowrap>{$ligne["poll"]}</td>
-				<td style='font-size:14px' align='right' nowrap>{$ligne["proto"]}</td>
+				<td style='font-size:14px;color:$color' align='left' nowrap>{$ligne["poll"]}</td>
+				<td style='font-size:14px;color:$color' align='center' nowrap>{$ligne["proto"]}</td>
+				<td style='font-size:14px;color:$color' align='right' nowrap>$enabled</td>
 				</tr>";
 		}
 	}else{
-		$tbl="<tr><td colspan=2>{click_on_add}</td></tr>";
+		$tbl="<tr><td colspan=3>{click_on_add}</td></tr>";
 	}
 	
 	$tbl=$tbl."
 	<tr>
-		<td colspan=2><hr></td>
+		<td colspan=3><hr></td>
 	</tr>
 	</table>";
 	
@@ -303,7 +351,7 @@ function page_list(){
 			<div>
 				<table style='width:100%'>
 					<tr>
-						<td valign='top'>$tbl</td>
+						<td valign='top'><div id='fetchmail-rules-js' style='height:250px;overflow:auto'>$tbl</div></td>
 						<td valign='top'>$error</td>
 					</tr>
 				</table>

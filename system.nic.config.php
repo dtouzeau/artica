@@ -323,7 +323,8 @@ function ChangeHostName(){
 	
 	
 	$sock=new sockets();
-	$sock->getfile('ChangeHostName:'.$_GET["ChangeHostName"]);
+	$sock->getFrameWork("cmd.php?ChangeHostName={$_GET["ChangeHostName"]}");
+	
 	
 	$users=new usersMenus();
 	if($users->POSTFIX_INSTALLED){
@@ -405,6 +406,10 @@ function listnicinfos($nicname){
 	$sock=new sockets();
 	$nicinfos=$sock->getfile("nicstatus:$nicname");
 	$tbl=explode(";",$nicinfos);
+	$tpl=new templates();
+	
+	$_netmask=html_entity_decode($tpl->_ENGINE_parse_body("{netmask}"));
+	if(strlen($_netmask)>11){$_netmask=texttooltip(substr($_netmask,0,8)."...:",$tpl->_ENGINE_parse_body("{netmask}"));}else{$_netmask=$_netmask.":";}
 	$wire='';
 	if(trim($tbl[5])=="yes"){
 		$wire=" (wireless)";
@@ -416,7 +421,7 @@ function listnicinfos($nicname){
 		<td style='font-weight:bold;font-size:12px'>{$tbl[0]}</td>
 	</tr>
 	<tr>
-		<td class=legend nowrap>{netmask}:</td>
+		<td class=legend nowrap>$_netmask</td>
 		<td style='font-weight:bold;font-size:12px'>{$tbl[2]}</td>
 	</tr>	
 	<tr>
@@ -430,7 +435,7 @@ function listnicinfos($nicname){
 	</table>
 	";
 	
-	$tpl=new templates();
+	
 	return $tpl->_ENGINE_parse_body($html);
 	
 	

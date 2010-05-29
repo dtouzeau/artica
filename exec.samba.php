@@ -221,10 +221,14 @@ function EnableProfiles(){
 
 function reconfigure(){
 	$unix=new unix();
-	if(is_file("/etc/artica-postfix/settings/Daemons/SambaSMBConf")){		
-		CheckExistentDirectories();
-		@copy("/etc/artica-postfix/settings/Daemons/SambaSMBConf","/etc/samba/smb.conf");
-	}
+	$sock=new sockets();
+	$EnableSambaActiveDirectory=$sock->GET_INFO("EnableSambaActiveDirectory");
+	
+	if($EnableSambaActiveDirectory==1){activedirectory();}
+	CheckExistentDirectories();
+	$samba=new samba();
+	@file_put_contents("/etc/samba/smb.conf",$samba->BuildConfig());
+	
 	
 	if(!is_file("/var/lib/samba/usershares/data")){
 		@mkdir("/var/lib/samba/usershares",null,true);
@@ -233,7 +237,7 @@ function reconfigure(){
 	
 	SambaAudit();
 	ParseHomeDirectories();
-	$sock=new sockets();
+	
 	$samba=new samba();
 	$net=$unix->find_program("net");
 	$master_password=$samba->GetAdminPassword("administrator");
@@ -244,14 +248,98 @@ function reconfigure(){
 		$cmd="$net idmap secret alloc $master_password >/dev/null 2>&1 &";
 	}
 	
-	
+	if($EnableSambaActiveDirectory==1){kinit();}
 	
 	shell_exec("/usr/share/artica-postfix/bin/artica-install --samba-reconfigure >/dev/null 2>&1");
+	}
+	
+	
+function kinit(){
+	$unix=new unix();
+	$kinit=$unix->find_program("kinit");
+	$echo=$unix->find_program("echo");
+	$net=$unix->find_program("net");
+	$hostname=$unix->find_program("hostname");
+	$sock=new sockets();
+	$config=unserialize(base64_decode($sock->GET_INFO("SambaAdInfos")));
+	$domain=strtoupper($config["ADDOMAIN"]);
+	$domain_lower=strtolower($config["ADDOMAIN"]);
+	
+	$ad_server=strtolower($config["ADSERVER"]);
+	
+	if($kinit<>null){	
+		shell_exec("$echo \"{$config["PASSWORD"]}\"|$kinit {$config["ADADMIN"]}@$domain");
+	}
+	
+	
+	exec($hostname,$results);
+	$servername=trim(@implode(" ",$results));
+	shell_exec("/usr/share/artica-postfix/bin/artica-install --change-hostname $servername.$domain_lower");
+	shell_exec("$net ads join -W $ad_server.$domain_lower -S $ad_server -U {$config["ADADMIN"]}%{$config["PASSWORD"]}");
+	
+	
+	
+}
+
+function activedirectory(){
+	
+	$sock=new sockets();
+	$config=unserialize(base64_decode($sock->GET_INFO("SambaAdInfos")));
+	$domain=strtoupper($config["ADDOMAIN"]);	
+	$server=strtoupper($config["ADSERVER"]);
+	$full_servername=strtolower($config["ADSERVER"].".".$config["ADDOMAIN"]);
+	$full_servernameUpper=strtoupper($full_servername);
+	$conf[]="[libdefaults]";
+	$conf[]="default_realm = $domain";
+	$conf[]="dns_lookup_realm = true";
+	$conf[]="dns_lookup_kdc = true";
+	$conf[]="ticket_lifetime = 24h";
+	$conf[]="forwardable = yes";
+	$conf[]="default_tgs_enctypes = DES-CBC-CRC DES CBC-MD5 RC4-HMAC";
+	$conf[]="default_tkt_enctypes = DES-CBC-CRC DES-CBC-MD5 RC4-HMAC";
+	$conf[]="preferred_enctypes = DES-CBC-CRC DES-CBC-MD5 RC4-HMAC";
+	$conf[]="";
+	$conf[]="[realms]";
+	$conf[]="$domain = {";
+	$conf[]="  kdc = $full_servername";
+	$conf[]="  admin_server = $full_servername";
+	$conf[]="  default_domain = ".strtolower($domain);
+	$conf[]="}";
+	$conf[]="";
+	$conf[]="[domain_realm]";
+	$conf[]=".{$config["ADDOMAIN"]} = $domain";
+	$conf[]="{$config["ADDOMAIN"]} = $domain";
+	$conf[]="";
+	$conf[]="[kdc]";
+	$conf[]="profile = /etc/kdc.conf";
+	$conf[]="";
+	@file_put_contents("/etc/krb5.conf",@implode("\n",$conf));
+	unset($conf);
+	$conf[]="[kdcdefaults]";
+	$conf[]="kdc_ports = 750,88";
+	$conf[]="acl_file = /var/kerberos/krb5kdc/kadm5.acl";
+	$conf[]="dict_file = /usr/share/dict/words";
+	$conf[]="admin_keytab = /var/kerberos/krb5kdc/kadm5.keytab";
+	$conf[]="v4_mode = noreauth";
+	$conf[]="[libdefaults]";
+	$conf[]="        default_realm = $domain";
+	$conf[]="[realms]";
+	$conf[]="$domain = {";
+	$conf[]="	master_key_type = des-cbc-crc";
+	$conf[]="   supported_enctypes = des3-hmac-sha1:normal arcfour-hmac:normal des-hmac-sha1:normal des-cbc-md5:normal des-cbc-crc:normal des-cbc-crc:v4 des-cbc-crc:afs3";
+	$conf[]="}";	
+	$conf[]="";
+	@file_put_contents("/etc/kdc.conf",@implode("\n",$conf));
+	
+	$config="*/{$config["ADADMIN"]}@$domain\n";
+	@file_put_contents("/etc/kadm.acl",$config);
+	
 	
 	
 	
 	
 }
+
 
 function CheckExistentDirectories(){
 	$change=false;

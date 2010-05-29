@@ -844,12 +844,22 @@ end;
 
 function myconf.SYSTEM_FQDN():string;
  var D:boolean;
+ ypdomainname:string;
+ domainname:string;
 begin
     D:=COMMANDLINE_PARAMETERS('debug');
-    fpsystem('/bin/hostname >/opt/artica/logs/hostname.txt');
+    fpsystem(SYS.LOCATE_GENERIC_BIN('hostname')+' -s >/opt/artica/logs/hostname.txt');
     result:=ReadFileIntoString('/opt/artica/logs/hostname.txt');
     result:=trim(result);
-    if D then writeln('hostname=',result);
+    ypdomainname:=SYS.LOCATE_GENERIC_BIN('ypdomainname');
+    if FIleExists(ypdomainname) then begin
+         fpsystem(ypdomainname +' >/tmp/domain.name.txt 2>&1');
+    end else begin
+         fpsystem(SYS.LOCATE_GENERIC_BIN('sysctl')+' -n kernel.domainname >/tmp/domain.name.txt 2>&1');
+    end;
+    domainname:=trim(ReadFileIntoString('/tmp/domain.name.txt'));
+    if length(domainname)>0 then result:=result+'.'+domainname;
+
 end;
 
 
@@ -5554,7 +5564,6 @@ end;
 procedure MyConf.START_ALL_DAEMONS();
 var
    Rootpath:string;
-   D:boolean;
    knel:integer;
    kernel_version:string;
    spfm:tspf;
@@ -5566,14 +5575,11 @@ var
    saslauthd:tsaslauthd;
    collectd:tcollectd;
    mailspy:tmailspy;
-   amavis:tamavis;
    retranslator:tkretranslator;
    dotclear:tdotclear;
    jcheckmail:tjcheckmail;
    dhcp3:tdhcp3;
-   lighttpd:Tlighttpd;
    cups:tcups;
-   obm2:Tobm2;
    zsmartd:Tsmartd;
    opengoo:topengoo;
    dstat:tdstat;
@@ -5584,7 +5590,6 @@ var
    policydw:tpolicyd_weight;
    autofs:tautofs;
    nfs:tnfs;
-   framework:tframework;
    assp:tassp;
    pdns:tpdns;
    gluster:tgluster;
@@ -5734,7 +5739,6 @@ begin
 
 
      PERL_CREATE_DEFAULT_SCRIPTS();
-     D:=COMMANDLINE_PARAMETERS('debug');
      Rootpath:=get_ARTICA_PHP_PATH();
      logs.Debuglogs('SYSTEM_START_ARTICA_ALL_DAEMON:: Rootpath='+ Rootpath);
 
@@ -8491,7 +8495,20 @@ begin
 end;
 //##############################################################################
 procedure myconf.SYSTEM_NETWORKS_SET_HOSTNAME(name:string);
+var
+   RegExpr:TRegExpr;
+   domainName:string;
+   sysctl:string;
 begin
+    name:=trim(name);
+    if length(name)=0 then exit;
+    RegExpr:=TRegExpr.Create;
+    RegExpr.Expression:='^(.+?)\.';
+    if RegExpr.Exec(name) then begin
+       name:=RegExpr.Match[1];
+       domainName:=RegExpr.Match[2];
+    end;
+
     if FileExists('/etc/hostname') then begin
        logs.Debuglogs('SYSTEM_NETWORKS_SET_HOSTANME:: Change hostname is debian mode');
        logs.WriteToFile(trim(name),'/etc/hostname');
@@ -8503,7 +8520,17 @@ begin
        logs.WriteToFile(trim(name),'/etc/HOSTNAME');
     end;
 
-       SYSTEM_NETWORKS_SET_HOSTNAME_IN_HOSTS(name);
+    if FileExists('/etc/hostname') then begin
+       logs.Debuglogs('SYSTEM_NETWORKS_SET_HOSTANME:: Change hostname is ubuntu');
+       logs.WriteToFile(trim(name),'/etc/HOSTNAME');
+    end;
+
+    sysctl:=SYS.LOCATE_GENERIC_BIN('sysctl');
+    if length(domainName)>0 then fpsystem(sysctl+' -w kernel.domainname='+domainName);
+    fpsystem(sysctl+' -w kernel.hostname='+name);
+    fpsystem(sysctl+' -p');
+
+    SYSTEM_NETWORKS_SET_HOSTNAME_IN_HOSTS(name);
     if FileExists('/etc/init.d/hostname.sh') then fpsystem('/etc/init.d/hostname.sh start &');
 
 
@@ -9654,13 +9681,11 @@ FUNCTION myconf.GLOBAL_STATUS():string;
  amavis:tamavis;
  retranslator:tkretranslator;
  dotclear:tdotclear;
- jcheckmail:tjcheckmail;
  dhcp:tdhcp3;
  Messagerie:boolean;
  POSFTIX_POSTCONF_PATH:string;
  openvpn:Topenvpn;
  cups:tcups;
- obm2:Tobm2;
  smartd:Tsmartd;
  rsync:trsync;
  policyd_weight:tpolicyd_weight;
@@ -9674,8 +9699,6 @@ FUNCTION myconf.GLOBAL_STATUS():string;
  zabbix:tzabbix;
  hamachi:thamachi;
  zvmtools:tvmtools;
- cpulimit_path:string;
- cpulimit_string:string;
  monit:tmonit;
  zarafa_server:tzarafa_server;
  zwifi:twifi;
@@ -9924,7 +9947,7 @@ end;
      logs.Debuglogs('fetchmail STATUS ----------------------------------');
      logs.Debuglogs('starting status FETCHMAIL');
      ini:=ini+fetchmail.STATUS()+CRLF;
-     ini:=ini+fetchmail.LOGGER_STATUS+CRLF;
+
 
      //clamav-milter
      logs.Debuglogs('clamav milter STATUS ----------------------------------');

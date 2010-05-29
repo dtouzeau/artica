@@ -514,11 +514,13 @@ function main_admin_tabs(){
 
 	
 	$sock=new sockets();
-	$SQUIDEnable=$sock->GET_INFO("SQUIDEnable");
-	if($SQUIDEnable==null){$SQUIDEnable=1;}
-	if($SQUIDEnable==1){
+	if($users->SQUID_INSTALLED){
+		$SQUIDEnable=$sock->GET_INFO("SQUIDEnable");
+		if($SQUIDEnable==null){$SQUIDEnable=1;}
+		if($SQUIDEnable==1){
 			$array["t:HTTP_FILTER_STATS"]="{HTTP_FILTER_MONITOR}";
 		}
+	}
 	
 
 if($users->KASPERSKY_SMTP_APPLIANCE){

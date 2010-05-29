@@ -24,7 +24,7 @@ private
        function Explode(const Separator, S: string; Limit: Integer = 0):TStringDynArray;
        function RPMFORGE():boolean;
        function ATRPMS():boolean;
-
+       function ELREPO():boolean;
 
 
 
@@ -997,7 +997,7 @@ begin
       exit;
    end;
 
-   fpsystem('rpm --import http://ATrpms.net/RPM-GPG-KEY.atrpms');
+   fpsystem('rpm --import http://elrepo.org/RPM-GPG-KEY-elrepo.org');
 
 
    fpsystem('yum check-update');

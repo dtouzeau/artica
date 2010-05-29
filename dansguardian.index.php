@@ -387,6 +387,7 @@ function popup_dansguardian_main(){
 	
 	$table=true;
 	$mysql=new mysql();
+	$users=new usersMenus();
 	if(!$mysql->TABLE_EXISTS("dansguardian_categories","artica_backup")){
 		$table=false;
 	}
@@ -428,7 +429,7 @@ function popup_dansguardian_main(){
 	if($dansguardian_enabled==null){$dansguardian_enabled=0;$sock->SET_INFO("DansGuardianEnabled",0);}
 	$squidGuardEnabled=$sock->GET_INFO("squidGuardEnabled");
 	if($squidGuardEnabled==null){$squidGuardEnabled=0;$sock->SET_INFO("squidGuardEnabled",0);}
-	
+	$cicap_enabled=$sock->GET_INFO('CicapEnabled');
 	
 	
 	
@@ -480,6 +481,16 @@ function popup_dansguardian_main(){
 		$template=Paragraphe("banned-template-64.png","{template_label}",'{template_explain}',"javascript:s_PopUp('dansguardian.template.php',800,800)"); 
 		$denywebistes=Paragraphe('folder-64-denywebistes.png','{deny_websites}','{deny_websites_text}',"javascript:Loadjs('squid.popups.php?script=url_regex')");  
 		 
+		// -> $cicap_enabled
+		
+		$cicap_dnsbl=Paragraphe("64-cop-acls-dnsbl.png","{CICAP_DNSBL}","{CICAP_DNSBL_TEXT}","javascript:Loadjs('c-icap.dnsbl.php')");
+		
+		
+		if($cicap_enabled==0){$cicap_dnsbl=null;}
+		if(!$users->C_ICAP_DNSBL){$cicap_dnsbl=null;}
+		
+		
+		
 		
 		if($dansguardian_enabled==0){
 			$download=null;
@@ -500,6 +511,7 @@ function popup_dansguardian_main(){
 	$tr[]=$dansguardian_db;
 	$tr[]=$dansguardian_update;
 	$tr[]=$denywebistes;
+	$tr[]=$cicap_dnsbl;
 	$tr[]=$blackcomputer;
 	$tr[]=$whitecomputer;
 	

@@ -664,7 +664,7 @@ PID:= C_ICAP_PID();
     logs.DebugLogs('Starting......: c-icap reconfigure SQUID '+squid.SQUID_BIN_PATH());
     fpsystem(squid.SQUID_BIN_PATH()+' -k reconfigure');
  end else begin
-    writeln('Starting......: c-icap failed');
+    writeln('Starting......: c-icap failed with command line '+C_ICAP_BIN_PATH() + ' -f '+C_ICAP_CONF_PATH()+' -d 3');
  end;
 
 

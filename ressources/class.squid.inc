@@ -1509,7 +1509,7 @@ class squidbee{
 				$this->kav_accept_why='{error_squid_icap_not_compliance}';
 			}
 		}else{
-			$this->kav_accept_why='{error_squid_upto_three}';
+			$this->kav_accept_why='{error_squid_upto_three}<br><strong>'.$this->SQUID_VERSION."</strong>";
 		}
 	}
 	
@@ -2364,9 +2364,26 @@ class cicap{
 		}
 	}
 	
+	private function DNBSL_LIST(){
+		$sock=new sockets();
+		$datas=explode("\n",$sock->GET_INFO("CicapDNSBL"));
+		while (list ($num, $line) = each ($datas)){
+			if(strlen($line)<4){continue;}
+			$servicename=str_replace(".","",$line);
+			$conf[]="url_check.LookupTableDB $servicename  domain dnsbl:$line";
+			$servicenames[]=$servicename;
+			}
+		if(!is_array($conf)){return array();}
+		
+		$conf[]="url_check.Profile default block ". implode(" ",$servicenames);
+		
+		return $conf;
+	}
+	
 	
 	public function buildconf(){
 		$this->BuildDefaults();
+		$sock=new sockets();
 			$usermenus=new usersMenus();
 			$user="squid";
 			$modules_path=$this->LOCATE_MODULES_DIR();
@@ -2418,11 +2435,33 @@ class cicap{
 				echo "Starting......: c-icap using Sysloger\n";
 				$conf[]="#Sysloger";
 				$conf[]="Module logger sys_logger.so\n";
+				$conf[]="sys_logger.server_priority alert|crit|debug|emerg|err|info|notice|warning\n";
 				$conf[]="sys_logger.Prefix \"C-ICAP:\"";
 				$conf[]="sys_logger.Facility local1";
 				$conf[]="Logger file_logger";
 				$conf[]="";	
 			}
+			
+			if(is_file("$modules_path/dnsbl_tables.so")){
+				if($sock->GET_INFO("DisableCicapDNBSL")<>1){
+					$array=$this->DNBSL_LIST();
+					echo "Starting......: c-icap using ". count($array) ." DNSBL services\n";
+					if(count($array)>0){
+						$this->cicap_whitelisted_servers();
+						echo "Starting......: c-icap using DNSBL\n";
+						$conf[]="Module common bdb_tables.so";
+						$conf[]="Module common dnsbl_tables.so";
+						$conf[]="#DNSBL";
+						$conf[]="Service url_check_module srv_url_check.so";
+						$conf[]="url_check.LookupTableDB whitelist domain hash:/etc/squid3/c-icap.whitelist.txt";
+						$conf[]="url_check.Profile default pass whitelist";
+						$conf[]=implode("\n",$this->DNBSL_LIST());
+						$conf[]="";	
+					}
+				}else{
+					echo "Starting......: c-icap Disabled DNSBL service\n";
+				}
+			}			
 	
 			
 			
@@ -2445,32 +2484,45 @@ class cicap{
 				$conf[]="srv_clamav.VirSaveDir {$this->main_array["CONF"]["VirSaveDir"]}";
 				$conf[]="srv_clamav.VirHTTPServer  \"{$this->main_array["CONF"]["VirHTTPServer"]}\"";
 				$conf[]="srv_clamav.VirUpdateTime   15";
-				
-			}	
+				}	
 	
-		@mkdir("/var/log/c-icap",0666,true);
-		@mkdir("/var/lib/c_icap/temporary",0666,true);
-		@mkdir("/var/run/c-icap",0666,true);
-		@mkdir("/var/tmp",0666,true);
-		@mkdir("/usr/share/c_icap/templates",0666,true);
-		//if(!is_file("/var/log/c-icap/server.log")){@file_put_contents("/var/log/c-icap/server.log"," ");}
-		//if(!is_file("/var/log/c-icap/access.log")){@file_put_contents("/var/log/c-icap/access.log"," ");}
-		
-		shell_exec("/bin/chmod -R 0755 /var/log/c-icap");
-		shell_exec("/bin/chmod -R 0755 /var/run/c-icap");
-		shell_exec("/bin/chmod -R 0755 /var/lib/c_icap");
-		shell_exec("/bin/chmod -R 0755 /var/tmp");
-		shell_exec("/bin/chmod -R 0755 /usr/share/c_icap");
-		
-		shell_exec("/bin/chown -R $user:$user /var/log/c-icap");
-		shell_exec("/bin/chown -R $user:$user /var/run/c-icap");
-		shell_exec("/bin/chown -R $user:$user /var/lib/c_icap");
-		shell_exec("/bin/chown -R $user:$user /var/tmp");
-		shell_exec("/bin/chown -R $user:$user /usr/share/c_icap");
-		echo "Starting......: c-icap apply securities on user \"$user\" done\n";
-		@file_put_contents("/etc/c-icap.conf",@implode("\n",$conf));
+				@mkdir("/var/log/c-icap",0666,true);
+				@mkdir("/var/lib/c_icap/temporary",0666,true);
+				@mkdir("/var/run/c-icap",0666,true);
+				@mkdir("/var/tmp",0666,true);
+				@mkdir("/usr/share/c_icap/templates",0666,true);
+				//if(!is_file("/var/log/c-icap/server.log")){@file_put_contents("/var/log/c-icap/server.log"," ");}
+				//if(!is_file("/var/log/c-icap/access.log")){@file_put_contents("/var/log/c-icap/access.log"," ");}
+				
+				shell_exec("/bin/chmod -R 0755 /var/log/c-icap");
+				shell_exec("/bin/chmod -R 0755 /var/run/c-icap");
+				shell_exec("/bin/chmod -R 0755 /var/lib/c_icap");
+				shell_exec("/bin/chmod -R 0755 /var/tmp");
+				shell_exec("/bin/chmod -R 0755 /usr/share/c_icap");
+				
+				shell_exec("/bin/chown -R $user:$user /var/log/c-icap");
+				shell_exec("/bin/chown -R $user:$user /var/run/c-icap");
+				shell_exec("/bin/chown -R $user:$user /var/lib/c_icap");
+				shell_exec("/bin/chown -R $user:$user /var/tmp");
+				shell_exec("/bin/chown -R $user:$user /usr/share/c_icap");
+				echo "Starting......: c-icap apply securities on user \"$user\" done\n";
+				@file_put_contents("/etc/c-icap.conf",@implode("\n",$conf));
 		
 	}
+	
+	private function cicap_whitelisted_servers(){
+		$sql="SELECT * FROM dansguardian_files WHERE filename='exceptionsitelist' AND RuleID=1 AND enabled=1";
+		$q=new mysql();
+		$results=$q->QUERY_SQL($sql,"artica_backup");
+	
+		while($ligne=@mysql_fetch_array($results,MYSQL_ASSOC)){
+			$t[]=$ligne["pattern"];
+		}
+		
+		@file_put_contents("/etc/squid3/c-icap.whitelist.txt",@implode("\n",$t));
+		
+	}
+	
 	
 	function Save(){
 		$ini=new Bs_IniHandler();

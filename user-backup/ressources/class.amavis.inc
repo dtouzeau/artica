@@ -771,14 +771,14 @@ private  function banned_filename_maps(){
 	if(!is_array($this->extensions)){return null;}
 	reset($this->extensions);
 	$pattern=implode('|',$this->extensions);
-	return "banned_filename_re = new_RE(\qr'.\.($pattern)$'i)";
+	return "banned_filename_re = new_RE(qr'.\.($pattern)$'i)";
 }
 
 private function banned_rules_maps(){
 	if(!is_array($this->extensions)){return null;}
 	reset($this->extensions);
 	$pattern=implode('|',$this->extensions);
-	return "%banned_rules = ('GENERAL' => new_RE(\qr'.\.($pattern)$'i));\n";
+	return "%banned_rules = ('GENERAL' => new_RE(qr'.\.($pattern)$'i));\n";
 	
 }
 

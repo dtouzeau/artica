@@ -367,6 +367,7 @@ function main_smb_config(){
 	$tpl=new templates();
 	$page=CurrentPageName();
 	$SambaEnabled=$sock->GET_INFO("SambaEnabled");
+	$EnableSambaActiveDirectory=$sock->GET_INFO("EnableSambaActiveDirectory");
 	if($SambaEnabled==null){$SambaEnabled=1;}	
 	$disable_samba=Paragraphe("server-disable-64.png",'{enable_disable_samba}','{enable_disable_samba_text}',
 	"javascript:Loadjs('samba.disable.php');",'{enable_disable_samba_text}',260,null,1);	
@@ -411,7 +412,44 @@ function main_smb_config(){
 		$enable_Editposix=texttooltip(htmlentities(substr($enable_Editposix,0,35)).'...:',htmlentities($enable_Editposix));
 	}
 	
+	$domain_master="
+<tr>
+	<td align='right' nowrap valign='top' class=legend>{local master}:</td>
+	<td valign='top'>" . Field_checkbox('local master','yes',$smb->main_array["global"]["local master"])."</td>
+	<td valign='top'>" . help_icon("{local master_text}")."</td>
+</tr>		
+<tr>	
+	<td align='right' nowrap valign='top' class=legend>{domain logons}:</td>
+	<td valign='top'>" . Field_checkbox('domain logons','yes',$smb->main_array["global"]["domain logons"])."</td>
+	<td valign='top'>" . help_icon("{domain logons_text}")."</td>
+</tr>
+<tr>
+	<td align='right' nowrap valign='top' class=legend>{domain master}:</td>
+	<td valign='top' >" . Field_array_Hash(array("no"=>"{no}","yes"=>"{yes}",
+	"auto"=>"{auto}"),"domain master",$smb->main_array["global"]["domain master"],null,null,0,'width:100px')."</td>
+	<td valign='top'>" . help_icon("{domain master_text}")."</td>
+</tr>";
 	
+	
+	if($EnableSambaActiveDirectory==1){
+		$workgroup_disabled=true;
+		$domain_master="
+<tr>
+	<td align='right' nowrap valign='top' class=legend>{local master}:</td>
+	<td valign='top' >--". Field_hidden("local master","{$smb->main_array["global"]["local master"]}")."</td>
+	<td valign='top'>" . help_icon("{local master_text}")."</td>
+</tr>		
+<tr>	
+	<td align='right' nowrap valign='top' class=legend>{domain logons}:</td>
+	<td valign='top' >--". Field_hidden("domain logons","{$smb->main_array["global"]["domain logons"]}")."</td>
+	<td valign='top'>" . help_icon("{domain logons_text}")."</td>
+</tr>		
+<tr>
+	<td align='right' nowrap valign='top' class=legend>{domain master}:</td>
+	<td valign='top' >--". Field_hidden("domain master","{$smb->main_array["global"]["domain master"]}")."</td>
+	<td valign='top'>" . help_icon("{domain master_text}")."</td>
+</tr>";
+	}
 	
 	$log_level=Field_array_Hash($logh,'log level',$smb->main_array["global"]["log level"],null,null,0,'width:90px');
 	
@@ -429,7 +467,7 @@ function main_smb_config(){
 	
 <tr>
 	<td align='right' nowrap valign='top' class=legend class=legend>{workgroup}:</td>
-	<td valign='top'>" . Field_text("workgroup",$smb->main_array["global"]["workgroup"],'width:190px')."</td>
+	<td valign='top'>" . Field_text("workgroup",$smb->main_array["global"]["workgroup"],'width:190px',null,null,null,false,null,$workgroup_disabled)."</td>
 	<td valign='top'>" . help_icon("{workgroup_text}")."</td>
 	</tr>
 <tr>
@@ -485,24 +523,11 @@ $form2="
 	<td valign='top'><img src='img/$winbindd'></td>
 	<td valign='top'>&nbsp;</td>
 </tr>	
-<tr>	
-	<td align='right' nowrap valign='top' class=legend>{domain logons}:</td>
-	<td valign='top'>" . Field_checkbox('domain logons','yes',$smb->main_array["global"]["domain logons"])."</td>
-	<td valign='top'>" . help_icon("{domain logons_text}")."</td>
-</tr>
 
-<tr>
-	<td align='right' nowrap valign='top' class=legend>{domain master}:</td>
-	<td valign='top' >" . Field_array_Hash(array("no"=>"{no}","yes"=>"{yes}",
-	"auto"=>"{auto}"),"domain master",$smb->main_array["global"]["domain master"],null,null,0,'width:100px')."</td>
-	<td valign='top'>" . help_icon("{domain master_text}")."</td>
-</tr>
+
+$domain_master
 	
-<tr>
-	<td align='right' nowrap valign='top' class=legend>{local master}:</td>
-	<td valign='top'>" . Field_checkbox('local master','yes',$smb->main_array["global"]["local master"])."</td>
-	<td valign='top'>" . help_icon("{local master_text}")."</td>
-</tr>	
+
 
 	
 <tr>
@@ -2303,6 +2328,18 @@ function neighborhood_index(){
 	$tpl=new templates();
 	
 	$samba=new samba();
+	
+	$sock=new sockets();
+	$EnableSambaActiveDirectory=$sock->GET_INFO("EnableSambaActiveDirectory");
+	
+	if($EnableSambaActiveDirectory==1){
+		$html="
+		<center style='margin:10px;font-size:14px'>{this_server_is_an_ad_member}</center>
+		";
+		echo $tpl->_ENGINE_parse_body($html);
+		exit;
+	}
+	
 	
 	if(strtolower($samba->main_array["global"]["domain logons"])=="yes"){
 		if(strtolower($samba->main_array["global"]["preferred master"]=="yes")){

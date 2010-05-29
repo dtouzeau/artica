@@ -479,11 +479,15 @@ function BuildConfig(){
 			$users=new usersMenus();
 			$ldap=new clladp();
 			$this->BuildDefaults();
+			$posix_getuid=posix_getuid();
 			
 			
 			$sock=new sockets();
 			$SambaRoamingEnabled=$sock->GET_INFO('SambaRoamingEnabled');
 			$SambaNetBiosName=trim($sock->GET_INFO("SambaNetBiosName"));
+			$EnableSambaActiveDirectory=$sock->GET_INFO("EnableSambaActiveDirectory");
+			$config_activedirectory=unserialize(base64_decode($sock->GET_INFO("SambaAdInfos")));
+			
 			if($SambaNetBiosName<>null){$this->main_array["global"]["netbios name"]=$SambaNetBiosName;}
 			
 			
@@ -502,7 +506,13 @@ function BuildConfig(){
 			}
 			
 			$conf=$conf ."[global]\n";
-			$conf=$conf ."workgroup = {$this->main_array["global"]["workgroup"]}\n";
+
+			
+			if($EnableSambaActiveDirectory){
+				$conf=$conf ."workgroup = ". strtoupper($config_activedirectory["WORKGROUP"])."\n";
+			}else{
+				$conf=$conf ."workgroup = {$this->main_array["global"]["workgroup"]}\n";
+			}
 			$conf=$conf ."netbios name = {$this->main_array["global"]["netbios name"]}\n";
 			$conf=$conf ."server string = {$this->main_array["global"]["server string"]}\n";
 			$conf=$conf ."disable netbios ={$this->main_array["global"]["disable netbios"]}\n";
@@ -540,15 +550,26 @@ function BuildConfig(){
 			$conf=$conf ."\n";
 			$conf=$conf ."# Controler ?? -----------------------------------\n";
 			if($users->WINBINDD_INSTALLED){
-				$conf=$conf ."security = user\n";
+			if($posix_getuid==0){echo "Starting......: Samba winbindd service is installed\n";}
+				if($EnableSambaActiveDirectory==1){
+					if($posix_getuid==0){echo "Starting......: Samba join domain {$config_activedirectory["ADDOMAIN"]}\n";}
+					$conf=$conf ."security = ADS\n";
+					$conf=$conf ."realm = ". strtoupper($config_activedirectory["ADDOMAIN"])."\n";
+					$conf=$conf ."client use spnego = yes\n";
+				}else{
+					$conf=$conf ."security = user\n";
+					
+				}			
 			}else{
 				$conf=$conf ."security = user\n";
 			}
 			$conf=$conf ."enable privileges = yes\n";
-			$conf=$conf ."domain master = {$this->main_array["global"]["domain master"]}\n";
-			$conf=$conf ."local master = {$this->main_array["global"]["local master"]}\n";
-			$conf=$conf ."preferred master = {$this->main_array["global"]["preferred master"]}\n";
-			$conf=$conf ."domain logons = {$this->main_array["global"]["domain logons"]}\n";
+			if($EnableSambaActiveDirectory<>1){
+				$conf=$conf ."domain master = {$this->main_array["global"]["domain master"]}\n";
+				$conf=$conf ."local master = {$this->main_array["global"]["local master"]}\n";
+				$conf=$conf ."preferred master = {$this->main_array["global"]["preferred master"]}\n";
+				$conf=$conf ."domain logons = {$this->main_array["global"]["domain logons"]}\n";
+			}
 			$conf=$conf ."os level = {$this->main_array["global"]["os level"]}\n";
 			$conf=$conf ."ldap passwd sync = no\n";
 			
@@ -556,7 +577,12 @@ function BuildConfig(){
 			$conf=$conf ."# WINBINDD  ($users->WINBINDD_INSTALLED)-----------------------------------\n";
 			if($users->WINBINDD_INSTALLED){
 				$conf=$conf ."winbind use default domain = yes\n";
-				$conf=$conf ."password server=*";
+				if($EnableSambaActiveDirectory==1){
+					if($posix_getuid==0){echo "Starting......: Samba master server {$config_activedirectory["ADSERVER"]}.{$config_activedirectory["ADDOMAIN"]}\n";}
+					$conf=$conf ."password server={$config_activedirectory["ADSERVER"]}.{$config_activedirectory["ADDOMAIN"]}\n";					
+				}else{
+					$conf=$conf ."password server=*\n";
+				}
 				$conf=$conf ."encrypt passwords = yes\n";
 				$conf=$conf ."winbind separator = +\n";			
 				$conf=$conf ."winbind uid = 10000-20000\n";

@@ -282,7 +282,6 @@ var PID,INADYN_PID:string;
    amavis:tamavis;
    jcheckmail:tjcheckmail;
    syslogng:Tsyslogng;
-   autofs:tautofs;
    zarafa_server:tzarafa_server;
 
 begin
@@ -354,10 +353,6 @@ spamass.MILTER_STOP();
 spf.SPF_MILTER_STOP();
 clamav.CLAMD_STOP();
 clamav.MILTER_STOP();
-
-
-autofs:=tautofs.Create(GLOBAL_INI.SYS);
-autofs.STOP();
 
 //collectd
 collectd:=tcollectd.Create(GLOBAL_INI.SYS);

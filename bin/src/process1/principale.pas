@@ -1239,7 +1239,14 @@ end;
        end;
 
 
-       if FileExists(dansguardian.C_ICAP_BIN_PATH()) then list.Add('$_GLOBAL["C_ICAP_INSTALLED"]=True;') else list.Add('$_GLOBAL["C_ICAP_INSTALLED"]=False;');
+       if FileExists(dansguardian.C_ICAP_BIN_PATH()) then begin
+          list.Add('$_GLOBAL["C_ICAP_INSTALLED"]=True;');
+          if FileExists('/usr/lib/c_icap/dnsbl_tables.so') then list.add('$_GLOBAL["C_ICAP_DNSBL"]=True;') else list.add('$_GLOBAL["C_ICAP_DNSBL"]=False;');
+       end else begin
+           list.Add('$_GLOBAL["C_ICAP_INSTALLED"]=False;');
+       end;
+
+
        if FileExists('/usr/bin/sarg') then list.Add('$_GLOBAL["SARG_INSTALLED"]=True;') else list.Add('$_GLOBAL["SARG_INSTALLED"]=False;');
 
        if FileExists('/opt/kaspersky/kav4proxy/sbin/kav4proxy-kavicapserver') then begin

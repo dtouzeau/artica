@@ -366,7 +366,6 @@ begin
 
           logs.Debuglogs('Starting lighttpd............:  Checking pommo aliases');
           POMMO_ALIASES();
-          logs.Debuglogs('Starting lighttpd............:  Checking pommo config');
           forcedirectories('/var/run/lighttpd');
           if length(logs_path)>0 then forcedirectories(logs_path);
           logs.Debuglogs('Starting lighttpd............:  Checking securities on '+user+':'+group);

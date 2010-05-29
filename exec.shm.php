@@ -8,7 +8,7 @@
 if(preg_match("#--verbose#",implode(" ",$argv))){$GLOBALS["DEBUG"]=true;$GLOBALS["VERBOSE"]=true;}
 
 if($GLOBALS["DEBUG"]){echo "Starting...{$argv[1]}\n";}
-$GLOBALS["langs"]=array("fr","en","po","es","it");
+$GLOBALS["langs"]=array("fr","en","po","es","it","br");
 if($argv[1]=="--remove"){remove_ipcs();die;}
 if($argv[1]=="--dump"){output_ipcs();die;}	
 if($argv[1]=="--dump-pages"){dump_pages();die;}

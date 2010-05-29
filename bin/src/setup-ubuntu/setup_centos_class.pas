@@ -24,7 +24,7 @@ private
        function Explode(const Separator, S: string; Limit: Integer = 0):TStringDynArray;
        function RPMFORGE():boolean;
        function ATRPMS():boolean;
-
+       function ELREPO():boolean;
 
 
 
@@ -103,6 +103,7 @@ begin
        exit;
     end;
     EPEL();
+    ELREPO();
     ATRPMS();
 
 

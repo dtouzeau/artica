@@ -245,13 +245,15 @@ function logonForm(){
 	unset($list["default"]);
 	unset($lang["po"]);
 	unset($lang["language"]);
-	
 	$lang["en"]="English";
 	$lang["fr"]="Francais";
 	$lang["po"]="Portugues";
-	$lang["de"]="Deutsch";
+	$lang["br"]="Brazilian";
 	$lang["es"]="Espanol";
 	$lang["it"]="Italiano";
+	$lang["de"]="Deutsch";
+	
+	
 	
 	if($_COOKIE["artica-language"]==null){
 		$languageClass=new articaLang();

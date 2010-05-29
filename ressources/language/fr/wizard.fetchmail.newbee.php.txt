@@ -17,7 +17,7 @@ Tous les mails sauvegard&eacute;s dans la sauvegarde ou dans la zone de quaranta
 <messaging_accounts>Comptes de messagerie</messaging_accounts>
 <not_delete_messages>Ne pas effacer les messages</not_delete_messages>
 <no_fetchmail_aliases>Aucun alias fetchmail</no_fetchmail_aliases>
-<no_fetchmail_aliases_intro>Si vous souhaitez recevoir les rapports de quarantaine et d'autres fonctionnalit&eacute;s, vous devez ajouter vos adresses e-mails d'origine</no_fetchmail_aliases_intro>
+<no_fetchmail_aliases_intro>Si vous souhaitez recevoir les rapports de quarantaine, vous devez ajouter vos adresses e-mails externes</no_fetchmail_aliases_intro>
 <proto>Protocole</proto>
 <server_information>Information du serveur</server_information>
 <session_information>Information de la session</session_information>

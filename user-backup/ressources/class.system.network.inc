@@ -106,7 +106,7 @@ class networking{
 		$users=new usersMenus();
 		$sock=new sockets();
 		$this->array_TCP=$users->TCP_ARRAY;
-		$this->hostname=trim($sock->getfile('myhostname'));
+		$this->hostname=trim($sock->getFrameWork('cmd.php?full-hostname=yes'));
 		
 	}
 	

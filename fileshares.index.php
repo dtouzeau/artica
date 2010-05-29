@@ -391,7 +391,7 @@ cookies_main();
 		$roaming=Buildicon64('DEF_ICO_ROAMINGP');
 		if($users->CUPS_INSTALLED){$cups=Paragraphe('64-printer.png',"{APP_CUPS}",'{APP_CUPS_TEXT}',"javascript:Loadjs('cups.index.php')",null,210,null,0,false);}
 		$plugins=Paragraphe("folder-lego.png","{plugins}","{enable_plugins_text}","javascript:Loadjs('samba.plugins.php')");
-		
+		$activedirectory=Paragraphe("folder-import-ad-64.png","{ad_samba_member}","{ad_samba_member_text}","javascript:Loadjs('samba.ad.php')");
 		
 		
 		
@@ -408,6 +408,7 @@ $body="<table style='width:100%'>
 		<tr>
 		<td valign='top'>$samba</td>
 		<td valign='top'>$roaming</td>
+		<td valign='top'>$activedirectory</td>
 		</tr>
 		<tr>
 			<td valign='top'>$NTconfig</td>

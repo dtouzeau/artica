@@ -30,6 +30,8 @@ private
 
 
 public
+EnableLighttpd:integer;
+    InsufficentRessources:Boolean;
     procedure   Free;
     constructor Create(const zSYS:Tsystem);
     procedure   START(notroubleshoot:boolean=false);
@@ -41,8 +43,7 @@ public
     function    PHP5_CGI_BIN_PATH():string;
     function    DEFAULT_CONF():string;
     function    MON():string;
-    EnableLighttpd:integer;
-    InsufficentRessources:Boolean;
+
 END;
 
 implementation                      
