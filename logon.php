@@ -479,6 +479,15 @@ function logon(){
 				setcookie("artica-language", $_POST["lang"], time()+172800);
 				$_SESSION["detected_lang"]=$lang->get_languages();
 			}
+			
+			$users=new usersMenus();
+			$users->_TranslateRights($_SESSION["privileges"]["ArticaGroupPrivileges"]);
+			if(!$users->IfIsAnuser()){
+				echo("location:admin.index.php");
+				return null;
+			}
+			
+			
 			$tpl=new templates();
 			$array["USERNAME"]=$_POST["artica_username"];
 			$array["PASSWORD"]=md5($_POST["artica_username"]);

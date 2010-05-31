@@ -5,8 +5,12 @@
 	include_once('ressources/class.artica.inc');
 	include_once('ressources/class.auto-aliases.inc');
 	
-	$usersmenus=new usersMenus();
-	if($usersmenus->AllowChangeDomains==false){header("location:domains.manage.org.index.php?ou={$_GET["ou"]}");}
+	
+	if(!VerifyRights()){
+		$tpl=new templates();
+		echo "alert('". $tpl->javascript_parse_text("{ERROR_NO_PRIVS}")."');";
+		die();exit();
+	}
 	
 	
 	if(isset($_GET["remote-domain-add-js"])){remote_domain_js();exit;}
@@ -36,6 +40,12 @@
 	if(isset($_GET["round-robin-delete"])){round_robin_delete();exit;}
 	INDEX();
 	
+	
+function VerifyRights(){
+	$usersmenus=new usersMenus();
+	if($usersmenus->AsMessagingOrg){return true;}
+	if(!$usersmenus->AllowChangeDomains){return false;}
+}
 	
 function round_robin_js(){
 	$page=CurrentPageName();

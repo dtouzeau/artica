@@ -45,7 +45,12 @@ function format_line($line){
 	if($ini->_params["SPAM"]["text_color"]==null){$ini->_params["SPAM"]["text_color"]="#FFFFFF";}
 
 	if($ini->_params["SPAMMY"]["row_color"]==null){$ini->_params["SPAMMY"]["row_color"]="#FFC59E";}
-	if($ini->_params["SPAMMY"]["text_color"]==null){$ini->_params["SPAMMY"]["text_color"]="#000000";}		
+	if($ini->_params["SPAMMY"]["text_color"]==null){$ini->_params["SPAMMY"]["text_color"]="#000000";}	
+
+	if($ini->_params["Command died"]["text_color"]=$ini->_params["DNS_Error"]["text_color"]);
+	if($ini->_params["Command died"]["row_color"]=$ini->_params["DNS_Error"]["row_color"]);
+	
+	
 	
 	$Country=$line["Country"];
 	$country_img=GetFlags($Country);
@@ -65,6 +70,11 @@ function format_line($line){
 	if(preg_match('#User unknown#',$bounce_error)){$bounce_error="User unknown";}
 	if(preg_match('#250.+?[OokK]+#',$bounce_error)){$bounce_error="Sended";}
 	if(preg_match('#delivered via#',$bounce_error)){$bounce_error="Sended";}
+	if(preg_match('#Command died with status\s+#',$bounce_error)){$bounce_error="Command died";}
+	
+	
+	
+	
 	if($spammy==1){$bounce_error="SPAMMY";}
 	if($SPAM==1){$bounce_error="SPAM";}
 	

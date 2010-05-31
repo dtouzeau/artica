@@ -3746,3 +3746,4 @@ When set, this option causes Squid to ignore the no-cache directive, if any, in 
 <activedirectory_admin>Active Directory Administrator</activedirectory_admin>
 <this_server_is_an_ad_member>This server is currently a member of an Active Directory server</this_server_is_an_ad_member>
 <WINBINDD_NOT_INSTALLED_TEXT>Winbindd daemon is not installed, until this daemon does not exists, you will not allowed to enable the feature.[br]Go to setup Center and upgrade Samba daemon</WINBINDD_NOT_INSTALLED_TEXT>
+<AsMessagingOrg>Can manage messaging features</AsMessagingOrg>

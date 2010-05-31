@@ -45,10 +45,12 @@
 page();
 
 function ajax_js(){
+	$tpl=new templates();
+	$title=$tpl->_ENGINE_parse_body("{APP_AMAVIS}");
 	$datas=file_get_contents('js/amavis.js');
 	$html="
 	$datas
-	YahooWin0(730,'amavis.index.php?ajax-pop=yes');";
+	YahooWin0(730,'amavis.index.php?ajax-pop=yes','$title');";
 	
 	echo $html;
 	}
@@ -342,78 +344,43 @@ function sanesecurity_enable(){
 
 function ajax_popup(){
 	$tpl=new templates();
-	$html="<H1>{APP_AMAVISD_NEW}</H1>
-	<div id=main_config_amavis style='padding:3px;'>".main_settings(1)."</div>";
+	$page=CurrentPageName();
+	$array["global-settings"]='{global_settings}';
+	$array["events"]='{daemon_events}';
+	$array["config-file"]='{config_file}';
+	$array["global-status"]='{status}';
 	
-	echo $tpl->_ENGINE_parse_body($html);
+
+
+
 	
-}
-
-function page(){
-$page=CurrentPageName();
-$user=new usersMenus();
-IF($_GET["hostname"]==null){$_GET["hostname"]=$user->hostname;}
-
-$html="	
-<script language=\"JavaScript\">       
-var timerID  = null;
-var timerID1  = null;
-var tant=0;
-var reste=0;
-
-function demarre(){
-   tant = tant+1;
-   reste=10-tant;
-	if (tant < 10 ) {                           
-      timerID = setTimeout(\"demarre()\",5000);
-      } else {
-               tant = 0;
-               //document.getElementById('wait').innerHTML='<img src=img/wait.gif>';
-               ChargeLogs();
-               demarre();                                //la boucle demarre !
-   }
-}
-
-function demar1(){
-   tant = tant+1;
-   
-        
-
-   if (tant < 2 ) {                             //delai court pour le premier affichage !
-      timerID = setTimeout(\"demar1()\",1000);
-                
-   } else {
-               tant = 0;                            //reinitialise le compteur
-               ChargeLogs();
-                   
-        demarre();                                 //on lance la fonction demarre qui relance le compteur
-   }
-}
-
-function ChargeLogs(){
-	LoadAjax('services_status','$page?status=yes&hostname={$_GET["hostname"]}');
+	while (list ($num, $ligne) = each ($array) ){
+		$html[]= $tpl->_ENGINE_parse_body("<li><a href=\"$page?main=$num&section=$num\"><span>$ligne</span></li>\n");
 	}
 	
-function ChargeIndex(){
-	LoadAjax('main_config_amavis','$page?section=domains-rules&hostname={$_GET["hostname"]}');
-	}	
-</script>	
-<table style='width:100%'>
-<tr>
-<td><div id=services_status></div></td>
-</tr>
-<td><div id=main_config_amavis></div></td>
-</tr>
-</table>	
-	<script>ChargeLogs();ChargeIndex();demarre();</script>
-
-	";
-$cfg["JS"][]="js/amavis.js";	
-$tpl=new template_users("{APP_AMAVISD_NEW}",$html,$_SESSION,0,0,0,$cfg);
-echo $tpl->web_page;			
 	
+	echo "
+	<div id=main_config_amavis style='width:100%;height:520px;overflow:auto'>
+		<ul>". implode("\n",$html)."</ul>
+	</div>
+		<script>
+				$(document).ready(function(){
+					$('#main_config_amavis').tabs({
+				    load: function(event, ui) {
+				        $('a', ui.panel).click(function() {
+				            $(ui.panel).load(this.href);
+				            return false;
+				        });
+				    }
+				});
+			
+			
+			});
+		</script>";		
+
 	
 }
+
 
 function page_status($noecho=0){
 			$ini=new Bs_IniHandler();
@@ -439,22 +406,7 @@ function page_status($noecho=0){
 		
 	}
 	
-function main_tabs(){
-	$page=CurrentPageName();
-	$array["global-settings"]='{global_settings}';
-	$array["events"]='{daemon_events}';
-	$array["config-file"]='{config_file}';
-	$array["global-status"]='{status}';
-	
-	
-	
-	while (list ($num, $ligne) = each ($array) ){
-		if($_GET["section"]==$num){$class="id=tab_current";}else{$class=null;}
-		$html=$html . "<li><a href=\"javascript:LoadAjax('main_config_amavis','$page?main=$num&section=$num&hostname={$_GET["hostname"]}')\" $class>$ligne</a></li>\n";
-			
-		}
-	return "<br><div id=tablist>$html</div><br>";		
-}	
+
 	
 	
 function main_page(){
@@ -466,7 +418,7 @@ function main_page(){
 		case "config-file":echo main_config_amavisfile();break;
 		case "global-settings":echo main_settings();break;
 		case "events":echo main_events();break;
-		case "global-status":echo $tpl->_parse_body(main_tabs()) .page_status(1);break;
+		case "global-status":echo page_status(1);break;
 		default:echo main_settings();break;
 	}
 	
@@ -478,7 +430,7 @@ function main_config_amavisfile(){
 	
 	$amavis=new amavis();
 	$tbl=explode("\n",$amavis->amavis_conf);
-	$html=main_tabs() . "<div style='background-color:white;width:100%;height:600px;overflow:auto;font-size:11px;'>
+	$html="<div style='background-color:white;width:100%;height:600px;overflow:auto;font-size:11px;'>
 	<table style='width:100%'>
 	
 	";
@@ -500,7 +452,7 @@ function main_config_amavisfile(){
 	}
 	
 function main_events(){
-	$tabs=main_tabs();
+	
 	$page=CurrentPageName();
 	$amavis=new amavis();
 	$sock=new sockets();
@@ -537,7 +489,7 @@ function main_events(){
 		
 	}
 	
-	$html="$tabs
+	$html="
 	<form name='ffmlogs'>
 	<table style='width:49%' class=table_form align='right'>
 	<tr>
@@ -594,7 +546,7 @@ function main_settings($noecho=0){
 	
 	
 	
-	$html=main_tabs() . "
+	$html="
 	<H5>{global_settings}</H5>
 	<table>
 			<tr>

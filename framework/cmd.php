@@ -3402,6 +3402,8 @@ function hostname_full(){
 	if($ypdomainname<>null){
 		exec("$ypdomainname",$results);
 		$domain=trim(@implode(" ",$results));
+		
+		
 	}else{
 		exec("$sysctl -n kernel.domainname",$results);
 		$domain=trim(@implode(" ",$results));
@@ -3409,6 +3411,8 @@ function hostname_full(){
 	unset($results);
 	exec("$hostname -s",$results);
 	$host=trim(@implode(" ",$results));
+	if(preg_match("#not set#",$domain)){$domain=null;}
+	if(preg_match("#\(none#",$domain)){$domain=null;}
 	if(strlen($domain)>0){$host="$host.$domain";}
 	echo "<articadatascgi>$host</articadatascgi>";	
 	

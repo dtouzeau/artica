@@ -44,8 +44,8 @@ function start_js(){
 	$title1=$tpl->_ENGINE_parse_body('{fetchmail_aliases}');
 	$server=$tpl->_ENGINE_parse_body('{server_name}');
 	$username=$tpl->_ENGINE_parse_body('{username}');
-	$delconfirm=$tpl->_ENGINE_parse_body('{fetch_delete_rule_confirm}');
-	$fetchaliase=$tpl->_ENGINE_parse_body('{fetchmail_aliases_ask}');
+	$delconfirm=$tpl->javascript_parse_text('{fetch_delete_rule_confirm}');
+	$fetchaliase=$tpl->javascript_parse_text('{fetchmail_aliases_ask}');
 	$GET_RIGHT_ISP_SETTINGS=$tpl->_ENGINE_parse_body('{GET_RIGHT_ISP_SETTINGS}');
 	
 	$html="
@@ -59,7 +59,7 @@ var x_FetchmailAddAliase= function (obj) {
 	
 	
 	function StartFetchmailPage(){
-		YahooWin3(650,'$page?page-index=yes&uid=$uid','$title');
+		YahooWin5('650','$page?page-display=$uid','$title');
 	}
 	
 	function AliasesFetchmail(){
@@ -68,7 +68,7 @@ var x_FetchmailAddAliase= function (obj) {
 	}
 	
 	function DisplayAccount(){
-		YahooWin5('650','$page?page-display='+uid);
+		
 	}
 	
 	function SelectRule(num){
@@ -264,8 +264,7 @@ function page_list_js_enable(){
 			 XHR.appendData('enable-fetch-rule',0);
 			}
 			XHR.appendData('fetchmail-rule-id','{$_GET["enable-js-rule"]}');
-			document.getElementById('fetchmail-rules-js').innerHTML='<center><img src=\"img/wait_verybig.gif\"></center>';
-			XHR.sendAndLoad('$page', 'GET',x_page_list_js_enable);		
+			XHR.sendAndLoad('$page', 'GET');		
 		}
 	
 	page_list_js_enable();
@@ -304,21 +303,29 @@ function page_list(){
 	if(is_array($rules)){
 		$tbl="<table style='width:98%'>
 		<tr>
-			<th<strong>{imap_server_name}</strong></th>
-			<th><strong>{protocol}</th>
-			<th><strong>{enabled}</th>
+			<th<strong>{user}</strong></th>
+			<th><strong>{imap_server_name}</th>
+			<th colspan=3><strong>{enabled}</th>
 			
 			
 		</tr>";
 		while (list ($num, $ligne) = each ($rules) ){
 			
 			$enabled=Field_checkbox("{$num}_enabled",1,$ligne["enabled"],"Loadjs('$page?enable-js-rule=$num&uid={$_GET["page-display"]}')");
-			if($enabled==0){$color="#E60B03";}else{$color="black";}
+			if($ligne["enabled"]==0){$color="#E60B03";}else{$color="black";}
+			
+			$edit=imgtootltip("24-administrative-tools.png","{edit}","ModifyFetchAccount($num)");
+			$delete=imgtootltip("ed_delete.gif","{delete}","DeleteFetchAccount($num,'{$ligne["poll"]}');");
 			$tbl=$tbl."
-				<tr ". CellRollOver("SelectRule($num)").">
-				<td style='font-size:14px;color:$color' align='left' nowrap>{$ligne["poll"]}</td>
-				<td style='font-size:14px;color:$color' align='center' nowrap>{$ligne["proto"]}</td>
-				<td style='font-size:14px;color:$color' align='right' nowrap>$enabled</td>
+				<tr ". CellRollOver().">
+			
+			
+			
+				<td style='font-size:11px;color:$color' align='left' nowrap>{$ligne["user"]}</td>
+				<td style='font-size:11px;color:$color' align='left' nowrap>{$ligne["poll"]}:{$ligne["proto"]}</td>
+				<td style='font-size:11px;color:$color' align='right' nowrap>$enabled</td>
+				<td style='font-size:11px;color:$color' align='right' nowrap>$edit</td>
+				<td style='font-size:11px;color:$color' align='right' nowrap>$delete</td>
 				</tr>";
 		}
 	}else{
@@ -327,7 +334,7 @@ function page_list(){
 	
 	$tbl=$tbl."
 	<tr>
-		<td colspan=3><hr></td>
+		<td colspan=5><hr></td>
 	</tr>
 	</table>";
 	
@@ -339,7 +346,7 @@ function page_list(){
 		<td valign='top'>
 			<strong style='font-size:18px;margin-top:10px;color:#005447'>{fetchmail_modify_rules}<hr></strong>
 		</td>
-		<td valign='top'>". button("{add}","AddFetchAccount()")."</td>
+		<td valign='top'>". imgtootltip("plus-24.png","{add}","AddFetchAccount()")."</td>
 		</tr>
 		</table>
 	</div>

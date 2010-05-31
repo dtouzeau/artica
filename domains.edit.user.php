@@ -220,6 +220,7 @@ function AJAX_USER_STARTER(){
 		case "material":echo AJAX_COMPUTER_MATERIAL_OS($_GET["userid"]);break;
 		case "computer_aliases":echo AJAX_COMPTER_ALIASES($_GET["userid"]);break;
 		case "safebox":echo USER_SAFEBOX();break;
+		case "privs":echo USER_PRIVILEGES();break;
 		
 		default:echo AJAX_USER_TAB();break;
 			
@@ -285,7 +286,10 @@ function AJAX_USER_TAB(){
 		unset($arr["file_share"]);
 		unset($arr["ftp_access"]);
 		unset($arr["mailbox"]);
+		$arr["privs"]="{privileges}";
 	}
+	
+	
 	
 	$arr["computer"]="{computer}";
 
@@ -4995,6 +4999,154 @@ function USER_SAFEBOX(){
 	
 	";
 	return $html;
+}
+
+function USER_PRIVILEGES(){
+	$AllowEditOuSecurity="status_critical.gif";
+	$AsOrgPostfixAdministrator="status_critical.gif";
+	$AsQuarantineAdministrator="status_critical.gif";
+	$AsMailManAdministrator="status_critical.gif";
+	$AsOrgStorageAdministrator="status_critical.gif";
+	$AsMessagingOrg="status_critical.gif";
+	$AllowAddUsers="status_critical.gif";
+	$AsDansGuardianGroupRule="status_critical.gif";
+	
+	$users=new usersMenus();
+	if($users->AllowEditOuSecurity){$AllowEditOuSecurity="status_ok.gif";}
+	if($users->AsOrgPostfixAdministrator){$AsOrgPostfixAdministrator="status_ok.gif";}
+	if($users->AsQuarantineAdministrator){$AsQuarantineAdministrator="status_ok.gif";}
+	if($users->AsMailManAdministrator){$AsMailManAdministrator="status_ok.gif";}
+	if($users->AsOrgStorageAdministrator){$AsOrgStorageAdministrator="status_ok.gif";}
+	if($users->AsMessagingOrg){$AsMessagingOrg="status_ok.gif";}
+	if($users->AllowAddUsers){$AllowAddUsers="status_ok.gif";}
+	if($users->AsDansGuardianGroupRule){$AsDansGuardianGroupRule="status_ok.gif";}
+
+	
+$group_allow="<H3>{groups_allow}</H3><br>
+		<table style='width:100%' class=table_form>
+		
+			<tr>
+				<td align='right'><strong>{AllowAddUsers}:</td><td width=1%><img src='img/$AllowAddUsers'></td>
+			</tr>
+			<tr>
+				<td align='right'><strong>{AsDansGuardianGroupRule}:</td><td width=1%><img src='img/$AsDansGuardianGroupRule'></td>
+			</tr>			
+		</table>
+";	
+	
+	
+$org_allow="<H3>{organization_allow}</H3><br>
+<table style='width:100%' class=table_form>	
+	<tr>
+		<td align='right' nowrap><strong>{AllowEditOuSecurity}:</td>
+		<td width=1%><img src='img/$AllowEditOuSecurity'></td>
+	</tr>
+	<tr>
+		<td align='right' nowrap><strong>{AsOrgPostfixAdministrator}:</td>
+		<td width=1%><img src='img/$AsOrgPostfixAdministrator'></td>
+	</tr>	
+	<tr>
+		<td align='right' nowrap><strong>{AsQuarantineAdministrator}:</td>
+		<td width=1%><img src='img/$AsQuarantineAdministrator'></td>
+	</tr>
+	<tr>
+		<td align='right' nowrap><strong>{AsMailManAdministrator}:</td>
+		<td width=1%><img src='img/$AsMailManAdministrator'></td>
+	</tr>	
+	<tr>
+		<td align='right' nowrap><strong>{AsOrgStorageAdministrator}:</td>
+		<td width=1%><img src='img/$AsOrgStorageAdministrator'></td>
+	</tr>	
+	<tr>
+		<td align='right' nowrap><strong>{AsMessagingOrg}:</td>
+		<td width=1%><img src='img/$AsMessagingOrg'></td>
+	</tr>
+</table>";
+
+	$AllowChangeAntiSpamSettings="status_critical.gif";
+	$AllowChangeUserPassword="status_critical.gif";
+	$AllowFetchMails="status_critical.gif";
+	$AllowChangeUserKas="status_critical.gif";
+	$AllowEditAliases="status_critical.gif";
+	$AllowChangeMailBoxRules="status_critical.gif";
+	$AllowSenderCanonical="status_critical.gif";
+	$AllowOpenVPN="status_critical.gif";
+	$AllowDansGuardianBanned="status_critical.gif";
+	$AllowXapianDownload="status_critical.gif";
+	$AllowManageOwnComputers="status_critical.gif";
+	$AllowEditAsWbl="status_critical.gif";
+	
+	if($users->AllowChangeAntiSpamSettings){$AllowChangeAntiSpamSettings="status_ok.gif";}
+	if($users->AllowChangeUserPassword){$AllowChangeUserPassword="status_ok.gif";}
+	if($users->AllowFetchMails){$AllowFetchMails="status_ok.gif";}
+	if($users->AllowChangeUserKas){$AllowChangeUserKas="status_ok.gif";}
+	if($users->AllowChangeMailBoxRules){$AllowChangeMailBoxRules="status_ok.gif";}
+	if($users->AllowSenderCanonical){$AllowSenderCanonical="status_ok.gif";}	
+	if($users->AllowOpenVPN){$AllowOpenVPN="status_ok.gif";}	
+	if($users->AllowDansGuardianBanned){$AllowDansGuardianBanned="status_ok.gif";}
+	if($users->AllowXapianDownload){$AllowXapianDownload="status_ok.gif";}	
+	if($users->AllowEditAsWbl){$AllowEditAsWbl="status_ok.gif";}		
+		
+	
+
+$user_allow="<H3>{users_allow}</H3><br>
+					<table style='width:100%' class=table_form>
+						
+						<tr>
+							<td align='right' nowrap><strong>{AllowChangeAntiSpamSettings}:</td>
+							<td width=1%><img src='img/$AllowChangeAntiSpamSettings'></td>
+						</tr>											
+						<tr>
+							<td align='right' nowrap><strong>{AllowChangeUserPassword}:</td>
+							<td width=1%><img src='img/$AllowChangeUserPassword'></td>
+						</tr>
+						<tr>
+							<td align='right' nowrap><strong>{AllowFetchMails}:</td>
+							<td width=1%><img src='img/$AllowFetchMails'></td>
+						</tr>
+						<tr>
+							<td align='right' nowrap><strong>{AllowChangeUserKas}:</td>
+							<td width=1%><img src='img/$AllowChangeUserKas'></td>
+						</tr>												
+						<tr>
+							<td align='right' nowrap><strong>{AllowEditAliases}:</td>
+							<td width=1%><img src='img/$AllowEditAliases'></td>
+						</tr>
+						<tr>
+							<td align='right' nowrap><strong>{AllowChangeMailBoxRules}:</td>
+							<td width=1%><img src='img/$AllowChangeMailBoxRules'></td>
+						</tr>						
+						<tr>
+							<td align='right' nowrap><strong>{AllowSender_canonical}:</td>
+							<td width=1%><img src='img/$AllowChangeMailBoxRules'></td>
+						</tr>
+						<tr>
+							<td align='right' nowrap><strong>{AllowOpenVPN}:</td>
+							<td width=1%><img src='img/$AllowOpenVPN'></td>
+						</tr>
+						<tr>
+							<td align='right' nowrap><strong>{AllowDansGuardianBanned}:</td>
+							<td width=1%><img src='img/$AllowDansGuardianBanned'></td>
+						</tr>
+						<tr>
+							<td align='right' nowrap><strong>{AllowXapianDownload}:</td>
+							<td width=1%><img src='img/$AllowXapianDownload'></td>
+						</tr>																									
+						<tr>
+							<td align='right' nowrap><strong>{AllowManageOwnComputers}:</td>
+							<td width=1%><img src='img/$AllowManageOwnComputers'></td>
+						</tr>						
+						
+						
+						<tr>
+							<td align='right' nowrap><strong>{AllowEditAsWbl}:</td>
+							<td width=1%><img src='img/$AllowEditAsWbl'></td>
+						</tr>									
+					</table>";	
+					
+$tpl=new templates();
+return $tpl->_ENGINE_parse_body("$user_allow$group_allow$org_allow");
+	
 }
 	
 ?>

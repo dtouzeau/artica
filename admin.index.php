@@ -13,7 +13,10 @@ include_once('ressources/class.os.system.inc');
 //ini_set('error_reporting', E_ALL);
 
 $users=new usersMenus();
-if($users->AsArticaAdministrator==true or $users->AsPostfixAdministrator or $user->AsSquidAdministrator){}else{header('location:users.index.php');exit;}
+if(!$users->AsAnAdministratorGeneric){
+		writelogs("Redirect to users.index.php",__FUNCTION__,__FILE__,__LINE__);
+		header('location:users.index.php');exit;
+}
 if(isset($_GET["StartStopService-js"])){StartStopService_js();exit;}
 if(isset($_GET["StartStopService-popup"])){StartStopService_popup();exit;}
 if(isset($_GET["StartStopService-perform"])){StartStopService_perform();exit;}

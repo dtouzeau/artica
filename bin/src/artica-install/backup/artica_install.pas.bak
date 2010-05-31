@@ -201,7 +201,15 @@ end;
       halt(0);
    end;
 
+    if ParamStr(1)='--change-hostname' then begin
+      GLOBAL_INI:=myconf.Create();
+      GLOBAL_INI.SYSTEM_NETWORKS_SET_HOSTNAME(ParamStr(2));
+      halt(0);
+   end;
 
+    if ParamStr(1)='--hostname' then begin
+      halt(0);
+   end;
 
 
 

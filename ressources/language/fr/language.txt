@@ -587,6 +587,7 @@ Squid optimise donc de fa&ccedil;on cons&eacute;quente le flux de donn&eacute;es
 <AsDansGuardianGroupRule>Peut administrer des r&egrave;gles de filtrage web.</AsDansGuardianGroupRule>
 <AsMailBoxAdministrator>Gestionnaire de boite aux lettres locales</AsMailBoxAdministrator>
 <AsMailManAdministrator>Peut administrer des listes de distribution</AsMailManAdministrator>
+<AsMessagingOrg>G&egrave;re la messagerie de l'organisation</AsMessagingOrg>
 <AsOrgPostfixAdministrator>Peu administrer le relais de messagerie (si les instances multiples sont activ&eacute;es).</AsOrgPostfixAdministrator>
 <AsOrgStorageAdministrator>Peut administrer les ressources de stockage/backup de l'organisation</AsOrgStorageAdministrator>
 <AsPostfixAdministrator>Param&egrave;tres de gestion Postfix</AsPostfixAdministrator>

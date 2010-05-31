@@ -7,6 +7,14 @@
 	include_once('ressources/class.apache.inc');
 	include_once('ressources/class.lvm.org.inc');
 	
+	
+	if(!VerifyRights()){
+		$tpl=new templates();
+		echo "alert('". $tpl->javascript_parse_text("{ERROR_NO_PRIVS}")."');";
+		die();exit();
+	}
+	
+	
 if(isset($_GET["ajaxmenu"])){echo "<div id='org_main'>";organization_sections();echo "</div>";exit;}
 if(isset($_GET["Tree_group_Add_New"])){Tree_group_Add_New();exit;}
 if(isset($_GET["ChangeOrg"])){echo groupslist($_GET["ChangeOrg"]);exit;}
@@ -45,6 +53,11 @@ function js(){
 	$prefix=str_replace(".","_",$page);
 	$js1=file_get_contents("js/artica_organizations.js");
 	$js2=file_get_contents("js/artica_domains.js");
+	$start_function="LoadSingleOrg()";
+	
+	if(isset($_GET["panel"])){
+		$start_function="LoadPanel()";
+	}
 	
 	$html="
 	var {$prefix}timeout=0;
@@ -53,11 +66,13 @@ function js(){
 		LoadWinORG2('760','$page?js-pop=yes&ou=$ou_encoded','$title');
 		
 	}
-
 	
+	function LoadPanel(){
+		LoadAjax('main-org-panel','$page?js-pop=yes&ou=$ou_encoded');
+	}	
 	$js1
 	$js2
-	LoadSingleOrg();";
+	$start_function;";
 	
 	
 	SET_CACHED(__FILE__,__FUNCTION__,"js:$ou_encoded",$html);
@@ -90,14 +105,10 @@ $html="
 <input type='hidden' value='{$_GET["ou"]}' id='ouselected'>
 <input type='hidden' value='{delete_ou_text}' id='delete_ou_text'>
 <div id='org_main' style='width:100%;height:450px;overflow:auto'>";
-
 $tpl=new templates();
-	
 writelogs("Building popup done...",__FUNCTION__,__FILE__);
 $page=$tpl->_ENGINE_parse_body($html);
 echo $page;
-
-	
 }
 	
 
@@ -416,14 +427,14 @@ function popup_tabs(){
 	$user=new usersMenus();
 	$array["management"]='{management}';
 	$array["users"]='{users}';
-	$array["groupwares"]='{groupwares}';
-	if(count($lvm_g->disklist)>0){
-		$array["storage"]='{storage}';
+	if($usersmenus->AsOrgAdmin){
+		$array["groupwares"]='{groupwares}';
+		if(count($lvm_g->disklist)>0){$array["storage"]='{storage}';}
 	}
 	
 	if($user->POSTFIX_INSTALLED){
 		$sock=new sockets();
-		if($user->AsOrgPostfixAdministrator){
+		if($user->AsMessagingOrg){
 			$array["postfix"]='{messaging}';
 		}
 	}
@@ -556,7 +567,7 @@ $quarantine=icon_quarantine($usersmenus);
 	}
 	
 	
-if($usersmenus->AsPostfixAdministrator){
+if(($usersmenus->AsPostfixAdministrator) OR ($usersmenus->AsMessagingOrg)){
 	$quarantine_admin=Paragraphe("64-banned-regex.png","{all_quarantines}","{all_quarantines_text}","javascript:Loadjs('domains.quarantine.php?js=yes&Master=yes')",null,210,100,0,true);
 	$quarantine_report=Paragraphe("64-administrative-tools.png","{quarantine_reports}","{quarantine_reports_text}","javascript:Loadjs('domains.quarantine.php?js=yes&MailSettings=yes')",null,210,100,0,true);	
 }
@@ -619,42 +630,35 @@ function organization_management(){
 	$usersmenus=new usersMenus();
 	$usersmenus->LoadModulesEnabled();	
 	
-	if(($usersmenus->AllowAddUsers) OR ($usersmenus->AsOrgAdmin)){	
+	if(($usersmenus->AllowAddUsers) OR ($usersmenus->AsOrgAdmin) OR ($usersmenus->AsMessagingOrg)){	
 		$add_user=Paragraphe('folder-useradd-64.png','{create_user}','{create_user_text}',"javascript:Loadjs('domains.add.user.php?ou=$ou')",null,210,null,0,true);	
 		$groups=Paragraphe('folder-group-64.png','{manage_groups}','{manage_groups_text}',"javascript:Loadjs('domains.edit.group.php?ou=$ou&js=yes')",null,210,100,0,true);
-		$ad_import=Paragraphe('folder-import-ad-64.png','{ad_import}','{ad_import_text}',"javascript:Loadjs('domains.ad.import.php?ou=$ou')",null,210,0,0,true);
+		
 	}
 		
-	
-	
 
-$find_members=Paragraphe('find-members-64.png','{find_members}','{find_members_text}',"javascript:Loadjs('domains.find.user.php?ou=$ou')",null,210,null,0,true);		
+	$find_members=Paragraphe('find-members-64.png','{find_members}','{find_members_text}',"javascript:Loadjs('domains.find.user.php?ou=$ou')",null,210,null,0,true);		
 	
 
-
-	writelogs("EnableMysqlFeatures: $usersmenus->EnableMysqlFeatures; AllowViewStatistics:$usersmenus->AllowViewStatistics; 
-	AMAVIS_INSTALLED:$usersmenus->AMAVIS_INSTALLED; EnableAmavisDaemon:$usersmenus->EnableAmavisDaemon",
-	__FUNCTION__,__FILE__);
-	
-
-	if($usersmenus->AsArticaAdministrator==true){$delete=Paragraphe('64-cancel.png','{delete_ou}','{delete_ou_text}',"javascript:DeleteOU(\"$ou\");",null,210,100,0,true);}
+	if($usersmenus->AsArticaAdministrator){$delete=Paragraphe('64-cancel.png','{delete_ou}','{delete_ou_text}',"javascript:DeleteOU(\"$ou\");",null,210,100,0,true);}
 	
 	
 if($usersmenus->AsOrgAdmin){
+	$ad_import=Paragraphe('folder-import-ad-64.png','{ad_import}','{ad_import_text}',"javascript:Loadjs('domains.ad.import.php?ou=$ou')",null,210,0,0,true);
 	$orgsettings=Paragraphe('64-org-settings.png','{ORG_SETTINGS}','{ORG_SETTINGS_TEXT}',"javascript:Loadjs('domains.organization-settings.php?ou=$ou')",null,210,0,0,true);
 	$orgsduplicate=Paragraphe('org-duplicate-64.png','{EXPORT_ORG}','{duplicate_to_remote_server}',"javascript:Loadjs('domains.organization-settings.php?ou=$ou&js-export=yes')",null,210,0,0,true);
-	$transport=Paragraphe('folder-transport-64.png','{localdomains}','{localdomains_text}',"javascript:Loadjs('domains.edit.domains.php?js=yes&ou=$ou')",null,210,null,0,true);
-	if($usersmenus->POSTFIX_INSTALLED){$sendmail="<div style='float:left'>".Buildicon64('DEF_ICO_SENDTOALL',210,100,"?ou=$ou")."</div>";}	
+	
+	
 }
+
+if(($usersmenus->AsOrgAdmin) OR ($usersmenus->AsMessagingOrg)){
+	$transport=Paragraphe('folder-transport-64.png','{localdomains}','{localdomains_text}',"javascript:Loadjs('domains.edit.domains.php?js=yes&ou=$ou')",null,210,null,0,true);
+	if($usersmenus->POSTFIX_INSTALLED){$sendmail="<div style='float:left'>".Buildicon64('DEF_ICO_SENDTOALL',210,100,"?ou=$ou")."</div>";}
+}	
+
 	
 if($usersmenus->POSTFIX_INSTALLED){$transport=null;	}
-	
-	if($usersmenus->SMTP_LEVEL>0){
-		$quarantine=null;
-		$ArticaHtml=null;
-		$stats=null;
-		}
-	
+		
 	
 	$html="<div style='width:700px'>
 	$add_user $groups $find_members 
@@ -1224,7 +1228,7 @@ function organization_users_list(){
 
 function organization_users_find_member(){
 	$tofind=$_GET["finduser"];
-	if($_SESSION["uid"]=-100){$ou=$_GET["ou"];}else{$ou=$_SESSION["ou"];}
+	if($_SESSION["uid"]==-100){$ou=$_GET["ou"];}else{$ou=$_SESSION["ou"];}
 	$ldap=new clladp();
 	if($tofind==null){$tofind='*';}else{$tofind="*$tofind*";}
 	$filter="(&(objectClass=userAccount)(|(cn=$tofind)(mail=$tofind)(displayName=$tofind)(uid=$tofind) (givenname=$tofind)))";
@@ -1302,7 +1306,11 @@ function organization_users_formatUser($hash){
 	
 	
 }
-
+function VerifyRights(){
+	$usersmenus=new usersMenus();
+	if($usersmenus->AsMessagingOrg){return true;}
+	if(!$usersmenus->AllowChangeDomains){return false;}
+}
 
 	
 

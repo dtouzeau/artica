@@ -28,6 +28,7 @@ private
      EnableAmavisInMasterCF:integer;
      EnablePostfixMultiInstance:integer;
      mem_installee:integer;
+     AmavisMemoryInRAM:integer;
      procedure START_MILTER();
      procedure AMAVISD_SETCONFIG(key:string;value:string);
      procedure include_config_files();
@@ -46,7 +47,7 @@ private
      function  IS_AMAVIS_MOUNTED_IN_RAM():boolean;
      function  AMAVISD_MILTER_STATUS():string;
      function  AMAVISD_STATUS():string;
-     AmavisMemoryInRAM:integer;
+
 
 public
     procedure   Free;
@@ -591,6 +592,7 @@ end;
 
 forceDirectories('/var/spool/postfix/var/run/amavisd-milter');
 forceDirectories('/var/amavisd-milter');
+forceDirectories('/tmp/savemail');
 
 fpsystem('/bin/chown -R postfix:postfix /var/spool/postfix/var/run/amavisd-milter');
 fpsystem('/bin/chown -R postfix:postfix /var/amavis');

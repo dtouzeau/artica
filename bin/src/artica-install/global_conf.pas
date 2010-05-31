@@ -846,6 +846,7 @@ function myconf.SYSTEM_FQDN():string;
  var D:boolean;
  ypdomainname:string;
  domainname:string;
+  RegExpr:TRegExpr;
 begin
     D:=COMMANDLINE_PARAMETERS('debug');
     fpsystem(SYS.LOCATE_GENERIC_BIN('hostname')+' -s >/opt/artica/logs/hostname.txt');
@@ -858,6 +859,15 @@ begin
          fpsystem(SYS.LOCATE_GENERIC_BIN('sysctl')+' -n kernel.domainname >/tmp/domain.name.txt 2>&1');
     end;
     domainname:=trim(ReadFileIntoString('/tmp/domain.name.txt'));
+    RegExpr:=TRegExpr.Create;
+    RegExpr.Expression:='name not set';
+    if RegExpr.Exec(domainname) then domainname:='';
+    RegExpr.Expression:='name not set';
+    if RegExpr.Exec(domainname) then domainname:='';
+
+
+    RegExpr.free;
+
     if length(domainname)>0 then result:=result+'.'+domainname;
 
 end;

@@ -615,6 +615,7 @@ If you enable this feature, you will be able to share folders trough the explore
 <AsDansGuardianGroupRule>Can manage web filtering rules for this group</AsDansGuardianGroupRule>
 <AsMailBoxAdministrator>Local Mailbox manager</AsMailBoxAdministrator>
 <AsMailManAdministrator>Can manage email distribution Lists</AsMailManAdministrator>
+<AsMessagingOrg>Can manage messaging features</AsMessagingOrg>
 <AsOrgPostfixAdministrator>Can manage organization MTA (if multiple instances is enabled)</AsOrgPostfixAdministrator>
 <AsOrgStorageAdministrator>Can manage organization's storages/backup</AsOrgStorageAdministrator>
 <AsPostfixAdministrator>Manage postfix settings</AsPostfixAdministrator>

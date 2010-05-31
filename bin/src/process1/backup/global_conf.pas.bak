@@ -857,7 +857,8 @@ begin
     end else begin
          fpsystem(SYS.LOCATE_GENERIC_BIN('sysctl')+' -n kernel.domainname >/tmp/domain.name.txt 2>&1');
     end;
-             domainname:=trim(ReadFileIntoString('/tmp/domain.name.txt'));
+    domainname:=trim(ReadFileIntoString('/tmp/domain.name.txt'));
+    if length(domainname)>0 then result:=result+'.'+domainname;
 
 end;
 

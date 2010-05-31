@@ -19,6 +19,7 @@
 	
 	if(isset($_GET["popup"])){popup();exit;}
 	if(isset($_GET["graph"])){echo graph();exit;}	
+	
 	if(isset($_GET["queries"])){queries();exit;}
 	if(isset($_GET["last-events"])){last_events();exit;}
 	if(isset($_GET["query-menu"])){query_menu();exit;}
@@ -95,11 +96,17 @@ function popup(){
 	$tpl=new templates();
 	$array["graph"]='{system}';
 	$array["queries"]='{queries}';
+	$array["synthesis"]='{synthesis}:{hits_number}';
 
 	
 
 	
 	while (list ($num, $ligne) = each ($array) ){
+		
+		if($num=="synthesis"){
+			$html[]= $tpl->_ENGINE_parse_body("<li><a href=\"squid.stats.general.php\"><span>$ligne</span></li>\n");
+			continue;
+		}
 		$html[]= $tpl->_ENGINE_parse_body("<li><a href=\"$page?$num=yes\"><span>$ligne</span></li>\n");
 	}
 	

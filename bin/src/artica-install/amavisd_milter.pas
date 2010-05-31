@@ -592,10 +592,13 @@ end;
 
 forceDirectories('/var/spool/postfix/var/run/amavisd-milter');
 forceDirectories('/var/amavisd-milter');
+forceDirectories('/tmp/savemail');
+
 
 fpsystem('/bin/chown -R postfix:postfix /var/spool/postfix/var/run/amavisd-milter');
 fpsystem('/bin/chown -R postfix:postfix /var/amavis');
 fpsystem('/bin/chmod 770 /var/amavis');
+fpsystem('/bin/chmod 770 /tmp/savemail');
 
 
 fpsystem(SYS.LOCATE_PHP5_BIN()+' /usr/share/artica-postfix/exec.amavis.php');

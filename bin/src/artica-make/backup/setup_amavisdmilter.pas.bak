@@ -417,8 +417,6 @@ if not InstallGeoIP() then exit;
   install.INSTALL_PROGRESS('APP_AMAVISD_NEW','{installed}');
   SYS.set_INFO('EnableAmavisDaemon','1');
   SYS.set_INFO('AmavisFilterEnabled','1');
-
-
   fpsystem('/etc/init.d/artica-postfix restart amavis &');
   result:=true;
 

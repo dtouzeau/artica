@@ -207,6 +207,12 @@ end;
       halt(0);
    end;
 
+    if ParamStr(1)='--hostname' then begin
+      GLOBAL_INI:=myconf.Create();
+      GLOBAL_INI.SYSTEM_FQDN();
+      halt(0);
+   end;
+
 
 
     if ParamStr(1)='--format-b-part' then begin
