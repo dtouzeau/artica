@@ -19,12 +19,13 @@
 	
 	if(isset($_GET["popup"])){popup();exit;}
 	if(isset($_GET["graph"])){echo graph();exit;}	
-	
+	if(isset($_GET["browsed"])){echo browsed_websites();exit;}
 	if(isset($_GET["queries"])){queries();exit;}
 	if(isset($_GET["last-events"])){last_events();exit;}
 	if(isset($_GET["query-menu"])){query_menu();exit;}
 	if(isset($_GET["popup-filter"])){popup_filter();exit;}
 	if(isset($_GET["Q_CLIENT"])){saveFilter();exit;}
+	if(isset($_GET["show-hits"])){showhits();exit;}
 	
 	
 js();
@@ -97,6 +98,7 @@ function popup(){
 	$array["graph"]='{system}';
 	$array["queries"]='{queries}';
 	$array["synthesis"]='{synthesis}:{hits_number}';
+	$array["browsed"]='{browsed_websites}';
 
 	
 
@@ -357,6 +359,78 @@ function tous_les_clients(){
 	
 	$sock->APC_SAVE("SQUID_STATS_CLIENTS_TOT",serialize($array));
 	return $array;
+}
+
+function browsed_websites(){
+	$page=CurrentPageName();
+	$tpl=new templates();
+	$display_hits=$tpl->_ENGINE_parse_body('{display_hits}');
+	$sql="SELECT COUNT(ID) as tcount,sitename FROM dansguardian_events GROUP BY sitename ORDER BY tcount DESC LIMIT 0,200";
+	$q=new mysql();
+	$results=$q->QUERY_SQL($sql,"artica_events");
+	
+	$html="<table style=width:100%>
+	<tr>
+		<th>{websites}</th>
+		<th>{category}</th>
+		<th colspan=3>{hits_number}</th>
+	</tr>
+	
+	";
+	while($ligne=@mysql_fetch_array($results,MYSQL_ASSOC)){
+		if($ligne["sitename"]=="127.0.0.1"){continue;}
+		if($ligne["sitename"]=="localhost"){continue;}
+		$md5=md5($ligne["sitename"]."showcat");
+		$js[]="LoadAjaxTiny('$md5','squid.categorize.php?categories-of=". base64_encode($ligne["sitename"])."');";
+		
+		$html=$html."
+		<tr ". CellRollOver().">
+			<td nowrap><strong style='font-size:12px'>{$ligne["sitename"]}</strong></td>
+			<td nowrap width=1%>". texttooltip("{hits}","{display_hits}:{$ligne["sitename"]}","WebSiteHits('{$ligne["sitename"]}')")."</td>
+			<td nowrap width=1%><span id='$md5'></span></td>
+			<td nowrap width=1%>". texttooltip("{categorize}","{categorize}:{$ligne["sitename"]}","Loadjs('squid.categorize.php?www={$ligne["sitename"]}')")."</td>
+			<td nowrap width=1% align='right'><strong style='font-size:12px' align='right'>{$ligne["tcount"]}</strong></td>
+		</tr>";
+		
+	}
+	
+	$html=$html."</table>
+	<script>
+		". @implode("\n",$js)."
+		function WebSiteHits(domain){
+			YahooWin4(650,'$page?show-hits='+domain,'$display_hits:'+domain);
+		}
+	</script>";
+	
+	echo $tpl->_ENGINE_parse_body($html);		
+}
+function showhits(){
+	$www=$_GET["show-hits"];
+	$tpl=new templates();
+	$sql="SELECT COUNT(ID) as tcount,uri FROM dansguardian_events WHERE sitename='$www' GROUP BY uri ORDER BY tcount DESC LIMIT 0,200";
+	$q=new mysql();
+	$results=$q->QUERY_SQL($sql,"artica_events");	
+
+	
+	$html="
+	<div style='height:450px;overflow:auto'>
+	<table style=width:100%>
+		<tr>
+		<th>{hits_number}</th>
+		<th></th>
+		
+	</tr>";
+	while($ligne=@mysql_fetch_array($results,MYSQL_ASSOC)){
+		$js="s_PopUp('{$ligne["uri"]}',800,800)";
+		$html=$html."
+		<tr ". CellRollOver($js,"{open}").">
+			<td nowrap width=1%><strong style='font-size:12px'>{$ligne["tcount"]}</strong></td>
+			<td nowrap width=99%><strong><code>{$ligne["uri"]}</code></strong></td>
+		</tr>";
+		
+	}
+		$html=$html."</table></div>";
+		echo $tpl->_ENGINE_parse_body($html);
 }
 	
 	

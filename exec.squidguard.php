@@ -169,6 +169,7 @@ function compile_databases(){
 	$users=new usersMenus();
 	$squid=new squidbee();
 	$array=$squid->SquidGuardDatabasesStatus();
+	$verb=" -d";
 	echo "Starting......: squidGuard compiling ". count($array)." databases\n";
 		while (list ($index, $file) = each ($array)){
 			$file=str_replace(".db",'',$file);

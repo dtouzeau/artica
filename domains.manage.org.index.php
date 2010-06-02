@@ -500,16 +500,14 @@ function organization_messaging(){
 		if(isset($_COOKIE["SwitchOrgTabsOu"])){$_GET["ou"]=$_COOKIE["SwitchOrgTabsOu"];}
 	}
 	
-	$stats=Paragraphe('64-milterspy-grey.png','{statistics}','{statistics_ou_text}',"",null,210,100,0,true);
+	
 	$tpl=new templates();
 
 	
 	$usersmenus=new usersMenus();
 	$usersmenus->LoadModulesEnabled();	
 	
-if($usersmenus->AllowChangeDomains==true){
-	$transport=Paragraphe('folder-transport-64.png','{localdomains}','{localdomains_text}',"javascript:Loadjs('domains.edit.domains.php?js=yes&ou=$ou')",null,210,null,0,true);
-	}
+
 	
 
 	$network=Paragraphe('folder-network-64.png','{postfix_network}','{postfix_network_text}',"javascript:Loadjs('domains.postfix.network.php?ou=$ou_encoded')",null,210,null,0,true);
@@ -525,13 +523,7 @@ if($usersmenus->AllowChangeDomains==true){
 		
 	}
 	
-	if($sock->GET_INFO("EnableWhiteListAndBlackListPostfix")==1){
-		if($usersmenus->AllowEditOuSecurity){
-			$whitelistrobots=Paragraphe('bg_chess-64.png','{enable_artica_wbl_robots}','{enable_artica_wbl_robots_icon}',"javascript:Loadjs('domains.white.list.robots.php?ou=$ou')",null,210,0,0,true);
-		}
-	}
-	
-	
+
 	$text_disbaled="{ERROR_NO_PRIVILEGES_OR_PLUGIN_DISABLED}";
 	if($usersmenus->KAV_MILTER_INSTALLED==true){
 		if($usersmenus->KAVMILTER_ENABLED==1){
@@ -540,8 +532,6 @@ if($usersmenus->AllowChangeDomains==true){
 			}
 		}
 		
-	
-if($kavmilter==null){$kavmilter=Paragraphe('icon-antivirus-64-grey.png','{antivirus}',$text_disbaled,null,null,210,null,0,true);}
 
 	if($usersmenus->kas_installed){
 		if($usersmenus->KasxFilterEnabled){
@@ -549,29 +539,22 @@ if($kavmilter==null){$kavmilter=Paragraphe('icon-antivirus-64-grey.png','{antivi
 		}
 	}
 	
-if($kas3x==null){$kas3x=Paragraphe('folder-caterpillar-grey.png','{as_plugin}',$text_disbaled,null,null,210,null,0,true);}
-
-	if($usersmenus->AsOrgAdmin){
-		$rttm="<div style='float:left'>".Buildicon64('DEF_ICO_EVENTS_RTMMAIL')."</div>";
-		$stats=Paragraphe('64-milterspy.png','{statistics}','{statistics_ou_text}',"javascript:Loadjs('statistics.ou.php?ou=$ou')",null,210,100,0,true);
-		$quarantine_robot=Paragraphe("folder-64-denycontries.png","{quarantine_robots}","{quarantine_robots_text}","javascript:Loadjs('domains.white.list.robots.php?ou=$ou');",null,210,100,0,true);
-	}
-
-$quarantine=icon_quarantine($usersmenus);
-
-	
-	if($usersmenus->AllowViewStatistics==true){
-		$ArticaHtml=icon_html_size_blocker($usersmenus);	
-		$icon_backuphtml=icon_backuphtml($usersmenus);
-			
-	}
-	
-	
-if(($usersmenus->AsPostfixAdministrator) OR ($usersmenus->AsMessagingOrg)){
+if(($usersmenus->AsPostfixAdministrator) OR ($usersmenus->AsMessagingOrg) OR ($usersmenus->AsOrgAdmin) OR ($usersmenus->AllowEditOuSecurity)){
+	$quarantine=icon_quarantine($usersmenus);
 	$quarantine_admin=Paragraphe("64-banned-regex.png","{all_quarantines}","{all_quarantines_text}","javascript:Loadjs('domains.quarantine.php?js=yes&Master=yes')",null,210,100,0,true);
-	$quarantine_report=Paragraphe("64-administrative-tools.png","{quarantine_reports}","{quarantine_reports_text}","javascript:Loadjs('domains.quarantine.php?js=yes&MailSettings=yes')",null,210,100,0,true);	
+	$quarantine_report=Paragraphe("64-administrative-tools.png","{quarantine_reports}","{quarantine_reports_text}","javascript:Loadjs('domains.quarantine.php?js=yes&MailSettings=yes')",null,210,100,0,true);
+	$rttm="<div style='float:left'>".Buildicon64('DEF_ICO_EVENTS_RTMMAIL')."</div>";
+	$stats=Paragraphe('64-milterspy.png','{statistics}','{statistics_ou_text}',"javascript:Loadjs('statistics.ou.php?ou=$ou')",null,210,100,0,true);
+	$quarantine_robot=Paragraphe("folder-64-denycontries.png","{quarantine_robots}","{quarantine_robots_text}","javascript:Loadjs('domains.white.list.robots.php?ou=$ou');",null,210,100,0,true);
+	if($sock->GET_INFO("EnableWhiteListAndBlackListPostfix")==1){
+		$whitelistrobots=Paragraphe('bg_chess-64.png','{enable_artica_wbl_robots}','{enable_artica_wbl_robots_icon}',"javascript:Loadjs('domains.white.list.robots.php?ou=$ou')",null,210,0,0,true);
+	}		
 }
 
+	if(($usersmenus->AllowChangeDomains) OR ($usersmenus->AsPostfixAdministrator)  OR ($usersmenus->AsMessagingOrg)){
+		$transport=Paragraphe('folder-transport-64.png','{localdomains}',
+		'{localdomains_text}',"javascript:Loadjs('domains.edit.domains.php?js=yes&ou=$ou')",null,210,null,0,true);
+	}
 
 if($usersmenus->cyrus_imapd_installed){
 	$buildAllmailboxes=	Paragraphe("rebuild-mailboxes-64.png","{rebuild_mailboxes_org}","{rebuild_mailboxes_org_text}",

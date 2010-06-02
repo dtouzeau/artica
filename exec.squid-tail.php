@@ -155,10 +155,10 @@ if(preg_match("#^(?:[^/]+://)?([^/:]+)#",$uri,$re)){
 	$zMD5=md5("$uri$date$CLIENT$username$TYPE$Country$site_IP");
 
 	
-	events("$date $REASON:: $CLIENT ($user) -> $sitename ($site_IP) Country=$Country REASON:\"$REASON\" TYPE::\"$TYPE\" size=$size" );
+	events("$date $REASON:: $CLIENT ($username) -> $sitename ($site_IP) Country=$Country REASON:\"$REASON\" TYPE::\"$TYPE\" size=$size" );
 	$uri=addslashes($uri);
 	$sql="INSERT INTO dansguardian_events (`sitename`,`uri`,`TYPE`,`REASON`,`CLIENT`,`zDate`,`zMD5`,`remote_ip`,`country`,`QuerySize`,`uid`) 
-	VALUES('$sitename','$uri','$TYPE','$REASON','$CLIENT','$date','$zMD5','$site_IP','$Country','$size','$user');";
+	VALUES('$sitename','$uri','$TYPE','$REASON','$CLIENT','$date','$zMD5','$site_IP','$Country','$size','$username');";
 	@file_put_contents("/var/log/artica-postfix/dansguardian-stats/$zMD5.sql",$sql);	
   
 }

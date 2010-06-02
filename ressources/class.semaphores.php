@@ -12,7 +12,7 @@ class semaphores{
 		$this->ok=true;
 		$this->bytesmem=$memorybytes;
 		$this->index=$index;
-		$this->shmid=shm_attach($this->id,$this->bytesmem,0777);
+		$this->shmid=@shm_attach($this->id,$this->bytesmem,0777);
 		if(!$this->shmid){$this->ok=false;}
 		
 	}

@@ -156,7 +156,7 @@ $style=CellRollOver();
 		if(file_exists("img/ext/{$ext}_small.gif")){$img="img/ext/{$ext}_small.gif";}
 		$categ=$categ . 
 		"<tr $style>
-		<td width=1%><IMG SRC='$img'></td>
+		<td width=1%><IMG SRC='$img' id='image_{$num}'></td>
 		<td width=1%>$onoff</td>
 		<td width=1% style='font-size:12px'> <strong id='pattern_{$num}'>{$ligne["pattern"]}</strong></td>
 		<td width=98% style='font-size:12px'><strong id='info_{$num}'>{$ligne["infos"]}</strong></td>

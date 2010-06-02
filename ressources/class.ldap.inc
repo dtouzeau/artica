@@ -442,7 +442,8 @@ function ErrorConnection(){
 			if($generated_id==1){$generated_id=10;}
 		}
 		
-		if($ou==null){if(isset($_GET["ou"])){$ou=$_GET["ou"];}}
+		if($ou==null){if($_GET["ou"]<>null){$ou=$_GET["ou"];}}
+		if($ou==null){if($_SESSION["ou"]<>null){$ou=$_SESSION["ou"];}}
 		
 		if($ou==null){$dn="cn=$group,dc=organizations,$this->suffix";}
 		else{$dn="cn=$group,ou=groups,ou=$ou,dc=organizations,$this->suffix";}

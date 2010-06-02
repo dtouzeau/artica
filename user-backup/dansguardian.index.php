@@ -85,9 +85,44 @@
 	if(isset($_GET["template-options-page"])){template_options_page();exit;}
 	if(isset($_GET["DansGuardianEnableUserArticaIP"])){template_options_save();exit;}
 	if(isset($_GET["dansguardian-rotate-logs"])){rotate_logs();exit;}
+	if(isset($_GET["squid-restart-js"])){squid_restart_js();exit;}
+	if(isset($_GET["squid-restart-perform"])){squid_restart_perform();exit;}
 	
 	
 	if(isset($_GET["rule_main"])){main_rules_switch();exit;}
+	
+	
+	
+function squid_restart_js(){
+$page=CurrentPageName();
+
+$html="
+	var x_squid_restart_start= function (obj) {
+		var res=obj.responseText;
+		if (res.length>0){alert(res);}
+	}	
+	
+	function squid_restart_start(){
+			var XHR = new XHRConnection();
+			XHR.appendData('squid-restart-perform','yes');
+			XHR.sendAndLoad('$page', 'GET',x_squid_restart_start); 
+	}
+	
+
+squid_restart_start()";
+echo $html;
+	
+	
+}
+
+function squid_restart_perform(){
+	$sock=new sockets();
+	$sock->getFrameWork("cmd.php?squid-reconfigure=yes");
+	$tpl=new templates();
+	echo $tpl->javascript_parse_text("{service_squid_restart_explain}");
+	
+}
+
 	
 function popup_js(){
 $page=CurrentPageName();	
@@ -456,7 +491,10 @@ function popup_dansguardian_main(){
 	
 			
 	$simple_intro="{danseguardian_simple_intro}";
-	if($squidGuardEnabled==1){$simple_intro="{squidguard_simple_intro}";}			
+	if($squidGuardEnabled==1){
+		$simple_intro="{squidguard_simple_intro}";
+		$tool="<div style='text-align:right'>". texttooltip("&laquo;&nbsp;{squidguard_testrules}&nbsp;&raquo;","{squidguard_testrules}","Loadjs('squidguard.tests.php')",null,0,"font-size:14px")."</div>";
+	}			
 			
 	
 	 $html="
@@ -469,6 +507,7 @@ function popup_dansguardian_main(){
 		  		</td>
 		  		<td valign='top'>
 		  			<p  style='font-size:13px'>$from_squid$simple_intro</p>
+		  			$tool
 		  		</td>
 		  	</tr>
 		  </table>";
@@ -481,6 +520,12 @@ function popup_dansguardian_main(){
 		$template=Paragraphe("banned-template-64.png","{template_label}",'{template_explain}',"javascript:s_PopUp('dansguardian.template.php',800,800)"); 
 		$denywebistes=Paragraphe('folder-64-denywebistes.png','{deny_websites}','{deny_websites_text}',"javascript:Loadjs('squid.popups.php?script=url_regex')");  
 		 
+		$compile=Paragraphe('system-64.png','{apply_squid}','{apply_squid_text}',"javascript:Loadjs('$page?squid-restart-js=yes')");
+		
+		$database_plus=Paragraphe('database-spider-plus.png','{shallalist}','{shallalist_text}',"javascript:Loadjs('shallalist.php')");
+		
+		
+		
 		// -> $cicap_enabled
 		
 		$cicap_dnsbl=Paragraphe("64-cop-acls-dnsbl.png","{CICAP_DNSBL}","{CICAP_DNSBL_TEXT}","javascript:Loadjs('c-icap.dnsbl.php')");
@@ -504,11 +549,12 @@ function popup_dansguardian_main(){
 			$compile_db=Paragraphe("compile-database-64.png","{compile_squidguard_databases}","{compile_squidguard_databases_text}","javascript:Loadjs('squidguard.status.php?compile=yes')");
 		}
 		
-		
+	$tr[]=$compile;
 	$tr[]=$apply;
 	$tr[]=$squidguard_status;
 	$tr[]=$compile_db;
 	$tr[]=$dansguardian_db;
+	$tr[]=$database_plus;
 	$tr[]=$dansguardian_update;
 	$tr[]=$denywebistes;
 	$tr[]=$cicap_dnsbl;

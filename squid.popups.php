@@ -631,6 +631,7 @@ echo $tpl->_ENGINE_parse_body($html,'squid.index.php');
 		var x_save_plugins= function (obj) {
 			var results=obj.responseText;
 			if(results.length>0){alert(results);}
+			Loadjs('div-poubelle','CacheOff.php?cache=yes');
 			YahooWin2Hide();
 			RefreshTab('squid_main_config');
 			RefreshLeftMenu();
@@ -735,7 +736,7 @@ function plugins_popup(){
 		$squidguard=Paragraphe_switch_img("{enable_squidguard}","{enable_squidguard_text}",'enable_squidguard',$squid->enable_squidguard,'{enable_disable}',250);
 	}
 	
-	$form="	
+	$form="<div id='div-poubelle'></div>
 		<table style='width:100%'>
 			<tr>
 			<td valign='top'>$cicap<br>$kav</td>

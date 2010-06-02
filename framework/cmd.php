@@ -60,6 +60,7 @@ if(isset($_GET["Global-Applications-Status"])){Global_Applications_Status();exit
 if(isset($_GET["status-forced"])){Global_Applications_Status();exit;}
 if(isset($_GET["system-reboot"])){shell_exec("reboot");exit;}
 if(isset($_GET["system-shutdown"])){shell_exec("init 0");exit;}
+if(isset($_GET["system-unique-id"])){GetUniqueID();exit;}
 
 
 
@@ -189,7 +190,7 @@ if(isset($_GET["reload-squidguard"])){SQUIDGUARD_RELOAD();exit;}
 if(isset($_GET["squidguard-db-status"])){squidGuardDatabaseStatus();exit;}
 if(isset($_GET["squidguard-status"])){squidGuardStatus();exit;}
 if(isset($_GET["compile-squidguard-db"])){squidGuardCompile();exit;}
-
+if(isset($_GET["squidguard-tests"])){squidguardTests();exit;}
 
 if(isset($_GET["philesize-img"])){philesizeIMG();exit;}
 if(isset($_GET["philesize-img-path"])){philesizeIMGPath();exit;}
@@ -359,6 +360,9 @@ if(isset($_GET["vhost-delete"])){DeleteVHosts();exit;}
 if(isset($_GET["replicate-performances-config"])){ReplicatePerformancesConfig();exit;}
 if(isset($_GET["reload-dansguardian"])){reload_dansguardian();exit;}
 if(isset($_GET["dansguardian-template"])){dansguardian_template();exit;}
+if(isset($_GET["searchww-cat"])){dansguardian_search_categories();exit;}
+if(isset($_GET["export-community-categories"])){dansguardian_community_categories();exit;}
+
 
 //disks
 if(isset($_GET["disks-list"])){disks_list();exit;}
@@ -492,6 +496,7 @@ if(isset($_GET["PolicydWeightReplicConF"])){Restart_Policyd_Weight();exit;}
 
 //dansguardian
 if(isset($_GET["dansguardian-update"])){dansguardian_update();exit;}
+if(isset($_GET["shalla-update-now"])){shalla_update();exit;}
 
 $uri=$_GET["uri"];
 
@@ -3315,6 +3320,22 @@ function squidGuardCompile(){
 	sys_THREAD_COMMAND_SET(LOCATE_PHP5_BIN2()." /usr/share/artica-postfix/exec.squidguard.php --compile >>$l 2>&1");
 	
 }
+
+function squidguardTests(){
+	$uri=base64_decode($_GET["uri"]);
+	$client=base64_decode($_GET["client"]);	
+	$unix=new unix();
+	$squidGuard=$unix->find_program("squidGuard");
+	$echo=$unix->find_program("echo");
+	$cmd="$echo \"$uri $client/- - GET\" | $squidGuard -c /etc/squid/squidGuard.conf -d 2>&1";
+	exec($cmd,$results);
+	$results[]=$cmd;
+	echo "<articadatascgi>".  base64_encode(serialize($results))."</articadatascgi>";	
+	
+	
+}
+
+
 function SQUID_CACHE_INFOS(){
 	$unix=new unix();
 	$squidclient=$unix->find_program("squidclient");
@@ -3414,8 +3435,93 @@ function hostname_full(){
 	if(preg_match("#not set#",$domain)){$domain=null;}
 	if(preg_match("#\(none#",$domain)){$domain=null;}
 	if(strlen($domain)>0){$host="$host.$domain";}
+	$host=str_replace('.(none)',"",$host);
 	echo "<articadatascgi>$host</articadatascgi>";	
 	
+}
+function GetUniqueID(){
+	$uuid=trim(@file_get_contents("/etc/artica-postfix/settings/Daemons/SYSTEMID"));
+	if($uuid==null){
+		$unix=new unix();
+		$blkid=$unix->find_program("blkid");
+		exec($blkid,$results);
+		while (list ($index, $line) = each ($results) ){
+			if(preg_match("#UUID=\"(.+?)\"#",$line,$re)){
+				$uuid=$re[1];
+			}
+		}
+		
+		@file_put_contents("/etc/artica-postfix/settings/Daemons/SYSTEMID",$uuid);
+	}
+	
+	echo "<articadatascgi>". base64_encode($uuid)."</articadatascgi>";	
+	
+}
+
+function shalla_update(){
+	sys_THREAD_COMMAND_SET("/usr/share/artica-postfix/bin/artica-update --filter-plus --force");
+}
+
+function dansguardian_search_categories(){
+	$www=base64_decode($_GET["searchww-cat"]);
+	
+	if(preg_match("#www\.(.+?)$#i",$www,$re)){$www=$re[1];}
+	writelogs_framework("Search \"$www\" :=>{$_GET["searchww-cat"]}",__FUNCTION__,__FILE__,__LINE__);
+	
+	$dansguardian_enabled=trim(@file_get_contents("/etc/artica-postfix/settings/Daemons/DansGuardianEnabled"));
+	if($dansguardian_enabled==null){$dansguardian_enabled=0;}
+	$squidGuardEnabled=trim(@file_get_contents("/etc/artica-postfix/settings/Daemons/squidGuardEnabled"));
+	if($squidGuardEnabled==null){$squidGuardEnabled=0;}
+	
+	if($squidGuardEnabled==1){$path="/var/lib/squidguard";}
+	if($dansguardian_enabled==1){$path="/etc/dansguardian/lists";}
+	
+	if($path==null){return;}
+	
+	$unix=new unix();
+	$www=str_replace(".","\.",$www);
+	$www="^$www$";
+	$grep=$unix->find_program("grep");
+	$cmd="$grep -R -E \"$www\" --mmap -s -l $path";
+	exec($cmd,$results);
+	writelogs_framework("$cmd -> ".count($results)." lines",__FUNCTION__,__FILE__,__LINE__);
+	while (list ($index, $line) = each ($results) ){
+		$line=trim(str_replace("$path/","",$line));
+		unset($re);
+		writelogs_framework("Search \"$www\" :=>\"$line\"",__FUNCTION__,__FILE__,__LINE__);
+		if(preg_match("#web-filter-plus\/BL\/(.+?)\/domains$#",$line,$re)){
+			
+			$array[$re[1]]=true;
+			continue;
+		}
+		
+		if(preg_match("#blacklist-artica\/(.+?)\/domains$#",$line,$re)){
+			$array[$re[1]]=true;
+			continue;
+		}
+		
+		if(preg_match("lists\/blacklists.+*\/(.+?)\/domains$#",$line,$re)){
+			$array[$re[1]]=true;
+			continue;
+		}
+		
+		if(preg_match("#^blacklists\/#",$line,$re)){continue;}
+		
+		if(preg_match("#^(.+?)\/domains$#",$line,$re)){
+			
+			$array[$re[1]]=true;
+			continue;
+		}
+
+		if(preg_match("#personal-categories#",$line)){continue;}
+		
+	}
+	
+	writelogs_framework(serialize($array),__FUNCTION__,__FILE__,__LINE__);
+	echo "<articadatascgi>". base64_encode(serialize($array))."</articadatascgi>";	
+}
+function dansguardian_community_categories(){
+	sys_THREAD_COMMAND_SET(LOCATE_PHP5_BIN2()." /usr/share/artica-postfix/exec.web-community-filter.php");	
 }
 
 

@@ -1,6 +1,7 @@
 <?php
 
 include_once(dirname(__FILE__)."/class.dansguardian.inc");
+include_once(dirname(__FILE__)."/class.groups.inc");
 
 class squidguard{
 	var $categories=array();
@@ -33,6 +34,7 @@ class squidguard{
 		$this->ldap_suffix=$ldap->suffix;
 		$this->SquidGuardIPWeb=$sock->GET_INFO("SquidGuardIPWeb");
 		if($this->SquidGuardIPWeb==null){$this->SquidGuardIPWeb="$usrs->hostname:9000";}
+		$this->SquidGuardIPWeb=str_replace('.(none)',"",$this->SquidGuardIPWeb);
 		echo "Starting......: squidGuard verbose mode={$GLOBALS["VERBOSE"]}\n";
 		
 	
@@ -40,10 +42,10 @@ class squidguard{
 		
 		$conf[]="dbhome /var/lib/squidguard";
 		$conf[]="logdir /var/log/squid";
-		$conf[]="ldapbinddn $ldapbinddn";
- 		$conf[]="ldapbindpass \"$ldap->ldap_password\"";
-		$conf[]="ldapprotover 3";
- 		$conf[]="ldapcachetime 300";		
+		//$conf[]="ldapbinddn $ldapbinddn";
+ 		//$conf[]="ldapbindpass \"$ldap->ldap_password\"";
+		//$conf[]="ldapprotover 3";
+ 		//$conf[]="ldapcachetime 300";		
  		
 
  		
@@ -150,7 +152,7 @@ class squidguard{
 				while (list ($ruleID, $categories) = each ($this->DestOfRules)){
 					if(!$this->rulesOK[$ruleID]){continue;}
 					$t[]=" {$rules[$ruleID]} {";
-					$t[]="   pass ". implode(" ",$categories);
+					$t[]="   pass ". implode(" ",$categories)." all";
 					$t[]="   redirect 302:https://$this->SquidGuardIPWeb/exec.squidguard.php?clientaddr=%a&clientname=%n&clientuser=%i&clientgroup=%s&targetgroup=%t&url=%u";
 					$t[]=" }";
 				}
@@ -159,7 +161,7 @@ class squidguard{
 			
 		if($this->EnableWhiteList){
 			$t[]=" whitelisted {";
-			$t[]="   pass";
+			$t[]="   pass all";
 			$t[]=" }";
 		}
 		
@@ -180,7 +182,7 @@ class squidguard{
 				$default_categories=implode(" ",$c);
 		}
 			$t[]=" default {";
-			$t[]="   pass $default_categories";
+			$t[]="   pass $default_categories all";
 			$t[]="   redirect https://$this->SquidGuardIPWeb/exec.squidguard.php?clientaddr=%a&clientname=%n&clientuser=%i&clientgroup=%s&targetgroup=%t&url=%u";
 			$t[]=" }";
 			$t[]="}";
@@ -239,8 +241,10 @@ class squidguard{
 		$q=new mysql();
 		$results=$q->QUERY_SQL($sql,"artica_backup");
 		while($ligne=@mysql_fetch_array($results,MYSQL_ASSOC)){
-			
-			$this->groupsofRule[$RuleID][]="\tldapusersearch  \"ldap://localhost/ou=organizations,$this->ldap_suffix?memberUid?sub?(&(objectclass=posixGroup)(gidNumber={$ligne["group_id"]})(memberUid=%s))\"";
+			$u=$this->BuildUserLists($ligne["group_id"]);
+			if(is_array($u)){$this->groupsofRule[$RuleID][]="\tuser\t" . implode(" ",$u);unset($u);}else{
+				$this->groupsofRule[$RuleID][]="\tuserlist\tGroupNumberID{$ligne["group_id"]}";
+			}
 			
 			
 		}
@@ -248,14 +252,29 @@ class squidguard{
 		$results=$q->QUERY_SQL($sql,"artica_backup");
 			while($ligne=@mysql_fetch_array($results,MYSQL_ASSOC)){
 				if($ligne["pattern"]==null){continue;}
-				$this->groupsofRule[$RuleID][]="\tip {$ligne["pattern"]}";
+				$this->groupsofRule[$RuleID][]="\tip\t{$ligne["pattern"]}";
 			
 		}
-
-		
-
-			
 	}
+	
+	
+	private function BuildUserLists($gpid){
+		$group=new groups($gpid);
+		if(is_array($group->members)){
+			if(count($group->members)<21){return $group->members;}
+			 
+			$conf=implode("\n",$group->members);
+		}
+		
+		if($GLOBALS["VERBOSE"]){echo "write {$GLOBALS["guarddb"]}/$gpid\n";}
+		file_put_contents("{$GLOBALS["guarddb"]}/GroupNumberID$gpid",$conf);
+		if(!is_file("{$GLOBALS["guarddb"]}/GroupNumberID$gpid")){
+			echo "Starting......: squidGuard unable to write {$GLOBALS["guarddb"]}/$gpid file!\n";
+		}
+		return null;
+	}
+	
+	
 	
 	private function CheckHostname($ip){
 		if(trim($ip)==null){return null;}
@@ -279,7 +298,7 @@ class squidguard{
 		while($ligne=@mysql_fetch_array($results,MYSQL_ASSOC)){
 			$ligne["pattern"]=$this->CheckHostname($ligne["pattern"]);
 			if($ligne["pattern"]==null){continue;}
-			$array[$ligne["pattern"]]="\tip {$ligne["pattern"]}";
+			$array[$ligne["pattern"]]="\tip\t{$ligne["pattern"]}";
 		}
 		return $array;
 	}
@@ -299,6 +318,8 @@ class squidguard{
 		
 		
 	private function DefaultCategories(){
+	if($GLOBALS["VERBOSE"]){echo "######################## DEFAULT CATEGORY ########################\n";}
+		
 		$q=new mysql();
 		
 			if(is_file("{$GLOBALS["guarddb"]}/personal-categories/W-1/domains")){
@@ -313,11 +334,22 @@ class squidguard{
 		}		
 		
 		
-		$sql="SELECT pattern FROM `dansguardian_files` WHERE 
-		filename = 'bannedsitelist' AND RuleID=1;";
+		$sql="SELECT pattern FROM `dansguardian_files` WHERE filename = 'bannedsitelist' AND RuleID=1;";
+		
+		if($GLOBALS["VERBOSE"]){echo "$sql\n";}
+		
 		$results=$q->QUERY_SQL($sql,"artica_backup");
 		
+		if(!$q->ok){if($GLOBALS["VERBOSE"]){echo "$sql\nError $q->mysql_error\n";}}
+		
 		while($ligne=@mysql_fetch_array($results,MYSQL_ASSOC)){
+			
+			$addplus="plus-{$ligne["pattern"]}";
+			$addplus=str_replace("/","-",$addplus);
+			$addplus_com=$addplus."-artica";
+			
+			if($GLOBALS["VERBOSE"]){echo "Default rule cat -> \"{$ligne["pattern"]}\" (default)\n";}
+			
 			if(is_file("{$GLOBALS["guarddb"]}/{$ligne["pattern"]}/domains")){
 					$this->CategoriesDefinitions[$ligne["pattern"]][]="\tdomainlist {$ligne["pattern"]}/domains";
 					$this->DefaultRules["rule"][]="!{$ligne["pattern"]}";	
@@ -329,10 +361,52 @@ class squidguard{
 				
 				if(is_file("{$GLOBALS["guarddb"]}/{$ligne["pattern"]}/expressions")){
 					$this->CategoriesDefinitions[$ligne["pattern"]][]="\texpressionlist {$ligne["pattern"]}/expressions";
+				}
+				
+				if(is_file("{$GLOBALS["guarddb"]}/web-filter-plus/BL/{$ligne["pattern"]}/expressions")){
+					$this->CategoriesDefinitions[$addplus][]="\texpressionlist web-filter-plus/BL/{$ligne["pattern"]}/expressions";
+				}	
+
+				if(is_file("{$GLOBALS["guarddb"]}/web-filter-plus/BL/{$ligne["pattern"]}/urls")){
+					$this->CategoriesDefinitions[$addplus][]="\turllist web-filter-plus/BL/{$ligne["pattern"]}/urls";
+				}
+
+				if(is_file("{$GLOBALS["guarddb"]}/web-filter-plus/BL/{$ligne["pattern"]}/domains")){
+					$this->CategoriesDefinitions[$addplus][]="\tdomainlist web-filter-plus/BL/{$ligne["pattern"]}/domains";
+					$this->DefaultRules["rule"][]="!$addplus";
 				}				
+
+				if(is_file("{$GLOBALS["guarddb"]}/blacklist-artica/{$ligne["pattern"]}/domains")){
+					$this->CategoriesDefinitions[$addplus_com][]="\tdomainlist blacklist-artica/{$ligne["pattern"]}/domains";
+					$this->DefaultRules["rule"][]="!$addplus_com";
+				}					
+
 		}
 		$count=count($this->DefaultRules["rule"]);
 		echo "Starting......: squidGuard Default rule: $count categories\n";
+		
+			$sql="SELECT category FROM `dansguardian_personal_categories` WHERE category_type = 'enabled' AND RuleID=1;";
+			$results=$q->QUERY_SQL($sql,"artica_backup");
+			while($ligne=@mysql_fetch_array($results,MYSQL_ASSOC)){
+				$category=trim($ligne["category"]);
+				$categoryPrint=$this->substrCategory($category);
+				$this->dump_personals($category);	
+				if($GLOBALS["VERBOSE"]){echo "Default rule personal cat -> \"$category\" (default)\n";}			
+				
+				if(is_file("{$GLOBALS["guarddb"]}/personal-categories/$categoryPrint/domains")){
+					echo "Starting......: squidGuard Personal category $category ($categoryPrint) for Default rule\n";
+					$this->CategoriesDefinitions["P-$categoryPrint"][]="\tdomainlist personal-categories/$categoryPrint/domains";
+					$this->DefaultRules["rule"][]="!P-$categoryPrint";
+				}
+				
+				
+			}		
+		
+		
+		
+		
+	
+	if($GLOBALS["VERBOSE"]){echo "##################################################################\n";}
 		
 	}
 	
@@ -352,8 +426,7 @@ class squidguard{
 		
 		
 		$q=new mysql();
-		$sql="SELECT pattern FROM `dansguardian_files` WHERE 
-		filename = 'bannedsitelist' AND RuleID=$RuleID;";
+		$sql="SELECT pattern FROM `dansguardian_files` WHERE filename = 'bannedsitelist' AND RuleID=$RuleID;";
 		$results=$q->QUERY_SQL($sql,"artica_backup");
 		
 
@@ -361,6 +434,9 @@ class squidguard{
 		
 			while($ligne=@mysql_fetch_array($results,MYSQL_ASSOC)){
 				if($GLOBALS["VERBOSE"]){echo "RuleID $RuleID category:\"{$ligne["pattern"]}\" ({$this->rules[$RuleID]})\n";}
+				$addplus="plus-{$ligne["pattern"]}";
+				$addplus=str_replace("/","-",$addplus);
+				$addplus_com=$addplus."-artica";
 
 				if(is_file("{$GLOBALS["guarddb"]}/{$ligne["pattern"]}/domains")){
 					$this->CategoriesDefinitions[$ligne["pattern"]][]="\tdomainlist {$ligne["pattern"]}/domains";
@@ -373,7 +449,26 @@ class squidguard{
 				
 				if(is_file("{$GLOBALS["guarddb"]}/{$ligne["pattern"]}/expressions")){
 					$this->CategoriesDefinitions[$ligne["pattern"]][]="\texpressionlist {$ligne["pattern"]}/expressions";
-				}				
+				}	
+
+				if(is_file("{$GLOBALS["guarddb"]}/web-filter-plus/BL/{$ligne["pattern"]}/expressions")){
+					$this->CategoriesDefinitions[$addplus][]="\texpressionlist web-filter-plus/BL/{$ligne["pattern"]}/expressions";
+				}	
+
+				if(is_file("{$GLOBALS["guarddb"]}/web-filter-plus/BL/{$ligne["pattern"]}/urls")){
+					$this->CategoriesDefinitions[$addplus][]="\turllist web-filter-plus/BL/{$ligne["pattern"]}/urls";
+				}
+
+				if(is_file("{$GLOBALS["guarddb"]}/web-filter-plus/BL/{$ligne["pattern"]}/domains")){
+					if($GLOBALS["VERBOSE"]){echo "Adding professional category [$addplus] => {$ligne["pattern"]}\n";}
+					$this->CategoriesDefinitions[$addplus][]="\tdomainlist web-filter-plus/BL/{$ligne["pattern"]}/domains";
+					$this->DestOfRules["rule"][]="!$addplus";
+				}
+				
+				if(is_file("{$GLOBALS["guarddb"]}/blacklist-artica/{$ligne["pattern"]}/domains")){
+					$this->CategoriesDefinitions[$addplus_com][]="\tdomainlist blacklist-artica/{$ligne["pattern"]}/domains";
+					$this->DefaultRules["rule"][]="!$addplus_com";
+				}					
 
 					
 				

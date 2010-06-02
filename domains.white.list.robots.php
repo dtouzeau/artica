@@ -2,6 +2,15 @@
 session_start();
 include_once('ressources/class.templates.inc');
 include_once('ressources/class.user.inc');
+
+
+	if(!GetRights()){
+		$tpl=new templates();
+		$error="alert('{ERROR_NO_PRIVS}');";
+		echo $tpl->_ENGINE_parse_body($error);
+		die();
+	}
+
 if(isset($_GET["wbl_robots"])){wbl_robots();exit;}
 
 if(isset($_GET["AddWhiteRobot"])){wbl_robots_white_add();exit;}
@@ -13,19 +22,20 @@ if(isset($_GET["DeleteRobot"])){wbl_robots_delete();exit;}
 js();
 
 
-
+function GetRights(){
+	$user=new usersMenus();
+	if($user->AllowEditOuSecurity){return true;}
+	if($user->AsPostfixAdministrator){return true;}
+	if($user->AsMessagingOrg){return true;}
+	if($user->AsQuarantineAdministrator){return true;}
+	return false;
+}
 
 function js(){
 	$page=CurrentPageName();
 	$tpl=new templates();
-	$user=new usersMenus();
-	if($user->AllowEditOuSecurity==false){
-		$tpl=new templates();
-		$error="alert('{ERROR_NO_PRIVS}');";
-		echo $tpl->_ENGINE_parse_body($error);
-		die();
 	
-	}
+
 	$title=$tpl->_ENGINE_parse_body('{enable_artica_wbl_robots}');
 	
 	$html="

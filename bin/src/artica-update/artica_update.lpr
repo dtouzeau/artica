@@ -9,7 +9,7 @@ uses
 
 var
 tempfile:TstringList;
-s,y:string;
+s:string;
 XSETS                   :tupdate;
 zlogs                   :Tlogs;
 D                       :boolean;
@@ -133,7 +133,14 @@ begin
  end;
 
 
-
+ if ParamStr(1)='--filter-plus' then begin
+    if not SYS.BuildPids() then begin
+         zlogs.Debuglogs('--filter-plus Already instance executed');
+         halt(0);
+    end;
+    XSETS.update_webfilterplus();
+    halt(0);
+ end;
 
 
 
@@ -153,6 +160,8 @@ begin
          halt(0);
     end;
     XSETS.update_dansguardian();
+    XSETS.update_squidguard();
+    XSETS.update_webfilterplus();
     halt(0);
  end;
 
@@ -181,6 +190,7 @@ if ParamStr(1)='--help' then begin
    writeln('--upgrade-nightly............................: Upgrade Artica to a nightly build');
    writeln('--dansguardian...............................: Update blacklists web sites for DansGuardian');
    writeln('--MalwarePatrol..............................: Update blacklists web sites from Malware Patrol');
+   writeln('--filter-plus ...............................: Update licensed blacklists web sites from Artica');
    writeln('--spamassassin-bl............................: Update & compile SA blacklists');
    writeln('--clamav-engine..............................: Update & compile ClamAV Engine');
    writeln('--clamav.....................................: Update ClamAV Database');

@@ -92,7 +92,26 @@ function dansguardian_delPersonalcategory(index){
         XHR.appendData('rule_main','{$_GET["rule_main"]}');
         document.getElementById('main_rules_categories_list').innerHTML='<center style=\"width:100%\"><img src=img/wait_verybig.gif></center>';   
         XHR.sendAndLoad('$page', 'GET',x_dansguardian_addPersonalcategory);  
-}	
+}
+
+	 var X_DansCategoryEnable= function (obj) {
+			var results=obj.responseText;
+			if(results.length>0){alert(results);}
+	}
+
+function DansPersonalCategoryEnable(md,cat,index,rule_main){
+ 	var XHR = new XHRConnection();
+ 	XHR.appendData('rule_main','{$_GET["rule_main"]}');
+	if(document.getElementById(md).checked){
+		XHR.appendData('DansGuardian_addcategory',cat);
+		
+	}else{
+		 XHR.appendData('DansGuardian_delcategory',index);
+	}
+	XHR.sendAndLoad('$page', 'GET',X_DansCategoryEnable);  
+}
+
+
 	
 	DANSGUARDIAN_LOAD_PCATEGORIES()";
 	
@@ -119,17 +138,7 @@ function popup($noecho=0){
 $html="
 	<input type='hidden' name='rule_main' value='$rule_main'>
 	<p class=caption>{categories_explain}</p>
-
-	<table style='width:100%'>
-	<tr>
-		<td><span id='categories_field_list'>" .main_rules_categories_fieldlist(1) . "</span></td>
-		<td align='left' width=1%>
-		". imgtootltip("plus-24.png","{add_category}","dansguardian_addPersonalcategory()")."
-		
-	</td>
-	</tr>
-	</table><br>
-	<div id='main_rules_categories_list' style='width:100%;height:250px;overflow:auto'>".main_rules_categories_list("$rule_main",1)."</div>
+	<div id='main_rules_categories_list'>".main_rules_categories_list("$rule_main",1)."</div>
 	";	
 
 
@@ -164,6 +173,61 @@ function main_rules_categories_fieldlist($noecho=0){
 	
 }
 function main_rules_categories_list($rule_main,$noecho=0){
+	$dans=new dansguardian_rules();
+	$html="
+	<table style='width:100%'>
+	<tr>
+		<th>{category}</th>
+		<th>{edit}</th>
+		<th colspan=2>{enabled}</th>
+	</tr>";
+	$q=new mysql();
+	$sql="SELECT ID,category FROM dansguardian_personal_categories WHERE category_type='enabled' AND RuleID=$rule_main";
+	$results=$q->QUERY_SQL($sql,"artica_backup");	
+	while($ligne=@mysql_fetch_array($results,MYSQL_ASSOC)){	
+		$val=$ligne["category"];
+		$array_selected[$val]=$ligne["ID"];
+	}
+	
+	$array_cat=$dans->array_blacksites;
+	
+	while (list ($num, $val) = each ($array_cat) ){
+		if($array_selected[$num]>0){$enabled=1;}else{$enabled=0;}
+		$md=md5($num);
+		$edit_icon=imgtootltip("icon_edit.gif","{edit}","dansguardian_edit_personal_category('{$ligne["category"]}')");
+		$html=$html."
+		<tr ". CellRollOver().">
+			<td><strong style='font-size:11px'>$val</td>
+			<td align='center' valign='middle'>$edit_icon</td>
+			<td>".Field_checkbox("$md",1,$enabled,"DansPersonalCategoryEnable('$md','$num','{$array_selected[$num]}','$rule_main')")."</td>
+			<td>$num</td>
+			
+		</tr> 
+		
+		";
+		
+	}
+	
+$categ="<div style='width:100%;height:600px;overflow:auto'>$html</div>";
+$tpl=new templates();
+if($noecho==1){return $tpl->_ENGINE_parse_body($categ);}
+echo $tpl->_ENGINE_parse_body("$categ");	
+	
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+function _main_rules_categories_list($rule_main,$noecho=0){
 	$dansguardian=new dansguardian();
 	$array_categories_user=$dansguardian->DefinedCategoryBlackListLoad();
 	$dans=new dansguardian_rules($_GET["hostname"],$rule_main);

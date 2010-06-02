@@ -62,6 +62,7 @@ public
       Procedure update_spamassassin_blacklist();
       procedure MalwarePatrol();
       Procedure update_squidguard();
+      Procedure update_webfilterplus();
 END;
 
 implementation
@@ -264,6 +265,7 @@ begin
        end;
   end;
 
+  fpsystem('/bin/touch /etc/artica-postfix/clamav.update.check');
 
 end;
 //#############################################################################
@@ -691,7 +693,7 @@ begin
     if FileExists(squidguard.BIN_PATH()) then begin
      if squidGuardEnabled=1 then update_squidguard();
   end;
-  
+   update_webfilterplus();
   
   if ParamStr(1)='--package' then begin
       if FileExists('/opt/artica/sources/auto-update/'+ParamStr(2)) then begin
@@ -1791,6 +1793,152 @@ if squidGuardEnabled=1 then logs.NOTIFICATION('[ARTICA]:('+sys.HOSTNAME_g()+') s
     l.free;
     e.free;
 end;
+
+//#############################################################################
+Procedure tupdate.update_webfilterplus();
+var
+   md5_in:string;
+   md5_out:string;
+   RegExpr:TRegExpr;
+   SYSTEMID:string;
+   CONF:TiniFile;
+   LICENSE:string;
+   tmp:string;
+   checked:boolean;
+   l:Tstringlist;
+   i:integer;
+   squidGuardEnabled:integer;
+   DansGuardianEnabled:integer;
+   squidguard:tsquidguard;
+   dans:Tdansguardian;
+   filetimemin:integer;
+begin
+checked:=false;
+
+ if SQUIDEnable=0 then begin
+    logs.Debuglogs('update_webfilterplus:: Proxy family is disabled');
+    exit;
+ end;
+
+if not TryStrToInt(SYS.GET_INFO('squidGuardEnabled'),squidGuardEnabled) then squidGuardEnabled:=0;
+if not TryStrToInt(SYS.GET_INFO('DansGuardianEnabled'),DansGuardianEnabled) then DansGuardianEnabled:=0;
+
+
+if not FileExists('/etc/artica-postfix/settings/Daemons/SYSTEMID') then begin
+    logs.Debuglogs('update_webfilterplus:: no SYSTEMID, aborting');
+    fpsystem(SYS.LOCATE_PHP5_BIN()+' /usr/share/artica-postfix/exec.web-community-filter.php');
+    exit;
+end;
+if not FileExists('/etc/artica-postfix/settings/Daemons/shallalistLicense') then begin
+    logs.Debuglogs('update_webfilterplus:: no license information');
+    fpsystem(SYS.LOCATE_PHP5_BIN()+' /usr/share/artica-postfix/exec.web-community-filter.php');
+    exit;
+end;
+
+if not SYS.COMMANDLINE_PARAMETERS('--force') then begin
+if FileExists('/etc/artica-postfix/filters.plus.md5') then begin
+   filetimemin:=SYS.FILE_TIME_BETWEEN_MIN('/etc/artica-postfix/filters.plus.md5');
+   if SYS.FILE_TIME_BETWEEN_MIN('/etc/artica-postfix/filters.plus.md5')<1440 then begin
+     logs.Debuglogs('update_webfilterplus:: '+INtToStr(filetimemin) +' need more that 1440 minutes, aborting');
+     exit;
+   end;
+end;
+end;
+
+
+SYSTEMID:=SYS.GET_INFO('SYSTEMID');
+CONF:=TiniFile.Create('/etc/artica-postfix/settings/Daemons/shallalistLicense');
+LICENSE:=CONF.ReadString('SHALLA','LICENSE','');
+if length(LICENSE)=0 then begin
+   logs.Debuglogs('update_webfilterplus:: no license information');
+   fpsystem(SYS.LOCATE_PHP5_BIN()+' /usr/share/artica-postfix/exec.web-community-filter.php');
+end;
+tmp:=logs.FILE_TEMP();
+RegExpr:=TRegExpr.Create;
+SYS.WGET_DOWNLOAD_FILE('http://www.artica.fr/shalla-orders.php?check=yes&lic='+LICENSE+'&uuid='+SYSTEMID,tmp);
+l:=Tstringlist.Create;
+l.LoadFromFile(tmp);
+logs.DeleteFile(tmp);
+RegExpr.Expression:='<ANSWER>OK</ANSWER>';
+for i:=0 to l.Count-1 do begin
+    if RegExpr.Exec(l.Strings[i]) then begin
+      logs.Debuglogs('update_webfilterplus:: License OK (line '+ IntToStr(i)+')');
+      checked:=true;
+      break;
+    end;
+end;
+
+
+if not checked then begin
+   logs.Debuglogs('update_webfilterplus:: License FAILED');
+   fpsystem(SYS.LOCATE_PHP5_BIN()+' /usr/share/artica-postfix/exec.web-community-filter.php');
+   exit;
+end;
+tmp:=logs.FILE_TEMP();
+SYS.WGET_DOWNLOAD_FILE('http://www.artica.fr/download/shalla/shallalist.tar.gz.md5',tmp);
+RegExpr.Expression:='(.+?)\s+';
+if RegExpr.Exec(logs.ReadFromFile(tmp)) then md5_out:=trim(RegExpr.Match[1]);
+logs.DeleteFile(tmp);
+if RegExpr.Exec(logs.ReadFromFile('/etc/artica-postfix/filters.plus.md5')) then md5_in:=trim(RegExpr.Match[1]);
+logs.Debuglogs('update_webfilterplus:: remote: "'+md5_out+'" local: "'+md5_in+'"');
+if md5_in<>md5_out then begin
+    tmp:=logs.FILE_TEMP();
+    SYS.WGET_DOWNLOAD_FILE('http://www.artica.fr/download/shalla/shallalist.tar.gz',tmp+'.tar.gz');
+    if not FileExists(tmp+'.tar.gz') then begin
+      logs.Debuglogs('update_webfilterplus:: Extract failed (file does not exists)');
+      fpsystem(SYS.LOCATE_PHP5_BIN()+' /usr/share/artica-postfix/exec.web-community-filter.php');
+      exit;
+    end;
+
+    if SYS.FileSize_ko(tmp+'.tar.gz')<1000 then begin
+       logs.Debuglogs('update_webfilterplus:: Extract failed (file seems corrupted)');
+       exit;
+    end;
+
+
+
+squidguard:=tsquidguard.Create(SYS);
+if FileExists(squidguard.BIN_PATH()) then begin
+    logs.Debuglogs('update_webfilterplus:: SquidGuard is installed');
+    if squidGuardEnabled=1 then begin
+       logs.Debuglogs('update_webfilterplus:: SquidGuard is enabled, starting compilation');
+       ForceDirectories('/var/lib/squidguard/web-filter-plus');
+       logs.Debuglogs('update_webfilterplus:: Extracting...');
+       fpsystem(SYS.LOCATE_GENERIC_BIN('tar')+' -xf '+tmp+'.tar.gz -C /var/lib/squidguard/web-filter-plus/');
+       logs.Debuglogs('update_webfilterplus:: Extracting success');
+       logs.NOTIFICATION('[ARTICA]:('+sys.HOSTNAME_g()+') success update HTTP Black list licensed database' ,'Success update HTTP Black list licensed database','update');
+       fpsystem(SYS.LOCATE_PHP5_BIN()+' /usr/share/artica-postfix/exec.web-community-filter.php');
+       fpsystem(SYS.LOCATE_PHP5_BIN()+' /usr/share/artica-postfix/exec.squidguard.php --build');
+       fpsystem(squidguard.BIN_PATH()+' -P -C all &');
+    end;
+end;
+squidguard.free;
+if SYS.COMMANDLINE_PARAMETERS('--force-dansguardian') then DansGuardianEnabled:=1;
+dans:=Tdansguardian.Create(SYS);
+if FileExists(dans.BIN_PATH()) then begin
+    logs.Debuglogs('update_webfilterplus:: DansGuardian is installed');
+    if DansGuardianEnabled=1 then begin
+
+       logs.Debuglogs('update_webfilterplus:: DansGuardian is enabled, starting compilation');
+       ForceDirectories('/etc/dansguardian/lists/web-filter-plus');
+       logs.Debuglogs('update_webfilterplus:: Extracting...');
+       fpsystem(SYS.LOCATE_GENERIC_BIN('tar')+' -xf '+tmp+'.tar.gz -C /etc/dansguardian/lists/web-filter-plus/');
+       logs.Debuglogs('update_webfilterplus:: Extracting success');
+       logs.NOTIFICATION('[ARTICA]:('+sys.HOSTNAME_g()+') success update HTTP Black list licensed database' ,'Success update HTTP Black list licensed database','update');
+       fpsystem(SYS.LOCATE_PHP5_BIN()+' /usr/share/artica-postfix/exec.web-community-filter.php');
+       fpsystem(SYS.LOCATE_PHP5_BIN()+' /usr/share/artica-postfix/exec.dansguardian.compile.php');
+    end;
+end;
+ logs.DeleteFile(tmp+'.tar.gz');
+end;
+
+
+
+
+end;
+
+
+
 
 
 end.

@@ -85,7 +85,7 @@ echo $tpl->_ENGINE_parse_body($html);
 
 function find_member(){
 	$tofind=$_GET["find-member"];
-	if($_SESSION["uid"]=-100){$ou=$_GET["ou"];}else{$ou=$_SESSION["ou"];}
+	if($_SESSION["uid"]==-100){$ou=$_GET["ou"];}else{$ou=$_SESSION["ou"];}
 	$ldap=new clladp();
 	if($tofind==null){$tofind='*';}else{$tofind="*$tofind*";}
 	$filter="(&(objectClass=userAccount)(|(cn=$tofind)(mail=$tofind)(displayName=$tofind)(uid=$tofind) (givenname=$tofind) ))";

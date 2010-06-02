@@ -3747,3 +3747,75 @@ When set, this option causes Squid to ignore the no-cache directive, if any, in 
 <this_server_is_an_ad_member>This server is currently a member of an Active Directory server</this_server_is_an_ad_member>
 <WINBINDD_NOT_INSTALLED_TEXT>Winbindd daemon is not installed, until this daemon does not exists, you will not allowed to enable the feature.[br]Go to setup Center and upgrade Samba daemon</WINBINDD_NOT_INSTALLED_TEXT>
 <AsMessagingOrg>Can manage messaging features</AsMessagingOrg>
+<synthesis>synthesis</synthesis>
+<browsed_websites>browsed websites</browsed_websites>
+<www_adv>All about advertising</www_adv>
+<aggressive>Sites of obvious aggressive content. This coveres hate speech and all kinds of rassism</aggressive>
+<www_sex>lingerie Sites selling and presenting sexy lingerie or lingerie in a sexy manner</www_sex>
+<webphone>Sites that enable user to phone via Internet/WWW.</webphone>
+<webradio>Sites that offer listening to music and radiostreams.</webradio>
+<weapons>Sites offering all kinds of weapons or accessories for weapons</weapons>
+<violence>Sites about killing and harming people</violence>
+<updatesites>Kind of white list to allow necessary downloads from vendors.</updatesites>
+<www_tracker>Site keeping an eye on where you surf and what you do in a passive.</www_tracker>
+<www_spyware>Sites that tries to actively try to install software</www_spyware>
+<socialnet>Sites bringing people together (social networking) be it for friendship or for business</socialnet>
+<www_shopping>Sites offering online shopping and price comparisons</www_shopping>
+<sex_lingerie>Sites selling and presenting sexy lingerie or lingerie in a sexy manner</sex_lingerie>
+<searchengines>Collection of seach engines and directory sites</searchengines>
+<science_chemistry>Sites of institutions as well as of amateurs about all topics of chemistry</science_chemistry>
+<webtv>Collection of site offering TV streams via world wide web</webtv>
+<science_astronomy>Sites of institutions as well as of amateurs about all topics of astronomy</science_astronomy>
+<ringtones>Sites that offer the download of ringtones or present other informations about ringtones.</ringtones>
+<religion>Sites with religious content</religion>
+<recreation_wellness>Sites about treatments for feeling internally and externally healthy and beautiful again</recreation_wellness>
+<recreation_travel>Sites with information about foreign countries, travel companies, travel fares, accomondations and everything else that has to do with travel</recreation_travel>
+<recreation_sports>All about sports</recreation_sports>
+<recreation_humor>Humorous pages, comic strips, funny stories</recreation_humor>
+<www_news>news Sites presenting news</www_news>
+<music>Sites that offer the download of music</music>
+<movies>Sites offering cinema programs</movies>
+<models>Model agency, model and supermodel fan pages</models>
+<jobsearch>Portals for job offers and job seekers</jobsearch>
+<www_isp>isp Home pages of Internet Service Providers</www_isp>
+<downloads>This covers mostly filesharing, p2p and torrent sites</downloads>
+<www_chat>Site for realtime chatting and instant messaging</www_chat>
+<www_hacking>Sites with information and discussions about security weaknesses and how to exploit them</www_hacking>
+<www_dynamic>All domains where people log in from one obtaining a dynmic IP address</www_dynamic>
+<shallalist>Professional Databases</shallalist>
+<shallalist_text>Update your database over than 1.6 million entries in categories and get the best webistes filtering</shallalist_text>
+<shallalist_buye>To use this database, you must purchase an annual license. The license costs 50 € / year
+Fill out the form below to get a quotation from the company Artica Technology.
+You will receive a quote from Artica Technology.</shallalist_buye>
+<your_email_address>your email address</your_email_address>
+<submit_license>Submit your license</submit_license>
+<shallalist_license>Your website database license</shallalist_license>
+<shalla_success_order>Your request has been successfully sent to Artica Technology</shalla_success_order>
+<shalla_success_license>Your license has been successfully added</shalla_success_license>
+<AsOrgAdmin>Can manage this organization</AsOrgAdmin>
+<remove_license>Remove license</remove_license>
+<professional>professional</professional>
+<not_compiled>Not compiled</not_compiled>
+<categorize>categorize</categorize>
+<dansguardian_categorize_explain>define available categories that will handle this website</dansguardian_categorize_explain>
+<categoryies>categories - category</categoryies>
+<www_downloads>This covers mostly filesharing, p2p and torrent sites. Other download sites (for software, wallpapers, ..) are included as well</www_downloads>
+<categoryies_community>community categories</categoryies_community>
+<automobile-bikes>All around motorcycles. Included are vendor sites, resellers, fan and hobby pages as well as and suppliers. Scooters included</automobile-bikes>
+<automobile-boats>All around motorboats. Included are vendor sites, resellers, fan and hobby pages as well as and suppliers. Not included are travel tips (this can be found in recreation/travel).</automobile-boats>
+<automobile-cars>All around cars. Included are automobile companies and automotive suppliers.</automobile-cars>
+<automobile-planes>All around planes ranging from small one and two seaters up to the large traffic planes, old and new, private, commercial and military. Vendors and supplier are included (airports are not). Helicopter sites are included as well.</automobile-planes>
+<finance-banking>Home page of banking companies are listed here. This is not restricted to online banking.</finance-banking>
+<finance-insurance>Sites of insurance companies, about information about insurances and link collections concering this subject.</finance-insurance>
+<finance-moneylending>Sites one can apply for loans and mortgages or can obtain information about this business</finance-moneylending>
+<finance-realestate>Sites about all types of realestate, bying and selling homes, finding appartments for rent and selling.</finance-realestate>
+<finance-other>All financial pages that do not fit in the financial categories above.</finance-other>
+<hobby-cooking> Sites concering food and food preparation.</hobby-cooking>
+<hobby-pets>Sites about all topics concerning pets: description, raise, food, looks, fairs, favorite pet stories and so on.</hobby-pets>
+<artica_community>Artica community</artica_community>
+<service_squid_restart_explain>All Web engines services will be restarted in few seconds, during this time all clients connexions will be stopped</service_squid_restart_explain>
+<squidguard_testrules>Check your squidGuard rules</squidguard_testrules>
+<squidguard_testrules_explain>This section allow you to test if a web site is blocked or pass trough the filter, [br]You can set first the web site you want to check and in second the IP address or the username that should match on of your rules.</squidguard_testrules_explain>
+<uri_test>URL to test</uri_test>
+<usernanmeorip>Username or IP address</usernanmeorip>
+<user_not_found>User not found</user_not_found>

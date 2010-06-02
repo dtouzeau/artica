@@ -220,6 +220,7 @@ examples[br]
 <advanced_options>Advanced options</advanced_options>
 <ad_samba_member>Active Directory Member</ad_samba_member>
 <ad_samba_member_text>Make this server has a member of a Microsoft Active Directory domain</ad_samba_member_text>
+<aggressive>Sites of obvious aggressive content. This coveres hate speech and all kinds of rassism</aggressive>
 <alias>Alias</alias>
 <aliases>Aliases</aliases>
 <all>all</all>
@@ -594,6 +595,7 @@ If you enable this feature, you will be able to share folders trough the explore
 <artica_agent_task_edited>Task was modified</artica_agent_task_edited>
 <artica_agent_task_ordered>Task was ordered</artica_agent_task_ordered>
 <artica_autoupdate>Auto-Update Artica Core</artica_autoupdate>
+<artica_community>Artica community</artica_community>
 <artica_cpulimit_explain>This feature will limit the CPU of background scripts/programs execution</artica_cpulimit_explain>
 <artica_cyrus_backup_processing>Backup Mailbox processing</artica_cyrus_backup_processing>
 <artica_cyrus_backup_processing_text>Artica currently backup your cyrus-imap mailboxes</artica_cyrus_backup_processing_text>
@@ -616,6 +618,7 @@ If you enable this feature, you will be able to share folders trough the explore
 <AsMailBoxAdministrator>Local Mailbox manager</AsMailBoxAdministrator>
 <AsMailManAdministrator>Can manage email distribution Lists</AsMailManAdministrator>
 <AsMessagingOrg>Can manage messaging features</AsMessagingOrg>
+<AsOrgAdmin>Can manage this organization</AsOrgAdmin>
 <AsOrgPostfixAdministrator>Can manage organization MTA (if multiple instances is enabled)</AsOrgPostfixAdministrator>
 <AsOrgStorageAdministrator>Can manage organization's storages/backup</AsOrgStorageAdministrator>
 <AsPostfixAdministrator>Manage postfix settings</AsPostfixAdministrator>
@@ -640,6 +643,10 @@ If users are connected to the Domain, the authentication is sended silently to t
 <Authorized networks text>Authorized to send emails trought Internet</Authorized networks text>
 <autoblock>Auto block</autoblock>
 <AutomaticConfig>Save automatically settings on system</AutomaticConfig>
+<automobile-bikes>All around motorcycles. Included are vendor sites, resellers, fan and hobby pages as well as and suppliers. Scooters included</automobile-bikes>
+<automobile-boats>All around motorboats. Included are vendor sites, resellers, fan and hobby pages as well as and suppliers. Not included are travel tips (this can be found in recreation/travel).</automobile-boats>
+<automobile-cars>All around cars. Included are automobile companies and automotive suppliers.</automobile-cars>
+<automobile-planes>All around planes ranging from small one and two seaters up to the large traffic planes, old and new, private, commercial and military. Vendors and supplier are included (airports are not). Helicopter sites are included as well.</automobile-planes>
 <automount_center>Auto-mount center</automount_center>
 <automount_center_text>Manage connections service with your external resources.</automount_center_text>
 <auto_account>Auto-create Accounts</auto_account>
@@ -750,6 +757,7 @@ Specify 0 when mail delivery should be tried only once.</bounce_queue_lifetime_t
 <broken_sasl_auth_clients_text>Enable inter-operability with SMTP clients that implement an obsolete version of the AUTH command (RFC 4954).[br]
 Examples of such clients are MicroSoft Outlook Express version 4 and MicroSoft Exchange version 5.0.</broken_sasl_auth_clients_text>
 <browse>Browse</browse>
+<browsed_websites>browsed websites</browsed_websites>
 <browse_computers>Browse computers</browse_computers>
 <browse_computers_text>Browse your networks & find computers near Artica server or manage yours computers</browse_computers_text>
 <browse_disk_text>Browse the disk and display folders and files</browse_disk_text>
@@ -780,6 +788,9 @@ Examples of such clients are MicroSoft Outlook Express version 4 and MicroSoft E
 <cancel>cancel</cancel>
 <catch_all>Catch-all</catch_all>
 <catch_all_mail_text>A catch-all mailbox will receive all mails when recipients not matching your users stored in local database</catch_all_mail_text>
+<categorize>categorize</categorize>
+<categoryies>categories - category</categoryies>
+<categoryies_community>community categories</categoryies_community>
 <CC Address>CC Address</CC Address>
 <certificate infos>certificate infos</certificate infos>
 <certificate password>Certificate password</certificate password>
@@ -1020,6 +1031,7 @@ Click on the button below in order to start the migration</CYRUS_TO_ZARAFA_EXPLA
 <DANSGUARDIAN_BLACKLISTS_UPDATE_TEXT>Perform update of the blacklists database in order to increase web sites filtering detection rate</DANSGUARDIAN_BLACKLISTS_UPDATE_TEXT>
 <dansguardian_blacklist_categories>Restrict user's web access using blacklist categories</dansguardian_blacklist_categories>
 <dansguardian_blacklist_users_categories>Block websites using pre-defined categories</dansguardian_blacklist_users_categories>
+<dansguardian_categorize_explain>define available categories that will handle this website</dansguardian_categorize_explain>
 <dansguardian_exception_site_list>Add websites that are not filtered</dansguardian_exception_site_list>
 <DANSGUARDIAN_GROUP_EXPLAIN>This feature allows you to assign this rule to groups hosted by your organizations[br]
 This feature offers several advantages:[br]Computers affected to users will be directly integrated.[br]
@@ -1163,6 +1175,7 @@ Setting this parameter to a value of 1 changes the meaning of the corresponding 
 <down>down</down>
 <download>download</download>
 <downloading>Downloading</downloading>
+<downloads>This covers mostly filesharing, p2p and torrent sites</downloads>
 <do_nothing>do nothing</do_nothing>
 <driver>driver</driver>
 <DUNNO_help>
@@ -1496,6 +1509,11 @@ Fetchmail is licensed under the GNU General Public License</fetchmail_about>
 after the message is queued, send the  entire  message through the specified external content filter or transport type</FILTER_help>
 <filter_stats>Filter statistics</filter_stats>
 <Filtration Process>Filtration Process</Filtration Process>
+<finance-banking>Home page of banking companies are listed here. This is not restricted to online banking.</finance-banking>
+<finance-insurance>Sites of insurance companies, about information about insurances and link collections concering this subject.</finance-insurance>
+<finance-moneylending>Sites one can apply for loans and mortgages or can obtain information about this business</finance-moneylending>
+<finance-other>All financial pages that do not fit in the financial categories above.</finance-other>
+<finance-realestate>Sites about all types of realestate, bying and selling homes, finding appartments for rent and selling.</finance-realestate>
 <find>Find</find>
 <find user>Find user</find user>
 <find_documents>find documents</find_documents>
@@ -1604,6 +1622,8 @@ enable or disable this feature.</group_behavior_text>
 Note that unwriteable directories are shown as usual.</hide_unwriteable_files_text>
 <high>High</high>
 <hits_number>Hits number</hits_number>
+<hobby-cooking> Sites concering food and food preparation.</hobby-cooking>
+<hobby-pets>Sites about all topics concerning pets: description, raise, food, looks, fairs, favorite pet stories and so on.</hobby-pets>
 <hold>hold</hold>
 <HOLD_help>
 Place the message on the hold queue,[br] where it  will sit  until someone either deletes it or releases it for delivery.[br]              
@@ -1864,6 +1884,7 @@ With the default 100 SMTP server process limit, "in flow delay as 1s" limits the
 <jGrowlMaxEvents>Display last x events in front-end</jGrowlMaxEvents>
 <jgrowl_no_clamav_update>Do not display ClamAV updates</jgrowl_no_clamav_update>
 <jgrowl_no_kas_update>Disable Kaspersky Anti-Spam updates notifications</jgrowl_no_kas_update>
+<jobsearch>Portals for job offers and job seekers</jobsearch>
 <join_network>Join a network</join_network>
 <js_add_domain>Add a new domain</js_add_domain>
 <js_add_entity>Add a new entity</js_add_entity>
@@ -2147,6 +2168,7 @@ This parameter also limits the time an unreachable destination is kept in the sh
 <mobile>mobile phone</mobile>
 <mode>mode</mode>
 <model>model</model>
+<models>Model agency, model and supermodel fan pages</models>
 <modified>modified</modified>
 <monday>Monday</monday>
 <month>month</month>
@@ -2165,8 +2187,10 @@ This parameter also limits the time an unreachable destination is kept in the sh
 <move>move</move>
 <move_member>Group member</move_member>
 <move_member_text>Add/move this member into a group</move_member_text>
+<movies>Sites offering cinema programs</movies>
 <MTA Clients Settings>MTA Clients Settings</MTA Clients Settings>
 <multidomains_icon_text>Each user will have "user@domain.tld" account instead "user" account.</multidomains_icon_text>
+<music>Sites that offer the download of music</music>
 <mx-target>MX Target</mx-target>
 <mx-target_text>Set the default target for MX records created using the "local MX" option</mx-target_text>
 <mxexamples>[ul][li]thekelleys.org.uk go to thekelleys.org.uk with weight 5[/li][li]thekelleys.org.uk go to eyas.biff.org.uk with weight 30[/li][/ul]</mxexamples>
@@ -2281,6 +2305,7 @@ It's the names that Windows boxes see are always the NetBIOS names</netbiosname_
 <notify_templates>notify templates</notify_templates>
 <notif_save_conf_ldap>Parameters are saved to temporary storage,
 don't forget to - Save & Apply settings - to make them in production mode</notif_save_conf_ldap>
+<not_compiled>Not compiled</not_compiled>
 <not_installed>not installed</not_installed>
 <not_match>didn't match</not_match>
 <november>November</november>
@@ -2547,6 +2572,7 @@ This is because Postfix needs to open lookup tables ahead of time, but the reade
 <product_licence_text>Get the licence info and update your licence definition</product_licence_text>
 <product_update_settings>updates settings</product_update_settings>
 <product_update_settings_text>Settings for download updates in order to maintain the security service</product_update_settings_text>
+<professional>professional</professional>
 <professional_email>Professional eMail</professional_email>
 <prompt_add_rule_name>Give name of your new rule</prompt_add_rule_name>
 <properties>properties</properties>
@@ -2630,6 +2656,10 @@ See also "maximal backoff time".
 <recipient_rules>Recipient&nbsp;Rules</recipient_rules>
 <recommend_restart_postfix>It is mandatory to restart postfix in order to accept mails</recommend_restart_postfix>
 <recommend_update_kaspersky>You should update kaspersky antivirus database, current version is out-of-date[br]Kaspersky recommend to update it's database each hour</recommend_update_kaspersky>
+<recreation_humor>Humorous pages, comic strips, funny stories</recreation_humor>
+<recreation_sports>All about sports</recreation_sports>
+<recreation_travel>Sites with information about foreign countries, travel companies, travel fares, accomondations and everything else that has to do with travel</recreation_travel>
+<recreation_wellness>Sites about treatments for feeling internally and externally healthy and beautiful again</recreation_wellness>
 <recursive>recursive</recursive>
 <redirect>Redirect to email address</redirect>
 <REDIRECT_help>After  the  message  is queued,[br] send the message to the  specified  address  instead  of  the  intended recipient(s).[br]
@@ -2759,6 +2789,7 @@ If this parameter is non-empty, then the Postfix SMTP server will reject mail to
 This feature is off by default. </relay_recipient_maps_text>
 <release>release</release>
 <release_mail>Release this message</release_mail>
+<religion>Sites with religious content</religion>
 <reload>reload</reload>
 <remote password>remote password</remote password>
 <remote server mailbox>Your mailbox remote server</remote server mailbox>
@@ -2767,6 +2798,7 @@ This feature is off by default. </relay_recipient_maps_text>
 <remote_rsync_server>Remote rsync server</remote_rsync_server>
 <remote_smb_server>Remote shared directory</remote_smb_server>
 <removed>removed</removed>
+<remove_license>Remove license</remove_license>
 <remove_mailgraph>remove mailgraph application</remove_mailgraph>
 <remove_mailqueue>Remove all mails in queue</remove_mailqueue>
 <remove_mailqueue_text>Are you sure to remove this mailqueue ?
@@ -2819,6 +2851,7 @@ Once backup task selected, you will choose the backup date in order to browse yo
 <results>Results</results>
 <RETRANSLATOR_CONNECT_URI>Use this uri in the Kaspersky products in order to update them trough this server.(see the link below)</RETRANSLATOR_CONNECT_URI>
 <return_to>return to</return_to>
+<ringtones>Sites that offer the download of ringtones or present other informations about ringtones.</ringtones>
 <roomNumber>Room number</roomNumber>
 <rotate_logs>Rotate log file</rotate_logs>
 <ROUNDCUBE_NEWVERSION>New RoundCube version</ROUNDCUBE_NEWVERSION>
@@ -2870,10 +2903,13 @@ in a SASL password LDAP, and if a username/password is found, it will use that u
 <schedule>schedule</schedule>
 <scheduled>Scheduled</scheduled>
 <schedule_import_settings>Schedule the importation process periodically in order to refresh database automatically</schedule_import_settings>
+<science_astronomy>Sites of institutions as well as of amateurs about all topics of astronomy</science_astronomy>
+<science_chemistry>Sites of institutions as well as of amateurs about all topics of chemistry</science_chemistry>
 <score>score</score>
 <scores_behavior>Scores and behavior</scores_behavior>
 <scores_behavior_text>Define scores and global behavior of the filter</scores_behavior_text>
 <search>search</search>
+<searchengines>Collection of seach engines and directory sites</searchengines>
 <search_break>Results of your query exceed maximum rows that the system accept, please specify a query that match more your research</search_break>
 <search_by>search by</search_by>
 <search_connector>Search Connector</search_connector>
@@ -2961,6 +2997,7 @@ while distributing domain2.com mail as usual.[br]
 <service_name>Daemon name</service_name>
 <service_not_installed>The service is not installed</service_not_installed>
 <service_running>The service currently running</service_running>
+<service_squid_restart_explain>All Web engines services will be restarted in few seconds, during this time all clients connexions will be stopped</service_squid_restart_explain>
 <service_stopped>The service is stopped!</service_stopped>
 <sessions>sessions</sessions>
 <SESSION_END>[center][h2]This session is terminated... please logon[/center][/h2]</SESSION_END>
@@ -2972,6 +3009,15 @@ while distributing domain2.com mail as usual.[br]
 <set_quota>Set quota</set_quota>
 <SET_SCHEDULE>Set the schedule task</SET_SCHEDULE>
 <SET_SCHEDULE_TEXT>Define when this task will be performed</SET_SCHEDULE_TEXT>
+<sex_lingerie>Sites selling and presenting sexy lingerie or lingerie in a sexy manner</sex_lingerie>
+<shallalist>Professional Databases</shallalist>
+<shallalist_buye>To use this database, you must purchase an annual license. The license costs 50 € / year
+Fill out the form below to get a quotation from the company Artica Technology.
+You will receive a quote from Artica Technology.</shallalist_buye>
+<shallalist_license>Your website database license</shallalist_license>
+<shallalist_text>Update your database over than 1.6 million entries in categories and get the best webistes filtering</shallalist_text>
+<shalla_success_license>Your license has been successfully added</shalla_success_license>
+<shalla_success_order>Your request has been successfully sent to Artica Technology</shalla_success_order>
 <shared>shared</shared>
 <shared_folder>Shared folder name</shared_folder>
 <SHARE_FOLDER>Share a folder</SHARE_FOLDER>
@@ -3251,6 +3297,7 @@ If this feature is enabled and a server offers STARTTLS while TLS is not already
 [code]postfix/smtp[pid]: Host offered STARTTLS: [hostname.example.com][/code]
 </smtp_tls_note_starttls_offer_text>
 <sn>Last Name</sn>
+<socialnet>Sites bringing people together (social networking) be it for friendship or for business</socialnet>
 <softwares_install>Softwares install</softwares_install>
 <soft_bounce>disables locally-generated bounces</soft_bounce>
 <soft_bounce_text>Safety net to keep mail queued that would otherwise be returned to the sender.[br] This parameter disables locally-generated bounces,[br] and prevents the Postfix SMTP server from rejecting mail permanently,[br]
@@ -3289,6 +3336,8 @@ by changing 5xx reply codes into 4xx. However, this option is no cure for addres
 <squidguard_simple_intro>With squidGuard, you will be able to create rules in order to restrict web usage.[br]You can define main rules that store users/IP address in order to block them during Internet browsing</squidguard_simple_intro>
 <squidguard_status>squidGuard status</squidguard_status>
 <squidguard_status_text>Display the status of the web filtering engine</squidguard_status_text>
+<squidguard_testrules>Check your squidGuard rules</squidguard_testrules>
+<squidguard_testrules_explain>This section allow you to test if a web site is blocked or pass trough the filter, [br]You can set first the web site you want to check and in second the IP address or the username that should match on of your rules.</squidguard_testrules_explain>
 <squid_advanced_parameters>Squid Advanced settings</squid_advanced_parameters>
 <squid_advanced_parameters_text>Tweaks and tunings about SQUID Advanced settings</squid_advanced_parameters_text>
 <squid_events>Squid Events</squid_events>
@@ -3356,6 +3405,7 @@ Also check that your server is running to have minimal data in order to correcly
 <subdirectory>sub directory</subdirectory>
 <subject>subject</subject>
 <submit>Submit</submit>
+<submit_license>Submit your license</submit_license>
 <subnet>subnet</subnet>
 <success>Success</success>
 <success operations>success operations</success operations>
@@ -3381,6 +3431,7 @@ you will be redirected to the new IP address in 15 seconds
 <synchronize_directorylist_each>Synchronize Directory listing each</synchronize_directorylist_each>
 <synchronize_each>Synchronize each</synchronize_each>
 <synchronizing_mailbox>synchronizing mailbox</synchronizing_mailbox>
+<synthesis>synthesis</synthesis>
 <system>system</system>
 <system error>There was a system problem, perhaps a preg_match problem or no sockets opens</system error>
 <system statistics>system statistics</system statistics>
@@ -3675,6 +3726,7 @@ The rules for transferring (routing) are set in this section.[br]
 <up>up</up>
 <update>update</update>
 <UpdateServerUrl>Update Server Url</UpdateServerUrl>
+<updatesites>Kind of white list to allow necessary downloads from vendors.</updatesites>
 <updates_error>Updates error</updates_error>
 <updates_success>Success updates</updates_success>
 <UPDATE_ANTIVIRUS>Update antivirus database</UPDATE_ANTIVIRUS>
@@ -3697,6 +3749,7 @@ The rules for transferring (routing) are set in this section.[br]
 <upload_new_license>Upload a new license</upload_new_license>
 <uptime>UpTime</uptime>
 <uri_dnsbl>DNSBL uri</uri_dnsbl>
+<uri_test>URL to test</uri_test>
 <urls>urls</urls>
 <url_regex_popup_import_explain>Copy and Paste on the text area below all web sites you want to block.[br]Each web site must be separated by a carriage return</url_regex_popup_import_explain>
 <usb_external_drive>External USB disk</usb_external_drive>
@@ -3706,6 +3759,7 @@ The rules for transferring (routing) are set in this section.[br]
 <UseProxy>Enable proxy server</UseProxy>
 <userid>Unique identifier[br] (mailbox)</userid>
 <username>User name</username>
+<usernanmeorip>Username or IP address</usernanmeorip>
 <userPassword>Password</userPassword>
 <users>Users</users>
 <users_allow>Users privileges</users_allow>
@@ -3717,6 +3771,7 @@ The rules for transferring (routing) are set in this section.[br]
 <user_email_text>Set the first email address of this user,this email will be the master email address of this account</user_email_text>
 <user_interface>User interface</user_interface>
 <user_interface_text>Personnalize Artica Interface for this user</user_interface_text>
+<user_not_found>User not found</user_not_found>
 <user_quarantine_emails_query_text>SPAMs or infected emails are stored in your quarantine area.[br]You can search email, resend them trough this area.</user_quarantine_emails_query_text>
 <user_tab_groups>Groups</user_tab_groups>
 <user_to_mailing_list>Transform this user to a mailing list</user_to_mailing_list>
@@ -3747,6 +3802,7 @@ The rules for transferring (routing) are set in this section.[br]
 <view_config>View configuration file</view_config>
 <view_members>Display members</view_members>
 <view_script>View script</view_script>
+<violence>Sites about killing and harming people</violence>
 <VirHTTPServer>Web uri to retreive files</VirHTTPServer>
 <VirHTTPServer_text>The url which used by the web client to retrieve downloaded file.[br]
  The file where the download stored can has diferent name than the original, if a file with the same name exists in the directory.[br]
@@ -3772,15 +3828,19 @@ In the url the "%f" can be used to specify the real name of downloaded file</Vir
 <warn_if_reject>Warn in log if reject</warn_if_reject>
 <warn_if_reject_text>Change the meaning of the next restriction,[br] so that it logs a warning instead of rejecting a request[br] (look for logfile records that contain "reject_warning").[br] This is useful for testing new restrictions[br] in a "live" environment without risking unnecessary loss of mail</warn_if_reject_text>
 <warn_shutdown_computer>This operation will turn off the computer, do want to perfom this operation ?</warn_shutdown_computer>
+<weapons>Sites offering all kinds of weapons or accessories for weapons</weapons>
 <webmail>webmail</webmail>
+<webphone>Sites that enable user to phone via Internet/WWW.</webphone>
 <webproxy_service>Web Proxy service</webproxy_service>
 <webproxy_service_text>proxy service allows you to accelerate web pages access by using a cache system.[br]
  This service also offers antivirus and web pages filtering features</webproxy_service_text>
+<webradio>Sites that offer listening to music and radiostreams.</webradio>
 <webserver_parameters>Web server engine</webserver_parameters>
 <webserver_parameters_text>Enable/Disable personalize the dedicated web server engine</webserver_parameters_text>
 <website>Web site</website>
 <websites>Web sites</websites>
 <website_name>Website name</website_name>
+<webtv>Collection of site offering TV streams via world wide web</webtv>
 <web_filter>Web filter</web_filter>
 <web_proxy>Web Proxy</web_proxy>
 <web_proxy_text>Configure your web proxy server</web_proxy_text>
@@ -3840,7 +3900,18 @@ At the opposit, Weekly container will use the incremental benefit but increase r
 <WORKGROUP>Workgroup</WORKGROUP>
 <working_title>Working title</working_title>
 <write>write</write>
+<www_adv>All about advertising</www_adv>
+<www_chat>Site for realtime chatting and instant messaging</www_chat>
+<www_downloads>This covers mostly filesharing, p2p and torrent sites. Other download sites (for software, wallpapers, ..) are included as well</www_downloads>
+<www_dynamic>All domains where people log in from one obtaining a dynmic IP address</www_dynamic>
+<www_hacking>Sites with information and discussions about security weaknesses and how to exploit them</www_hacking>
+<www_isp>isp Home pages of Internet Service Providers</www_isp>
+<www_news>news Sites presenting news</www_news>
 <www_server_name>Web server name</www_server_name>
+<www_sex>lingerie Sites selling and presenting sexy lingerie or lingerie in a sexy manner</www_sex>
+<www_shopping>Sites offering online shopping and price comparisons</www_shopping>
+<www_spyware>Sites that tries to actively try to install software</www_spyware>
+<www_tracker>Site keeping an eye on where you surf and what you do in a passive.</www_tracker>
 <xapian_packages>Search Engines</xapian_packages>
 <xapian_processing>Indexing Your storage (search engine)</xapian_processing>
 <xapian_processing_text>omindex currently scan directories in order to improve search documents on your server[br]During this time, the server should be busy.</xapian_processing_text>
@@ -3858,6 +3929,7 @@ mailboxes will not remove
 <your>Your</your>
 <your mailbox usage>your mailbox usage</your mailbox usage>
 <your_distributions_lists>Your distributions lists</your_distributions_lists>
+<your_email_address>your email address</your_email_address>
 <your_quarantine>A sua quarentena</your_quarantine>
 <your_server_type>o seu servidor MTA est&aacute; definido como</your_server_type>
 <your_storage>O seu disco de armazenamento</your_storage>

@@ -19,15 +19,10 @@ session_start();
 	
 //permissions	
 	$usersprivs=new usersMenus();
-	$change_aliases=1;
+	$change_aliases=GetRights_aliases();
 	$modify_user=1;
+	if($_SESSION["uid"]<>$_GET["userid"]){$modify_user=0;}
 	
-	if(!$usersprivs->AsAnAdministratorGeneric){
-		if(!$usersprivs->AllowEditAliases){
-			$change_aliases=0;
-			}
-		if($_SESSION["uid"]<>$_GET["userid"]){$modify_user=0;}
-	}
 	
 	
 	
@@ -39,7 +34,7 @@ session_start();
 		if(isset($_GET["DeleteAliasesMailing"])){DeleteAliasesMailing();exit;}
 		if(isset($_GET["aliases-users-list"])){USER_ALIASES($_GET["uid"]);exit;}
 		if(isset($_GET["delete-aliases"])){USER_ALIASES_DELETE_JS();exit;}
-
+		$modify_user=1;
 		
 	}
 	
@@ -189,6 +184,16 @@ session_start();
 	if(isset($_GET["safebox"])){USER_SAFEBOX();exit;}
 	
 INDEX();
+
+function GetRights_aliases(){
+	$usersprivs=new usersMenus();
+	if($usersprivs->AsAnAdministratorGeneric){return 1;}
+	if($usersprivs->AllowEditOuSecurity){return 1;}
+	if($usersprivs->AsMessagingOrg){return 1;}
+	if($usersprivs->AllowEditAliases){return 1;}
+	return 0;
+}
+
 	
 function INDEX(){	
 	
@@ -1000,8 +1005,9 @@ function USER_CLEAN_JS(){
 		$title=$tpl->_ENGINE_parse_body("{CLEAN_USER_DATAS}");		
 		$no_privs=$tpl->_ENGINE_parse_body("{ERROR_NO_PRIVILEGES_OR_PLUGIN_DISABLED}");
 		
-		$priv=new usersMenus();   		
-		if(!$priv->AsAnAdministratorGeneric){if(!$priv->AllowEditAliases){$privilege=false;}}
+		if(GetRights_aliases()==0){$privilege=false;}
+		
+		
 		if(!$privilege){echo("alert('$no_privs')");exit;}
 		
 		
@@ -1096,9 +1102,8 @@ function USER_ALIASES_FORM_ADD_JS(){
 		$tpl=new templates();
 		$title=$tpl->_ENGINE_parse_body("{add_new_alias}");		
 		$no_privs=$tpl->_ENGINE_parse_body("{ERROR_NO_PRIVILEGES_OR_PLUGIN_DISABLED}");
-		
-		$priv=new usersMenus();   		
-		if(!$priv->AsAnAdministratorGeneric){if(!$priv->AllowEditAliases){$privilege=false;}}
+		if(GetRights_aliases()==0){$privilege=false;}
+
 		if(!$privilege){die("alert('$no_privs')");}
 	
 		$html="
@@ -1227,13 +1232,8 @@ echo $tpl->_ENGINE_parse_body($html);
    		$boutton=button("{add_new_alias}","Loadjs('$page?USER_ALIASES_FORM_ADD_JS=$userid');");
    		$no_priv=$tpl->javascript_parse_text("{ERROR_NO_PRIVS}");
    		$boutton_off=button("{add_new_alias}","alert('$no_priv');");
-   		
-   		
-		$privilege=true;
-		$priv=new usersMenus();   		
-		if(!$priv->AsAnAdministratorGeneric){
-			if(!$priv->AllowEditAliases){$privilege=false;}
-		}    
+   		$privilege=true;
+   		if(GetRights_aliases()==0){$privilege=false;}
 		if(!$privilege){$boutton=$boutton_off;}
     	
 
@@ -5010,6 +5010,7 @@ function USER_PRIVILEGES(){
 	$AsMessagingOrg="status_critical.gif";
 	$AllowAddUsers="status_critical.gif";
 	$AsDansGuardianGroupRule="status_critical.gif";
+	$AsOrgAdmin="status_critical.gif";
 	
 	$users=new usersMenus();
 	if($users->AllowEditOuSecurity){$AllowEditOuSecurity="status_ok.gif";}
@@ -5020,6 +5021,7 @@ function USER_PRIVILEGES(){
 	if($users->AsMessagingOrg){$AsMessagingOrg="status_ok.gif";}
 	if($users->AllowAddUsers){$AllowAddUsers="status_ok.gif";}
 	if($users->AsDansGuardianGroupRule){$AsDansGuardianGroupRule="status_ok.gif";}
+	if($users->AsOrgAdmin){$AsOrgAdmin="status_ok.gif";}
 
 	
 $group_allow="<H3>{groups_allow}</H3><br>
@@ -5061,6 +5063,10 @@ $org_allow="<H3>{organization_allow}</H3><br>
 		<td align='right' nowrap><strong>{AsMessagingOrg}:</td>
 		<td width=1%><img src='img/$AsMessagingOrg'></td>
 	</tr>
+	<tr>
+		<td align='right' nowrap><strong>{AsOrgAdmin}:</td>
+		<td width=1%><img src='img/$AsOrgAdmin'></td>
+	</tr>	
 </table>";
 
 	$AllowChangeAntiSpamSettings="status_critical.gif";

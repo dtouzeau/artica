@@ -71,7 +71,7 @@ class groups{
 			
 			$this->dn=$dn;
 			if(preg_match('#ou=groups,ou=(.+?),dc#',$dn,$reg)){$res["ou"]=$reg[1];}
-			writelogs("Group ID $this->group_id is in the root \"$dn\" and ou=\"{$res["ou"]}\"",__CLASS__.'/'.__FUNCTION__,__FILE__);
+			//writelogs("Group ID $this->group_id is in the root \"$dn\" and ou=\"{$res["ou"]}\"",__CLASS__.'/'.__FUNCTION__,__FILE__);
 		
 			
 			$res["dn"]=$dn;
@@ -178,11 +178,7 @@ class groups{
 				$kav=new kavmilterd();
 				$kav->LoadRule("$this->groupName.$this->ou");
 				return $kav->RuleDatas;
-			}else{
-				writelogs("Kaspersky Antivirus For Milter is not enabled",__CLASS__.'/'.__FUNCTION__,__FILE__);
 			}
-		}else{
-			writelogs("Kaspersky Antivirus For Milter is not installed",__CLASS__.'/'.__FUNCTION__,__FILE__);
 		}
 		}
 		
@@ -226,6 +222,11 @@ class groups{
 		writelogs("Adding \"$group\" in organization \"$ou\" ($generated_id)",__CLASS__.'/'.__FUNCTION__,__FILE__);	
 		$this->generated_id=$generated_id;
 		$ldap=new clladp();
+		if($ou==null){
+			
+		}
+		
+		
 		if($ou==null){$dn="cn=$group,ou=groups,dc=organizations,$ldap->suffix";}
 		else{$dn="cn=$group,ou=groups,ou=$ou,dc=organizations,$ldap->suffix";}
 		

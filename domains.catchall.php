@@ -5,14 +5,10 @@
 	include_once('ressources/class.user.inc');
 	
 	
-	$access=true;
-	$users=new usersMenus();
-	if(!isset($_GET["ou"])){$access=false;}
-	if(!isset($_GET["domain"])){$access=false;}
-	if(!$users->AllowEditOuSecurity){$access=false;}
-	if($_SESSION["uid"]<>-100){if($_SESSION["ou"]<>$_GET["ou"]){$access=false;}}
+
+
 	
-	if(!$access){
+	if(!checkrights()){
 		$tpl=new templates();
 		echo "alert('".$tpl->_ENGINE_parse_body('{ERROR_NO_PRIVS}')."');";
 		die();
@@ -23,6 +19,19 @@
 	if(isset($_GET["sugaradminpassword"])){sugar_save();exit;}
 	js();
 	
+	
+function checkrights(){
+	$users=new usersMenus();
+	if(!isset($_GET["ou"])){return false;}
+	if(!isset($_GET["domain"])){return false;}
+	if($_SESSION["uid"]<>-100){if($_SESSION["ou"]<>$_GET["ou"]){return false;}}
+	if($users->AsMessagingOrg){return true;}
+	if($users->AllowEditOuSecurity){return true;}
+	if($users->AsAnAdministratorGeneric){return true;}
+	return false;
+	
+	
+}
 	
 function js(){
 	

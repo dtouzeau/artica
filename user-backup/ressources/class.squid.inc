@@ -1802,6 +1802,8 @@ public function SquidGuardDatabasesStatus(){
 				$conf[]= "external_acl_type ldap_group %LOGIN " . dirname($users->SQUID_LDAP_AUTH)."/squid_ldap_group -D \"cn=$ldap->ldap_admin,$ldap->suffix\" -w $ldap->ldap_password -b \"$ldap->suffix\"  -f \"(&(objectClass=posixGroup)(gidNumber=%a)(memberUid=%v))\" -S -v 3 -h $ldap->ldap_host";
 				$conf[]= "auth_param basic children 5";
 				$conf[]= "auth_param basic realm Squid proxy-caching web server";
+				$conf[]= "acl ldapauth proxy_auth REQUIRED";
+				$conf[]= "http_access allow ldapauth";
 				$conf[]="";
 			}else{
 				$conf[]= "#No LDAP auth_param basic program found !";
@@ -2192,6 +2194,7 @@ function BuildSquidConf(){
 		$conf=$conf."\n";
 		$conf=$conf."#Logs-------------------------------------------------\n";
 		$conf=$conf."emulate_httpd_log on\n";
+		$conf=$conf."log_fqdn on\n";
 		$conf=$conf."coredump_dir	/var/squid/cache\n";
 		$conf=$conf."cache_store_log	/var/log/squid/store.log\n";
 		$conf=$conf."cache_log	/var/log/squid/cache.log\n";

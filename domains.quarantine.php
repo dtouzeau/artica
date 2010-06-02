@@ -2,7 +2,7 @@
 include_once(dirname(__FILE__).'/ressources/class.templates.inc');
 include_once(dirname(__FILE__).'/ressources/class.mysql.inc');
 
-$users=new usersMenus();
+
 
 
 if(isset($_GET["delete-js"])){delete_js();exit;}
@@ -10,7 +10,14 @@ if(isset($_GET["message-id"])){JS_MESSAGE_ID();exit;}
 if(isset($_GET["message_id"])){echo quarantine_show();exit;}
 if(isset($_GET["release-mail-send"])){release_mail_send();exit;}
 
-if(!$users->AsQuarantineAdministrator){die("No access");}
+if(!GetRights()){
+			$tpl=new templates();
+			$error="{ERROR_NO_PRIVS}";
+			echo $tpl->_ENGINE_parse_body("alert('$error')");
+			die();
+	}
+	
+	
 if(isset($_GET["js"])){echo quarantine_script();exit;}
 if(isset($_GET["popup"])){echo quarantine_index();exit;}
 if(isset($_GET["query"])){echo quarantine_query();exit;}
@@ -23,7 +30,12 @@ if(isset($_GET["OuSendQuarantineReports"])){quarantine_ou_settings_save();exit;}
 
 if(isset($_GET["delete-message-id"])){delete_message();exit;}
 
-
+function GetRights(){
+	$users=new usersMenus();
+	if($users->AsMessagingOrg){return true;}
+	if($users->AsQuarantineAdministrator){return true;}
+	return false;
+}
 
 function delete_js(){
 	$tpl=new templates();

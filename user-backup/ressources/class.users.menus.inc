@@ -1392,6 +1392,7 @@ private function build_user_left_menus(){
 		if($priv["AsOrgPostfixAdministrator"]=='yes'){$this->AsOrgPostfixAdministrator=true;}
 		if($priv["AsDansGuardianGroupRule"]=='yes'){$this->AsDansGuardianGroupRule=true;}
 		if($priv["AsMessagingOrg"]=='yes'){$this->AsMessagingOrg=true;}
+		if($priv["AsOrgAdmin"]=='yes'){$this->AsOrgAdmin=true;}
 		
 		
 		
@@ -1455,7 +1456,7 @@ private function build_user_left_menus(){
 			}
 			
 		
-		if($this->AsMessagingOrg){$this->AllowSenderCanonical=true;}
+		if($this->AsMessagingOrg){$this->AllowSenderCanonical=true;$this->AllowAddUsers=true;$this->AllowAddGroup=true;}
 		if($this->AllowChangeDomains==true){$this->AsOrgAdmin=true;$this->AllowSenderCanonical=true;}
 		if($this->AllowEditOuSecurity==true){$this->AsOrgAdmin=true;$this->AllowAddGroup=true;$this->AllowSenderCanonical=true;}
 		if($this->AsDnsAdministrator==true){$this->AsOrgAdmin=true;$this->AllowAddGroup=true;}
@@ -1513,7 +1514,7 @@ private function build_user_left_menus(){
 	
 	
 	function isTreeReadable($priv=null){
-		if(posix_getuid()==0){$this->uid==-100;}
+		if(posix_getuid()==0){$this->uid=-100;}
 		if($this->uid==-100){return true;}
 		if($priv==null){$priv=$this->priv;}
 		if($priv["AsSystemAdministrator"]=="yes"){return true;}

@@ -124,7 +124,7 @@ class dansguardian{
 		
 		$upd["FilterGroupListConf"][0]=$rules->BuildMembersList();		
 		$sock=new sockets();
-		$sock->getFrameWork("cmd.php?reload-dansguardian");
+		$sock->getFrameWork("cmd.php?reload-dansguardian=yes");
 		return true;
 
 		}
@@ -158,7 +158,7 @@ class dansguardian{
 			$this->UserCategoryBlackList[$categoryName]=$categoryName;		
 			$this->UserCategoryWeightedPhraseList[$categoryName]=$categoryName;
 			$sock=new sockets();
-			$sock->getFrameWork("cmd.php?reload-dansguardian");				
+			$sock->getFrameWork("cmd.php?reload-dansguardian=yes");				
 		
 	}	
 	
@@ -182,7 +182,7 @@ class dansguardian{
 			$q->QUERY_SQL($sql,"artica_backup");
 			$this->UserCategoryBlackList[$categoryName]=$categoryName;
 			$sock=new sockets();
-			$sock->getFrameWork("cmd.php?reload-dansguardian");				
+			$sock->getFrameWork("cmd.php?reload-dansguardian=yes");				
 		
 		}
 	
@@ -195,7 +195,7 @@ class dansguardian{
 			$q=new mysql();
 			$q->QUERY_SQL($sql,"artica_backup");
 			$sock=new sockets();
-			$sock->getFrameWork("cmd.php?reload-dansguardian");					
+			$sock->getFrameWork("cmd.php?reload-dansguardian=yes");					
 		}
 	
 	function DefinedCategoryWeightedPhraseListAddRule($category,$words,$score){
@@ -217,7 +217,7 @@ class dansguardian{
 		$q=new mysql();
 		$q->QUERY_SQL($sql,"artica_backup");
 		$sock=new sockets();
-		$sock->getFrameWork("cmd.php?reload-dansguardian");			
+		$sock->getFrameWork("cmd.php?reload-dansguardian=yes");			
 		
 		}
 	
@@ -229,7 +229,7 @@ class dansguardian{
 		$q=new mysql();
 		$q->QUERY_SQL($sql,"artica_backup");
 		$sock=new sockets();
-		$sock->getFrameWork("cmd.php?reload-dansguardian");			
+		$sock->getFrameWork("cmd.php?reload-dansguardian=yes");			
 		
 	}
 	
@@ -238,7 +238,7 @@ class dansguardian{
 		$q=new mysql();
 		$q->QUERY_SQL($sql,"artica_backup");	
 		$sock=new sockets();
-		$sock->getFrameWork("cmd.php?reload-dansguardian");		
+		$sock->getFrameWork("cmd.php?reload-dansguardian=yes");		
 		
 	}	
 	
@@ -261,7 +261,7 @@ class dansguardian{
 			}			
 			
 			$sock=new sockets();
-			$sock->getFrameWork("cmd.php?reload-dansguardian");
+			$sock->getFrameWork("cmd.php?reload-dansguardian=yes");
 		}
 		
 	
@@ -548,38 +548,125 @@ class dansguardian_rules{
 	var $error;
 	var $hostname;
 	var $ruleindex;
-	var $array_blacksites=array("adult"=>"{adult}",
+	var $array_blacksites=array(
+									"adult"=>"{adult}",
+									"sex/lingerie"=>"{sex_lingerie}",
+									"mixed_adult"=>"{mixed_adult}",
+									"sexual_education"=>"{sexual_education}",
+	
 									"agressif"=>"{agressif}",
-									"audio-video"=>"{audio-video}",
-									"blog"=>"{blog}",
+									"agressive"=>"{agressif} (2)",
+									"violence"=>"{violence}",
+
+									
+									"automobile/bikes"=>"{automobile-bikes}",
+									"automobile/boats"=>"{automobile-boats}",
+									"automobile/cars"=>"{automobile-cars}",
+									"automobile/planes"=>"{automobile-planes}",
+
+									
+									"publicite"=>"{publicite}",
+									"adv"=>"{publicite} (2)",
+									"astrology"=>"{astrology}",
+									
 									"cleaning"=>"{cleaning}",
 									"dangerous_material"=>"{dangerous_material}",
+									"downloads"=>"{www_downloads}",
+									
 									"drogue"=>"{drogue}",
+									"drugs"=>"{drogue} (2)",
+									"dynamic"=>"{www_dynamic}",
+									
 									"financial"=>"{financial}",
+									"finance/banking"=>"{finance-banking}",
+									"finance/insurance"=>"{finance-insurance}",
+									"finance/moneylending"=>"{finance-moneylending}",
+									"finance/realestate"=>"{finance-realestate}",
+									"finance/other"=>"{finance-other}",
+
 									"forums"=>"{forums}",
+									"forum"=>"{forums} (2)",
+									"socialnet"=>"{socialnet}",
+									"jobsearch"=>"{jobsearch}",
+	
 									"gambling"=>"{gambling}",
+									"gamble"=>"{gambling} (2)",
 									"hacking"=>"{hacking}",
+									"hobby/cooking"=>"{hobby-cooking}",
+									
+									"isp"=>"{www_isp}",
+									"webmail"=>"{webmail}",
+									
 									"liste_bu"=>"{liste_bu}",
 									"mobile-phone"=>"{mobile-phone}",
-									"phishing"=>"{phishing}",
-									"publicite"=>"{publicite}",
+									"marketingware"=>"{marketingware}",
+									
+									"webradio"=>"{webradio}",
+									"audio-video"=>"{audio-video}",
 									"radio"=>"{radio}",
+									"music"=>"{music}",
+									"movies"=>"{movies}",
+									"models"=>"{models}",
+									
+									"blog"=>"{blog}",
+									"news"=>"{www_news}",
+									"phishing"=>"{phishing}",
+									
 									"redirector"=>"{redirector}",
 									"strict_redirector"=>"{strict_redirector}",
 									"strong_redirector"=>"{strong_redirector}",
+									
 									"tricheur"=>"{tricheur}",
 									"warez"=>"{warez}",
-									"webmail"=>"{webmail}",
+									
+									"webphone"=>"{webphone}",
+									"weapons"=>"{weapons}",
+									"webtv"=>"{webtv}",
 									"games"=>"{games}",
-									"mixed_adult"=>"{mixed_adult}",
+									"hobby/games"=>"{games} (2)",
+									"hobby/pets"=>"{hobby-pets}",
+									
 									"filehosting"=>"{filehosting}",
 									"reaffected"=>"{reaffected}",
-									"sexual_education"=>"{sexual_education}",
+									"religion"=>"{religion}",
+									
 									"shopping"=>"{shopping}",
 									"dating"=>"{dating}",
-									"marketingware"=>"{marketingware}",
-									"astrology"=>"{astrology}",
-									"sect"=>"{sect}");
+									"ringtones"=>"{ringtones}",
+									"recreation/wellness"=>"{recreation_wellness}",
+									"recreation/travel"=>"{recreation_travel}",
+									"recreation/sports"=>"{recreation_sports}",
+									"recreation/humor"=>"{recreation_humor}",
+									"sect"=>"{sect}",
+									"shopping"=>"{www_shopping}",
+									
+									"science/chemistry"=>"{science_chemistry}",
+									"science/astronomy"=>"{science_astronomy}",
+									"searchengines"=>"{searchengines}",
+									"spyware"=>"{www_spyware}",
+									"tracker"=>"{www_tracker}",
+									"updatesites"=>"{updatesites}",
+									
+									);
+									
+		  var $array_pics=array(
+		  	"mixed_adult"=>"sex-icon.png",
+		  	"sex/lingerie"=>"sex-icon.png",
+		  	"porn"=>"sex-icon.png",
+		 	"adult"=>"sex-icon.png",
+		  	"sexual_education"=>"kiss-icon.png",
+		  	"music"=>"fire-guitar-icon.png",
+		  	"agressif"=>"icon_fight.png",
+		  	"agressive"=>"icon_fight.png",
+		  	"violence"=>"icon_fight.png",
+		  	"socialnet"=>"icon_forum.png",
+		  	"forum"=>"icon_forum.png",
+		  	"forums"=>"icon_forum.png",
+		  	"jobsearch"=>"icon_forum.png",
+		  	"tracker"=>"icon_eye.png",
+		  	 "gambling"=>"icon_poker.png",
+		  	 "gamble"=>"icon_poker.png",
+		  	);
 									
 									
 			var $array_banned_phrases_list=array("gambling"=>"{gambling}",
@@ -734,7 +821,7 @@ class dansguardian_rules{
 	
 	function dansguardian_rules($hostname=null,$RuleID=0){
 		ksort($this->array_weighted_phrases_lists);
-		ksort($this->array_blacksites);
+		//ksort($this->array_blacksites);
 		ksort($this->array_banned_phrases_list);
 		if($RuleID>0){
 				$this->ruleindex=$RuleID;
@@ -811,7 +898,9 @@ class dansguardian_rules{
 		$sql="INSERT INTO dansguardian_files (RuleID,filename,infos,pattern,enabled) VALUES('$ruleindex','bannedsitelist','$info','$category','1');";
 		$q=new mysql();
 		$q->QUERY_SQL($sql,"artica_backup");		
-		if(!$q->ok){writelogs("$q->mysql_error",__CLASS__.'/'.__FUNCTION__,__FILE__);}		
+		if(!$q->ok){writelogs("$q->mysql_error",__CLASS__.'/'.__FUNCTION__,__FILE__);}	
+		$sock=new sockets();
+		$sock->getFrameWork("cmd.php?reload-dansguardian=yes");	
 	}
 	
 	function AddPersonalCategory($category,$ruleindex){
@@ -821,7 +910,7 @@ class dansguardian_rules{
 		$q->QUERY_SQL($sql,"artica_backup");		
 		if(!$q->ok){writelogs("$q->mysql_error",__CLASS__.'/'.__FUNCTION__,__FILE__);return;}
 		$sock=new sockets();
-		$sock->getFrameWork("cmd.php?reload-dansguardian");					
+		$sock->getFrameWork("cmd.php?reload-dansguardian=yes");					
 	}	
 	
 	function DelPersonalCategory($index){
@@ -831,7 +920,7 @@ class dansguardian_rules{
 		$q->QUERY_SQL($sql,"artica_backup");
 		if(!$q->ok){writelogs("$q->mysql_error",__CLASS__.'/'.__FUNCTION__,__FILE__);return;}	
 		$sock=new sockets();
-		$sock->getFrameWork("cmd.php?reload-dansguardian");				
+		$sock->getFrameWork("cmd.php?reload-dansguardian=yes");				
 		
 	}
 	
@@ -842,7 +931,20 @@ class dansguardian_rules{
 		$q->QUERY_SQL($sql,"artica_backup");		
 		if(!$q->ok){writelogs("$q->mysql_error",__CLASS__.'/'.__FUNCTION__,__FILE__);return;}
 		$sock=new sockets();
-		$sock->getFrameWork("cmd.php?reload-dansguardian");		
+		$sock->getFrameWork("cmd.php?reload-dansguardian=yes");	
+
+		
+		if(preg_match("#www\.(.+?)$#i",$WebsiteToAdd,$re)){$WebsiteToAdd=$re[1];}
+		$md5=md5($www.$category);
+		$uuid=base64_decode($sock->getFrameWork("cmd.php?system-unique-id=yes"));
+		$sql="INSERT INTO dansguardian_community_categories (zmd5,zDate,category,pattern,uuid) VALUES('$md5',NOW(),'$category','$www','$uuid')";
+		$q=new mysql();
+		$q->QUERY_SQL($sql,"artica_backup");
+		if(!$q->ok){writelogs("$q->mysql_error",__CLASS__.'/'.__FUNCTION__,__FILE__);return;}
+		$sock=new sockets();
+		$sock->getFrameWork("cmd.php?export-community-categories=yes");		
+		
+		
 	}
 	
 	function DeletePersonalCategoryWebSite($ID){
@@ -852,7 +954,7 @@ class dansguardian_rules{
 		$q->QUERY_SQL($sql,"artica_backup");
 		if(!$q->ok){writelogs("$q->mysql_error",__CLASS__.'/'.__FUNCTION__,__FILE__);return;}
 		$sock=new sockets();
-		$sock->getFrameWork("cmd.php?reload-dansguardian");		
+		$sock->getFrameWork("cmd.php?reload-dansguardian=yes");		
 	}	
 	
 	
@@ -974,7 +1076,7 @@ class dansguardian_rules{
 		$q->QUERY_SQL($sql,"artica_backup");		
 		if(!$q->ok){writelogs("$q->mysql_error",__CLASS__.'/'.__FUNCTION__,__FILE__);}
 		$sock=new sockets();
-		$sock->getFrameWork("cmd.php?reload-dansguardian");			
+		$sock->getFrameWork("cmd.php?reload-dansguardian=yes");			
 		}
 		
 	function Add_exceptionsitelist($ruleindex,$www){
@@ -999,7 +1101,7 @@ class dansguardian_rules{
 		$q->QUERY_SQL($sql,"artica_backup");		
 		if(!$q->ok){writelogs("$q->mysql_error",__CLASS__.'/'.__FUNCTION__,__FILE__);}
 		$sock=new sockets();
-		$sock->getFrameWork("cmd.php?reload-dansguardian");			
+		$sock->getFrameWork("cmd.php?reload-dansguardian=yes");			
 		
 		
 		}
@@ -1013,7 +1115,7 @@ class dansguardian_rules{
 		$q->QUERY_SQL($sql,"artica_backup");		
 		if(!$q->ok){writelogs("$q->mysql_error",__CLASS__.'/'.__FUNCTION__,__FILE__);}
 		$sock=new sockets();
-		$sock->getFrameWork("cmd.php?reload-dansguardian");			
+		$sock->getFrameWork("cmd.php?reload-dansguardian=yes");			
 		}
 		
 	function Add_ExeptionFileSiteList($ruleindex,$pattern,$info,$enabled){
@@ -1034,7 +1136,7 @@ class dansguardian_rules{
 		$q->QUERY_SQL($sql,"artica_backup");		
 		if(!$q->ok){writelogs("$q->mysql_error",__CLASS__.'/'.__FUNCTION__,__FILE__);}	
 		$sock=new sockets();
-		$sock->getFrameWork("cmd.php?reload-dansguardian");					
+		$sock->getFrameWork("cmd.php?reload-dansguardian=yes");					
 		}	
 
 	function Add_exceptioniplist($pattern,$info,$enabled=1){
@@ -1054,7 +1156,7 @@ class dansguardian_rules{
 			return false;
 		}	
 		$sock=new sockets();
-		$sock->getFrameWork("cmd.php?reload-dansguardian");	
+		$sock->getFrameWork("cmd.php?reload-dansguardian=yes");	
 		return true;				
 		}
 	function Add_bannediplist($pattern,$info,$enabled=1){
@@ -1074,7 +1176,7 @@ class dansguardian_rules{
 			return false;
 		}	
 		$sock=new sockets();
-		$sock->getFrameWork("cmd.php?reload-dansguardian");	
+		$sock->getFrameWork("cmd.php?reload-dansguardian=yes");	
 		return true;				
 		}	
 		
@@ -1090,7 +1192,7 @@ class dansguardian_rules{
 			return false;
 		}			
 		$sock=new sockets();
-		$sock->getFrameWork("cmd.php?reload-dansguardian");			
+		$sock->getFrameWork("cmd.php?reload-dansguardian=yes");			
 		}					
 
 	function Del_exceptioniplist($ruleindex,$index){
@@ -1105,7 +1207,7 @@ class dansguardian_rules{
 			return false;
 		}			
 		$sock=new sockets();
-		$sock->getFrameWork("cmd.php?reload-dansguardian");			
+		$sock->getFrameWork("cmd.php?reload-dansguardian=yes");			
 		}		
 		
 		
@@ -1116,7 +1218,7 @@ class dansguardian_rules{
 		$q->QUERY_SQL($sql,"artica_backup");		
 		if(!$q->ok){writelogs("$q->mysql_error",__CLASS__.'/'.__FUNCTION__,__FILE__);}	
 		$sock=new sockets();
-		$sock->getFrameWork("cmd.php?reload-dansguardian");				
+		$sock->getFrameWork("cmd.php?reload-dansguardian=yes");				
 		}		
 		
 	function DelBannedExtensionList($ruleindex,$index){
@@ -1126,7 +1228,7 @@ class dansguardian_rules{
 		$q->QUERY_SQL($sql,"artica_backup");
 		if(!$q->ok){writelogs("$q->mysql_error",__CLASS__.'/'.__FUNCTION__,__FILE__);}	
 		$sock=new sockets();
-		$sock->getFrameWork("cmd.php?reload-dansguardian");			
+		$sock->getFrameWork("cmd.php?reload-dansguardian=yes");			
 	}
 	
 	function DelBannedMimeTypeList($ruleindex,$index){
@@ -1136,7 +1238,7 @@ class dansguardian_rules{
 		$q->QUERY_SQL($sql,"artica_backup");
 		if(!$q->ok){writelogs("$q->mysql_error",__CLASS__.'/'.__FUNCTION__,__FILE__);}	
 		$sock=new sockets();
-		$sock->getFrameWork("cmd.php?reload-dansguardian");						
+		$sock->getFrameWork("cmd.php?reload-dansguardian=yes");						
 	}	
 		
 	function DelExceptionsitelist($ID){
@@ -1146,7 +1248,7 @@ class dansguardian_rules{
 		$q->QUERY_SQL($sql,"artica_backup");
 		if(!$q->ok){writelogs("$q->mysql_error",__CLASS__.'/'.__FUNCTION__,__FILE__);}	
 		$sock=new sockets();
-		$sock->getFrameWork("cmd.php?reload-dansguardian");					
+		$sock->getFrameWork("cmd.php?reload-dansguardian=yes");					
 	}
 
 	function DelExeptionFileSiteList($ID){
@@ -1164,7 +1266,7 @@ class dansguardian_rules{
 		$q->QUERY_SQL($sql,"artica_backup");
 		if(!$q->ok){writelogs("$q->mysql_error\n\n$sql\n\n",__CLASS__.'/'.__FUNCTION__,__FILE__);}
 		$sock=new sockets();
-		$sock->getFrameWork("cmd.php?reload-dansguardian");				
+		$sock->getFrameWork("cmd.php?reload-dansguardian=yes");				
 		}
 		
 	function Edit_bannedregexpurllist($ID,$pattern,$info,$enabled=null){
@@ -1177,7 +1279,7 @@ class dansguardian_rules{
 		$q->QUERY_SQL($sql,"artica_backup");
 		if(!$q->ok){writelogs("$q->mysql_error\n\n$sql\n\n",__CLASS__.'/'.__FUNCTION__,__FILE__);}	
 		$sock=new sockets();
-		$sock->getFrameWork("cmd.php?reload-dansguardian");			
+		$sock->getFrameWork("cmd.php?reload-dansguardian=yes");			
 		}
 		
 function Edit_bannedextensionlist($ID,$enabled=null){
@@ -1188,7 +1290,7 @@ function Edit_bannedextensionlist($ID,$enabled=null){
 		$q->QUERY_SQL($sql,"artica_backup");
 		if(!$q->ok){writelogs($q->mysql_error,__CLASS__.'/'.__FUNCTION__,__FILE__,__LINE__);}
 		$sock=new sockets();
-		$sock->getFrameWork("cmd.php?reload-dansguardian");							
+		$sock->getFrameWork("cmd.php?reload-dansguardian=yes");							
 		}
 		
 function Edit_ExeptionFileSiteList($ID,$enabled=null){
@@ -1196,7 +1298,7 @@ function Edit_ExeptionFileSiteList($ID,$enabled=null){
 		$q=new mysql();
 		$q->QUERY_SQL($sql,"artica_backup");
 		$sock=new sockets();
-		$sock->getFrameWork("cmd.php?reload-dansguardian");					
+		$sock->getFrameWork("cmd.php?reload-dansguardian=yes");					
 		}		
 
 function Edit_bannedMimeTypelist($ID,$enabled=null){
@@ -1208,7 +1310,7 @@ function Edit_bannedMimeTypelist($ID,$enabled=null){
 			writelogs("$q->mysql_error",__CLASS__.'/'.__FUNCTION__,__FILE__,__LINE__);
 		}
 		$sock=new sockets();
-		$sock->getFrameWork("cmd.php?reload-dansguardian");			
+		$sock->getFrameWork("cmd.php?reload-dansguardian=yes");			
 		}		
 		
 function DelBannedregexpurllist($ruleindex,$listindex){
@@ -1218,7 +1320,7 @@ function DelBannedregexpurllist($ruleindex,$listindex){
 		$q->QUERY_SQL($sql,"artica_backup");
 		if(!$q->ok){writelogs("$q->mysql_error",__CLASS__.'/'.__FUNCTION__,__FILE__);}	
 		$sock=new sockets();
-		$sock->getFrameWork("cmd.php?reload-dansguardian");					
+		$sock->getFrameWork("cmd.php?reload-dansguardian=yes");					
 		
 		}
 		

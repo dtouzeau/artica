@@ -1,10 +1,12 @@
-1.4.052919:
+1.4.053118:
 ========================================================================================
 
 Interface Changes
 -------------------------------------------------
 1.4.052911: Change left menu behavior.
 1.4.052911: Add a new language : brazilian.
+1.4.053110: Fix unable to define a Messaging organization Administrator
+1.4.053118: Tweaks on Administrators privileges.
 
 Messaging Changes:
 -----------------------------------------------
@@ -14,6 +16,8 @@ Messaging Changes:
 Proxy Changes:
 -------------------------------------------------
 1.4.052911: Improve the category section in filter area.
+1.4.053118: Add top 200 websites visisted.
+1.4.053118: Introduce license manager to obtain more than 1.6 Million blacklisted websites for 50€/year
 
 System Changes
 -------------------------------------------------
@@ -22,6 +26,10 @@ System Changes
 File Sharing changes:
 -----------------------------------------------
 1.4.052919: Introduce possibility to link Artica server to an Active Directory server.
+
+
+
+
 
 
 1.4.052511:

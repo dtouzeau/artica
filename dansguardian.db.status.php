@@ -50,7 +50,7 @@ $html="
 function popup_squidguard(){
 	$sock=new sockets();
 	$datas=unserialize(base64_decode($sock->getFrameWork("cmd.php?squidguard-db-status=yes")));
-	
+	$tpl=new templates();
 	
 	$html="
 	<div style='width:100%;height:350px;overflow:auto'>
@@ -65,6 +65,12 @@ function popup_squidguard(){
 	</tr>";
 
 
+	if(!is_array($datas)){
+		echo $tpl->_ENGINE_parse_body("<H2>{error_no_datas}</H2>");
+		return;
+	}
+	
+	
 	
 	while (list ($path, $array) = each ($datas) ){
 
@@ -111,8 +117,16 @@ function popup_squidguard(){
 		$date=date('d M y h:i',$array2["domainlist"]["date"]);
 		
 		if(preg_match("#personal-categories\/(.+)#",$category,$re)){
-			$category="{personal} {$re[1]}";
+			$category="{personal}: {$re[1]}";
 		}
+		
+		if(preg_match("#web-filter-plus\/BL\/(.+)#",$category,$re)){
+			$category="{professional}: {$re[1]}";
+		}	
+
+		if(preg_match("#blacklist-artica\/(.+)#",$category,$re)){
+			$category="{artica_community}: {$re[1]}";
+		}			
 		
 		$html=$html."
 		<tr ". CellRollOver().">
@@ -130,7 +144,6 @@ function popup_squidguard(){
 	
 	$html=$html."</table></div>";
 	
-	$tpl=new templates();
 	echo $tpl->_ENGINE_parse_body($html,'squid.index.php');			
 	
 }

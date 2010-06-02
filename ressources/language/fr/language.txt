@@ -196,6 +196,7 @@ exemples[br]
 <advanced_options>Options avanc&eacute;es</advanced_options>
 <ad_samba_member>Membre Active Directory</ad_samba_member>
 <ad_samba_member_text>Faire de ce serveur un membre d'un domaine Microsoft Active Directory</ad_samba_member_text>
+<aggressive>Site de contenus agressifs, couvre les sites racistes de haine...</aggressive>
 <alias>Alias</alias>
 <aliases>Alias</aliases>
 <all>Tout</all>
@@ -566,6 +567,7 @@ Squid optimise donc de fa&ccedil;on cons&eacute;quente le flux de donn&eacute;es
 <artica_agent_task_edited>La t&acirc;che &agrave; &eacute;t&eacute; modifi&eacute;e</artica_agent_task_edited>
 <artica_agent_task_ordered>la t&acirc;che &agrave; &eacute;t&eacute; planifi&eacute;e</artica_agent_task_ordered>
 <artica_autoupdate>Mise &agrave; jour automatique Artica</artica_autoupdate>
+<artica_community>Communaut&eacute; Artica</artica_community>
 <artica_cpulimit_explain>Cette fonctionnalit&eacute; limite la consommation CPU des scripts et programmes en ex&eacute;cution.</artica_cpulimit_explain>
 <artica_cyrus_backup_processing>Sauvegarde des bo&icirc;tes aux lettres en cours</artica_cyrus_backup_processing>
 <artica_cyrus_backup_processing_text>Artica sauvegarde actuellement vos bo&icirc;tes aux lettres</artica_cyrus_backup_processing_text>
@@ -588,6 +590,7 @@ Squid optimise donc de fa&ccedil;on cons&eacute;quente le flux de donn&eacute;es
 <AsMailBoxAdministrator>Gestionnaire de boite aux lettres locales</AsMailBoxAdministrator>
 <AsMailManAdministrator>Peut administrer des listes de distribution</AsMailManAdministrator>
 <AsMessagingOrg>G&egrave;re la messagerie de l'organisation</AsMessagingOrg>
+<AsOrgAdmin>Peut administrer cette organisation</AsOrgAdmin>
 <AsOrgPostfixAdministrator>Peu administrer le relais de messagerie (si les instances multiples sont activ&eacute;es).</AsOrgPostfixAdministrator>
 <AsOrgStorageAdministrator>Peut administrer les ressources de stockage/backup de l'organisation</AsOrgStorageAdministrator>
 <AsPostfixAdministrator>Param&egrave;tres de gestion Postfix</AsPostfixAdministrator>
@@ -612,6 +615,10 @@ Cette fonctionnalit&eacute; permet d'afficher un popup d'authentification si et 
 <Authorized networks text>Autoris&eacute; &agrave; envoyer des emails &agrave; travers Internet</Authorized networks text>
 <autoblock>Auto-bloquer</autoblock>
 <AutomaticConfig>Sauvegarder automatiquement les param&egrave;tres du syst&egrave;me</AutomaticConfig>
+<automobile-bikes>Tout ce qui parle des motos, incluant les sites marchands de fans, de passions, scooters inclus</automobile-bikes>
+<automobile-boats>Tout ce qui concerne les bateaux &agrave; moteurs incluant les sites marchands, de passions, fans, non inclus les sites de voyages</automobile-boats>
+<automobile-cars>Tout ce qui concerne l'automobile, constructeurs et revendeurs</automobile-cars>
+<automobile-planes>Tout ce qui concerne les avions, h&eacute;licopt&egrave;res, a&eacute;roports non inclus</automobile-planes>
 <automount_center>Centre d'Auto-montage</automount_center>
 <automount_center_text>Configurez le service de connection avec vos ressources externes (p&eacute;riph&eacute;riques, montages r&eacute;seaux)</automount_center_text>
 <auto_account>Auto-cr&eacute;ation de Comptes</auto_account>
@@ -720,6 +727,7 @@ Specify 0 when mail delivery should be tried only once.</bounce_queue_lifetime_t
 <broken_sasl_auth_clients>interoperabilit&eacute; avec les clients SMTP obsol&egrave;tent</broken_sasl_auth_clients>
 <broken_sasl_auth_clients_text>Active l'interoperabilit&eacute; avec les clients SMTP qui impl&eacute;mentent une version obsolete de la commande AUTH (RFC 2554). [br]MicroSoft Outlook Express version 4 et MicroSoft Exchange version 5.0 sont des exemples de tels clients.</broken_sasl_auth_clients_text>
 <browse>Parcourir</browse>
+<browsed_websites>Sites web parcourus</browsed_websites>
 <browse_computers>Parcourir les ordinateurs</browse_computers>
 <browse_computers_text>Parcourez vos r&eacute;seaux et trouver des ordinateurs &agrave; proximit&eacute; de votre serveur Artica ou g&eacute;rer vos ordinateurs</browse_computers_text>
 <browse_disk_text>Parcourez le disque et visualisez les r&eacute;pertoires</browse_disk_text>
@@ -750,6 +758,9 @@ Specify 0 when mail delivery should be tried only once.</bounce_queue_lifetime_t
 <cancel>annuler</cancel>
 <catch_all>Catch-all</catch_all>
 <catch_all_mail_text>A catch-all mailbox will receive all mails when recipients not matching your users stored in local database</catch_all_mail_text>
+<categorize>Cat&eacute;goriser</categorize>
+<categoryies>cat&eacute;gorie(s)</categoryies>
+<categoryies_community>Cat&eacute;gories de la communaut&eacute;</categoryies_community>
 <CC Address>Adresse CC</CC Address>
 <certificate infos>Infos de certificat</certificate infos>
 <certificate password>Mot de passe de certificat</certificate password>
@@ -982,6 +993,7 @@ Dans ce cas, vous ne conserverez pas deux fois les m&ecirc;mes &eacute;l&eacute;
 <DANSGUARDIAN_BLACKLISTS_UPDATE_TEXT>Lancez la mise &agrave; jour des bases de filtrage afin d'am&eacute;liorer le niveau de d&eacute;tection des filtres par cat&eacute;gorie.</DANSGUARDIAN_BLACKLISTS_UPDATE_TEXT>
 <dansguardian_blacklist_categories>Restreindre l'acc&egrave;s aux sites web par l'utilisation des cat&eacute;gories de sites web.</dansguardian_blacklist_categories>
 <dansguardian_blacklist_users_categories>Bloquer des sites web en utilisant des listes pr&eacute;-d&eacute;finies.</dansguardian_blacklist_users_categories>
+<dansguardian_categorize_explain>define available categories that will handle this website</dansguardian_categorize_explain>
 <dansguardian_exception_site_list>Ajouter des sites web qui ne seront pas filtr&eacute;s</dansguardian_exception_site_list>
 <DANSGUARDIAN_GROUP_EXPLAIN>Cette fonctionnalit&eacute; permet de d&eacute;l&eacute;guer des r&egrave;gles &agrave; un groupe d'une organisation.[br]
 Elle offre plusieurs avantages:[br]
@@ -1122,6 +1134,7 @@ Vous pouvez ajouter des privil&egrave;ges de groupe afin d'autoriser certains ut
 <down>vers le bas</down>
 <download>t&eacute;l&eacute;chargez</download>
 <downloading>T&eacute;l&eacute;chargement</downloading>
+<downloads>Couvre le partage de fichiers, perr-to-peer et sites web torrent</downloads>
 <do_nothing>ne rien faire</do_nothing>
 <driver>pilote</driver>
 <DUNNO_help>
@@ -1444,6 +1457,11 @@ Il retransfert les messages sur un autre serveur sur le port 25.[br]Fetchmail n'
 <FILTER_help>apr&egrave;s que le message soit mis en file d'attente, envoyer le message &agrave; travers le filtre de contenu externe sp&eacute;cifi&eacute; ou type de transport</FILTER_help>
 <filter_stats>Statistiques du filtre</filter_stats>
 <Filtration Process>Processus de Filtrage</Filtration Process>
+<finance-banking>Page de garde des sites de soci&eacute;t&eacute;s de banque</finance-banking>
+<finance-insurance>Sites sur les assurances, informations relatives</finance-insurance>
+<finance-moneylending>Sites de pr&ecirc;ts et hypoth&egrave;ques ou informations relatives</finance-moneylending>
+<finance-other>Tout ce qui concerne la finance qui ne correspond pas aux autres cat&eacute;gories</finance-other>
+<finance-realestate>Site d'achats et vente de immobilier, trouver des appartements &agrave; louer et &agrave; vendre</finance-realestate>
 <find>trouver</find>
 <find user>Trouver un utilisateur</find user>
 <find_documents>Recherchez des documents</find_documents>
@@ -1549,6 +1567,8 @@ activer ou d&eacute;sactiver cette fonctionnalit&eacute;.</group_behavior_text>
 <hide_unwriteable_files_text>N'autorise pas l'affichage de l'existence de fichiers qui ne peuvent pas &ecirc;tre modifi&eacute;s.[br]Notez que les r&eacute;pertoires prot&eacute;g&eacute;s en &eacute;criture sont affich&eacute;s comme d'habitude.</hide_unwriteable_files_text>
 <high>Haut</high>
 <hits_number>Nombre d'acc&egrave;s</hits_number>
+<hobby-cooking>Sites concernant l'alimentation et la pr&eacute;paration des aliments</hobby-cooking>
+<hobby-pets>Sites &agrave; propos des animaux, descriptions, nourriture, foires, histoires sur les animaux de compagnie et autres</hobby-pets>
 <hold>tenir</hold>
 <HOLD_help>
 Place the message on the hold queue,[br] where it  will sit  until someone either deletes it or releases it for delivery.[br]              
@@ -1805,6 +1825,7 @@ With the default 100 SMTP server process limit, "in flow delay as 1s" limits the
 <jGrowlMaxEvents>Afficher les X derniers &eacute;v&egrave;nements sur la page de garde</jGrowlMaxEvents>
 <jgrowl_no_clamav_update>Ne pas afficher les mises &agrave; jour ClamAV</jgrowl_no_clamav_update>
 <jgrowl_no_kas_update>D&eacute;sactiver l'affichage des mises &agrave; jour de Kaspersky Anti-Spam</jgrowl_no_kas_update>
+<jobsearch>Site d'offres d'emplois ou de recherche de travail.</jobsearch>
 <join_network>Rejoindre un r&eacute;seau</join_network>
 <js_add_domain>Ajoutez un nouveau domaine</js_add_domain>
 <js_add_entity>Ajouter une nouvelle identit&eacute;</js_add_entity>
@@ -2090,6 +2111,7 @@ This parameter also limits the time an unreachable destination is kept in the sh
 <mobile>t&eacute;l&eacute;phone portable</mobile>
 <mode>mode</mode>
 <model>mod&egrave;le</model>
+<models>Agences de mannequinat, mannequins ou page de fans</models>
 <modified>modifi&eacute;</modified>
 <monday>Lundi</monday>
 <month>mois</month>
@@ -2108,8 +2130,10 @@ This parameter also limits the time an unreachable destination is kept in the sh
 <move>d&eacute;placer</move>
 <move_member>Membres des groupes</move_member>
 <move_member_text>Ajouter/d&eacute;placer ce membre dans un groupe</move_member_text>
+<movies>Sites offering cinema programs</movies>
 <MTA Clients Settings>Param&egrave;tres de Clients MTA</MTA Clients Settings>
 <multidomains_icon_text>chaque utilisateur disposera d'une compte de type &quot;user@domain.tld&quot; au lieu de &quot;user&quot;</multidomains_icon_text>
+<music>Site offrant le t&eacute;l&eacute;chargement de musiques</music>
 <mx-target>Destination MX</mx-target>
 <mx-target_text>D&eacute;finissez la cible par d&eacute;faut pour les enregistrements MX cr&eacute;&eacute; &agrave; l'aide de l'option &quot;local MX&quot;</mx-target_text>
 <mxexamples>[ul][li]thekelleys.org.uk go to thekelleys.org.uk with weight 5[/li][li]thekelleys.org.uk go to eyas.biff.org.uk with weight 30[/li][/ul]</mxexamples>
@@ -2222,6 +2246,7 @@ The default is to use the local machine name, $myhostname, which defaults to the
 <notify>Notifi&eacute;</notify>
 <notify_templates>notifier les mod&egrave;les</notify_templates>
 <notif_save_conf_ldap>Les param&egrave;tres sont sauvegard&eacute;s dans le stockage temporaire, n'oubliez pas de - Sauver et Appliquer les param&egrave;tres - &agrave; faire en mode de production</notif_save_conf_ldap>
+<not_compiled>Non compil&eacute;</not_compiled>
 <not_installed>non install&eacute;</not_installed>
 <not_match>ne correspondent pas</not_match>
 <november>Novembre</november>
@@ -2483,6 +2508,7 @@ This is because Postfix needs to open lookup tables ahead of time, but the reade
 <product_licence_text>Obtenir l'information de licence et mettez la &agrave; jour</product_licence_text>
 <product_update_settings>param&egrave;tres de mise &agrave; jour</product_update_settings>
 <product_update_settings_text>Param&egrave;tres pour t&eacute;l&eacute;charger les mises &agrave; jour afin de maintenir le service de s&eacute;curit&eacute;</product_update_settings_text>
+<professional>professionel</professional>
 <professional_email>eMail professionnel</professional_email>
 <prompt_add_rule_name>Donner un nom &agrave; votre nouvelle r&egrave;gle</prompt_add_rule_name>
 <properties>propri&eacute;t&eacute;s</properties>
@@ -2567,6 +2593,10 @@ Les bo&icirc;tes aux lettres d&eacute;j&agrave; cr&eacute;es ne seront pas impac
 <recipient_rules>R&egrave;gles sur le destinataire</recipient_rules>
 <recommend_restart_postfix>Il est obligatoire de red&eacute;marrer postfix pour accepter du courrier</recommend_restart_postfix>
 <recommend_update_kaspersky>Vous devez mettre &agrave; jour des bases antivirus Kaspersky, la version actuelle n'est plus &agrave; jour [br] Kaspersky recommande de mettre &agrave; jour la base de donn&eacute;es chaque heure</recommend_update_kaspersky>
+<recreation_humor>Tout ce qui concerne l'humour ou les histoires dr&ocirc;les</recreation_humor>
+<recreation_sports>Tout ce qui concerne le sport</recreation_sports>
+<recreation_travel>Sites d'informations sur les pays &eacute;trangers, les soci&eacute;t&eacute;s Voyage  et tout ce qui a &agrave; voir avec les voyages</recreation_travel>
+<recreation_wellness>Sites sur les traitements ou les motivations pour &ecirc;tre sain et beau.</recreation_wellness>
 <recursive>r&eacute;cursif</recursive>
 <redirect>Rediriger vers l'adresse email</redirect>
 <REDIRECT_help>After  the  message  is queued,[br] send the message to the  specified  address  instead  of  the  intended recipient(s).[br]
@@ -2690,6 +2720,7 @@ If this parameter is non-empty, then the Postfix SMTP server will reject mail to
 This feature is off by default. </relay_recipient_maps_text>
 <release>lib&eacute;rer</release>
 <release_mail>Renvoyer ce message</release_mail>
+<religion>Sites religieux ou s'en rapprochant</religion>
 <reload>recharger</reload>
 <remote password>mot de passe distant</remote password>
 <remote server mailbox>Votre serveur de messagerie distant</remote server mailbox>
@@ -2698,6 +2729,7 @@ This feature is off by default. </relay_recipient_maps_text>
 <remote_rsync_server>Serveur Rsync distant</remote_rsync_server>
 <remote_smb_server>R&eacute;pertoire partag&eacute;</remote_smb_server>
 <removed>supprim&eacute;</removed>
+<remove_license>Supprimer la licence</remove_license>
 <remove_mailgraph>supprime l'application mailgraph</remove_mailgraph>
 <remove_mailqueue>Supprime tous les mails en file d'attente</remove_mailqueue>
 <remove_mailqueue_text>&Ecirc;tes-vous s&ucirc;r de vouloir supprimer cette file d'attente de messagerie? 
@@ -2746,6 +2778,7 @@ Placer une limite sur les ent&ecirc;tes HTTP peut r&eacute;soudre certains probl
 <results>R&eacute;sultats</results>
 <RETRANSLATOR_CONNECT_URI>Utilisez ce lien web dans les produits Kaspersky afin de les mettre &agrave; jour &agrave; travers ce serveur (voir le lien ci-dessous)</RETRANSLATOR_CONNECT_URI>
 <return_to>retourner vers</return_to>
+<ringtones>Sites permettant de t&eacute;l&eacute;charger des sonneries ou informations relatives.</ringtones>
 <roomNumber>Num&eacute;ro de chambre</roomNumber>
 <rotate_logs>Rotation des fichier d'&eacute;v&egrave;nements</rotate_logs>
 <ROUNDCUBE_NEWVERSION>Nouvelle version de RoundCube</ROUNDCUBE_NEWVERSION>
@@ -2790,10 +2823,13 @@ Lorsqu'un message arrive, Postfix enregistre le nom d'utilisateur fournit, la m&
 <schedule>planification</schedule>
 <scheduled>planifi&eacute;</scheduled>
 <schedule_import_settings>Programmez un importation r&eacute;guli&egrave;re afin de rafra&icirc;chir la base automatiquement</schedule_import_settings>
+<science_astronomy>Institutions ou sites amateurs en qui concerne l'astrologie.</science_astronomy>
+<science_chemistry>Site d'institutions ou d'amateurs en ce qui concerne la chimie</science_chemistry>
 <score>score</score>
 <scores_behavior>Scores et comportement</scores_behavior>
 <scores_behavior_text>Scores de d&eacute;tection et comportement du filtre</scores_behavior_text>
 <search>recherche</search>
+<searchengines>Collection de moteurs de recherche ou de bases de donn&eacute;es.</searchengines>
 <search_break>Results of your query exceed maximum rows that the system accept, please specify a query that match more your research</search_break>
 <search_by>recherche par</search_by>
 <search_connector>Connecteur de recherche</search_connector>
@@ -2881,6 +2917,7 @@ while distributing domain2.com mail as usual.[br]
 <service_name>Nom du d&eacute;mon</service_name>
 <service_not_installed>Ce service n'est pas install&eacute;</service_not_installed>
 <service_running>Ce service fonctionne actuellement</service_running>
+<service_squid_restart_explain>Tous les services Web vont &ecirc;tre re-d&eacute;marr&eacute;s dans quelques secondes, pendant ce temps les connections web seront coup&eacute;es</service_squid_restart_explain>
 <service_stopped>Le service est arr&ecirc;t&eacute;!</service_stopped>
 <sessions>sessions</sessions>
 <SESSION_END>[center][h2] Cette session est termin&eacute;e ... s'il vous pla&icirc;t connecter vous[/center][/h2]</SESSION_END>
@@ -2892,6 +2929,14 @@ while distributing domain2.com mail as usual.[br]
 <set_quota>Param&egrave;trer le quota</set_quota>
 <SET_SCHEDULE>D&eacute;finir l'ordonnancement de la t&acirc;che</SET_SCHEDULE>
 <SET_SCHEDULE_TEXT>D&eacute;finissez l'heure de d&eacute;marrage de la t&acirc;che</SET_SCHEDULE_TEXT>
+<sex_lingerie>Sites de vente de lingerie qui pr&eacute;sentent cette lingerie de fa&ccedil;on sexy</sex_lingerie>
+<shallalist>Base de donn&eacute;es professionnelle</shallalist>
+<shallalist_buye>Pour utiliser cette base de donn&eacute;es, vous devez obtenir une licence.[br]Celle-ci co&ucirc;te 50Euros par an.[br]
+Remplissez le formulaire ci-joint afin d'obtenir un devis de la soci&eacute;t&eacute; Artica Technology.[br]Une fois achet&eacute;, vous recevrez une clef de licence pour Activer la mise &agrave; jour.</shallalist_buye>
+<shallalist_license>Votre licence</shallalist_license>
+<shallalist_text>Mettez &agrave; jour votre base de donn&eacute;es avec plus de 1.6 Million de sites web et cat&eacute;gories et obtenez un meilleur filtrage web.</shallalist_text>
+<shalla_success_license>Votre licence &agrave; &eacute;t&eacute; correctement ajout&eacute;e</shalla_success_license>
+<shalla_success_order>Votre demand&eacute; &agrave; correctement &eacute;t&eacute; transmise &agrave; la soci&eacute;t&eacute; Artica Technology</shalla_success_order>
 <shared>partag&eacute;</shared>
 <shared_folder>Nom du dossier partag&eacute;</shared_folder>
 <SHARE_FOLDER>Partagez un dossier</SHARE_FOLDER>
@@ -3165,6 +3210,7 @@ If this feature is enabled and a server offers STARTTLS while TLS is not already
 [code]postfix/smtp[pid]: Host offered STARTTLS: [hostname.example.com][/code]
 </smtp_tls_note_starttls_offer_text>
 <sn>Nom</sn>
+<socialnet>Sites permettant de rassembler les internautes (sociales) pour des relations amicales ou professionnelles</socialnet>
 <softwares_install>Installation logiciels</softwares_install>
 <soft_bounce>disables locally-generated bounces</soft_bounce>
 <soft_bounce_text>Safety net to keep mail queued that would otherwise be returned to the sender.[br] This parameter disables locally-generated bounces,[br] and prevents the Postfix SMTP server from rejecting mail permanently,[br]
@@ -3205,6 +3251,8 @@ by changing 5xx reply codes into 4xx. However, this option is no cure for addres
 <squidguard_simple_intro>Avec squidGuard vous serez en mesure de cr&eacute;er des r&egrave;gles permettant de restreindre l'utilisation du web.[br]Vous pourrez d&eacute;finir des r&egrave;gles principales qui contiennent des utilisateurs/adresses IP afin de les bloquer pendant la navigation Internet sur des sites web interdits.</squidguard_simple_intro>
 <squidguard_status>Statut de squidGuard</squidguard_status>
 <squidguard_status_text>Afficher l'&eacute;tat du filtre web</squidguard_status_text>
+<squidguard_testrules>V&eacute;rification des r&egrave;gles squidGuard</squidguard_testrules>
+<squidguard_testrules_explain>Cette section vous permet de tester si un site est correctement bloqu&eacute; ou si le filtre laisse passer la requ&ecirc;te.[br]Vous pouvez d&eacute;finir en premier une adresse web &agrave; v&eacute;rifier et dans le deuxi&egrave;me champ une adresse IP ou un compte utilisateur qui devrait appartenir &agrave; une r&egrave;gle</squidguard_testrules_explain>
 <squid_advanced_parameters>Param&egrave;tres avanc&eacute;s</squid_advanced_parameters>
 <squid_advanced_parameters_text>Personnalisation et param&egrave;tres avanc&eacute;s du proxy SQUID</squid_advanced_parameters_text>
 <squid_events>&Eacute;v&egrave;nements de Squid</squid_events>
@@ -3270,6 +3318,7 @@ Certains g&eacute;n&eacute;rateurs de statistiques peuvent ne pas &ecirc;tre ins
 <subdirectory>sous-r&eacute;pertoire</subdirectory>
 <subject>sujet</subject>
 <submit>Soumettre</submit>
+<submit_license>Soumettre votre licence</submit_license>
 <subnet>sous-r&eacute;seaux</subnet>
 <success>Succ&egrave;s</success>
 <success operations>Op&eacute;rations r&eacute;ussies</success operations>
@@ -3293,6 +3342,7 @@ Vous allez &ecirc;tre redirig&eacute; vers la nouvelle adresse IP dans 15 second
 <synchronize_directorylist_each>Synchroniser le listage du r&eacute;pertoire chaque</synchronize_directorylist_each>
 <synchronize_each>Synchroniser chaque</synchronize_each>
 <synchronizing_mailbox>Synchronisation de boites aux lettres</synchronizing_mailbox>
+<synthesis>synth&egrave;se</synthesis>
 <system>syst&egrave;me</system>
 <system error>Il y a un soucis syst&egrave;me, peut &ecirc;tre une erreur  preg_match ou la socket ne peut &ecirc;tre ouverte</system error>
 <system statistics>statistiques syst&egrave;me</system statistics>
@@ -3586,6 +3636,7 @@ Si il est en rouge, vous allez devoir maintenir la base des utilisateurs.[br]Cet
 <up>haut</up>
 <update>mise &agrave; jour</update>
 <UpdateServerUrl>Url du serveur de mise &agrave; jour</UpdateServerUrl>
+<updatesites>Sorte de liste blanche permettant d'autoriser les t&eacute;l&eacute;chargements n&eacute;cessaires d'&eacute;diteurs.</updatesites>
 <updates_error>Erreurs de mise &agrave; jours</updates_error>
 <updates_success>Mise &agrave; jour effectu&eacute;e avec succ&egrave;s</updates_success>
 <UPDATE_ANTIVIRUS>Base de donn&eacute;es de mise &agrave; jour antivirale</UPDATE_ANTIVIRUS>
@@ -3608,6 +3659,7 @@ Si il est en rouge, vous allez devoir maintenir la base des utilisateurs.[br]Cet
 <upload_new_license>T&eacute;l&eacute;charger une nouvel licence</upload_new_license>
 <uptime>temps de vie</uptime>
 <uri_dnsbl>Lien DNSBL</uri_dnsbl>
+<uri_test>adresse web &agrave; tester</uri_test>
 <urls>Urls</urls>
 <url_regex_popup_import_explain>Copiez et collez dans le champs ci-dessous les sites web que vous d&eacute;sirez interdire.[br]Chaque site web devra &ecirc;tre s&eacute;par&eacute; par un retour chariot</url_regex_popup_import_explain>
 <usb_external_drive>Disque dur externe USB</usb_external_drive>
@@ -3617,6 +3669,7 @@ Si il est en rouge, vous allez devoir maintenir la base des utilisateurs.[br]Cet
 <UseProxy>Activer le serveur proxy</UseProxy>
 <userid>Identifiant unique[br] (boite aux lettres)</userid>
 <username>Nom d'utilisateur</username>
+<usernanmeorip>utilisateur ou adresse IP</usernanmeorip>
 <userPassword>Mot de passe</userPassword>
 <users>Utilisateurs</users>
 <users_allow>Droits d'utilisateur</users_allow>
@@ -3628,6 +3681,7 @@ Si il est en rouge, vous allez devoir maintenir la base des utilisateurs.[br]Cet
 <user_email_text>R&eacute;gler la premi&egrave;re adresse e-mail de cet utilisateur, cet email sera l'adresse maitre de ce compte</user_email_text>
 <user_interface>Interface utilisateur</user_interface>
 <user_interface_text>Personnalisez l'interface Artica de cet utilisateur</user_interface_text>
+<user_not_found>Utilisateur non trouv&eacute;.</user_not_found>
 <user_quarantine_emails_query_text>Les spams et les messages infect&eacute;s sont stock&eacute;s dans votre espace de quarantaine.</user_quarantine_emails_query_text>
 <user_tab_groups>groupes</user_tab_groups>
 <user_to_mailing_list>Transformez cet utilisateur en liste de distribution</user_to_mailing_list>
@@ -3658,6 +3712,7 @@ Si il est en rouge, vous allez devoir maintenir la base des utilisateurs.[br]Cet
 <view_config>Visualiser le fichier de configuration</view_config>
 <view_members>Afficher les membres</view_members>
 <view_script>voir le script</view_script>
+<violence>Sites sur le meurtre ou permettant de blesser les gens</violence>
 <VirHTTPServer>Adresse web afin de retrouver les fichiers</VirHTTPServer>
 <VirHTTPServer_text>The url which used by the web client to retrieve downloaded file.[br]
  The file where the download stored can has diferent name than the original, if a file with the same name exists in the directory.[br]
@@ -3684,15 +3739,19 @@ In the url the "%f" can be used to specify the real name of downloaded file</Vir
 <warn_if_reject_text>Change the meaning of the next restriction,[br] so that it logs a warning instead of rejecting a request[br] (look for logfile records that contain "reject_warning").[br] This is useful for testing new restrictions[br] in a "live" environment without risking unnecessary loss of mail</warn_if_reject_text>
 <warn_shutdown_computer>Cette op&eacute;ration va &eacute;teindre l'ordinateur.
 Voulez-vous effectuer cette op&eacute;ration ?</warn_shutdown_computer>
+<weapons>Sites sur les armes ou tout accessoires autour</weapons>
 <webmail>webmail</webmail>
+<webphone>Sites permettant l'utilisateur &agrave; t&eacute;l&eacute;phoner via Internet</webphone>
 <webproxy_service>Service de proxy web</webproxy_service>
 <webproxy_service_text>Le service Proxy Web vous permet d'acc&eacute;l&eacute;rer l'affichage des pages web Internet gr&acirc;ce &agrave; l'utilisation d'un syst&egrave;me de cache.[br]
 Il offre aussi le filtrage de contenu avec un antivirus et le filtrage des pages web par cat&eacute;gories.</webproxy_service_text>
+<webradio>Sites web permettant l'&eacute;coute de musiques et de radio.</webradio>
 <webserver_parameters>Param&egrave;tre serveur web</webserver_parameters>
 <webserver_parameters_text>Activer/d&eacute;sactiver, personnalisez le serveur web d&eacute;di&eacute;</webserver_parameters_text>
 <website>Site Web</website>
 <websites>Sites Web</websites>
 <website_name>Nom du site</website_name>
+<webtv>Site offrant la T&eacute;l&eacute;vision via Internet</webtv>
 <web_filter>Filtrage web</web_filter>
 <web_proxy>Proxy Web</web_proxy>
 <web_proxy_text>Param&eacute;trer votre serveur Proxy</web_proxy_text>
@@ -3748,7 +3807,18 @@ Pendant la sauvegarde, le serveur risque d'&ecirc;tre occup&eacute;.[br]Il est i
 <WORKGROUP>Groupe de travail</WORKGROUP>
 <working_title>Emploi</working_title>
 <write>Ecrire</write>
+<www_adv>Tout sur les publicit&eacute;s</www_adv>
+<www_chat>Site de discussions instantan&eacute;es</www_chat>
+<www_downloads>Couvre le partage de fichiers, perr-to-peer et sites web torrent</www_downloads>
+<www_dynamic>Tous les domaines permettant aux utilisateurs d'obtenir des adresses IP dynamiques</www_dynamic>
+<www_hacking>Site d'informations sur les failles de s&eacute;curit&eacute; et comment les exploiter</www_hacking>
+<www_isp>Pages de fournisseurs d'acc&egrave;s Internet</www_isp>
+<www_news>Sites pr&eacute;sentant toute forme de nouvelles informations</www_news>
 <www_server_name>Nom du serveur web</www_server_name>
+<www_sex>Sites de vente de lingerie qui pr&eacute;sentent cette lingerie de fa&ccedil;on sexy</www_sex>
+<www_shopping>Sites offrant l'achat sur internet ou de comparaisons de prix sur Internet.</www_shopping>
+<www_spyware>Sites web essayant d'installer des logiciels sans consentements</www_spyware>
+<www_tracker>Site en gardant un %u0153il sur l'endroit o&ugrave; vous naviguez et ce que vous faites d'une mani&egrave;re passive.</www_tracker>
 <xapian_packages>Moteurs de recherche</xapian_packages>
 <xapian_processing>Indexation de vos stockages (moteur de recherche)</xapian_processing>
 <xapian_processing_text>omindex est actuellement en cours d'analyse de vos r&eacute;pertoires afin d'am&eacute;liorer la recherche des documents sur votre serveur[br]Pendant ce temps, il est possible que votre serveur soit occup&eacute;.</xapian_processing_text>
@@ -3764,6 +3834,7 @@ Les bo&icirc;tes aux lettres, alias... de ce domaine vont &eacute;galement &ecir
 <your>Votre</your>
 <your mailbox usage>L'utilisation de votre bo&icirc;te aux lettres</your mailbox usage>
 <your_distributions_lists>Vos listes de distribution</your_distributions_lists>
+<your_email_address>Votre adresse email</your_email_address>
 <your_quarantine>Votre quarantaine</your_quarantine>
 <your_server_type>Configuration de votre serveur MTA</your_server_type>
 <your_storage>Votre stockage sur disque</your_storage>

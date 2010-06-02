@@ -444,6 +444,20 @@ function bannedsitelist($rulid){
 			$conf=$conf. "#{$ligne["infos"]}\n.Include</etc/dansguardian/lists/blacklists/$pattern/domains>\n\n";
 		}
 		
+		
+		if(is_file("/etc/dansguardian/lists/web-filter-plus/BL/$pattern/domains")){
+			$count=$count+1;
+			$conf=$conf. "#{$ligne["infos"]}\n.Include</etc/dansguardian/lists/web-filter-plus/BL/$pattern/domains>\n\n";
+		}
+		
+		if(is_file("/etc/dansguardian/lists/blacklist-artica/$pattern/domains")){
+			$count=$count+1;
+			$conf=$conf. "#{$ligne["infos"]}\n.Include</etc/dansguardian/lists/blacklist-artica/$pattern/domains>\n\n";
+		}		
+		
+		
+		
+		
 	}
 	
 	$sql="SELECT category FROM dansguardian_personal_categories WHERE category_type = 'enabled' AND RuleID=$rulid GROUP BY category";

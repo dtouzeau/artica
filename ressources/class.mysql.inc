@@ -2342,6 +2342,22 @@ private	function CheckTables_repositories(){
 					return false;}
 		}
 		
+		if(!$this->TABLE_EXISTS('dansguardian_community_categories','artica_backup')){	
+		$sql="CREATE TABLE `artica_backup`.`dansguardian_community_categories` (
+			`zmd5` VARCHAR( 90 ) NOT NULL ,
+			`zDate` DATETIME NOT NULL ,
+			`category` VARCHAR( 20 ) NOT NULL ,
+			`pattern` VARCHAR( 255 ) NOT NULL ,
+			`enabled` INT( 1 ) NOT NULL DEFAULT '1',
+			`uuid` VARCHAR( 255 ) NOT NULL ,
+			`sended` INT( 1 ) NOT NULL DEFAULT '0',
+			PRIMARY KEY ( `zmd5` ) ,
+			INDEX ( `zDate` , `category` , `pattern` , `enabled` , `uuid` , `sended` )
+			)";
+		$this->QUERY_SQL($sql,'artica_backup');
+		}	
+		
+		
 		if(!$this->TABLE_EXISTS('dansguardian_groups','artica_backup')){
 		$sql="CREATE TABLE IF NOT EXISTS `dansguardian_groups` (
 			  `ID` int(11) NOT NULL AUTO_INCREMENT,

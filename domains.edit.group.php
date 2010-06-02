@@ -344,14 +344,18 @@ function GROUPS_LIST($OU){
 	}else{
 		$ou=ORGANISTATION_FROM_USER();
 		$orgs="<strong>$ou</strong><input type='hidden' name=SelectOuList id='SelectOuList' value='$ou'>";
-		$hash=$ldap->UserGetGroups($_SESSION["uid"],1);
+		if(!$users->AsOrgAdmin){$hash=$ldap->UserGetGroups($_SESSION["uid"],1);}
+		if($users->AsOrgAdmin){$hash=$ldap->hash_groups($ou,1);}
+		
+	}
+		
 		if(is_array($hash)){
 			while (list ($num, $line) = each ($hash)){
 				if(strtolower($line)=='default_group'){unset($hash["$num"]);}
 			}
 		reset($hash);
 		}
-	}
+	
 		
 	
 	
@@ -984,6 +988,8 @@ function MEMBERS_NOT_AFFECTED($ou){
 function AddGroup(){
 	$group=$_GET["addgroup"];
 	$ou=$_GET["ou"];
+	if($ou==null){if($_SESSION["ou"]<>null){$ou=$_SESSION["ou"];}}
+	
 	$ldap=new clladp();
 	include_once(dirname(__FILE__).'/ressources/class.groups.inc');
 	
@@ -1335,12 +1341,16 @@ function GROUP_PRIVILEGES($gid){
     	$AsOrgPostfixAdministrator=Field_yesno_checkbox('AsOrgPostfixAdministrator',$HashPrivieleges["AsOrgPostfixAdministrator"]);
     	$AsDansGuardianGroupRule=Field_yesno_checkbox('AsDansGuardianGroupRule',$HashPrivieleges["AsDansGuardianGroupRule"]);
     	$AsMessagingOrg=Field_yesno_checkbox('AsMessagingOrg',$HashPrivieleges["AsMessagingOrg"]);
+    	$AsOrgAdmin=Field_yesno_checkbox('AsOrgAdmin',$HashPrivieleges["AsOrgAdmin"]);
+    	
+    	
     	
     	
     	if($priv->AllowAddUsers==false){
     		$AllowAddUsers="<img src='img/status_critical.gif'>".Field_hidden('AllowAddUsers',$HashPrivieleges["AllowAddUsers"]);
     		$AsDansGuardianGroupRule="<img src='img/status_critical.gif'>".Field_hidden('AsDansGuardianGroupRule',$HashPrivieleges["AsDansGuardianGroupRule"]);
     		$AsMessagingOrg="<img src='img/status_critical.gif'>".Field_hidden('AsMessagingOrg',$HashPrivieleges["AsMessagingOrg"]);
+    		$AsOrgAdmin="<img src='img/status_critical.gif'>".Field_hidden('AsOrgAdmin',$HashPrivieleges["AsOrgAdmin"]);
     	
     	}
     	if($priv->AsArticaAdministrator==false){
@@ -1352,6 +1362,7 @@ function GROUP_PRIVILEGES($gid){
     		$AsOrgPostfixAdministrator="<img src='img/status_critical.gif'>".Field_hidden('AsOrgPostfixAdministrator',$HashPrivieleges["AsOrgPostfixAdministrator"]);
     		$AsDansGuardianGroupRule="<img src='img/status_critical.gif'>".Field_hidden('AsDansGuardianGroupRule',$HashPrivieleges["AsDansGuardianGroupRule"]);
     		$AsMessagingOrg="<img src='img/status_critical.gif'>".Field_hidden('AsMessagingOrg',$HashPrivieleges["AsMessagingOrg"]);
+    		$AsOrgAdmin="<img src='img/status_critical.gif'>".Field_hidden('AsOrgAdmin',$HashPrivieleges["AsOrgAdmin"]);
 		}
     		
     		
@@ -1359,6 +1370,9 @@ function GROUP_PRIVILEGES($gid){
     		$AllowAddGroup="<img src='img/status_critical.gif'>".Field_hidden('AllowAddGroup',$HashPrivieleges["AllowAddGroup"]);
     		$AsDansGuardianGroupRule="<img src='img/status_critical.gif'>".Field_hidden('AsDansGuardianGroupRule',$HashPrivieleges["AsDansGuardianGroupRule"]);
     		$AsMessagingOrg="<img src='img/status_critical.gif'>".Field_hidden('AsMessagingOrg',$HashPrivieleges["AsMessagingOrg"]);
+    		$AsOrgAdmin="<img src='img/status_critical.gif'>".Field_hidden('AsOrgAdmin',$HashPrivieleges["AsOrgAdmin"]);
+    		
+    		
     	
     	}
     	if($priv->AllowChangeDomains==false){$AllowChangeDomains="<img src='img/status_critical.gif'>".Field_hidden('AllowChangeDomains',$HashPrivieleges["AllowChangeDomains"]);}
@@ -1368,6 +1382,7 @@ function GROUP_PRIVILEGES($gid){
 		if($priv->AsOrgStorageAdministrator==false){$AsOrgStorageAdministrator="<img src='img/status_critical.gif'>".Field_hidden('AsOrgStorageAdministrator',$HashPrivieleges["AsOrgStorageAdministrator"]);}
 		if($priv->AsOrgPostfixAdministrator==false){$AsOrgPostfixAdministrator="<img src='img/status_critical.gif'>".Field_hidden('AsOrgPostfixAdministrator',$HashPrivieleges["AsOrgPostfixAdministrator"]);}
 		if($priv->AsMessagingOrg==false){$AsMessagingOrg="<img src='img/status_critical.gif'>".Field_hidden('AsMessagingOrg',$HashPrivieleges["AsMessagingOrg"]);}
+		if($priv->AsOrgAdmin==false){$AsOrgAdmin="<img src='img/status_critical.gif'>".Field_hidden('AsOrgAdmin',$HashPrivieleges["AsOrgAdmin"]);}
     	
 		
 		
@@ -1457,7 +1472,11 @@ $org_allow="&nbsp;{organization_allow}</H3><br>
 	<tr>
 		<td align='right' nowrap><strong>{AsMessagingOrg}:</td>
 		<td>$AsMessagingOrg</td>
-	</tr>		
+	</tr>
+	<tr>
+		<td align='right' nowrap><strong>{AsOrgAdmin}:</td>
+		<td>$AsOrgAdmin</td>
+	</tr>			
 	
 	
 	

@@ -19,6 +19,7 @@ class ccurl{
 			curl_setopt($ch, CURLOPT_HEADER, 0);
 			curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 			curl_setopt($ch, CURLOPT_POST, 1);
+			curl_setopt($ch, CURLOPT_USERAGENT, "Mozilla/4.0 (compatible;)");
 			curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
 			curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
 			curl_setopt($ch, CURLOPT_POSTFIELDS, $curlPost);	
@@ -26,6 +27,7 @@ class ccurl{
 			$this->data=curl_exec($ch);
 			$error=curl_errno($ch);		
 			writelogs("datas: $this->uri (". strlen($this->data)." bytes) error:$error",__CLASS__.'/'.__FUNCTION__,__FILE__);
+			
 			
 			if($error==6){
 				writelogs("error 6 CURLE_COULDNT_RESOLVE_HOST",__CLASS__.'/'.__FUNCTION__,__FILE__);
