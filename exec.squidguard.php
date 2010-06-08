@@ -46,17 +46,23 @@ function build(){
 	
 	$users=new usersMenus();
 	$sock=new sockets();
+	$unix=new unix();
+	$chown=$unix->find_program("chown");
+	$chmod=$unix->find_program("chmod");
 	if(!$users->SQUIDGUARD_INSTALLED){return null;}
 	if($sock->GET_INFO("squidGuardEnabled")<>1){return null;}
 	
 	$s=new squidguard();
 	$datas=$s->BuildConf();
 	@file_put_contents("/etc/squid/squidGuard.conf",$datas);
+	
+	$user=GetSquidUser();
+	shell_exec("$chown -R $user /var/lib/squidguard/*");
+	shell_exec("$chmod -R 755 /var/lib/squidguard/*");
 	shell_exec($users->SQUID_BIN_PATH." -k reconfigure");
 	
 	
-
-}
+	}
 
 
 function databasesStatus(){
@@ -170,15 +176,34 @@ function compile_databases(){
 	$squid=new squidbee();
 	$array=$squid->SquidGuardDatabasesStatus();
 	$verb=" -d";
-	echo "Starting......: squidGuard compiling ". count($array)." databases\n";
+	
+	
+		$array=$squid->SquidGuardDatabasesStatus(0);
+
+	
+	if( count($array)>0){
 		while (list ($index, $file) = each ($array)){
+			echo "Starting......: squidGuard compiling ". count($array)." databases\n";
 			$file=str_replace(".db",'',$file);
 			$textfile=str_replace("/var/lib/squidguard/","",$file);
 			echo "Starting......: squidGuard compiling $textfile database ".($index+1) ."/". count($array)."\n";
 			if($GLOBALS["VERBOSE"]){$verb=" -d";echo $users->SQUIDGUARD_BIN_PATH." -P$verb -C $file\n";}
 			system($users->SQUIDGUARD_BIN_PATH." -P$verb -C $file");
 		}
+	}else{
+		echo "Starting......: squidGuard compiling all databases\n";
+		if($GLOBALS["VERBOSE"]){$verb=" -d";echo $users->SQUIDGUARD_BIN_PATH." -P$verb -C all\n";}
+		system($users->SQUIDGUARD_BIN_PATH." -P$verb -C all");
+	}
+
+	
 		
+	$user=GetSquidUser();
+	$unix=new unix();
+	$chown=$unix->find_program("chown");
+	$chmod=$unix->find_program("chmod");
+	shell_exec("$chown -R $user /var/lib/squidguard/*");
+	shell_exec("$chmod -R 755 /var/lib/squidguard/*");		
  	system(LOCATE_PHP5_BIN2()." ".dirname(__FILE__)."/exec.squid.php --build");
 	build();
  
@@ -210,6 +235,31 @@ function parseTemplate(){
 	</body>
 	</html>
 	";
+	
+	
+	
+}
+
+function GetSquidUser(){
+	$unix=new unix();
+	$squidconf=$unix->SQUID_CONFIG_PATH();
+	if(!is_file($squidconf)){
+		echo "Starting......: squidGuard unable to get squid configuration file\n";
+		return "squid:squid";
+	}
+	
+	$f=explode("\n",@file_get_contents($squidconf));
+	while (list ($index, $line) = each ($array)){
+		if(preg_match("#cache_effective_user\s+(.+)#",$line,$re)){
+			$user=trim($re[1]);
+			$user=trim($re[1]);
+		}
+		if(preg_match("#cache_effective_group\s+(.+)#",$line,$re)){
+			$group=trim($re[1]);
+		}
+	}
+	
+return "$user:$group";
 	
 	
 	

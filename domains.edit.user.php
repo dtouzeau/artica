@@ -3837,12 +3837,12 @@ function USER_GROUP_CONTENT($userid){
 			<div id='USER_GROUP' style='margin:3px;padding:5px;height:200px;overflow:auto'>".USER_GROUP_LIST($userid)."</div>
 		</center>";
 	   	
-	
+	$ou_encoded=base64_encode($ou);
 	$html="
 	<table style='width:100%'>
 	<tr>
 	<td valign='top'>
-	" . Paragraphe("64-folder-group-add.png","{add_group}","{ADD_USER_GROUP_TEXT}","javascript:LoadGroupForMember('$ou','$userid');")."
+	" . Paragraphe("64-folder-group-add.png","{add_group}","{ADD_USER_GROUP_TEXT}","javascript:LoadGroupForMember('$ou_encoded','$userid');")."
 	</td>
 	<td valign='top'>
 	
@@ -3910,6 +3910,9 @@ function USER_BBC_MAP_LIST(){
 
 function USER_GROUP_POPUP_ADD(){
 	$group=new groups();
+	$ou_con=base64_decode($_GET["ou"]);
+	if($ou_con<>null){$_GET["ou"]=$ou_con;}
+	
 	$hash_group=$group->list_of_groups($_GET["ou"],1);
 	$hash_group[null]="{no_group}";
 	$uid=$_GET["uid"];

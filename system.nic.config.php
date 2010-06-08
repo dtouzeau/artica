@@ -714,6 +714,10 @@ function Virtuals(){
 		
 		}
 		
+		function VirtualsEdit(ID){
+			YahooWin2(500,'$page?virtual-popup-add=yes&ID='+ID,'$virtual_interfaces');
+		}
+		
 var X_CalcCdirVirt= function (obj) {
 			var results=obj.responseText;
 			document.getElementById('cdir').value=results;
@@ -746,6 +750,7 @@ var X_CalcCdirVirt= function (obj) {
 			XHR.appendData('gateway',document.getElementById('gateway').value);
 			XHR.appendData('nic',document.getElementById('nic').value);
 			XHR.appendData('org',document.getElementById('org').value);
+			XHR.appendData('ID',document.getElementById('ID').value);
 			document.getElementById('virtip').innerHTML=\"<center style='margin:10px'><img src='img/wait_verybig.gif'></center>\";
 			XHR.sendAndLoad('$page', 'GET',X_VirtualIPAddSave);
 		}
@@ -776,7 +781,13 @@ function virtual_add_form(){
 	$sock=new sockets();
 	$page=CurrentPageName();
 	$nics=unserialize(base64_decode($sock->getFrameWork("cmd.php?list-nics=yes")));
-		
+	if($_GET["ID"]>0){
+		$sql="SELECT * FROM nics_virtuals WHERE ID='{$_GET["ID"]}'";
+		$q=new mysql();
+		$ligne=@mysql_fetch_array($q->QUERY_SQL($sql,"artica_backup"));
+	}
+	
+	
 	$styleOfFields="width:190px;font-size:14px;padding:3px";
 	$ous=$ldap->hash_get_ou(true);
 	
@@ -786,10 +797,11 @@ function virtual_add_form(){
 	$nics_array[null]="{select}";
 	$ous[null]="{select}";
 	
-	$nic_field=Field_array_Hash($nics_array,"nic",null,null,null,0,"font-size:14px;padding:3px");
-	$ou_fields=Field_array_Hash($ous,"org",null,null,null,0,"font-size:14px;padding:3px");
+	$nic_field=Field_array_Hash($nics_array,"nic",$ligne["nic"],null,null,0,"font-size:14px;padding:3px");
+	$ou_fields=Field_array_Hash($ous,"org",$ligne["org"],null,null,0,"font-size:14px;padding:3px");
 	$html="
 	<div id='virtip'>
+	". Field_hidden("ID","{$_GET["ID"]}")."
 	<table style='width:100%'>
 	<tr>
 		<td class=legend>{nic}</td>
@@ -801,11 +813,11 @@ function virtual_add_form(){
 	</tr>	
 	<tr>
 			<td class=legend>{tcp_address}:</td>
-			<td>" . Field_text("ipaddr",null,$styleOfFields,null,"CalcCdirVirt(0)",null,false,null,$DISABLED)."</td>
+			<td>" . Field_text("ipaddr",$ligne["ipaddr"],$styleOfFields,null,"CalcCdirVirt(0)",null,false,null,$DISABLED)."</td>
 		</tr>
 		<tr>
 			<td class=legend>{netmask}:</td>
-			<td>" . Field_text("netmask",null,$styleOfFields,null,"CalcCdirVirt(0)",null,false,null,$DISABLED)."</td>
+			<td>" . Field_text("netmask",$ligne["netmask"],$styleOfFields,null,"CalcCdirVirt(0)",null,false,null,$DISABLED)."</td>
 		</tr>
 		<tr>
 			<td class=legend>CDIR:</td>
@@ -813,14 +825,14 @@ function virtual_add_form(){
 			<table style='width:99%;padding:-1px;margin:-1px'>
 			<tr>
 			<td width=1%>
-			" . Field_text("cdir",null,$styleOfFields,null,null,null,false,null,$DISABLED)."</td>
+			" . Field_text("cdir",$ligne["cdir"],$styleOfFields,null,null,null,false,null,$DISABLED)."</td>
 			<td align='left'> ".imgtootltip("img_calc_icon.gif","cdir","CalcCdirVirt(1)") ."</td>
 			</tr>
 			</table></td>
 		</tr>			
 		<tr>
 			<td class=legend>{gateway}:</td>
-			<td>" . Field_text("gateway",null,$styleOfFields,null,null,null,false,null,$DISABLED)."</td>
+			<td>" . Field_text("gateway",$ligne["gateway"],$styleOfFields,null,null,null,false,null,$DISABLED)."</td>
 		</tr>	
 	</table>
 	</div>
@@ -854,9 +866,18 @@ function virtuals_add(){
 	
 	
 	$sql="
-	INSERT INTO nics_virtuals (nic,org,ipaddr,netmask,cdir)
-	VALUES('{$_GET["nic"]}','{$_GET["org"]}','{$_GET["virt-ipaddr"]}','{$_GET["netmask"]}','{$_GET["cdir"]}');
+	INSERT INTO nics_virtuals (nic,org,ipaddr,netmask,cdir,gateway)
+	VALUES('{$_GET["nic"]}','{$_GET["org"]}','{$_GET["virt-ipaddr"]}','{$_GET["netmask"]}','{$_GET["cdir"]}','{$_GET["gateway"]}');
 	";
+	
+	if($_GET["ID"]>0){
+		$sql="UPDATE nics_virtuals SET nic='{$_GET["nic"]}',
+		org='{$_GET["org"]}',
+		ipaddr='{$_GET["virt-ipaddr"]}',
+		netmask='{$_GET["netmask"]}',
+		cdir='{$_GET["cdir"]}',
+		gateway='{$_GET["gateway"]}' WHERE ID={$_GET["ID"]}";
+	}
 	
 	$q=new mysql();
 	$q->QUERY_SQL($sql,"artica_backup");
@@ -891,6 +912,7 @@ function virtuals_list(){
 		<th nowrap>CDIR</th>
 		<th nowrap>{netmask}</th>
 		<th>&nbsp;</th>
+		<th>&nbsp;</th>
 	</tr>
 	";	
 	
@@ -919,6 +941,7 @@ function virtuals_list(){
 			<td><strong style='font-size:14px' align='right'>$eth</strong></td>
 			<td><strong style='font-size:14px' align='right'>{$ligne["cdir"]}</strong></td>
 			<td><strong style='font-size:14px' align='right'>{$ligne["netmask"]}</strong></td>
+			<td width=1%>". imgtootltip("24-administrative-tools.png","{edit}","VirtualsEdit({$ligne["ID"]})")."</td>
 			<td width=1%>". imgtootltip("ed_delete.gif","{delete}","VirtualsDelete({$ligne["ID"]})")."</td>
 		</tr>
 		
@@ -950,13 +973,24 @@ function ConstructVirtsIP(){
 		$arr=explode(".",$ligne["ipaddr"]);
 		$arr[3]="255";
 		$brd=implode(".",$arr);
-		$conf[]="addr add local {$ligne["cdir"]} brd $brd dev {$ligne["nic"]} label {$ligne["nic"]}:{$ligne["ID"]}";
+		$eth="{$ligne["nic"]}:{$ligne["ID"]}";
+		
+		
+		
+		$conf[$eth]=array(
+			"NETMASK"=>$ligne["netmask"],
+			"IP_ADDR"=>$ligne["ipaddr"],
+			"BROADCAST"=>$brd,
+			"GATEWAY"=>$ligne["gateway"],
+		
+		
+		);
 		
 	}
 	
 	$sock=new sockets();
 	if(is_array($conf)){
-		$sock->SaveConfigFile(implode("\n",$conf),"VirtualsIPs");
+		$sock->SaveConfigFile(base64_encode(serialize($conf)),"VirtualsIPs");
 		$sock->getFrameWork("cmd.php?virtuals-ip-reconfigure=yes");
 		return;
 	}

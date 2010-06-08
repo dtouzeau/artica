@@ -330,9 +330,13 @@ function GET_MYSQL_ROOT($key){
 		
 		if(preg_match('#<articadatascgi>(.+)</articadat#s',$line,$regs)){
 				$results=trim($regs[1]);
-				if($uri=="cmd.php?uri=artica_version"){$this->SET_APC_STORE("artica_version",$results);}
 				return $results;
 		}
+	if(preg_match('#<articadatascgi>(.+)</artic\s+adatascgi>#s',$line,$regs)){
+				$results=trim($regs[1]);
+				return $results;
+		}
+		
 			
 			writelogs("unable to preg_match \"$line\" uri=$uri",__FUNCTION__,__FILE__);
 		

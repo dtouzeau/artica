@@ -2270,11 +2270,10 @@ function samba_logon_scripts(){
 
 function TCP_VIRTUALS(){
 	if(isset($_GET["stay"])){
-		shell_exec(LOCATE_PHP5_BIN2()." /usr/share/artica-postfix/exec.virtuals-ip.php");
+
 		sys_THREAD_COMMAND_SET(LOCATE_PHP5_BIN2()." /usr/share/artica-postfix/exec.postfix-multi.php --virtuals");
 		return;
 	}
-	sys_THREAD_COMMAND_SET(LOCATE_PHP5_BIN2()." /usr/share/artica-postfix/exec.virtuals-ip.php");
 	sys_THREAD_COMMAND_SET(LOCATE_PHP5_BIN2()." /usr/share/artica-postfix/exec.postfix-multi.php --virtuals");
 }
 

@@ -12,6 +12,7 @@ class demime{
 		var $subject="";
 		var $message_date;
 		var $error;
+		var $MustkillMail=false;
 	function demime($path){
 		if(!is_file($path)){return null;}
 		$this->file_source=$path;
@@ -83,7 +84,9 @@ private function DecodeDate($decoded){
 		$parameters=array('File'=>$this->file_source,'SkipBody'=>1);	
 		if(!$mime->Decode($parameters, $decoded)){
 			$this->error='MIME message decoding error: '.$mime->error.' at position '.$mime->error_position;
+			$this->MustkillMail=true;
 			return false;
+			
 		}
 		
 		if(!is_array($decoded[0]["Headers"])){
@@ -91,7 +94,8 @@ private function DecodeDate($decoded){
 			return false;
 		}
 		$mime_decoded=$decoded[0]["Headers"];
-		
+		$mime_decoded["from:"]=str_replace("'","",$mime_decoded["from:"]);
+		$mime_decoded["from:"]=str_replace('"',"",$mime_decoded["from:"]);
 		
 		if($mime_decoded["x-envelope-from:"]<>null){
 			if(preg_match("#<(.+?)>#",$mime_decoded["x-envelope-from:"],$re)){
@@ -111,13 +115,20 @@ private function DecodeDate($decoded){
 		$this->message_date=$this->DateMessageToSql($this->message_date);
 		$this->message_id=$mime_decoded["message-id:"];
 		if(preg_match("#<(.+?)>#",$this->message_id,$re)){$this->message_id=$re[1];}
+		$mime_decoded["to:"]=str_replace('"',"",$mime_decoded["to:"]);
+		$mime_decoded["to:"]=str_replace("'","",$mime_decoded["to:"]);
+		$mime_decoded["cc:"]=str_replace('"',"",$mime_decoded["cc:"]);
+		$mime_decoded["cc:"]=str_replace("'","",$mime_decoded["cc:"]);		
+		if($mime_decoded["to:"]<>null){$mime_decoded["to:"]=$this->Explodecc($mime_decoded["to:"]);}
+		if($mime_decoded["cc:"]<>null){$mime_decoded["cc:"]=$this->Explodecc($mime_decoded["cc:"]);}
+		$this->events("x-envelope-to-blocked=".$mime_decoded["x-envelope-to-blocked:"]." line ".__LINE__);
+		$this->events("x-envelope-to=".$mime_decoded["x-envelope-to:"]." line ".__LINE__);
+		$this->events("to=".$mime_decoded["to:"]." line ".__LINE__);
+		$this->events("cc={$mime_decoded["cc:"]}".__LINE__);
 		
-		if($mime_decoded["to:"]<>null){$mime_decoded["to:"]=$mime_decoded["to:"].",";}
-		if($mime_decoded["cc:"]<>null){$mime_decoded["cc:"]=$mime_decoded["cc:"].",";}
-		$this->events("x-envelope-to-blocked=".$mime_decoded["x-envelope-to-blocked:"]);
-		$this->events("x-envelope-to=".$mime_decoded["x-envelope-to:"]);
-		$this->events("to=".$mime_decoded["to:"]);
 		
+		
+		$this->events("From=$this->mailfrom line ".__LINE__);
 		if($mime_decoded["x-envelope-to-blocked:"]==null){$mime_decoded["x-envelope-to-blocked:"]=$mime_decoded["x-envelope-to:"];}
 		
 		
@@ -127,7 +138,7 @@ private function DecodeDate($decoded){
 			if($mime_decoded["cc:"]<>null){$mime_decoded["x-envelope-to-blocked:"]=$mime_decoded["x-envelope-to-blocked:"].$mime_decoded["cc:"];}
 			$mailtos=explode(",",$mime_decoded["x-envelope-to-blocked:"]);
 		}else{
-			if($mime_decoded["cc:"]<>null){$mime_decoded["to:"]=$mime_decoded["to:"].$mime_decoded["cc:"];}
+			if($mime_decoded["cc:"]<>null){$mime_decoded["to:"]=$mime_decoded["to:"].",".$mime_decoded["cc:"];}
 			$mailtos=explode(",",$mime_decoded["to:"]);
 		}
 		
@@ -138,6 +149,7 @@ private function DecodeDate($decoded){
 			$email=trim($email);
 			if(trim($email)==null){continue;}
 			if(!preg_match("#<(.+?)>#",$email,$re)){
+				$this->events("mailto finale=$email ".__LINE__);
 				$this->mailto_array[]=$email;
 				continue;
 			}else{
@@ -166,7 +178,8 @@ private function DecodeDate($decoded){
 			$file_mho=$file;
 			$file_mho=str_replace('$','\$',$file_mho);
 			$file_mho=str_replace('!','\!',$file_mho);			
-			$file_mho=str_replace('&','\&',$file_mho);				
+			$file_mho=str_replace('&','\&',$file_mho);
+			$file_mho=str_replace(';','\;',$file_mho);					
 			$workingfile="/tmp/".md5($file_mho).".html";
 			
 			
@@ -194,6 +207,13 @@ private function DecodeDate($decoded){
 		   if(strlen($datas)==0){$this->events("\"$cmd\" => \"$results\"");}
 		   return $datas;
 
+ }
+ 
+ private function Explodecc($cc){
+ 	if(preg_match_all("#<(.+?)>#is",$cc,$re)){
+ 		return implode(",",$re[0]);
+ 	}
+ 	return $cc;
  }
  
 function events($text){

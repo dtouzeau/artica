@@ -704,7 +704,7 @@ l.add('libnet-server-perl');
 l.add('libtext-template-perl');
 l.add('libnet-dns-perl');
 l.add('libstring-random-perl');
-l.add('libltdl-dev'); //Clamav compilation
+
 
 //openvpn
 L.add('openvpn');
@@ -774,6 +774,7 @@ l.add('cryptsetup');
 l.add('monit');
 
 
+
 l.add('rsync');
 l.add('stunnel4');
 l.add('smbfs');
@@ -813,12 +814,14 @@ if distri.DISTRINAME_CODE='DEBIAN' then begin
       l.add('libtommath-dev');
       l.add('libsnmp-dev');
       l.add('perl-modules');
+
    end;
 
    l.Add('libpam0g-dev');
    l.Add('unrar-free');
    l.add('pike7.6-core');
    l.add('pike7.6-dev');
+   l.add('libltdl3-dev');
 
 end;
 
@@ -832,6 +835,8 @@ if distri.DISTRINAME_CODE='UBUNTU' then begin
    l.Add('libgeo-ip-perl');
    l.add('libcurl4-openssl-dev');
    l.add('libsnmp-dev');
+   l.add('libltdl-dev'); //Clamav compilation
+   l.add('language-pack-nl'); // Zarafa
 
 
    if UbuntuIntVer=8 then begin
@@ -973,6 +978,7 @@ l.Add('spamc');
 l.add('wv');
 l.add('libmilter-dev');
 l.add('pflogsumm');
+l.add('dkim-filter');
 
 
 //Zarafa

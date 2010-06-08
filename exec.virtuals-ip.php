@@ -9,74 +9,115 @@ if(posix_getuid()<>0){
 	die("Cannot be used in web server mode\n\n");
 }
 if(preg_match("#--verbose#",implode(" ",$argv))){$GLOBALS["VERBOSE"]=true;}
-if($argv[1]=="--just-add"){$GLOBALS["NO_DELETE"]=true;}
+if($argv[1]=="--just-add"){die();}
 if($argv[1]=="--ifconfig"){ifconfig_tests();exit;}
 
-$unix=new unix();
-$ip=$unix->find_program("ip");
 
-$sock=new sockets();
-GetDefaultRoute();
+$configs_exploded=unserialize(base64_decode(@file_get_contents("/etc/artica-postfix/settings/Daemons/VirtualsIPs")));
 
-if(!$GLOBALS["NO_DELETE"]){
-		exec("$ip addr show",$virtualsList);
-		while (list ($index, $line) = each ($virtualsList) ){
-			if(preg_match("#inet\s+(.+?)\s+scope global\s+(.+?):([0-9]+)#",$line,$re)){
-				echo "Removing {$re[1]} from NIC {$re[2]} index {$re[3]}\n";
-				shell_exec("$ip addr del {$re[1]} dev {$re[2]} >/dev/null 2>&1");
+
+if(is_file("/etc/network/interfaces")){
+	echo "Starting......: Virtuals IP mode Debian\n";
+	ParseDebianNetworks($configs_exploded);
+}
+
+if(is_dir("/etc/sysconfig/network-scripts")){
+	ParseRedHatNetworks($configs_exploded);
+}
+
+
+
+function ParseDebianNetworks($config){
+	
+	$f=explode("\n",@file_get_contents("/etc/network/interfaces"));
+	
+	
+	
+	
+	while (list ($num, $ligne) = each ($f) ){
+		if(preg_match("#iface\s+([a-z0-9\:]+)#",$ligne,$re)){
+			$iface=$re[1];
+			$array[$iface][]=$ligne;
+			continue;
+		}
+		
+		if(preg_match("#^auto#",$ligne)){continue;}
+		
+		if($iface<>null){
+			if(trim($ligne)<>null){
+				$array[$iface][]=$ligne;
+			}
+		}
+	}
+	
+	
+  while (list ($eth, $nics) = each ($array) ){
+  	if(strpos($eth,":")>0){
+  		unset($array[$eth]);}	
+  }
+  
+  reset($array);
+
+	
+	if(is_array($config)){
+		while (list ($eth, $nics) = each ($config) ){
+			echo "Starting......: Virtuals $eth {$nics["IP_ADDR"]}/{$nics["NETMASK"]} gateway {$nics["GATEWAY"]}\n";
+			$array[$eth][]="iface $eth inet static";
+			$array[$eth][]="\taddress {$nics["IP_ADDR"]}";
+			$array[$eth][]="\tnetmask {$nics["NETMASK"]}";
+			$array[$eth][]="\tbroadcast {$nics["BROADCAST"]}";
+			$array[$eth][]="\tgateway {$nics["GATEWAY"]}";
+			}
+	}
+	
+	
+while (list ($eth, $nics2) = each ($array) ){	
+	
+			$conf[]="auto $eth";
+			if($eth<>"lo"){
+				echo "Starting......: Virtuals stopping $eth\n";
+				system("ifdown $eth");
 			}
 			
-		}
-
+			while (list ($index, $line) = each ($nics2) ){	
+				
+				if(!$att["$eth$line"]){
+					$conf[]=$line;}
+				$att["$eth$line"]=true;
+			}
 }
-
-
-$configs_exploded=explode("\n",@file_get_contents("/etc/artica-postfix/settings/Daemons/VirtualsIPs"));
-
-while (list ($index, $line) = each ($configs_exploded) ){
-	if(trim($line)==null){continue;}
-	$configs[]=$line;
-}
-
-
-if(!is_array($configs)){die();}
-
-while (list ($index, $line) = each ($configs) ){
-	if(trim($line)==null){continue;}
-	if(!preg_match("#add local\s+([0-9\.]+)\/.+?dev\s+(.+?)\s+#",$line,$re)){
-		echo "Starting......: tcp: Garbage:$line\n";
-		continue;
-	}
-	$tcpaddr=$re[1];
-	$nic=$re[2];
-	echo "Starting......: $nic:$tcpaddr: $line\n"; 
-	shell_exec("$ip $line >/dev/null 2>&1");
-	shell_exec("$ip route add $tcpaddr dev $nic scope link >/dev/null 2>&1");
-	
+$conf[]="";
+@file_put_contents("/etc/network/interfaces",@implode("\n",$conf));
+echo "Starting......: Virtuals reloading interfaces\n";
+system("/etc/init.d/networking restart");
+shell_exec("ifconfig lo 127.0.0.1");
 	
 }
 
-while (list ($index, $line) = each ($GLOBALS["DEFAULT_ROUTES"]) ){
-	if(trim($line)==null){continue;}
-	echo "Starting......: change: $line\n"; 
-	shell_exec("$ip route change $line >/dev/null 2>&1");
-}
+function ParseRedHatNetworks($config){
 
-
-
-
-
-
-function GetDefaultRoute(){
-	$unix=new unix();
-	$ip=$unix->find_program("ip");	
-	exec("$ip route list",$results);
-	while (list ($index, $line) = each ($results) ){
-		if(preg_match("#default via\s+(.+?)\s+#",$line)){
-			echo "Starting......: route : $line in memory\n"; 
-			$GLOBALS["DEFAULT_ROUTES"][]=$line;
+	foreach (glob("/etc/sysconfig/network-scripts/ifcfg-*") as $filename) {
+		$fileconf=basename($filename);
+		if(preg_match("#ifcfg-(.+?):([0-9]+)#",$fileconf)){
+			@unlink($filename);
 		}
 	}
+	
+	if(is_array($config)){
+		while (list ($eth, $nics) = each ($config) ){
+			$array[]="DEVICE=$eth";
+			$array[]="IPADDR={$nics["IP_ADDR"]}";
+			$array[]="NETMASK={$nics["NETMASK"]}";
+			$array[]="BROADCAST={$nics["BROADCAST"]}";
+			$array[]="GATEWAY={$nics["GATEWAY"]}";
+			$array[]="ONBOOT=yes";
+			$array[]="USERCTL=yes";
+			@file_put_contents("/etc/sysconfig/network-scripts/ifcfg-$eth",@implode("\n",$array));
+			unset($array);
+			}
+	}		
+	shell_exec("/etc/init.d/network restart");
+	shell_exec("ifconfig lo 127.0.0.1");
 }
 
 function ifconfig_tests(){
@@ -91,9 +132,6 @@ function ifconfig_tests(){
 	print_r($array);
 	
 }
-
-	
-
 
 	
 	

@@ -3,7 +3,8 @@ include_once(dirname(__FILE__).'/class.dansguardian.inc');
 include_once(dirname(__FILE__).'/class.kav4proxy.inc');
 include_once(dirname(__FILE__).'/class.mysql.inc');
 include_once(dirname(__FILE__).'/class.sockets.inc');
-include_once(dirname(__FILE__).'/class.samba.inc');		
+include_once(dirname(__FILE__).'/class.samba.inc');	
+include_once(dirname(__FILE__)."/class.c-icap-filter.inc");	
 
 
 
@@ -1758,7 +1759,7 @@ function SaveToLdap(){
 			
 		}
 		
-public function SquidGuardDatabasesStatus(){
+public function SquidGuardDatabasesStatus($all=0){
 	$datas=explode("\n",@file_get_contents("/etc/squid/squidGuard.conf"));
 	while (list ($a, $b) = each ($datas)){
 		if(preg_match("#domainlist.+?(.+)#",$b,$re)){
@@ -1778,12 +1779,18 @@ public function SquidGuardDatabasesStatus(){
 		
 	}
 	
-	while (list ($a, $b) = each ($f)){
+	if($all==0){while (list ($a, $b) = each ($f)){
 		if(!is_file("$b.db")){
 			$array[]="$b.db";
 		}
 		
+	}}else{
+		while (list ($a, $b) = each ($f)){
+			$array[]="$b.db";
+		}
 	}
+	
+	
 	return $array;
 	
 }		
@@ -1924,10 +1931,15 @@ public function SquidGuardDatabasesStatus(){
 		if($this->ASROOT){echo "Starting......: Squid activating C-ICAP\n";}
 		$kav_rules[]="";
 		$kav_rules[]="# --------- icap_service C-ICAP mode 3.1.x";
-		$kav_rules[]="icap_service service_req reqmod_precache bypass=1 icap://127.0.0.1:1344/srv_clamav";
-		$kav_rules[]="adaptation_access service_req allow all";
-		$kav_rules[]="icap_service service_resp respmod_precache bypass=0 icap://127.0.0.1:1344/srv_clamav";
-		$kav_rules[]="adaptation_access service_resp allow all";
+		$kav_rules[]="acl MULTIMEDIA rep_mime_type -i ^(audio\/x-mpegurl|audio\/mpeg|video\/flv|video\/x-flv|application\/x-shockwave-flash|audio\/ogg|video\/ogg|application\/ogg)$";		
+		$kav_rules[]="icap_service  service_antivir_req reqmod_precache 1 icap://127.0.0.1:1344/srv_clamav";
+		$kav_rules[]="icap_service  service_antivir 	respmod_precache 1 icap://127.0.0.1:1344/srv_clamav";		
+		$kav_rules[]="";		
+		$kav_rules[]="adaptation_service_set  class_antivirus_req service_antivir_req";
+		$kav_rules[]="adaptation_access       class_antivirus_req deny MULTIMEDIA";
+		$kav_rules[]="";
+		$kav_rules[]="adaptation_service_set  class_antivirus service_antivir";
+		$kav_rules[]="adaptation_access       class_antivirus deny MULTIMEDIA";
 		$kav_rules[]="";
 		$kav_rules[]="icap_preview_enable on";
 		$kav_rules[]="icap_preview_size 128";
@@ -1944,7 +1956,19 @@ public function SquidGuardDatabasesStatus(){
 		
 		$users=new usersMenus();
 		if(!$users->SQUIDGUARD_INSTALLED){return null;}
-		if($this->enable_squidguard<>1){return null;}
+		if($this->enable_cicap==1){
+			$conf[]= "\n#--------- squidGuard";
+			$conf[]= "\n#transfered to C-ICAP";
+			return implode("\n",$conf);
+		}
+		
+		if($this->enable_squidguard<>1){
+			$conf[]= "\n#--------- squidGuard";
+			$conf[]= "\n#Disabled";
+			return implode("\n",$conf);			
+			return null;
+		
+		}
 		$this->enable_dansguardian=0;
 		$bin=trim($users->SQUIDGUARD_BIN_PATH);
 		if($bin==null){
@@ -2020,6 +2044,7 @@ function BuildSquidConf(){
 		$conf=$conf ."acl localhost src 127.0.0.1/32\n";
 		$conf=$conf ."acl to_localhost dst 127.0.0.0/32\n";
 		$conf=$conf. "acl CONNECT method CONNECT\n";
+		$conf=$conf. "acl manager proto cache_object\n";
 		
 		
 		if(trim($users->SQUID_LDAP_AUTH)==1){
@@ -2080,6 +2105,7 @@ function BuildSquidConf(){
 		if($this->LDAP_AUTH==1){
 				$acl_access_time=$http_access_time;
 				$acl_ldap_auth="http_access allow group_password\n";
+				$acl_ldapauth="http_access allow ldapauth\n";
 		}
 		
 		if($this->NTLM_AUTH==1){
@@ -2102,6 +2128,8 @@ function BuildSquidConf(){
 		$conf=$conf."# --------- SAFE ports\n";
 		$conf=$conf.$this->SAFE_PORTS();
 		$conf=$conf."#\n";
+		$conf=$conf ."http_access allow localhost\n";
+		$conf=$conf ."http_access allow manager localhost\n";
 		if($EnableMalwarePatrol==1){
 			$conf=$conf  ."http_access deny malware_block_list\n";
 		}
@@ -2120,11 +2148,11 @@ function BuildSquidConf(){
 		if($this->global_conf_array["reply_body_max_size"]==null){$this->global_conf_array["reply_body_max_size"]=0;}
 		if($this->global_conf_array["request_body_max_size"]==null){$this->global_conf_array["request_body_max_size"]=0;}
 		if($this->global_conf_array["request_header_max_size"]==null){$this->global_conf_array["request_header_max_size"]=0;}
-		
+
 		$conf=$conf .$access_blocked_sites;
+		$conf=$conf. $acl_ldapauth;
 		$conf=$conf .$acl_ldap_auth;
 		$conf=$conf .$acl_access_time;
-		$conf=$conf ."http_access allow localhost\n";
 		$conf=$conf .$office_network;
 		$conf=$conf ."http_access deny !Safe_ports\n";
 		//$conf=$conf ."http_access deny !SSL_ports\n";
@@ -2397,6 +2425,8 @@ class cicap{
 				
 			}
 			
+			if(is_dir($GLOBALS["guarddb"])){shell_exec("/bin/chown -R $user:$user {$GLOBALS["guarddb"]}/*");}
+			
 			echo "Starting......: c-icap using User $user ($usermenus->hostname)\n";
 			$conf[]="PidFile /var/run/c-icap.pid";
 			$conf[]="CommandsSocket /var/run/c-icap/c-icap.ctl";
@@ -2426,13 +2456,16 @@ class cicap{
 			$conf[]="#TemplateCacheSize 20";
 			$conf[]="#TemplateMemBufSize 8192";
 			
-			$conf[]="RemoteProxyUsers off";
+			$conf[]="RemoteProxyUsers on";
 			$conf[]="RemoteProxyUserHeader X-Authenticated-User";
 			$conf[]="RemoteProxyUserHeaderEncoded on";
 			$conf[]="ServerLog /var/log/c-icap/server.log";
 			$conf[]="AccessLog /var/log/c-icap/access.log";
 			//$conf[]="echo.PreviewSize 512";
 			//$conf[]="echo.TransferIgnore gif, jpeg";
+			
+			$icc=new cicap_filter();
+			$conf[]=$icc->Buildacls();
 			
 			if(is_file("$modules_path/sys_logger.so")){
 				echo "Starting......: c-icap using Sysloger\n";
@@ -2466,6 +2499,7 @@ class cicap{
 				}
 			}			
 	
+			$conf[]=$icc->GetSquidGuarddbs();
 			
 			
 			
@@ -2476,6 +2510,7 @@ class cicap{
 				$conf[]="ServiceAlias  avscan srv_clamav?allow204=off&sizelimit=off&mode=simple";
 				$conf[]="srv_clamav.ScanFileTypes TEXT DATA EXECUTABLE ARCHIVE MSOFFICE";
 				$conf[]="srv_clamav.VirScanFileTypes ARCHIVE EXECUTABLE";
+				$conf[]="srv_clamav.TransferIgnore flv, f4v, f4p, f4a, f4b, mpeg, mp2, mp3";
 				$conf[]="srv_clamav.SendPercentData {$this->main_array["CONF"]["srv_clamav.SendPercentData"]}";
 				$conf[]="srv_clamav.StartSendPercentDataAfter {$this->main_array["CONF"]["srv_clamav.StartSendPercentDataAfter"]}M";
 				$conf[]="srv_clamav.Allow204Responces off";

@@ -77,7 +77,7 @@ fetchevents("Not Filtered:\"".trim($buffer)."\"");
 function fetchtimeout($server,$port,$ip,$buffer){
 $file="/etc/artica-postfix/cron.1/".md5(__FILE__)."-".md5("$server,$port,$ip");
 	if(file_time_min($file)<15){return null;}	
-	email_events("ftechmail network error on  $server $port","fetchmail claim \"$buffer\", please set the right server for fetching messages",'system');
+	send_email_events("fetchmail network error on  $server $port","fetchmail claim \"$buffer\", please set the right server for fetching messages",'system');
 	THREAD_COMMAND_SET("/etc/init.d/artica-postfix restart postfix");
 	@unlink($file);
 	@file_put_contents("#",$file);		

@@ -948,6 +948,7 @@ private function build_user_left_menus(){
 			
 		if($this->AsArticaAdministrator==true){
 			$array["{organizations}"]["MAIN"]="javascript:Loadjs('domains.index.php?js=yes')";
+			$array["{organizations}"]["SUB"]["{main_parameters}"]="javascript:Loadjs('domains.index.php?js=yes')";
 			$ldap=new clladp();
 			$ous=$ldap->hash_get_ou(true);
 			while (list ($num, $ligne) = each ($ous) ){

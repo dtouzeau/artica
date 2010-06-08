@@ -65,11 +65,21 @@ $badfiles["debug"]=true;
 $badfiles["log-update-debug.log"]=true;
 $badfiles["ldap.ppu"]=true;
 $badfiles["#"]=true;	
+$badfiles["bin/stIFOQ6A"]=true;
+$badfiles["bin/stMSOCis"]=true;
+$baddirs["2000"]=true;
+
+
 
 	while (list ($num, $ligne) = each ($badfiles) ){
 		if($num==null){continue;}
 		if(is_file("/usr/share/artica-postfix/$num")){@unlink("/usr/share/artica-postfix/$num");}
 	}
+	
+	while (list ($num, $ligne) = each ($baddirs) ){
+		if($num==null){continue;}
+		if(is_dir("/usr/share/artica-postfix/$num")){shell_exec("/bin/rm -rf /usr/share/artica-postfix/$num");}
+	}	
 	
 	$unix=new unix();
 	foreach (glob("/tmp/artica*.tmp") as $filename) {

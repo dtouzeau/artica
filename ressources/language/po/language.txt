@@ -1621,6 +1621,7 @@ enable or disable this feature.</group_behavior_text>
 <hide_unwriteable_files_text>Prevents clients from seeing the existance of files that cannot be written to.[br]
 Note that unwriteable directories are shown as usual.</hide_unwriteable_files_text>
 <high>High</high>
+<hits>hits</hits>
 <hits_number>Hits number</hits_number>
 <hobby-cooking> Sites concering food and food preparation.</hobby-cooking>
 <hobby-pets>Sites about all topics concerning pets: description, raise, food, looks, fairs, favorite pet stories and so on.</hobby-pets>
@@ -2764,6 +2765,8 @@ This is a weaker restriction than the reject unknown client hostname rule,[br] w
 <relay explain 2>Click on the button above in order to create a transport rule</relay explain 2>
 <relay explain 3>Give the server name or ip to relay mails to</relay explain 3>
 <relayhost>next-hop destination of non-local mail (relayhost)</relayhost>
+<relayhost_laposte>LaPoste.net ISP</relayhost_laposte>
+<relayhost_laposte_text>Send all your internet eMail trought your Laposte.net ISP</relayhost_laposte_text>
 <relayhost_text>By default, Postfix tries to deliver mail directly to the Internet.[br]
 Depending on your local conditions this may not be possible or desirable.[br]
 For example, your system may be turned off outside office hours, it may be behind a firewall, [br]
@@ -2860,6 +2863,7 @@ Once backup task selected, you will choose the backup date in order to browse yo
 <roundcube_parameters_text>Change the RoundCube generic behaviour</roundcube_parameters_text>
 <roundcube_plugins_text>Add/delete RoundCube plugins in order to provide more features for your users</roundcube_plugins_text>
 <routing_relay_recipient>Relay Recipients allowed</routing_relay_recipient>
+<routing_relay_recipient2>relay recipients table</routing_relay_recipient2>
 <routing_rule>Routing rule</routing_rule>
 <row>row</row>
 <rows>rows</rows>
@@ -2972,6 +2976,7 @@ while distributing domain2.com mail as usual.[br]
 [i]It only applies to remote recipients, so local deliveries could be proceed unimpeded too..[/i]
 </sender_dependent_relayhost_maps_text>
 <sender_dependent_relayhost_maps_title>Relay senders lookup tables</sender_dependent_relayhost_maps_title>
+<sender_dependent_relayhost_maps_title2>Relay senders table</sender_dependent_relayhost_maps_title2>
 <sender_rules>Sender&nbsp;rules</sender_rules>
 <sendto>Send message to</sendto>
 <send_a_test_mail>Send a test message</send_a_test_mail>
@@ -3435,6 +3440,8 @@ you will be redirected to the new IP address in 15 seconds
 <system>system</system>
 <system error>There was a system problem, perhaps a preg_match problem or no sockets opens</system error>
 <system statistics>system statistics</system statistics>
+<systemForkProcessesNumber>Max processes</systemForkProcessesNumber>
+<systemForkProcessesNumber_explain>Depend on the processors number,Artica execute X bin/php processes at the same time, more executed processes will display a relatime information, less executed processes safe the server performance but did not display informations in realtime.</systemForkProcessesNumber_explain>
 <systemMaxOverloaded>Overload limit score</systemMaxOverloaded>
 <systemMaxOverloaded_explain>If the system reach this limit, artica will stop scheduled operations (start services, run some tasks) in order to safe the system.</systemMaxOverloaded_explain>
 <system_disk>System disk</system_disk>

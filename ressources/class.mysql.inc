@@ -1263,14 +1263,8 @@ class mysql{
 				$sql="ALTER TABLE `fetchmail_rules` ADD `nokeep` INT( 1 ) NOT NULL DEFAULT '0'";
 				$this->QUERY_SQL($sql,'artica_backup');
 		}
-		
-		
-		
-		
-
-		
-		
-		if(!$this->TABLE_EXISTS('postfix_multi','artica_backup')){
+  
+	if(!$this->TABLE_EXISTS('postfix_multi','artica_backup')){
 		
 			$sql="CREATE TABLE IF NOT EXISTS `postfix_multi` (
 				  `ID` int(11) NOT NULL AUTO_INCREMENT,
@@ -1294,6 +1288,7 @@ class mysql{
 				  `ipaddr` varchar(25) NOT NULL,
 				  `netmask` varchar(25) NOT NULL,
 				  `cdir` varchar(30) NOT NULL,
+				  `gateway` varchar(30) NOT NULL,
 				  PRIMARY KEY (`ID`),
 				  UNIQUE KEY `cdir_2` (`cdir`),
 				  KEY `nic` (`nic`),
@@ -1302,6 +1297,15 @@ class mysql{
 				)";
 			$this->QUERY_SQL($sql,'artica_backup');
 			}
+			
+			if(!$this->FIELD_EXISTS("nics_virtuals","gateway","artica_backup")){
+				$sql="ALTER TABLE `nics_virtuals` ADD `gateway` VARCHAR( 30 ) NOT NULL";
+				$this->QUERY_SQL($sql,'artica_backup');
+			}			
+			
+			
+			
+			
 	}
 
 	private function CheckTableEvents(){

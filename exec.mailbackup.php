@@ -25,6 +25,8 @@ if(!Build_pid_func(__FILE__,"MAIN")){
 
 $q=new mysql();
 $q->check_storage_table();
+$sock=new sockets();
+if($sock->GET_INFO("KeepArticaMysqlError")<>1){DeleteMysqlError();}
 $quarantine_dir="/tmp/savemail";
 $files=DirList($quarantine_dir);
 $count=0;
@@ -32,8 +34,6 @@ $pid=getmypid();
 $max=count($files);
 $date1=date('H:i:s');
 events("Processing ".count($files)." files in $quarantine_dir");
-
-
 	while (list ($num, $file) = each ($files) ){
 		
 		events("################################################################### $count/$max)");
@@ -175,6 +175,7 @@ function archive_process($file){
 	$mm=new demime($target_file);
 	if(!$mm->unpack()){
 		events("Failed unpack with error \"$mm->error\"");
+		if($mm->MustkillMail){@unlink($target_file);}
 		return false;
 	}
 	
@@ -339,7 +340,11 @@ function DeleteLine($msgid){
 	$q=new mysql();
 	$q->QUERY_SQL($sql,"artica_backup");
 	
-}	
+}
+
+function DeleteMysqlError(){
+foreach (glob("/var/log/artica-postfix/mysql-error.*.err") as $filename) {if(file_time_min($filename)>5){@unlink($filename);}}
+}
 
 
 

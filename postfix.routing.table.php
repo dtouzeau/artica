@@ -64,7 +64,7 @@ $page=CurrentPageName();
 $html="
 	$include
 	function LoadPostfixRountingTable(){
-		YahooWinS(886,'$page?popup=yes','$title');
+		YahooWinS(889,'$page?popup=yes','$title');
 	
 	}
 	
@@ -210,8 +210,8 @@ $tabbarr="
             <li><a href=\"$page?transport-table=yes\"><span>{transport_table}</span></a></li>
            	$local
 			<li><a href=\"$page?relay-domain-table=yes\"><span>{relay_domains_table}</span></a></li>
-			<li><a href=\"$page?relay-recipient-table=yes\"><span>{routing_relay_recipient}</span></a></li>
-			<li><a href=\"$page?relay-sender-table=yes\"><span>{sender_dependent_relayhost_maps_title}</span></a></li>
+			<li><a href=\"$page?relay-recipient-table=yes\"><span>{routing_relay_recipient2}</span></a></li>
+			<li><a href=\"$page?relay-sender-table=yes\"><span>{sender_dependent_relayhost_maps_title2}</span></a></li>
 			
 			
 			

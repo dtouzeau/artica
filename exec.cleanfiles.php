@@ -9,7 +9,7 @@
 	
 	
 	CleanTempDirs();
-	
+	CleanArticaUpdateLogs();
 	die();
 	
 	
@@ -24,10 +24,23 @@ function CleanTempDirs(){
 		if(trim($num)==null){continue;}
 		$time=$unix->file_time_min($num);
 		if($time<380){continue;}
-		shell_exec("/bin/rm -rf \"$num\"");
+		if(is_dir($num)){
+			shell_exec("/bin/rm -rf \"$num\"");
+		}
 		
 	}
 	
+}
+
+
+function CleanArticaUpdateLogs(){
+	
+foreach (glob("/var/log/artica-postfix/artica-update-*.debug") as $filename) {
+	$file_time_min=file_time_min($filename);
+	if(file_time_min($filename)>5752){@unlink($filename);}
+	
+}
+
 }
 
 ?>

@@ -108,10 +108,12 @@ var
    mem:integer;
    processNumber:integer;
    cpunum:integer;
+   systemForkProcessesNumber:integer;
 begin
   WATCHDOG_START();
   pid:=PID_NUM();
   processNumber:=1;
+  if not  TryStrToInt(SYS.GET_INFO('systemForkProcessesNumber'),systemForkProcessesNumber) then systemForkProcessesNumber:=0;
   count:=0;
 
 
@@ -161,6 +163,7 @@ begin
   // 512 = 516300
   // 1G = 1002252
 
+if systemForkProcessesNumber=0 then begin
   if mem>255436 then begin
       if cpunum<2 then processNumber:=1;
   end;
@@ -178,9 +181,12 @@ begin
   if mem>2004504 then begin
      processNumber:=6;
      if cpunum<4 then processNumber:=4;
-
   end;
+  SYS.SET_INFO('systemForkProcessesNumber',IntToStr(processNumber))
 
+end else begin
+   processNumber:=systemForkProcessesNumber;
+end;
 
 
 

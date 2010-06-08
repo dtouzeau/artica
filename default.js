@@ -1438,6 +1438,17 @@ function CacheOff(){
 	XHR.sendAndLoad('CacheOff.php', 'GET',x_CacheOff);	
 	}
 
+var x_remove_cache= function (obj) {
+	var response=obj.responseText;
+	RefreshLeftMenu();
+}
+
+function remove_cache(){
+	var XHR = new XHRConnection();
+	XHR.appendData('cache','yes');
+	XHR.sendAndLoad('CacheOff.php', 'GET',x_remove_cache);
+}
+
 
 function execJS(node){
   var bSaf = (navigator.userAgent.indexOf('Safari') != -1);

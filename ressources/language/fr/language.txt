@@ -1566,6 +1566,7 @@ activer ou d&eacute;sactiver cette fonctionnalit&eacute;.</group_behavior_text>
 <hide_unwriteable_files>Cacher les fichiers prot&eacute;g&eacute;s en &eacute;criture</hide_unwriteable_files>
 <hide_unwriteable_files_text>N'autorise pas l'affichage de l'existence de fichiers qui ne peuvent pas &ecirc;tre modifi&eacute;s.[br]Notez que les r&eacute;pertoires prot&eacute;g&eacute;s en &eacute;criture sont affich&eacute;s comme d'habitude.</hide_unwriteable_files_text>
 <high>Haut</high>
+<hits>Acc&egrave;s</hits>
 <hits_number>Nombre d'acc&egrave;s</hits_number>
 <hobby-cooking>Sites concernant l'alimentation et la pr&eacute;paration des aliments</hobby-cooking>
 <hobby-pets>Sites &agrave; propos des animaux, descriptions, nourriture, foires, histoires sur les animaux de compagnie et autres</hobby-pets>
@@ -2698,7 +2699,9 @@ This is a weaker restriction than the reject unknown client hostname rule,[br] w
 <relay explain 2>Cliquez sur le bouton ci-dessus afin de cr&eacute;er une r&egrave;gle de transport</relay explain 2>
 <relay explain 3>Donnez le nom du serveur ou l'adresse ip vers laquelle on va relayer les messages</relay explain 3>
 <relayhost>relais pour les domaines inconnus</relayhost>
-<relayhost_text>Par d&eacute;faut, Postfix essai de d&eacute;lvrer les messages directement sur Internet.[br]
+<relayhost_laposte>FAI LaPoste.net</relayhost_laposte>
+<relayhost_laposte_text>Envoyez tous vos messages &agrave; destination d'internet vers le FAI laposte.net</relayhost_laposte_text>
+<relayhost_text>Par d&eacute;faut, Postfix essai de d&eacute;livrer les messages directement sur Internet.[br]
 Ceci peut &ecirc;tre diff&eacute;rent de ce que vous d&eacute;sirez.[br]
 Par exemple, le serveur peut &ecirc;tre derri&egrave;re un pare-feu ou doit obligatoirement utiliser un autre relais.[br]Cette fonctionnalit&eacute; vous permet de forcer Postfix &agrave; transmettre les domaines inconnus vers un autre serveur de messagerie.</relayhost_text>
 <relayhost_title>Quel mode de livraison: directe ou indirecte?</relayhost_title>
@@ -2786,7 +2789,8 @@ Placer une limite sur les ent&ecirc;tes HTTP peut r&eacute;soudre certains probl
 <roundcube_parameters>Param&egrave;tres RoundCube</roundcube_parameters>
 <roundcube_parameters_text>Modifiez le comportement globale de RoundCube</roundcube_parameters_text>
 <roundcube_plugins_text>Ajoutez/Supprimez des addins &agrave; RoudCube afin de fournir plus de fonctionnalit&eacute;s &agrave; vos utilisateurs.</roundcube_plugins_text>
-<routing_relay_recipient>Les b&eacute;n&eacute;ficiaires relais autoris&eacute;s</routing_relay_recipient>
+<routing_relay_recipient>Routage par destinataires</routing_relay_recipient>
+<routing_relay_recipient2>Routage par destinataire</routing_relay_recipient2>
 <routing_rule>R&egrave;gle de routage</routing_rule>
 <row>ligne</row>
 <rows>lignes</rows>
@@ -2892,6 +2896,7 @@ while distributing domain2.com mail as usual.[br]
 [i]It only applies to remote recipients, so local deliveries could be proceed unimpeded too..[/i]
 </sender_dependent_relayhost_maps_text>
 <sender_dependent_relayhost_maps_title>Routage par &eacute;metteur</sender_dependent_relayhost_maps_title>
+<sender_dependent_relayhost_maps_title2>Routage par &eacute;metteur</sender_dependent_relayhost_maps_title2>
 <sender_rules>R&egrave;gles d'exp&eacute;diteurs</sender_rules>
 <sendto>Envoy&eacute; un message vers</sendto>
 <send_a_test_mail>Envoyer un message de test</send_a_test_mail>
@@ -3346,6 +3351,11 @@ Vous allez &ecirc;tre redirig&eacute; vers la nouvelle adresse IP dans 15 second
 <system>syst&egrave;me</system>
 <system error>Il y a un soucis syst&egrave;me, peut &ecirc;tre une erreur  preg_match ou la socket ne peut &ecirc;tre ouverte</system error>
 <system statistics>statistiques syst&egrave;me</system statistics>
+<systemForkProcessesNumber>Nombre de processus en parall&egrave;le</systemForkProcessesNumber>
+<systemForkProcessesNumber_explain>Le calcul de base s'effectue en fonction du nombre de processeur que vous avez sur votre serveur.[br]
+Il autorise Artica &agrave; lancer X processus php/binaire en m&ecirc;me temps.[br]
+Plus de processus sont ex&eacute;cut&eacute;s, plus vous disposez d'une information r&eacute;active et en temps r&eacute;el mais au d&eacute;triment de la charge machine.
+Moins de processus ex&eacute;cut&eacute;s vous permet de conserver de la puissance machine mais r&eacute;duit la qualit&eacute; d'information de la console Artica.</systemForkProcessesNumber_explain>
 <systemMaxOverloaded>Surcharge maximale</systemMaxOverloaded>
 <systemMaxOverloaded_explain>Si le syst&egrave;me d&eacute;passe cette limite, Artica va geler tous ses ordres et op&eacute;rations en cours (d&eacute;marrage des services, ex&eacute;cution de t&acirc;ches). Ceci afin de sauvegarder la puissance syst&egrave;me.</systemMaxOverloaded_explain>
 <system_disk>Disque syst&egrave;me</system_disk>

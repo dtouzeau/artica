@@ -273,6 +273,7 @@ echo $tpl->web_page;
 }
 
 function js_script(){
+	if(isset($_GET["encoded"])){$_GET["ou"]=base64_decode($_GET["ou"]);}
 	if($_GET["ou"]==null){$_GET["ou"]=ORGANISTATION_FROM_USER();}
 	$ou=$_GET["ou"];
 	$ou_encrypted=base64_encode($ou);

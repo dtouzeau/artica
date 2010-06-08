@@ -602,6 +602,9 @@ class usersMenus {
 			$this->HOSTAPD_INSTALLED=$_GLOBAL["HOSTAPD_INSTALLED"];
 			$this->WPA_SUPPLIANT_INSTALLED=$_GLOBAL["WPA_SUPPLIANT_INSTALLED"];
 			$this->HOSTAPD_BINVER=$_GLOBAL["HOSTAPD_BINVER"];
+			
+			$this->hostname=str_replace('.(none)','',$this->hostname);
+			
 			if($this->SAMBA_INSTALLED){
 				if($this->LOCAL_SID==null){
 					$sock=new sockets();
@@ -897,16 +900,18 @@ private function build_user_left_menus(){
 		}*/
 		
 		if($this->AsSambaAdministrator==true){
-			if($this->SAMBA_INSTALLED){
-				$sub_array_pages["{fileshare}"]["fileshares.index.php"]='MAIN';
-				$this->main_left_menus["fileshares.index.php"]=array(
-				"TITLE"=>"{fileshare}",
-				"IMG"=>"folder-64-share.png",
-				"TEXT"=>"{menu_share_text}",
-				"NOAJAX"=>false,
-				"AJAX"=>"Loadjs('fileshares.index.php?js=yes')",
-				);				
-				}
+			if(!$this->KASPERSKY_SMTP_APPLIANCE){
+				if($this->SAMBA_INSTALLED){
+					$sub_array_pages["{fileshare}"]["fileshares.index.php"]='MAIN';
+					$this->main_left_menus["fileshares.index.php"]=array(
+					"TITLE"=>"{fileshare}",
+					"IMG"=>"folder-64-share.png",
+					"TEXT"=>"{menu_share_text}",
+					"NOAJAX"=>false,
+					"AJAX"=>"Loadjs('fileshares.index.php?js=yes')",
+					);				
+					}
+			}
 		}		
 
 	
@@ -948,6 +953,7 @@ private function build_user_left_menus(){
 			
 		if($this->AsArticaAdministrator==true){
 			$array["{organizations}"]["MAIN"]="javascript:Loadjs('domains.index.php?js=yes')";
+			$array["{organizations}"]["SUB"]["{main_parameters}"]="javascript:Loadjs('domains.index.php?js=yes')";
 			$ldap=new clladp();
 			$ous=$ldap->hash_get_ou(true);
 			while (list ($num, $ligne) = each ($ous) ){
@@ -964,13 +970,14 @@ private function build_user_left_menus(){
 		if(($this->AsOrgAdmin) or ($this->AllowAddUsers)){
 			if($OU<>null){
 				if(strlen($OU)>13){$OU_TEXT=substr($OU,0,10).'...';}else{$OU_TEXT=$OU;}
-				$array[$OU_TEXT]["MAIN"]="javascript:Loadjs('domains.manage.org.index.php?js=yes&ou=$OU');";
-				$array[$OU_TEXT]["SUB"]["{main_parameters}"]="javascript:Loadjs('domains.manage.org.index.php?js=yes&ou=$OU');";
-				$array[$OU_TEXT]["SUB"]["{domains}"]="javascript:Loadjs('domains.edit.domains.php?js=yes&ou=$OU');";
-				$array[$OU_TEXT]["SUB"]["{add_user}"]="javascript:Loadjs('domains.add.user.php?ou=$OU');";
-				$array[$OU_TEXT]["SUB"]["{members}"]="javascript:Loadjs('domains.manage.org.index.php?finduser-js=es&ou=$OU');";
-				$array[$OU_TEXT]["SUB"]["{groups}"]="javascript:Loadjs('domains.edit.group.php?ou=$OU&js=yes');";
-				$array[$OU_TEXT]["SUB"]["{search}"]="javascript:Loadjs('domains.find.user.php?ou=$OU');";
+				$OU_encoded=base64_encode($OU);
+				$array[$OU_TEXT]["MAIN"]="javascript:Loadjs('domains.manage.org.index.php?js=yes&ou=$OU_encoded&encoded=yes');";
+				$array[$OU_TEXT]["SUB"]["{main_parameters}"]="javascript:Loadjs('domains.manage.org.index.php?js=yes&ou=$OU_encoded&encoded=yes');";
+				$array[$OU_TEXT]["SUB"]["{domains}"]="javascript:Loadjs('domains.edit.domains.php?js=yes&ou=$OU_encoded&encoded=yes');";
+				$array[$OU_TEXT]["SUB"]["{add_user}"]="javascript:Loadjs('domains.add.user.php?ou=$OU_encoded&encoded=yes');";
+				$array[$OU_TEXT]["SUB"]["{members}"]="javascript:Loadjs('domains.manage.org.index.php?finduser-js=es&ou=$OU_encoded&encoded=yes');";
+				$array[$OU_TEXT]["SUB"]["{groups}"]="javascript:Loadjs('domains.edit.group.php?ou=$OU_encoded&js=yes&encoded=yes');";
+				$array[$OU_TEXT]["SUB"]["{search}"]="javascript:Loadjs('domains.find.user.php?ou=$OU_encoded&encoded=yes');";
 			}
 				
 				
@@ -993,12 +1000,14 @@ private function build_user_left_menus(){
 			
 			
 		if($this->AsSambaAdministrator==true){if($this->SAMBA_INSTALLED){
-			$array["{fileshare}"]["MAIN"]="javascript:Loadjs('fileshares.index.php?js=yes')";}
-			$array["{fileshare}"]["SUB"]["{main_parameters}"]="javascript:Loadjs('fileshares.index.php?js=yes');";
-			$array["{fileshare}"]["SUB"]["{APP_SAMBA}"]="javascript:Loadjs('samba.index.php?script=smbpop');";
-			$array["{fileshare}"]["SUB"]["{explorer}"]="javascript:Loadjs('tree.php');";
-			$array["{fileshare}"]["SUB"]["{SHARE_FOLDER}"]="javascript:Loadjs('SambaBrowse.php');";
-			$array["{fileshare}"]["SUB"]["{computers}"]="javascript:Loadjs('computer-browse.php');";
+			if(!$this->KASPERSKY_SMTP_APPLIANCE){
+				$array["{fileshare}"]["MAIN"]="javascript:Loadjs('fileshares.index.php?js=yes')";}
+				$array["{fileshare}"]["SUB"]["{main_parameters}"]="javascript:Loadjs('fileshares.index.php?js=yes');";
+				$array["{fileshare}"]["SUB"]["{APP_SAMBA}"]="javascript:Loadjs('samba.index.php?script=smbpop');";
+				$array["{fileshare}"]["SUB"]["{explorer}"]="javascript:Loadjs('tree.php');";
+				$array["{fileshare}"]["SUB"]["{SHARE_FOLDER}"]="javascript:Loadjs('SambaBrowse.php');";
+				$array["{fileshare}"]["SUB"]["{computers}"]="javascript:Loadjs('computer-browse.php');";
+			}
 		}
 		if($this->AsSystemAdministrator==true){if($this->PUREFTP_INSTALLED){$array["{fileshare}"]="javascript:Loadjs('fileshares.index.php?js=yes')";}}
 		if($this->SQUID_INSTALLED==true){if($this->AsSquidAdministrator==true){
@@ -1065,14 +1074,12 @@ private function build_user_left_menus(){
 			}
 		}
 		
+		if($this->KASPERSKY_SMTP_APPLIANCE){unset($array["system"]["SUB"]["{APP_DHCP}"]);}
+		
 		$menus=$this->BuildArticaMenus($array,$sub_array_pages);
 		$this->toplinks=$menus;
 		return $menus;
-		
-		
-		
-			
-		
+
 		$this->toplinks="<div id='TpLink'>
 		<table style='width:100%'>";
 		

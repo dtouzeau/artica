@@ -194,7 +194,7 @@ function main_rules_categories_list($rule_main,$noecho=0){
 	while (list ($num, $val) = each ($array_cat) ){
 		if($array_selected[$num]>0){$enabled=1;}else{$enabled=0;}
 		$md=md5($num);
-		$edit_icon=imgtootltip("icon_edit.gif","{edit}","dansguardian_edit_personal_category('{$ligne["category"]}')");
+		$edit_icon=imgtootltip("icon_edit.gif","{edit}","dansguardian_edit_personal_category('$num')");
 		$html=$html."
 		<tr ". CellRollOver().">
 			<td><strong style='font-size:11px'>$val</td>

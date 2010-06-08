@@ -604,6 +604,10 @@ if  SYS.GET_INFO('MysqlTooManyConnections')='1' then begin
     exit;
 end;
 
+
+
+
+
 if processname<>'artica-backup' then begin
    artica_backup_pid:=SYS.PIDOF('artica-backup');
    if SYS.PROCESS_EXIST(artica_backup_pid) then begin
@@ -644,17 +648,7 @@ if length(pid_file)=0 then SET_MYSQLD_PARAMETERS('pid-file','/var/run/mysqld/mys
 SET_MYSQLD_PARAMETERS('socket','/var/run/mysqld/mysqld.sock');
 ForceDirectories('/var/log/mysql');
 
-//SET_MYSQLD_PARAMETERS('max_binlog_size','100M');
 
-
-
-   datadir:=SERVER_PARAMETERS('datadir');
-   if not FileExists(datadir+'/mysql/host.frm') then begin
-     if FileExists(mysql_install_db) then begin
-        logs.Debuglogs('Starting......: Mysql installing default databases.');
-        fpsystem(mysql_install_db);
-     end;
-   end;
 
    logbin:=SERVER_PARAMETERS('log_bin');
    mysql_user:=SERVER_PARAMETERS('user');
@@ -685,6 +679,18 @@ ForceDirectories('/var/log/mysql');
    if(EnableMysqlLog=1) then logpathstring:=' --log=/var/log/mysql.log --log-slow-queries=/var/log/mysql-slow-queries.log';
    if not FileExists('/var/log/mysql-slow-queries.log') then logs.OutputCmd('/bin/touch /var/log/mysql-slow-queries.log');
    logs.OutputCmd('/bin/chown '+mysql_user+':'+mysql_user+' /var/log/mysql-slow-queries.log');
+
+
+   datadir:=SERVER_PARAMETERS('datadir');
+   logs.DebugLogs('Starting......: Mysql Checking :' +datadir+'/mysql/host.frm');
+   if not FileExists(datadir+'/mysql/host.frm') then begin
+     if FileExists(mysql_install_db) then begin
+        logs.Debuglogs('Starting......: Mysql installing default databases.');
+        fpsystem(mysql_install_db);
+     end else begin
+         logs.DebugLogs('Starting......: unable to stat mysql_install_db');
+     end;
+   end;
 
    fpsystem(daemon_bin_path +logpathstring+ ' &');
  pid:=PID_NUM();

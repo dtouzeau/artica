@@ -8513,7 +8513,7 @@ begin
     name:=trim(name);
     if length(name)=0 then exit;
     RegExpr:=TRegExpr.Create;
-    RegExpr.Expression:='^(.+?)\.';
+    RegExpr.Expression:='^(.+?)\.(.+?)$';
     if RegExpr.Exec(name) then begin
        name:=RegExpr.Match[1];
        domainName:=RegExpr.Match[2];
@@ -8536,7 +8536,10 @@ begin
     end;
 
     sysctl:=SYS.LOCATE_GENERIC_BIN('sysctl');
-    if length(domainName)>0 then fpsystem(sysctl+' -w kernel.domainname='+domainName);
+    if length(domainName)>0 then begin
+       writeln('domainname='+domainName);
+       fpsystem(sysctl+' -w kernel.domainname='+domainName);
+    end;
     fpsystem(sysctl+' -w kernel.hostname='+name);
     fpsystem(sysctl+' -p');
 

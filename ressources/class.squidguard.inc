@@ -2,6 +2,8 @@
 
 include_once(dirname(__FILE__)."/class.dansguardian.inc");
 include_once(dirname(__FILE__)."/class.groups.inc");
+include_once(dirname(__FILE__)."/class.c-icap-filter.inc");
+
 
 class squidguard{
 	var $categories=array();
@@ -66,29 +68,11 @@ class squidguard{
 	
 	private function GetRules(){
 		if(is_array($GLOBALS["RULES_DG"])){return $GLOBALS["RULES_DG"];}
-		$q=new mysql();
-		$sql="SELECT RuleID,RuleName FROM `dansguardian_rules`";
-		$results=$q->QUERY_SQL($sql,"artica_backup");
-		while($ligne=@mysql_fetch_array($results,MYSQL_ASSOC)){
-			
-		if(strtolower(trim($ligne["RuleName"]))=="default rule"){$ligne["RuleName"]="default";}	
-		$ligne["RuleName"]=str_replace("(","",$ligne["RuleName"]);
-		$ligne["RuleName"]=str_replace(")","",$ligne["RuleName"]);
-		$ligne["RuleName"]=str_replace("[","",$ligne["RuleName"]);
-		$ligne["RuleName"]=str_replace("]","",$ligne["RuleName"]);
-		$ligne["RuleName"]=str_replace(" ","_",$ligne["RuleName"]);
-		$ligne["RuleName"]=str_replace(".","",$ligne["RuleName"]);
-		
-		if($GLOBALS["VERBOSE"]){echo "RuleID {$ligne["RuleID"]} ". strtolower(trim($ligne["RuleName"]))."\n";}
-			$array[$ligne["RuleID"]]=strtolower(trim($ligne["RuleName"]));
-			
-		}
+		$cicap=new cicap_filter();
+		$array=$cicap->rules;
 		if(!is_array($array)){return array();}
 		$GLOBALS["RULES_DG"]=$array;
 		return $array;
-		
-		
-		
 	}
 	
 	private function BUILD_SRC(){
@@ -322,15 +306,27 @@ class squidguard{
 		
 		$q=new mysql();
 		
-			if(is_file("{$GLOBALS["guarddb"]}/personal-categories/W-1/domains")){
-			$this->DefaultRules["rule"][]="W-1";
-			$this->CategoriesDefinitions["W-1"][]="\tdomainlist personal-categories/W-1/domains";
+			$main_path="{$GLOBALS["guarddb"]}/personal-categories/W-1";
+			if(is_file("$main_path/domains")){
+				$this->DefaultRules["rule"][]="W-1";
+				$this->CategoriesDefinitions["W-1"][]="\tdomainlist personal-categories/W-1/domains";
+				$this->CategoriesDefinitions["W-1"][]="\turllist personal-categories/W-1/urls";
+				$this->CategoriesDefinitions["W-1"][]="\texpressionlist personal-categories/W-1/expressions";
+				if(!is_file("$main_path/urls")){@file_put_contents("$main_path/urls","www.nowebsite.com/fr");}
+				if(!is_file("$main_path/expressions")){@file_put_contents("$main_path/expressions","\n");}
+			
+			
 		}
 		
 		
 		if(is_file("{$GLOBALS["guarddb"]}/personal-categories/filesblock-{$this->rules[$RuleID]}/expressions")){
 			$this->DefaultRules["rule"][]="!F-1";
 			$this->CategoriesDefinitions["F-1"][]="\texpressionlist personal-categories/filesblock-{$this->rules[$RuleID]}/expressions";
+			$this->CategoriesDefinitions["F-1"][]="\turllist personal-categories/filesblock-{$this->rules[$RuleID]}/urls";
+			$this->CategoriesDefinitions["F-1"][]="\tdomainlist personal-categories/filesblock-{$this->rules[$RuleID]}/domains";
+			if(!is_file("$main_path/urls")){@file_put_contents("$main_path/urls","www.nowebsite.com/fr");}
+			if(!is_file("$main_path/domains")){@file_put_contents("$main_path/domains","nowebsite.com");}
+			
 		}		
 		
 		
@@ -352,33 +348,52 @@ class squidguard{
 			
 			if(is_file("{$GLOBALS["guarddb"]}/{$ligne["pattern"]}/domains")){
 					$this->CategoriesDefinitions[$ligne["pattern"]][]="\tdomainlist {$ligne["pattern"]}/domains";
-					$this->DefaultRules["rule"][]="!{$ligne["pattern"]}";	
-				}
-				
-				if(is_file("{$GLOBALS["guarddb"]}/{$ligne["pattern"]}/urls")){
 					$this->CategoriesDefinitions[$ligne["pattern"]][]="\turllist {$ligne["pattern"]}/urls";
+					$this->CategoriesDefinitions[$ligne["pattern"]][]="\texpressionlist {$ligne["pattern"]}/expressions";					
+					$this->DefaultRules["rule"][]="!{$ligne["pattern"]}";	
+
+				if(!is_file("{$GLOBALS["guarddb"]}/{$ligne["pattern"]}/urls")){
+					file_put_contents("{$GLOBALS["guarddb"]}/{$ligne["pattern"]}/urls","www.nowebsite.com/fr");
 				}
 				
-				if(is_file("{$GLOBALS["guarddb"]}/{$ligne["pattern"]}/expressions")){
-					$this->CategoriesDefinitions[$ligne["pattern"]][]="\texpressionlist {$ligne["pattern"]}/expressions";
+				if(!is_file("{$GLOBALS["guarddb"]}/{$ligne["pattern"]}/expressions")){
+					file_put_contents("{$GLOBALS["guarddb"]}/{$ligne["pattern"]}/expressions","\n");
 				}
 				
-				if(is_file("{$GLOBALS["guarddb"]}/web-filter-plus/BL/{$ligne["pattern"]}/expressions")){
-					$this->CategoriesDefinitions[$addplus][]="\texpressionlist web-filter-plus/BL/{$ligne["pattern"]}/expressions";
-				}	
-
-				if(is_file("{$GLOBALS["guarddb"]}/web-filter-plus/BL/{$ligne["pattern"]}/urls")){
-					$this->CategoriesDefinitions[$addplus][]="\turllist web-filter-plus/BL/{$ligne["pattern"]}/urls";
-				}
-
-				if(is_file("{$GLOBALS["guarddb"]}/web-filter-plus/BL/{$ligne["pattern"]}/domains")){
+					
+				
+			}
+			
+		if(is_file("{$GLOBALS["guarddb"]}/web-filter-plus/BL/{$ligne["pattern"]}/domains")){
 					$this->CategoriesDefinitions[$addplus][]="\tdomainlist web-filter-plus/BL/{$ligne["pattern"]}/domains";
+					$this->CategoriesDefinitions[$addplus][]="\turllist web-filter-plus/BL/{$ligne["pattern"]}/urls";
+					$this->CategoriesDefinitions[$addplus][]="\texpressionlist web-filter-plus/BL/{$ligne["pattern"]}/expressions";
 					$this->DefaultRules["rule"][]="!$addplus";
-				}				
+					
+					if(!is_file("{$GLOBALS["guarddb"]}/web-filter-plus/BL/{$ligne["pattern"]}/urls")){
+						file_put_contents("{$GLOBALS["guarddb"]}/web-filter-plus/BL/{$ligne["pattern"]}/urls","www.nowebsite.com/fr");
+					}
+					
+					if(!is_file("{$GLOBALS["guarddb"]}/web-filter-plus/BL/{$ligne["pattern"]}/expressions")){
+						file_put_contents("{$GLOBALS["guarddb"]}/web-filter-plus/BL/{$ligne["pattern"]}/expressions","\n");
+					}					
+					
+					
+				}					
 
-				if(is_file("{$GLOBALS["guarddb"]}/blacklist-artica/{$ligne["pattern"]}/domains")){
+
+			
+				$main_path="{$GLOBALS["guarddb"]}/blacklist-artica/{$ligne["pattern"]}";
+				if(is_file("$main_path/domains")){
 					$this->CategoriesDefinitions[$addplus_com][]="\tdomainlist blacklist-artica/{$ligne["pattern"]}/domains";
+					$this->CategoriesDefinitions[$addplus_com][]="\turllist blacklist-artica/{$ligne["pattern"]}/urls";
+					$this->CategoriesDefinitions[$addplus_com][]="\texpressionlist blacklist-artica/{$ligne["pattern"]}/expressions";
 					$this->DefaultRules["rule"][]="!$addplus_com";
+					
+					if(!is_file("$main_path/urls")){@file_put_contents("$main_path/urls","www.nowebsite.com/fr");}
+					if(!is_file("$main_path/expressions")){@file_put_contents("$main_path/expressions","\n");}						
+					
+					
 				}					
 
 		}
@@ -393,10 +408,18 @@ class squidguard{
 				$this->dump_personals($category);	
 				if($GLOBALS["VERBOSE"]){echo "Default rule personal cat -> \"$category\" (default)\n";}			
 				
-				if(is_file("{$GLOBALS["guarddb"]}/personal-categories/$categoryPrint/domains")){
+				$main_path="{$GLOBALS["guarddb"]}/personal-categories/$categoryPrint";
+				@mkdir($main_path,0666,true);
+				if(is_file("$main_path/domains")){
 					echo "Starting......: squidGuard Personal category $category ($categoryPrint) for Default rule\n";
 					$this->CategoriesDefinitions["P-$categoryPrint"][]="\tdomainlist personal-categories/$categoryPrint/domains";
+					$this->CategoriesDefinitions["P-$categoryPrint"][]="\turllist personal-categories/$categoryPrint/urls";
+					$this->CategoriesDefinitions["P-$categoryPrint"][]="\texpressionlist personal-categories/$categoryPrint/expressions";
 					$this->DefaultRules["rule"][]="!P-$categoryPrint";
+					
+					if(!is_file("$main_path/urls")){@file_put_contents("$main_path/urls","www.nowebsite.com/fr");}
+					if(!is_file("$main_path/expressions")){@file_put_contents("$main_path/expressions","\n");}						
+					
 				}
 				
 				
@@ -413,15 +436,27 @@ class squidguard{
 	
 	private function SearchCategories($RuleID){
 		
-		if(is_file("{$GLOBALS["guarddb"]}/personal-categories/W-$RuleID/domains")){
+		$main_path="{$GLOBALS["guarddb"]}/personal-categories/W-$RuleID";
+		@mkdir($main_path,0666,true);
+		if(is_file("$main_path/domains")){
 			$this->DestOfRules[$RuleID]["W-$RuleID"]="W-$RuleID";
 			$this->CategoriesDefinitions["W-$RuleID"][]="\tdomainlist personal-categories/W-$RuleID/domains";
+			$this->CategoriesDefinitions["W-$RuleID"][]="\turllist personal-categories/W-$RuleID/urls";
+			$this->CategoriesDefinitions["W-$RuleID"][]="\texpressionlist personal-categories/W-$RuleID/expressions";
+			
+			if(!is_file("$main_path/urls")){@file_put_contents("$main_path/urls","www.nowebsite.com/fr");}
+			if(!is_file("$main_path/expressions")){@file_put_contents("$main_path/expressions","\n");}					
 		}
 		
-		
-		if(is_file("{$GLOBALS["guarddb"]}/personal-categories/filesblock-{$this->rules[$RuleID]}/expressions")){
+		$main_path="{$GLOBALS["guarddb"]}/personal-categories/filesblock-{$this->rules[$RuleID]}";
+		@mkdir($main_path,0666,true);
+		if(is_file("$main_path/expressions")){
 			$this->DestOfRules[$RuleID]["F-$RuleID"]="!F-$RuleID";
 			$this->CategoriesDefinitions["F-$RuleID"][]="\texpressionlist personal-categories/filesblock-{$this->rules[$RuleID]}/expressions";
+			$this->CategoriesDefinitions["F-$RuleID"][]="\turllist personal-categories/filesblock-{$this->rules[$RuleID]}/urls";
+			$this->CategoriesDefinitions["F-$RuleID"][]="\tdomainlist personal-categories/filesblock-{$this->rules[$RuleID]}/domains";
+			if(!is_file("$main_path/urls")){@file_put_contents("$main_path/urls","www.nowebsite.com/fr");}
+			if(!is_file("$main_path/domains")){@file_put_contents("$main_path/domains","\n");}				
 		}		
 		
 		
@@ -433,43 +468,48 @@ class squidguard{
 		
 		
 			while($ligne=@mysql_fetch_array($results,MYSQL_ASSOC)){
-				if($GLOBALS["VERBOSE"]){echo "RuleID $RuleID category:\"{$ligne["pattern"]}\" ({$this->rules[$RuleID]})\n";}
+				
 				$addplus="plus-{$ligne["pattern"]}";
 				$addplus=str_replace("/","-",$addplus);
 				$addplus_com=$addplus."-artica";
 
-				if(is_file("{$GLOBALS["guarddb"]}/{$ligne["pattern"]}/domains")){
+				
+				$main_path="{$GLOBALS["guarddb"]}/{$ligne["pattern"]}";
+				@mkdir($main_path,0666,true);
+				if(is_file("$main_path/domains")){
 					$this->CategoriesDefinitions[$ligne["pattern"]][]="\tdomainlist {$ligne["pattern"]}/domains";
-					$this->DestOfRules[$RuleID][$ligne["pattern"]]="!{$ligne["pattern"]}";	
-				}
-				
-				if(is_file("{$GLOBALS["guarddb"]}/{$ligne["pattern"]}/urls")){
 					$this->CategoriesDefinitions[$ligne["pattern"]][]="\turllist {$ligne["pattern"]}/urls";
-				}
-				
-				if(is_file("{$GLOBALS["guarddb"]}/{$ligne["pattern"]}/expressions")){
 					$this->CategoriesDefinitions[$ligne["pattern"]][]="\texpressionlist {$ligne["pattern"]}/expressions";
-				}	
-
-				if(is_file("{$GLOBALS["guarddb"]}/web-filter-plus/BL/{$ligne["pattern"]}/expressions")){
-					$this->CategoriesDefinitions[$addplus][]="\texpressionlist web-filter-plus/BL/{$ligne["pattern"]}/expressions";
-				}	
-
-				if(is_file("{$GLOBALS["guarddb"]}/web-filter-plus/BL/{$ligne["pattern"]}/urls")){
-					$this->CategoriesDefinitions[$addplus][]="\turllist web-filter-plus/BL/{$ligne["pattern"]}/urls";
-				}
-
-				if(is_file("{$GLOBALS["guarddb"]}/web-filter-plus/BL/{$ligne["pattern"]}/domains")){
-					if($GLOBALS["VERBOSE"]){echo "Adding professional category [$addplus] => {$ligne["pattern"]}\n";}
-					$this->CategoriesDefinitions[$addplus][]="\tdomainlist web-filter-plus/BL/{$ligne["pattern"]}/domains";
-					$this->DestOfRules["rule"][]="!$addplus";
+					$this->DestOfRules[$RuleID][$ligne["pattern"]]="!{$ligne["pattern"]}";	
+					if(!is_file("$main_path/urls")){@file_put_contents("$main_path/urls","www.nowebsite.com/fr");}
+					if(!is_file("$main_path/expressions")){@file_put_contents("$main_path/expressions","\n");}					
 				}
 				
-				if(is_file("{$GLOBALS["guarddb"]}/blacklist-artica/{$ligne["pattern"]}/domains")){
+				$main_path="{$GLOBALS["guarddb"]}/web-filter-plus/BL/{$ligne["pattern"]}";
+				@mkdir($main_path,0666,true);
+				if(is_file("$main_path/domains")){
+					$this->CategoriesDefinitions[$addplus][]="\tdomainlist web-filter-plus/BL/{$ligne["pattern"]}/domains";
+					$this->CategoriesDefinitions[$addplus][]="\turllist web-filter-plus/BL/{$ligne["pattern"]}/urls";
+					$this->CategoriesDefinitions[$addplus][]="\texpressionlist web-filter-plus/BL/{$ligne["pattern"]}/expressions";
+					$this->DestOfRules[$RuleID][$addplus]="!$addplus";
+					if(!is_file("$main_path/urls")){@file_put_contents("$main_path/urls","www.nowebsite.com/fr");}
+					if(!is_file("$main_path/expressions")){@file_put_contents("$main_path/expressions","\n");}	
+					if($GLOBALS["VERBOSE"]){echo "Adding professional category [$addplus] => {$ligne["pattern"]}\n";}
+					}
+				
+					
+				$main_path="{$GLOBALS["guarddb"]}/blacklist-artica/{$ligne["pattern"]}";	
+				@mkdir($main_path,0666,true);
+				if(is_file("$main_path/domains")){
 					$this->CategoriesDefinitions[$addplus_com][]="\tdomainlist blacklist-artica/{$ligne["pattern"]}/domains";
-					$this->DefaultRules["rule"][]="!$addplus_com";
-				}					
-
+					$this->CategoriesDefinitions[$addplus_com][]="\turllist blacklist-artica/{$ligne["pattern"]}/urls";
+					$this->CategoriesDefinitions[$addplus_com][]="\texpressionlist blacklist-artica/{$ligne["pattern"]}/expressions";
+					
+					$this->DestOfRules[$RuleID][$addplus_com]="!$addplus_com";
+					if(!is_file("$main_path/urls")){@file_put_contents("$main_path/urls","www.nowebsite.com/fr");}
+					if(!is_file("$main_path/expressions")){@file_put_contents("$main_path/expressions","\n");}					
+					}					
+				
 					
 				
 			}
@@ -481,9 +521,15 @@ class squidguard{
 				$categoryPrint=$this->substrCategory($category);
 				$this->dump_personals($category);				
 				
-				if(is_file("{$GLOBALS["guarddb"]}/personal-categories/$categoryPrint/domains")){
+				$main_path="{$GLOBALS["guarddb"]}/personal-categories/$categoryPrint";	
+				@mkdir($main_path,0666,true);
+				if(is_file("$main_path/domains")){
 					echo "Starting......: squidGuard Personal category $category ($categoryPrint)\n";
 					$this->CategoriesDefinitions["P-$categoryPrint"][]="\tdomainlist personal-categories/$categoryPrint/domains";
+					$this->CategoriesDefinitions["P-$categoryPrint"][]="\turllist personal-categories/$categoryPrint/urls";
+					$this->CategoriesDefinitions["P-$categoryPrint"][]="\texpressionlist personal-categories/$categoryPrint/expressions";
+					if(!is_file("$main_path/urls")){@file_put_contents("$main_path/urls","www.nowebsite.com/fr");}
+					if(!is_file("$main_path/expressions")){@file_put_contents("$main_path/expressions","\n");}						
 					$this->DestOfRules[$RuleID]["P-$categoryPrint"]="!P-$categoryPrint";
 				}
 				

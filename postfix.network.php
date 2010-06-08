@@ -733,6 +733,7 @@ function POSTFIX_MULTI_INSTANCE(){
 	<p class=caption style='font-size:13px;margin-top:10px'>{POSTFIX_MULTI_INSTANCE_HOWTO}</p>	
 	<script>
 	var x_POSTFIX_MULTI_INSTANCE= function (obj) {
+			remove_cache();
 			RefreshTab('main_config_postfix_net');
 			if(document.getElementById('main_config_postfix')){RefreshTab('main_config_postfix');}
 			}	

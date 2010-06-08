@@ -10,7 +10,7 @@ include_once(dirname(__FILE__)."/ressources/class.mysql.inc");
 include_once(dirname(__FILE__).'/framework/class.unix.inc');
 include_once(dirname(__FILE__)."/framework/frame.class.inc");
 
-if(preg_match("#--verbose#",implode(" ",$argv))){$GLOBALS["VERBOSE"]=true;}
+if(preg_match("#--verbose#",implode(" ",$argv))){$GLOBALS["VERBOSE"]=true;$GLOBALS["cmdlineadd"]=" --verbose";}
 $_GET["LOGFILE"]="/var/log/artica-postfix/dansguardian.compile.log";
 if(preg_match("#--verbose#",implode(" ",$argv))){$GLOBALS["debug"]=true;}
 if(posix_getuid()<>0){die("Cannot be used in web server mode\n\n");}
@@ -39,6 +39,10 @@ LoadGlobal_exceptionsitelist();
 
 $dans=new dansguardian();
 $dans->SaveSettings();
+$cmd=LOCATE_PHP5_BIN2()." ".dirname(__FILE__)."/exec.web-community-filter.php --patterns{$GLOBALS["cmdlineadd"]}";
+events("MAIN:: $cmd");
+system($cmd);
+
 HtmlTemplate();
 BuildPersonalCategories();
 bannedsitelist_userdefined();
@@ -49,6 +53,7 @@ BuildBannedIPList();
 FixMissingGroupsFiles();
 FixMissingFiles();
 BuildMasterRule();
+
 echo "Starting......: Dansguardian reconfigure settings done\n";
 
 function HtmlTemplate(){
@@ -147,7 +152,7 @@ function BuildMasterRule(){
 	@file_put_contents("/etc/dansguardian/dansguardian.conf",$file);
 	CheckFilesDatabases($file,1);
 	CheckAuthMethods();
-	
+	DEFAULT_RULE_BANNEDSITE_LISTS();
 	}
 	
 	
@@ -385,6 +390,19 @@ function CheckFilesDatabases($content,$ruleid){
 }
 
 
+function DEFAULT_RULE_BANNEDSITE_LISTS(){
+	
+	$conf=bannedsitelist(1);
+	@file_put_contents("/etc/dansguardian/bannedsitelist",$conf);
+	DeleteConfigFile("/etc/dansguardian/dansguardian.conf","bannedsitelist");
+	if(strlen($conf)>0){
+		WriteConfigFile("/etc/dansguardian/dansguardian.conf","bannedsitelist","/etc/dansguardian/bannedsitelist");
+	}
+	
+}
+
+
+
 
 
 function LoadGlobal_exceptionsitelist(){
@@ -410,7 +428,6 @@ function getDatabaseContent($ruleid,$basename){
 	$count=0;
 	while($ligne=@mysql_fetch_array($results,MYSQL_ASSOC)){
 		$count=$count+1;
-		if($count>0){events(__FUNCTION__.":: $basename={$ligne["pattern"]}");}
 		$conf=$conf. "#{$ligne["infos"]}\n{$ligne["pattern"]}\n\n";
 		
 	}
@@ -441,19 +458,28 @@ function bannedsitelist($rulid){
 		$pattern=trim($ligne["pattern"]);
 		if(is_file("/etc/dansguardian/lists/blacklists/$pattern/domains")){
 			$count=$count+1;
-			$conf=$conf. "#{$ligne["infos"]}\n.Include</etc/dansguardian/lists/blacklists/$pattern/domains>\n\n";
+			if($ligne["infos"]<>null){$ligne["infos"]="#{$ligne["infos"]}\n";}
+			$conf=$conf. "{$ligne["infos"]}.Include</etc/dansguardian/lists/blacklists/$pattern/domains>\n";
+		}else{
+			events(__FUNCTION__."::$rulid;[$pattern] could not find /etc/dansguardian/lists/blacklists/$pattern/domains");
 		}
 		
 		
 		if(is_file("/etc/dansguardian/lists/web-filter-plus/BL/$pattern/domains")){
 			$count=$count+1;
-			$conf=$conf. "#{$ligne["infos"]}\n.Include</etc/dansguardian/lists/web-filter-plus/BL/$pattern/domains>\n\n";
+			if($ligne["infos"]<>null){$ligne["infos"]="#{$ligne["infos"]}\n";}
+			$conf=$conf. "{$ligne["infos"]}.Include</etc/dansguardian/lists/web-filter-plus/BL/$pattern/domains>\n";
+		}else{
+			events(__FUNCTION__."::$rulid;[$pattern] could not find /etc/dansguardian/lists/web-filter-plus/BL/$pattern/domains");
 		}
 		
 		if(is_file("/etc/dansguardian/lists/blacklist-artica/$pattern/domains")){
 			$count=$count+1;
-			$conf=$conf. "#{$ligne["infos"]}\n.Include</etc/dansguardian/lists/blacklist-artica/$pattern/domains>\n\n";
-		}		
+			if($ligne["infos"]<>null){$ligne["infos"]="#{$ligne["infos"]}\n";}
+			$conf=$conf. "{$ligne["infos"]}.Include</etc/dansguardian/lists/blacklist-artica/$pattern/domains>\n";
+		}else{
+		  events(__FUNCTION__."::$rulid;[$pattern] could not find /etc/dansguardian/lists/blacklist-artica/$pattern/domains");		
+		}
 		
 		
 		
@@ -466,7 +492,9 @@ function bannedsitelist($rulid){
 		$pattern=trim($ligne["category"]);
 		if(is_file("/etc/dansguardian/lists/personal-blacklists/$pattern/domains")){
 			$count=$count+1;
-			$conf=$conf. "#Personal Category $pattern\n.Include</etc/dansguardian/lists/personal-blacklists/$pattern/domains>\n\n";
+			$conf=$conf. "#Personal Category $pattern\n.Include</etc/dansguardian/lists/personal-blacklists/$pattern/domains>\n";
+		}else{
+			events(__FUNCTION__."::$rulid;[$pattern] could not find /etc/dansguardian/lists/personal-blacklists/$pattern/domains");
 		}
 		
 	}	
@@ -480,7 +508,7 @@ function bannedsitelist($rulid){
 function BuildPersonalCategories(){
 
 	@mkdir("/etc/dansguardian/lists/personal-blacklists",755,true);
-	$sql="SELECT * FROM `dansguardian_personal_categories`";
+	$sql="SELECT category,pattern FROM `dansguardian_personal_categories`";
 	$q=new mysql();
 	$results=$q->QUERY_SQL($sql,"artica_backup");
 	$count=0;
@@ -490,11 +518,15 @@ function BuildPersonalCategories(){
 		$array[$ligne["category"]][]=$ligne["pattern"];	
 	}
 	
-	if(!is_array($array)){return null;}
+	if(!is_array($array)){
+		events(__FUNCTION__."::Building personal category no category found"); 
+		return null;
+	}
 	
 	
 	while (list ($num, $array2) = each ($array) ){
 		$datas=implode("\n",$array2);
+		events(__FUNCTION__."::Building personal category personal-blacklists/$num"); 
 		@mkdir("/etc/dansguardian/lists/personal-blacklists/$num",755,true);
 		@file_put_contents("/etc/dansguardian/lists/personal-blacklists/$num/domains",$datas);
 	}

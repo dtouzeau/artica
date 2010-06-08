@@ -1795,16 +1795,17 @@ end;
       if sys.IsUserExists('bind') then sys.AddUserToGroup('cyrus','bind','','');
       sys.AddUserToGroup('cyrus','mail','','');
    end;
-   logs.OutputCmd('/bin/chown -R cyrus:mail '+config_directory);
-   logs.OutputCmd('/bin/chown -R cyrus:mail '+partition_default);
-   logs.OutputCmd('/bin/chmod -R 755 '+partition_default);
-   logs.OutputCmd('/bin/chown -R cyrus:mail '+ partition_default);
-   logs.OutputCmd('/bin/chown -R cyrus:mail /usr/sieve');
-   logs.OutputCmd('/bin/chown -R cyrus:mail /var/sieve');
+
+  logs.DebugLogs('Starting......: Scheduling permissions');
+  SYS.THREAD_COMMAND_SET(SYS.LOCATE_GENERIC_BIN('nohup')+ ' /bin/chown -R cyrus:mail '+config_directory+' >/dev/null');
+  SYS.THREAD_COMMAND_SET(SYS.LOCATE_GENERIC_BIN('nohup')+ ' /bin/chown -R cyrus:mail '+partition_default+' >/dev/null');
+  SYS.THREAD_COMMAND_SET(SYS.LOCATE_GENERIC_BIN('nohup')+ ' /bin/chmod -R 755 '+partition_default+' >/dev/null');
+  logs.OutputCmd('/bin/chown -R cyrus:mail /usr/sieve');
+  logs.OutputCmd('/bin/chown -R cyrus:mail /var/sieve');
 
 
-   if DirectoryExists('/var/lib/cyrus/proc') then SYS.FILE_CHOWN('cyrus','mail','/var/lib/cyrus/proc');
-   if DirectoryExists('/var/run/saslauthd') then logs.OutputCmd('/bin/chown postfix:mail /var/run/saslauthd');
+  if DirectoryExists('/var/lib/cyrus/proc') then SYS.FILE_CHOWN('cyrus','mail','/var/lib/cyrus/proc');
+  if DirectoryExists('/var/run/saslauthd') then logs.OutputCmd('/bin/chown postfix:mail /var/run/saslauthd');
 
    if EnableCyrusMasterCluster=1 then begin
       if Not FileExists(CYRUS_SYNC_SERVER_BIN_PATH()) then EnableCyrusMasterCluster:=0;
@@ -1813,7 +1814,6 @@ end;
    if EnableCyrusReplicaCluster=1 then begin
       if Not FileExists(CYRUS_SYNC_SERVER_BIN_PATH()) then EnableCyrusReplicaCluster:=0;
    end;
-
    logs.Debuglogs('Configure -> ETC_DEFAULT_SASLAUTHD()');
    ETC_DEFAULT_SASLAUTHD();
    logs.Debuglogs('Configure -> CYRUS_ETC_DEFAULT_CYRUS22()');
@@ -2091,7 +2091,7 @@ begin
 
     ForceDirectories(POSTFIX_QUEUE_DIRECTORY()+'/var/run/cyrus/socket');
 
-    logs.OutputCmd('/bin/chown -R cyrus:mail /var/lib/cyrus &');
+    fpsystem(SYS.LOCATE_GENERIC_BIN('nohup')+ ' /bin/chown -R cyrus:mail /var/lib/cyrus >/dev/null 2>&1 &');
     end;
     ForceDirectories('/var/run/cyrus/socket');
     logs.OutputCmd('/bin/chmod -R 0755 /var/run/cyrus');
@@ -2708,12 +2708,9 @@ begin
 
 
        fpsystem('/bin/chmod 750 /var/run/cyrus');
-       fpsystem('chmod -R 755 /var/lib/cyrus');
-       fpsystem('chmod -R 755 /var/spool/cyrus');
-
-       fpsystem('/bin/chown -R cyrus:mail /var/lib/cyrus >/dev/null 2>&1');
-       fpsystem('/bin/chown -R cyrus:mail /var/spool/cyrus >/dev/null 2>&1');
-       fpsystem('/bin/chown -R cyrus:mail /var/run/cyrus >/dev/null 2>&1');
+       SYS.THREAD_COMMAND_SET('chmod -R 755 /var/lib/cyrus');
+       SYS.THREAD_COMMAND_SET('/bin/chown -R cyrus:mail /var/lib/cyrus >/dev/null 2>&1');
+       SYS.THREAD_COMMAND_SET('/bin/chown -R cyrus:mail /var/run/cyrus >/dev/null 2>&1');
 
 
         ctl_cyrusdb:=ctl_cyrusdb_path();

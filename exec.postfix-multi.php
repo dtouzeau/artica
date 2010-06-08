@@ -39,7 +39,7 @@ reconfigure();
 
 
 function reconfigure(){
-	shell_exec(LOCATE_PHP5_BIN2()." ".dirname(__FILE__)."/exec.virtuals-ip.php");
+	
 	
 	echo "Starting......: Enable Postfix multi-instances\n";
 	shell_exec("{$GLOBALS["postmulti"]} -e init >/dev/null 2>&1");
@@ -160,8 +160,9 @@ function ConfigureMainCF($ou){
 	$instance=str_replace(" ","-",$ou);
 	$users=new usersMenus();
 	$unix=new unix();
-	
+	echo "Starting......: Postfix checkign organization $ou\n";
 	$main=new main_multi($ou);
+	
 	
 	if($users->cyrus_imapd_installed){
 		echo "Starting......: Postfix change $ou cyrus is installed\n";

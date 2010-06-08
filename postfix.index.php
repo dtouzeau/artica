@@ -172,12 +172,16 @@ if(GET_CACHED(__FILE__,__FUNCTION__,null)){return;}
 	$oneone=Buildicon64('DEF_ICO_SEND_TO_ONEONE');
 	$wanadoo=Buildicon64('DEF_ICO_SEND_TO_WANADOO');
 	$free=Buildicon64('DEF_ICO_SEND_TO_FREE');
+	$laposte=Buildicon64('DEF_ICO_SEND_TO_LAPOSTE');
+
+	
 	
 	$tr[]=$orange;
 	$tr[]=$oleane;
 	$tr[]=$wanadoo;
 	$tr[]=$oneone;
 	$tr[]=$free;
+	$tr[]=$laposte;
 
 
 	
@@ -202,7 +206,7 @@ if($t<3){
 	$tpl=new templates();
 	$html=$tpl->_ENGINE_parse_body($html);
 	SET_CACHED(__FILE__,__FUNCTION__,null,$html);		
-	
+	echo $html;
 }
 
 
@@ -1671,16 +1675,12 @@ $failedtext="{ERROR_NO_PRIVILEGES_OR_PLUGIN_DISABLED}";
 		if($users->AsMailBoxAdministrator){
 			$zarafaweb=Paragraphe('zarafa-web-64.png','{APP_ZARAFA_WEB}','{APP_ZARAFA_WEB_TEXT}',"javascript:Loadjs('zarafa.web.php')",null,210,100,0,true);
 			$cyrus=null;
-			$multimdomains=null;
 			$murder=null;
 			$cyrus_cluster=null;
 			$cyrus_backup=null;
 		}
 	}
 	
-
-	
-
 	
 		$tr[]=$zarafaweb;
 		$tr[]=$cyrus;
@@ -2153,7 +2153,7 @@ function orangefr_popup(){
 	</table>
 	<script>		
 	var x_FFMISPRELAY_SAVE=function(obj){
-    	var tempvalue=obj.responseText;
+    	var tempvalue=trim(obj.responseText);
 	  	if(tempvalue.length>0){alert(tempvalue);}
 		document.getElementById('anim').innerHTML='';
 		}

@@ -220,6 +220,7 @@ function PostfixFullProcess($file){
 	$file=basename($file);
 	$postfix_id=str_replace(".msg","",$file);
 	
+	if(preg_match("#delivery temporarily suspended.+?Local configuration error#",$bounce_error)){$bounce_error="Remote Server error";$delivery_success="no";}
 	
 	if($mailto==null){if($delivery_user<>null){$mailto=$delivery_user;}}
 	if($time_connect==null){if($time_end<>null){$time_connect=$time_end;}}
@@ -236,6 +237,7 @@ function PostfixFullProcess($file){
 	$bounce_error_array["RBL"]=true;
 	$bounce_error_array["Helo command rejected"]=true;
 	$bounce_error_array["Domain not found"]=true;
+	
 	
 	
 	if($bounce_error_array[$bounce_error]){$search_postfix_id=false;}else{
@@ -264,6 +266,9 @@ function PostfixFullProcess($file){
 		}else{echo events("FAILED MYSQL $org_file");events($sql);return false;}
 		
 	}else{
+		
+		$mailfrom=str_replace(">, orig_to=","",$mailfrom);
+		
 		if($mailfrom<>null){$mailfrom=" ,sender_user='$mailfrom'";}
 		if($delivery_success<>null){$delivery_success=" ,delivery_success='$delivery_success'";}
 		if($domain_from<>null){$domain_from=" ,sender_domain='$domain_from'";}

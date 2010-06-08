@@ -3819,3 +3819,12 @@ You will receive a quote from Artica Technology.</shallalist_buye>
 <uri_test>URL to test</uri_test>
 <usernanmeorip>Username or IP address</usernanmeorip>
 <user_not_found>User not found</user_not_found>
+<hits>hits</hits>
+<systemForkProcessesNumber>Max processes</systemForkProcessesNumber>
+<systemForkProcessesNumber_explain>Depend on the processors number,Artica execute X bin/php processes at the same time, more executed processes will display a relatime information, less executed processes safe the server performance but did not display informations in realtime.</systemForkProcessesNumber_explain>
+<sender_dependent_relayhost_maps_title2>Relay senders table</sender_dependent_relayhost_maps_title2>
+<routing_relay_recipient2>relay recipients table</routing_relay_recipient2>
+<relayhost_laposte>LaPoste.net ISP</relayhost_laposte>
+<relayhost_laposte_text>Send all your internet eMail trought your Laposte.net ISP</relayhost_laposte_text>
+
+ 

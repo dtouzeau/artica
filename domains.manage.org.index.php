@@ -45,6 +45,9 @@ js();
 
 
 function js(){
+	if(isset($_GET["encoded"])){$_GET["ou"]=base64_decode($_GET["ou"]);}
+	
+	
 	$ou_encoded=base64_encode($_GET["ou"]);
 	if(GET_CACHED(__FILE__,__FUNCTION__,"js:$ou_encoded")){return null;}
 	$tpl=new templates();
@@ -81,15 +84,16 @@ function js(){
 	}
 	
 function organization_users_find_member_js(){
+	if(isset($_GET["encoded"])){$_GET["ou"]=base64_decode($_GET["ou"]);}
 	$ou=$_GET["ou"];
 	$tpl=new templates();
 	$title=$tpl->_ENGINE_parse_body("{organization}:: {$_GET["ou"]}");
 	$page=CurrentPageName();
-	
+	$ou_encoded=base64_encode($ou);
 	$html="
 	
 	function organization_users_find_member_js_start(){
-		YahooSearchUser(770,'$page?finduser=&ou=$ou');
+		YahooSearchUser(770,'$page?finduser=&ou=$ou_encoded','$title');
 	}
 	organization_users_find_member_js_start();
 	";
@@ -1211,7 +1215,7 @@ function organization_users_list(){
 
 function organization_users_find_member(){
 	$tofind=$_GET["finduser"];
-	if($_SESSION["uid"]==-100){$ou=$_GET["ou"];}else{$ou=$_SESSION["ou"];}
+	if($_SESSION["uid"]==-100){$ou=base64_decode($_GET["ou"]);}else{$ou=$_SESSION["ou"];}
 	$ldap=new clladp();
 	if($tofind==null){$tofind='*';}else{$tofind="*$tofind*";}
 	$filter="(&(objectClass=userAccount)(|(cn=$tofind)(mail=$tofind)(displayName=$tofind)(uid=$tofind) (givenname=$tofind)))";

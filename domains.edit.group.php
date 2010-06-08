@@ -92,6 +92,7 @@ function GroupPrivilegesjs(){
 
 
 function js(){
+if(isset($_GET["encoded"])){$_GET["ou"]=base64_decode($_GET["ou"]);}
 $ou=$_GET["ou"];	
 $ou_encrypted=base64_encode($ou);
 $cfg[]="js/edit.group.js";
@@ -107,7 +108,7 @@ $page=CurrentPageName();
 $prefix=str_replace('.','_',$page);
 
 if(isset($_GET["group-id"])){
-	$loadgp="LoadAjax('GroupSettings','domains.edit.group.php?LoadGroupSettings={$_GET["group-id"]}&ou=$ou')";
+	$loadgp="LoadAjax('GroupSettings','domains.edit.group.php?LoadGroupSettings={$_GET["group-id"]}&ou=$ou_encrypted&encoded=yes')";
 }
 
 while (list ($num, $ligne) = each ($cfg) ){
@@ -133,7 +134,7 @@ function DisplayDivs(){
 		if(!document.getElementById('grouplist')){
 			setTimeout('DisplayDivs()',900);
 		}
-		LoadAjax('grouplist','$page?LoadGroupList=$ou');
+		LoadAjax('grouplist','$page?LoadGroupList=$ou_encrypted&encoded=yes');
 		LoadGroupSettings();
 		{$prefix}timeout=0;
 		$loadgp
@@ -190,9 +191,10 @@ function INDEX(){
 	if($ou==null){$ou=ORGANISTATION_FROM_USER();}
 	$page=CurrentPageName();
 	$title=$ou . ":&nbsp;{groups}";
+	$ou_encoded=base64_encode($ou);
 	$html=RoundedLightGrey("
 	<input type='hidden' id='inputbox delete' value=\"{are_you_sure_to_delete}\">
-	<input type='hidden' id='ou' value='$ou'>
+	<input type='hidden' id='ou' value='$ou_encoded'>
 	<input type='hidden' id='warning_delete_all_users' value='{warning_delete_all_users}'>
 	<table style='width:300px'>
 	<tr>
@@ -327,7 +329,12 @@ function GROUP_SIEVE_UPDATE(){
 	
 	
 function GROUPS_LIST($OU){
+	writelogs("startup ou=$OU",__FUNCTION__,__FILE__);
 	$ou=$OU;
+	$ou_conn=base64_decode($ou);
+	if($ou_conn<>null){$ou=$ou_conn;$_GET["ou"]=$ou_conn;}
+	
+	
 	writelogs("ou=$ou,{$_SESSION["uid"]}",__FUNCTION__,__FILE__);
 	
 	
@@ -339,7 +346,12 @@ function GROUPS_LIST($OU){
 	if($users->AsArticaAdministrator){
 		writelogs("AsArticaAdministrator privileges",__FUNCTION__,__FILE__);
 		$org=$ldap->hash_get_ou(true);
-		$orgs=Field_array_Hash($org,'SelectOuList',$ou,"LoadGroupList()",null,0,'width:250px');
+		
+		while (list ($ou1, $ou2) = each ($org)){
+			$orgs_encoded[base64_encode($ou1)]=$ou2;
+		}
+		
+		$orgs=Field_array_Hash($orgs_encoded,'SelectOuList',base64_encode($ou),"LoadGroupList()",null,0,'width:250px');
 		$hash=$ldap->hash_groups($ou,1);
 	}else{
 		$ou=ORGANISTATION_FROM_USER();
@@ -359,7 +371,7 @@ function GROUPS_LIST($OU){
 		
 	
 	
-	writelogs("Load " . count($hash) . " groups from ou $OU",__FUNCTION__,__FILE__);
+	writelogs("Load " . count($hash) . " groups from ou $ou",__FUNCTION__,__FILE__);
 	$hash[null]="{select}";
 	$field=Field_array_Hash($hash,'SelectGroupList',null,"LoadGroupSettings()",null,0,'width:250px');
 	$html="
@@ -435,6 +447,10 @@ function GROUP_SETTINGS_PAGE(){
 	$ldap=new clladp();
 	$page=CurrentPageName();
 	$num=$_GET["LoadGroupSettings"];
+	$ou_conn=$_GET["ou"];
+	$ou_conn=base64_decode($_GET["ou"]);
+	if($ou_conn<>null){$_GET["ou"]=$ou_conn;}
+	
 	if(!is_numeric($num)){return null;}
 	if(trim($num)==null){$num=0;}
 	if($num==0){
@@ -460,9 +476,6 @@ function GROUP_SETTINGS_PAGE(){
 	
 	$group=new groups($num);
 	$SAMBA_GROUP=Paragraphe('64-group-samba-grey.png','{MK_SAMBA_GROUP}',$text_disbaled,'');
-	
-	
-	
 	$mailing_list=Paragraphe('64-mailinglist-grey.png',"{mailing_list}","$text_disbaled");
 	
 
@@ -527,12 +540,13 @@ function GROUP_SETTINGS_PAGE(){
 	$RENAME_GROUP=Paragraphe('group_rename-64.png','{GROUP_RENAME}','{GROUP_RENAME_TEXT}',"javascript:Loadjs('domains.edit.group.rename.php?group-id=$num&ou={$_GET["ou"]}')");
 	$OPTIONS_DEFAULT_PASSWORD=Paragraphe('64-key.png','{group_default_password}','{group_default_password_text}',"javascript:YahooWin('400','$page?default_password=yes&gpid=$num')");
 	
+	$ou_encoded=base64_encode($_GET["ou"]);
 	
 	$html_tab1="
 	<table style='width:100%'>
 	<tr>
 	<td valign='top'>".Paragraphe('members-priv-64.png','{privileges}','{privileges_text}',"javascript:GroupPrivileges($num)") ."</td>
-	<td valign='top'>".Paragraphe('member-64.png',"($members) {members}","{members_text}","javascript:LoadMembers($num)") ."</td>
+	<td valign='top'>".Paragraphe('member-64.png',"($members) {members}","{members_text}","javascript:YahooWin(650,'$page?MembersList=$num&ou=$ou_encoded','{members}::{$_GET["ou"]}');") ."</td>
 	<td valign='top'>$COMPUTERS</td>
 	</tr>
 	<tr>

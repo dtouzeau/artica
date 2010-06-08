@@ -557,6 +557,7 @@ function main_config_artica(){
 $sock=new sockets();
 $users=new usersMenus();
 $MaxtimeBackupMailSizeCalculate=trim($sock->GET_INFO("MaxtimeBackupMailSizeCalculate"));
+$systemForkProcessesNumber=trim($sock->GET_INFO("systemForkProcessesNumber"));
 $cpulimit=trim($sock->GET_INFO("cpulimit"));
 $cpuLimitEnabled=trim($sock->GET_INFO("cpuLimitEnabled"));
 
@@ -648,6 +649,11 @@ $html="
 			<td nowrap>". Field_text("systemMaxOverloaded",$systemMaxOverloaded,"width:40px")."&nbsp;{load}</td>
 			<td>" . help_icon("{systemMaxOverloaded_explain}")."</td>
 		</tr>
+		<tr>
+			<td nowrap width=1% align='right' class=legend>{systemForkProcessesNumber}:</td>
+			<td nowrap>". Field_text("systemForkProcessesNumber",$systemForkProcessesNumber,"width:40px")."&nbsp;{processes}</td>
+			<td>" . help_icon("{systemForkProcessesNumber_explain}")."</td>
+		</tr>		
 		
 		<tr>
 			<td nowrap width=1% align='right' class=legend>{mysql_server_consumption}:</td>
@@ -941,13 +947,12 @@ function main_status(){
 
 
 function save_process(){
-
-	
 $sock=new sockets();	
 $ini=new Bs_IniHandler();
 $ini->loadString($sock->GET_INFO("ArticaPerformancesSettings"));
 if(isset($_GET["cpuLimitEnabled"])){$sock->SET_INFO('cpuLimitEnabled',$_GET["cpuLimitEnabled"]);}
 if(isset($_GET["systemMaxOverloaded"])){$sock->SET_INFO('systemMaxOverloaded',$_GET["systemMaxOverloaded"]);}
+if(isset($_GET["systemForkProcessesNumber"])){$sock->SET_INFO('systemForkProcessesNumber',$_GET["systemForkProcessesNumber"]);}
 
 
 
@@ -960,6 +965,7 @@ if(isset($_GET["systemMaxOverloaded"])){$sock->SET_INFO('systemMaxOverloaded',$_
 	
 $sock->SaveConfigFile($ini->toString(),"ArticaPerformancesSettings");
 $sock->getFrameWork('cmd.php?replicate-performances-config=yes');
+$sock->getFrameWork('cmd.php?RestartDaemon=yes');
 
 
 if(isset($_GET["MysqlNice"])){

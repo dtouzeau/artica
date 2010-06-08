@@ -2064,9 +2064,9 @@ $conf=$conf."# =================================================================
 			
 			$sock=new sockets();
 			$sock->SET_INFO("MasterCFEnabled",1);
-			if($NoRestartDaemon==0){$datas=$sock->getfile('SaveMaincf');}
+			if($NoRestartDaemon==0){$datas=$sock->getFrameWork('cmd.php?SaveMaincf=yes');}
 	  		$tpl=new templates();
-	  		if(posix_getuid()<>0){echo $tpl->_ENGINE_parse_body("{success}:POSTFIX Master.cf\n");}
+	  		
 	  		return true;
 		
 		

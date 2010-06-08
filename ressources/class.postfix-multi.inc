@@ -7,6 +7,9 @@ include_once(dirname(__FILE__) . '/class.system.network.inc');
 
 class multi_config{
 	var $ou=null;
+	
+	
+	
 	var $q;
 	function multi_config($ou){
 		$this->ou=$ou;
@@ -45,6 +48,14 @@ class main_multi{
 	var $MAIN_ARRAY=array();
 	var $DN;
 	var $inet_interfaces=array();
+	var $bcc_maps=array();
+	var $senderbccmaps=array();
+	var $mydestination_hash=array();
+	var $virtual_alias_maps=array();
+	var $alias_maps_hash=array();
+	var $virtual_mailbox_hash=array();
+	var $transport_maps_hash_AT=array();
+	var $transport_maps_hash=array();
 	
 	function main_multi($ou,$nostart=0){
 		$this->ou=$ou;
@@ -53,9 +64,11 @@ class main_multi{
 		
 		$this->instance=str_replace(" ","-",$ou);
 		if($nostart==0){
+			
 			$this->LoadDatas();
+			
 			$this->inet_interfaces_load();
-			$this->mydestination();
+			$this->mydestination_maps();
 			$this->transport_maps();
 			$this->Aliases();
 			$this->ArticaDefault();
@@ -64,6 +77,12 @@ class main_multi{
 			$this->smtpd_client_restrictions_set();
 			$this->postfix_allowed_connections();
 			$this->SaveConf();
+			$this->recipient_bcc_maps();
+			$this->sender_bcc_maps();
+			$this->aliases_users();
+			
+			
+			
 			}
 		}
 		
@@ -78,9 +97,147 @@ class main_multi{
 	private function SaveConf(){
 		while (list ($key, $line) = each ($this->MAIN_ARRAY) ){$conf=$conf."$key = $line\n";}
 		@file_put_contents("/etc/postfix-$this->instance/main.cf",$conf);
+		$this->BuildMaps();
 		$array=$this->BuildMasterCF();
 		@file_put_contents("/etc/postfix-$this->instance/master.cf",implode("\n",$array));
+		
+		
 	}
+	
+	
+	private function CleanMainCf(){
+		
+		$f=explode("\n",@file_put_contents("/etc/postfix-$this->instance/main.cf"));
+		while (list ($num, $ligne) = each ($f) ){
+			if(preg_match("#^mydestinationTable#",$ligne)){unset($f[$num]);}
+			if(preg_match("#^TransportMapsTable#",$ligne)){unset($f[$num]);}
+		}
+		
+		echo "Starting......: Cleaning /etc/postfix-$this->instance/main.cf ". count($f)." lines\n";
+		@file_put_contents("/etc/postfix-$this->instance/main.cf",@implode("\n",$f));
+		
+	}
+	
+	
+	private function BuildMaps(){
+		
+		$postconf_macro="{$GLOBALS["postmulti"]} -i postfix-$this->instance -x postconf -e";
+		$instance_path="/etc/postfix-$this->instance";
+		
+		echo "Starting......: $this->ou:: Macro..........: $postconf_macro\n";
+		echo "Starting......: $this->ou:: Path...........: $instance_path\n";  
+		echo "Starting......: $this->ou:: queue directory: /var/spool/postfix/$this->instance\n"; 
+		
+		shell_exec("$postconf_macro \"relay_recipient_maps =\" >/dev/null 2>&1");
+		
+		
+			if(!is_array($this->senderbccmaps)){
+				shell_exec("$postconf_macro -e sender_bcc_maps=\"\"");
+			}else{
+				shell_exec("{$GLOBALS["postconf"]} -e \"sender_bcc_maps =hash:/etc/postfix/sender_bcc\" >/dev/null 2>&1");
+				echo "Starting......: $this->ou:: Compiling Sender(s) BCC\n"; 
+				@file_put_contents("$instance_path/sender_bcc",implode("\n",$this->senderbccmaps));
+				shell_exec("{$GLOBALS["postmap"]} hash:/etc/postfix-$this->instance/sender_bcc >/dev/null 2>&1");
+				shell_exec("$postconf_macro sender_bcc_maps=\"hash:/etc/postfix-$this->instance/sender_bcc\"");
+			}
+		
+		
+			if(!is_array($this->bcc_maps)){
+				shell_exec("$postconf_macro recipient_bcc_maps=\"\"");
+			}else{
+				shell_exec("$postconf_macro recipient_bcc_maps=\"/etc/postfix-$this->instance/recipient_bcc\"");
+				echo "Starting......: $this->ou:: Compiling Recipient(s) BCC\n";
+				@file_put_contents("$instance_path/recipient_bcc",implode("\n",$this->bcc_maps));
+				shell_exec("{$GLOBALS["postmap"]} hash:$instance_path/recipient_bcc >/dev/null 2>&1");
+			}
+
+			
+		if(!is_array($this->mydestination_hash)){
+			shell_exec("$postconf_macro \"mydestination = \" >/dev/null 2>&1");
+			shell_exec("$postconf_macro  \"virtual_mailbox_domains = \" >/dev/null 2>&1");
+		}else{
+			shell_exec("$postconf_macro \"mydestination =hash:$instance_path/mydestination\" >/dev/null 2>&1");
+			shell_exec("$postconf_macro \"virtual_mailbox_domains =\" >/dev/null 2>&1");
+			@file_put_contents("$instance_path/mydestination",implode("\n",$GLOBALS["mydestination"]));
+			shell_exec("{$GLOBALS["postmap"]} hash:$instance_path/mydestination >/dev/null 2>&1");		
+		}
+		
+		
+		if(!is_array($this->virtual_alias_maps)){
+			shell_exec("$postconf_macro \"virtual_alias_maps = \" >/dev/null 2>&1");
+			echo "Starting......: $this->ou:: No virtual aliases\n"; 
+			}else{	
+			echo "Starting......: $this->ou:: ". count($this->virtual_alias_maps)." virtual aliase(s)\n"; 		
+			shell_exec("$postconf_macro \"virtual_alias_maps =hash:$instance_path/virtual\" >/dev/null 2>&1");		
+			@file_put_contents("$instance_path/virtual",implode("\n",$this->virtual_alias_maps));
+			echo "Starting......: $this->ou:: compiling virtual aliase database $instance_path/virtual\n"; 
+			shell_exec("{$GLOBALS["postmap"]} hash:$instance_path/virtual >/dev/null 2>&1");		
+		}	
+
+		
+		if(!is_array($this->alias_maps_hash)){
+				shell_exec("$postconf_macro \"aliases_maps = \" >/dev/null 2>&1");
+				shell_exec("$postconf_macro -e \"virtual_mailbox_maps = \" >/dev/null 2>&1");
+				echo "Starting......: $this->ou:: No aliases\n"; 
+		}else{
+			if($GLOBALS["MAILMAN"]=true){
+				echo "Starting......: Building mailman aliase(s)\n";
+				if($this->mailman_aliases()){
+					$hash_mailman=",hash:{$GLOBALS["MAILMAN_ALIASES"]}";
+					$hash_mailman_virtual=",hash:/var/lib/mailman/data/virtual-mailman";
+				}
+			}
+			
+			echo "Starting......: $this->ou:: ". count($this->alias_maps_hash)." aliase(s)\n"; 
+			shell_exec("$postconf_macro \"alias_maps =hash:$instance_path/aliases$hash_mailman\" >/dev/null 2>&1");
+			shell_exec("$postconf_macro \"alias_database =hash:$instance_path/aliases\" >/dev/null 2>&1");
+			@file_put_contents("$instance_path/aliases",implode("\n",$this->alias_maps_hash));
+			shell_exec("{$GLOBALS["postmap"]} hash:$instance_path/aliases >/dev/null 2>&1");			
+		}
+		
+		
+		if(!is_array($this->transport_maps_hash)){
+			shell_exec("$postconf_macro \"transport_maps =\" >/dev/null 2>&1");
+		}else{
+			while (list ($num, $ligne) = each ($this->transport_maps_hash) ){if($ligne==null){continue;}$array[]="$num\t$ligne";}	
+			echo "Starting......: $this->ou:: ". count($array)." routings rules\n"; 
+			
+			if(is_array($this->transport_maps_hash_AT)){
+				while (list ($num, $ligne) = each ($this->transport_maps_hash_AT) ){if($ligne==null){continue;}$array[]="$num\t$ligne";}
+			}
+			@file_put_contents("$instance_path/transport",implode("\n",$array));
+			shell_exec("{$GLOBALS["postmap"]} hash:$instance_path/transport >/dev/null 2>&1");
+			shell_exec("$instance_path \"transport_maps = hash:$instance_path/transport\" >/dev/null 2>&1");		
+		}
+
+		
+		shell_exec("$postconf_macro \"queue_directory=/var/spool/postfix/$this->instance\" >/dev/null 2>&1");
+		$this->CleanMainCf();
+		
+}
+
+
+	private function mailman_aliases(){
+		if(!is_file("/var/lib/mailman/bin/genaliases")){
+			echo "Starting......: Unable to locate genaliases tool\n";
+			return false;
+		}
+		
+		shell_exec("/var/lib/mailman/bin/genaliases");
+		
+		if(is_file("/var/lib/mailman/data/aliases")){
+			$GLOBALS["MAILMAN_ALIASES"]="/var/lib/mailman/data/aliases";
+			
+		
+		if(is_file("/var/lib/mailman/data/virtual-mailman")){
+			$GLOBALS["MAILMAN_VIRTUAL"]="/var/lib/mailman/data/virtual-mailman";
+			return true;
+		}
+		}
+	}
+	
+	
+	
 	
 	private function inet_interfaces_load(){
 		$sql="SELECT nic,ipaddr FROM nics_virtuals WHERE org='$this->ou'";
@@ -105,33 +262,173 @@ class main_multi{
 	}
 	
 	
-	private function mydestination(){
-	  		$this->MAIN_ARRAY["mydestination"]="ldap:mydestinationTable";
-			$this->BuildLdapSettings("mydestinationTable",
-			$this->DN,"(&(objectclass=organizationalUnit)(associatedDomain=%s))",
-			"associatedDomain");
-		//............................................................................................................................................................................................
+private function mydestination_maps(){
+	$ldap=new clladp();
+	$filter="(&(objectClass=organizationalUnit)(associatedDomain=*))";
+	$attrs=array("associatedDomain");
+	$dn="ou=$this->ou,dc=organizations,$ldap->suffix";
+	$hash=$ldap->Ldap_search($dn,$filter,$attrs);
+
+	for($i=0;$i<$hash["count"];$i++){
+		for($t=0;$t<$hash[$i]["associateddomain"]["count"];$t++){
+			$this->mydestination_hash[]=$hash[$i][strtolower("associatedDomain")][$t]."\tOK";
+		}
+		
+	}
+	echo "Starting......: $this->ou:: ".count($this->mydestination_hash)." Local domain(s)\n"; 	
+}
+	
+private function recipient_bcc_maps(){
+	
+$ldap=new clladp();
+	$filter="(&(objectClass=UserArticaClass)(RecipientToAdd=*))";
+	$attrs=array("RecipientToAdd","mail");
+	$dn="ou=$this->ou,dc=organizations,$ldap->suffix";
+	$hash=$ldap->Ldap_search($dn,$filter,$attrs);
+	
+	for($i=0;$i<$hash["count"];$i++){
+		$mail=$hash[$i]["mail"][0];
+		$RecipientToAdd=$hash[$i]["recipienttoadd"][0];
+		$this->bcc_maps[]="$mail\t$RecipientToAdd";
+		
+	}	
+	echo "Starting......: $this->ou:: ". count($this->bcc_maps)." recipient(s) BCC\n"; 	
+}
+
+private function sender_bcc_maps(){
+$ldap=new clladp();
+	$filter="(&(objectClass=UserArticaClass)(SenderBccMaps=*))";
+	$attrs=array("SenderBccMaps","mail");
+	$dn="dc=organizations,$ldap->suffix";
+	$hash=$ldap->Ldap_search($dn,$filter,$attrs);
+	
+	for($i=0;$i<$hash["count"];$i++){
+		$mail=$hash[$i]["mail"][0];
+		$this->senderbccmaps=$hash[$i]["senderbccmaps"][0];
+		$GLOBALS["sender_bcc_maps"][]="$mail\t$senderbccmaps";
+		
+	}	
+	echo "Starting......: $this->ou:: ". count($this->senderbccmaps)." Sender(s) BCC\n"; 	
+}
+	
+private function transport_maps(){
+	$ldap=new clladp();
+	$filter="(&(objectClass=transportTable)(cn=*))";
+	$attrs=array("cn","transport");
+	$dn="$ldap->suffix";
+	$hash=$ldap->Ldap_search($dn,$filter,$attrs);	
+	for($i=0;$i<$hash["count"];$i++){
+		$domain=$hash[$i]["cn"][0];
+		$transport=$hash[$i]["transport"][0];
+		//$transport=str_replace("relay:","smtp:",$transport);
+		
+		if(substr($domain,0,1)=="@"){$domain=substr($domain,1,strlen($domain));}
+		$this->transport_maps_hash["$domain"]="$transport";
+		
+		if(strpos("  $domain","@")==0){$domain="@$domain";}
+		$this->transport_maps_hash_AT["$domain"]="$transport";
 	}
 	
-	private function transport_maps(){
-		$ldap=new clladp();
-		$this->MAIN_ARRAY["transport_maps"]="ldap:TransportMapsTable";
-		$this->BuildLdapSettings("TransportMapsTable",
-			$this->DN,"(&(objectClass=transportTable)(cn=%d))",
-			"transport");
-			
-		$this->MAIN_ARRAY["relay_domains"]="ldap:RelaisDomainsTable";
-		$this->BuildLdapSettings("RelaisDomainsTable",$ldap->suffix,"(&(objectclass=PostFixRelayDomains)(cn=%s))","cn");			
+	
+  	$dn="cn=artica_smtp_sync,cn=artica,$ldap->suffix";
+  	$filter="(&(objectClass=InternalRecipients)(cn=*))";	
+  	$attrs=array("cn","ArticaSMTPSenderTable");	
+	$hash=$ldap->Ldap_search($dn,$filter,$attrs);	
+	for($i=0;$i<$hash["count"];$i++){
+		$email=$hash[$i]["cn"][0];
+		$transport=$hash[$i][strtolower("ArticaSMTPSenderTable")][0];
+		$this->transport_maps_hash["$email"]="$transport";
+
+	} 		
 			
 	}
+	
+private function aliases_users(){
+	$ldap=new clladp();
+	$filter="(&(objectClass=userAccount)(uid=*))";
+	$attrs=array("uid","mail");
+	$dn="ou=$this->ou,dc=organizations,$ldap->suffix";
+	$hash=$ldap->Ldap_search($dn,$filter,$attrs);
+
+	for($i=0;$i<$hash["count"];$i++){
+		$uid=$hash[$i]["uid"][0];
+		for($t=0;$t<$hash[$i]["mail"]["count"];$t++){
+			$this->alias_maps_hash[]="$uid\t{$hash[$i]["mail"][$t]}";
+			$this->virtual_mailbox_hash="{$hash[$i]["mail"][$t]}\t$uid";
+		}
+	}
+
+	$filter="(&(objectClass=transportTable)(cn=*@*))";
+	$attrs=array("cn");
+	$dn="cn=PostfixRobots,cn=artica,$ldap->suffix";
+	$hash=$ldap->Ldap_search($dn,$filter,$attrs);
+	for($i=0;$i<$hash["count"];$i++){
+		$cn=$hash[$i]["cn"][0];
+		$this->alias_maps_hash[]="$cn\tx";
+	}
+
+}	
 	
 	private function Aliases(){
-		$this->MAIN_ARRAY["virtual_mailbox_maps"]="ldap:VirtualMailboxMapsTable";
-		$this->MAIN_ARRAY["alias_maps"]="ldap:AliasMapsTable";
-		$this->MAIN_ARRAY["local_recipient_maps"]="ldap:VirtualMailboxMapsTable";
-		$this->BuildLdapSettings("VirtualMailboxMapsTable",$this->DN,"(&(objectClass=userAccount)(mail=%s))","uid");
-		$this->BuildLdapSettings("AliasMapsTable",$this->DN,"(&(objectClass=userAccount)(uid=%u))","mail");
+	$ldap=new clladp();
+	$filter="(&(objectClass=userAccount)(mailAlias=*))";
+	$attrs=array("mail","mailAlias");
+	$dn="ou=$this->ou,dc=organizations,$ldap->suffix";
+	$hash=$ldap->Ldap_search($dn,$filter,$attrs);
+
+	for($i=0;$i<$hash["count"];$i++){
+		$mail=$hash[$i]["mail"][0];
+		for($t=0;$t<$hash[$i]["mailalias"]["count"];$t++){
+			$this->virtual_alias_maps[]="{$hash[$i]["mailalias"][$t]}\t$mail";
+		}
+	}
+
+	
+	
+	$filter="(&(objectClass=MailingAliasesTable)(cn=*))";
+	$attrs=array("cn","MailingListAddress","MailingListAddressGroup");
+	$hash=$ldap->Ldap_search($dn,$filter,$attrs);
+	
+	for($i=0;$i<$hash["count"];$i++){
+		$cn=$hash[$i]["cn"][0];
+		$MailingListAddressGroup=$hash[$i]["mailinglistaddressgroup"][0];
+		for($t=0;$t<$hash[$i]["mailinglistaddress"]["count"];$t++){
+			$mailinglistaddress[$hash[$i]["mailinglistaddress"][$t]]=$hash[$i]["mailinglistaddress"][$t];
+		}
 		
+		if($MailingListAddressGroup==1){
+			$uid=$ldap->uid_from_email($cn);
+			$user=new user($uid);
+			$array=$user->MailingGroupsLoadAliases();
+			while (list ($num, $ligne) = each ($array) ){
+    			if($ligne==null){continue;}  	
+    			$mailinglistaddress[$ligne]=$ligne;
+    		}	
+		}
+		
+		if(is_array($mailinglistaddress)){
+				while (list ($num, $ligne) = each ($mailinglistaddress) ){
+					$final[]=$num;
+				}
+				$this->virtual_alias_maps[]="$cn\t". implode(",",$final);
+			}	
+			
+		unset($final);
+		unset($mailinglistaddress);
+		$MailingListAddressGroup=0;	
+	
+		
+	}
+	
+	
+	$filter="(&(objectClass=ArticaMailManRobots)(cn=*))";
+	$attrs=array("cn","MailManAliasPath");
+	$dn="dc=organizations,$ldap->suffix";
+	$hash=$ldap->Ldap_search($dn,$filter,$attrs);
+	$sock=new sockets();
+	if($sock->GET_INFO("MailManEnabled")==1){$GLOBALS["MAILMAN"]=true;}else{$GLOBALS["MAILMAN"]=false;return;}	
+	if($hash["count"]>0){$GLOBALS["MAILMAN"]=true;}else{$GLOBALS["MAILMAN"]=false;}	
+	
 	}
 	
 	private function MyHostname_SET(){

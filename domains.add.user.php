@@ -10,8 +10,12 @@
 	
 function js(){
 	$tpl=new templates();
-	$title=$tpl->_ENGINE_parse_body('{add_user}');
+	
+	if(isset($_GET["encoded"])){$_GET["ou"]=base64_decode($_GET["ou"]);}
 	$ou=$_GET["ou"];
+	
+	
+	$title=$tpl->_ENGINE_parse_body('{add_user}::'.$ou);
 	$ou_encoded=base64_encode($ou);
 	$page=CurrentPageName();
 	

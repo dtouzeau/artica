@@ -1426,6 +1426,14 @@ function mail(){
 			 "TITLE"=>"relayhost_free",
 			 "TEXT"=>"relayhost_free_text",
 			 "CLASS"=>"MAIL",
+			 "LANG"=>"postfix.index.php");	
+
+		$array["DEF_ICO_SEND_TO_LAPOSTE"]=array(
+			 "IMG"=>"laposte-net.png",
+			 "JS"=>"Loadjs('postfix.index.php?script=orangefr&isp=laposte')",
+			 "TITLE"=>"relayhost_laposte",
+			 "TEXT"=>"relayhost_laposte_text",
+			 "CLASS"=>"MAIL",
 			 "LANG"=>"postfix.index.php");			
 
 		$array["DEF_ICO_POSTFIX_NOTIFS"]=array(
