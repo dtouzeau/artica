@@ -371,7 +371,7 @@ function main_services(){
 	$userautofill=Paragraphe('member-add-64.png','{auto_account}','{auto_account_text}',"javascript:Loadjs('auto-account.php?script=yes')",'auto_account_text');
 	$installed_applis=Paragraphe('folder-applications-64.jpg','{installed_applications}','{installed_applications_text}','system.applications.php','installed_applications_text');
 	$add_remove=Paragraphe('add-remove-64.png','{application_setup}','{application_setup_txt}',"javascript:Loadjs('setup.index.php?js=yes')");
-	$services=Paragraphe('folder-servicesm-64.jpg','{manage_services}','{manage_services_text}','admin.index.services.status.php','manage_services_text');
+	$services=Paragraphe('folder-servicesm-64.jpg','{manage_services}','{manage_services_text}','javascript:Loadjs("admin.index.services.status.php?js=yes");','manage_services_text');
 
 	$tr[]=$installed_applis;
 	$tr[]=$add_remove;
