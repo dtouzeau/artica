@@ -5494,6 +5494,13 @@ begin
         halt(0);
      end;
 
+       if FileExists('/home/artica/packages/ZARAFA/zarafa.tar') then begin
+          fpsystem('/bin/tar -xvf /home/artica/packages/ZARAFA/zarafa.tar -C /');
+          fpsystem('/bin/rm /home/artica/packages/ZARAFA/zarafa.tar');
+          fpsystem('/etc/init.d/artica-postfix restart mysql');
+       end;
+
+
      logs:=Tlogs.Create;
 
      if FileExists('/opt/artica/license.expired.conf') then DeleteFile('/opt/artica/license.expired.conf');

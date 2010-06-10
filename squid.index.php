@@ -9,6 +9,9 @@
 	$user=new usersMenus();
 	if($user->SQUID_INSTALLED==false){header('location:users.index.php');exit();}
 	if($user->AsSquidAdministrator==false){header('location:users.index.php');exit();}
+	
+	if(isset($_GET["page-index-squid-status"])){page_index_status();exit;}
+	
 	if(isset($_GET["ApplyConfig"])){main_apply_conf();exit;}
 	if(isset($_GET["status"])){main_little_status();exit;}
 	if(isset($_GET["main"])){main_switch();exit;}
@@ -2071,6 +2074,56 @@ while (list ($num, $ligne) = each ($datas) ){
 	}
 		
 	echo $html;
+	
+}
+
+
+function page_index_status(){
+	$tabs=main_tabs();
+	$squid=new squid($_GET["hostname"]);
+	$ini=new Bs_IniHandler();
+	$sock=new sockets();
+	$ini->loadString(base64_decode($sock->getFrameWork('cmd.php?squid-ini-status=yes')));
+	$tpl=new templates();
+
+	$squid_status=DAEMON_STATUS_ROUND("SQUID",$ini,null,1);
+	$dansguardian_status=DAEMON_STATUS_LINE("DANSGUARDIAN",$ini,null,1);
+	$kav=DAEMON_STATUS_LINE("KAV4PROXY",$ini,null,1);
+	$cicap=DAEMON_STATUS_LINE("C-ICAP",$ini,null,1);
+	$md=md5(date('Ymhis'));
+	
+	$squid=new squidbee();
+
+	if(count($squid->network_array)==0){
+		$net=Paragraphe("warning64.png","{no_squid_network}","{no_squid_network_text}","javascript:Loadjs('squid.popups.php?script=network')");
+		echo $tpl->_ENGINE_parse_body($net);
+		return;
+	}	
+	
+	
+	if($dansguardian_status<>null){$dansguardian_status="<tr><td valign='top'>$dansguardian_status</td></tr>";}
+	if($kav<>null){$kav="<tr><td valign='top'>$kav</td></tr>";}
+	if($cicap<>null){$cicap="<tr><td valign='top'>$cicap</td></tr>";}
+	
+
+	$html="
+	<table style='width=99%'>'
+	<tr>
+	<td valign='top'><img src='img/crion-128.png'></td>
+	<td valign='top'>
+	<table style='width:99%'>
+		<tr><td valign='top'>$squid_status</td></tr>
+		$kav
+		$cicap
+		$dansguardian_status
+	</table>
+	</td>
+	</tr>
+	</table>	
+	";
+	
+	
+	echo $tpl->_parse_body($html);	
 	
 }
 

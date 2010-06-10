@@ -2339,6 +2339,7 @@ if($res["ARRAY_KEYS"]["FTPStatus"]==null){
 	function _ParsePrivieleges($content=null){
 		if(preg_match_all('#\[([a-zA-Z]+)\]="([a-z0-9]+)"#is',$content,$reg)){
 				while (list ($num, $ligne) = each ($reg[1]) ){
+					writelogs("$ligne={$reg[2][$num]}",__CLASS__.'/'.__FUNCTION__,__FILE__);
 					$priv[$ligne]=$reg[2][$num];
 					}}
 			

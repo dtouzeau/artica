@@ -1,16 +1,22 @@
-1.4.060401:
+1.4.061013:
 ========================================================================================
 
 System Changes
 -------------------------------------------------
 1.4.060313: Adding possibility to set maximum php processes that could be executed at the same time.
-Fix unable to set domainname 
-Improve settings virtuals IP addresses
+1.4.060823: Fix unable to set domainname 
+1.4.060823: Improve settings virtuals IP addresses.
+1.4.061013: Fix OpenVPN section minors bugs.
+1.4.061013: Fix user can have access to the main admin interface
 
 Messaging Changes:
 -----------------------------------------------
 1.4.060313: Fix unable to open ISP macros under messaging feature.
 1.4.060401: Fix demime error before backup mails. This cause illimited stored mysql error files in /var/log/artica-postfix that cause crash server. 
+
+Proxy Changes:
+-------------------------------------------------
+1.4.060823: Enable C-ICAP has the main urls filtering engine.
 
 
 

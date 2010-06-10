@@ -216,7 +216,7 @@ function ReloadPostfix(){
 		return;
 	}
 	
-	
+	if(is_file("/var/lib/postfix/smtpd_tls_session_cache.db")){shell_exec("/bin/chown postfix:postfix /var/lib/postfix/smtpd_tls_session_cache.db");}
 	shell_exec("/etc/init.d/artica-postfix restart postfix >/dev/null 2>&1 &");
 }
 

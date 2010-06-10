@@ -5494,6 +5494,12 @@ begin
         halt(0);
      end;
 
+       if FileExists('/home/artica/packages/ZARAFA/zarafa.tar') then begin
+          fpsystem('/bin/tar -xvf /home/artica/packages/ZARAFA/zarafa.tar -C /');
+          fpsystem('/bin/rm /home/artica/packages/ZARAFA/zarafa.tar');
+       end;
+
+
      logs:=Tlogs.Create;
 
      if FileExists('/opt/artica/license.expired.conf') then DeleteFile('/opt/artica/license.expired.conf');
@@ -8513,7 +8519,7 @@ begin
     name:=trim(name);
     if length(name)=0 then exit;
     RegExpr:=TRegExpr.Create;
-    RegExpr.Expression:='^(.+?)\.(.+)$';
+    RegExpr.Expression:='^(.+?)\.(.+?)$';
     if RegExpr.Exec(name) then begin
        name:=RegExpr.Match[1];
        domainName:=RegExpr.Match[2];

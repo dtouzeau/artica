@@ -64,13 +64,14 @@ var
    a:string;
    lighttp:Tlighttpd;
    lightstatus:string;
-
+   port,uris:string;
+    slighttpd:Tlighttpd;
 begin
 fpsystem('clear');
 lighttp:=Tlighttpd.Create(SYS);
 writeln('########################################################');
 writeln('###                                                  ###');
-writeln('###             Artica version ' + SYS.ARTICA_VERSION()+'            ###');
+writeln('###             Artica version ' + SYS.ARTICA_VERSION()+'');
 writeln('###                                                  ###');
 writeln('########################################################');
 writeln('');
@@ -80,19 +81,22 @@ writeln('');
 
    end else  begin
 //     lightstatus:='lighttpd daemon is running using '+IntToStr(SYS.PROCESS_MEMORY(lighttp.LIGHTTPD_PID()))+' Kb memory';
-
-
+       slighttpd:=Tlighttpd.Create(SYS);
+       port:=slighttpd.LIGHTTPD_LISTEN_PORT();
+       uris:=SYS.txt_uris(port);
+       writeln(uris);
+       writeln('');
    end;
 
 writeln('Menu :');
 writeln('');
 writeln('[W]..... How to access to the Artica Web interface ?');
 writeln('[U]..... Global Administrator Username  & password');
-if FileExists('/etc/network/interfaces') then writeln('[T]..... Change TCP/IP settings');
-
-
+writeln('[Q]..... Exit and enter to the system');
+writeln('');
 writeln('');
 writeln(lightstatus);
+writeln('Your command: ');
 readln(a);
 
 a:=UpperCase(a);
@@ -108,7 +112,12 @@ if a='U' then begin
    exit;
 end;
 
+if a='Q' then begin
+   fpsystem('/bin/login.old');
+   halt(0);
+end;
 
+ Menu();
 
 end;
 //##############################################################################

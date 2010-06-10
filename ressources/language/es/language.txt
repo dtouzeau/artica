@@ -1141,6 +1141,7 @@ Setting this parameter to a value of 1 changes the meaning of the corresponding 
 <disk_name>Disk name</disk_name>
 <display>display</display>
 <displayname>Display name</displayname>
+<display_hits>Display hits</display_hits>
 <display_product_events>Display product's events</display_product_events>
 <display_queries_list>Display queries</display_queries_list>
 <display_statistics_of_this_user>Display statistics of this user</display_statistics_of_this_user>
@@ -2054,6 +2055,7 @@ The message delivery transport name is the first field in the entry in the maste
 <main_settings>Main settings</main_settings>
 <main_settings_samba>Global configuration</main_settings_samba>
 <main_settings_text>Define global parameters of the software, personalize daemons processes and tune performances</main_settings_text>
+<make_samba_ad>Be an Active Directory member</make_samba_ad>
 <make_samba_ad_text>If enabled, this server will be a member of your Active Directory server.[br]In this case Active Directory members will have access to this server services eg Proxy, File sharing...</make_samba_ad_text>
 <MalwarePatrol>Malware Patrol</MalwarePatrol>
 <MalwarePatrol_text>Malware Patrol is a free, automated and user contributed system for verifying URLs for the presence of Viruses, Trojans, Worms, or any other software considered Malware.</MalwarePatrol_text>
@@ -2100,7 +2102,9 @@ It allows the Windows 2000 ACL editor to correctly use inheritance with the Samb
 If you use normal proxy with LDAP Authentication you will be able to match organizations groups to your filtering rules.</MAP_USERS_RULES_DANSGUARDIAN_TEXT>
 <mark_all_events_has_read>Mark all events has read</mark_all_events_has_read>
 <mark_has_read>Mak this event has read</mark_has_read>
+<master_openvpn_server>Master VPN server</master_openvpn_server>
 <master_panel>Master panel</master_panel>
+<master_server>Master server</master_server>
 <match>match</match>
 <Matches>Matches</Matches>
 <match_in>Match in</match_in>
@@ -2369,6 +2373,8 @@ don't forget to - Save & Apply settings - to make them in production mode</notif
 <opcheck1>Check artica-postfix service status</opcheck1>
 <openldap_parameters>LDAP Database parameters</openldap_parameters>
 <openldap_parameters_text>Mandatories settings are stored on an LDAP database, personalize, optimize the OpenLDAP settings</openldap_parameters_text>
+<OPENVPN_PASSWORD_CHANGED>You have modified your certificate password.
+ You need to rebuild your certificate and ask users/remote sites to download the new configuration package</OPENVPN_PASSWORD_CHANGED>
 <operation>operation</operation>
 <operator>operator</operator>
 <Opportunistic_TLS>Opportunistic TLS</Opportunistic_TLS>
@@ -2647,6 +2653,9 @@ See also "maximal backoff time".
 <rebuild_mailboxes_org>Reconstruct all mailboxes</rebuild_mailboxes_org>
 <rebuild_mailboxes_org_explain>This operation will reconstruct all mailboxes.[br]It can be used when you want to globally create mailboxes when did not exists.[br]Already stored mailboxes will be passed, so you can safe use this feature</rebuild_mailboxes_org_explain>
 <rebuild_mailboxes_org_text>Reconstruct all user's mailboxes in your organization</rebuild_mailboxes_org_text>
+<rebuild_openvpn_certificate>Rebuild certificate</rebuild_openvpn_certificate>
+<rebuild_openvpn_certificate_perform>The main certificate will be reconstruct, you need to rebuild all clients certificate in order to allow users/remote sites to connect to this server</rebuild_openvpn_certificate_perform>
+<rebuild_openvpn_certificate_text>Reconstruct the SSL certificate</rebuild_openvpn_certificate_text>
 <received>received</received>
 <received_mails>Received mails</received_mails>
 <recipient>Recipient</recipient>
@@ -2657,6 +2666,7 @@ See also "maximal backoff time".
 <recipient_rules>Recipient&nbsp;Rules</recipient_rules>
 <recommend_restart_postfix>It is mandatory to restart postfix in order to accept mails</recommend_restart_postfix>
 <recommend_update_kaspersky>You should update kaspersky antivirus database, current version is out-of-date[br]Kaspersky recommend to update it's database each hour</recommend_update_kaspersky>
+<reconnect_vpn_clients>Reconnect all VPN clients</reconnect_vpn_clients>
 <recreation_humor>Humorous pages, comic strips, funny stories</recreation_humor>
 <recreation_sports>All about sports</recreation_sports>
 <recreation_travel>Sites with information about foreign countries, travel companies, travel fares, accomondations and everything else that has to do with travel</recreation_travel>
@@ -3754,6 +3764,7 @@ The rules for transferring (routing) are set in this section.[br]
 <upload file>Upload file</upload file>
 <upload_max_filesize>Max uploading files size</upload_max_filesize>
 <upload_new_license>Upload a new license</upload_new_license>
+<upload_vpn_configuration>Upload VPN settings</upload_vpn_configuration>
 <uptime>UpTime</uptime>
 <uri_dnsbl>DNSBL uri</uri_dnsbl>
 <uri_test>URL to test</uri_test>

@@ -373,9 +373,18 @@ $page=CurrentPageName();
 	var x_LeftInfos= function (obj) {
 		var tempvalue=obj.responseText;
 		document.getElementById('left_status').innerHTML=tempvalue;
-		}			
+		setTimeout(\"SatusInfos();\",500);
+		}
 
-		function RightInfos(){
+		
+	function SatusInfos(){
+		if(document.getElementById('page-index-squid-status')){
+			LoadAjax('page-index-squid-status','squid.index.php?page-index-squid-status=yes');
+		}
+	}
+		
+
+	function RightInfos(){
 			var counter=1;
 			if(document.getElementById('counter')){counter=document.getElementById('counter').value;}
 			var XHR = new XHRConnection();
@@ -390,8 +399,9 @@ $page=CurrentPageName();
 			var XHR = new XHRConnection();
 			XHR.appendData('status','left');
 			document.getElementById('left_status').innerHTML='<center><img src=img/wait_verybig.gif></center>';
+			
 			XHR.sendAndLoad('admin.index.php', 'GET',x_LeftInfos);	
-			}
+	 }
 			
 	RightInfos();			
 </script>";

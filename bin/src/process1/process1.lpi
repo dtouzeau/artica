@@ -12,7 +12,7 @@
       <MainUnit Value="0"/>
       <TargetFileExt Value=""/>
       <Title Value="process1"/>
-      <ActiveEditorIndexAtStart Value="4"/>
+      <ActiveEditorIndexAtStart Value="3"/>
     </General>
     <VersionInfo>
       <ProjectVersion Value=""/>
@@ -66,12 +66,12 @@
         <Filename Value="principale.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="principale"/>
-        <CursorPos X="65" Y="908"/>
-        <TopLine Value="874"/>
+        <CursorPos X="50" Y="730"/>
+        <TopLine Value="696"/>
         <EditorIndex Value="3"/>
         <UsageCount Value="206"/>
         <Bookmarks Count="1">
-          <Item0 X="6" Y="1043" ID="0"/>
+          <Item0 X="6" Y="1052" ID="0"/>
         </Bookmarks>
         <Loaded Value="True"/>
       </Unit4>
@@ -88,7 +88,7 @@
         <Filename Value="global_conf.pas"/>
         <UnitName Value="global_conf"/>
         <CursorPos X="18" Y="865"/>
-        <TopLine Value="811"/>
+        <TopLine Value="797"/>
         <EditorIndex Value="4"/>
         <UsageCount Value="101"/>
         <Bookmarks Count="1">
@@ -99,8 +99,8 @@
       <Unit7>
         <Filename Value="zsystem.pas"/>
         <UnitName Value="zsystem"/>
-        <CursorPos X="28" Y="3847"/>
-        <TopLine Value="3813"/>
+        <CursorPos X="10" Y="7760"/>
+        <TopLine Value="6811"/>
         <EditorIndex Value="2"/>
         <UsageCount Value="101"/>
         <Loaded Value="True"/>
@@ -601,123 +601,123 @@
     <JumpHistory Count="30" HistoryIndex="29">
       <Position1>
         <Filename Value="principale.pas"/>
-        <Caret Line="1214" Column="8" TopLine="1157"/>
+        <Caret Line="575" Column="33" TopLine="541"/>
       </Position1>
       <Position2>
         <Filename Value="principale.pas"/>
-        <Caret Line="1201" Column="87" TopLine="1167"/>
+        <Caret Line="626" Column="125" TopLine="579"/>
       </Position2>
       <Position3>
         <Filename Value="principale.pas"/>
-        <Caret Line="1220" Column="144" TopLine="640"/>
+        <Caret Line="611" Column="74" TopLine="607"/>
       </Position3>
       <Position4>
         <Filename Value="principale.pas"/>
-        <Caret Line="1" Column="1" TopLine="1"/>
+        <Caret Line="732" Column="1" TopLine="698"/>
       </Position4>
       <Position5>
         <Filename Value="principale.pas"/>
-        <Caret Line="11" Column="176" TopLine="1"/>
+        <Caret Line="735" Column="78" TopLine="701"/>
       </Position5>
       <Position6>
         <Filename Value="principale.pas"/>
-        <Caret Line="575" Column="33" TopLine="541"/>
+        <Caret Line="1883" Column="1" TopLine="1849"/>
       </Position6>
       <Position7>
         <Filename Value="principale.pas"/>
-        <Caret Line="626" Column="125" TopLine="579"/>
+        <Caret Line="2173" Column="1" TopLine="2139"/>
       </Position7>
       <Position8>
         <Filename Value="principale.pas"/>
-        <Caret Line="611" Column="74" TopLine="607"/>
+        <Caret Line="1946" Column="1" TopLine="1912"/>
       </Position8>
       <Position9>
         <Filename Value="principale.pas"/>
-        <Caret Line="732" Column="1" TopLine="698"/>
+        <Caret Line="477" Column="1" TopLine="477"/>
       </Position9>
       <Position10>
         <Filename Value="principale.pas"/>
-        <Caret Line="735" Column="78" TopLine="701"/>
+        <Caret Line="679" Column="128" TopLine="645"/>
       </Position10>
       <Position11>
         <Filename Value="principale.pas"/>
-        <Caret Line="1883" Column="1" TopLine="1849"/>
+        <Caret Line="681" Column="137" TopLine="645"/>
       </Position11>
       <Position12>
         <Filename Value="principale.pas"/>
-        <Caret Line="2173" Column="1" TopLine="2139"/>
+        <Caret Line="1242" Column="38" TopLine="1208"/>
       </Position12>
       <Position13>
         <Filename Value="principale.pas"/>
-        <Caret Line="1946" Column="1" TopLine="1912"/>
+        <Caret Line="1244" Column="108" TopLine="1200"/>
       </Position13>
       <Position14>
         <Filename Value="principale.pas"/>
-        <Caret Line="477" Column="1" TopLine="477"/>
+        <Caret Line="1" Column="1" TopLine="1"/>
       </Position14>
       <Position15>
         <Filename Value="principale.pas"/>
-        <Caret Line="679" Column="128" TopLine="645"/>
+        <Caret Line="529" Column="12" TopLine="495"/>
       </Position15>
       <Position16>
         <Filename Value="principale.pas"/>
-        <Caret Line="681" Column="137" TopLine="645"/>
+        <Caret Line="908" Column="65" TopLine="874"/>
       </Position16>
       <Position17>
-        <Filename Value="principale.pas"/>
-        <Caret Line="1242" Column="38" TopLine="1208"/>
+        <Filename Value="global_conf.pas"/>
+        <Caret Line="455" Column="28" TopLine="421"/>
       </Position17>
       <Position18>
-        <Filename Value="principale.pas"/>
-        <Caret Line="1244" Column="108" TopLine="1200"/>
+        <Filename Value="zsystem.pas"/>
+        <Caret Line="4042" Column="45" TopLine="3994"/>
       </Position18>
       <Position19>
-        <Filename Value="principale.pas"/>
+        <Filename Value="zsystem.pas"/>
         <Caret Line="1" Column="1" TopLine="1"/>
       </Position19>
       <Position20>
-        <Filename Value="principale.pas"/>
-        <Caret Line="529" Column="12" TopLine="495"/>
+        <Filename Value="zsystem.pas"/>
+        <Caret Line="161" Column="27" TopLine="127"/>
       </Position20>
       <Position21>
         <Filename Value="principale.pas"/>
         <Caret Line="908" Column="65" TopLine="874"/>
       </Position21>
       <Position22>
-        <Filename Value="global_conf.pas"/>
-        <Caret Line="455" Column="28" TopLine="421"/>
+        <Filename Value="principale.pas"/>
+        <Caret Line="1" Column="1" TopLine="1"/>
       </Position22>
       <Position23>
-        <Filename Value="zsystem.pas"/>
-        <Caret Line="4042" Column="45" TopLine="3994"/>
-      </Position23>
-      <Position24>
-        <Filename Value="zsystem.pas"/>
-        <Caret Line="1" Column="1" TopLine="1"/>
-      </Position24>
-      <Position25>
-        <Filename Value="zsystem.pas"/>
-        <Caret Line="161" Column="27" TopLine="127"/>
-      </Position25>
-      <Position26>
-        <Filename Value="principale.pas"/>
-        <Caret Line="908" Column="65" TopLine="874"/>
-      </Position26>
-      <Position27>
-        <Filename Value="principale.pas"/>
-        <Caret Line="1" Column="1" TopLine="1"/>
-      </Position27>
-      <Position28>
         <Filename Value="principale.pas"/>
         <Caret Line="529" Column="12" TopLine="495"/>
+      </Position23>
+      <Position24>
+        <Filename Value="principale.pas"/>
+        <Caret Line="908" Column="65" TopLine="874"/>
+      </Position24>
+      <Position25>
+        <Filename Value="global_conf.pas"/>
+        <Caret Line="455" Column="28" TopLine="421"/>
+      </Position25>
+      <Position26>
+        <Filename Value="zsystem.pas"/>
+        <Caret Line="3847" Column="28" TopLine="3813"/>
+      </Position26>
+      <Position27>
+        <Filename Value="zsystem.pas"/>
+        <Caret Line="7751" Column="1" TopLine="7707"/>
+      </Position27>
+      <Position28>
+        <Filename Value="zsystem.pas"/>
+        <Caret Line="415" Column="28" TopLine="358"/>
       </Position28>
       <Position29>
         <Filename Value="principale.pas"/>
-        <Caret Line="908" Column="65" TopLine="874"/>
+        <Caret Line="651" Column="38" TopLine="602"/>
       </Position29>
       <Position30>
-        <Filename Value="global_conf.pas"/>
-        <Caret Line="455" Column="28" TopLine="421"/>
+        <Filename Value="principale.pas"/>
+        <Caret Line="722" Column="93" TopLine="685"/>
       </Position30>
     </JumpHistory>
   </ProjectOptions>

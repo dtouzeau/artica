@@ -19,7 +19,7 @@
 <openvpn_local_text>Si sp&eacute;cifi&eacute;, OpenVPN va s'accrocher &agrave; cette adresse uniquement. Le cas &eacute;ch&eacute;ant, toutes les adresses seront accroch&eacute;es</openvpn_local_text>
 <OPENVPN_SERVER_CONNECT>Connectez votre serveur</OPENVPN_SERVER_CONNECT>
 <OPENVPN_SERVER_CONNECT_EXPLAIN>Mettez ici le fichier zip contenant les param&egrave;tres pour votre site.</OPENVPN_SERVER_CONNECT_EXPLAIN>
-<OPENVPN_SERVER_CONNECT_TEXT>Liez votre serveur &agrave; une concentrateur/F&eacute;d&eacute;rateur VPN Artica</OPENVPN_SERVER_CONNECT_TEXT>
+<OPENVPN_SERVER_CONNECT_TEXT>Liez votre serveur &agrave; un concentrateur/F&eacute;d&eacute;rateur VPN Artica</OPENVPN_SERVER_CONNECT_TEXT>
 <OPENVPN_SERVER_SETTINGS>Configuration du serveur OpenVPN</OPENVPN_SERVER_SETTINGS>
 <OPENVPN_SERVER_SETTINGS_TEXT>D&eacute;finissez ici les param&egrave;tres du serveur VPN</OPENVPN_SERVER_SETTINGS_TEXT>
 <OPENVPN_WIZARD>D&eacute;marrage des premiers param&egrave;tres</OPENVPN_WIZARD>

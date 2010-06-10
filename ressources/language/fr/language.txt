@@ -1100,6 +1100,7 @@ Vous pouvez ajouter des privil&egrave;ges de groupe afin d'autoriser certains ut
 <disk_name>Nom du disque</disk_name>
 <display>display</display>
 <displayname>nom d'affichage</displayname>
+<display_hits>Afficher les connections</display_hits>
 <display_product_events>Affichage du produit &eacute;v&eacute;nements</display_product_events>
 <display_queries_list>Afficher les requ&ecirc;tes</display_queries_list>
 <display_statistics_of_this_user>Afficher les statistiques de cet utilisateur/IP</display_statistics_of_this_user>
@@ -1995,6 +1996,7 @@ The message delivery transport name is the first field in the entry in the maste
 <main_settings>Configuration g&eacute;n&eacute;rale</main_settings>
 <main_settings_samba>Param&egrave;tres globaux</main_settings_samba>
 <main_settings_text>D&eacute;finir les param&egrave;tres principaux du logiciel, personnaliser les d&eacute;mons et r&eacute;gler les performances des processus</main_settings_text>
+<make_samba_ad>Membre d'un serveur Active Directory</make_samba_ad>
 <make_samba_ad_text>Si activ&eacute;, ce serveur sera un membre de votre domaine Microsoft Active Directory.[br]Dans ce cas, les membres Windows pourront avoir acc&egrave;s au services de ce serveur tels que le partage de fichiers, le proxy internet....</make_samba_ad_text>
 <MalwarePatrol>Malware Patrol</MalwarePatrol>
 <MalwarePatrol_text>Malware Patrol est une base de donn&eacute;es gratuite permettant de bloquer des pages web si une pr&eacute;sence de code malicieux &agrave; &eacute;t&eacute; d&eacute;tect&eacute;e par la communaut&eacute;.</MalwarePatrol_text>
@@ -2008,7 +2010,7 @@ The message delivery transport name is the first field in the entry in the maste
 <manage_account_text>Pr&eacute;ciser les param&egrave;tres principaux de messagerie de ce compte</manage_account_text>
 <manage_aliases_text>D&eacute;finir les diff&eacute;rentes adresses o&ugrave; cet utilisateur peut recevoir des mails</manage_aliases_text>
 <manage_distribution_lists>Gestion de vos listes</manage_distribution_lists>
-<manage_groups>Administration des utilisateurs et groupes</manage_groups>
+<manage_groups>Utilisateurs et Groupes</manage_groups>
 <manage_groups_antispam>G&eacute;rer les r&egrave;gles antispam globales</manage_groups_antispam>
 <manage_groups_antispam_text>D&eacute;finir les param&egrave;tres par d&eacute;faut de votre antispam. Ces param&egrave;tres vont &eacute;craser les param&egrave;tres utilisateurs.</manage_groups_antispam_text>
 <manage_groups_text>Ajouter et modifier les groupes de votre organisation, d&eacute;finissez les droits</manage_groups_text>
@@ -2041,7 +2043,9 @@ SI vous utilisez le proxy en mode transparent, seul la correspondance par adress
 Le cas &eacute;ch&eacute;ant, si vous avez activ&eacute; l'authentification LDAP, vous serez amen&eacute; &agrave; faire une correspondance avec les groupes stock&eacute;s dans les organisations.</MAP_USERS_RULES_DANSGUARDIAN_TEXT>
 <mark_all_events_has_read>Marquez tous les &eacute;v&egrave;nements comme lus</mark_all_events_has_read>
 <mark_has_read>Marquer cet &eacute;v&egrave;nement comme lu</mark_has_read>
+<master_openvpn_server>Serveur Ma&icirc;tre VPN</master_openvpn_server>
 <master_panel>panneau principal</master_panel>
+<master_server>serveur ma&icirc;tre</master_server>
 <match>correspondre</match>
 <Matches>correspond</Matches>
 <match_in>correspond dans</match_in>
@@ -2310,6 +2314,8 @@ The default is to use the local machine name, $myhostname, which defaults to the
 <opcheck1>V&eacute;rifier le statut du service artica-postfix</opcheck1>
 <openldap_parameters>Param&egrave;tres de la base de donn&eacute;es LDAP</openldap_parameters>
 <openldap_parameters_text>les Param&egrave;tres importants sont stock&eacute;s dans la base LDAP. Personnalisez, optimisez les param&egrave;tres OpenLDAP</openldap_parameters_text>
+<OPENVPN_PASSWORD_CHANGED>Vous avez modifi&eacute; le mot de passe du certificat.
+Vous devrez alors reconstruire le certificat SSL principal et demander &agrave; vos sites distants et utilisateurs de re-t&eacute;l&eacute;charger leur configuration</OPENVPN_PASSWORD_CHANGED>
 <operation>op&eacute;ration</operation>
 <operator>op&eacute;rateur</operator>
 <Opportunistic_TLS>TLS opportuniste</Opportunistic_TLS>
@@ -2584,6 +2590,9 @@ See also "maximal backoff time".
 <rebuild_mailboxes_org_explain>Cette op&eacute;ration va reconstruire toutes les bo&icirc;tes aux lettres.[br]Elle peut &ecirc;tre utilis&eacute; lors d'une re-cr&eacute;ation globale des bo&icirc;tes aux lettres suite &agrave; une restauration.Lorsque certaines n'existent pas ou n'existent plus.[br]
 Les bo&icirc;tes aux lettres d&eacute;j&agrave; cr&eacute;es ne seront pas impact&eacute;es. Vous pouvez utiliser cette fonctionnalit&eacute; en tout confiance.</rebuild_mailboxes_org_explain>
 <rebuild_mailboxes_org_text>Reconstruire toutes les bo&icirc;tes aux lettres de vos utilisateurs dans cette organisation.</rebuild_mailboxes_org_text>
+<rebuild_openvpn_certificate>Reconstruire le certificat</rebuild_openvpn_certificate>
+<rebuild_openvpn_certificate_perform>Le certificat principal va &ecirc;tre reconstruit, vous avez besoin de reconstruire les exportations des param&egrave;tres de tous les clients amen&eacute;s &agrave; se connecter au serveur.</rebuild_openvpn_certificate_perform>
+<rebuild_openvpn_certificate_text>reconstruire le certificat SSL principal</rebuild_openvpn_certificate_text>
 <received>re&ccedil;us</received>
 <received_mails>mails re&ccedil;us</received_mails>
 <recipient>Destinataire</recipient>
@@ -2594,6 +2603,7 @@ Les bo&icirc;tes aux lettres d&eacute;j&agrave; cr&eacute;es ne seront pas impac
 <recipient_rules>R&egrave;gles sur le destinataire</recipient_rules>
 <recommend_restart_postfix>Il est obligatoire de red&eacute;marrer postfix pour accepter du courrier</recommend_restart_postfix>
 <recommend_update_kaspersky>Vous devez mettre &agrave; jour des bases antivirus Kaspersky, la version actuelle n'est plus &agrave; jour [br] Kaspersky recommande de mettre &agrave; jour la base de donn&eacute;es chaque heure</recommend_update_kaspersky>
+<reconnect_vpn_clients>Reconnecter tous les connexions VPN</reconnect_vpn_clients>
 <recreation_humor>Tout ce qui concerne l'humour ou les histoires dr&ocirc;les</recreation_humor>
 <recreation_sports>Tout ce qui concerne le sport</recreation_sports>
 <recreation_travel>Sites d'informations sur les pays &eacute;trangers, les soci&eacute;t&eacute;s Voyage  et tout ce qui a &agrave; voir avec les voyages</recreation_travel>
@@ -3667,6 +3677,7 @@ Si il est en rouge, vous allez devoir maintenir la base des utilisateurs.[br]Cet
 <upload file>Fichier de t&eacute;l&eacute;chargement</upload file>
 <upload_max_filesize>Taille Max du fichier de t&eacute;l&eacute;chargement</upload_max_filesize>
 <upload_new_license>T&eacute;l&eacute;charger une nouvel licence</upload_new_license>
+<upload_vpn_configuration>Charger les param&egrave;tres VPN</upload_vpn_configuration>
 <uptime>temps de vie</uptime>
 <uri_dnsbl>Lien DNSBL</uri_dnsbl>
 <uri_test>adresse web &agrave; tester</uri_test>

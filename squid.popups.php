@@ -608,7 +608,7 @@ if(trim($users->SQUID_LDAP_AUTH)==null){
 						$form_ntlm="	
 						<table style='width:100%'>
 						<tr>
-						<td valign='top' style='font-size:13px>{SQUID_NOT_COMPILED_NTLM_RUN_RECONFIGURE}</td>
+						<td valign='top' style='font-size:13px'>{SQUID_NOT_COMPILED_NTLM_RUN_RECONFIGURE}</td>
 						<td  valign='top'>". button("{install_upgrade}","ForceUpgradeSquid()")."</td>
 						</tr>
 						</table>			
@@ -734,6 +734,12 @@ function plugins_popup(){
 	
 	if($users->SQUIDGUARD_INSTALLED){
 		$squidguard=Paragraphe_switch_img("{enable_squidguard}","{enable_squidguard_text}",'enable_squidguard',$squid->enable_squidguard,'{enable_disable}',250);
+	}
+	
+	
+	if($users->KASPERSKY_WEB_APPLIANCE){
+		$dans=null;
+		$cicap=null;
 	}
 	
 	$form="<div id='div-poubelle'></div>

@@ -403,7 +403,12 @@ function mysql_tabs(){
 		$array["service_family"]="{services_family}";
 	}
 	
-
+	if($users->KASPERSKY_WEB_APPLIANCE){
+		unset($array["service_family"]);
+		unset($array["samba_packages"]);
+		unset($array["web_packages"]);
+		unset($array["smtp_packages"]);
+	}
 	
 	while (list ($num, $ligne) = each ($array) ){
 		if($_GET["main"]==$num){$class="id=tab_current";}else{$class=null;}
@@ -718,15 +723,19 @@ $html="
 </tr>";
 	$html=$html.spacer('{CORE_PRODUCTS}');
 	$html=$html.BuildRows("APP_SQUID",$GlobalApplicationsStatus,"squid3");
-	
-	$html=$html.spacer('{STATS_TOOLS}');
-	$html=$html.BuildRows("APP_SARG",$GlobalApplicationsStatus,"sarg");
+	if(!$users->KASPERSKY_WEB_APPLIANCE){
+		$html=$html.spacer('{STATS_TOOLS}');
+		$html=$html.BuildRows("APP_SARG",$GlobalApplicationsStatus,"sarg");
+	}
 	
 	$html=$html.spacer('{CONTENTS_FILTERS_PRODUCTS}');
+	
 	$html=$html.BuildRows("APP_SQUIDGUARD",$GlobalApplicationsStatus,"squidGuard");
-	$html=$html.BuildRows("APP_DANSGUARDIAN",$GlobalApplicationsStatus,"dansguardian");
-	$html=$html.BuildRows("APP_C_ICAP",$GlobalApplicationsStatus,"c-icap");
-	$html=$html.BuildRows("APP_CLAMAV",$GlobalApplicationsStatus,"clamav");
+	if(!$users->KASPERSKY_WEB_APPLIANCE){
+		$html=$html.BuildRows("APP_DANSGUARDIAN",$GlobalApplicationsStatus,"dansguardian");
+		$html=$html.BuildRows("APP_C_ICAP",$GlobalApplicationsStatus,"c-icap");
+		$html=$html.BuildRows("APP_CLAMAV",$GlobalApplicationsStatus,"clamav");
+	}
 	
 	$html=$html.spacer('{LICENSED_FILTERS_PRODUCTS}');
 	$html=$html.BuildRows("APP_KAV4PROXY",$GlobalApplicationsStatus,"kav4proxy");
@@ -840,6 +849,9 @@ function system_packages(){
 	
 $sock=new sockets();
 $users=new usersMenus();
+$KASPERSKY_APPLIANCE=FALSE;
+if($users->KASPERSKY_SMTP_APPLIANCE){$KASPERSKY_APPLIANCE=TRUE;}
+if($users->KASPERSKY_WEB_APPLIANCE){$KASPERSKY_APPLIANCE=TRUE;}
 
 $GlobalApplicationsStatus=$sock->APC_GET("GlobalApplicationsStatus",2);
 if($GlobalApplicationsStatus==null){
@@ -867,25 +879,26 @@ if($users->VMWARE_HOST){
 	$html=$html.BuildRows("APP_MYSQL",$GlobalApplicationsStatus,"mysql-cluster-gpl");
 	$html=$html.BuildRows("APP_PDNS",$GlobalApplicationsStatus,"pdns");	
 	//$html=$html.BuildRows("APP_EACCELERATOR",$GlobalApplicationsStatus,"eaccelerator");
-	$html=$html.BuildRows("APP_DAR",$GlobalApplicationsStatus,"dar");
+	if(!$KASPERSKY_APPLIANCE){$html=$html.BuildRows("APP_DAR",$GlobalApplicationsStatus,"dar");}
 	$html=$html.BuildRows("APP_MSMTP",$GlobalApplicationsStatus,"msmtp");
-	$html=$html.BuildRows("APP_PUREFTPD",$GlobalApplicationsStatus,"pure-ftpd");
+	if(!$KASPERSKY_APPLIANCE){$html=$html.BuildRows("APP_PUREFTPD",$GlobalApplicationsStatus,"pure-ftpd");}
 	$html=$html.BuildRows("APP_SMARTMONTOOLS",$GlobalApplicationsStatus,"smartmontools");
 	$html=$html.BuildRows("APP_PHPLDAPADMIN",$GlobalApplicationsStatus,"phpldapadmin");
 	$html=$html.BuildRows("APP_PHPMYADMIN",$GlobalApplicationsStatus,"phpMyAdmin");
 	
 	
 	
-if(!$users->KASPERSKY_SMTP_APPLIANCE){$html=$html.BuildRows("APP_CLAMAV",$GlobalApplicationsStatus,"clamav");}
-	$html=$html.BuildRows("APP_AMACHI",$GlobalApplicationsStatus,"hamachi");
+ if(!$KASPERSKY_APPLIANCE){
+		$html=$html.BuildRows("APP_CLAMAV",$GlobalApplicationsStatus,"clamav");
+		$html=$html.BuildRows("APP_AMACHI",$GlobalApplicationsStatus,"hamachi");
+		$html=$html.spacer('{computers_management}');
+		$html=$html.BuildRows("APP_NMAP",$GlobalApplicationsStatus,"nmap");
+		$html=$html.BuildRows("APP_WINEXE",$GlobalApplicationsStatus,"winexe-static");
+		$html=$html.BuildRows("APP_OCSI",$GlobalApplicationsStatus,"OCSNG_UNIX_SERVER");
+		}
 	
-	$html=$html.spacer('{computers_management}');
-	$html=$html.BuildRows("APP_NMAP",$GlobalApplicationsStatus,"nmap");
-	$html=$html.BuildRows("APP_WINEXE",$GlobalApplicationsStatus,"winexe-static");
-if(!$users->KASPERSKY_SMTP_APPLIANCE){$html=$html.BuildRows("APP_OCSI",$GlobalApplicationsStatus,"OCSNG_UNIX_SERVER");}
 	
-	
-if(!$users->KASPERSKY_SMTP_APPLIANCE){$html=$html.spacer('{xapian_packages}');
+if(!$KASPERSKY_APPLIANCE){$html=$html.spacer('{xapian_packages}');
 	$html=$html.BuildRows("APP_XAPIAN",$GlobalApplicationsStatus,"xapian-core");
 	$html=$html.BuildRows("APP_XAPIAN_OMEGA",$GlobalApplicationsStatus,"xapian-omega");
 	$html=$html.BuildRows("APP_XAPIAN_PHP",$GlobalApplicationsStatus,"xapian-bindings");

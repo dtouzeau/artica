@@ -153,12 +153,7 @@ if(!$user->POSTFIX_INSTALLED){
 		$imglogon="img/logon-squid.png";
 	}
 }
-if($user->POSTFIX_INSTALLED){
-	if(!$user->SQUID_INSTALLED){
-		$imglogon="img/logon-postfix.png";
-	}
-}
-
+if($user->POSTFIX_INSTALLED){if(!$user->SQUID_INSTALLED){$imglogon="img/logon-postfix.png";}}
 
 $persologon=$sock->GET_INFO("ArticaLogonImage");
 if(trim($persologon)<>null){
@@ -166,11 +161,8 @@ if(trim($persologon)<>null){
 	$imglogon=str_replace("%TEMPLATE%","ressources/templates/{$_COOKIE["artica-template"]}",$imglogon);
 }
 	
-if($user->KASPERSKY_SMTP_APPLIANCE){
-		$imglogon="img/logon-k.png";	
-	}
-
-
+if($user->KASPERSKY_SMTP_APPLIANCE){$imglogon="img/logon-k.png";}
+if($user->KASPERSKY_WEB_APPLIANCE){$imglogon="img/logon-squidk.png";}
 $page=CurrentPageName();
 
 
@@ -425,13 +417,13 @@ function logon(){
 		}else{
 			
 			
-			session_start();
+			//session_start();
 			$_SESSION["uid"]='-100';
 			$_SESSION["groupid"]='-100';
 			$_SESSION["passwd"]=$_POST["artica_password"];
 			setcookie("artica-language", $_POST["lang"], time()+172800);
 			$_SESSION["detected_lang"]=$_POST["lang"];
-			$_SESSION["privileges"]='
+			$_SESSION["privileges"]["ArticaGroupPrivileges"]='
 			[AllowAddGroup]="yes"
 			[AllowAddUsers]="yes"
 			[AllowChangeKav]="yes"
@@ -461,10 +453,13 @@ function logon(){
 	if(trim($_POST["artica_password"])==trim($userPassword)){
 			$ldap=new clladp();
 			$ouprivs=$ldap->_Get_privileges_ou($u->uid,$u->ou);
+			$privileges=$ldap->_Get_privileges_userid($_POST["artica_username"]);
+			
+			
 			$_SESSION["OU_LANG"]=$ouprivs["ForceLanguageUsers"];
 			$_SESSION["uid"]=$_POST["artica_username"];
 			$_SESSION["passwd"]=$_POST["artica_password"];
-			$_SESSION["privileges"]["ArticaGroupPrivileges"]=$ldap->_Get_privileges_userid($_POST["artica_username"]);
+			$_SESSION["privileges"]["ArticaGroupPrivileges"]=$privileges;
 			$_SESSION["groupid"]=$ldap->UserGetGroups($_POST["artica_username"],1);
 			$_SESSION["DotClearUserEnabled"]=$u->DotClearUserEnabled;
 			$_SESSION["MailboxActive"]=$u->MailboxActive;
@@ -481,8 +476,10 @@ function logon(){
 			}
 			
 			$users=new usersMenus();
-			$users->_TranslateRights($_SESSION["privileges"]["ArticaGroupPrivileges"]);
-			if(!$users->IfIsAnuser()){
+			$privileges_array=$users->_ParsePrivieleges($privileges);
+			$users->_TranslateRights($privileges_array,true);
+			if(!$users->IfIsAnuser(true)){
+				writelogs('This is not an user =>admin.index.php ',__FUNCTION__,__FILE__);
 				echo("location:admin.index.php");
 				return null;
 			}

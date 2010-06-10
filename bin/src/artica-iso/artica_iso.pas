@@ -39,6 +39,24 @@ if not FileExists('/etc/artica-postfix/artica-iso-first-reboot') then begin
     fpsystem('/etc/init.d/artica-postfix stop');
     fpsystem('/etc/init.d/artica-postfix start');
     fpsystem('/usr/share/artica-postfix/bin/artica-install -awstats generate --verbose');
+
+    if fileExists('/usr/share/artica-postfix/bin/artica-login') then begin
+        fpsystem('/bin/mv /bin/login /bin/login.old');
+        fpsystem('dpkg-divert --divert /bin/login.old /bin/login');
+        fpsystem('/bin/mv /usr/share/artica-postfix/bin/artica-login /bin/login');
+        fpsystem('/bin/chmod 777 /bin/login');
+    end;
+
+
+    if FileExists('/home/artica/packages/ZARAFA/zarafa.tar') then begin
+       fpsystem('echo "artica-cd... Installing zarafa"');
+       fpsystem('/bin/tar -xfv /home/artica/packages/ZARAFA/zarafa.tar -C /');
+       fpsystem('/etc/init.d/artica-postfix restart zarafa');
+       fpsystem('/bin/rm -rf /home/artica/ZARAFA');
+    end else begin
+        fpsystem('echo "artica-cd... no zarafa package"');
+    end;
+
     fpsystem('echo "artica-cd... restart artica"');
     fpsystem('/bin/rm -rf /usr/share/artica-postfix/ressources/settings.inc');
     fpsystem('/etc/init.d/artica-postfix stop');

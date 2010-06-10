@@ -207,7 +207,7 @@ if(isset($_GET["change-acl-group"])){samba_change_acl_group();exit;}
 if(isset($_GET["delete-acl-group"])){samba_delete_acl_group();exit;}
 if(isset($_GET["delete-acl-user"])){samba_delete_acl_user();exit;}
 if(isset($_GET["change-acl-items"])){samba_change_acl_items();exit;}
-
+if(isset($_GET["wbinfo-domain"])){samba_wbinfo_domain();exit;}
 
 
 //postfix
@@ -234,6 +234,10 @@ if(isset($_GET["reload-assp"])){ReloadASSPService();exit;}
 if(isset($_GET["restart-mailgraph"])){RestartMailGraphService();exit;}
 if(isset($_GET["restart-mysql"])){RestartMysqlDaemon();exit;}
 if(isset($_GET["restart-openvpn-server"])){RestartOpenVPNServer();exit;}
+if(isset($_GET["openvpn-rebuild-certificate"])){openvpn_rebuild_certificates();exit;}
+if(isset($_GET["OpenVPNServerSessions"])){openvpn_sesssions();exit;}
+if(isset($_GET["openvpn-client-sesssions"])){openvpn_client_sesssions();exit;}
+
 if(isset($_GET["read-log"])){read_log();exit;}
 
 //roundcube
@@ -3339,7 +3343,16 @@ function SQUID_CACHE_INFOS(){
 	$unix=new unix();
 	$squidclient=$unix->find_program("squidclient");
 	if($squidclient==null){return;}
-	$cmd="$squidclient mgr:storedir";
+	
+	$ini=new Bs_IniHandler("/etc/artica-postfix/settings/Daemons/ArticaSquidParameters");
+	if($ini->_params["NETWORK"]["LDAP_AUTH"]==1){
+		$ldappassword=trim(@file_get_contents("/etc/artica-postfix/ldap_settings/password"));
+		$auth=" -u squidinternalauth -w $ldappassword ";
+	}
+	
+	
+	
+	$cmd="$squidclient$auth mgr:storedir";
 	exec($cmd,$results);
 	while (list ($index, $line) = each ($results) ){
 		if(preg_match("#Store Directory\s+\#([0-9]+).+?:\s+(.+)#",$line,$re)){
@@ -3522,6 +3535,36 @@ function dansguardian_search_categories(){
 function dansguardian_community_categories(){
 	sys_THREAD_COMMAND_SET(LOCATE_PHP5_BIN2()." /usr/share/artica-postfix/exec.web-community-filter.php");	
 }
+function samba_wbinfo_domain(){
+	$WORKGROUP=base64_decode($_GET["wbinfo-domain"]);
+	$unix=new unix();
+	$wbinfo=$unix->find_program("wbinfo");
+	exec("$wbinfo -D $WORKGROUP 2>&1",$results);
+	while (list ($index, $line) = each ($results) ){
+		if(preg_match("#(.+?):(.+)#",$line,$re)){
+			$array[trim($re[1])]=trim($re[2]);
+		}
+		
+	}
+	
+	echo "<articadatascgi>". base64_encode(serialize($array))."</articadatascgi>";
+	
+}
+
+function openvpn_rebuild_certificates(){
+	shell_exec("/bin/rm /etc/artica-postfix/openvpn/keys/*");
+	sys_THREAD_COMMAND_SET("/usr/share/artica-postfix/bin/artica-install --openvpn-build-certificate && /etc/init.d/artica-postfix restart openvpn");
+	
+}
+function openvpn_sesssions(){
+	$array=explode("\n",@file_get_contents("/var/log/openvpn/openvpn-status.log"));
+	echo "<articadatascgi>". base64_encode(serialize($array))."</articadatascgi>";
+}
+function openvpn_client_sesssions(){
+	$array=explode("\n",@file_get_contents("/etc/artica-postfix/openvpn/clients/{$_GET["openvpn-client-sesssions"]}/openvpn-status.log"));
+	echo "<articadatascgi>". base64_encode(serialize($array))."</articadatascgi>";
+}
+
 
 
 ?>

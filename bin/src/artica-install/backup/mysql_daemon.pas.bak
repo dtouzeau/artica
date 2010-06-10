@@ -38,6 +38,7 @@ private
      FUNCTION STATUS_REPLICAT():string;
      FUNCTION STATUS_NDB():string;
      FUNCTION STATUS_MAIN():string;
+     procedure DELETE_PARAMETERS(key:string);
 
 
 public
@@ -203,6 +204,46 @@ l.free;
 RegExpr.free;
 
 end;
+//#############################################################################
+procedure tmysql_daemon.DELETE_PARAMETERS(key:string);
+var
+ RegExpr:TRegExpr;
+ l:tstringlist;
+ start:boolean;
+ found:boolean;
+ i:integer;
+begin
+
+  if not FileExists(CNF_PATH()) then begin
+     logs.DebugLogs('Starting......: Unable to stat my.cnf (DELETE_MYSQLD_PARAMETERS)');
+     exit();
+  end;
+  start:=false;
+  found:=false;
+  l:=Tstringlist.Create;
+  l.LoadFromFile(CNF_PATH());
+  RegExpr:=TRegExpr.Create;
+  RegExpr.Expression:=key;
+  for i:=0 to l.Count-1 do begin
+
+            if RegExpr.Exec(l.Strings[i]) then begin
+             try
+                logs.DebugLogs('Starting......: deleting entry '+l.Strings[i]);
+               l.Delete(i);
+             except
+               logs.DebugLogs('Starting......: FATAL ERROR  (DELETE_MYSQLD_PARAMETERS) line 234 while deleting a value='+key);
+             end;
+               found:=true;
+               break;
+            end;
+  end;
+ if found then logs.WriteToFile(L.Text,CNF_PATH());
+l.free;
+RegExpr.free;
+
+
+end;
+
 //#############################################################################
 procedure tmysql_daemon.SET_PARAMETERS(bigkey:string;key:string;value:string);
 var Ini:TiniFile;
@@ -648,22 +689,16 @@ if length(pid_file)=0 then SET_MYSQLD_PARAMETERS('pid-file','/var/run/mysqld/mys
 SET_MYSQLD_PARAMETERS('socket','/var/run/mysqld/mysqld.sock');
 ForceDirectories('/var/log/mysql');
 
-   datadir:=SERVER_PARAMETERS('datadir');
-   logs.DebugLogs('Starting......: Mysql Checking :' +datadir+'/mysql/host.frm');
-   if not FileExists(datadir+'/mysql/host.frm') then begin
-     if FileExists(mysql_install_db) then begin
-        logs.Debuglogs('Starting......: Mysql installing default databases.');
-        fpsystem(mysql_install_db);
-     end else begin
-         logs.DebugLogs('Starting......: unable to stat mysql_install_db');
-     end;
-   end;
+
 
    logbin:=SERVER_PARAMETERS('log_bin');
    mysql_user:=SERVER_PARAMETERS('user');
    fpsystem('/bin/chmod 777 /tmp');
    if length(mysql_user)=0 then mysql_user:='mysql';
    if length(logbin)=0 then logbin:=SERVER_PARAMETERS('log');
+
+
+
    logbin:=ExtractFileDir(logbin);
    syslog:=SYS.LOCATE_SYSLOG_PATH();
    logs.DebugLogs('Starting......: tuning '+ CNF_PATH() );
@@ -689,8 +724,24 @@ ForceDirectories('/var/log/mysql');
    if not FileExists('/var/log/mysql-slow-queries.log') then logs.OutputCmd('/bin/touch /var/log/mysql-slow-queries.log');
    logs.OutputCmd('/bin/chown '+mysql_user+':'+mysql_user+' /var/log/mysql-slow-queries.log');
 
+
+   datadir:=SERVER_PARAMETERS('datadir');
+   logs.DebugLogs('Starting......: Mysql Checking :' +datadir+'/mysql/host.frm');
+   if not FileExists(datadir+'/mysql/host.frm') then begin
+     if FileExists(mysql_install_db) then begin
+        logs.Debuglogs('Starting......: Mysql installing default databases.');
+        fpsystem(mysql_install_db);
+     end else begin
+         logs.DebugLogs('Starting......: unable to stat mysql_install_db');
+     end;
+   end;
+
+   DELETE_PARAMETERS('skip-innodb');
    fpsystem(daemon_bin_path +logpathstring+ ' &');
- pid:=PID_NUM();
+   pid:=PID_NUM();
+
+
+
  if not SYS.PROCESS_EXIST(pid) then begin
     logs.DebugLogs('Starting......: Mysql failed');
  end else begin

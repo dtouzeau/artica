@@ -274,8 +274,18 @@ function kinit(){
 	
 	exec($hostname,$results);
 	$servername=trim(@implode(" ",$results));
+	echo "Starting......: Samba using server name has $servername.$domain_lower\n";
 	shell_exec("/usr/share/artica-postfix/bin/artica-install --change-hostname $servername.$domain_lower");
-	shell_exec("$net ads join -W $ad_server.$domain_lower -S $ad_server -U {$config["ADADMIN"]}%{$config["PASSWORD"]}");
+	echo "Starting......: connecting to $ad_server.$domain_lower\n";
+	$cmd="$net ads join -W $ad_server.$domain_lower -S $ad_server -U {$config["ADADMIN"]}%{$config["PASSWORD"]} 2>&1";
+	exec("$cmd",$results);
+	
+	while (list ($index, $line) = each ($results) ){
+		if(preg_match("#DNS update failed#",$line)){
+			echo "FAILED with command line \"$cmd\"\n";
+		}
+		echo "Starting......: connecting to $ad_server.$domain_lower ($line)\n";
+	}
 	
 	
 	
@@ -307,8 +317,8 @@ function activedirectory(){
 	$conf[]="}";
 	$conf[]="";
 	$conf[]="[domain_realm]";
-	$conf[]=".{$config["ADDOMAIN"]} = $domain";
-	$conf[]="{$config["ADDOMAIN"]} = $domain";
+	$conf[]=strtolower(".{$config["ADDOMAIN"]}")." = $domain";
+	$conf[]=strtolower(".{$config["ADDOMAIN"]}")."= $domain";
 	$conf[]="";
 	$conf[]="[kdc]";
 	$conf[]="profile = /etc/kdc.conf";

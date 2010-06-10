@@ -72,6 +72,24 @@ if(preg_match("#dansguardian.+?:\s+Error connecting to proxy#",$buffer,$re)){
 }
 
 
+if(preg_match("#zarafa-server.+?INNODB engine is disabled#",$buffer)){
+	$file="/etc/artica-postfix/croned.1/zarafa.INNODB.engine";
+	if(IfFileTime($file,2)){
+			events("Zarafa innodb errr");
+			THREAD_COMMAND_SET('/etc/init.d/artica-postfix restart mysql');
+			THREAD_COMMAND_SET('/etc/init.d/artica-postfix restart zarafa');
+			WriteFileCache($file);
+			return;
+		}else{
+			events("Zarafa innodb err, but take action after 10mn");
+			return;
+		}			
+	
+}
+
+
+
+
 // -------------------------------------------------------------------- MONIT
 
 

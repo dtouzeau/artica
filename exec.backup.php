@@ -180,6 +180,7 @@ function backup($ID){
 			return false;
 		}
 		$mount_path=$pattern;
+		if($GLOBALS["DEBUG"]){echo "backup($ID)::  mount path=\"$mount_path\"\n";}
 	}	
 	
 	
@@ -480,6 +481,7 @@ function restorembx($basedContent){
 		$cmd="$rsync$pwd --stats rsync://$user{$array_config["SERVER"]}/{$array_config["FOLDER"]}*  $localimapdir 2>&1";
 		
 		
+		
 	}
 	
 	
@@ -541,11 +543,15 @@ function mount_rsync($pattern,$ID,$testwrite=true){
 	}
 	
 	$pattern_list="$rsync --list-only$pwd rsync://$user{$array["SERVER"]}/{$array["FOLDER"]} --stats --dry-run 2>&1";
+	
+	if($GLOBALS["DEBUG"]){echo "mount_rsync():: Listing files or directories using \"$pattern_list\"\n";}
+	
 	exec($pattern_list,$results);
 	if(is_file($tmpstr)){@unlink($tmpstr);}
 	
 	while (list ($num, $line) = each ($results)){
 		if(preg_match("#\@ERROR#",$line)){
+		if($GLOBALS["DEBUG"]){echo "mount_rsync()::  found  \"$line\"\n";}
 			writelogs("[TASK $ID]: failed to connect rsync://$user{$array["SERVER"]}/{$array["FOLDER"]}",__FUNCTION__,__FILE__,__LINE__);
 		}
 		if(preg_match("#Number of files#",$line)){return true;}
@@ -574,6 +580,9 @@ function ParseMailboxDirRsync($pattern){
 	}	
 	
 	$pattern_list="$rsync --list-only$pwd rsync://$user{$array["SERVER"]}/{$array["FOLDER"]}/ --stats --dry-run 2>&1";
+	
+	if($GLOBALS["DEBUG"]){echo "ParseMailboxDirRsync():: Listing files or directories using \"$pattern_list\"\n";}
+	
 	writelogs("$pattern_list",__FUNCTION__,__FILE__,__LINE__);
 	exec($pattern_list,$results);
 	@unlink($tmpstr);

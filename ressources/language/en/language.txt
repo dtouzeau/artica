@@ -3740,6 +3740,7 @@ When set, this option causes Squid to ignore the no-cache directive, if any, in 
 <uri_dnsbl>DNSBL uri</uri_dnsbl>
 <ad_samba_member>Active Directory Member</ad_samba_member>
 <ad_samba_member_text>Make this server has a member of a Microsoft Active Directory domain</ad_samba_member_text>
+<make_samba_ad>Be an Active Directory member</make_samba_ad>
 <make_samba_ad_text>If enabled, this server will be a member of your Active Directory server.[br]In this case Active Directory members will have access to this server services eg Proxy, File sharing...</make_samba_ad_text> 
 <activedirectory_server>Active Directory server name</activedirectory_server>
 <activedirectory_domain>Active Directory domain</activedirectory_domain>
@@ -3826,5 +3827,13 @@ You will receive a quote from Artica Technology.</shallalist_buye>
 <routing_relay_recipient2>relay recipients table</routing_relay_recipient2>
 <relayhost_laposte>LaPoste.net ISP</relayhost_laposte>
 <relayhost_laposte_text>Send all your internet eMail trought your Laposte.net ISP</relayhost_laposte_text>
-
- 
+<display_hits>Display hits</display_hits>
+ <rebuild_openvpn_certificate>Rebuild certificate</rebuild_openvpn_certificate>
+ <rebuild_openvpn_certificate_text>Reconstruct the SSL certificate</rebuild_openvpn_certificate_text>
+ <rebuild_openvpn_certificate_perform>The main certificate will be reconstruct, you need to rebuild all clients certificate in order to allow users/remote sites to connect to this server</rebuild_openvpn_certificate_perform>
+ <upload_vpn_configuration>Upload VPN settings</upload_vpn_configuration>
+ <master_openvpn_server>Master VPN server</master_openvpn_server>
+ <OPENVPN_PASSWORD_CHANGED>You have modified your certificate password.
+ You need to rebuild your certificate and ask users/remote sites to download the new configuration package</OPENVPN_PASSWORD_CHANGED> 
+ <reconnect_vpn_clients>Reconnect all VPN clients</reconnect_vpn_clients>
+ <master_server>Master server</master_server>

@@ -362,6 +362,11 @@ function StatusSamba(){
 	return $html;
 }
 function StatusSquid(){
+	
+	$html="<div id='page-index-squid-status'></div>";
+	
+	return $html;
+	
 	$ini=new Bs_IniHandler();
 	$sock=new sockets();
 	$ini->loadString($sock->getFrameWork("cmd.php?squid-ini-status=yes"));

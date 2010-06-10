@@ -2,7 +2,7 @@
 <are_you_sure_to_install>Etes-vour s&ucirc;r de vouloir installer</are_you_sure_to_install>
 <check_installer>V&eacute;rification de l'installation</check_installer>
 <control_center>Centre de contr&ocirc;le</control_center>
-<downloading_packages>Packages en cours de t&eacute;l&eacute;chargement ...</downloading_packages>
+<downloading_packages>T&eacute;l&eacute;chargement ...</downloading_packages>
 <failed_downloading_file>Erreurs de t&eacute;l&eacute;chargement</failed_downloading_file>
 <failed_parsing_file>Impossible de lire le fichier de configuration</failed_parsing_file>
 <go_in_status>Vous pouvez s&eacute;lectionner l'ongle Statut des installations pour voir la progression de l'installation</go_in_status>

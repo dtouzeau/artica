@@ -1489,6 +1489,7 @@ class squidbee{
 		$this->SQUID_VERSION=$users->SQUID_VERSION;
 		$this->SQUID_ICAP_ENABLED=$users->SQUID_ICAP_ENABLED;
 		$this->KAV4PROXY_INSTALLED=$users->KAV4PROXY_INSTALLED;
+		$this->SquidAcountUpdate();
 		
 		$this->hasProxyTransparent=$sock->GET_INFO("hasProxyTransparent");
 		if($this->hasProxyTransparent==null){$this->hasProxyTransparent=0;}
@@ -1629,6 +1630,34 @@ class squidbee{
 		
 		
 		
+	}
+	
+	
+	function SquidAcountUpdate(){
+		$ldap=new clladp();
+		$dn="cn=squidinternalauth,dc=organizations,$ldap->suffix";
+		if(!$ldap->ExistsDN($dn)){
+			$upd["objectClass"][]="top";
+			$upd["objectClass"][]="userAccount";
+			$upd["cn"][0]="squidinternalauth";
+			$upd["userid"][0]="squidinternalauth";
+			$upd["accountActive"][0]="TRUE";
+			$upd["accountgroup"][0]="1000";
+			$upd["domainname"][0]="nodomain";
+			$upd["domainname"][0]="nodomain";
+			$upd["homedirectory"][0]="/dev/null";
+			$upd["maildir"][0]="/dev/null";
+			$upd["sn"][0]="squidinternalauth";	
+			$upd["userpassword"][0]=$ldap->ldap_password;
+			if(!$ldap->ldap_add($dn,$upd)){
+				if(posix_getuid()==0){
+					echo "SquidAcountUpdate():: error $ldap->ldap_last_error\n";
+				}
+			}
+		}else{
+			$upd["userpassword"][0]=$ldap->ldap_password;
+			$ldap->Ldap_modify($dn,$upd);
+		}
 	}
 	
 	
@@ -1847,10 +1876,13 @@ public function SquidGuardDatabasesStatus($all=0){
 			$conf[]= "\n#Authentification mode, building using squid compiled for artica";
 			$conf[]= "auth_param ntlm program $users->SQUID_NTLM_AUTH --helper-protocol=squid-2.5-ntlmssp";
 			$conf[]= "auth_param basic program $users->SQUID_NTLM_AUTH --helper-protocol=squid-2.5-basic";
-			$conf[]= "auth_param ntlm children 5";
-			$conf[]= "auth_param basic children 5";
-			$conf[]= "auth_param basic credentialsttl 5 hours";		
+			$conf[]= "auth_param ntlm children 15";
+			$conf[]= "auth_param basic children 15";
+			$conf[]= "auth_param basic credentialsttl 5 hours";	
+			$conf[]= "auth_param basic casesensitive off";	
 			$conf[]= "auth_param basic realm Squid proxy-caching web server";
+			$conf[]= "authenticate_cache_garbage_interval 10 seconds";
+			$conf[]= "authenticate_ttl 0 hour";
 			$conf[]= "#--------- NTLM ACL settings";
 			$conf[]= "acl ntlm_users proxy_auth REQUIRED";
 			$conf[]="";
@@ -1916,7 +1948,11 @@ public function SquidGuardDatabasesStatus($all=0){
 		$kav_rules[]="# --------- icap_service C-ICAP";
 		$kav_rules[]="icap_service\tservice_req reqmod_precache bypass=1 icap://127.0.0.1:1344/srv_clamav";
 		$kav_rules[]="icap_service\tservice_avi respmod_precache bypass=0 icap://127.0.0.1:1344/srv_clamav";
+		
 		$kav_rules[]=$this->ICAP_HEADERS();
+		
+
+		
 		$kav_rules[]="";
 		$kav_rules[]="icap_class\tclass_antivirus service_avi";
 		$kav_rules[]="icap_class\tclass_antivirus_req service_req";		
@@ -1932,14 +1968,21 @@ public function SquidGuardDatabasesStatus($all=0){
 		$kav_rules[]="";
 		$kav_rules[]="# --------- icap_service C-ICAP mode 3.1.x";
 		$kav_rules[]="acl MULTIMEDIA rep_mime_type -i ^(audio\/x-mpegurl|audio\/mpeg|video\/flv|video\/x-flv|application\/x-shockwave-flash|audio\/ogg|video\/ogg|application\/ogg)$";		
-		$kav_rules[]="icap_service  service_antivir_req reqmod_precache 1 icap://127.0.0.1:1344/srv_clamav";
-		$kav_rules[]="icap_service  service_antivir 	respmod_precache 1 icap://127.0.0.1:1344/srv_clamav";		
+		//$kav_rules[]="icap_service  service_antivir_req reqmod_precache 1 icap://127.0.0.1:1344/srv_clamav";
+		if($this->enable_squidguard==1){
+			$kav_rules[]="icap_service\tservice_url_check reqmod_precache 1 icap://127.0.0.1:1344/url_check";
+			$kav_rules[]="adaptation_service_set  class_url_check   service_url_check";
+			$kav_rules[]="adaptation_access  class_url_check  allow all";
+			$kav_rules[]="";
+		}		
+		$kav_rules[]="icap_service  service_antivir 	respmod_precache 1 icap://127.0.0.1:1344/srv_clamav";
 		$kav_rules[]="";		
-		$kav_rules[]="adaptation_service_set  class_antivirus_req service_antivir_req";
-		$kav_rules[]="adaptation_access       class_antivirus_req deny MULTIMEDIA";
+		//$kav_rules[]="adaptation_service_set  class_antivirus_req $service_url_check service_antivir_req";
+		//$kav_rules[]="adaptation_access       class_antivirus_req deny MULTIMEDIA";
 		$kav_rules[]="";
 		$kav_rules[]="adaptation_service_set  class_antivirus service_antivir";
 		$kav_rules[]="adaptation_access       class_antivirus deny MULTIMEDIA";
+		$kav_rules[]="adaptation_access       class_antivirus allow all";
 		$kav_rules[]="";
 		$kav_rules[]="icap_preview_enable on";
 		$kav_rules[]="icap_preview_size 128";
@@ -1994,7 +2037,7 @@ public function SquidGuardDatabasesStatus($all=0){
 			}
 		}
 			$conf[]= "\n#--------- squidGard";
-			$conf[]= "\nC-ICAP enabled ? =$this->enable_cicap";
+			$conf[]= "\n#IS C-ICAP enabled = $this->enable_cicap";
 			$conf[]= "redirect_program $users->SQUIDGUARD_BIN_PATH";
 			$conf[]= "redirect_children 10\n";
 		if($this->ASROOT){echo "Starting......: Activate squidGuard \"$bin\"\n";}
@@ -2112,6 +2155,8 @@ function BuildSquidConf(){
 		if($this->NTLM_AUTH==1){
 				$acl_access_time=$http_access_time;
 				$acl_ldap_auth="http_access allow ntlm_users\n";
+				@mkdir("/var/cache/samba/winbindd_privileged",0755,true);
+				if(posix_getuid()==0){shell_exec("chgrp squid /var/cache/samba/winbindd_privileged/");}
 				$office_network=null;
 		}		
 		
@@ -2465,7 +2510,7 @@ class cicap{
 			$conf[]="RemoteProxyUsers on";
 			$conf[]="RemoteProxyUserHeader X-Authenticated-User";
 			$conf[]="RemoteProxyUserHeaderEncoded on";
-			$conf[]="LogFormat allFormat \"%tl;%a;%un;%iu;%is;$iu\""; 		
+			$conf[]="LogFormat allFormat \"%tl;%a;%un;%iu;%is;%huo\""; 		
 			$conf[]="ServerLog /var/log/c-icap/server.log";
 			$conf[]="AccessLog /var/log/c-icap/access.log allFormat all";
 			//$conf[]="echo.PreviewSize 512";

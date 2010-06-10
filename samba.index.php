@@ -354,9 +354,54 @@ function main_status_scannedonly(){
 	
 }
 
+function main_status_active_directory(){
+	$sock=new sockets();
+	$EnableSambaActiveDirectory=$sock->GET_INFO("EnableSambaActiveDirectory");
+	if($EnableSambaActiveDirectory==0){return null;}
+	$config=unserialize(base64_decode($sock->GET_INFO("SambaAdInfos")));	
+	$WORKGROUP=base64_encode($config["WORKGROUP"]);
+	$ADSERVER=$config["ADSERVER"];
+	$results=unserialize(base64_decode($sock->getFrameWork("cmd.php?wbinfo-domain=$WORKGROUP")));
+	if(strtolower($results["Active Directory"])=='yes'){
+		$img="42-green.png";
+	}else{
+		$img="42-red.png";
+	}
+	
+	if(strlen($results["Alt_Name"])>14){$results["Alt_Name"]=texttooltip(substr($results["Alt_Name"],0,14)."...",$results["Alt_Name"],null,null,1,"font-size:10px");}
+	if(strlen($results["SID"])>14){$results["SID"]=texttooltip(substr($results["SID"],0,14)."...",$results["SID"],null,null,1,"font-size:10px");}
+	
+$html="<table style='width:1OO%'>
+<tr>
+<td width=1% valign='top'>" . imgtootltip($img,'{make_samba_ad}',"Loadjs('samba.ad.php')")."</td>
+<td>
+	<table style='width:100%'>
+		<tr>
+		<td align='right' nowrap><strong>{activedirectory_server}:</td>
+		<td><strong><span style='font-size:12px'>$ADSERVER</strong></td>
+		</tr>
+		<tr>
+		<td align='right' nowrap><strong>{activedirectory_domain}:</td>
+		<td><strong><span style='font-size:10px'>{$results["Alt_Name"]}</strong></td>
+		</tr>		
+		<tr>
+		<td align='right' nowrap><strong>SID:</td>
+		<td><strong><span style='font-size:10px'>{$results["SID"]}</strong></td>
+		</tr>			
+	</table>
+	</td>
+</table>";	
+$tpl=new templates();
+return RoundedLightGreen($tpl->_ENGINE_parse_body($html));
+	
+}
+
 
 function main_status(){
-return "<div style='width:290px'>".main_status_smbd() . "<br>" . main_status_nmbd()."<br>".main_status_scannedonly()."</div>";
+	
+	$ad=main_status_active_directory();
+	if($ad<>null){$ad="<br>$ad";}
+return "<div style='width:290px'>".main_status_smbd() . "<br>" . main_status_nmbd()."$ad<br>".main_status_scannedonly()."</div>";
 	
 }
 

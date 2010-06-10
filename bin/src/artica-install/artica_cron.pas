@@ -182,6 +182,8 @@ if systemForkProcessesNumber=0 then begin
      processNumber:=6;
      if cpunum<4 then processNumber:=4;
   end;
+  if processNumber>4 then processNumber:=4;
+
   SYS.SET_INFO('systemForkProcessesNumber',IntToStr(processNumber))
 
 end else begin
@@ -520,7 +522,7 @@ logs.DeleteFile('/etc/cron.d/artica-cron-executor-300');
       if length(backup_command)>0 then begin
           l.Add(backup_command);
       end;
-      l.Add('@'+Nicet+nolog+',lavg1('+IntToStr(systemMaxOverloaded)+')  10s '+cmdnice+SYS.LOCATE_PHP5_BIN()+ ' ' +artica_path+'/exec.parse-orders.php');
+      l.Add('@'+Nicet+nolog+',lavg1('+IntToStr(systemMaxOverloaded)+') 10s '+cmdnice+SYS.LOCATE_PHP5_BIN()+ ' ' +artica_path+'/exec.parse-orders.php');
       l.Add('@'+Nicet+nolog+',lavg1('+IntToStr(systemMaxOverloaded)+') 12s '+cmdnice+SYS.LOCATE_PHP5_BIN()+ ' ' +artica_path+'/exec.executor.php --group10s');
       l.Add('@'+Nicet+nolog+',lavg1('+IntToStr(systemMaxOverloaded)+') 30s '+cmdnice+SYS.LOCATE_PHP5_BIN()+ ' ' +artica_path+'/exec.executor.php --group30s');
 

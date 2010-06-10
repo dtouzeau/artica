@@ -1,5 +1,9 @@
 <?php
 session_start();
+	header("Pragma: no-cache");	
+	header("Expires: 0");
+	header("Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT");
+	header("Cache-Control: no-cache, must-revalidate");
 include_once('ressources/class.templates.inc');
 include_once('ressources/class.users.menus.inc');
 include_once('ressources/class.openvpn.inc');
@@ -24,19 +28,27 @@ function js(){
 	$title=$tpl->_ENGINE_parse_body('{REMOTE_SITES_VPN}','index.openvpn.php');
 	$ADD_REMOTE_SITES_VPN=$tpl->_ENGINE_parse_body('{ADD_REMOTE_SITES_VPN}','index.openvpn.php');
 	$DOWNLOAD_CONFIG_FILES=$tpl->_ENGINE_parse_body('{DOWNLOAD_CONFIG_FILES}','users.openvpn.index.php');
-	
 	$page=CurrentPageName();
 	
+	$function="RemoteVPNStart()";
+	$internalcode="YahooWin3(600,'$page?popup=yes','$title');";
+	
+	if(isset($_GET["infront"])){
+		echo "<div id='remotesites-div'></div>";
+		$function="RemoteVPNStart()";
+		$internalcode="LoadAjax('remotesites-div','$page?popup=yes')";
+		}
+	
+	$page=CurrentPageName();
+	if(isset($_GET["infront"])){echo "<script>";}
 	$html="
 	
 	function RemoteVPNStart(){
-		YahooWin3(600,'$page?popup=yes','$title');
-	
+		$internalcode
 	}
 	
 	function EditVPNRemoteSite(siteid){
-		YahooWin4(500,'$page?remote-site='+siteid,'$ADD_REMOTE_SITES_VPN');
-	
+		YahooWin4(600,'$page?remote-site='+siteid,'$ADD_REMOTE_SITES_VPN');
 	}
 	
 	function VPNRemoteSiteRefreshList(){
@@ -55,8 +67,8 @@ function js(){
 		var XHR = new XHRConnection();
 		XHR.appendData('siteid',document.getElementById('siteid').value);
 		XHR.appendData('sitename',document.getElementById('sitename').value);
-		XHR.appendData('IP_START',document.getElementById('IP_START').value);
-		XHR.appendData('netmask',document.getElementById('netmask').value);
+		XHR.appendData('IP_START',document.getElementById('IP_START_REMOTE_SITE').value);
+		XHR.appendData('netmask',document.getElementById('netmask_remote_site').value);
 		XHR.sendAndLoad('$page', 'GET',x_EditOpenVPNSite);		
 	}
 	
@@ -71,29 +83,26 @@ function js(){
 	}
 	
 	
-	RemoteVPNStart();
+	$function
 	";
 	
 	echo $html;
+if(isset($_GET["infront"])){echo "</script>";}
 	
 }
 
 
 function popup(){
 	
-	$add=Paragraphe('HomeAdd-64.png','{ADD_REMOTE_SITES_VPN}',
-	'{ADD_REMOTE_SITES_VPN_TEXT}',"javascript:EditVPNRemoteSite('');",null,210,null,0,false);
+	//$add=Paragraphe('HomeAdd-64.png','{ADD_REMOTE_SITES_VPN}','{ADD_REMOTE_SITES_VPN_TEXT}',"javascript:EditVPNRemoteSite('');",null,210,null,0,false);
 	
 	
 	$list=remote_sitelist();
 	
-	$html="<H1>{REMOTE_SITES_VPN}</H1>
-	<table style='width:100%'>
-		<tr>
-			<td valign='top' width=1%>$add</td>
-			<td valign='top'><div id='remotesiteslist' style='width:100%;height:250px;overflow:auto'>$list</div></td>
-		</tr>
-	</table>
+	$html="
+	<div style='width:100%;text-align:right'>".button("{ADD_REMOTE_SITES_VPN}","EditVPNRemoteSite('')")."</div>
+	<div id='remotesiteslist' style='width:100%;height:250px;overflow:auto'>$list</div></td>
+	
 	
 	";
 	
@@ -124,28 +133,30 @@ function remote_site_edit(){
 		$button_title="{add}";
 	}
 	
-	$html="<H1>$title</H1>
+	$html="
+	<p style='font-size:13px'>{ADD_REMOTE_SITES_VPN_TEXT}</p>
 	<input type='hidden' id='siteid' value='$siteid'>
-	<table class=table_form>
+	<table style='width:100%'>
 		<tr>
-			<td class=legend>{site_name}:</td>
-			<td>". Field_text("sitename",$ligne["sitename"],"width:120px")."</td>
+			<td class=legend nowrap>{site_name}:</td>
+			<td>". Field_text("sitename",$ligne["sitename"],"width:120px;font-size:13px;padding:3px")."</td>
 			<td></td>
 		</tr>
 		<tr>
-			<td class=legend>{from_ip_address}:</td>
-			<td>". Field_text("IP_START",$ligne["IP_START"],"width:90px")."</td>
+			<td class=legend nowrap>{from_ip_address}:</td>
+			<td>". Field_text("IP_START_REMOTE_SITE",$ligne["IP_START"],"width:120px;font-size:13px;padding:3px")."</td>
 			<td>10.1.1.0 {or} 192.168.2.0...</td>
 		</tr>
 		<tr>
-			<td class=legend>{netmask}:</td>
-			<td>". Field_text("netmask",$ligne["netmask"],"width:90px")."</td>
+			<td class=legend nowrap>{netmask}:</td>
+			<td>". Field_text("netmask_remote_site",$ligne["netmask"],"width:120px;font-size:13px;padding:3px")."</td>
 			<td>255.255.255.0 {or} 255.227.0.0...</td>
 		</tr>	
 		<tr>
 			<td colspan=3 align='right'>
 			<hr>
-				<input type='button' OnClick=\"javascript:EditOpenVPNSite();\" value='$button_title&nbsp;&raquo'>
+			". button($button_title,"EditOpenVPNSite()")."
+				
 			</td>
 		</tr>			
 	</table>";
@@ -162,24 +173,29 @@ function remote_sitelist(){
 	$sql="SELECT * FROM vpnclient WHERE connexion_type=1 ORDER BY sitename DESC";
 	$q=new mysql();
 	$results=$q->QUERY_SQL($sql,"artica_backup");
-	$html="<table style='width:99%'>";
+	$html="<table style='width:99%'>
+	<tr>
+	<th colspan=2>{site_name}</th>
+	<th>{from_ip_address}</th>
+	<th>{netmask}</th>
+	<th>{download}</th>
+	<th>&nbsp;</th>
+	</tr>
+	";
 	
 	
 	while($ligne=mysql_fetch_array($results,MYSQL_ASSOC)){
 			$js="EditVPNRemoteSite('{$ligne["ID"]}');";
 			$jsDownload="VPNRemoteSiteConfig('{$ligne["ID"]}');";
 			$html=$html. "
-			<tr ". CellRollOver($js).">
-			<td width=1%><img src='img/fw_bold.gif'></td>
-			<td nowrap>{$ligne["sitename"]}</td>
-			<td nowrap>{$ligne["IP_START"]}</td>
-			<td nowrap>{$ligne["netmask"]}</td>
-			<td width=1%>". imgtootltip("ed_delete.gif","{delete}","RemoteVPNDelete('{$ligne["ID"]}')")."</td>
+			<tr ". CellRollOver().">
+			<td width=1%>". imgtootltip("HomeNone-48.png","{edit}","$js")."</td>
+			<td nowrap style='font-size:16px'>{$ligne["sitename"]}</td>
+			<td nowrap style='font-size:16px' width=1%> {$ligne["IP_START"]}</td>
+			<td nowrap style='font-size:16px' width=1%>{$ligne["netmask"]}</td>
+			<td width=1% align='middle' valign='center'>". imgtootltip("icon-download.gif","{download}","$jsDownload")."</td>
+			<td width=1%>". imgtootltip("delete-48.png","{delete}","RemoteVPNDelete('{$ligne["ID"]}')")."</td>
 			</tr>
-			<tr ". CellRollOver($jsDownload).">
-				<td colspan=5 align='right' style='padding:5px'><strong>{DOWNLOAD_CONFIG_FILES}</strong></td>
-			</tr>
-				
 			
 			";
 		
@@ -246,7 +262,15 @@ function remote_site_config(){
 	$tbl=array_reverse($tbl);
 	while (list ($num, $line) = each ($tbl) ){
 		if(trim($line)==null){continue;}
-		$html=$html . "<div><code style='font-size:10px;color:black;'>" . htmlentities($line)."</code></div>";
+		
+		
+		$color="black";
+		if(preg_match("#error#",$line)){$color="red";}
+		if(preg_match("#warning#",$line)){$color="red";}
+		if(preg_match("#unable to#",$line)){$color="red";}
+		
+		
+		$html=$html . "<div><code style='font-size:10px;color:$color;'>" . htmlentities($line)."</code></div>";
 		
 	}
 	

@@ -11,6 +11,7 @@ if(!$GLOBALS["KAV4PROXY_NOSESSION"]){session_start();}
 //64-out-of-office.png
 class usersMenus {
 	var $TreePage=array("domains.edit.group.php"=>true,"samba.index.php"=>true);
+	var $ArchStruct=0;
 	var $menus;
 	var $main_left_menus=array();
 	var $menusright;
@@ -115,6 +116,7 @@ class usersMenus {
 	*/
 	
 	var $ChangeAutoInterface=null;
+	var $KASPERSKY_WEB_APPLIANCE=false;
 	var $mysql_password='';
 	var $mysql_admin='root';
 	var $mysql_server='127.0.0.1';
@@ -339,6 +341,7 @@ class usersMenus {
 	var $SQUIDGUARD_INSTALLED=false;
 	var $SQUIDGUARD_BINVER=0;
 	var $SQUIDGUARD_BIN_PATH="";
+	var $RSYNC_INSTALLED=false;
 	
 	function usersMenus($priv=null,$nobuild=0,$hostname=null){
 
@@ -602,6 +605,9 @@ class usersMenus {
 			$this->HOSTAPD_INSTALLED=$_GLOBAL["HOSTAPD_INSTALLED"];
 			$this->WPA_SUPPLIANT_INSTALLED=$_GLOBAL["WPA_SUPPLIANT_INSTALLED"];
 			$this->HOSTAPD_BINVER=$_GLOBAL["HOSTAPD_BINVER"];
+			$this->KASPERSKY_WEB_APPLIANCE=$_GLOBAL["KASPERSKY_WEB_APPLIANCE"];
+			$this->ArchStruct=$_GLOBAL["ArchStruct"];
+			$this->RSYNC_INSTALLED=$_GLOBAL["RSYNC_INSTALLED"];
 			
 			$this->hostname=str_replace('.(none)','',$this->hostname);
 			
@@ -633,10 +639,13 @@ class usersMenus {
 				$rights=$priv;
 
 				$this->AsAnAdministratorGeneric=$this->IsGlobalAdmin();
-				if($this->AsArticaAdministrator==false){$menus["{account}"]="javascript:Loadjs(\"users.account.php?js=yes\")";}
-				if($this->AllowEditAsWbl==true){$menus["{white list} & {black list}"]="users.aswb.php";}
+				if(!$this->AsArticaAdministrator){
+					$menus["{account}"]="javascript:Loadjs(\"users.account.php?js=yes\")";
+					//if($this->AllowEditAsWbl){$menus["{white list} & {black list}"]="users.aswb.php";}
+				}
 				
-				if($this->AsPostfixAdministrator==true){
+				
+				if($this->AsPostfixAdministrator){
 					$menus["{manage_your_server}"]="javascript:ConfigureYourserver()";
 					$menus["{global settings}"]="javascript:Loadjs(\"artica.settings.php?js=yes\")";
 					$menus["{softwares_install}"]="javascript:Loadjs(\"setup.index.php?js=yes\");";
@@ -978,11 +987,7 @@ private function build_user_left_menus(){
 				$array[$OU_TEXT]["SUB"]["{members}"]="javascript:Loadjs('domains.manage.org.index.php?finduser-js=es&ou=$OU_encoded&encoded=yes');";
 				$array[$OU_TEXT]["SUB"]["{groups}"]="javascript:Loadjs('domains.edit.group.php?ou=$OU_encoded&js=yes&encoded=yes');";
 				$array[$OU_TEXT]["SUB"]["{search}"]="javascript:Loadjs('domains.find.user.php?ou=$OU_encoded&encoded=yes');";
-			}
-				
-				
-				
-			
+			}			
 		}
 		
 		if($this->AsArticaAdministrator==true){
@@ -994,22 +999,47 @@ private function build_user_left_menus(){
 			if($this->dhcp_installed){
 				$array["system"]["SUB"]["{APP_DHCP}"]="javascript:Loadjs('index.gateway.php?index_dhcp=yes')";
 			}
+			
+			if($this->OPENVPN_INSTALLED){
+				$array["system"]["SUB"]["{APP_OPENVPN}"]="javascript:Loadjs('index.openvpn.php?infront=yes')";
+			}
+			
+			
 		}
 			
 
 			
 			
-		if($this->AsSambaAdministrator==true){if($this->SAMBA_INSTALLED){
-			if(!$this->KASPERSKY_SMTP_APPLIANCE){
-				$array["{fileshare}"]["MAIN"]="javascript:Loadjs('fileshares.index.php?js=yes')";}
+		if($this->AsSambaAdministrator){
+			if($this->SAMBA_INSTALLED){
+				$array["{fileshare}"]["MAIN"]="javascript:Loadjs('fileshares.index.php?js=yes')";
 				$array["{fileshare}"]["SUB"]["{main_parameters}"]="javascript:Loadjs('fileshares.index.php?js=yes');";
 				$array["{fileshare}"]["SUB"]["{APP_SAMBA}"]="javascript:Loadjs('samba.index.php?script=smbpop');";
 				$array["{fileshare}"]["SUB"]["{explorer}"]="javascript:Loadjs('tree.php');";
 				$array["{fileshare}"]["SUB"]["{SHARE_FOLDER}"]="javascript:Loadjs('SambaBrowse.php');";
 				$array["{fileshare}"]["SUB"]["{computers}"]="javascript:Loadjs('computer-browse.php');";
+				}
+		}
+		
+		
+		if($this->AsSystemAdministrator){
+			if($this->PUREFTP_INSTALLED){
+				$array["{fileshare}"]["MAIN"]="javascript:Loadjs('fileshares.index.php?js=yes')";
+				$array["{fileshare}"]["SUB"]["{main_parameters}"]="javascript:Loadjs('fileshares.index.php?js=yes');";
 			}
 		}
-		if($this->AsSystemAdministrator==true){if($this->PUREFTP_INSTALLED){$array["{fileshare}"]="javascript:Loadjs('fileshares.index.php?js=yes')";}}
+			
+		if($this->AsSystemAdministrator){
+			if($this->RSYNC_INSTALLED){
+				$array["{fileshare}"]["MAIN"]="javascript:Loadjs('fileshares.index.php?js=yes')";
+				$array["{fileshare}"]["SUB"]["{main_parameters}"]="javascript:Loadjs('fileshares.index.php?js=yes');";
+				$array["{fileshare}"]["SUB"]["{explorer}"]="javascript:Loadjs('tree.php');";
+			}	
+		}
+		
+		
+		
+		
 		if($this->SQUID_INSTALLED==true){if($this->AsSquidAdministrator==true){
 			$array["{web_proxy}"]["MAIN"]="javascript:Loadjs('squid.newbee.php?yes')";
 			$array["{web_proxy}"]["SUB"]["{main_parameters}"]="javascript:Loadjs('squid.newbee.php?yes')";
@@ -1030,9 +1060,7 @@ private function build_user_left_menus(){
 			$array["{web_proxy}"]["SUB"]["{statistics}"]="javascript:Loadjs('squid.statistics.php')";
 			
 		}
-		
-		
-		}
+	}
 		
 		if($this->POSTFIX_INSTALLED){
 			if($this->AsPostfixAdministrator==true){
@@ -1074,7 +1102,11 @@ private function build_user_left_menus(){
 			}
 		}
 		
-		if($this->KASPERSKY_SMTP_APPLIANCE){unset($array["system"]["SUB"]["{APP_DHCP}"]);}
+		if($this->KASPERSKY_SMTP_APPLIANCE){
+			unset($array["{fileshare}"]);
+			unset($array["system"]["SUB"]["{APP_DHCP}"]);
+		
+		}
 		
 		$menus=$this->BuildArticaMenus($array,$sub_array_pages);
 		$this->toplinks=$menus;
@@ -1124,6 +1156,7 @@ private function build_user_left_menus(){
 		
 		
 		";
+		if(is_array($master_array)){
 		while (list ($num, $ligne) = each ($master_array) ){
 			if(is_array($ligne)){
 				$html[]="<li><a class=\"head\" href=\"{$ligne["MAIN"]}\">". $tpl->_ENGINE_parse_body($num)."</a>";
@@ -1140,7 +1173,7 @@ private function build_user_left_menus(){
 			$html[]="<li><a class=\"head\" href=\"$ligne\">$num</a></li>";
 			//$html[]="<ul><li> <a href=\"$ligne\">$num</a></li></ul>";
 			
-		}
+		}}
 		
 		$html[]="</u></div>
 		<script>
@@ -1358,8 +1391,8 @@ private function build_user_left_menus(){
 		}
 	}	
 	
-	function _TranslateRights($priv){
-		
+	function _TranslateRights($priv,$log=false){
+		if(!is_array($priv)){return;}
 		if(posix_getuid()==0){
 			$this->AsMailBoxAdministrator=true;
 			$this->AsArticaAdministrator=true;
@@ -1367,6 +1400,13 @@ private function build_user_left_menus(){
 		}
 		$this->AsArticaAdministrator=false;
 		$this->AsSystemAdministrator=false;
+		
+		if($log){
+			if(is_array($priv)){
+			while (list ($key, $val) = each ($priv) ){
+				writelogs("$key=$val",__CLASS__.'/'.__FUNCTION__,__FILE__,__LINE__);
+			}}
+		}
 		
 		if($priv["AllowChangeDomains"]=='yes'){$this->AllowChangeDomains=true;}
 		if($priv["AllowAddGroup"]=="yes"){$this->AllowAddGroup=true;}
@@ -1412,7 +1452,7 @@ private function build_user_left_menus(){
 		}
 		
 		
-		if($this->IsGlobalAdmin()==true){
+		if($this->IsGlobalAdmin($log)==true){
 			$this->AllowChangeDomains=true;
 			$this->AllowAddGroup=true;
 			$this->AllowChangeOrg=true;
@@ -1472,31 +1512,64 @@ private function build_user_left_menus(){
 		
 	}
 	
-	function IfIsAnuser(){
-			if($this->AsMessagingOrg){return false;}
-			if($this->AsSystemAdministrator==true){return false;}
-			if($this->AsMailBoxAdministrator==true){return false;}
-			if($this->AsPostfixAdministrator==true){return false;}
-			if($this->AllowChangeKav==true){return false;}
-			if($this->AllowChangeKas==true){return false;}
-			if($this->AllowAddUsers==true){return false;}
-			if($this->AsOrgAdmin==true){return false;}
-			if($this->AllowViewStatistics==true){return false;}
-			if($this->AllowEditOuSecurity==true){return false;}
-			if($this->AsSambaAdministrator==true){return false;}
-			if($this->AsDnsAdministrator==true){return false;}
-			if($this->AsQuarantineAdministrator==true){return false;}
-			if($this->AsOrgStorageAdministrator==true){return false;}
+	function IfIsAnuser($log=false){
+			if($this->AsMessagingOrg){
+				if($log){writelogs("AsMessagingOrg=TRUE",__CLASS__.'/'.__FUNCTION__,__FILE__);}
+				return false;
+			
+			}
+			if($this->AsSystemAdministrator){
+			if($log){writelogs("AsSystemAdministrator=TRUE",__CLASS__.'/'.__FUNCTION__,__FILE__);}
+				return false;}
+			if($this->AsMailBoxAdministrator){
+				if($log){writelogs("AsMailBoxAdministrator=TRUE",__CLASS__.'/'.__FUNCTION__,__FILE__);}
+				return false;}
+			if($this->AsPostfixAdministrator){
+				if($log){writelogs("AsPostfixAdministrator=TRUE",__CLASS__.'/'.__FUNCTION__,__FILE__);}
+				return false;}
+			if($this->AllowChangeKav){
+			if($log){writelogs("AllowChangeKav=TRUE",__CLASS__.'/'.__FUNCTION__,__FILE__);}
+				return false;}
+			if($this->AllowChangeKas){
+				if($log){writelogs("AllowChangeKas=TRUE",__CLASS__.'/'.__FUNCTION__,__FILE__);}
+				return false;}
+			if($this->AllowAddUsers){
+			if($log){writelogs("AllowAddUsers=TRUE",__CLASS__.'/'.__FUNCTION__,__FILE__);}
+				return false;}
+			if($this->AsOrgAdmin){
+			if($log){writelogs("AsOrgAdmin=TRUE",__CLASS__.'/'.__FUNCTION__,__FILE__);}
+				return false;}
+			if($this->AllowViewStatistics){
+			if($log){writelogs("AllowViewStatistics=TRUE",__CLASS__.'/'.__FUNCTION__,__FILE__);}
+				return false;}
+			if($this->AllowEditOuSecurity){
+			if($log){writelogs("AllowEditOuSecurity=TRUE",__CLASS__.'/'.__FUNCTION__,__FILE__);}
+				return false;}
+			if($this->AsSambaAdministrator){
+			if($log){writelogs("AsSambaAdministrator=TRUE",__CLASS__.'/'.__FUNCTION__,__FILE__);}
+				return false;}
+			if($this->AsDnsAdministrator){
+			if($log){writelogs("AsDnsAdministrator=TRUE",__CLASS__.'/'.__FUNCTION__,__FILE__);}
+				return false;}
+			if($this->AsQuarantineAdministrator){
+			if($log){writelogs("AsQuarantineAdministrator=TRUE",__CLASS__.'/'.__FUNCTION__,__FILE__);}
+				return false;}
+			if($this->AsOrgStorageAdministrator){
+			if($log){writelogs("AsOrgStorageAdministrator=TRUE",__CLASS__.'/'.__FUNCTION__,__FILE__);}
+				return false;}
 			return true;
 			}
 	
 	
 	function _ParsePrivieleges($content=null){
-		if($content==null){$content=$_SESSION["privileges"]["ArticaGroupPrivileges"];}
-		if(is_array($_SESSION["privileges_array"])){
-			//print_r($_SESSION["privileges_array"]);
-		return $_SESSION["privileges_array"];} 
-		
+		if($content==null){$content=trim($_SESSION["privileges"]["ArticaGroupPrivileges"]);}
+		if(is_array($_SESSION["privileges_array"])){return $_SESSION["privileges_array"];} 
+			writelogs("_SESSION[privileges_array] is not an array",__CLASS__.'/'.__FUNCTION__,__FILE__);
+			if($content==null){
+				writelogs("No privileges _SESSION[privileges][ArticaGroupPrivileges] is null",__CLASS__.'/'.__FUNCTION__,__FILE__);
+			}
+			writelogs($content,__CLASS__.'/'.__FUNCTION__,__FILE__);
+			
 			if(preg_match_all('#\[([a-zA-Z]+)\]="([a-z0-9]+)"#is',$content,$reg)){
 				while (list ($num, $ligne) = each ($reg[1]) ){
 					if($reg[2][$num]=="yes"){
@@ -1504,6 +1577,8 @@ private function build_user_left_menus(){
 					}
 					$priv[$ligne]=$reg[2][$num];
 					}}
+					
+					
 			$_SESSION["privileges_array"]=$priv;
 			return $priv;
 	}
@@ -1537,11 +1612,12 @@ private function build_user_left_menus(){
 		return false;
 		}
 		
-	function IsGlobalAdmin($priv=null){
+	function IsGlobalAdmin($priv=null,$log=false){
 		if(posix_getuid()==0){$this->uid=-100;}
 		if($this->uid==-100){
 			$this->AsArticaAdministrator=true;
 			$this->AsQuarantineAdministrator=true;
+			if($log){writelogs("It is a global administrator",__CLASS__.'/'.__FUNCTION__,__FILE__,__LINE__);}
 			return true;
 			}
 		if($priv==null){$priv=$this->priv;}

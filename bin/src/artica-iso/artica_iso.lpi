@@ -34,10 +34,10 @@
         <Filename Value="artica_iso.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="artica_iso"/>
-        <CursorPos X="146" Y="30"/>
+        <CursorPos X="62" Y="43"/>
         <TopLine Value="1"/>
         <EditorIndex Value="0"/>
-        <UsageCount Value="26"/>
+        <UsageCount Value="27"/>
         <Loaded Value="True"/>
       </Unit0>
       <Unit1>
@@ -53,7 +53,7 @@
         <Filename Value="../artica-install/xfce.pas"/>
         <UnitName Value="xfce"/>
         <CursorPos X="104" Y="159"/>
-        <TopLine Value="88"/>
+        <TopLine Value="89"/>
         <EditorIndex Value="2"/>
         <UsageCount Value="12"/>
         <Loaded Value="True"/>

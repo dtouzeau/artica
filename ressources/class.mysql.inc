@@ -2237,7 +2237,7 @@ private	function CheckTables_repositories(){
 		
 	}
 	
-	private function CheckTables_openvpn(){
+	public function CheckTables_openvpn(){
 		
 				if(!$this->TABLE_EXISTS('hamachi','artica_backup')){		
 					$sql="CREATE TABLE `artica_backup`.`hamachi` (
@@ -2261,6 +2261,7 @@ private	function CheckTables_repositories(){
 					  `IP_START` varchar(25) NOT NULL,
 					  `netmask` varchar(25) NOT NULL,
 					  `ethlisten` varchar(10) NOT NULL,
+					  `keypassword` varchar(255) NOT NULL,
 					  `connexion_type` int(1) NOT NULL,
 					  `ca_bin` longblob NOT NULL,
 					  `key_bin` longblob NOT NULL,
@@ -2291,6 +2292,11 @@ private	function CheckTables_repositories(){
 					$sql="ALTER TABLE `vpnclient` ADD `ethlisten` varchar(10) NOT NULL ,ADD INDEX ( `ethlisten` )";
 					if(!$this->QUERY_SQL($sql,"artica_backup")){return false;}
 				}	
+				
+				if(!$this->FIELD_EXISTS("vpnclient","keypassword","artica_backup")){
+					$sql="ALTER TABLE `vpnclient` ADD `keypassword` varchar(255) NOT NULL";
+					if(!$this->QUERY_SQL($sql,"artica_backup")){return false;}
+				}					
 
 			return true;
 

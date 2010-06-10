@@ -96,6 +96,7 @@ echo "Starting......: OpenVPN cleaning iptables $count rules\n";
 function BuildTunServer(){
 	
    $unix=new unix();
+   $sock=new sockets();
    $servername=$unix->hostname_g();	
    
  
@@ -134,10 +135,10 @@ if($IPTABLES_ETH<>null){
 	echo "Starting......: OpenVPN no local NIC linked...\n";
 }
 	
-   $ca='/etc/artica-postfix/openvpn/keys/ca.crt';
+   $ca='/etc/artica-postfix/openvpn/keys/allca.crt';
    $dh='/etc/artica-postfix/openvpn/keys/dh1024.pem';
-   $key="/etc/artica-postfix/openvpn/keys/$servername.key";
-   $crt="/etc/artica-postfix/openvpn/keys/$servername.crt";
+   $key="/etc/artica-postfix/openvpn/keys/vpn-server.key";
+   $crt="/etc/artica-postfix/openvpn/keys/vpn-server.crt";
    $route='';
    
    //$IPTABLES_ETH_IP=
@@ -189,14 +190,21 @@ if(count($routess)==0){
    			echo "Starting......: OpenVPN Netmask is null for the range $calc_ip, assume $NETMASK\n";
    			$ini->set("GLOBAL","NETMASK",$NETMASK);
    	}
+   	
+	$OpenVpnPasswordCert=$sock->GET_INFO("OpenVpnPasswordCert");
+	if($OpenVpnPasswordCert==null){$OpenVpnPasswordCert="MyKey";}
    
+   	if(is_file("/etc/artica-postfix/openvpn/keys/password")){
+   		$askpass=" --askpass /etc/artica-postfix/openvpn/keys/password ";
+   	}
  
    $cmd=" --port $port --dev tun --server $IP_START $NETMASK --comp-lzo $local --ca $ca --dh $dh --key $key --cert $crt";
    $cmd=$cmd. " --ifconfig-pool-persist /etc/artica-postfix/openvpn/ipp.txt " . implode(" ",$routess);
-   $cmd=$cmd. " --client-to-client --verb 5 --daemon --writepid /var/run/openvpn/openvpn-server.pid --log \"/var/log/openvpn/openvpn.log\"";
+   $cmd=$cmd. " $askpass--client-to-client --verb 5 --daemon --writepid /var/run/openvpn/openvpn-server.pid --log \"/var/log/openvpn/openvpn.log\"";
+   $cmd=$cmd. " --status /var/log/openvpn/openvpn-status.log 10";
    @file_put_contents("/etc/openvpn/cmdline.conf",$cmd);
   
-   $sock=new sockets();
+   
    $sock->SaveConfigFile($ini->toString(),"ArticaOpenVPNSettings");
    echo "Starting......: OpenVPN building settings done.\n";
    if($GLOBALS["VERBOSE"]){writelogs("$cmd",__FUNCTION__,__FILE__,__LINE__);}
@@ -326,12 +334,15 @@ function BuildOpenVpnClients(){
 	while($ligne=mysql_fetch_array($results,MYSQL_ASSOC)){
 		$subpath="$main_path/{$ligne["ID"]}";
 		@mkdir("$subpath",0666,true);
+		$password=base64_decode($ligne["keypassword"]);
+		if($password==null){$password="MyKey";}
 		echo "Starting......: OpenVPN client, building configuration for {$ligne["connexion_name"]}\n";
 		@file_put_contents("$subpath/ca.crt",$ligne["ca_bin"]);
 		@file_put_contents("$subpath/certificate.crt",$ligne["cert_bin"]);
 		@file_put_contents("$subpath/master-key.key",$ligne["key_bin"]);
 		@file_put_contents("$subpath/settings.ovpn",$ligne["ovpn"]);
 		@file_put_contents("$subpath/ethlink",$ligne["ethlisten"]);
+		@file_put_contents("$subpath/keypassword",$password);
 		BuildOpenVpnClients_changeConfig($subpath,"{$ligne["ID"]}");
 		}
 		
@@ -356,13 +367,13 @@ function vpn_client_pid($id){
 }
 function vpn_client_pids($id){
 	$unix=new unix();
-	exec($unix->find_program("pgrep"). " -f \"openvpn --config /etc/artica-postfix/openvpn/clients/$id/settings.ovpn\"",$re);
+	exec($unix->find_program("pgrep"). " -f \"openvpn.+?\/etc\/artica-postfix\/openvpn\/clients\/$id\/settings\.ovpn\"",$re);
 	return $re;
 	
 }
 function vpn_client_allpids(){
 	$unix=new unix();
-	exec($unix->find_program("pgrep"). " -f \"openvpn --config /etc/artica-postfix/openvpn/clients/[0-9]+/settings.ovpn\"",$re);
+	exec($unix->find_program("pgrep"). " -f \"openvpn.+?\/etc\/artica-postfix\/openvpn\/clients\/[0-9]+\/settings\.ovpn\"",$re);
 	while (list ($num, $pid) = each ($re) ){
 		$pid=trim($pid);
 		if($pid==null){continue;}
@@ -439,8 +450,24 @@ function BuildIpTablesClient($eth,$tun_id){
 }
 
 
+function OpenVPNCLientStartGetDev($id){
+	$main_path="/etc/artica-postfix/openvpn/clients";
+	$datas=explode("\n",@file_get_contents("$main_path/$id/settings.ovpn"));
+	while (list ($num, $line) = each ($datas) ){
+		if(preg_match("#^dev\s+tun([0-9]+)#",$line,$re)){
+			return "tun{$re[1]}";
+		}
+	}		
+
+	
+}
+
+
+
+
 function OpenVPNCLientStart($id){
 	$unix=new unix();
+	$sock=new sockets();
 	$main_path="/etc/artica-postfix/openvpn/clients";
 	chdir("/root");
 	$count=0;
@@ -455,9 +482,18 @@ function OpenVPNCLientStart($id){
 		return;
 	}
 	
-	$main_path="/etc/artica-postfix/openvpn/clients";
-	$cmd="openvpn --config $main_path/$id/settings.ovpn --writepid $main_path/$id/pid --daemon --log $main_path/$id/log";
-	//echo "$cmd\n";
+	$tun=OpenVPNCLientStartGetDev($id);	
+	if($tun<>null){
+	if(!is_file("/dev/net/$tun")){
+		echo "Starting......: OpenVPN client $id,creating dev \"$tun\"\n";
+		system($unix->find_program("mknod") ." /dev/net/$tun c 10 200");
+		system($unix->find_program("chmod"). " 600 /dev/net/$tun");
+	}}
+	
+
+	shell_exec("/bin/chmod -R 600 $main_path/$id");
+	$cmd="openvpn --askpass $main_path/$id/keypassword --config $main_path/$id/settings.ovpn --writepid $main_path/$id/pid --daemon --log $main_path/$id/log";
+	$cmd=$cmd. " --status $main_path/$id/openvpn-status.log 10";
 	shell_exec($cmd);	
 	$count=0;
 	for($i=0;$i<7;$i++){
@@ -474,7 +510,7 @@ function OpenVPNCLientStart($id){
 	
 	$pid=vpn_client_pid($id);
 	if(!$unix->process_exists($pid)){
-		echo "Starting......: OpenVPN client $id, failed\n";
+		echo "Starting......: OpenVPN client $id, failed \"$cmd\"\n";
 		return;
 	}
 	

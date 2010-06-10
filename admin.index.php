@@ -356,6 +356,9 @@ if($users->KASPERSKY_SMTP_APPLIANCE){
 }
 
 
+
+
+
 $html="	
 <script language=\"JavaScript\">       
 var timerID  = null;
@@ -488,9 +491,11 @@ $title=$tpl->_ENGINE_parse_body("<span style='text-transform:lowercase;font-size
 
 
 if($users->KASPERSKY_SMTP_APPLIANCE){
-	$title=$tpl->_ENGINE_parse_body("<span style='color:#005447'>{WELCOME}</span> <span style='font-size:13px;color:#005447'>For Kaspersky Appliance</span>&nbsp;|&nbsp;<span style='font-size:12px'>{$hash["displayName"]} - <span style='text-transform:lowercase'>$usersmenus->hostname</span></span>");
+	$title=$tpl->_ENGINE_parse_body("<span style='color:#005447'>{WELCOME}</span> <span style='font-size:13px;color:#005447'>For Kaspersky SMTP Appliance</span>&nbsp;|&nbsp;<span style='font-size:12px'>{$hash["displayName"]} - <span style='text-transform:lowercase'>$usersmenus->hostname</span></span>");
 }
-
+if($users->KASPERSKY_WEB_APPLIANCE){
+	$title=$tpl->_ENGINE_parse_body("<span style='color:#005447'>{WELCOME}</span> <span style='font-size:13px;color:#005447'>For Kaspersky Web Appliance</span>&nbsp;|&nbsp;<span style='font-size:12px'>{$hash["displayName"]} - <span style='text-transform:lowercase'>$usersmenus->hostname</span></span>");
+}
 
 $tpl=new template_users($title,$html,$_SESSION,0,0,0,$cfg);
 error_log(basename(__FILE__)." ".__FUNCTION__.'() line '. __LINE__);

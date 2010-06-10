@@ -626,6 +626,8 @@ begin
        tryStrToInt(SYS.GET_INFO('WifiCardOk'),WifiCardOk);
        if WifiCardOk=1 then  fpsystem(SYS.LOCATE_PHP5_BIN()+ ' /usr/share/artica-postfix/exec.wifi.detect.cards.php --iwlist &');
 
+
+
        
        if FileExists('/etc/artica-postfix/crossroads.indentities.conf') then begin
             crossroads_master_name:=GLOBAL_INI.CROSSROADS_MASTERNAME();
@@ -646,6 +648,10 @@ begin
    if not TryStrToInt(SYS.GET_INFO('EnableMysqlFeatures'),EnableMysqlFeatures) then EnableMysqlFeatures:=1;
    list.Add('$_GLOBAL["LinuxDistriCode"]="'+SYS.GET_INFO('LinuxDistributionCodeName')+'";');
    list.Add('$_GLOBAL["LinuxDistriFullName"]="'+SYS.GET_INFO('LinuxDistributionFullName')+'";');
+   list.Add('$_GLOBAL["ArchStruct"]="'+IntToStr(SYS.ArchStruct())+'";');
+
+
+
 
    openldap:=topenldap.Create;
    list.Add('$_GLOBAL["SLAPD_CONF_PATH"]="'+openldap.SLAPD_CONF_PATH()+'";');
@@ -655,7 +661,7 @@ begin
    phpldap.FRee;
    if FileExists('/usr/share/phpmyadmin/index.php') then list.Add('$_GLOBAL["phpmyadmin_installed"]=True;') else list.Add('$_GLOBAL["phpmyadmin_installed"]=False;');
 
-
+   if FIleExists('/etc/artica-postfix/KASPERSKY_WEB_APPLIANCE') then list.Add('$_GLOBAL["KASPERSKY_WEB_APPLIANCE"]=True;') else list.Add('$_GLOBAL["KASPERSKY_WEB_APPLIANCE"]=False;');
 
    
    // collectd
@@ -719,6 +725,9 @@ begin
 
    //mysql-cluster
    if FIleExists(SYS.LOCATE_NDB_MGMD()) then list.Add('$_GLOBAL["MYSQL_NDB_MGMD_INSTALLED"]=True;') else list.Add('$_GLOBAL["MYSQL_NDB_MGMD_INSTALLED"]=False;');
+
+   //rsync
+   if FileExists(SYS.LOCATE_GENERIC_BIN('rsync') then list.Add('$_GLOBAL["RSYNC_INSTALLED"]=True;') else list.Add('$_GLOBAL["RSYNC_INSTALLED"]=False;');
 
    //cpu,mem...
    list.Add('$_GLOBAL["CPU_NUMBER"]="'+ IntToStr(sys.CPU_NUMBER())+'";');
@@ -1241,7 +1250,7 @@ end;
 
        if FileExists(dansguardian.C_ICAP_BIN_PATH()) then begin
           list.Add('$_GLOBAL["C_ICAP_INSTALLED"]=True;');
-          if FileExists('/usr/lib/c_icap/dnsbl_tables.so') then list.add('$_GLOBAL["C_ICAP_DNSBL"]=True;') end else list.add('$_GLOBAL["C_ICAP_DNSBL"]=False;');
+          if FileExists('/usr/lib/c_icap/dnsbl_tables.so') then list.add('$_GLOBAL["C_ICAP_DNSBL"]=True;') else list.add('$_GLOBAL["C_ICAP_DNSBL"]=False;');
        end else begin
            list.Add('$_GLOBAL["C_ICAP_INSTALLED"]=False;');
        end;

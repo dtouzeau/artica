@@ -12,7 +12,7 @@
       <MainUnit Value="0"/>
       <TargetFileExt Value=""/>
       <Title Value="process1"/>
-      <ActiveEditorIndexAtStart Value="4"/>
+      <ActiveEditorIndexAtStart Value="3"/>
     </General>
     <VersionInfo>
       <ProjectVersion Value=""/>
@@ -66,12 +66,12 @@
         <Filename Value="principale.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="principale"/>
-        <CursorPos X="65" Y="908"/>
-        <TopLine Value="874"/>
+        <CursorPos X="141" Y="730"/>
+        <TopLine Value="685"/>
         <EditorIndex Value="3"/>
         <UsageCount Value="206"/>
         <Bookmarks Count="1">
-          <Item0 X="6" Y="1043" ID="0"/>
+          <Item0 X="6" Y="1052" ID="0"/>
         </Bookmarks>
         <Loaded Value="True"/>
       </Unit4>
@@ -87,20 +87,20 @@
       <Unit6>
         <Filename Value="global_conf.pas"/>
         <UnitName Value="global_conf"/>
-        <CursorPos X="64" Y="861"/>
-        <TopLine Value="811"/>
+        <CursorPos X="18" Y="865"/>
+        <TopLine Value="797"/>
         <EditorIndex Value="4"/>
         <UsageCount Value="101"/>
         <Bookmarks Count="1">
-          <Item0 X="1" Y="4487" ID="1"/>
+          <Item0 X="1" Y="4493" ID="1"/>
         </Bookmarks>
         <Loaded Value="True"/>
       </Unit6>
       <Unit7>
         <Filename Value="zsystem.pas"/>
         <UnitName Value="zsystem"/>
-        <CursorPos X="45" Y="4042"/>
-        <TopLine Value="3994"/>
+        <CursorPos X="10" Y="7760"/>
+        <TopLine Value="6811"/>
         <EditorIndex Value="2"/>
         <UsageCount Value="101"/>
         <Loaded Value="True"/>
@@ -601,123 +601,123 @@
     <JumpHistory Count="30" HistoryIndex="29">
       <Position1>
         <Filename Value="principale.pas"/>
-        <Caret Line="387" Column="93" TopLine="353"/>
+        <Caret Line="11" Column="176" TopLine="1"/>
       </Position1>
       <Position2>
         <Filename Value="principale.pas"/>
-        <Caret Line="467" Column="62" TopLine="433"/>
+        <Caret Line="575" Column="33" TopLine="541"/>
       </Position2>
       <Position3>
         <Filename Value="principale.pas"/>
-        <Caret Line="468" Column="83" TopLine="433"/>
+        <Caret Line="626" Column="125" TopLine="579"/>
       </Position3>
       <Position4>
         <Filename Value="principale.pas"/>
-        <Caret Line="469" Column="142" TopLine="433"/>
+        <Caret Line="611" Column="74" TopLine="607"/>
       </Position4>
       <Position5>
         <Filename Value="principale.pas"/>
-        <Caret Line="487" Column="115" TopLine="433"/>
+        <Caret Line="732" Column="1" TopLine="698"/>
       </Position5>
       <Position6>
         <Filename Value="principale.pas"/>
-        <Caret Line="540" Column="33" TopLine="506"/>
+        <Caret Line="735" Column="78" TopLine="701"/>
       </Position6>
       <Position7>
         <Filename Value="principale.pas"/>
-        <Caret Line="593" Column="21" TopLine="559"/>
+        <Caret Line="1883" Column="1" TopLine="1849"/>
       </Position7>
       <Position8>
         <Filename Value="principale.pas"/>
-        <Caret Line="1178" Column="100" TopLine="1141"/>
+        <Caret Line="2173" Column="1" TopLine="2139"/>
       </Position8>
       <Position9>
         <Filename Value="principale.pas"/>
-        <Caret Line="1214" Column="8" TopLine="1157"/>
+        <Caret Line="1946" Column="1" TopLine="1912"/>
       </Position9>
       <Position10>
         <Filename Value="principale.pas"/>
-        <Caret Line="1201" Column="87" TopLine="1167"/>
+        <Caret Line="477" Column="1" TopLine="477"/>
       </Position10>
       <Position11>
         <Filename Value="principale.pas"/>
-        <Caret Line="1220" Column="144" TopLine="640"/>
+        <Caret Line="679" Column="128" TopLine="645"/>
       </Position11>
       <Position12>
         <Filename Value="principale.pas"/>
-        <Caret Line="1" Column="1" TopLine="1"/>
+        <Caret Line="681" Column="137" TopLine="645"/>
       </Position12>
       <Position13>
         <Filename Value="principale.pas"/>
-        <Caret Line="11" Column="176" TopLine="1"/>
+        <Caret Line="1242" Column="38" TopLine="1208"/>
       </Position13>
       <Position14>
         <Filename Value="principale.pas"/>
-        <Caret Line="575" Column="33" TopLine="541"/>
+        <Caret Line="1244" Column="108" TopLine="1200"/>
       </Position14>
       <Position15>
         <Filename Value="principale.pas"/>
-        <Caret Line="626" Column="125" TopLine="579"/>
+        <Caret Line="1" Column="1" TopLine="1"/>
       </Position15>
       <Position16>
         <Filename Value="principale.pas"/>
-        <Caret Line="611" Column="74" TopLine="607"/>
+        <Caret Line="529" Column="12" TopLine="495"/>
       </Position16>
       <Position17>
         <Filename Value="principale.pas"/>
-        <Caret Line="732" Column="1" TopLine="698"/>
+        <Caret Line="908" Column="65" TopLine="874"/>
       </Position17>
       <Position18>
-        <Filename Value="principale.pas"/>
-        <Caret Line="735" Column="78" TopLine="701"/>
+        <Filename Value="global_conf.pas"/>
+        <Caret Line="455" Column="28" TopLine="421"/>
       </Position18>
       <Position19>
-        <Filename Value="principale.pas"/>
-        <Caret Line="1883" Column="1" TopLine="1849"/>
+        <Filename Value="zsystem.pas"/>
+        <Caret Line="4042" Column="45" TopLine="3994"/>
       </Position19>
       <Position20>
-        <Filename Value="principale.pas"/>
-        <Caret Line="2173" Column="1" TopLine="2139"/>
+        <Filename Value="zsystem.pas"/>
+        <Caret Line="1" Column="1" TopLine="1"/>
       </Position20>
       <Position21>
-        <Filename Value="principale.pas"/>
-        <Caret Line="1946" Column="1" TopLine="1912"/>
+        <Filename Value="zsystem.pas"/>
+        <Caret Line="161" Column="27" TopLine="127"/>
       </Position21>
       <Position22>
         <Filename Value="principale.pas"/>
-        <Caret Line="477" Column="1" TopLine="477"/>
+        <Caret Line="908" Column="65" TopLine="874"/>
       </Position22>
       <Position23>
         <Filename Value="principale.pas"/>
-        <Caret Line="679" Column="128" TopLine="645"/>
+        <Caret Line="1" Column="1" TopLine="1"/>
       </Position23>
       <Position24>
         <Filename Value="principale.pas"/>
-        <Caret Line="681" Column="137" TopLine="645"/>
+        <Caret Line="529" Column="12" TopLine="495"/>
       </Position24>
       <Position25>
         <Filename Value="principale.pas"/>
-        <Caret Line="1242" Column="38" TopLine="1208"/>
+        <Caret Line="908" Column="65" TopLine="874"/>
       </Position25>
       <Position26>
-        <Filename Value="principale.pas"/>
-        <Caret Line="1244" Column="108" TopLine="1200"/>
-      </Position26>
-      <Position27>
-        <Filename Value="principale.pas"/>
-        <Caret Line="1" Column="1" TopLine="1"/>
-      </Position27>
-      <Position28>
-        <Filename Value="principale.pas"/>
-        <Caret Line="529" Column="12" TopLine="495"/>
-      </Position28>
-      <Position29>
-        <Filename Value="principale.pas"/>
-        <Caret Line="908" Column="65" TopLine="874"/>
-      </Position29>
-      <Position30>
         <Filename Value="global_conf.pas"/>
         <Caret Line="455" Column="28" TopLine="421"/>
+      </Position26>
+      <Position27>
+        <Filename Value="zsystem.pas"/>
+        <Caret Line="3847" Column="28" TopLine="3813"/>
+      </Position27>
+      <Position28>
+        <Filename Value="zsystem.pas"/>
+        <Caret Line="7751" Column="1" TopLine="7707"/>
+      </Position28>
+      <Position29>
+        <Filename Value="zsystem.pas"/>
+        <Caret Line="415" Column="28" TopLine="358"/>
+      </Position29>
+      <Position30>
+        <Filename Value="principale.pas"/>
+        <Caret Line="651" Column="38" TopLine="602"/>
       </Position30>
     </JumpHistory>
   </ProjectOptions>
@@ -741,7 +741,7 @@
       </Item1>
       <Item2>
         <Source Value="global_conf.pas"/>
-        <Line Value="6638"/>
+        <Line Value="6644"/>
       </Item2>
       <Item3>
         <Source Value="../artica-install/bogofilter.pas"/>

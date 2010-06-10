@@ -24,10 +24,11 @@ private
      function PID_NUM():string;
      function BuildCommandLIneTUN():string;
      function BuildCommandLIneTAP():string;
+     function INVESTIGATE():boolean;
 public
     procedure   Free;
     constructor Create(const zSYS:Tsystem);
-    procedure   START();
+    procedure   START(noinvestigate:boolean=false);
     procedure   STOP();
     function    BIN_PATH():string;
     function    VERSION():string;
@@ -89,7 +90,7 @@ begin
 end;
 //##############################################################################
 
-procedure topenvpn.START();
+procedure topenvpn.START(noinvestigate:boolean);
 var
    l:TstringList;
    pid:string;
@@ -171,18 +172,21 @@ end;
   end;
 
 
-   logs.Debuglogs('Starting......: OpenVPN server verify key "' + server_name + '.key" in /etc/artica-postfix/openvpn/keys directory ' );
+   logs.Debuglogs('Starting......: OpenVPN server verify key "vpn-server.key" in /etc/artica-postfix/openvpn/keys directory ' );
                                                                               
-   if not FileExists('/etc/artica-postfix/openvpn/keys/' + server_name + '.key') then BuildCertificate();
+   if not FileExists('/etc/artica-postfix/openvpn/keys/vpn-server.key') then BuildCertificate();
    if not FileExists('/etc/artica-postfix/openvpn/keys/dh1024.pem') then BuildCertificate();
 
-      if not FileExists('/etc/artica-postfix/openvpn/keys/' + server_name + '.key') then begin
+      if not FileExists('/etc/artica-postfix/openvpn/keys/vpn-server.key') then begin
            logs.Syslogs('Starting......: OpenVPN server unable to build certificates');
            exit;
       end;
 
 
    forceDirectories('/var/run/openvpn');
+   forceDirectories('/var/log/openvpn');
+   logs.DeleteFile('/var/log/openvpn/openvpn.log');
+
 
     if DEV_TYPE<>'tap0' then begin
 
@@ -206,17 +210,54 @@ end;
         end;
   end;
 
+
+  //Cannot load certificate file /etc/artica-postfix/openvpn/keys/vpn-server.crt: error:02001002:system library:fopen:No such file or directory
+
   pid:=PID_NUM();
   if SYS.PROCESS_EXIST(pid) then begin
       logs.DebugLogs('Starting......: OpenVPN Success with PID number '+ pid);
       fpsystem(SYS.LOCATE_PHP5_BIN()+' /usr/share/artica-postfix/exec.openvpn.php --iptables-server');
+  end else begin
+      if not noinvestigate then begin
+         logs.DebugLogs('Starting......: OpenVPN Failed,try to investigate');
+          if INVESTIGATE() then START(true);
+      end;
   end;
-        fpsystem(SYS.LOCATE_PHP5_BIN()+' /usr/share/artica-postfix/exec.openvpn.php --client-start');
+
+  fpsystem(SYS.LOCATE_PHP5_BIN()+' /usr/share/artica-postfix/exec.openvpn.php --client-start');
 
 mini.free;
 
 end;
 
+//##############################################################################
+function topenvpn.INVESTIGATE():boolean;
+var
+   l:TstringList;
+   i:integer;
+   RegExpr:TRegExpr;
+begin
+    result:=false;
+    if not FileExists('/var/log/openvpn/openvpn.log') then exit;
+
+    l:=Tstringlist.Create;
+    l.LoadFromFile('/var/log/openvpn/openvpn.log');
+    RegExpr:=TRegExpr.Create;
+    for i:=0 to l.Count-1 do begin
+        RegExpr.Expression:='Cannot load certificate file.+?fopen:No such file or directory';
+        if RegExpr.Exec(l.Strings[i]) then begin
+           logs.DebugLogs('Starting......: OpenVPN Certificate missing, try to build a new one');
+           fpsystem('/bin/rm /etc/artica-postfix/openvpn/keys/*');
+           BuildCertificate();
+           exit(true);
+        end;
+    end;
+
+ l.free;
+  RegExpr.free;
+ logs.DebugLogs('Starting......: OpenVPN no common error found');
+
+end;
 //##############################################################################
 function topenvpn.BuildCommandLIneTUN():string;
 begin
@@ -249,10 +290,10 @@ procedure topenvpn.BuildCertificate();
 var
 ini:TiniFile;
 l:TstringList;
-server_name:string;
-cmd:string;
+server_name,cmd:string;
 RegExpr:TRegExpr;
 i:integer;
+pass:string;
 begin
   VerifConfig();
   ini:=TiniFile.Create('/etc/artica-postfix/settings/Daemons/ArticaOpenVPNSettings');
@@ -268,6 +309,9 @@ begin
      exit;
   end;
 
+  if SYS.COMMANDLINE_PARAMETERS('--rebuild') then begin
+     fpsystem('/bin/rm /etc/artica-postfix/openvpn/keys/*');
+  end;
 SetCurrentDir('/etc/artica-postfix/openvpn');
 l.add('export EASY_RSA="/etc/artica-postfix/openvpn"');
 l.add('export OPENSSL="openssl"');
@@ -429,11 +473,9 @@ if ParamStr(2)='--rebuild' then begin
    fpsystem('./clean-all');
 end;
 
-if not FileExists('/etc/artica-postfix/openvpn/keys/ca.key') then begin
-logs.OutputCmd('openssl req -batch -days 3650 -nodes -new -newkey rsa:1024 -sha1 -x509 -keyout "/etc/artica-postfix/openvpn/keys/ca.key" -out "/etc/artica-postfix/openvpn/keys/ca.crt" -config /etc/artica-postfix/openvpn/openssl.cnf');
-end else begin
-    logs.DebugLogs('Starting......: OpenVPN ca.key OK');
-end;
+pass:=trim(SYS.GET_INFO('OpenVpnPasswordCert'));
+if length(pass)=0 then pass:='MyKey';
+
 
 if not FileExists('/etc/artica-postfix/openvpn/keys/index.txt') then begin
    logs.WriteToFile(' ','/etc/artica-postfix/openvpn/keys/index.txt');
@@ -448,7 +490,63 @@ end else begin
 end;
 
 
-if not FileExists('/etc/artica-postfix/openvpn/keys/'+server_name+'.csr') then begin
+if not FileExists('/etc/artica-postfix/openvpn/keys/ca.key') then begin
+   //openssl req -new -x509 -keyout ca.key -out ca.crt -config /etc/artica-postfix/openvpn/openssl.cnf
+   //old 1:openssl req -batch -days 3650 -nodes -new -newkey rsa:1024 -sha1 -x509 -keyout "/etc/artica-postfix/openvpn/keys/ca.key" -out "/etc/artica-postfix/openvpn/keys/ca.crt" -config /etc/artica-postfix/openvpn/openssl.cnf
+   cmd:='openssl req -new -x509 -keyout /etc/artica-postfix/openvpn/keys/ca.key -out /etc/artica-postfix/openvpn/keys/ca.crt -config /etc/artica-postfix/openvpn/openssl.cnf -passout pass:'+pass+' -batch -days 3650';
+   fpsystem(cmd);
+   logs.Debuglogs(cmd);
+end else begin
+    logs.DebugLogs('Starting......: OpenVPN /etc/artica-postfix/openvpn/keys/ca.key OK');
+end;
+
+if not FileExists('/etc/artica-postfix/openvpn/keys/openvpn-ca.key') then begin
+   cmd:='openssl req -new -batch -keyout /etc/artica-postfix/openvpn/keys/openvpn-ca.key -out /etc/artica-postfix/openvpn/keys/openvpn-ca.csr -config /etc/artica-postfix/openvpn/openssl.cnf -passout pass:'+pass;
+   logs.Debuglogs(cmd);
+   fpsystem(cmd);
+
+
+end else begin
+    logs.DebugLogs('Starting......: OpenVPN /etc/artica-postfix/openvpn/keys/openvpn-ca.key OK');
+end;
+
+if not FileExists('/etc/artica-postfix/openvpn/keys/openvpn-ca.crt') then begin
+   cmd:='openssl ca -extensions v3_ca -days 3650 -out /etc/artica-postfix/openvpn/keys/openvpn-ca.crt -in /etc/artica-postfix/openvpn/keys/openvpn-ca.csr -batch -config /etc/artica-postfix/openvpn/openssl.cnf -passin pass:'+pass;
+   logs.Debuglogs(cmd);
+   fpsystem(cmd);
+
+end else begin
+    logs.DebugLogs('Starting......: OpenVPN /etc/artica-postfix/openvpn/keys/openvpn-ca.crt OK');
+end;
+
+fpsystem('/bin/cat /etc/artica-postfix/openvpn/keys/ca.crt /etc/artica-postfix/openvpn/keys/openvpn-ca.crt > /etc/artica-postfix/openvpn/keys/allca.crt');
+
+if not FileExists('/etc/artica-postfix/openvpn/keys/vpn-server.key') then begin
+   cmd:='openssl req -nodes -new -keyout /etc/artica-postfix/openvpn/keys/vpn-server.key -out /etc/artica-postfix/openvpn/keys/vpn-server.csr -batch -config /etc/artica-postfix/openvpn/openssl.cnf';
+   logs.Debuglogs(cmd);
+   fpsystem(cmd);
+
+end else begin
+    logs.DebugLogs('Starting......: OpenVPN /etc/artica-postfix/openvpn/keys/vpn-server.key OK');
+end;
+
+if not FileExists('/etc/artica-postfix/openvpn/keys/vpn-server.crt') then begin
+   fpsystem('/bin/rm /etc/artica-postfix/openvpn/keys/index.txt');
+   fpsystem('/bin/touch /etc/artica-postfix/openvpn/keys/index.txt');
+   cmd:='openssl ca -keyfile /etc/artica-postfix/openvpn/keys/openvpn-ca.key -cert /etc/artica-postfix/openvpn/keys/openvpn-ca.crt -out /etc/artica-postfix/openvpn/keys/vpn-server.crt';
+   cmd:=cmd+' -in /etc/artica-postfix/openvpn/keys/vpn-server.csr -extensions server -batch -config /etc/artica-postfix/openvpn/openssl.cnf -passin pass:'+pass;
+   logs.Debuglogs(cmd);
+   fpsystem(cmd);
+
+end else begin
+    logs.DebugLogs('Starting......: OpenVPN /etc/artica-postfix/openvpn/keys/vpn-server.crt OK');
+end;
+
+fpsystem('/bin/chmod 0600 /etc/artica-postfix/openvpn/keys/vpn-server.key');
+logs.WriteToFile(pass,'/etc/artica-postfix/openvpn/keys/password');
+
+
+{if not FileExists('/etc/artica-postfix/openvpn/keys/'+server_name+'.csr') then begin
    cmd:='openssl req -batch -days 3650 -nodes -new -newkey rsa:1024 -keyout "/etc/artica-postfix/openvpn/keys/'+server_name+'.key"';
    cmd:=cmd +' -out "/etc/artica-postfix/openvpn/keys/'+server_name+'.csr" -extensions server -config "/etc/artica-postfix/openvpn/openssl.cnf"';
    logs.OutputCmd(cmd);
@@ -463,7 +561,7 @@ logs.OutputCmd(cmd);
 end else begin
         logs.DebugLogs('Starting......: OpenVPN '+server_name+'.crt OK');
 end;
-
+ }
 
 
 if not FileExists('/etc/artica-postfix/openvpn/keys/dh1024.pem') then begin

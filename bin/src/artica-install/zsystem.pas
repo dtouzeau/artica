@@ -411,7 +411,8 @@ public
         function LIGHTTPD_GET_USER():string;
         function LIGHTTPD_CONF_PATH:string;
         function LIGHTTPD_LISTEN_PORT():string;
-       function WIRELESS_CARD():string;
+        function WIRELESS_CARD():string;
+        function ArchStruct():integer;
 END;
 
 implementation
@@ -7746,6 +7747,34 @@ end;
    RegExpr.Free;
    l.free;
 
+end;
+//##############################################################################
+function Tsystem.ArchStruct():integer;
+var
+   tmpstr,data:string;
+   RegExpr:TRegExpr;
+   ArchStructLogs:Tlogs;
+begin
+tmpstr:=FILE_TEMP();
+ArchStructLogs:=Tlogs.Create;
+fpsystem(LOCATE_GENERIC_BIN('uname')+ ' -m >'+tmpstr +' 2>&1');
+data:=trim(ArchStructLogs.ReadFromFile(tmpstr));
+ArchStructLogs.free;
+fpsystem('/bin/rm '+tmpstr+' >/dev/null 2>&1');
+RegExpr:=TRegExpr.Create;
+RegExpr.Expression:='i[0-9]86';
+if RegExpr.Exec(data) then begin
+   RegExpr.free;
+   result:=32;
+   exit;
+end;
+
+RegExpr.Expression:='x86_64';
+if RegExpr.Exec(data) then begin
+   RegExpr.free;
+   result:=64;
+   exit;
+end;
 end;
 //##############################################################################
 end.

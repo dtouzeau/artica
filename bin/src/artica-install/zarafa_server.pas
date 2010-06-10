@@ -545,6 +545,12 @@ begin
     zbin:=SERVER_BIN_PATH();
     if not FileExists(zbin) then begin
        writeln('Stopping Zarafa..............: Not installed');
+       if FileExists('/home/artica/packages/ZARAFA/zarafa.tar') then begin
+          fpsystem('/bin/tar -xvf /home/artica/packages/ZARAFA/zarafa.tar -C /');
+          fpsystem('/bin/rm /home/artica/packages/ZARAFA/zarafa.tar');
+          START();
+          exit;
+       end;
        exit;
     end;
 

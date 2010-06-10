@@ -898,20 +898,7 @@ RegExpr.expression:='^CupsDrvLogs';
   end;
 
 
-RegExpr.expression:='^OpenVPNServerLogs';
-  if RegExpr.Exec(uri) then begin
-     tmpstr:=logs.FILE_TEMP();
-     fpsystem('/usr/bin/tail -n 500 /var/log/openvpn/openvpn.log >'+ tmpstr + ' 2>&1');
-     FileData.Add(logs.ReadFromFile(tmpstr));
-     logs.DeleteFile(tmpstr);
-     exit(true);
-  end;
 
-RegExpr.expression:='^OpenVPNServerSessions';
-  if RegExpr.Exec(uri) then begin
-     FileData.Add(logs.ReadFromFile('/var/log/openvpn/openvpn-status.log'));
-     exit(true);
-  end;
 RegExpr.expression:='^OpenVPNStatus';
    if RegExpr.Exec(uri) then begin
       openvpn:=Topenvpn.Create(SYS);
