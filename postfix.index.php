@@ -1834,7 +1834,7 @@ function tweaks(){
 	
 	$events=Buildicon64("DEF_ICO_EVENTS_POSTFIX");
 	$performances=Paragraphe('folder-performances-64.png','{performances_settings}','{performances_settings_text}',"javascript:Loadjs('postfix.performances.php')");
-	$maincf=Paragraphe('folder-script-64.png','{main.cf}','{main.cf_explain}','postfix.main.cf.php');
+	$maincf=Paragraphe('folder-script-64.png','{main.cf}','{main.cf_explain}',"javascript:Loadjs('postfix.main.cf.php')");
 	$storage=Paragraphe('folder-storage2-64.png','{storage_rules}','{storage_rules_text}',"javascript:Loadjs('postfix.storage.rules.php')");
 	$maincfedit=Paragraphe('folder-maincf-64.png','{main.cf_edit}','{main.cfedit_explain}',"javascript:Loadjs('postfix.main.cf.edit.php?js=yes')");
 	$mastercf=Paragraphe('folder-script-64-master.png','{master.cf}','{mastercf_explain}',"javascript:Loadjs('postfix.master.cf.php?script=yes')") ;
@@ -2258,7 +2258,16 @@ function bar_status(){
 	$array[]="POLICYD_WEIGHT";
 	$array[]="MAILMAN";
 	$array[]="APP_CYRUS_IMAP";	
-	$array[]="MAILARCHIVER";	
+	$array[]="MAILARCHIVER";
+	
+	
+	$array[]="APP_ZARAFA";
+	$array[]="APP_ZARAFA_SPOOLER";
+	$array[]="APP_ZARAFA_GATEWAY";
+	$array[]="APP_ZARAFA_MONITOR";
+	$array[]="APP_ZARAFA_DAGENT";
+	$array[]="APP_ZARAFA_ICAL";
+	
 
 	
 	$status="<input type='hidden' id='monitor_page_switch' value='1' name='monitor_page_switch'>";

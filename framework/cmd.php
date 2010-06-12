@@ -222,6 +222,8 @@ if(isset($_GET["postfix-bcc-tables"])){postfix_hash_bcc();exit;}
 if(isset($_GET["postfix-others-values"])){postfix_others_values();exit;}
 if(isset($_GET["postfix-mime-header-checks"])){postfix_mime_header_checks();exit;}
 if(isset($_GET["postfix-interfaces"])){postfix_interfaces();exit;}
+if(isset($_GET["get-main-cf"])){postfix_get_main_cf();exit;}
+
 
 
 
@@ -3563,6 +3565,10 @@ function openvpn_sesssions(){
 function openvpn_client_sesssions(){
 	$array=explode("\n",@file_get_contents("/etc/artica-postfix/openvpn/clients/{$_GET["openvpn-client-sesssions"]}/openvpn-status.log"));
 	echo "<articadatascgi>". base64_encode(serialize($array))."</articadatascgi>";
+}
+function postfix_get_main_cf(){
+	$array=explode("\n",@file_get_contents("/etc/postfix/main.cf"));
+	echo "<articadatascgi>". base64_encode(serialize($array))."</articadatascgi>";	
 }
 
 

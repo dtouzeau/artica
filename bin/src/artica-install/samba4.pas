@@ -6,7 +6,7 @@ unit samba4;
 interface
 
 uses
-    Classes, SysUtils,variants,strutils,IniFiles,md5,logs,unix,RegExpr in 'RegExpr.pas',zsystem;
+    Classes, SysUtils,variants,strutils,IniFiles,logs,unix,RegExpr in 'RegExpr.pas',zsystem;
 
 
 
@@ -16,14 +16,8 @@ uses
 
 private
      LOGS:Tlogs;
-     D:boolean;
      SYS:TSystem;
      artica_path:string;
-     inif:TiniFile;
-     EnableMilterSpyDaemon:integer;
-     RetranslatorEnabled:integer;
-     RetranslatorCronMinutes:integer;
-     IsoQlogRetryTimes:integer;
      function PID_NUM():string;
 
 
@@ -125,6 +119,7 @@ var
 
 
 begin
+   result:='';
    if not FileExists(BIN_PATH) then exit;
  //  l:=SYS.
 end;

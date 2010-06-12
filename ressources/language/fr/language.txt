@@ -1,3 +1,5 @@
+</li>
+<//li>
 <about_organization>Cette section vous permet de g&eacute;rer vos utilisateurs et vos domaines en fonction de vos privil&egrave;ges dans l'interface.</about_organization>
 <about_procmail>Procmail est un puissant et solide ensemble d'outils qui vous permettent de traiter automatiquement les mails que vous recevez ou apr&egrave;s, s'ils sont d&eacute;j&agrave; dans un dossier de messages. [Br]
 Procmail est un utilitaire de traitement du courrier, qui peut vous aider &agrave; filtrer votre courrier, trier le courrier selon l'exp&eacute;diteur, la ligne Objet, de la longueur du message, les mots-cl&eacute;s dans le message, mettre en place un serveur ftp par serveur de messagerie, et bien plus encore. [Br]
@@ -118,6 +120,7 @@ Ajouter une liste : exe,pif,bat,doc</add_attachment_blocking_text_explain>
 <add_auto_connection_explain>va auto-monter directement dans le r&eacute;pertoire /automounts/nom-de-montage</add_auto_connection_explain>
 <add_a_new_tab>Ajoutez un nouvel onglet</add_a_new_tab>
 <add_a_new_tab_text>Ajoutez un nouvel onglet afin d'y placer des nouveaux gadgets</add_a_new_tab_text>
+<add_a_parent_proxy>Ajouter un proxy parent</add_a_parent_proxy>
 <add_block_site_explain>Ajouter un site web qui sera stock&eacute; dans cette cat&eacute;gorie</add_block_site_explain>
 <ADD_COMPUTER>Ajouter un nouvel ordinateur</ADD_COMPUTER>
 <add_computer_access>Ajouter un acc&egrave;s ordinateur</add_computer_access>
@@ -528,6 +531,7 @@ Squid optimise donc de fa&ccedil;on cons&eacute;quente le flux de donn&eacute;es
 <APP_ZARAFA>Zarafa Collaboration</APP_ZARAFA>
 <APP_ZARAFA_DAGENT>Zarafa Agent postier</APP_ZARAFA_DAGENT>
 <APP_ZARAFA_GATEWAY>Passerelle Zarafa</APP_ZARAFA_GATEWAY>
+<APP_ZARAFA_ICAL>Passerelle iCal, CalDav</APP_ZARAFA_ICAL>
 <APP_ZARAFA_MONITOR>Moniteur Zarafa</APP_ZARAFA_MONITOR>
 <APP_ZARAFA_SERVER>Serveur Zarafa</APP_ZARAFA_SERVER>
 <APP_ZARAFA_SPOOLER>Spouleur Zarafa</APP_ZARAFA_SPOOLER>
@@ -723,6 +727,9 @@ Specify 0 when mail delivery should be tried only once.</bounce_queue_lifetime_t
 [br]By default, these notifications are generated from built-in templates with message headers and message text.
 [br]This option allows you to override the built-in information</bounce_template_file_text>
 <BP>Boite Postale</BP>
+<br>
+ In a parent relationship, the child cache will forward requests to its parent cache.<br>
+  If the parent does not hold a requested object, it will forward the request on behalf of the child<br></br>
 <broadcast>Broadcast</broadcast>
 <broken_sasl_auth_clients>interoperabilit&eacute; avec les clients SMTP obsol&egrave;tent</broken_sasl_auth_clients>
 <broken_sasl_auth_clients_text>Active l'interoperabilit&eacute; avec les clients SMTP qui impl&eacute;mentent une version obsolete de la commande AUTH (RFC 2554). [br]MicroSoft Outlook Express version 4 et MicroSoft Exchange version 5.0 sont des exemples de tels clients.</broken_sasl_auth_clients_text>
@@ -1147,6 +1154,7 @@ Vous pouvez ajouter des privil&egrave;ges de groupe afin d'autoriser certains ut
 <edit mode>Mode &eacute;dition</edit mode>
 <edit_paremeters>D&eacute;finir les param&egrave;tres pour cette section</edit_paremeters>
 <edit_rule>Modifier un r&egrave;gle</edit_rule>
+<edit_squid_parent_parameters>Editer les param&egrave;tres du proxy parent</edit_squid_parent_parameters>
 <edit_table>Editer le tableau</edit_table>
 <edit_user>Modifier cet utilisateur</edit_user>
 <EHLOattrsXFORWARD>Attributs X-forward</EHLOattrsXFORWARD>
@@ -1248,6 +1256,7 @@ Cette fonctionnalit&eacute; est &quot;ergonomique&quot;. [br]Si vous la rendez i
 <enable_shutdown_interface>Activer le bouton d'arr&ecirc;t de l'ordinateur &agrave; la fermeture de session.</enable_shutdown_interface>
 <enable_squidguard>Activer squidGuard</enable_squidguard>
 <enable_squidguard_text>squidGuard est un redirecteur de pages pour Squid qui utilise des listes noires de sites web</enable_squidguard_text>
+<enable_squid_parent>Activer la liaison avec le ou les proxys parents</enable_squid_parent>
 <enable_ssl>Activer SSL</enable_ssl>
 <enable_this_filter>Activer ce filtre</enable_this_filter>
 <enable_this_option>Activer cette fonctionnalit&eacute;</enable_this_option>
@@ -1597,6 +1606,8 @@ It send notifications to recipients in order to allow them to "download" attache
 <https_mode>Mode HTTPS</https_mode>
 <HTTP_FILTER_MONITOR>Moniteur de Filtre Web</HTTP_FILTER_MONITOR>
 <icon_artica_events_front_end>Raccourci des &eacute;v&egrave;nements Artica sur la page d'index</icon_artica_events_front_end>
+<icp_port>Port ICP</icp_port>
+<icp_port_explain>Num&eacute;ro de port ICP utilis&eacute; pour recevoir et envoyer les requ&ecirc;tes ICP des caches voisins. Indiquer 0 pour d&eacute;sactiver cette option.</icp_port_explain>
 <identity>Identit&eacute;</identity>
 <if>si</if>
 <if_in>si dans</if_in>
@@ -1887,6 +1898,7 @@ With the default 100 SMTP server process limit, "in flow delay as 1s" limits the
 <left_menu_internal_hard_drives>Disques durs</left_menu_internal_hard_drives>
 <left_menu_net_settings>R&eacute;seaux</left_menu_net_settings>
 <level>niveau</level>
+<li><strong>sibling:</li>
 <licence operations>op&eacute;rations de licence</licence operations>
 <licence status>status de la licence</licence status>
 <license>licence</license>
@@ -2354,6 +2366,30 @@ Vous devrez alors reconstruire le certificat SSL principal et demander &agrave; 
 <pages>pages</pages>
 <parameters>Param&egrave;tres</parameters>
 <parameters_quickLink>Ouvrez les param&egrave;tres pour activer la fonctionnalit&eacute;</parameters_quickLink>
+<parent_options_proxy_closest_only>Pour les r&eacute;ponses ICP_OP_MISS seules les CLOSEST_PARENT_MISSes et FIRST_PARENT_MISSes seront transf&eacute;r&eacute;es.</parent_options_proxy_closest_only>
+<parent_options_proxy_connect_timeout>Indiquer le temps impartit (time-out) pour ce cache parent</parent_options_proxy_connect_timeout>
+<parent_options_proxy_default>S'il s'agit d'un cache parent qui peut &ecirc;tre utilis&eacute; comme un &quot;dernier recours&quot;. et que l'ICP n'est activ&eacute; alors l'option &laquo;par d&eacute;faut&raquo; serait
+la plus appropri&eacute;e. [br]
+Ajouter default &agrave; un parent ne force pas toutes les demandes &agrave; adresser &agrave; ce parent.[br]
+le terme &quot;default&quot; est peut-&ecirc;tre un mauvais choix. [br]
+Si le cache est en mesure d'&eacute;tablir des liens directs, l'op&eacute;ration de connexion en directe sera l'op&eacute;ration pr&eacute;f&eacute;r&eacute;e par d&eacute;faut.[br]
+Pour forcer toutes les requ&ecirc;tes vers le(s) cache(s) parent (s), utilisez l'option &quot;never_direct&quot; (auto-g&eacute;r&eacute;e par Artica)</parent_options_proxy_default>
+<parent_options_proxy_digest_url>Indique &agrave; Squid de r&eacute;cup&eacute;rer le cache &quot;digest&quot; (si activ&eacute;) depuis le proxy parent avec l'url sp&eacute;cifi&eacute;e au lieue de la valeur par d&eacute;faut.</parent_options_proxy_digest_url>
+<parent_options_proxy_login>Si ce proxy doit s'authentifier sur le proxy parent[br]
+indiquez compte:mot de passe dans le champs ci-dessous</parent_options_proxy_login>
+<parent_options_proxy_multicast_responder>Indique que le proxy nomm&eacute; est un membre d'un groupe multicast.[br] les requ&ecirc;tes ICP ne seront pas envoy&eacute;es directement &agrave; l'h&ocirc;te, mais les r&eacute;ponses ICP de ce proxy seront accept&eacute;es .</parent_options_proxy_multicast_responder>
+<parent_options_proxy_no_delay>Pour emp&ecirc;cher l'acc&egrave;s &agrave; ce proxy voisin d'influencer le retardement de cycles.</parent_options_proxy_no_delay>
+<parent_options_proxy_no_digest>Pour ne PAS requ&ecirc;ter le cache &quot;digests&quot; depuis ce voisin</parent_options_proxy_no_digest>
+<parent_options_proxy_no_netdb_exchange>Ceci d&eacute;sactive la base ICMP RTT depuis le proxy voisin</parent_options_proxy_no_netdb_exchange>
+<parent_options_proxy_no_query>Definir pour les parents qui ne supportent pas les requ&ecirc;tes ICP.[br]
+Il est &eacute;vident d'avoir des doutes sur le port ICP  en utilisant cette option. [br]
+Squid ne se soucie pas du chiffre qui a &eacute;t&eacute; donn&eacute; dans le port ICP si l'option no-query est sp&eacute;cifi&eacute;e. [br]
+N'importe quel port est support&eacute;. [br]
+Il est recommand&eacute; d'utiliser 0 si ICP n'est pas utilis&eacute;.</parent_options_proxy_no_query>
+<parent_options_proxy_only>Les objets r&eacute;cup&eacute;r&eacute;s &agrave; partir de ce cache ne doivent pas &ecirc;tre sauvegard&eacute;s dans le cache local</parent_options_proxy_only>
+<parent_options_proxy_round_robin>Utilisation du round-robin en l'absence de requ&ecirc;tes ICP.</parent_options_proxy_round_robin>
+<parent_options_proxy_ttl>Sp&eacute;cifiez une dur&eacute;e de vie multicast (TTL) lors de l'envoi de requ&ecirc;tes de groupes ICP. [br] Nous n'acceptons pas les r&eacute;ponses &agrave; partir d'h&ocirc;tes ICP al&eacute;atoire. [br]Donc, vous devez configurer d'autres membres du groupe en tant que pairs avec l'option  multicast-responder</parent_options_proxy_ttl>
+<parent_options_proxy_weight>Pond&eacute;ration du proxy parent. Le poids doit &ecirc;tre un entier. Le poids par d&eacute;faut est de 1, plus le poids est important plus le proxy sera favoris&eacute;</parent_options_proxy_weight>
 <partitions>Partitions</partitions>
 <partitions_number>Nombre de partitions</partitions_number>
 <partition_infos>Information sur la partition</partition_infos>
@@ -2941,6 +2977,7 @@ while distributing domain2.com mail as usual.[br]
 <session_settings>Param&egrave;tres de session</session_settings>
 <settings>param&egrave;tres</settings>
 <setup_center_system>Logiciels syst&egrave;mes</setup_center_system>
+<set_options>D&eacute;finir les options</set_options>
 <set_quota>Param&egrave;trer le quota</set_quota>
 <SET_SCHEDULE>D&eacute;finir l'ordonnancement de la t&acirc;che</SET_SCHEDULE>
 <SET_SCHEDULE_TEXT>D&eacute;finissez l'heure de d&eacute;marrage de la t&acirc;che</SET_SCHEDULE_TEXT>
@@ -3277,6 +3314,16 @@ by changing 5xx reply codes into 4xx. However, this option is no cure for addres
 <SQUID_NEWVERSION_TEXT>Une nouvelle version du proxy Internet SQUID est disponible. Il est conseill&eacute; de la mettre &agrave; jour.</SQUID_NEWVERSION_TEXT>
 <SQUID_NOT_COMPILED_NTLM_RUN_RECONFIGURE>Le proxy principale (SQUID) n'est pas compil&eacute; avec la directive NTLM, si vous voulez utiliser l'authentification &agrave; travers un domaine NT, vous devez mettre &agrave; jour SQUID.[br]
 Cliquez sur le bouton ci-dessous afin d'ordonner cette op&eacute;ration.</SQUID_NOT_COMPILED_NTLM_RUN_RECONFIGURE>
+<squid_parent_options>Options des serveurs proxy distants</squid_parent_options>
+<squid_parent_proxy>Proxy Parent</squid_parent_proxy>
+<squid_parent_proxy_explain>Cette section autorise votre proxy &agrave; faire partie d'une hi&eacute;rarchie de serveurs proxys ou juste d'autoriser votre proxy &agrave; r&eacute;cup&eacute;rer les pages web de fa&ccedil;on indirecte depuis un autre proxy.</squid_parent_proxy_explain>
+<squid_parent_proxy_text>Lier votre proxy &agrave; d'autres proxy parents</squid_parent_proxy_text>
+<squid_parent_sibling_how_to>permet de d&eacute;finir le type de communication avec le cache distant.[br]
+Trois valeurs possible :[ul]
+[li][b]parent :[/b][br] le parent r&eacute;pond &agrave; son fils s'il poss&egrave;de l'objet, sinon, relaye la requ&ecirc;te &agrave; l'un de ses fils ;[br][/li]
+[li][b]sibling :[/b][br] Idem que pour parent, mais la requ&ecirc;te n'est pas relay&eacute;e en cas d'&eacute;chec de la demande ;[br][/li]
+[li][b]multicast :[/b][br]La requ&ecirc;te est &eacute;mise vers plusieurs cache via une adresse multicast.[br][/li]
+[/ul]</squid_parent_sibling_how_to>
 <squid_refresh_pattern_explain>C'est la section permettant de d&eacute;finir la r&eacute;tention du cache pour un site web</squid_refresh_pattern_explain>
 <squid_sizelimit>Limite des requ&ecirc;tes</squid_sizelimit>
 <squid_status>Statut de Squid</squid_status>
@@ -3368,6 +3415,12 @@ Plus de processus sont ex&eacute;cut&eacute;s, plus vous disposez d'une informat
 Moins de processus ex&eacute;cut&eacute;s vous permet de conserver de la puissance machine mais r&eacute;duit la qualit&eacute; d'information de la console Artica.</systemForkProcessesNumber_explain>
 <systemMaxOverloaded>Surcharge maximale</systemMaxOverloaded>
 <systemMaxOverloaded_explain>Si le syst&egrave;me d&eacute;passe cette limite, Artica va geler tous ses ordres et op&eacute;rations en cours (d&eacute;marrage des services, ex&eacute;cution de t&acirc;ches). Ceci afin de sauvegarder la puissance syst&egrave;me.</systemMaxOverloaded_explain>
+<SystemV5CacheEnabled>Activation du cache syst&egrave;me V5</SystemV5CacheEnabled>
+<SystemV5CacheEnabled_explain>Artica peut utiliser la m&eacute;moire syst&egrave;me du serveur.[br]Cela veut dire que les pages g&eacute;n&eacute;r&eacute;es/param&egrave;tres sont stock&eacute;s directement dans la m&eacute;moire partag&eacute;e du syst&egrave;me.[br]L'utilisation du cache syst&egrave;me V5 conserve le cache m&ecirc;me lorsque que vous vous fermez votre session sur l'interface d'administration.[br]
+Le cache est alors permanent.[br]
+[br]Pour reconstruire compl&egrave;tement les pages et les param&egrave;tres, vous avez besoin de cliquer sur &quot;Cache&quot; afin de vider la m&eacute;moire syst&egrave;me.[br]
+Cette m&eacute;thode &agrave; pour but d'am&eacute;liorer les performances de navigation &agrave; travers l'interface.[br]
+Si vous d&eacute;sactivez cette option, Artica utilisera uniquement un cache de &quot;session&quot; non permanent qui sera d&eacute;truit &agrave; chaque fermeture de session.</SystemV5CacheEnabled_explain>
 <system_disk>Disque syst&egrave;me</system_disk>
 <system_perfomances>Performances syst&egrave;me</system_perfomances>
 <system_perfomances_datas>Perf. de donn&eacute;es syst&egrave;me</system_perfomances_datas>

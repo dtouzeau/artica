@@ -560,6 +560,9 @@ $MaxtimeBackupMailSizeCalculate=trim($sock->GET_INFO("MaxtimeBackupMailSizeCalcu
 $systemForkProcessesNumber=trim($sock->GET_INFO("systemForkProcessesNumber"));
 $cpulimit=trim($sock->GET_INFO("cpulimit"));
 $cpuLimitEnabled=trim($sock->GET_INFO("cpuLimitEnabled"));
+$SystemV5CacheEnabled=trim($sock->GET_INFO("SystemV5CacheEnabled"));
+
+if(strlen(trim($SystemV5CacheEnabled))==0){$SystemV5CacheEnabled=1;}
 
 $systemMaxOverloaded=trim($sock->GET_INFO("systemMaxOverloaded"));
 
@@ -661,7 +664,11 @@ $html="
 			<td>" . help_icon("{mysql_server_text}")."</td>
 		</tr>
 		
-	
+		<tr>
+			<td nowrap width=1% align='right' class=legend>{SystemV5CacheEnabled}:</td>
+			<td>" . Field_checkbox("SystemV5CacheEnabled",1,$SystemV5CacheEnabled,"{enable_disable}")."</td>
+			<td>" . help_icon("{SystemV5CacheEnabled_explain}")."</td>
+		</tr>	
 		
 				
 		<tr>
@@ -747,6 +754,7 @@ return $tpl->_ENGINE_parse_body($html);
 
 
 function main_warn_preload(){
+	return null;
 	$users=new usersMenus();
 	if($users->preload_installed){return null;}
 	$html="<H5>{APP_PRELOAD_NOTINSTALLED}</h5>
@@ -953,6 +961,7 @@ $ini->loadString($sock->GET_INFO("ArticaPerformancesSettings"));
 if(isset($_GET["cpuLimitEnabled"])){$sock->SET_INFO('cpuLimitEnabled',$_GET["cpuLimitEnabled"]);}
 if(isset($_GET["systemMaxOverloaded"])){$sock->SET_INFO('systemMaxOverloaded',$_GET["systemMaxOverloaded"]);}
 if(isset($_GET["systemForkProcessesNumber"])){$sock->SET_INFO('systemForkProcessesNumber',$_GET["systemForkProcessesNumber"]);}
+if(isset($_GET["SystemV5CacheEnabled"])){$sock->SET_INFO('SystemV5CacheEnabled',$_GET["SystemV5CacheEnabled"]);}
 
 
 

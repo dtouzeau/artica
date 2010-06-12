@@ -410,6 +410,10 @@ function mysql_tabs(){
 		unset($array["smtp_packages"]);
 	}
 	
+	if($users->ZARAFA_APPLIANCE){
+		unset($array["web_packages"]);
+	}
+	
 	while (list ($num, $ligne) = each ($array) ){
 		if($_GET["main"]==$num){$class="id=tab_current";}else{$class=null;}
 		$ligne=$tpl->_ENGINE_parse_body($ligne);
@@ -544,7 +548,9 @@ if($users->POSTFIX_INSTALLED){
 	
 	$html=$html.spacer('{CORE_PRODUCTS}');
 	$html=$html.BuildRows("APP_POSTFIX",$GlobalApplicationsStatus,"postfix");
-	$html=$html.BuildRows("APP_CYRUS_IMAP",$GlobalApplicationsStatus,"cyrus-imapd");
+	if(!$users->ZARAFA_APPLIANCE){
+		$html=$html.BuildRows("APP_CYRUS_IMAP",$GlobalApplicationsStatus,"cyrus-imapd");
+	}
 	$html=$html.BuildRows("APP_ZARAFA",$GlobalApplicationsStatus,"zarafa");
 	
 	

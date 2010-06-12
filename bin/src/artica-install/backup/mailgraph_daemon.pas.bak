@@ -15,7 +15,6 @@ uses
 private
      LOGS:Tlogs;
      D:boolean;
-     GLOBAL_INI:TiniFIle;
      SYS:TSystem;
      artica_path:string;
      postfix:Tpostfix;
@@ -385,7 +384,7 @@ if MailGraphEnabled=0 then begin
 end;
 
 if SYS.isoverloadedTooMuch() then begin
-   logs.DebugLogs('Starting......: spamassassin System is overloaded');
+   logs.DebugLogs('Starting......: Mailgraph System is overloaded');
    exit;
 end;
 
@@ -501,9 +500,7 @@ end;
 procedure tMailgraphClass.MAILGRAPH_STOP();
 var
    pid   :string;
-   pids  :Tstringlist;
    count :integer;
-   i     :integer;
 begin
   count:=0;
   if not FileExists(postfix.POSFTIX_POSTCONF_PATH()) then exit;
@@ -538,7 +535,6 @@ end;
 procedure tMailgraphClass.WRITE_INITD();
 var
    l:TstringList;
-   initPath:string;
 begin
 
 l:=TstringList.Create;

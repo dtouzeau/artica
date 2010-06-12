@@ -727,7 +727,7 @@ begin
    if FIleExists(SYS.LOCATE_NDB_MGMD()) then list.Add('$_GLOBAL["MYSQL_NDB_MGMD_INSTALLED"]=True;') else list.Add('$_GLOBAL["MYSQL_NDB_MGMD_INSTALLED"]=False;');
 
    //rsync
-   if FileExists(SYS.LOCATE_GENERIC_BIN('rsync') then list.Add('$_GLOBAL["RSYNC_INSTALLED"]=True;') else list.Add('$_GLOBAL["RSYNC_INSTALLED"]=False;');
+   if FileExists(SYS.LOCATE_GENERIC_BIN('rsync')) then list.Add('$_GLOBAL["RSYNC_INSTALLED"]=True;') else list.Add('$_GLOBAL["RSYNC_INSTALLED"]=False;');
 
    //cpu,mem...
    list.Add('$_GLOBAL["CPU_NUMBER"]="'+ IntToStr(sys.CPU_NUMBER())+'";');

@@ -26,6 +26,7 @@ class squid{
 	var $protocol_field;
 	var $EnableKav4Proxy;
 	var $SQUID_VERSION;
+	var $EnableParentProxy=0;
 	var $dn;
 	
 	var $acl_list=array("browser"=>"{acl_browser}",
@@ -1476,6 +1477,7 @@ class squidbee{
 	var $SQUID_ICAP_ENABLED=false;
 	var $SQUID_VERSION="";
 	var $KAV4PROXY_INSTALLED=false;
+	var $EnableParentProxy=0;
 	
 	
 	function squidbee(){
@@ -1539,6 +1541,8 @@ class squidbee{
 		$this->visible_hostname=$ini->_params["NETWORK"]["visible_hostname"];
 		$this->LDAP_AUTH=$ini->_params["NETWORK"]["LDAP_AUTH"];
 		$this->NTLM_AUTH=$ini->_params["NETWORK"]["NTLM_AUTH"];
+		$this->EnableParentProxy=$ini->_params["NETWORK"]["EnableParentProxy"];
+
 		
 		$this->enable_kavproxy=$ini->_params["KAV"]["enabled"];
 		$this->enable_dansguardian=$ini->_params["DANSGUARDIAN"]["enable_dansguardian"];
@@ -1699,6 +1703,7 @@ function SaveToLdap(){
 			$ini=$ini."cdir=".implode(";",$this->network_array)."\n";
 			$ini=$ini."dns_servers=".implode(";",$this->dns_array)."\n";
 			$ini=$ini."LISTEN_PORT=$this->listen_port\n";
+			$ini=$ini."EnableParentProxy=$this->EnableParentProxy\n";
 			if($this->enable_dansguardian==1){
 					$this->alt_listen_port=$sock->RandomPort();
 					$dansguardian=new dansguardian();
@@ -2043,6 +2048,49 @@ public function SquidGuardDatabasesStatus($all=0){
 		if($this->ASROOT){echo "Starting......: Activate squidGuard \"$bin\"\n";}
 			return implode("\n",$conf);
 	}
+	
+	
+	private function cache_peer(){
+		if($this->EnableParentProxy==0){
+			return "\n#--------- SQUID PARENTS (feature not enabled)\n";
+		}
+		
+		$sql="SELECT * FROM squid_parents ORDER BY ID DESC";
+		$q=new mysql();
+		$results=$q->QUERY_SQL($sql,"artica_backup");
+		if(!$q->ok){
+			return "\n#--------- SQUID PARENTS (ERROR $q->mysql_error)\n";
+		}
+		$f[]="";
+		$f[]="";
+		$f[]="#--------- SQUID PARENTS";
+		while($ligne=@mysql_fetch_array($results,MYSQL_ASSOC)){
+			if(trim($ligne["servername"])==null){continue;}
+			if(trim($ligne["server_port"])==null){continue;}
+			if(trim($ligne["server_type"])==null){$ligne["server_type"]="parent";}
+			if(strlen(trim($ligne["icp_port"]))==0){$ligne["icp_port"]=0;}
+			if($ALREADY_CACHE_PEER[$ligne["servername"]]){continue;}
+			$array=unserialize(base64_decode($ligne["options"]));
+			if(!is_array($array)){$array=array("no-query"=>"" ,"no-digest"=>"");}
+					
+			while (list($num,$val)=each($array)){
+				
+				if(trim($num)==null){continue;}
+				if(trim($val)<>null){$z[]="$num=$val";}
+				else{$z[]=$num;}
+			}
+			$options=implode(" ",$z);
+			unset($z);unset($array);
+			$f[]="cache_peer {$ligne["servername"]} {$ligne["server_type"]} {$ligne["server_port"]} {$ligne["icp_port"]} $options";
+			$ALREADY_CACHE_PEER[$ligne["servername"]]=true;
+			}
+		
+		$f[]="";
+		
+		return implode("\n",$f);
+		
+	}
+	
 		
 		
 function BuildSquidConf(){
@@ -2055,7 +2103,7 @@ function BuildSquidConf(){
 		$kav_rules=$this->icap_kav_services_3();
 		$kav_acl="acl acl_kav_GET method GET\n";
 		$kav_acl=$this->acls_multimedias();
-			
+		$acl_blocked_sites="acl blockedsites url_regex \"/etc/squid3/squid-block.acl\"\n";
 			
 		if($this->hasProxyTransparent==1){$this->LDAP_AUTH=0;$this->NTLM_AUTH=0;}
 
@@ -2078,7 +2126,9 @@ function BuildSquidConf(){
 		$access_blocked_sites="http_access deny blockedsites\n";
 		$conf=$conf.$squidGuard;
 		
-		$acl_blocked_sites="acl blockedsites url_regex \"/etc/squid3/squid-block.acl\"\n";
+		$conf=$conf . $this->cache_peer();
+		
+		
 
 		$conf=$conf  ."\n#--------- acls\n";
 		if($EnableMalwarePatrol==1){
@@ -2089,7 +2139,8 @@ function BuildSquidConf(){
 		$conf=$conf ."acl to_localhost dst 127.0.0.0/32\n";
 		$conf=$conf. "acl CONNECT method CONNECT\n";
 		$conf=$conf. "acl manager proto cache_object\n";
-		
+		$conf=$conf. "acl FTP proto FTP\n";
+
 		
 		if(trim($users->SQUID_LDAP_AUTH)==1){
 				if(is_array($this->acl_times)){
@@ -2122,7 +2173,9 @@ function BuildSquidConf(){
 			$conf=$conf ."acl office_network src " . implode(" ",$this->network_array) ."\n";
 		}
 		
-		if(count($this->network_array)>0){$office_network="http_access allow office_network\n";}
+		if(count($this->network_array)>0){
+			$office_network="http_access allow office_network\n";
+		}
 		
 
 		
@@ -2145,6 +2198,11 @@ function BuildSquidConf(){
 		$conf=$conf."\n\n#--------- MAIN RULES...\n";
 		//$conf=$conf."follow_x_forwarded_for allow localhost\n";
 		
+		if($this->EnableParentProxy==1){
+			$conf=$conf."\n#--------- RULES THAT FORCE TO PASS trough parent proxies except FTP\n";
+			$conf=$conf."always_direct allow FTP\n";
+			$conf=$conf."always_direct deny all\n\n";
+		}		
 		
 		if($this->LDAP_AUTH==1){
 				$acl_access_time=$http_access_time;

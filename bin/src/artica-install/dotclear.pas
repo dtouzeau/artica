@@ -102,7 +102,6 @@ var
 RegExpr:TRegExpr;
 l:TStringList;
 i:integer;
-D:Boolean;
 begin
 
 
@@ -156,15 +155,11 @@ end;
 //##############################################################################
 procedure tdotclear.START();
 var
-   cmdline:string;
-   count:integer;
    pid:string;
    user:string;
    logs_path:string;
-   daemon:boolean;
-begin
-   daemon:=LOGS.COMMANDLINE_PARAMETERS('--daemon');
 
+begin
 logs.Debuglogs('###################### DOTCLEAR #####################');
 if not FIleExists('/usr/share/dotclear/index.php') then begin
     logs.Debuglogs('Starting......: lighttpd daemon for dotclear dotclear is not installed..');
@@ -173,7 +168,7 @@ end;
 
 
 
-   count:=0;
+
    if not FileExists(LIGHTTPD_BIN_PATH()) then begin
        logs.Debuglogs('tdotclear.START():: it seems that lighttpd is not installed... Aborting');
        exit;
@@ -265,11 +260,8 @@ end;
 //##############################################################################
 procedure tdotclear.RELOAD();
  var
-    count      :integer;
     pid:string;
 begin
-
-     count:=0;
 
 if not FIleExists('/usr/share/dotclear/index.php') then begin
     logs.Debuglogs('Starting lighttpd............: lighttpd daemon for dotclear dotclear is not installed');
@@ -291,9 +283,6 @@ var
 begin
 
   if not FIleExists('/usr/share/dotclear/index.php') then exit;
-
-
-
   ini:=TstringList.Create;
   ini.Add('[DOTCLEAR]');
   ini.Add('service_name=APP_DOTCLEAR');
@@ -416,10 +405,6 @@ end;
 
 procedure tdotclear.LIGHTTPD_DEFAULT_CONF();
 var
-RegExpr:TRegExpr;
-l:TStringList;
-i:integer;
-document:string;
 socket_path:string;
 session_path:string;
 user:string;

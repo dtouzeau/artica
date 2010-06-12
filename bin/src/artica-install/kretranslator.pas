@@ -6,7 +6,7 @@ unit kretranslator;
 interface
 
 uses
-    Classes, SysUtils,variants,strutils,IniFiles, Process,md5,logs,unix,RegExpr in 'RegExpr.pas',zsystem;
+    Classes, SysUtils,variants,strutils,IniFiles, Process,logs,unix,RegExpr in 'RegExpr.pas',zsystem;
 
   type
   tkretranslator=class
@@ -14,8 +14,6 @@ uses
 
 private
      LOGS:Tlogs;
-     D:boolean;
-     GLOBAL_INI:TiniFIle;
      SYS:TSystem;
      artica_path:string;
      RetranslatorHttpdPort:integer;
@@ -162,6 +160,7 @@ begin
       exit;
   end;
 
+   count:=0;
    while SYS.PROCESS_EXIST(pid) do begin
       TryStrToint(pid,pidnum);
       if pidnum>1 then begin
@@ -219,7 +218,6 @@ end;
 procedure tkretranslator.START();
 var
    count:integer;
-   pid:string;
 begin
 forceDirectories('/var/db/kav/databases');
 ForceDirectories('/var/db/kav/databases_backup');
@@ -245,7 +243,7 @@ if FileExists(SYS.LOCATE_LIGHTTPD_BIN_PATH()) then begin
    CREATE_HTTPD_CONF();
    CREATE_INITIAL_CONF();
    logs.OutputCmd(SYS.LOCATE_LIGHTTPD_BIN_PATH() + ' -f /etc/artica-postfix/lighttpd-retranslator.conf');
-   
+        count:=0;
         while not SYS.PROCESS_EXIST(PID_HTTP()) do begin
               sleep(100);
               inc(count);
@@ -474,18 +472,14 @@ end;
 
 function tkretranslator.VERSION():string;
 var
-   tmp            :string;
    RegExpr        :TRegExpr;
-   D              :boolean;
    F              :TstringList;
    T              :string;
    i              :integer;
 begin
    result:='';
-   if not FileExists(BIN_PATH()) then begin
-      if D then writeln('tkretranslator.VERSION() -> unable to stat binary');
-      exit;
-   end;
+   if not FileExists(BIN_PATH()) then exit;
+
    t:=logs.FILE_TEMP();
    fpsystem(BIN_PATH()+' -v >'+t+' 2>&1');
    if not FileExists(t) then exit;
@@ -508,9 +502,7 @@ function tkretranslator.PATTERN_DATE():string;
 var
    tmp            :string;
    RegExpr        :TRegExpr;
-   D              :boolean;
    F              :TstringList;
-   T              :string;
    i              :integer;
    patterndate    :string;
    fdate          :string;

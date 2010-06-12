@@ -853,6 +853,10 @@ begin
     if FileExists(xapian.PHP_SO_PATH()) then list.Add('$_GLOBAL["XAPIAN_PHP_INSTALLED"]=True;') else list.Add('$_GLOBAL["XAPIAN_PHP_INSTALLED"]=false;');
     xapian.free;
     if FileExists('/etc/artica-postfix/KASPER_MAIL_APP') then list.Add('$_GLOBAL["KASPERSKY_SMTP_APPLIANCE"]=True;') else list.Add('$_GLOBAL["KASPERSKY_SMTP_APPLIANCE"]=false;');
+    if FileExists('/etc/artica-postfix/ZARAFA_APPLIANCE') then list.Add('$_GLOBAL["ZARAFA_APPLIANCE"]=True;') else list.Add('$_GLOBAL["ZARAFA_APPLIANCE"]=false;');
+
+
+
 
     list.Add('$_GLOBAL["ldap_admin"]="' +  GLOBAL_INI.get_LDAP('admin') + '";');
     list.Add('$_GLOBAL["ldap_password"]="' +  GLOBAL_INI.get_LDAP('password') + '";');

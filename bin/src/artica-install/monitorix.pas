@@ -22,7 +22,6 @@ type LDAP=record
 
 private
      LOGS:Tlogs;
-     D:boolean;
      GLOBAL_INI:TiniFIle;
      SYS:TSystem;
      artica_path:string;
@@ -75,7 +74,6 @@ end;
 //##############################################################################
 procedure tmonitorix.START();
 var
-   pid:string;
    tmpstr:string;
    uri:string;
    port:string;

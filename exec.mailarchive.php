@@ -175,7 +175,7 @@ function quarantine_process($file){
 	$ldap=new clladp();
 	$q=new mysql();
 
-	events("Unpack $target_file");
+	events("Unpack $target_file " .@filesize($target_file)." bytes");
 	$mm=new demime($target_file);
 	if(!$mm->unpack()){
 		events("Failed unpack with error \"$mm->error\"");

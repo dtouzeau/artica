@@ -70,7 +70,6 @@ end;
 //#############################################################################
 function timapsync.MAILSYNC_VERSION():string;
 var
-   l:string;
    F:TstringList;
    t:string;
    i:integer;
@@ -113,7 +112,6 @@ end;
 
 function timapsync.VERSION():string;
 var
-   l:string;
    F:TstringList;
    t:string;
    i:integer;

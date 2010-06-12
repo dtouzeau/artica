@@ -111,8 +111,8 @@ private
        procedure  ShowScreen(line:string);
        function   POSTFIX_EXTRAINFOS_PATH(filename:string):string;
        procedure  SYSTEM_NETWORKS_SET_NIC_DEBIAN(nicname:string;ipadress:string;netmask:string;gateway:string;dhcp:string);
-       function FileSize_ko(path:string):longint;
-
+       function   FileSize_ko(path:string):longint;
+       procedure  GETTY_CHANGE_INITTAB();
 
 
        procedure MAIL_IMAP_CLIENT_CHECK();
@@ -419,7 +419,7 @@ public
 
       //start the service
       function  SYSTEM_START_ARTICA_DAEMON():boolean;
-      function  SYSTEM_START_ARTICA_ALL_DAEMON():boolean;
+      procedure SYSTEM_START_ARTICA_ALL_DAEMON();
       procedure SYSTEM_START_MINIMUM_DAEMON();
       procedure LDAP_VERIFY_PASSWORD();
       procedure START_ALL_DAEMONS();
@@ -843,12 +843,12 @@ end;
 //##############################################################################
 
 function myconf.SYSTEM_FQDN():string;
- var D:boolean;
+var
  ypdomainname:string;
  domainname:string;
   RegExpr:TRegExpr;
 begin
-    D:=COMMANDLINE_PARAMETERS('debug');
+
     fpsystem(SYS.LOCATE_GENERIC_BIN('hostname')+' -s >/opt/artica/logs/hostname.txt');
     result:=ReadFileIntoString('/opt/artica/logs/hostname.txt');
     result:=trim(result);
@@ -1130,7 +1130,6 @@ function myconf.SCAN_DISK_PHP(norecheck:boolean):string;
    DiskDev:string;
    SIZE:string;
    ID_BUS:string;
-   MOUNTED_HD:string;
    proc_partition:boolean;
 
 begin
@@ -2186,8 +2185,6 @@ end;
 function MyConf.ARTICA_VERSION():string;
 var
    l:string;
-   F:TstringList;
-
 begin
    l:=get_ARTICA_PHP_PATH() + '/VERSION';
    if not FileExists(l) then exit('0.00');
@@ -2850,7 +2847,6 @@ var
    sugarcrm:tsugarcrm;
    rsync:Trsync;
    policyd_weight:tpolicyd_weight;
-   ccyr:Tcyrus;
    ocsi:tocsi;
    mgreylist:tmilter_greylist;
    assp:tassp;
@@ -5500,6 +5496,18 @@ begin
           fpsystem('/etc/init.d/artica-postfix restart mysql');
        end;
 
+       if FileExists('/etc/artica-postfix/FROM_ISO') then begin
+          if not FileExists('/bin/login.old') then begin
+               writeln('Starting......: Change login binary');
+               fpsystem('/bin/mv /bin/login /bin/login.old');
+               fpsystem('/bin/ln -s /usr/share/artica-postfix/bin/artica-logon /bin/login');
+               fpsystem('/bin/chmod 777 /usr/share/artica-postfix/bin/artica-logon');
+               fpsystem('dpkg-divert --divert /bin/login.old /bin/login');
+               GETTY_CHANGE_INITTAB();
+          end;
+       end;
+
+
 
      logs:=Tlogs.Create;
 
@@ -5572,7 +5580,7 @@ fpsystem(SYS.LOCATE_PHP5_BIN()+' /usr/share/artica-postfix/exec.virtuals-ip.php 
 end;
 //##############################################################################
 
-function MyConf.SYSTEM_START_ARTICA_ALL_DAEMON():boolean;
+procedure MyConf.SYSTEM_START_ARTICA_ALL_DAEMON();
 begin
      SYSTEM_START_MINIMUM_DAEMON()
 end;
@@ -11912,6 +11920,39 @@ begin
 
    end;
 end;
-
+//#####################################################################################
+procedure myconf.GETTY_CHANGE_INITTAB();
+var
+l:Tstringlist;
+begin
+l.add('# /etc/inittab: init(8) configuration.');
+l.add('# $Id: inittab,v 1.91 2002/01/25 13:35:21 miquels Exp $');
+l.add('');
+l.add('id:2:initdefault:');
+l.add('si::sysinit:/etc/init.d/rcS');
+l.add('~~:S:wait:/sbin/sulogin');
+l.add('l0:0:wait:/etc/init.d/rc 0');
+l.add('l1:1:wait:/etc/init.d/rc 1');
+l.add('l2:2:wait:/etc/init.d/rc 2');
+l.add('l3:3:wait:/etc/init.d/rc 3');
+l.add('l4:4:wait:/etc/init.d/rc 4');
+l.add('l5:5:wait:/etc/init.d/rc 5');
+l.add('l6:6:wait:/etc/init.d/rc 6');
+l.add('z6:6:respawn:/sbin/sulogin');
+l.add('ca:12345:ctrlaltdel:/sbin/shutdown -t1 -a -r now');
+l.add('pf::powerwait:/etc/init.d/powerfail start');
+l.add('pn::powerfailnow:/etc/init.d/powerfail now');
+l.add('po::powerokwait:/etc/init.d/powerfail stop');
+l.add('');
+l.add('1:2345:respawn:/sbin/getty -i -n -l /usr/share/artica-postfix/bin/artica-logon 38400 tty1');
+l.add('2:23:respawn:/sbin/getty -i -n -l /usr/share/artica-postfix/bin/artica-logon 38400 tty2');
+l.add('3:23:respawn:/sbin/getty -i -n -l /usr/share/artica-postfix/bin/artica-logon 38400 tty3');
+l.add('4:23:respawn:/sbin/getty -i -n -l /usr/share/artica-postfix/bin/artica-logon 38400 tty4');
+l.add('5:23:respawn:/sbin/getty -i -n -l /usr/share/artica-postfix/bin/artica-logon 38400 tty5');
+l.add('6:23:respawn:/sbin/getty -i -n -l /usr/share/artica-postfix/bin/artica-logon 38400 tty6');
+l.add('');
+logs.WriteToFile(l.Text,'/etc/inittab');
+end;
+//#####################################################################################
 end.
 

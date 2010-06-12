@@ -15,7 +15,6 @@ uses
 
 private
      LOGS:Tlogs;
-     GLOBAL_INI:TiniFIle;
      SYS:TSystem;
 
 
@@ -69,12 +68,11 @@ end;
 //##############################################################################
 function Tbogofilter.VERSION():string;
 var
-   command_line:string;
    RegExpr:TRegExpr;
    l:TstringList;
    i:integer;
 begin
- command_line:=DEAMON_BIN_PATH() + ' --version >/opt/artica/tmp/bogover 2>&1';
+
  RegExpr:=TRegExpr.Create;
  RegExpr.Expression:='version\s+([0-9\.])';
  if not FileExists('/opt/artica/tmp/bogover') then exit;

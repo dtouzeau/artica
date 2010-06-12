@@ -4,6 +4,7 @@ include_once(dirname(__FILE__).'/ressources/class.ldap.inc');
 include_once(dirname(__FILE__).'/ressources/class.demime.inc');
 include_once(dirname(__FILE__).'/ressources/class.mysql.inc');
 include_once(dirname(__FILE__)."/framework/class.unix.inc");
+include_once(dirname(__FILE__)."/framework/frame.class.inc");
 if(preg_match("#--verbose#",implode(" ",$argv))){$GLOBALS["DEBUG"]=true;}
 
 
@@ -68,7 +69,7 @@ events("Processing ".count($files)." files in $quarantine_dir");
 ASSP_QUAR("/usr/share/assp/okmail");
 ASSP_QUAR("/usr/share/assp/notspam");		
 		
-		
+system(LOCATE_PHP5_BIN2()." ". dirname(__FILE__)."/exec.clean.logs.php &");		
 die();
 
 function ASSP_QUAR($baseDir){

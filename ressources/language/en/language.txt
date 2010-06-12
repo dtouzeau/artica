@@ -3837,3 +3837,63 @@ You will receive a quote from Artica Technology.</shallalist_buye>
  You need to rebuild your certificate and ask users/remote sites to download the new configuration package</OPENVPN_PASSWORD_CHANGED> 
  <reconnect_vpn_clients>Reconnect all VPN clients</reconnect_vpn_clients>
  <master_server>Master server</master_server>
+ <WEBMAIL>WebMail</WEBMAIL>
+ <APP_ZARAFA_ICAL>iCal, CalDav Gateway</APP_ZARAFA_ICAL>
+ <SystemV5CacheEnabled>Enable systemV5 cache</SystemV5CacheEnabled>
+ <SystemV5CacheEnabled_explain>Artica can use the shared memory system.[br]It means that generated web pages/parameters are saved directly into the server physical memory.[br]
+ Using systemV5 cache, when you loggoff pages/parameters are not deleted from the memory.
+ [br]You need to click on "Cache" link in order to empty the shared memory and force Artica to re-generate web pages.[br]
+ This method has been developped to safe performances when you browse trough the interface.[br]
+ If you disable this feature, Artica will only use session/file system cache and did not store any parameters/web cache in the shared memory</SystemV5CacheEnabled_explain>
+ <squid_parent_proxy>Parent Proxy</squid_parent_proxy>
+ <squid_parent_proxy_text>Link your proxy server to a parent proxy server</squid_parent_proxy>
+ <squid_parent_proxy_explain>
+This section allow your proxy to be part of a hierarchy of proxies or just allow your proxy to fetch content not directly 
+ from a web server but rather indirectly from another proxy.
+ </squid_parent_proxy_explain>
+ <edit_squid_parent_parameters>Edit Proxy Parent settings</edit_squid_parent_parameters>
+ <add_a_parent_proxy>Add a Parent Proxy</add_a_parent_proxy>
+ <squid_parent_sibling_how_to>neighbor selection:[ul]
+ [li][b]parent:[/b][br]
+ In a parent relationship, the child cache will forward requests to its parent cache.[br]
+  If the parent does not hold a requested object, it will forward the request on behalf of the child[br][/li]
+ [li][b]sibling:[/b][br] 
+A peer may only request objects already held in the cache; a sibling can not forward cache misses on behalf of the peer[br][/li] 
+[li][b]Multicast and Unicast:[/b][br] 
+A unicast packet is the complete opposite: one machine is talking to only one other machine. All TCP connections are unicast, since they can only have one destination host for each source host.[br]
+UDP packets are almost always unicast too, though they can be sent to the broadcast address so that they reach every single machine in some cases.[br][/li]
+[/ul]
+</squid_parent_sibling_how_to> 
+<icp_port>ICP port</icp_port>
+<icp_port_explain>Port number from which sends and receives ICP queries to and from neighbor caches. To disable "0" is used.</icp_port_explain>
+<squid_parent_options>Remote proxy server options</squid_parent_options>
+<set_options>Set options</set_options>
+<parent_options_proxy_only>Specify that objects fetched from this cache should not be saved locally</parent_options_proxy_only>
+<parent_options_proxy_weight>specify a weighted parent. The weight must be an integer. The default weight is 1, larger weights are favoured more</parent_options_proxy_weight>
+<parent_options_proxy_ttl>Specify a IP multicast Time To Live (ttl) value when sending ICP queries to multicast groups.[br]We do not accept ICP replies from random hosts. So you must configure other group members as peers with the multicast-responder option below</parent_options_proxy_ttl>
+<parent_options_proxy_no_query>
+Set for those peers, which do not support ICP queries.[br]
+It is obvious to have doubt about the ICP port specified in, while using this option.[br]
+Squid does not care what digit has been given in the ICP port when no-query is specified.[br]
+Using any number is fine.[br]
+It is recommended to use 0 to emphasis the fact that ICP is not used in any way (not even to UDP echo port 7).
+</parent_options_proxy_no_query>
+<parent_options_proxy_default>If this is a parent cache which can be used as a "last-resort." and not ICP enabled then "default" would 
+be the appropriate option.[br]
+Simply adding default to a parent does not force all requests to be sent to that parent.[br]
+The term default is perhaps a poor choice of words.[br]
+If the cache is able to make direct connections, direct will be preferred over default.[br]
+If needed to force all requests to parent cache(s), use the never_direct option</parent_options_proxy_default>
+<parent_options_proxy_round_robin>Define a set of parents which should be used in a round-robin fashion in the absence of any ICP queries</parent_options_proxy_round_robin>
+<parent_options_proxy_multicast_responder>Indicates that the named peer is a member of a multicast group. ICP queries will not be sent directly to the peer, but ICP replies will be accepted from it.</parent_options_proxy_multicast_responder>
+<parent_options_proxy_closest_only>Indicates that, for ICP_OP_MISS replies, we'll only forward CLOSEST_PARENT_MISSes and never FIRST_PARENT_MISSes</parent_options_proxy_closest_only>
+<parent_options_proxy_no_digest>To NOT request cache digests from this neighbor.</parent_options_proxy_no_digest>
+<parent_options_proxy_no_netdb_exchange>It disables requesting ICMP RTT database (NetDB) from the neighbor</parent_options_proxy_no_netdb_exchange>
+<parent_options_proxy_no_delay>To prevent access to this neighbor from influencing the delay pools</parent_options_proxy_no_delay>
+<parent_options_proxy_login>If this is a personal/workgroup proxy and your parent requires proxy authentication.[br]
+Fill username:password in the field.</parent_options_proxy_login>
+<parent_options_proxy_connect_timeout>Specify a peer specific connect timeout.</parent_options_proxy_connect_timeout>
+<parent_options_proxy_digest_url>To tell Squid to fetch the cache digest (if digests are enabled) for this host from the specified URL rather than the Squid default location.</parent_options_proxy_digest_url>
+<enable_squid_parent>Activate using parent proxy feature</enable_squid_parent>
+
+ 

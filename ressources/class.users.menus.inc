@@ -342,6 +342,7 @@ class usersMenus {
 	var $SQUIDGUARD_BINVER=0;
 	var $SQUIDGUARD_BIN_PATH="";
 	var $RSYNC_INSTALLED=false;
+	var $ZARAFA_APPLIANCE=false;
 	
 	function usersMenus($priv=null,$nobuild=0,$hostname=null){
 
@@ -608,6 +609,7 @@ class usersMenus {
 			$this->KASPERSKY_WEB_APPLIANCE=$_GLOBAL["KASPERSKY_WEB_APPLIANCE"];
 			$this->ArchStruct=$_GLOBAL["ArchStruct"];
 			$this->RSYNC_INSTALLED=$_GLOBAL["RSYNC_INSTALLED"];
+			$this->ZARAFA_APPLIANCE=$_GLOBAL["ZARAFA_APPLIANCE"];
 			
 			$this->hostname=str_replace('.(none)','',$this->hostname);
 			
@@ -1066,6 +1068,10 @@ private function build_user_left_menus(){
 			if($this->AsPostfixAdministrator==true){
 				$array["{messaging}"]["MAIN"]="javascript:Loadjs('postfix.index.php')";
 				$array["{messaging}"]["SUB"]["{main_parameters}"]="javascript:Loadjs('postfix.index.php')";
+				
+			  if($this->ZARAFA_APPLIANCE){
+			  	$array["{messaging}"]["SUB"]["{APP_ZARAFA_WEB}"]="javascript:Loadjs('zarafa.web.php')";
+			  }
 				
 				if($this->AMAVIS_INSTALLED){
 					if($sock->GET_INFO("EnableAmavisDaemon")==1){
@@ -1562,18 +1568,19 @@ private function build_user_left_menus(){
 	
 	
 	function _ParsePrivieleges($content=null){
+		$posix_getuid=posix_getuid();
 		if($content==null){$content=trim($_SESSION["privileges"]["ArticaGroupPrivileges"]);}
 		if(is_array($_SESSION["privileges_array"])){return $_SESSION["privileges_array"];} 
-			writelogs("_SESSION[privileges_array] is not an array",__CLASS__.'/'.__FUNCTION__,__FILE__);
+			if($posix_getuid<>0){writelogs("_SESSION[privileges_array] is not an array",__CLASS__.'/'.__FUNCTION__,__FILE__);}
 			if($content==null){
-				writelogs("No privileges _SESSION[privileges][ArticaGroupPrivileges] is null",__CLASS__.'/'.__FUNCTION__,__FILE__);
+				if($posix_getuid<>0){writelogs("No privileges _SESSION[privileges][ArticaGroupPrivileges] is null",__CLASS__.'/'.__FUNCTION__,__FILE__);}
 			}
-			writelogs($content,__CLASS__.'/'.__FUNCTION__,__FILE__);
+			if($posix_getuid<>0){writelogs($content,__CLASS__.'/'.__FUNCTION__,__FILE__);}
 			
 			if(preg_match_all('#\[([a-zA-Z]+)\]="([a-z0-9]+)"#is',$content,$reg)){
 				while (list ($num, $ligne) = each ($reg[1]) ){
 					if($reg[2][$num]=="yes"){
-						writelogs("Privilege  on $ligne",__CLASS__.'/'.__FUNCTION__,__FILE__);
+						if($posix_getuid<>0){writelogs("Privilege  on $ligne",__CLASS__.'/'.__FUNCTION__,__FILE__,__LINE__);}
 					}
 					$priv[$ligne]=$reg[2][$num];
 					}}

@@ -30,6 +30,7 @@ private
     function  GATEWAY_GET_PID():string;
     function  SERVER_GET_PID():string;
     function  DAGENT_GET_PID():string;
+    function  ICAL_GET_PID():string;
 
     function  SPOOLER_STATUS():string;
     function  SERVER_STATUS():string;
@@ -37,15 +38,18 @@ private
     function  GATEWAY_STATUS():string;
     function  MONITOR_STATUS():string;
     function  APACHE_STATUS():string;
+    function  ICAL_STATUS():string;
     function  APACHE_FOUND_ERROR():boolean;
 
     procedure CHECK_CYRUS_CONFIG();
     function  GATEWAY_BIN_PATH():string;
+    function  ICAL_BIN_PATH():string;
     procedure GATEWAY_START();
     procedure SPOOLER_START();
     procedure MONITOR_START();
     procedure DAGENT_START();
     procedure APACHE_CONFIG();
+    procedure ICAL_START();
     function  ZARAFA_WEB_PID_NUM():string;
 
     procedure SERVER_STOP();
@@ -53,6 +57,7 @@ private
     procedure MONITOR_STOP();
     procedure GATEWAY_STOP();
     procedure DAGENT_STOP();
+    procedure ICAL_STOP();
 
 public
     procedure   Free;
@@ -127,6 +132,11 @@ begin
 result:=SYS.LOCATE_GENERIC_BIN('zarafa-dagent');
 end;
 //##############################################################################
+function tzarafa_server.ICAL_BIN_PATH():string;
+begin
+result:=SYS.LOCATE_GENERIC_BIN('zarafa-ical');
+end;
+//##############################################################################
 function tzarafa_server.SERVER_GET_PID():string;
 Var
    RegExpr:TRegExpr;
@@ -143,6 +153,23 @@ begin
      result:=SYS.PIDOF(SERVER_BIN_PATH());
 end;
 //##############################################################################
+function tzarafa_server.ICAL_GET_PID():string;
+Var
+   RegExpr:TRegExpr;
+   list:TstringList;
+   i:integer;
+   PidPath:string;
+   D:boolean;
+begin
+     if FileExists('/var/run/zarafa-ical.pid') then begin
+        result:=SYS.GET_PID_FROM_PATH('/var/run/zarafa-ical.pid');
+     end;
+
+     if length(result)>2 then exit;
+     result:=SYS.PIDOF(ICAL_BIN_PATH());
+end;
+//##############################################################################
+
 function tzarafa_server.SPOOLER_GET_PID():string;
 Var
    RegExpr:TRegExpr;
@@ -212,7 +239,11 @@ end;
 procedure tzarafa_server.server_cfg();
 var
    l:TStringList;
+   ZarafaiCalPort:Integer;
 begin
+
+forceDirectories('/var/log/zarafa');
+
 l:=Tstringlist.Create;
 l.add('server_bind		= 127.0.0.1');
 l.add('server_tcp_enabled	= yes');
@@ -476,7 +507,7 @@ logs.WriteToFile(l.Text,'/etc/zarafa/dagent.cfg');
 l.clear;
 l.free;
 
-
+// /etc/zarafa/monitor.cfg
 l:=Tstringlist.Create;
 l.add('server_socket	=	file:///var/run/zarafa');
 l.add('run_as_user = ');
@@ -497,6 +528,28 @@ l.add('companyquota_warning_template   =   /etc/zarafa/quotamail/companywarning.
 l.add('companyquota_soft_template      =   /etc/zarafa/quotamail/companysoft.mail');
 l.add('companyquota_hard_template      =   /etc/zarafa/quotamail/companyhard.mail');
 logs.WriteToFile(l.Text,'/etc/zarafa/monitor.cfg');
+l.clear;
+l.free;
+
+// /etc/zarafa/ical.cfg
+if not TryStrToInt(SYS.GET_INFO('ZarafaiCalPort'),ZarafaiCalPort) then ZarafaiCalPort:=8088;
+l:=Tstringlist.Create;
+l.add('server_bind	=	0.0.0.0');
+l.add('run_as_user      =       root');
+l.add('run_as_group     =       root');
+l.add('ical_port	=	'+IntToStr(ZarafaiCalPort));
+l.add('ical_enable      =       yes');
+l.add('server_socket	=	file:///var/run/zarafa');
+l.add('pid_file         =	/var/run/zarafa-ical.pid');
+l.add('log_method	=	syslog');
+l.add('log_level	=	2');
+l.add('log_file	        =	/var/log/zarafa/ical.log');
+l.add('log_timestamp	=	1');
+logs.WriteToFile(l.Text,'/etc/zarafa/ical.cfg');
+l.clear;
+l.free;
+
+
 end;
 //#############################################################################
 function tzarafa_server.VERSION(nocache:boolean):string;
@@ -563,6 +616,7 @@ begin
   MONITOR_START();
   GATEWAY_START();
   DAGENT_START();
+  ICAL_START();
   APACHE_START();
 end;
 //#############################################################################
@@ -581,6 +635,7 @@ begin
   MONITOR_STOP();
   GATEWAY_STOP();
   DAGENT_STOP();
+  ICAL_STOP();
 end;
 //#############################################################################
 procedure tzarafa_server.SERVER_START();
@@ -640,6 +695,7 @@ ini.Add(DAGENT_STATUS());
 ini.Add(GATEWAY_STATUS());
 ini.Add(MONITOR_STATUS());
 ini.Add(APACHE_STATUS());
+ini.Add(ICAL_STATUS());
 result:=ini.Text;
 ini.free;
 end;
@@ -683,8 +739,6 @@ pid:=SERVER_GET_PID();
       ini.free;
 end;
 //##############################################################################
-
-
 procedure tzarafa_server.SPOOLER_START();
 var
    zbin:string;
@@ -1017,6 +1071,144 @@ pid:=DAGENT_GET_PID();
       ini.free;
 end;
 //##############################################################################
+procedure tzarafa_server.ICAL_START();
+var
+   zbin:string;
+   cmd:string;
+   pid:string;
+   count:integer;
+   ZarafaiCalEnable:integer;
+begin
+    zbin:=ICAL_BIN_PATH();
+    if not FileExists(zbin) then exit;
+    pid:=ICAL_GET_PID();
+    if not TryStrToINt(SYS.GET_INFO('ZarafaiCalEnable'),ZarafaiCalEnable) then ZarafaiCalEnable:=0;
+
+
+
+
+
+if sys.PROCESS_EXIST(pid) then begin
+      logs.DebugLogs('Starting zarafa..............: Zarafa iCal/CalDAV gateway already running PID '+ pid);
+      if ZarafaiCalEnable=0 then ICAL_STOP();
+      exit;
+end;
+
+if ZarafaiCalEnable=0 then begin
+   logs.DebugLogs('Starting zarafa..............: Zarafa iCal/CalDAV gateway is disabled by Artica');
+   exit;
+end;
+
+logs.DebugLogs('Starting zarafa..............: Zarafa iCal/CalDAV gateway config "/etc/zarafa/zarafa-ical.cfg"');
+cmd:=zbin+' -c /etc/zarafa/ical.cfg';
+fpsystem(cmd);
+
+pid:=ICAL_GET_PID();
+count:=0;
+ while not SYS.PROCESS_EXIST(pid) do begin
+        sleep(100);
+        inc(count);
+        if count>40 then begin
+           logs.DebugLogs('Starting zarafa..............: Zarafa iCal/CalDAV gateway (timeout)');
+           break;
+        end;
+        pid:=ICAL_GET_PID();
+  end;
+pid:=ICAL_GET_PID();
+if sys.PROCESS_EXIST(pid) then begin
+      logs.DebugLogs('Starting zarafa..............: Zarafa iCal/CalDAV gateway success running PID '+ pid);
+      exit;
+end;
+logs.DebugLogs('Starting zarafa..............: Zarafa iCal/CalDAV gateway failed "'+cmd+'"');
+end;
+//##############################################################################
+function tzarafa_server.ICAL_STATUS():string;
+var
+   ini:TstringList;
+   pid,pid_path:string;
+   ZarafaiCalEnable:integer;
+begin
+if not FileExists(ICAL_BIN_PATH()) then begin
+   SYS.MONIT_DELETE('APP_ZARAFA_ICAL');
+   exit;
+end;
+    if not TryStrToINt(SYS.GET_INFO('ZarafaiCalEnable'),ZarafaiCalEnable) then ZarafaiCalEnable:=0;
+
+
+      ini:=TstringList.Create;
+      ini.Add('[APP_ZARAFA_ICAL]');
+      ini.Add('service_name=APP_ZARAFA_ICAL');
+      ini.Add('service_cmd=zarafa');
+      ini.Add('service_disabled='+INtToSTr(ZarafaiCalEnable));
+      ini.Add('master_version=' + VERSION());
+
+      if ZarafaiCalEnable=0 then begin
+         result:=ini.Text;
+         ini.free;
+         SYS.MONIT_DELETE('APP_ZARAFA_ICAL');
+         exit;
+      end;
+
+      pid_path:='/var/run/zarafa-ical.pid';
+      if SYS.MONIT_CONFIG('APP_ZARAFA_ICAL',pid_path,'zarafa') then begin
+         ini.Add('monit=1');
+         result:=ini.Text;
+         ini.free;
+         exit;
+      end;
+
+      pid:=ICAL_GET_PID();
+
+
+      if SYS.PROCESS_EXIST(pid) then ini.Add('running=1') else  ini.Add('running=0');
+      ini.Add('application_installed=1');
+      ini.Add('master_pid='+ pid);
+      ini.Add('master_memory=' + IntToStr(SYS.PROCESS_MEMORY(pid)));
+      ini.Add('status='+SYS.PROCESS_STATUS(pid));
+      result:=ini.Text;
+      ini.free;
+end;
+//##############################################################################
+
+procedure tzarafa_server.ICAL_STOP();
+var
+   zbin:string;
+   pid:string;
+   count:integer;
+begin
+     zbin:=ICAL_BIN_PATH();
+    if not FileExists(zbin) then begin
+       writeln('Stopping Zarafa iCal/CalDAV..: Not installed');
+       exit;
+    end;
+   pid:=ICAL_GET_PID();
+
+   if not sys.PROCESS_EXIST(pid) then begin
+       writeln('Stopping Zarafa iCal/CalDAV..: Already stopped');
+       exit;
+   end;
+       writeln('Stopping Zarafa iCal/CalDAV..: PID '+pid);
+   fpsystem('/bin/kill '+ pid);
+  while sys.PROCESS_EXIST(pid) do begin
+      sleep(100);
+      fpsystem('/bin/kill '+ pid);
+      inc(count);
+      if count>50 then begin
+       writeln('Stopping Zarafa iCal/CalDAV..: Time-out');
+         logs.OutputCmd('/bin/kill -9 ' + pid);
+         break;
+      end;
+      pid:=ICAL_GET_PID();
+  end;
+pid:=ICAL_GET_PID();
+   if not sys.PROCESS_EXIST(pid) then begin
+       writeln('Stopping Zarafa iCal/CalDAV..: stopped');
+       exit;
+   end;
+       writeln('Zarafa iCal/CalDAV gateway...: failed');
+end;
+//##############################################################################
+
 procedure tzarafa_server.DAGENT_STOP();
 var
    zbin:string;

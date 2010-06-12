@@ -1,4 +1,4 @@
-1.4.061013:
+1.4.061220:
 ========================================================================================
 
 System Changes
@@ -8,16 +8,18 @@ System Changes
 1.4.060823: Improve settings virtuals IP addresses.
 1.4.061013: Fix OpenVPN section minors bugs.
 1.4.061013: Fix user can have access to the main admin interface
+1.4.061220: Adding possibility to disable systemv5 cache system for the web interface (under artica performances area).
 
 Messaging Changes:
 -----------------------------------------------
 1.4.060313: Fix unable to open ISP macros under messaging feature.
-1.4.060401: Fix demime error before backup mails. This cause illimited stored mysql error files in /var/log/artica-postfix that cause crash server. 
+1.4.060401: Fix demime error before backup mails. This cause illimited stored mysql error files in /var/log/artica-postfix that cause crash server.
+1.4.061220: Adding Zarafa ICal/CalDav process startup/monitor  
 
 Proxy Changes:
 -------------------------------------------------
 1.4.060823: Enable C-ICAP has the main urls filtering engine.
-
+1.4.061220: Supporting "Proxy parents" features under the proxy networking section. 
 
 
 1.4.053118:

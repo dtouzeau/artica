@@ -163,6 +163,7 @@ if(trim($persologon)<>null){
 	
 if($user->KASPERSKY_SMTP_APPLIANCE){$imglogon="img/logon-k.png";}
 if($user->KASPERSKY_WEB_APPLIANCE){$imglogon="img/logon-squidk.png";}
+if($user->ZARAFA_APPLIANCE){$imglogon="img/logon-zarafa.png";}
 $page=CurrentPageName();
 
 

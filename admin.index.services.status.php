@@ -669,6 +669,7 @@ function SERVICES_STATUS(){
 		$html=$html . BuildRow($users,$ini->_params["APP_ZARAFA_GATEWAY"],"{APP_ZARAFA_GATEWAY}");
 		$html=$html . BuildRow($users,$ini->_params["APP_ZARAFA_MONITOR"],"{APP_ZARAFA_MONITOR}");
 		$html=$html . BuildRow($users,$ini->_params["APP_ZARAFA_DAGENT"],"{APP_ZARAFA_DAGENT}");
+		$html=$html . BuildRow($users,$ini->_params["APP_ZARAFA_ICAL"],"{APP_ZARAFA_ICAL}");
 		$html=$html . BuildRow($users,$ini->_params["APP_ZARAFA_WEB"],"{APP_ZARAFA_WEB}");	
 		
 		$html=$html . BuildRow($users,$ini->_params["FETCHMAIL"],"{APP_FETCHMAIL}");

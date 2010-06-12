@@ -12,6 +12,8 @@ class sockets{
 	
 	function sockets(){
 		if($GLOBALS["DEBUG"]){echo "Instanciate sockets()\n";}
+		$GLOBALS["posix_getuid"]=posix_getuid();
+		
 		$this->remote_ip=$this->APC_GET("ARTICA_DAEMON_IP");
 		$this->remote_port=$this->APC_GET("ARTICA_DAEMON_PORT");
 		
@@ -168,7 +170,7 @@ function downloadFile($url,$hostname)  {
    			
    	$value=trim($this->getFrameWork("getinfos.php?key=$key&uid=".$uid));
     $GLOBALS["GET_INFO"][$key]=$value;
-   	$this->SET_APC_STORE($key,$value);
+   	if(!$nocache){$this->SET_APC_STORE($key,$value);}
    	return trim($value);
    
    	}
@@ -332,18 +334,62 @@ function GET_MYSQL_ROOT($key){
 				$results=trim($regs[1]);
 				return $results;
 		}
-	if(preg_match('#<articadatascgi>(.+)</artic\s+adatascgi>#s',$line,$regs)){
+	if(preg_match('#<articadatascgi>(.+)</\s+articadatascgi>#s',$line,$regs)){
 				$results=trim($regs[1]);
 				return $results;
 		}
+		
+		if(preg_match('#<articadatascgi>(.+)</artic\s+adatascgi>#s',$line,$regs)){
+				$results=trim($regs[1]);
+				return $results;
+		}		
 		
 			
 			writelogs("unable to preg_match \"$line\" uri=$uri",__FUNCTION__,__FILE__);
 		
 	}
 	
+	private function SYSTEMV5_ENABLED(){
+		
+		
+		
+		if($GLOBALS["SystemV5CacheEnabled"]<>null){
+			if($GLOBALS["SystemV5CacheEnabled"]==1){return true;}
+			return false;
+		}
+		
+		if($GLOBALS["posix_getuid"]>0){
+			if(strlen(trim($_SESSION["SystemV5CacheEnabled"]))==0){
+				$_SESSION["SystemV5CacheEnabled"]=$this->GET_INFO("SystemV5CacheEnabled",true);
+				if(strlen(trim($_SESSION["SystemV5CacheEnabled"]))==0){$_SESSION["SystemV5CacheEnabled"]=1;}
+				$GLOBALS["SystemV5CacheEnabled"]=$_SESSION["SystemV5CacheEnabled"];
+			}else{
+				$GLOBALS["SystemV5CacheEnabled"]=$_SESSION["SystemV5CacheEnabled"];
+			}
+			
+			
+			
+		}else{
+			$GLOBALS["SystemV5CacheEnabled"]=$this->GET_INFO("SystemV5CacheEnabled",true);
+			if(strlen(trim($GLOBALS["SystemV5CacheEnabled"]))==0){$GLOBALS["SystemV5CacheEnabled"]=1;}
+			
+		}
+		
+		
+		if($GLOBALS["SystemV5CacheEnabled"]<>null){
+			if($GLOBALS["SystemV5CacheEnabled"]==1){return true;}
+			return false;
+		}	
+		
+	}
+	
 	
 	function DATA_CACHE_SAVE($key,$value,$IsAnArray=false){
+		if(!$this->SYSTEMV5_ENABLED()){
+			$_SESSION["APC"][$key]=$value;
+			$_SESSION["APC"]["{$key}-time"]=time();
+			return;
+		}
 		$shm=new semaphores($this->semaphore_key,$this->semaphore_memory);
 		$shm->SET($key,$value);
 		$shm->SET("{$key}-time",time());
@@ -351,10 +397,19 @@ function GET_MYSQL_ROOT($key){
 		}
 		
 	function DATA_CACHE($key,$IsAnArray=false,$maxtime=0){
-	   		$shm=new semaphores($this->semaphore_key,$this->semaphore_memory);
-			$value=$shm->GET($key);
-   			$time=$shm->GET("{$key}-time");
-			$shm->CLOSE();
+			if(!$this->SYSTEMV5_ENABLED()){
+				$value=$_SESSION["APC"][$key];
+				$data1=$_SESSION["APC"]["{$key}-time"];
+				$data2 = time();
+				$difference = ($data2 - $data1); 
+				$min=round($difference/60);	 
+				if($min>$maxtime){$value=null;}
+				return $value;   			
+   			}
+   		$shm=new semaphores($this->semaphore_key,$this->semaphore_memory);
+		$value=$shm->GET($key);
+		$time=$shm->GET("{$key}-time");
+		$shm->CLOSE();
    		if($maxtime>0){
 	 		$data1 = $time;
 			$data2 = time();
@@ -371,6 +426,7 @@ function GET_MYSQL_ROOT($key){
 	}		
 	
 	function LANGUAGE_CACHE_IMPORT($array_keys,$lang){
+		if(!$this->SYSTEMV5_ENABLED()){return null;}
 		$shm=new semaphores($this->semaphore_key,$this->semaphore_memory,2);
 		$shm->SET($lang,$array_keys);
 		$shm->CLOSE();
@@ -379,11 +435,12 @@ function GET_MYSQL_ROOT($key){
 
 
 	function LANGUAGE_DUMP($lang){
-		
-		$shm=new semaphores($this->semaphore_key,$this->semaphore_memory,2);
-		if($shm->ok){
-			$data=$shm->GET($lang);
-			$shm->CLOSE();
+		if($this->SYSTEMV5_ENABLED()){
+			$shm=new semaphores($this->semaphore_key,$this->semaphore_memory,2);
+			if($shm->ok){
+				$data=$shm->GET($lang);
+				$shm->CLOSE();
+			}
 		}
 		
 		if($GLOBALS["DEBUG"]){echo "LANGUAGE_DUMP Memory store ". count($data)." rows\n";}
@@ -425,34 +482,40 @@ function GET_MYSQL_ROOT($key){
 	
 	
 	function SET_APC_STORE($key,$value){
-		$shm=new semaphores($this->semaphore_key,$this->semaphore_memory,3);
-		$shm->SET($key,$value);
-		$shm->SET("{$key}-time",time());
+		if($this->SYSTEMV5_ENABLED()){
+			$shm=new semaphores($this->semaphore_key,$this->semaphore_memory,3);
+			$shm->SET($key,$value);
+			$shm->SET("{$key}-time",time());
+			$shm->CLOSE();
+		}
+		
 		$_SESSION["APC"][$key]=$value;
 		$_SESSION["APC"]["{$key}-time"]=time();
-		$shm->CLOSE();
+		
 		}
 		
 	function APC_CLEAN(){
-		$shm=new semaphores($this->semaphore_key,$this->semaphore_memory,3);
 		unset($_SESSION["APC"]);
+		$shm=new semaphores($this->semaphore_key,$this->semaphore_memory,3);
 		$shm->removekey();
 		$shm->Delete();
 		$shm->CLOSE();
+		
 	}
 	
 	function APC_GET($key,$maxtime=0){
 			$value=$_SESSION["APC"][$key];
 			$time=$_SESSION["APC"][$key];
 			if($GLOBALS["DEBUG"]){echo "APC_GET($key,$maxtime) no _SESSION cache\n";}
-			if(trim($value)==null){
-   				$shm=new semaphores($this->semaphore_key,$this->semaphore_memory,3);   				
-				if($GLOBALS["DEBUG"]){echo "APC_GET($key,$maxtime) -> semaphores($sock->semaphore_key,$sock->semaphore_memory,3) \n";}
-				$value=$shm->GET($key);
-   				$time=$shm->GET("{$key}-time");
-   				$_SESSION["APC"][$key]=$value;
-   				$_SESSION["APC"]["{$key}-time"]=$time;
-			}
+			if($this->SYSTEMV5_ENABLED()){
+				if(trim($value)==null){
+	   				$shm=new semaphores($this->semaphore_key,$this->semaphore_memory,3);   				
+					if($GLOBALS["DEBUG"]){echo "APC_GET($key,$maxtime) -> semaphores($sock->semaphore_key,$sock->semaphore_memory,3) \n";}
+					$value=$shm->GET($key);
+	   				$time=$shm->GET("{$key}-time");
+	   				$_SESSION["APC"][$key]=$value;
+	   				$_SESSION["APC"]["{$key}-time"]=$time;
+			}}
 
    		if($maxtime>0){
    			$md5=md5("{$key}-time");
@@ -474,7 +537,6 @@ function GET_MYSQL_ROOT($key){
 	
 	function APC_SAVE($key,$value){
 		$this->SET_APC_STORE($key,$value);
-		$this->SET_APC_STORE("{$key}-time",time());
 	}
    
 		

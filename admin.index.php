@@ -497,6 +497,11 @@ if($users->KASPERSKY_WEB_APPLIANCE){
 	$title=$tpl->_ENGINE_parse_body("<span style='color:#005447'>{WELCOME}</span> <span style='font-size:13px;color:#005447'>For Kaspersky Web Appliance</span>&nbsp;|&nbsp;<span style='font-size:12px'>{$hash["displayName"]} - <span style='text-transform:lowercase'>$usersmenus->hostname</span></span>");
 }
 
+if($users->ZARAFA_APPLIANCE){
+	$title=$tpl->_ENGINE_parse_body("<span style='color:#005447'>{WELCOME}</span> <span style='font-size:13px;color:#005447'>For Zarafa Mail Appliance</span>&nbsp;|&nbsp;<span style='font-size:12px'>{$hash["displayName"]} - <span style='text-transform:lowercase'>$usersmenus->hostname</span></span>");
+	
+}
+
 $tpl=new template_users($title,$html,$_SESSION,0,0,0,$cfg);
 error_log(basename(__FILE__)." ".__FUNCTION__.'() line '. __LINE__);
 $html=$tpl->web_page;

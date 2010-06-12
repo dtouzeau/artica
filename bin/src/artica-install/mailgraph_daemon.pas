@@ -6,7 +6,7 @@ unit mailgraph_daemon;
 interface
 
 uses
-    Classes, SysUtils,variants,strutils,IniFiles, Process,logs,unix,RegExpr in 'RegExpr.pas',zsystem,postfix_class;
+    Classes, SysUtils,variants,strutils, Process,logs,unix,RegExpr in 'RegExpr.pas',zsystem,postfix_class;
 
   type
   tMailgraphClass=class
@@ -15,7 +15,6 @@ uses
 private
      LOGS:Tlogs;
      D:boolean;
-     GLOBAL_INI:TiniFIle;
      SYS:TSystem;
      artica_path:string;
      postfix:Tpostfix;
@@ -501,9 +500,7 @@ end;
 procedure tMailgraphClass.MAILGRAPH_STOP();
 var
    pid   :string;
-   pids  :Tstringlist;
    count :integer;
-   i     :integer;
 begin
   count:=0;
   if not FileExists(postfix.POSFTIX_POSTCONF_PATH()) then exit;
@@ -538,7 +535,6 @@ end;
 procedure tMailgraphClass.WRITE_INITD();
 var
    l:TstringList;
-   initPath:string;
 begin
 
 l:=TstringList.Create;

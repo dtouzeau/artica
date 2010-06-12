@@ -1,3 +1,5 @@
+</li>
+<//li>
 <about_organization>This section allows you to manage users and domains according your privileges</about_organization>
 <about_procmail>Procmail is a powerful and robust set of tools that enable you to automatically process mail as you receive it or after it is already in a message folder.[br]
 Procmail is a mail processing utility, which can help you filter your mail, sort incoming mail according to sender, Subject line, length of message, keywords in the message, implement an ftp-by-mail server, and much more.[br]
@@ -141,6 +143,7 @@ Add a list:exe,pif,bat,pdf,doc</add_attachment_blocking_text_explain>
 <add_auto_connection_explain>will auto-mount directly in /automounts/mount-name directory</add_auto_connection_explain>
 <add_a_new_tab>Add a new tab</add_a_new_tab>
 <add_a_new_tab_text>Add a new page in order to add more widgets</add_a_new_tab_text>
+<add_a_parent_proxy>Add a Parent Proxy</add_a_parent_proxy>
 <add_block_site_explain>Add a web site that will be stored by this category</add_block_site_explain>
 <ADD_COMPUTER>Add a new computer</ADD_COMPUTER>
 <add_computer_access>Add computer access</add_computer_access>
@@ -556,6 +559,7 @@ If you enable this feature, you will be able to share folders trough the explore
 <APP_ZARAFA>Zarafa Collaboration</APP_ZARAFA>
 <APP_ZARAFA_DAGENT>Zarafa Delivery Agent</APP_ZARAFA_DAGENT>
 <APP_ZARAFA_GATEWAY>Zarafa Gateway</APP_ZARAFA_GATEWAY>
+<APP_ZARAFA_ICAL>iCal, CalDav Gateway</APP_ZARAFA_ICAL>
 <APP_ZARAFA_MONITOR>Zarafa Monitor</APP_ZARAFA_MONITOR>
 <APP_ZARAFA_SERVER>Zarafa server</APP_ZARAFA_SERVER>
 <APP_ZARAFA_SPOOLER>Zarafa Spooler</APP_ZARAFA_SPOOLER>
@@ -752,6 +756,9 @@ Specify 0 when mail delivery should be tried only once.</bounce_queue_lifetime_t
 [br]By default, these notifications are generated from built-in templates with message headers and message text.
 [br]This option allows you to override the built-in information</bounce_template_file_text>
 <BP>Post Office Box</BP>
+<br>
+ In a parent relationship, the child cache will forward requests to its parent cache.<br>
+  If the parent does not hold a requested object, it will forward the request on behalf of the child<br></br>
 <broadcast>Broadcast</broadcast>
 <broken_sasl_auth_clients>obsolete SMTP clients compatibility</broken_sasl_auth_clients>
 <broken_sasl_auth_clients_text>Enable inter-operability with SMTP clients that implement an obsolete version of the AUTH command (RFC 4954).[br]
@@ -1188,6 +1195,7 @@ Setting this parameter to a value of 1 changes the meaning of the corresponding 
 <edit mode>edit mode</edit mode>
 <edit_paremeters>Set parameters for this section</edit_paremeters>
 <edit_rule>Edit a rule</edit_rule>
+<edit_squid_parent_parameters>Edit Proxy Parent settings</edit_squid_parent_parameters>
 <edit_table>Edit the table</edit_table>
 <edit_user>Edit this user</edit_user>
 <EHLOattrsXFORWARD>X-forward attributes</EHLOattrsXFORWARD>
@@ -1293,6 +1301,7 @@ disabling it just safe performances... </enable_philesight_text>
 <enable_shutdown_interface>Enable shutdown button when disconnecting</enable_shutdown_interface>
 <enable_squidguard>Enable squidGuard</enable_squidguard>
 <enable_squidguard_text>SquidGuard is a URL redirector used to use blacklists with the proxy software Squid</enable_squidguard_text>
+<enable_squid_parent>Activate using parent proxy feature</enable_squid_parent>
 <enable_ssl>Enable SSL</enable_ssl>
 <enable_this_filter>Enable this filter</enable_this_filter>
 <enable_this_option>Enable this feature</enable_this_option>
@@ -1652,6 +1661,8 @@ It send notifications to recipients in order to allow them to "download" attache
 <https_mode>HTTPS Mode</https_mode>
 <HTTP_FILTER_MONITOR>Web filter monitor</HTTP_FILTER_MONITOR>
 <icon_artica_events_front_end>Artica events icon on the frontend page</icon_artica_events_front_end>
+<icp_port>ICP port</icp_port>
+<icp_port_explain>Port number from which sends and receives ICP queries to and from neighbor caches. To disable "0" is used.</icp_port_explain>
 <identity>Identity</identity>
 <if>if</if>
 <if_in>if in</if_in>
@@ -1946,6 +1957,7 @@ With the default 100 SMTP server process limit, "in flow delay as 1s" limits the
 <left_menu_internal_hard_drives>Hard drives</left_menu_internal_hard_drives>
 <left_menu_net_settings>Networks</left_menu_net_settings>
 <level>level</level>
+<li><strong>sibling:</li>
 <licence operations>licence operations</licence operations>
 <licence status>licence status</licence status>
 <license>license</license>
@@ -2413,6 +2425,32 @@ don't forget to - Save & Apply settings - to make them in production mode</notif
 <pages>pages</pages>
 <parameters>Parameters</parameters>
 <parameters_quickLink>Open settings to enable the feature</parameters_quickLink>
+<parent_options_proxy_closest_only>Indicates that, for ICP_OP_MISS replies, we'll only forward CLOSEST_PARENT_MISSes and never FIRST_PARENT_MISSes</parent_options_proxy_closest_only>
+<parent_options_proxy_connect_timeout>Specify a peer specific connect timeout.</parent_options_proxy_connect_timeout>
+<parent_options_proxy_default>If this is a parent cache which can be used as a "last-resort." and not ICP enabled then "default" would 
+be the appropriate option.[br]
+Simply adding default to a parent does not force all requests to be sent to that parent.[br]
+The term default is perhaps a poor choice of words.[br]
+If the cache is able to make direct connections, direct will be preferred over default.[br]
+If needed to force all requests to parent cache(s), use the never_direct option</parent_options_proxy_default>
+<parent_options_proxy_digest_url>To tell Squid to fetch the cache digest (if digests are enabled) for this host from the specified URL rather than the Squid default location.</parent_options_proxy_digest_url>
+<parent_options_proxy_login>If this is a personal/workgroup proxy and your parent requires proxy authentication.[br]
+Fill username:password in the field</parent_options_proxy_login>
+<parent_options_proxy_multicast_responder>Indicates that the named peer is a member of a multicast group. ICP queries will not be sent directly to the peer, but ICP replies will be accepted from it.</parent_options_proxy_multicast_responder>
+<parent_options_proxy_no_delay>To prevent access to this neighbor from influencing the delay pools</parent_options_proxy_no_delay>
+<parent_options_proxy_no_digest>To NOT request cache digests from this neighbor.</parent_options_proxy_no_digest>
+<parent_options_proxy_no_netdb_exchange>It disables requesting ICMP RTT database (NetDB) from the neighbor</parent_options_proxy_no_netdb_exchange>
+<parent_options_proxy_no_query>
+Set for those peers, which do not support ICP queries.[br]
+It is obvious to have doubt about the ICP port specified in, while using this option.[br]
+Squid does not care what digit has been given in the ICP port when no-query is specified.[br]
+Using any number is fine.[br]
+It is recommended to use 0 to emphasis the fact that ICP is not used in any way (not even to UDP echo port 7).
+</parent_options_proxy_no_query>
+<parent_options_proxy_only>Specify that objects fetched from this cache should not be saved locally</parent_options_proxy_only>
+<parent_options_proxy_round_robin>Define a set of parents which should be used in a round-robin fashion in the absence of any ICP queries</parent_options_proxy_round_robin>
+<parent_options_proxy_ttl>Specify a IP multicast Time To Live (ttl) value when sending ICP queries to multicast groups.[br]We do not accept ICP replies from random hosts. So you must configure other group members as peers with the multicast-responder option below</parent_options_proxy_ttl>
+<parent_options_proxy_weight>specify a weighted parent. The weight must be an integer. The default weight is 1, larger weights are favoured more</parent_options_proxy_weight>
 <partitions>Partitions</partitions>
 <partitions_number>partitions number</partitions_number>
 <partition_infos>Parition information</partition_infos>
@@ -3021,6 +3059,7 @@ while distributing domain2.com mail as usual.[br]
 <session_settings>Session settings</session_settings>
 <settings>settings</settings>
 <setup_center_system>System softwares</setup_center_system>
+<set_options>Set options</set_options>
 <set_quota>Set quota</set_quota>
 <SET_SCHEDULE>Set the schedule task</SET_SCHEDULE>
 <SET_SCHEDULE_TEXT>Define when this task will be performed</SET_SCHEDULE_TEXT>
@@ -3362,6 +3401,23 @@ by changing 5xx reply codes into 4xx. However, this option is no cure for addres
 <SQUID_NEWVERSION_TEXT>A new squid cache version is vailable in artica update server,it is recommended to upgrade to this version</SQUID_NEWVERSION_TEXT>
 <SQUID_NOT_COMPILED_NTLM_RUN_RECONFIGURE>Squid is not compiled with NTLM directive, if you want to use authentication trough NT Domain, you must upgrade SQUID[br]
 Click on the button below in ordre to perform this operation</SQUID_NOT_COMPILED_NTLM_RUN_RECONFIGURE>
+<squid_parent_options>Remote proxy server options</squid_parent_options>
+<squid_parent_proxy>Parent Proxy</squid_parent_proxy>
+<squid_parent_proxy_explain>
+This section allow your proxy to be part of a hierarchy of proxies or just allow your proxy to fetch content not directly 
+ from a web server but rather indirectly from another proxy.
+ </squid_parent_proxy_explain>
+<squid_parent_proxy_text>Link your proxy server to a parent proxy server</squid_parent_proxy_text>
+<squid_parent_sibling_how_to>neighbor selection:[ul]
+ [li][b]parent:[/b][br]
+ In a parent relationship, the child cache will forward requests to its parent cache.[br]
+  If the parent does not hold a requested object, it will forward the request on behalf of the child[br][/li]
+ [li][b]sibling:[/b][br] 
+A peer may only request objects already held in the cache; a sibling can not forward cache misses on behalf of the peer[br][/li] 
+[li][b]Multicast and Unicast:[/b][br] 
+A unicast packet is the complete opposite: one machine is talking to only one other machine. All TCP connections are unicast, since they can only have one destination host for each source host.[br]
+UDP packets are almost always unicast too, though they can be sent to the broadcast address so that they reach every single machine in some cases.[br][/li]
+[/ul]</squid_parent_sibling_how_to>
 <squid_refresh_pattern_explain>This is the way how the websites objects in the cache be refreshed</squid_refresh_pattern_explain>
 <squid_sizelimit>Headers/Page size limits</squid_sizelimit>
 <squid_status>Squid Status</squid_status>
@@ -3454,6 +3510,12 @@ you will be redirected to the new IP address in 15 seconds
 <systemForkProcessesNumber_explain>Depend on the processors number,Artica execute X bin/php processes at the same time, more executed processes will display a relatime information, less executed processes safe the server performance but did not display informations in realtime.</systemForkProcessesNumber_explain>
 <systemMaxOverloaded>Overload limit score</systemMaxOverloaded>
 <systemMaxOverloaded_explain>If the system reach this limit, artica will stop scheduled operations (start services, run some tasks) in order to safe the system.</systemMaxOverloaded_explain>
+<SystemV5CacheEnabled>Enable systemV5 cache</SystemV5CacheEnabled>
+<SystemV5CacheEnabled_explain>Artica can use the shared memory system.[br]It means that generated web pages/parameters are saved directly into the server physical memory.[br]
+ Using systemV5 cache, when you loggoff pages/parameters are not deleted from the memory.
+ [br]You need to click on "Cache" link in order to empty the shared memory and force Artica to re-generate web pages.[br]
+ This method has been developped to safe performances when you browse trough the interface.[br]
+ If you disable this feature, Artica will only use session/file system cache and did not store any parameters/web cache in the shared memory</SystemV5CacheEnabled_explain>
 <system_disk>System disk</system_disk>
 <system_perfomances>System perf.</system_perfomances>
 <system_perfomances_datas>System datas perf.</system_perfomances_datas>

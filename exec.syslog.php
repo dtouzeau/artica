@@ -84,7 +84,33 @@ if(preg_match("#zarafa-server.+?INNODB engine is disabled#",$buffer)){
 			events("Zarafa innodb err, but take action after 10mn");
 			return;
 		}			
-	
+}
+
+if(preg_match("#zarafa-server.+?Unable to connect to database.+?MySQL server on.+?([0-9\.]+)#",$buffer)){
+	$file="/etc/artica-postfix/croned.1/zarafa.MYSQL.CONNECT";
+	if(IfFileTime($file,2)){
+			events("Zarafa Mysql Error errr");
+			email_events("MailBox server unable connect to database","Zarafa server  claim \"$buffer\" ",'mailbox');
+			WriteFileCache($file);
+			return;
+		}else{
+			events("MailBox server unable connect to database but take action after 10mn");
+			return;
+		}			
+}
+
+if(preg_match("#winbindd: Exceeding\s+[0-9]+\s+client connections, no idle connection found#",$buffer)){
+	$file="/etc/artica-postfix/croned.1/Winbindd.connect.error";
+	if(IfFileTime($file,2)){
+			events("winbindd Error connections");
+			email_events("Winbindd exceeding connections","Samba server  claim \"$buffer\" \nArtica will restart samba",'system');
+			THREAD_COMMAND_SET('/etc/init.d/artica-postfix restart samba');
+			WriteFileCache($file);
+			return;
+		}else{
+			events("Winbindd exceeding connections take action after 10mn");
+			return;
+		}			
 }
 
 

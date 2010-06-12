@@ -4,22 +4,54 @@
 	include_once('ressources/class.users.menus.inc');
 	
 	
-$usersmenus=new usersMenus();
-if($usersmenus->AsMailBoxAdministrator==false){header('location:users.index.php');exit;}
 
-main_cf_page();
+	$user=new usersMenus();
+	if($user->AsPostfixAdministrator==false){
+		$tpl=new templates();
+		echo "alert('". $tpl->javascript_parse_text("{ERROR_NO_PRIVS}")."');";
+		die();exit();
+	}
+	
+	if(isset($_GET["show"])){main_cf_page();exit;}
+
+js();
+
+function js(){
+	
+	$tpl=new templates();
+	$title=$tpl->_ENGINE_parse_body("{main.cf}");
+	$page=CurrentPageName();
+	$html="
+		function MainCfShowConfig(){
+			YahooWin2(800,'$page?show=yes','$title');
+		}
+		MainCfShowConfig();
+	
+	";
+		
+	echo $html;
+	
+	
+}
+
 function main_cf_page(){
 	
 	$sock=new sockets();
-	$datas=$sock->getfile('main.cf');
+	$datas=unserialize(base64_decode($sock->getFrameWork('cmd.php?get-main-cf=yes')));
+	$html="<table>";
+	while (list ($index, $line) = each ($datas) ){
+		$html=$html."
+		<tr>
+			<td width=1%><code style='font-size:11px'>$index</td>
+			<td><code style='font-size:11px'>". htmlspecialchars($line)."</code></td>
+		</tr>
+		
+		";
+	}
+	$html=$html."</table>";
 	
-	$datas=str_replace("\n","<br>",$datas);
-	$datas=str_replace("<br><br>","<br>",$datas);
-	$datas=str_replace("\t","&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;",$datas);
+	echo "<div style='width:100%;height:550px;overflow:auto'>$html</div>";
 	
-	$tpl=new template_users('{main.cf}',"<div style='padding:5px;border:1px solid #CCCCCC'><code style='font-size:10px'>$datas</code></div>");
-	
-	echo $tpl->web_page;
 	
 }
 	

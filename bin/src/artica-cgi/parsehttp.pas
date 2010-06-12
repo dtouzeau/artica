@@ -4065,11 +4065,6 @@ end;
         exit;
     end;
 
-     RegExpr.expression:='main\.cf';
-     if RegExpr.Exec(uri) then begin
-        FileData.LoadFromFile('/etc/postfix/main.cf');
-        result:=true;
-    end;
     RegExpr.expression:='resolv\.conf';
   if RegExpr.Exec(uri) then begin
         FileData.LoadFromFile('/etc/resolv.conf');
@@ -4092,9 +4087,6 @@ end;
         FileData.Add(cgiop.KAV_GET_DAEMON_INFOS());
         result:=true;
     end;
-
-
-
 
      RegExpr.expression:='aveserver_licencemanager:(.+)';
      if RegExpr.Exec(uri) then begin

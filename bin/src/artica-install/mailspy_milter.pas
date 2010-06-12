@@ -190,10 +190,10 @@ var
    pid_path:string;
 begin
    if not FileExists(BIN_PATH()) then exit;
-pid_path:='/var/spool/postfix/var/run/mailspy/mailspy.pid';
+   pid_path:='/var/spool/postfix/var/run/mailspy/mailspy.pid';
    ini:=TstringList.Create;
    ini.Add('[MAILSPY]');
-   ini.Add('master_memory=' + IntToStr(SYS.PROCESS_MEMORY(pid)));
+   ini.Add('master_memory=' + IntToStr(SYS.PROCESS_MEMORY(pid_path)));
    ini.Add('service_name=APP_MAILSPY');
    ini.Add('service_cmd=mailspy');
    ini.Add('service_disabled='+IntToStr(EnableMilterSpyDaemon));
@@ -206,7 +206,7 @@ pid_path:='/var/spool/postfix/var/run/mailspy/mailspy.pid';
       exit;
    end;
 
-   if SYS.MONIT_CONFIG('APP_MAILSPY','/var/spool/postfix/var/run/mailspy/mailspy.pid','mailspy') then begin
+   if SYS.MONIT_CONFIG('APP_MAILSPY',pid_path,'mailspy') then begin
       result:=ini.Text;
       ini.free;
       exit;

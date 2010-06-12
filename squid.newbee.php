@@ -367,7 +367,7 @@ $html="
 </tr>
 <tr>
 	<td valign='top'>" . Paragraphe('64-settings.png','{squid_advanced_parameters}','{squid_advanced_parameters_text}',"javascript:Loadjs('squid.advParameters.php')")."</td>
-	<td valign='top'></td>
+	<td valign='top'>" . Paragraphe('server-redirect-64.png','{squid_parent_proxy}','{squid_parent_proxy_text}',"javascript:Loadjs('squid.parent.proxy.php')")."</td>
 	<td valign='top'></td>
 	
 </tr>
