@@ -525,13 +525,16 @@ logs.DeleteFile('/etc/cron.d/artica-cron-executor-300');
       l.Add('@'+Nicet+nolog+',lavg1('+IntToStr(systemMaxOverloaded)+') 10s '+cmdnice+SYS.LOCATE_PHP5_BIN()+ ' ' +artica_path+'/exec.parse-orders.php');
       l.Add('@'+Nicet+nolog+',lavg1('+IntToStr(systemMaxOverloaded)+') 12s '+cmdnice+SYS.LOCATE_PHP5_BIN()+ ' ' +artica_path+'/exec.executor.php --group10s');
       l.Add('@'+Nicet+nolog+',lavg1('+IntToStr(systemMaxOverloaded)+') 30s '+cmdnice+SYS.LOCATE_PHP5_BIN()+ ' ' +artica_path+'/exec.executor.php --group30s');
+      l.Add('@'+Nicet+nolog+',lavg1('+IntToStr(systemMaxOverloaded)+') 10 '+cmdnice+SYS.LOCATE_PHP5_BIN()+ ' ' +artica_path+'/exec.rsync.events.php');
+
+
 
 
 // ---------------------------------- fetchmail ---------------------------------------------------------------------------------------------------------
       fetchmail:=tfetchmail.Create(SYS);
       if FileExists(fetchmail.FETCHMAIL_BIN_PATH()) then begin
          logs.DebugLogs('Starting......: Daemon (fcron) set fetchmail injector schedule');
-         l.Add('@'+Nicet+',lavg1('+IntToStr(systemMaxOverloaded)+') 2 '+cmdnice+SYS.LOCATE_PHP5_BIN()+ ' ' +artica_path+'/exec.fetchmail.sql.php');
+         l.Add('@'+Nicet+nolog+',lavg1('+IntToStr(systemMaxOverloaded)+') 2 '+cmdnice+SYS.LOCATE_PHP5_BIN()+ ' ' +artica_path+'/exec.fetchmail.sql.php');
       end;
       fetchmail.free;
 // -------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -576,10 +579,11 @@ logs.DeleteFile('/etc/cron.d/artica-cron-executor-300');
 if not TryStrToInt(SYS.GET_INFO('WifiAPEnable'),WifiAPEnable) then WifiAPEnable:=0;
 if WifiAPEnable=1 then begin
       logs.DebugLogs('Starting......: Daemon (cron) Activate WIFI Client connection watchdog');
-      l.Add('@'+Nicet+',lavg1('+IntToStr(systemMaxOverloaded)+') 5 '+cmdnice+SYS.LOCATE_PHP5_BIN()+ ' ' +artica_path+'/exec.wifi.detect.cards.php --checkap');
+      l.Add('@'+Nicet+nolog+',lavg1('+IntToStr(systemMaxOverloaded)+') 5 '+cmdnice+SYS.LOCATE_PHP5_BIN()+ ' ' +artica_path+'/exec.wifi.detect.cards.php --checkap');
 end;
 
-l.add('@first(1),lavg1('+IntToStr(systemMaxOverloaded)+') 10   /etc/init.d/artica-postfix start all');
+
+l.add('@first(1),lavg1('+IntToStr(systemMaxOverloaded)+') 10 '+ SYS.LOCATE_GENERIC_BIN('nohup')+' /etc/init.d/artica-postfix start all >/dev/null 2>&1 &');
 
 
       if EnableMilterSpyDaemon=1 then begin

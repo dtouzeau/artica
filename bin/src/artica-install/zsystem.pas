@@ -1069,11 +1069,15 @@ var
    S    : TDateTime;
    maint:TDateTime;
 begin
+result:=0;
 if not FileExists(filepath) then exit(0);
-    fa:=FileAge(filepath);
-    maint:=Now;
-    S:=FileDateTodateTime(fa);
-    result:=MinutesBetween(maint,S);
+    try
+       fa:=FileAge(filepath);
+       maint:=Now;
+       S:=FileDateTodateTime(fa);
+       result:=MinutesBetween(maint,S);
+    finally
+    end;
 end;
 //##############################################################################
 function Tsystem.FILE_TIME_BETWEEN_SEC(filepath:string):LongInt;
@@ -1296,8 +1300,11 @@ begin
    end;
 
    if not FileExists('/etc/artica-postfix/settings/Daemons/MonitServicesSettings') then fpsystem(LOCATE_PHP5_BIN()+' /usr/share/artica-postfix/exec.first.settings.php --monit >/dev/null 2>&1');
-   conf:=TiniFile.Create('/etc/artica-postfix/settings/Daemons/MonitServicesSettings');
-
+   try
+      conf:=TiniFile.Create('/etc/artica-postfix/settings/Daemons/MonitServicesSettings');
+   Except
+   exit;
+   end;
    if not FileExists('/usr/sbin/'+internal_name+'-start.sh') then begin
       l.Add('#!/bin/sh');
       l.Add('PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/X11R6/bin');
@@ -1859,12 +1866,12 @@ begin
      end;
   end;
   try
-  ini:=TiniFile.Create('/etc/artica-postfix/versions.cache');
-  result:=ini.ReadString(APP_NAME,'VERSION','');
-  finally
-    ini.Free;
+     ini:=TiniFile.Create('/etc/artica-postfix/versions.cache');
+  except
+     exit;
   end;
-
+  result:=ini.ReadString(APP_NAME,'VERSION','');
+  ini.Free;
 end;
 //#########################################################################################
 procedure Tsystem.SET_CACHE_VERSION(APP_NAME:string;version:string);
@@ -4062,9 +4069,15 @@ begin
 if not FileExists('/etc/artica-postfix/performances.conf') then begin
   fpsystem('/bin/touch /etc/artica-postfix/performances.conf');
 end;
+
 Ini:=TinIFile.Create('/etc/artica-postfix/performances.conf');
-ini.WriteString('PERFORMANCES',key,value);
-ini.UpdateFile;
+try
+   ini.WriteString('PERFORMANCES',key,value);
+   ini.UpdateFile;
+
+except
+ writeln('Tsystem.SET_PERFS() Fatal error while writing ',key,'->',value,' in ','/etc/artica-postfix/performances.conf');
+end;
 Ini.Free;
 end;
 //#############################################################################

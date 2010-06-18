@@ -1,5 +1,5 @@
-<about_perf>Cette section vous aide &agrave; d&eacute;finir les performances des processus et des services Artica selon les performances de votre ordinateur. [Br]
-Vous pouvez choisir les meilleures performances, mais peu de services ou des services complets, mais moins performances.</about_perf>
+<about_perf>Cette section vous aide &agrave; d&eacute;finir les performances des processus et des services Artica selon les capcit&eacute;s de votre ordinateur. [br]
+Vous pouvez choisir de meilleures performances pour Artica afin d'avoir un &eacute;tat en temps r&eacute;el ou r&eacute;duire les performances d'Artica afin de permettre aux services principaux de disposer de plus de ressources.</about_perf>
 <ADMIN_COVER_PAGE_STATUS>Etats de la page de garde Administrateur</ADMIN_COVER_PAGE_STATUS>
 <APP_PRELOAD_NOTINSTALLED>Le processus Preload n'est pas install&eacute;</APP_PRELOAD_NOTINSTALLED>
 <APP_PRELOAD_NOTINSTALLED_TEXT>Preload est &quot;un processus readahead adaptatif&quot; qui s'ex&eacute;cute en arri&egrave;re-plan de votre syst&egrave;me et observe quels programmes vous utilisez le plus souvent et les met en cache pour acc&eacute;l&eacute;rer le temps de charge des application. [br] En utilisant Preload, vous pouvez exploiter la RAM inutilis&eacute;e et am&eacute;liorer les performances g&eacute;n&eacute;rales de votre syst&egrave;me. [br]
@@ -15,8 +15,8 @@ Vous pouvez d&eacute;finir ici la fr&eacute;quence d'ex&eacute;cution.[br]Plus e
 <cpu_number>Nombre de CPUs</cpu_number>
 <default>d&eacute;faut</default>
 <DisableFollowServiceHigerThan1G>D&eacute;sactiver le limiteur de m&eacute;moire</DisableFollowServiceHigerThan1G>
-<DisableFollowServiceHigerThan1G_explain>Cette fonctionnalit&eacute; d&eacute;sactive les services requis pour tourner sur un ordinateur de plus de 1Gb de m&eacute;moire vive[br]Il bloque le d&eacute;mrrage de  SpamAssassin, amavis et Sylog-ng   Mysql sir votre ordinateur ne dispose pas de la m&eacute;moire requise.[br]
-SIvous activez cette option en vert, les services seront autoris&eacute;s &agrave; d&eacute;marrer m&ecirc;me si votre ordinateur ne dispose pas des capacit&eacute;s requises.</DisableFollowServiceHigerThan1G_explain>
+<DisableFollowServiceHigerThan1G_explain>Par d&eacute;faut, Artica d&eacute;sactive les services requis pour tourner sur un ordinateur de plus de 1Gb de m&eacute;moire vive si l'ordintateur ne dispose pas des capacit&eacute;s n&eacute;c&eacute;ssaires.[br]Il bloque le d&eacute;marrage de  SpamAssassin, amavis et Sylog-ng   Mysql si votre ordinateur ne dispose pas de la m&eacute;moire requise.[br]
+Si vous activez cette option, les services seront autoris&eacute;s &agrave; d&eacute;marrer m&ecirc;me si votre ordinateur ne dispose pas des capacit&eacute;s requises.</DisableFollowServiceHigerThan1G_explain>
 <log_fifo_size>Tampons de sortie</log_fifo_size>
 <log_fifo_size_text>Voici un tr&egrave;s important param&egrave;tre. [br]
 Les &quot;Output Buffers&quot; ainsi que &quot;log_fifo_size&quot; r&egrave;glent la taille des tampons de sortie, vers toutes les destinations. [br]
@@ -30,8 +30,8 @@ La ligne statistiques vous permettra de savoir quelle destination perd des messa
 Vous pouvez alors d&eacute;cider si vous devez augmenter la valeur globalement ou par destination, de m&ecirc;me que cela vous donne une id&eacute;e de la valeur &agrave; donner.</log_fifo_size_text>
 <low>bas</low>
 <MaxtimeBackupMailSizeCalculate>Calcule l' espace de stockage tout les</MaxtimeBackupMailSizeCalculate>
-<MaxtimeBackupMailSizeCalculate_explain>Lorsque vous utilisez la zone de quarantaine et de sauvegarde avec la fontion &agrave; la vol&eacute;e, artica calculera p&eacute;riodiquement la consommation disque de ces zones.
-Ce traitement devrait consommer I / O sur votre disque dur et devrait diminuer les performances du serveur lors du calcul.
+<MaxtimeBackupMailSizeCalculate_explain>Lorsque vous utilisez la zone de quarantaine et de sauvegarde avec la fonction &agrave; la vol&eacute;e, artica calculera p&eacute;riodiquement la consommation disque de ces zones.
+Ce traitement consomme des acc&egrave;s disques (I/O) et diminue les performances du serveur lors des calculs.
 Vous pouvez augmenter ou diminuer l'intervalle en fonction de la taille moyenne de ces zones.
 La valeur par d&eacute;faut a &eacute;t&eacute; calcul&eacute; pour une zone de quarantaine/sauvegarde de 10G d'espace disque.</MaxtimeBackupMailSizeCalculate_explain>
 <medium>moyen</medium>

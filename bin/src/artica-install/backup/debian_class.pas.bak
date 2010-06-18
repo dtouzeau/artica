@@ -26,8 +26,9 @@ private
      LOGS:Tlogs;
      SYS:TSystem;
      artica_path:string;
-     function ARTICA_VERSION():string;
      squid:Tsquid;
+     function ARTICA_VERSION():string;
+
 public
     procedure   Free;
     constructor Create;
@@ -71,7 +72,6 @@ end;
 procedure tdebian.ARTICA_CD_SOURCES_LIST();
 var
    l:TstringList;
-   gpg:string;
 begin
 gpg:='';
 gpg:=SYS.LOCATE_GPG();

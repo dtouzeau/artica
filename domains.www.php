@@ -186,7 +186,7 @@ if($_GET["host"]<>null){
 	<table style='width:100%'>
 	<tr>
 		<td valign='top'><img src='img/$img'>
-		<td valign='top'>". RoundedLightWhite("
+		<td valign='top'>
 			<table style='width:100%'>
 				<tr>
 					<td class=legend>{service_type}:</td>
@@ -211,8 +211,6 @@ if($_GET["host"]<>null){
 					<td class=legend>{WWWAppliPassword}:</td>
 					<td>". Field_password("WWWAppliPassword",$LoadVhosts["wwwapplipassword"])."</td>
 				</tr>		
-											
-				<tr><td colspan=2><hr></td></tr>
 				<tr>
 					<td colspan=2 align='right'><hr>
 					". button("$button","AddWebService();")."
@@ -225,7 +223,7 @@ if($_GET["host"]<>null){
 				</tr>
 
 					
-			</table>")."
+			</table>
 			
 		</td>
 	</tr>
@@ -234,8 +232,39 @@ if($_GET["host"]<>null){
 	
 	";
 	
+	if($h->noneeduser["$serv"]){
+		$script_1="
+		if(document.getElementById('WWWAppliUser')){document.getElementById('WWWAppliUser').disabled=true;}
+		if(document.getElementById('WWWAppliPassword')){document.getElementById('WWWAppliPassword').disabled=true;}
+		";
+	}else{
+		$script_1="
+		if(document.getElementById('WWWAppliUser')){document.getElementById('WWWAppliUser').disabled=false;}
+		if(document.getElementById('WWWAppliPassword')){document.getElementById('WWWAppliPassword').disabled=false;}
+		";
+	}
+	
+	if($h->noneeduser_mysql["$serv"]){
+		$script_2="
+		if(document.getElementById('WWWMysqlUser')){document.getElementById('WWWMysqlUser').disabled=true;}
+		if(document.getElementById('WWWMysqlPassword')){document.getElementById('WWWMysqlPassword').disabled=true;}
+		";
+	}else{
+		$script_2="
+		if(document.getElementById('WWWMysqlUser')){document.getElementById('WWWMysqlUser').disabled=false;}
+		if(document.getElementById('WWWMysqlPassword')){document.getElementById('WWWMysqlPassword').disabled=false;}
+		";
+	}	
+	
 	$tpl=new templates();
-	echo $tpl->_ENGINE_parse_body($html,'domains.manage.org.index.php');
+	echo $tpl->_ENGINE_parse_body($html,'domains.manage.org.index.php')."
+	<script>
+		function wwwEnableDisable(){
+			$script_1
+			$script_2
+		}
+		setTimeout('wwwEnableDisable()',1000);
+	</script>";
 	
 	
 }
@@ -244,17 +273,55 @@ if($_GET["host"]<>null){
 function wwwInfos(){
 	$tpl=new templates();
 	$h=new vhosts();
-
-	
 	$serv=$_GET["wwwInfos"];
-$html="
+	if(is_numeric($serv)){return null;}
+	if($serv==null){return null;}
+	
+	if($h->noneeduser["$serv"]){
+		$script_1="
+		if(document.getElementById('WWWAppliUser')){document.getElementById('WWWAppliUser').disabled=true;}
+		if(document.getElementById('WWWAppliPassword')){document.getElementById('WWWAppliPassword').disabled=true;}
+		";
+	}else{
+		$script_1="
+		if(document.getElementById('WWWAppliUser')){document.getElementById('WWWAppliUser').disabled=false;}
+		if(document.getElementById('WWWAppliPassword')){document.getElementById('WWWAppliPassword').disabled=false;}
+		";
+	}
+	
+	if($h->noneeduser_mysql["$serv"]){
+		$script_2="
+		if(document.getElementById('WWWMysqlUser')){document.getElementById('WWWMysqlUser').disabled=true;}
+		if(document.getElementById('WWWMysqlPassword')){document.getElementById('WWWMysqlPassword').disabled=true;}
+		";
+	}else{
+		$script_2="
+		if(document.getElementById('WWWMysqlUser')){document.getElementById('WWWMysqlUser').disabled=false;}
+		if(document.getElementById('WWWMysqlPassword')){document.getElementById('WWWMysqlPassword').disabled=false;}
+		";
+	}	
+	
+$html="<table style='width:100%'>
+<tr>
+<td valign='top'><img src='img/{$h->IMG_ARRAY_128["$serv"]}'></td>
+<td valign='top'>
 		<H2 style='margin-bottom:0px'>{{$h->TEXT_ARRAY[$serv]["TITLE"]}}</H2><hr>
 		<p style='font-size:12px'>{{$h->TEXT_ARRAY[$serv]["TEXT"]}}</p>
 		<hr>
+</td>
+</tr>
+</table>
 		";
 	
 	$tpl=new templates();
-	echo "<br>".RoundedLightWhite($tpl->_ENGINE_parse_body($html,'domains.manage.org.index.php'));
+	
+	echo "<div style='padding:3px;border:1px dotted #CCCCCC;margin-top:5px'>
+		".$tpl->_ENGINE_parse_body($html,'domains.manage.org.index.php')."
+	</div>
+	<script>
+	$script_1
+	$script_2
+	</script>";
 }
 
 function add_web_service(){
@@ -276,22 +343,36 @@ function add_web_service(){
 	
 	
 	
+	$noneed_mysql=false;
 	
 	if($ou==null){echo $tpl->_ENGINE_parse_body("{organization}=null");exit;}
 	$vhosts=new vhosts($_GET["ou"]);
+	$vvhosts=new vhosts();
+	$noneeduser=$vvhosts->noneeduser;
+	$noneeduser_mysql=$vvhosts->noneeduser_mysql;
 	
-	if($ServerWWWType=="ARTICA_USR"){
-		$noneed_mysql=true;
-		$noneed_appliPass=true;
-	}
 	
+	if($noneeduser[$ServerWWWType]){$noneed_appliPass=true;}
+	if($noneeduser_mysql[$ServerWWWType]){$noneed_mysql=true;}
+	
+	
+	
+	
+
 	if(!$noneed_mysql){
-		if($_GET["WWWMysqlUser"]==null){echo $tpl->_ENGINE_parse_body("{WWWMysqlUser}=null");exit;}
-		if($_GET["WWWMysqlPassword"]==null){echo $tpl->_ENGINE_parse_body("{WWWMysqlPassword}=null");exit;}
+		if($_GET["WWWMysqlUser"]==null){
+			echo $tpl->_ENGINE_parse_body("\"$ServerWWWType\":\n{WWWMysqlUser}=null\n$noneed_mysql\nL.".__LINE__);
+			exit;
+		}
+		if($_GET["WWWMysqlPassword"]==null){
+			echo $tpl->_ENGINE_parse_body("$ServerWWWType:{WWWMysqlPassword}=null");exit;
+			}
 	}
 	
-	if(!$vhosts->noneeduser[$ServerWWWType]){
-		if($_GET["WWWAppliUser"]==null){echo $tpl->_ENGINE_parse_body("$ServerWWWType:{WWWAppliUser}=null");exit;}
+	if(!$noneeduser["$ServerWWWType"]){
+		if($_GET["WWWAppliUser"]==null){
+			echo $tpl->_ENGINE_parse_body("$ServerWWWType:\n{WWWAppliUser}=null\n{$vhosts->noneeduser["$ServerWWWType"]}");
+		exit;}
 	}
 	
 	if(!$noneed_appliPass){
@@ -322,6 +403,7 @@ function add_web_service(){
 	$vhosts->Addhost($hostname,$ServerWWWType);
 	
 	$sock=new sockets();
+	writelogs("Scheduling =>cmd.php?install-web-services=yes",__FUNCTION__,__FILE__,__LINE__);
 	$sock->getFrameWork("cmd.php?install-web-services=yes");
 	
 	}
@@ -358,6 +440,13 @@ function listOfAvailableServices(){
 	if($user->GROUPOFFICE_INSTALLED){
 			$array["GROUPOFFICE"]="{APP_GROUPOFFICE}";
 	}	
+	
+	if($user->ZARAFA_INSTALLED){
+		$array["ZARAFA"]="{APP_ZARAFA}";
+		$array["ZARAFA_MOBILE"]="{APP_ZARAFA_MOBILE_ACCESS}";
+	}
+
+	
 	
 	$array["ARTICA_USR"]="{APP_ARTICA_USR}";
 	

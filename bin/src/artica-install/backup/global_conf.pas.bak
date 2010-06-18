@@ -119,6 +119,8 @@ private
        function  MAIL_IMAP_CLIENT_VERSION():string;
        procedure MAIL_IMAP_CLIENT_INSTALL();
 
+       procedure SYSTEM_VERIFY_ISO();
+
        function  SCAN_DISK_PARTITIONS_SIZE_PHP(dev:string):string;
        function  usb_devinfo_query(dev:string;key:string):string;
 
@@ -419,8 +421,6 @@ public
 
       //start the service
       function  SYSTEM_START_ARTICA_DAEMON():boolean;
-      procedure SYSTEM_START_ARTICA_ALL_DAEMON();
-      procedure SYSTEM_START_MINIMUM_DAEMON();
       procedure LDAP_VERIFY_PASSWORD();
       procedure START_ALL_DAEMONS();
       procedure START_MYSQL();
@@ -5466,8 +5466,11 @@ var
    kernel_version:string;
    l:TstringList;
    xfce:Txfce;
+   pidof_path:string;
 begin
      forcedirectories('/etc/artica-postfix');
+     logs:=Tlogs.Create;
+
 
      if not FileExists('/etc/artica-postfix/first.boot') then begin
          l:=TstringList.Create;
@@ -5490,41 +5493,61 @@ begin
         halt(0);
      end;
 
-       if FileExists('/home/artica/packages/ZARAFA/zarafa.tar') then begin
-          fpsystem('/bin/tar -xvf /home/artica/packages/ZARAFA/zarafa.tar -C /');
-          fpsystem('/bin/rm /home/artica/packages/ZARAFA/zarafa.tar');
-          fpsystem('/etc/init.d/artica-postfix restart mysql');
-       end;
-
-       if FileExists('/etc/artica-postfix/FROM_ISO') then begin
-          if not FileExists('/bin/login.old') then begin
-               writeln('Starting......: Change login binary');
-               fpsystem('/bin/mv /bin/login /bin/login.old');
-               fpsystem('/bin/ln -s /usr/share/artica-postfix/bin/artica-logon /bin/login');
-               fpsystem('/bin/chmod 777 /usr/share/artica-postfix/bin/artica-logon');
-               fpsystem('dpkg-divert --divert /bin/login.old /bin/login');
-          end;
-       end;
+     writeln('Starting......: Artica version '+trim(SYS.ARTICA_VERSION()));
+     writeln('Starting......: Kernel version ' + kernel_version);
+     writeln('Starting......: Distribution "' + LINUX_DISTRIBUTION() + '" i' + SYSTEM_GET_PLATEFORM());
 
 
+    if not FileExists('/bin/pidof') then begin
+       pidof_path:=SYS.LOCATE_GENERIC_BIN('pidof');
+       if FileExists(pidof_path) then logs.OutputCmd('/bin/ln -s '+pidof_path+' /bin/pidof');
+    end;
 
-     logs:=Tlogs.Create;
+
+    SYSTEM_VERIFY_ISO();
+
+
+    if FileExists('/etc/init.d/keymap.sh') then begin
+       writeln('Starting......: run /etc/init.d/keymap.sh');
+       fpsystem('/etc/init.d/keymap.sh start');
+    end else begin
+       writeln('Starting......: unable to stat /etc/init.d/keymap.sh');
+    end;
+
 
      if FileExists('/opt/artica/license.expired.conf') then DeleteFile('/opt/artica/license.expired.conf');
-     writeln('Starting......: Kernel version ' + kernel_version);
-     logs.DebugLogs('Starting......: Distribution "' + LINUX_DISTRIBUTION() + '" i' + SYSTEM_GET_PLATEFORM());
-     lighttpd.LIGHTTPD_START();
+
+
+
+
+    if SYS.PROCESS_EXIST(SYS.PIDOF('artica-backup')) then begin
+          logs.Syslogs('A backup process is currently in execution, stop process');
+          fpsystem(get_ARTICA_PHP_PATH()+'/bin/process1');
+    end;
+
+    if SYS.PROCESS_EXIST(SYS.PIDOF('artica-update')) then begin
+          logs.Syslogs('An update process is currently in execution, stop process');
+          fpsystem(get_ARTICA_PHP_PATH()+'/bin/process1');
+    end;
+
+
      ldap.LDAP_START();
      Rootpath:=get_ARTICA_PHP_PATH();
 
-  ForceDirectories('/usr/share/artica-postfix/ressources/profiles');
-  ForceDirectories('/var/log/artica-postfix/RTM');
-  logs.OutputCmd('/bin/chmod 777 /usr/share/artica-postfix/ressources/profiles');
-  logs.OutputCmd('/bin/chmod 777 /tmp');
+     ForceDirectories('/usr/share/artica-postfix/ressources/profiles');
+     ForceDirectories('/var/log/artica-postfix/RTM');
+     logs.OutputCmd('/bin/chmod 777 /usr/share/artica-postfix/ressources/profiles');
+     logs.OutputCmd('/bin/chmod 777 /tmp');
 
      artica_cron:=tcron.Create(SYS);
      artica_cron.START();
+     artica_cron.free;
+
+
      SYSLOGER_START();
+     START_MYSQL();
+     APACHE_ARTICA_START();
+     BOA_START();
 
 
      logs.OutputCmd(Rootpath + '/bin/artica-ldap -iptables --start');
@@ -5539,51 +5562,54 @@ begin
      xfce:=Txfce.Create;
      xfce.INSTALL_XFCE();
      xfce.Free;
-     artica_cron.free;
+
+     INSTANT_SEARCH();
+     SYSTEM_CHANGE_MOTD();
+
+
+
+
 end;
-
-
 //##############################################################################
-procedure MyConf.SYSTEM_START_MINIMUM_DAEMON();
-var
-   cron:tcron;
+procedure myconf.SYSTEM_VERIFY_ISO();
 begin
 
-    if not FileExists('/bin/pidof') then begin
-       if FileExists('/sbin/pidof') then logs.OutputCmd('/bin/ln -s /bin/pidof /sbin/pidof');
-    end;
+       if FileExists('/home/artica/packages/ZARAFA/zarafa.tar') then begin
+          fpsystem('/bin/tar -xvf /home/artica/packages/ZARAFA/zarafa.tar -C /');
+          fpsystem('/bin/rm /home/artica/packages/ZARAFA/zarafa.tar');
+          fpsystem('/etc/init.d/artica-postfix restart mysql');
+       end;
 
-    if SYS.PROCESS_EXIST(SYS.PIDOF('artica-backup')) then begin
-          logs.Syslogs('A backup process is currently in execution, stop process');
-          fpsystem(get_ARTICA_PHP_PATH()+'/bin/process1');
-    end;
+       if FileExists('/home/artica/packages/SQUID/SQUID.tar.gz') then begin
+          fpsystem('/bin/tar -xvf /home/artica/packages/SQUID/SQUID.tar.gz -C /');
+          fpsystem('/bin/rm /home/artica/packages/SQUID/SQUID.tar.gz');
+          fpsystem('/etc/init.d/artica-postfix restart squid');
+          fpsystem('/etc/init.d/artica-postfix restart squid');
+          fpsystem('/usr/share/artica-postfix/bin/process1 --force');
+       end;
 
-    if SYS.PROCESS_EXIST(SYS.PIDOF('artica-update')) then begin
-          logs.Syslogs('An update process is currently in execution, stop process');
-          fpsystem(get_ARTICA_PHP_PATH()+'/bin/process1');
-    end;
+       if FileExists('/home/artica/packages/kav4proxy-5.5-62.tar.gz') then begin
+          fpsystem('/usr/share/artica-postfix/bin/artica-make APP_KAV4PROXY');
+       end;
 
-INSTANT_SEARCH();
-if FileExists('/etc/init.d/keymap.sh') then fpsystem('/etc/init.d/keymap.sh start');
-SYSTEM_CHANGE_MOTD();
-cron:=tcron.Create(SYS);
-cron.START();
-cron.free;
-ldap.LDAP_START();
-START_MYSQL();
-APACHE_ARTICA_START();
-BOA_START();
-fpsystem(SYS.LOCATE_PHP5_BIN()+' /usr/share/artica-postfix/exec.virtuals-ip.php --just-add &');
+       if FileExists('/etc/artica-postfix/FROM_ISO') then begin
+          writeln('Starting......: Artica was installed from ISO');
+          if not FileExists('/bin/login.old') then begin
+               writeln('Starting......: Change login binary');
+               fpsystem('/bin/mv /bin/login /bin/login.old');
+               fpsystem('/bin/ln -s /usr/share/artica-postfix/bin/artica-logon /bin/login');
+               fpsystem('/bin/chmod 777 /usr/share/artica-postfix/bin/artica-logon');
+               fpsystem('dpkg-divert --divert /bin/login.old /bin/login');
+          end else begin
+             writeln('Starting......: /bin/login.old exists');
+          end;
+          GETTY_CHANGE_INITTAB();
+       end;
 
 
 end;
-//##############################################################################
 
-procedure MyConf.SYSTEM_START_ARTICA_ALL_DAEMON();
-begin
-     SYSTEM_START_MINIMUM_DAEMON()
-end;
-//##############################################################################
+
 
 procedure MyConf.START_ALL_DAEMONS();
 var
@@ -5749,7 +5775,8 @@ begin
     if FileExists('/etc/cron.d/artica.artica-update.scheduled') then logs.DeleteFile('/etc/cron.d/artica.artica-update.scheduled');
 
     if COMMANDLINE_PARAMETERS('--force') then begin
-        SYSTEM_START_MINIMUM_DAEMON();
+        SYSTEM_START_ARTICA_DAEMON();
+
     end;
 
 
@@ -5953,6 +5980,7 @@ end;
           dansguardian.C_ICAP_START();
           dansguardian.DANSGUARDIAN_START();
           if FileExists(dansguardian.BIN_PATH()) then dansguardian.DANSGUARDIAN_TAIL_START();
+          squid.PROXY_PAC_START();
      end;
 
      logs.Debuglogs('############ ntpd ##################');
@@ -11923,9 +11951,32 @@ end;
 procedure myconf.GETTY_CHANGE_INITTAB();
 var
 l:Tstringlist;
+RegExpr:TRegExpr;
+i:integer;
 begin
+l:=Tstringlist.Create;
+try
+   l.LoadFromFile('/etc/inittab');
+except
+   exit;
+end;
+RegExpr:=TRegExpr.Create;
+RegExpr.Expression:='ERASED BY ARTICA';
+for i:=0 to l.Count-1 do begin
+    if RegExpr.Exec(l.Strings[i]) then begin
+       RegExpr.free;
+       l.free;
+       exit;
+    end;
+end;
+
+l.Clear;
+l.free;
+l:=Tstringlist.Create;
+
 l.add('# /etc/inittab: init(8) configuration.');
 l.add('# $Id: inittab,v 1.91 2002/01/25 13:35:21 miquels Exp $');
+l.add('# ERASED BY ARTICA for autologon');
 l.add('');
 l.add('id:2:initdefault:');
 l.add('si::sysinit:/etc/init.d/rcS');
@@ -11951,6 +12002,8 @@ l.add('5:23:respawn:/sbin/getty -i -n -l /usr/share/artica-postfix/bin/artica-lo
 l.add('6:23:respawn:/sbin/getty -i -n -l /usr/share/artica-postfix/bin/artica-logon 38400 tty6');
 l.add('');
 logs.WriteToFile(l.Text,'/etc/inittab');
+writeln('Modify /etc/inittab done.....');
+l.free;
 end;
 //#####################################################################################
 end.

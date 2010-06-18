@@ -205,6 +205,10 @@ $q->QUERY_SQL($sql,"artica_backup");
 			echo $q->mysql_error."\n".$sql;
 			return ;
 		}	
+		
+		
+	$sock=new sockets();
+	$sock->getFrameWork("cmd.php?postfix-multi-configure-hostname={$_GET["hostname"]}");	
 	
 	}
 function PostFixDeleteMyNetwork(){
@@ -217,7 +221,7 @@ function PostFixDeleteMyNetwork(){
 	}	
 	
 	$sock=new sockets();
-	$sock->getFrameWork("cmd.php?postfix-multi-configure-ou={$_GET["ou"]}");
+	$sock->getFrameWork("cmd.php?postfix-multi-configure-hostname={$_GET["hostname"]}");
 	
 }	
 

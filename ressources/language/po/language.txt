@@ -144,6 +144,7 @@ Add a list:exe,pif,bat,pdf,doc</add_attachment_blocking_text_explain>
 <add_a_new_tab>Add a new tab</add_a_new_tab>
 <add_a_new_tab_text>Add a new page in order to add more widgets</add_a_new_tab_text>
 <add_a_parent_proxy>Add a Parent Proxy</add_a_parent_proxy>
+<add_a_proxy>Add a proxy</add_a_proxy>
 <add_block_site_explain>Add a web site that will be stored by this category</add_block_site_explain>
 <ADD_COMPUTER>Add a new computer</ADD_COMPUTER>
 <add_computer_access>Add computer access</add_computer_access>
@@ -158,7 +159,9 @@ Add a list:exe,pif,bat,pdf,doc</add_attachment_blocking_text_explain>
 <add_invisible_disk_text>Add a new disk in the collection if your local disk is not correctly displayed</add_invisible_disk_text>
 <add_ip_address>Add a TCP/IP address</add_ip_address>
 <add_Kav_LicenseDomain>Add a domain in licence</add_Kav_LicenseDomain>
+<add_localHostOrDomainIs>Add a white listed server</add_localHostOrDomainIs>
 <add_local_domain>Add a new local domain</add_local_domain>
+<add_mail_server>Add mail server</add_mail_server>
 <add_member>Add a new member</add_member>
 <add_member_to_group>Add member to this group</add_member_to_group>
 <add_new_account>Add a new account</add_new_account>
@@ -436,6 +439,7 @@ This feature will help you to concentrate and factorize internet updates.</APP_K
 <APP_MILTERGREYLIST>Milter-greylist</APP_MILTERGREYLIST>
 <APP_MIMEDEFANG>MimeDefang</APP_MIMEDEFANG>
 <APP_MIMEDEFANGX>MimeDefang Multiplexor</APP_MIMEDEFANGX>
+<APP_MONIT>Realtime Daemons monitor</APP_MONIT>
 <APP_MONIT_EXPLAIN>This section will drive the watchdog daemon that ensure the service is up, you can set settings in order to define when you are notified of troubles on this daemon</APP_MONIT_EXPLAIN>
 <APP_MSMTP>msmtp (SMTP client)</APP_MSMTP>
 <APP_MSMTP_NOT_INSTALLED>You need to install new SMTP engine version in order to use Authentication feature</APP_MSMTP_NOT_INSTALLED>
@@ -488,6 +492,7 @@ Policyd-weight caches the most frequent client/sender combinations (SPAM as well
 <APP_POSTFIX>Postfix MTA Mail system</APP_POSTFIX>
 <APP_PRELOAD>Preload Daemon</APP_PRELOAD>
 <APP_PROCMAIL>Procmail processing</APP_PROCMAIL>
+<APP_PROXY_PAC>proxy.pac web service</APP_PROXY_PAC>
 <APP_PUREFTPD>Pure-ftpd</APP_PUREFTPD>
 <APP_QUEUEGRAPH>QueueGraph</APP_QUEUEGRAPH>
 <APP_RENATTACH>Renattach</APP_RENATTACH>
@@ -560,9 +565,14 @@ If you enable this feature, you will be able to share folders trough the explore
 <APP_ZARAFA_DAGENT>Zarafa Delivery Agent</APP_ZARAFA_DAGENT>
 <APP_ZARAFA_GATEWAY>Zarafa Gateway</APP_ZARAFA_GATEWAY>
 <APP_ZARAFA_ICAL>iCal, CalDav Gateway</APP_ZARAFA_ICAL>
+<APP_ZARAFA_MOBILE_ACCESS>Zarafa Mobile Webaccess</APP_ZARAFA_MOBILE_ACCESS>
 <APP_ZARAFA_MONITOR>Zarafa Monitor</APP_ZARAFA_MONITOR>
 <APP_ZARAFA_SERVER>Zarafa server</APP_ZARAFA_SERVER>
 <APP_ZARAFA_SPOOLER>Zarafa Spooler</APP_ZARAFA_SPOOLER>
+<APP_ZARAFA_TEXT>Nowadays, e-mail is one of the mission critical applications of a company.[br]
+Zarafa combines the usabillity of Outlook with the stability and flexibility of a Linux server.[br]
+Not only Outlook is supported natively, but users can use also the web 2.0 Outlook "Look & Feel" webaccess, 
+all ActiveSync compatible mobile devices and Blackberry via the Blackberry Enterprise Server</APP_ZARAFA_TEXT>
 <APP_ZARAFA_WEB>Zarafa web server</APP_ZARAFA_WEB>
 <APP_ZARAFA_WEB_TEXT>Manage the web server that serve Zarafa web access applications</APP_ZARAFA_WEB_TEXT>
 <april>April</april>
@@ -1302,6 +1312,16 @@ disabling it just safe performances... </enable_philesight_text>
 <enable_squidguard>Enable squidGuard</enable_squidguard>
 <enable_squidguard_text>SquidGuard is a URL redirector used to use blacklists with the proxy software Squid</enable_squidguard_text>
 <enable_squid_parent>Activate using parent proxy feature</enable_squid_parent>
+<enable_squid_proxy_pac>Activate the Autoconfiguration file service</enable_squid_proxy_pac>
+<enable_squid_proxy_pac_text>If you activate this feature, Artica will run a web server on the defined port in order to provide the pac file.[br]
+You will be able to enter the uri to the pac file into browsers in order to set default proxy settings</enable_squid_proxy_pac_text>
+<enable_squid_reverse>Activate SQUID is Reverse Proxy</enable_squid_reverse>
+<enable_squid_reverse_text>Reverse proxy cache, also known as Web Server Acceleration, 
+is a method of reducing the load on a busy web server by using a web cache between the server and the internet.[br]
+Another benefit that can be gained is improved security.[br]
+It's one of many ways to improve scalability without increasing the complexity of maintenence too much.[br]
+A good use of a reverse proxy is to ease the burden on a web server that provides both static and dynamic content.[br]
+The static content can be cached on the reverse proxy while the web server will be freed up to better handle the dynamic content</enable_squid_reverse_text>
 <enable_ssl>Enable SSL</enable_ssl>
 <enable_this_filter>Enable this filter</enable_this_filter>
 <enable_this_option>Enable this feature</enable_this_option>
@@ -1649,6 +1669,7 @@ Log the optional text if  specified,[br]otherwise log a generic message.
 <hostname>hostname</hostname>
 <hosts>hosts</hosts>
 <hosts_number>Hosts number</hosts_number>
+<hosts_without_proxy>Hosts without proxy</hosts_without_proxy>
 <hotmail>Hotmail & Live</hotmail>
 <hour>hour</hour>
 <hourly>hourly</hourly>
@@ -1889,6 +1910,8 @@ With the default 100 SMTP server process limit, "in flow delay as 1s" limits the
 <is not regex>Regular Expression not matches</is not regex>
 <is regex>Regular Expression matches</is regex>
 <is up>is up</is up>
+<isInNetProxy>Add a white listed network</isInNetProxy>
+<isInNet_explain>Browsers will not use proxy if computers is a part of listed networks[br]Example: 192.168.1.0 - 255.255.255.0</isInNet_explain>
 <isnot>is not</isnot>
 <ISP>Internet Provider</ISP>
 <ISP_MODE>Internet Provider Mode</ISP_MODE>
@@ -1986,6 +2009,7 @@ With the default 100 SMTP server process limit, "in flow delay as 1s" limits the
 <local network>Local network</local network>
 <localdomains>Manage email domains</localdomains>
 <localdomains_text>Manage all internet SMTP domains of your organization</localdomains_text>
+<localHostOrDomainIs_explain>Browsers will not use proxy when trying to connect to listed servers[br]Example: www.google.fr or intranet.server.tld...</localHostOrDomainIs_explain>
 <localityName>locality name</localityName>
 <localmx>Local MX</localmx>
 <localmx_text>Return an MX record pointing to the MX Target for all local machines.</localmx_text>
@@ -2155,6 +2179,8 @@ The default time unit is d (days).[br]Specify 0 when mail delivery should be tri
 <memory_use>Memory use</memory_use>
 <mem_size>Memory size</mem_size>
 <mem_stat>Memory Usage</mem_stat>
+<MEM_TOTAL_INF_512>Installed memory under 512Mb</MEM_TOTAL_INF_512>
+<MEM_TOTAL_INF_512_TEXT>To maintain computer performance, Artica has disabled some services that consume memory, increase the server memory up to 512Mb</MEM_TOTAL_INF_512_TEXT>
 <MEM_TOTAL_INF_700>Installed memory under 750Mb</MEM_TOTAL_INF_700>
 <MEM_TOTAL_INF_700_TEXT>To maintain computer performance, Artica has disabled some services that consume memory, increase the server memory up to 700Mb</MEM_TOTAL_INF_700_TEXT>
 <menus_left_main>Index section</menus_left_main>
@@ -2168,6 +2194,7 @@ The default time unit is d (days).[br]Specify 0 when mail delivery should be tri
 <message_size_limit_text>The maximal size in bytes of a message, including envelope information</message_size_limit_text>
 <message_usage>Messages usage</message_usage>
 <messaging>Messaging</messaging>
+<messaging_servers>Messaging servers</messaging_servers>
 <messaging_service>Messaging service</messaging_service>
 <messaging_service_text>Messaging service allows you to provide a mail relay on this server, including all securities features like anti-spam, antivirus</messaging_service_text>
 <mime_nesting_limit>mime nesting limit</mime_nesting_limit>
@@ -2566,6 +2593,7 @@ or when the address is an authorized destination (see "permit auth destination" 
 <postfix_last_error>Last postfix error found</postfix_last_error>
 <postfix_last_errors>Last postfix/cyrus errors</postfix_last_errors>
 <postfix_main_settings>Postfix main settings</postfix_main_settings>
+<postfix_multi_add_mailserver>Add a new mail server in your organization</postfix_multi_add_mailserver>
 <POSTFIX_MULTI_INSTANCE>multiple Postfix instances</POSTFIX_MULTI_INSTANCE>
 <POSTFIX_MULTI_INSTANCE_HOWTO>
 When enabling multiple Postfix instances feature, the main process will be disabled and switched to listen only loopback address (127.0.0.1) in order to serve WebMails and forwards all mail to a central mail hub.[br]
@@ -2627,6 +2655,12 @@ This is because Postfix needs to open lookup tables ahead of time, but the reade
 <protocol>protocol</protocol>
 <province>province</province>
 <ProxyAddress>Proxy Address</ProxyAddress>
+<proxys_list>Proxy(s) list</proxys_list>
+<proxy_addr>Proxy address</proxy_addr>
+<proxy_pac>Autoconfiguration File</proxy_pac>
+<proxy_pac_rules>Autoconfiguration file rules</proxy_pac_rules>
+<proxy_pac_rules_text>Define the Autoconfiguration file settings for your users</proxy_pac_rules_text>
+<proxy_pac_text>Use a client autoconfiguration file to configure all of your Navigator clients</proxy_pac_text>
 <pureftpd_main_settings>Pure-ftpd settings</pureftpd_main_settings>
 <pureftpd_satus>Pure-ftpd status</pureftpd_satus>
 <put_user_quarantine>put mails into user quarantine</put_user_quarantine>
@@ -2705,6 +2739,7 @@ See also "maximal backoff time".
 <recommend_restart_postfix>It is mandatory to restart postfix in order to accept mails</recommend_restart_postfix>
 <recommend_update_kaspersky>You should update kaspersky antivirus database, current version is out-of-date[br]Kaspersky recommend to update it's database each hour</recommend_update_kaspersky>
 <reconnect_vpn_clients>Reconnect all VPN clients</reconnect_vpn_clients>
+<reconstruct_virtual_ips>Reconstruct virtuals IPs</reconstruct_virtual_ips>
 <recreation_humor>Humorous pages, comic strips, funny stories</recreation_humor>
 <recreation_sports>All about sports</recreation_sports>
 <recreation_travel>Sites with information about foreign countries, travel companies, travel fares, accomondations and everything else that has to do with travel</recreation_travel>
@@ -3392,6 +3427,8 @@ by changing 5xx reply codes into 4xx. However, this option is no cure for addres
 <squidguard_status_text>Display the status of the web filtering engine</squidguard_status_text>
 <squidguard_testrules>Check your squidGuard rules</squidguard_testrules>
 <squidguard_testrules_explain>This section allow you to test if a web site is blocked or pass trough the filter, [br]You can set first the web site you want to check and in second the IP address or the username that should match on of your rules.</squidguard_testrules_explain>
+<squid_accel_websites>Web servers</squid_accel_websites>
+<squid_accel_websites_text>Define the web servers that will be cached and protected by your proxy server</squid_accel_websites_text>
 <squid_advanced_parameters>Squid Advanced settings</squid_advanced_parameters>
 <squid_advanced_parameters_text>Tweaks and tunings about SQUID Advanced settings</squid_advanced_parameters_text>
 <squid_events>Squid Events</squid_events>
@@ -3419,8 +3456,12 @@ A unicast packet is the complete opposite: one machine is talking to only one ot
 UDP packets are almost always unicast too, though they can be sent to the broadcast address so that they reach every single machine in some cases.[br][/li]
 [/ul]</squid_parent_sibling_how_to>
 <squid_refresh_pattern_explain>This is the way how the websites objects in the cache be refreshed</squid_refresh_pattern_explain>
+<squid_reverse_proxy>Reverse Proxy</squid_reverse_proxy>
+<squid_reverse_proxy_text>Make one accelerator act as a single front-end for multiple servers</squid_reverse_proxy_text>
 <squid_sizelimit>Headers/Page size limits</squid_sizelimit>
 <squid_status>Squid Status</squid_status>
+<SQUID_TOP_HITS_STAT_EXPLAIN>You will find here the 50 best web pages opened by your users</SQUID_TOP_HITS_STAT_EXPLAIN>
+<SQUID_TOP_USERS_STAT_EXPLAIN>You will find here the 50 best users that browsing this web site since the first time Artica store logs</SQUID_TOP_USERS_STAT_EXPLAIN>
 <srv_artica>Artica service</srv_artica>
 <srv_kav_mail>Kaspersky Antivirus For Postfix</srv_kav_mail>
 <srv_postfix>Postfix service status</srv_postfix>
@@ -3750,7 +3791,9 @@ Each logging level also includes the information that is logged at a lower loggi
 <TOO_MANY_STOPPED_SERVICES>Too many stopped services</TOO_MANY_STOPPED_SERVICES>
 <top>top</top>
 <topten>TOP 10</topten>
+<top_hits>TOP Hits</top_hits>
 <top_ressources>TOP ressources</top_ressources>
+<top_users>TOP Users</top_users>
 <total>total</total>
 <town>town</town>
 <to_ip_address>to tcp/ip address</to_ip_address>
@@ -3828,6 +3871,7 @@ The rules for transferring (routing) are set in this section.[br]
 <upload_new_license>Upload a new license</upload_new_license>
 <upload_vpn_configuration>Upload VPN settings</upload_vpn_configuration>
 <uptime>UpTime</uptime>
+<uri_add_in_browser>Uri to add in browsers settings</uri_add_in_browser>
 <uri_dnsbl>DNSBL uri</uri_dnsbl>
 <uri_test>URL to test</uri_test>
 <urls>urls</urls>
@@ -3935,6 +3979,7 @@ In the url the "%f" can be used to specify the real name of downloaded file</Vir
 <WHEN_TO_BACKUP_TEXT>Define the schedule of the backup execution</WHEN_TO_BACKUP_TEXT>
 <white list>White List</white list>
 <white list explain>Managing the list of trusted addresses.[br] Messages from these addresses are not checked for the presence of spam signs</white list explain>
+<whitelisted_networks>Whitelisted network</whitelisted_networks>
 <width>width</width>
 <width_action>width</width_action>
 <WifiConnectAPDisabled>Wifi Access Point Client mode is not activated</WifiConnectAPDisabled>

@@ -149,7 +149,7 @@ end;
        writeln('Stopping kav4Samba...........: Killing ' + pid + ' PID');
        fpsystem('/bin/kill -9 ' + pid);
   end;
-
+  count:=0;
   pid:=SYS.PIDOF('kav4samba-kavsamba');
     while SYS.PROCESS_EXIST(pid) do begin
         sleep(100);

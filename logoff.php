@@ -193,4 +193,6 @@ $html="
 
 $tpl=new template_users('{disconnected}',$html,1,0,0,0);
 echo $tpl->web_page;
+
+
 ?>

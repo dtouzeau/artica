@@ -369,7 +369,6 @@ var
    path  :string;
    cmd   :string;
    count :integer;
-   D:Boolean;
    l:Tstringlist;
 begin
 count:=0;
@@ -473,11 +472,9 @@ end;
 
 procedure tMailgraphClass.MAILGRAPH_RECONFIGURE();
 var
-   RegExpr:TRegExpr;
-   list:TstringList;
-   i:Integer;
 
-   mailgraph_pl,mailgraph_rrd,mailgraph_cgi,images_path,rrd_path,mailgraph_virus:string;
+   list:TstringList;
+   images_path:string;
 begin
 
    images_path:='/opt/artica/share/www/mailgraph';

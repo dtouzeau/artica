@@ -193,7 +193,7 @@ begin
 
        if FileExists(SYS.LOCATE_GENERIC_BIN('smbd')) then begin
           ntlm_auth:=',ntlm';
-          enable_ntlm_auth_helpers:=' --enable-ntlm-auth-helpers=no_check ';
+          enable_ntlm_auth_helpers:=' --enable-ntlm-auth-helpers=no_check';
           if DirectoryExists(path+'/helpers/ntlm_auth/smb_lm') then enable_ntlm_auth_helpers:=enable_ntlm_auth_helpers+',smb_lm';
           if DirectoryExists(path+'/helpers/ntlm_auth/SMB') then enable_ntlm_auth_helpers:=enable_ntlm_auth_helpers+',SMB';
           enable_basic_auth_helpers:=',MSNT,multi-domain-NTLM,SMB ';
@@ -403,7 +403,13 @@ zsquid:Tsquid;
 begin
  writeln('Prepare installation or upgrade....');
  install.INSTALL_PROGRESS('APP_KAV4PROXY','{downloading}');
- source_folder:=libs.COMPILE_GENERIC_APPS('kav4proxy');
+
+ if FileExists('/home/artica/packages/kav4proxy-5.5-62.tar.gz') then begin
+    fpsystem('/bin/tar -xf /home/artica/packages/kav4proxy-5.5-62.tar.gz -C /root/');
+    source_folder:='/root/kav4proxy-5.5-62');
+ end else begin
+     source_folder:=libs.COMPILE_GENERIC_APPS('kav4proxy');
+ end;
 
 if not DirectoryExists(source_folder) then begin
      writeln('Install Kav4Proxy failed...');
@@ -476,6 +482,8 @@ install.INSTALL_STATUS('APP_KAV4PROXY',70);
  install.INSTALL_PROGRESS('APP_KAV4PROXY','{installed}');
  install.INSTALL_STATUS('APP_KAV4PROXY',100);
  SetCurrentDir('/root');
+ if FileExists('/home/artica/packages/kav4proxy-5.5-62.tar.gz') then fpsystem('/bin/rm -f /home/artica/packages/kav4proxy-5.5-62.tar.gz');
+
  fpsystem('/etc/init.d/artica-postfix restart squid');
 
 

@@ -567,7 +567,7 @@ class dansguardian_rules{
 									
 									"publicite"=>"{publicite}",
 									"adv"=>"{publicite} (2)",
-									"astrology"=>"{astrology}",
+									
 									
 									"cleaning"=>"{cleaning}",
 									"dangerous_material"=>"{dangerous_material}",
@@ -641,6 +641,7 @@ class dansguardian_rules{
 									"shopping"=>"{www_shopping}",
 									
 									"science/chemistry"=>"{science_chemistry}",
+									"astrology"=>"{astrology}",
 									"science/astronomy"=>"{science_astronomy}",
 									"searchengines"=>"{searchengines}",
 									"spyware"=>"{www_spyware}",
@@ -664,8 +665,39 @@ class dansguardian_rules{
 		  	"forums"=>"icon_forum.png",
 		  	"jobsearch"=>"icon_forum.png",
 		  	"tracker"=>"icon_eye.png",
-		  	 "gambling"=>"icon_poker.png",
-		  	 "gamble"=>"icon_poker.png",
+		  	"gambling"=>"icon_poker.png",
+		  	"gamble"=>"icon_poker.png",
+		  	"automobile/bikes"=>"icon-moto.gif",
+		  	"publicite"=>"icon-ads.png",
+		  	"adv"=>"icon-ads.png",
+			"financial"=>"icon-bank.png",
+			"finance/banking"=>"icon-bank.png",
+			"finance/insurance"=>"icon-bank.png",
+			"finance/moneylending"=>"icon-bank.png",
+			"finance/realestate"=>"icon-bank.png",
+			"finance/other"=>"icon-bank.png",	
+			"dangerous_material"=>"icon-bomb.png",
+			"drogue"=>"icon-drugs.png",
+			"drugs"=>"icon-drugs.png",
+		  	"hobby/cooking"=>"icon-food.png",
+		  	"astrology"=>"icon-astrologie.png",	
+		  	"webmail"=>"icon-webmail.png",	
+		  	"mobile-phone"=>"icon-mobile-phone.png", 
+		  	"hacking"=>"icon-hacks.png",
+		  	"phishing"=>"icon-fish.png",
+		  	"automobile/boats"=>"icon-boat.png",
+		  	"automobile/cars"=>"icon-car.png",
+		  	"automobile/planes"=>"icon-plane.png",
+		  	"cleaning"=>"icon-clean.png",
+		  	"webtv"=>"icon-tv.png",
+		  	"recreation/sports"=>"icon-sport.png",
+		  	"recreation/travel"=>"icon-travel.png",
+		  	"searchengines"=>"icon-search.png",
+		  	"games"=>"icon-games.png",
+		  	"hobby/games"=>"icon-games.png",
+		 	"hobby/pets"=>"icon-pets.png",
+		  	"weapons"=>"icon-armes.png",
+		  	"sect"=>"icon-sect.png"
 		  	);
 									
 									

@@ -22,7 +22,6 @@ type LDAP=record
 
 private
      LOGS:Tlogs;
-     D:boolean;
      SYS:TSystem;
      artica_path:string;
      inif:TiniFile;

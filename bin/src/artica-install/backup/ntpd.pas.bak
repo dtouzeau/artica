@@ -6,7 +6,7 @@ unit ntpd;
 interface
 
 uses
-    Classes, SysUtils,variants,strutils,IniFiles, Process,md5,logs,unix,RegExpr in 'RegExpr.pas',zsystem;
+    Classes, SysUtils,variants,strutils,IniFiles, Process,logs,unix,RegExpr in 'RegExpr.pas',zsystem;
 
 type LDAP=record
       admin:string;
@@ -58,8 +58,9 @@ begin
        if not TryStrToInt(SYS.GET_INFO('NTPDEnabled'),NTPDEnabled) then NTPDEnabled:=0;
        if not TryStrToInt(SYS.GET_INFO('NTPDServerEnabled'),NTPDServerEnabled) then NTPDServerEnabled:=0;
 
-
-
+       if NTPDEnabled=0 then begin
+          if NTPDServerEnabled=1 then NTPDEnabled:=1;
+       end;
 
        if not DirectoryExists('/usr/share/artica-postfix') then begin
               artica_path:=ParamStr(0);

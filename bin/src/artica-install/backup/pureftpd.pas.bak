@@ -525,7 +525,6 @@ end;
 procedure tpureftpd.PURE_FTPD_START();
  var
     count      :integer;
-    D          :boolean;
     pid:string;
     STANDALONE_OR_INETD:string;
 begin
@@ -573,7 +572,7 @@ begin
      FIX_CONFIG_ERRORS();
 
      if FileExists(PURE_FTPD_WRAPPER_PATH()) then begin
-
+        logs.DebugLogs('Starting......: pure-ftpd daemon using wrapper '+PURE_FTPD_WRAPPER_PATH());
         fpsystem(PURE_FTPD_WRAPPER_PATH()+' &');
      end;
 

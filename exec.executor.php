@@ -167,7 +167,7 @@ function group10(){
 	$array[]="exec.clean.logs.php --clean-tmp";
 	
 	if($GLOBALS["OVERLOADED"]){return;}
-	$array[]="exec.rsync.events.php";
+	
 	
 	if($EnablePhileSight==1){$array[]="exec.philesight.php --check";}
 	$array[]="exec.kaspersky-update-logs.php";
@@ -288,6 +288,7 @@ if(is_array($array2)){
 }
 function group30s(){
 	$array[]="exec.mpstat.php";
+	$array[]="exec.jgrowl.php --build";
 	
     
 

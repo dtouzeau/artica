@@ -17,9 +17,20 @@ if(!Build_pid_func(__FILE__,"MAIN")){
 }
 
 rsync_queue();
+rsync_server_queue();
 dar_queue();
 
 die();
+
+
+function rsync_server_queue(){
+	$q=new mysql();
+	$q->BuildTables();
+	foreach (glob("/var/log/artica-postfix/rsync/*") as $filename) {
+		ScanRsyncServer($filename);
+	}
+}
+
 
 function rsync_queue(){
 		@mkdir("/var/log/artica-postfix/rsync-queue",0755,true);
@@ -88,6 +99,22 @@ function DarFile($filename){
 $q=new mysql();
 $q->QUERY_SQL($sql,'artica_events');
 return $q->ok;	
+}
+
+function ScanRsyncServer($filename){
+	
+	$datas=unserialize(@file_get_contents($filename));
+	if(!is_array($datas)){return null;}
+	
+	$sql="INSERT INTO rsync_server (ip_address,zDate,transaction_size)
+	VALUES('{$datas["IP"]}','{$datas["DATE"]}','{$datas["SIZE"]}');";
+	
+	$q=new mysql();
+	$q->QUERY_SQL($sql,"artica_events");
+	if(!$q->ok){return null;}
+	@unlink($filename);
+	
+	
 }
 
 	

@@ -767,8 +767,11 @@ $html="<H1>{activate_plugins}</H1>$form";
 	
 function listen_port_js(){
 	$page=CurrentPageName();
+	$tpl=new templates();
+	$title=$tpl->_ENGINE_parse_body("{listen_port}");
+	
 		echo "
-		YahooWin2(450,'$page?content=listen_port','Port...','');
+		YahooWin2(350,'$page?content=listen_port','$title');
 		
 		var x_listenport= function (obj) {
 			var results=obj.responseText;
@@ -854,12 +857,11 @@ $form="
 		
 		<table style='width:100%'>
 			<tr>
-			<td class=legend nowrap>{listen_port}:</td>
-			<td>" . Field_text('listen_port',$squid->listen_port,'width:95px')."</td>
+			<td class=legend nowrap style='font-size:16px;'>{listen_port}:</td>
+			<td>" . Field_text('listen_port',$squid->listen_port,'width:95px;font-size:16px;padding:5px')."</td>
 			</tr>
 			<tr>
 			<td colspan=2 align='right'><hr>". button("{edit}","listenport()")."</td>
-		
 			</tr>
 		</table>			
 		
@@ -870,12 +872,12 @@ $form="
 		
 		<table style='width:100%'>
 			<tr>
-			<td class=legend nowrap>DansGuardian {listen_port}:</td>
-			<td><strong style='width:13px'>" . Field_text('listen_port',$squid->listen_port,'width:95px')."</strong></td>
+			<td class=legend nowrap style='font-size:16px;'>DansGuardian {listen_port}:</td>
+			<td><strong style='width:13px'>" . Field_text('listen_port',$squid->listen_port,'width:95px;;font-size:16px;padding:5px')."</strong></td>
 			</tr>		
 			<tr>
 			<td class=legend nowrap>SQUID {listen_port}:</td>
-			<td><strong style='font-size:14px'>$squid->alt_listen_port</strong></td>
+			<td><strong style='font-size:16px;'>$squid->alt_listen_port</strong></td>
 			</tr>
 			<tr>
 			<td colspan=2 align='right'><hr>". button("{edit}","listenport()")."
@@ -887,8 +889,8 @@ $form="
 		
 		$form=RoundedLightWhite($form);
 		
-$html="<H1>{listen_port}</H1>
-			<p class=caption>{listen_port_text}</p>
+$html="
+			<p class=caption style='font-size:14px;padding:5px'>{listen_port_text}</p>
 				$form
 			<br>
 			

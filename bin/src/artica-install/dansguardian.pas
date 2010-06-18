@@ -6,7 +6,7 @@ unit dansguardian;
 interface
 
 uses
-    Classes, SysUtils,variants,strutils, Process,logs,unix,RegExpr in 'RegExpr.pas',zsystem,kav4proxy,clamav,postfix_class,IniFiles,
+    Classes, SysUtils,variants,strutils, Process,logs,unix,RegExpr in 'RegExpr.pas',zsystem,kav4proxy,clamav,
     squid in '/home/dtouzeau/developpement/artica-postfix/bin/src/artica-install/squid.pas';
 
 type LDAP=record
@@ -30,7 +30,6 @@ private
      cicap_mem_pid:string;
      dansguardian_mem_pid:string;
      username:string;
-     postfix:tpostfix;
      SQUIDEnable:integer;
      TAIL_STARTUP:string;
 
@@ -271,7 +270,6 @@ end;
 FUNCTION tdansguardian.DANSGUARDIAN_PID():string;
 var
   RegExpr:TRegExpr;
-  i:integer;
   tmp:string;
 begin
   if length(dansguardian_mem_pid)>0 then exit(dansguardian_mem_pid);
@@ -398,7 +396,6 @@ procedure tdansguardian.DANSGUARDIAN_START(nottroubleshoot:boolean);
 var
    count:integer;
    pid:string;
-   FileTemp:string;
    verb:string;
 begin
 count:=0;
@@ -422,7 +419,7 @@ if SYS.isoverloadedTooMuch() then begin
 end;
 
 
-FileTemp:=artica_path+'/ressources/logs/dansguardian.start';
+
 if FileExists(transparent_image_path()) then logs.OutputCmd('/bin/ln -s --force '+transparent_image_path()+' /etc/dansguardian/transparent1x1.gif');
 
 
@@ -557,7 +554,7 @@ end;
 procedure tdansguardian.VERIFY_PARENT_PROXY();
 var
    squid:tsquid;
-   http_port,tmp:string;
+   http_port:string;
    RegExpr     :TRegExpr;
 begin
    squid:=tsquid.Create;
@@ -802,18 +799,12 @@ end;
 //##############################################################################
 function tdansguardian.C_ICAP_VERSION():string;
 var
-    RegExpr:TRegExpr;
-    FileDatas:TStringList;
-    i:integer;
-    BinPath:string;
     filetmp:string;
-    nocache:boolean;
 begin
 if not FIleExists('/usr/bin/c-icap-config') then result:='060708rc2';
-if not nocache then begin
    result:=SYS.GET_CACHE_VERSION('APP_C_ICAP');
    if length(result)>2 then exit;
-end;
+
 filetmp:=logs.FILE_TEMP();
 if not FileExists('/usr/bin/c-icap-config') then begin
    logs.Debuglogs('unable to find /usr/bin/c-icap-config');
@@ -850,9 +841,9 @@ end;
 //##############################################################################
 function tdansguardian.DANSGUARDIAN_STATS():string;
 var
-   tmpstr:string;
    phpfile:string;
 begin
+result:='';
 if not FileExists(BIN_PATH) then exit;
 phpfile:=artica_path+'/cron.dansguardian.php';
 if not FileExists(phpfile) then begin
@@ -974,7 +965,6 @@ function tdansguardian.DANSGUARDIAN_TAIL_STATUS():string;
 var
 ini:TstringList;
 pid:string;
-Enabled:integer;
 begin
 
 if not FileExists(BIN_PATH()) then begin
@@ -1308,7 +1298,7 @@ var
    i           :integer;
    found       :boolean;
    keyF        :string;
-   D           :boolean;
+
 begin
     found:=false;
     if not FileExists(C_ICAP_CONF_PATH()) then begin
@@ -1319,7 +1309,6 @@ begin
     l:=TstringList.create;
     keyF:=key;
     keyF:=AnsiReplaceText(keyF,'.','\.');
-    D:=SYS.COMMANDLINE_PARAMETERS('debug');
     RegExpr.Expression:='^'+keyF+'\s+(.*)';
     l.LoadFromFile(C_ICAP_CONF_PATH());
     For i:=0 to l.Count-1 do begin
@@ -1350,14 +1339,9 @@ end;
 //#############################################################################
 function tdansguardian.DANSGUARDIAN_BIN_VERSION(version:string):int64;
 var
-   tmp            :string;
    tmp2           :string;
-   RegExpr        :TRegExpr;
-   t              :integer;
-   i              :int64;
 begin
    result:=0;
-   RegExpr:=TRegExpr.Create;
    tmp2:=trim(AnsiReplaceText(version,'-',''));
    tmp2:=trim(AnsiReplaceText(version,'.',''));
    if length(tmp2)=3 then tmp2:=tmp2+'0';

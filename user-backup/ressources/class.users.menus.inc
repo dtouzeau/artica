@@ -828,6 +828,7 @@ private function build_user_left_menus(){
 	
 	function BuildLeftMenus(){
 		$sock=new sockets();
+		$SquidActHasReverse=$sock->GET_INFO("SquidActHasReverse");
 		$currentPageName=CurrentPageName();
 		error_log("page=$currentPageName ".__FUNCTION__.' in '.__FILE__. " in line ". __LINE__);
 		if($_SESSION["UsersInterfaceDatas"]<>null){
@@ -968,7 +969,8 @@ private function build_user_left_menus(){
 			$ldap=new clladp();
 			$ous=$ldap->hash_get_ou(true);
 			while (list ($num, $ligne) = each ($ous) ){
-				$array["{organizations}"]["SUB"][$num]="javascript:Loadjs('domains.manage.org.index.php?js=yes&ou=$num');";
+				$OU_encoded=base64_encode($OU);
+				$array["{organizations}"]["SUB"][$num]="javascript:Loadjs('domains.manage.org.index.php?js=yes&ou=$num&in-front-ajax=yes');";
 			}
 			
 			$array["{organizations}"]["SUB"]["{add}"]="javascript:TreeAddNewOrganisation();";
@@ -983,7 +985,7 @@ private function build_user_left_menus(){
 				if(strlen($OU)>13){$OU_TEXT=substr($OU,0,10).'...';}else{$OU_TEXT=$OU;}
 				$OU_encoded=base64_encode($OU);
 				$array[$OU_TEXT]["MAIN"]="javascript:Loadjs('domains.manage.org.index.php?js=yes&ou=$OU_encoded&encoded=yes');";
-				$array[$OU_TEXT]["SUB"]["{main_parameters}"]="javascript:Loadjs('domains.manage.org.index.php?js=yes&ou=$OU_encoded&encoded=yes');";
+				$array[$OU_TEXT]["SUB"]["{main_parameters}"]="javascript:Loadjs('domains.manage.org.index.php?js=yes&ou=$OU_encoded&encoded=yes&in-front-ajax=yes');";
 				$array[$OU_TEXT]["SUB"]["{domains}"]="javascript:Loadjs('domains.edit.domains.php?js=yes&ou=$OU_encoded&encoded=yes');";
 				$array[$OU_TEXT]["SUB"]["{add_user}"]="javascript:Loadjs('domains.add.user.php?ou=$OU_encoded&encoded=yes');";
 				$array[$OU_TEXT]["SUB"]["{members}"]="javascript:Loadjs('domains.manage.org.index.php?finduser-js=es&ou=$OU_encoded&encoded=yes');";
@@ -996,7 +998,7 @@ private function build_user_left_menus(){
 			$array["system"]["MAIN"]="javascript:Loadjs('system.index.php?js=yes')";
 			$array["system"]["SUB"]["{main_parameters}"]="javascript:Loadjs('system.index.php?js=yes')";
 			$array["system"]["SUB"]["{left_menu_internal_hard_drives}"]="javascript:Loadjs('system.internal.disks.php')";
-			$array["system"]["SUB"]["{left_menu_net_settings}"]="javascript:Loadjs('system.nic.config.php?js=yes')";
+			$array["system"]["SUB"]["{left_menu_net_settings}"]="javascript:Loadjs('system.nic.config.php?js=yes&in-front-ajax=yes')";
 			if($sock->GET_INFO("WifiCardOk")==1){$array["system"]["SUB"]["WIFI"]="javascript:Loadjs('system.wifi.php')";}
 			if($this->dhcp_installed){
 				$array["system"]["SUB"]["{APP_DHCP}"]="javascript:Loadjs('index.gateway.php?index_dhcp=yes')";
@@ -1043,20 +1045,27 @@ private function build_user_left_menus(){
 		
 		
 		if($this->SQUID_INSTALLED==true){if($this->AsSquidAdministrator==true){
+			
 			$array["{web_proxy}"]["MAIN"]="javascript:Loadjs('squid.newbee.php?yes')";
 			$array["{web_proxy}"]["SUB"]["{main_parameters}"]="javascript:Loadjs('squid.newbee.php?yes')";
-			if($this->DANSGUARDIAN_INSTALLED){
-				$array["{web_proxy}"]["SUB"]["{DANSGUARDIAN_RULES}"]="javascript:Loadjs('dansguardian.index.php?js=yes')";
+			
+			if($SquidActHasReverse<>1){
+				if($this->DANSGUARDIAN_INSTALLED){
+					$array["{web_proxy}"]["SUB"]["{DANSGUARDIAN_RULES}"]="javascript:Loadjs('dansguardian.index.php?js=yes')";
 
+				}
 			}
 			
-			if($this->SQUIDGUARD_INSTALLED){
-				$array["{web_proxy}"]["SUB"]["{DANSGUARDIAN_RULES}"]="javascript:Loadjs('dansguardian.index.php?js=yes')";
-
+			if($SquidActHasReverse<>1){
+				if($this->SQUIDGUARD_INSTALLED){
+					$array["{web_proxy}"]["SUB"]["{DANSGUARDIAN_RULES}"]="javascript:Loadjs('dansguardian.index.php?js=yes')";
+				}
 			}
 			
-			if($this->C_ICAP_INSTALLED){
-				$array["{web_proxy}"]["SUB"]["{DANSGUARDIAN_RULES}"]="javascript:Loadjs('dansguardian.index.php?js=yes')";
+			if($SquidActHasReverse<>1){
+				if($this->C_ICAP_INSTALLED){
+					$array["{web_proxy}"]["SUB"]["{DANSGUARDIAN_RULES}"]="javascript:Loadjs('dansguardian.index.php?js=yes')";
+				}
 			}
 
 			$array["{web_proxy}"]["SUB"]["{statistics}"]="javascript:Loadjs('squid.statistics.php')";
@@ -1075,7 +1084,7 @@ private function build_user_left_menus(){
 				
 				if($this->AMAVIS_INSTALLED){
 					if($sock->GET_INFO("EnableAmavisDaemon")==1){
-						$array["{messaging}"]["SUB"]["{APP_AMAVIS}"]="javascript:Loadjs('amavis.index.php?ajax=yes')";
+						$array["{messaging}"]["SUB"]["{APP_AMAVIS}"]="javascript:Loadjs('amavis.index.php?ajax=yes&in-front-ajax=yes')";
 					}
 				}
 				$array["{messaging}"]["SUB"]["{postfix_events}"]="javascript:s_PopUp('postfix.events.php?pop=true',450,400)";

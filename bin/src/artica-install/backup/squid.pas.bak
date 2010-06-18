@@ -27,6 +27,7 @@ private
      SYS:TSystem;
      artica_path:string;
      SQUIDEnable:integer;
+     SquidEnableProxyPac:integer;
      myversion:integer;
      TAIL_STARTUP:string;
      function COMMANDLINE_PARAMETERS(FoundWhatPattern:string):boolean;
@@ -35,9 +36,10 @@ private
      function SQUID_DETERMINE_PID_PATH():string;
      procedure WRITE_INITD();
      procedure ERROR_FD();
-     function  DANSGUARDIAN_PORT():string;
-     function  GET_LOCAL_PORT():string;
-     function  TAIL_PID():string;
+     function    DANSGUARDIAN_PORT():string;
+     function    GET_LOCAL_PORT():string;
+     function    TAIL_PID():string;
+     function    PROXY_PAC_PID():string;
 
 
 public
@@ -85,6 +87,11 @@ public
     procedure   SARG_CONFIG();
     procedure   SARG_EXECUTE();
 
+    //ProxyPac
+    procedure   PROXY_PAC_STOP();
+    procedure   PROXY_PAC_START();
+
+
 END;
 
 implementation
@@ -98,9 +105,15 @@ begin
        
        if not TryStrToInt(SYS.GET_INFO('DansGuardianEnabled'),DansGuardianEnabled) then DansGuardianEnabled:=0;
        if not TryStrToInt(SYS.GET_INFO('SQUIDEnable'),SQUIDEnable) then SQUIDEnable:=1;
+       if not TryStrToInt(SYS.GET_INFO('SquidEnableProxyPac'),SquidEnableProxyPac) then SquidEnableProxyPac:=0;
+
+
+
        TAIL_STARTUP:=SYS.LOCATE_PHP5_BIN()+' /usr/share/artica-postfix/exec.squid-tail.php';
-       if SQUIDEnable=0 then DansGuardianEnabled:=0;
-       
+       if SQUIDEnable=0 then begin
+          DansGuardianEnabled:=0;
+          SquidEnableProxyPac:=0;
+       end;
        Caches:=TstringList.Create;
        if not DirectoryExists('/usr/share/artica-postfix') then begin
               artica_path:=ParamStr(0);
@@ -1043,7 +1056,7 @@ begin
  result:=logs.ReadFromFile(pidpath);
  logs.DeleteFile(pidpath);
 
- if SquidEnabled=0 then begin
+ if SQUIDEnable=0 then begin
     SYS.MONIT_DELETE('APP_SQUID');
     exit;
  end;
@@ -1717,6 +1730,148 @@ count:=0;
 
 
 end;
+//####################################################################################
+function  tsquid.PROXY_PAC_PID():string;
+begin
+result:=SYS.GET_PID_FROM_PATH('/var/run/proxypac.pid');
+end;
+//####################################################################################
+procedure tsquid.PROXY_PAC_START();
+var
+   pid:string;
+   count:integer;
+begin
+
+if not FileExists(SQUID_BIN_PATH()) then begin
+   logs.Debuglogs('Starting......: proxy.pac service, squid is not installed');
+   exit;
+end;
+
+
+if SquidEnableProxyPac=0 then begin
+   logs.Debuglogs('Starting......: proxy.pac service is disabled');
+   PROXY_PAC_STOP();
+   exit;
+end;
+
+
+pid:=PROXY_PAC_PID();
+if SYS.PROCESS_EXIST(pid) then begin
+      logs.DebugLogs('Starting......: proxy.pac service log already running with pid '+pid);
+      exit;
+end;
+
+  logs.DebugLogs('Starting......: proxy.pac service');
+ fpsystem(SYS.LOCATE_PHP5_BIN()+' /usr/share/artica-postfix/exec.proxy.pac.php');
+ logs.OutputCmd(SYS.LOCATE_GENERIC_BIN('lighttpd')+ ' -f /etc/lighttpd/proxypac.conf');
+
+pid:=PROXY_PAC_PID();
+count:=0;
+while not SYS.PROCESS_EXIST(pid) do begin
+        sleep(100);
+        inc(count);
+        if count>40 then begin
+           logs.DebugLogs('Starting......: proxy.pac service (timeout)');
+           break;
+        end;
+        pid:=PROXY_PAC_PID();
+  end;
+
+pid:=PROXY_PAC_PID();
+
+if SYS.PROCESS_EXIST(pid) then begin
+      logs.DebugLogs('Starting......: proxy.pac service success with pid '+pid);
+      exit;
+end else begin
+    logs.DebugLogs('Starting......: proxy.pac service failed');
+end;
+
+end;
+//####################################################################################
+procedure tsquid.PROXY_PAC_STOP();
+var
+   pid:string;
+   count:integer;
+begin
+if not FileExists(SQUID_BIN_PATH()) then begin
+   writeln('Stopping proxy.pac service...: squid is not installed');
+   exit;
+end;
+   pid:=PROXY_PAC_PID();
+
+   if not sys.PROCESS_EXIST(pid) then begin
+       writeln('Stopping proxy.pac service...: Already stopped');
+       exit;
+   end;
+   writeln('Stopping proxy.pac service...: PID '+pid);
+   fpsystem('/bin/kill '+ pid);
+   count:=0;
+  while sys.PROCESS_EXIST(pid) do begin
+      sleep(100);
+      fpsystem('/bin/kill '+ pid);
+      inc(count);
+      if count>50 then begin
+         writeln('Stopping proxy.pac service...: time-out');
+         logs.OutputCmd('/bin/kill -9 ' + pid);
+         break;
+      end;
+      pid:=PROXY_PAC_PID();
+  end;
+pid:=PROXY_PAC_PID();
+   if not sys.PROCESS_EXIST(pid) then begin
+       writeln('Stopping proxy.pac service...: stopped');
+       exit;
+   end;
+   writeln('Stopping proxy.pac service...: failed');
+end;
+//##############################################################################
+function tsquid.PROXY_PAC_STATUS():string;
+var
+   ini:TstringList;
+   pid,pid_path:string;
+
+begin
+if not FileExists(SQUID_BIN_PATH()) then begin
+   SYS.MONIT_DELETE('APP_PROXY_PAC');
+   exit;
+end;
+
+
+
+      ini:=TstringList.Create;
+      ini.Add('[APP_PROXY_PAC]');
+      ini.Add('service_name=APP_PROXY_PAC');
+      ini.Add('service_cmd=proxy-pac');
+      ini.Add('service_disabled='+INtToSTr(SquidEnableProxyPac));
+      ini.Add('master_version=0.00');
+
+      if SquidEnableProxyPac=0 then begin
+         result:=ini.Text;
+         ini.free;
+         SYS.MONIT_DELETE('APP_PROXY_PAC');
+         exit;
+      end;
+
+      pid_path:='/var/run/proxypac.pid';
+      if SYS.MONIT_CONFIG('APP_PROXY_PAC',pid_path,'proxy-pac') then begin
+         ini.Add('monit=1');
+         result:=ini.Text;
+         ini.free;
+         exit;
+      end;
+
+      pid:=PROXY_PAC_PID();
+
+
+      if SYS.PROCESS_EXIST(pid) then ini.Add('running=1') else  ini.Add('running=0');
+      ini.Add('application_installed=1');
+      ini.Add('master_pid='+ pid);
+      ini.Add('master_memory=' + IntToStr(SYS.PROCESS_MEMORY(pid)));
+      ini.Add('status='+SYS.PROCESS_STATUS(pid));
+      result:=ini.Text;
+      ini.free;
+end;
 //#####################################################################################
+
 
 end.

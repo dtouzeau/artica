@@ -772,7 +772,7 @@ l.add('libdb4.2-ruby1.8');
 l.add('libcairo-ruby1.8');
 l.add('cryptsetup');
 l.add('monit');
-l.add('language-pack-nl');
+ladd('libtommath-devel'); //clamav
 
 
 l.add('rsync');
@@ -836,6 +836,7 @@ if distri.DISTRINAME_CODE='UBUNTU' then begin
    l.add('libcurl4-openssl-dev');
    l.add('libsnmp-dev');
    l.add('libltdl-dev'); //Clamav compilation
+   l.add('language-pack-nl'); // Zarafa
 
 
    if UbuntuIntVer=8 then begin

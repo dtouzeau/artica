@@ -110,6 +110,11 @@ function js(){
 	$title=$tpl->_ENGINE_parse_body('{net_settings}');
 	$page=CurrentPageName();
 	$prefix=md5($page);
+	$openjs="YahooWin(700,'$page?popup=yes','$title');";
+	IF(isset($_GET["in-front-ajax"])){
+		$openjs="$('#BodyContent').load('$page?popup=yes');";
+	}
+	
 	$html="
 var {$prefix}_timerID  = null;
 var {$prefix}_tant=0;
@@ -132,7 +137,7 @@ function {$prefix}_demarre(){
 	$add
 	
 	function {$prefix}_StartNicConfig(){
-		YahooWin(700,'$page?popup=yes','$title');
+		$openjs
 		setTimeout(\"NicSettingsChargeLogs()\",1000);
 		setTimeout(\"{$prefix}_demarre()\",1000);
 	
@@ -159,6 +164,7 @@ function ChangeHostName(current){
 		var hostname=prompt(text,current);
 		var XHR = new XHRConnection();
 		XHR.appendData('ChangeHostName',hostname);
+		document.getElementById('hostname_cf').innerHTML='<center><img src=img/wait_verybig.gif></center>';
 		XHR.sendAndLoad('$page', 'GET',x_ChangeHostName);
 
 }
@@ -336,7 +342,7 @@ function ChangeHostName(){
 	}
 	
 	
-	echo $tpl->_ENGINE_parse_body('{hostname}:{success}');
+	
 }
 
 
@@ -950,7 +956,7 @@ function virtuals_list(){
 		
 	}
 	$html=$html."</table></center>
-	<div style='text-align:right'>". button("{build}","BuildVirtuals()")."</div>
+	<div style='text-align:right'>". button("{reconstruct_virtual_ips}","BuildVirtuals()")."</div>
 	
 	";
 	$tpl=new templates();

@@ -9,7 +9,7 @@
 <enable_kav_macro_text>Pour emp&ecirc;cher l'arr&ecirc;t, les t&eacute;l&eacute;chargements lents sur certains flux et sur les gros fichiers, appuyer sur le bouton pour &eacute;viter l'antivirus</enable_kav_macro_text>
 <info>Infos</info>
 <listen_port_chain>Donner le port local de SQUID. Ce port sera utilis&eacute; par DansGuardian pour transf&eacute;rer les requ&ecirc;tes clients vers SQUID</listen_port_chain>
-<listen_port_text>Donne le port d'&eacute;coute que les utilisateurs doivent param&eacute;trer dans leurs logiciels internet</listen_port_text>
+<listen_port_text>Indiquez le port d'&eacute;coute que les utilisateurs doivent param&eacute;trer dans leurs navigateurs internet</listen_port_text>
 <Safe_ports>Autoriser les ports web</Safe_ports>
 <Safe_ports_add>Ajouter un port d'acc&egrave;s</Safe_ports_add>
 <Safe_ports_text>Param&eacute;trer ici une liste des ports distants autoris&eacute;s &agrave; passer &agrave; travers le proxy</Safe_ports_text>

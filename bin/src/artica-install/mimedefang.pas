@@ -22,8 +22,6 @@ type LDAP=record
 
 private
      LOGS:Tlogs;
-     D:boolean;
-     GLOBAL_INI:TiniFIle;
      SYS:TSystem;
      artica_path:string;
      function Maillog_path():string;
@@ -111,7 +109,6 @@ end;
 
 function tmimedefang.Maillog_path():string;
 var filedatas,logconfig,ExpressionGrep:string;
-D:boolean;
 RegExpr:TRegExpr;
 begin
 if FileExists('/var/log/mail.log') then exit('/var/log/mail.log');
@@ -426,13 +423,11 @@ end;
 function tmimedefang.MIMEDEFANG_STATUS():string;
 var
 ini:TstringList;
-pidpath:string;
 MimeDefangEnabled:integer;
 begin
    MimeDefangEnabled:=0;
    if FileExists(BIN_PATH()) then  exit;
    if not TryStrToInt(SYS.GET_INFO('MimeDefangEnabled'),MimeDefangEnabled) then MimeDefangEnabled:=0;
-   pidpath:='/var/spool/MIMEDefang/mimedefang.pid';
    ini:=TstringList.Create;
    ini.Add('[MIMEDEFANG]');
    if FileExists(BIN_PATH()) then  begin
@@ -658,7 +653,7 @@ var
    ALLOW_NEW_CONNECTIONS_TO_QUEUE:string;
    MX_SENDER_CHECK:string;
    MX_RECIPIENT_CHECK:string;
-   KEEP_FAILED_DIRECTORIES:string;
+  // KEEP_FAILED_DIRECTORIES:string;
    cmd:string;
 begin
  LOOPBACK_RESERVED_CONNECTIONS:=READ_CONF('LOOPBACK_RESERVED_CONNECTIONS');
@@ -670,7 +665,7 @@ begin
  LOG_FILTER_TIME:=READ_CONF('LOG_FILTER_TIME');
  MX_SENDER_CHECK:=READ_CONF('MX_SENDER_CHECK');
  MX_RECIPIENT_CHECK:=READ_CONF('MX_RECIPIENT_CHECK');
- KEEP_FAILED_DIRECTORIES:=READ_CONF('KEEP_FAILED_DIRECTORIES');
+ //KEEP_FAILED_DIRECTORIES:=READ_CONF('KEEP_FAILED_DIRECTORIES');
  MD_EXTRA:=READ_CONF('MD_EXTRA');
  ALLOW_NEW_CONNECTIONS_TO_QUEUE:=READ_CONF('ALLOW_NEW_CONNECTIONS_TO_QUEUE');
 cmd:='';

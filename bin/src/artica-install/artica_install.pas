@@ -1171,7 +1171,7 @@ end;
  
   if paramStr(1)='--start-minimum-daemons' then begin
      GLOBAL_INI:=MyConf.Create();
-     GLOBAL_INI.SYSTEM_START_MINIMUM_DAEMON();
+     GLOBAL_INI.SYSTEM_START_ARTICA_DAEMON();
     halt(0);
  end;
  
@@ -2631,7 +2631,8 @@ end;
 if ParamStr(1)='--startall' then begin
     GLOBAL_INI:=MyConf.Create();
        if ParamStr(2)='--force' then begin
-            GLOBAL_INI.SYSTEM_START_ARTICA_ALL_DAEMON();
+            GLOBAL_INI.START_ALL_DAEMONS();
+             GLOBAL_INI.SYSTEM_START_ARTICA_DAEMON();
             halt(0);
        end;
     
@@ -2640,7 +2641,8 @@ if ParamStr(1)='--startall' then begin
                zlogs.Debuglogs('#######################################');
                zlogs.Debuglogs('######## WATCHDOG #####################');
                zlogs.Debuglogs('(--startall)::Running watchdog process');
-               GLOBAL_INI.SYSTEM_START_ARTICA_ALL_DAEMON();
+               GLOBAL_INI.START_ALL_DAEMONS();
+               GLOBAL_INI.SYSTEM_START_ARTICA_DAEMON();
                zlogs.Debuglogs('#######################################');
                zlogs.Debuglogs('(--startall):: End');
                zlogs.Debuglogs('');

@@ -497,7 +497,6 @@ var
    l:TstringList;
    i:integer;
    RegExpr:TRegExpr;
-   ftmp:string;
 begin
 
 if not FileExists('/etc/inetd.conf') then begin
@@ -525,7 +524,6 @@ end;
 procedure tpureftpd.PURE_FTPD_START();
  var
     count      :integer;
-    D          :boolean;
     pid:string;
     STANDALONE_OR_INETD:string;
 begin

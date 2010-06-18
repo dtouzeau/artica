@@ -1272,10 +1272,23 @@ class mysql{
 				  `value` varchar(255) NOT NULL,
 				  `ou` varchar(255) NOT NULL,
 				  `ValueTEXT` text NOT NULL,
+				  `uuid` VARCHAR( 255 ) NOT NULL ,
+				  `ip_address` VARCHAR( 16 ) NOT NULL,
 				  PRIMARY KEY (`ID`),
 				  UNIQUE KEY `ID` (`ID`),
-				  KEY `key` (`key`,`value`,`ou`)
-				)";	
+				  KEY `key` (`key`),
+				  KEY `value`(`value`),
+				  KEY `ou` (`ou`),
+				  KEY `uuid` (`uuid`),
+				  KEY `ip_address` (`ip_address`)
+				  )";	
+			$this->QUERY_SQL($sql,'artica_backup');
+		}
+		
+		if(!$this->FIELD_EXISTS("postfix_multi","uuid","artica_backup")){
+			$sql="ALTER TABLE `postfix_multi` ADD `uuid` VARCHAR( 255 ) NOT NULL ,
+			ADD `ip_address` VARCHAR( 16 ) NOT NULL ,
+			ADD INDEX ( `uuid` , `ip_address` )";
 			$this->QUERY_SQL($sql,'artica_backup');
 		}
 
@@ -2347,24 +2360,26 @@ private	function CheckTables_repositories(){
   					PRIMARY KEY (`ID`),
   					KEY `category_name` (`category_name`,`pattern`))";
 				$this->QUERY_SQL($sql,'artica_backup');
-				if(!$this->ok){
-					$this->mysql_error=$this->mysql_error."\n$sql";
-					return false;}
+				if(!$this->ok){$this->mysql_error=$this->mysql_error."\n$sql";}
 		}
 		
 		if(!$this->TABLE_EXISTS('dansguardian_community_categories','artica_backup')){	
 		$sql="CREATE TABLE `artica_backup`.`dansguardian_community_categories` (
-			`zmd5` VARCHAR( 90 ) NOT NULL ,
-			`zDate` DATETIME NOT NULL ,
-			`category` VARCHAR( 20 ) NOT NULL ,
-			`pattern` VARCHAR( 255 ) NOT NULL ,
-			`enabled` INT( 1 ) NOT NULL DEFAULT '1',
-			`uuid` VARCHAR( 255 ) NOT NULL ,
-			`sended` INT( 1 ) NOT NULL DEFAULT '0',
-			PRIMARY KEY ( `zmd5` ) ,
-			INDEX ( `zDate` , `category` , `pattern` , `enabled` , `uuid` , `sended` )
+				`zmd5` VARCHAR( 90 ) NOT NULL ,
+				`zDate` DATETIME NOT NULL ,
+				`category` VARCHAR( 20 ) NOT NULL ,
+				`pattern` VARCHAR( 255 ) NOT NULL ,
+				`enabled` INT( 1 ) NOT NULL DEFAULT '1',
+				`uuid` VARCHAR( 255 ) NOT NULL ,
+				`sended` INT( 1 ) NOT NULL DEFAULT '0',
+				PRIMARY KEY ( `zmd5` ) ,
+				KEY `zDate` (`zDate`),
+	  			KEY `pattern` (`pattern`),
+	  			KEY `enabled` (`enabled`),
+	  			KEY `sended` (`sended`),
+	  			KEY `category` (`category`)
 			)";
-		$this->QUERY_SQL($sql,'artica_backup');
+			$this->QUERY_SQL($sql,'artica_backup');
 		}	
 		
 		
@@ -2551,7 +2566,19 @@ private	function CheckTables_repositories(){
 			`uri` VARCHAR( 255 ) NOT NULL ,`task_type` VARCHAR( 90 ) NOT NULL ,
 			`zDate` DATETIME NOT NULL ,INDEX ( `task_type` , `zDate` ) ,UNIQUE (`uri`))";
 		$this->QUERY_SQL($sql,"artica_backup");
+		}
 		
+		
+		
+		if(!$this->TABLE_EXISTS('squid_accel','artica_backup')){
+			$sql="CREATE TABLE `artica_backup`.`squid_accel` (
+			`ID` INT NOT NULL AUTO_INCREMENT PRIMARY KEY ,
+			`website_name` VARCHAR( 255 ) NOT NULL ,
+			`website_ip` VARCHAR( 25 ) NOT NULL ,
+			`website_port` INT NOT NULL ,
+			`options` TEXT NOT NULL ,
+			INDEX ( `website_name` )) ";
+			$this->QUERY_SQL($sql,"artica_backup");
 		}
 		
 		
@@ -2605,26 +2632,24 @@ private	function CheckTables_repositories(){
 		
 			if(!$this->TABLE_EXISTS('rsync_events','artica_events')){	
 					$sql="
-				CREATE TABLE IF NOT EXISTS `rsync_events` (
-				  `ID` int(20) NOT NULL auto_increment,
-				  `folder_md5` varchar(90) NOT NULL,
-				  `date_start` datetime NOT NULL,
-				  `date_end` datetime NOT NULL,
-				  `events` text NOT NULL,
-				  `path` varchar(255) NOT NULL,
-				  `failed` int(1) NOT NULL,
-				  `sent_size` float NOT NULL,
-				  `speed` float NOT NULL,
-				  `numfiles` int(5) NOT NULL,
-				  `storage_server` varchar(80) NOT NULL,
-				  PRIMARY KEY  (`ID`),
-				  KEY `folder_md5` (`folder_md5`,`date_start`,`date_end`,`path`),
-				  KEY `failed` (`failed`),
-				  KEY `storage_server` (`storage_server`)
-				) ";		
+						CREATE TABLE IF NOT EXISTS `rsync_events` (
+					  `ID` int(20) NOT NULL AUTO_INCREMENT,
+					  `folder_md5` varchar(90) NOT NULL,
+					  `date_start` datetime NOT NULL,
+					  `date_end` datetime NOT NULL,
+					  `events` text NOT NULL,
+					  `path` varchar(255)  NOT NULL,
+					  `failed` int(1) NOT NULL,
+					  `sent_size` float NOT NULL,
+					  `speed` float NOT NULL,
+					  `numfiles` int(5) NOT NULL,
+					  `storage_server` varchar(80) NOT NULL,
+					  PRIMARY KEY (`ID`),
+					  KEY `failed` (`failed`),
+					  KEY `storage_server` (`storage_server`),
+					  KEY `folder_md5` (`folder_md5`))";		
 								
 					$this->QUERY_SQL($sql,'artica_events');
-					
 				}
 				
 			if(!$this->TABLE_EXISTS('dar_events','artica_events')){	
@@ -2654,9 +2679,22 @@ private	function CheckTables_repositories(){
 					`zmd5` VARCHAR( 90 ) NOT NULL ,
 					`recursive` INT( 1 ) NOT NULL DEFAULT '0',
 					INDEX ( `taskid` , `path` , `zmd5` ))"; 
-					$this->QUERY_SQL($sql,'artica_events');
+					$this->QUERY_SQL($sql,'artica_backup');
 	
 		}
+		
+			if(!$this->TABLE_EXISTS('rsync_server','artica_events')){			
+				
+			$sql="CREATE TABLE `artica_events`.`rsync_server` (
+					`ID` INT( 10 ) NOT NULL AUTO_INCREMENT PRIMARY KEY ,
+					`ip_address` VARCHAR( 90 ) NOT NULL ,
+					`zDate` DATETIME NOT NULL ,
+					`transaction_size` INT( 20 ) NOT NULL ,
+					INDEX ( `ip_address` , `zDate` )) "; 
+					$this->QUERY_SQL($sql,'artica_events');
+	
+		}		
+	
 	}
 }
 

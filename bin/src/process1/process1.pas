@@ -225,10 +225,7 @@ end;
                  if D then writeln('Sleep 700');
                  sleep(700);
                  if D then writeln('-> SYSTEM_START_ARTICA_ALL_DAEMON()');
-                 zlogs.Debuglogs('->GLOBAL_INI.SYSTEM_START_ARTICA_ALL_DAEMON();');
-                 GLOBAL_INI.SYSTEM_START_ARTICA_ALL_DAEMON();
-
-
+                 GLOBAL_INI.SYSTEM_START_ARTICA_DAEMON();
               end else begin
                  if D then writeln('Artica-postfix daemon is stopped, aborting');
               end;

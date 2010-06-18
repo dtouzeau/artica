@@ -6,7 +6,7 @@ unit samba4;
 interface
 
 uses
-    Classes, SysUtils,variants,strutils,IniFiles,logs,unix,RegExpr in 'RegExpr.pas',zsystem;
+    Classes, SysUtils,variants,strutils,logs,unix,RegExpr in 'RegExpr.pas',zsystem;
 
 
 
@@ -72,10 +72,8 @@ procedure tsamba4.START();
 var
    pid:string;
    parms:string;
-   count:integer;
 begin
   pid:=PID_NUM();
-  count:=0;
    if SYS.PROCESS_EXIST(pid) then begin
       logs.DebugLogs('Starting......: samba4 is already running using PID ' + pid + '...');
       exit;
@@ -114,10 +112,6 @@ end;
 end;
 //#########################################################################################
 function tsamba4.VERSION():string;
-var
-   l:string;
-
-
 begin
    result:='';
    if not FileExists(BIN_PATH) then exit;

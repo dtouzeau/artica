@@ -72,10 +72,8 @@ end;
 procedure tdebian.ARTICA_CD_SOURCES_LIST();
 var
    l:TstringList;
-   gpg:string;
 begin
-gpg:='';
-gpg:=SYS.LOCATE_GPG();
+
 if not FileExists('/etc/artica-postfix/FROM_ISO') then begin
    logs.Debuglogs('ARTICA_CD_SOURCES_LIST():: /etc/artica-postfix/FROM_ISO does not exists, this is not a system from Artica-ISO');
    exit;

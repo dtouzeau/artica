@@ -92,6 +92,10 @@ writeln('Menu :');
 writeln('');
 writeln('[W]..... How to access to the Artica Web interface ?');
 writeln('[U]..... Global Administrator Username  & password');
+if FileExists('/usr/sbin/dpkg-reconfigure') then begin
+   // writeln('[L]..... Configure the system language');
+end;
+
 writeln('[Q]..... Exit and enter to the system');
 writeln('');
 writeln('');
@@ -108,6 +112,13 @@ if a='W' then begin
 end;
 if a='U' then begin
    credentials();
+   Menu();
+   exit;
+end;
+
+if a='L' then begin
+   fpsystem('sudo /usr/sbin/dpkg-reconfigure locales');
+   fpsystem('sudo dpkg-reconfigure console-data');
    Menu();
    exit;
 end;

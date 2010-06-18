@@ -772,7 +772,7 @@ l.add('libdb4.2-ruby1.8');
 l.add('libcairo-ruby1.8');
 l.add('cryptsetup');
 l.add('monit');
-
+l.add('libtommath-devel'); //clamav
 
 
 l.add('rsync');

@@ -96,7 +96,16 @@ if($wwwservertype=="OPENGOO"){
 
 if($wwwservertype=="GROUPOFFICE"){
 		GROUPOFFICE_INSTALL($apacheservername,$root,$hash[$i]);
+	}
+
+if($wwwservertype=="ZARAFA"){
+		ZARAFA_INSTALL($apacheservername,$root,$hash[$i]);
+	}	
+
+if($wwwservertype=="ZARAFA_MOBILE"){
+		ZARAFA_MOBILE_INSTALL($apacheservername,$root,$hash[$i]);
 	}		
+	
 	
 }
 
@@ -305,6 +314,18 @@ function ARTICA_INSTALL($servername,$root,$hash=array()){
 	
 	
 }
+function ZARAFA_INSTALL($servername,$root,$hash=array()){
+	events("Starting install ZARAFA_INSTALL sub-system ");
+	events("ln -s --force /usr/share/zarafa-webaccess $root");
+	shell_exec("ln -s --force /usr/share/zarafa-webaccess $root");
+}
+function ZARAFA_MOBILE_INSTALL($servername,$root,$hash=array()){
+	events("Starting install ZARAFA_MOBILE sub-system ");
+	events("ln -s --force /usr/share/zarafa-webaccess-mobile $root");
+	shell_exec("ln -s --force /usr/share/zarafa-webaccess-mobile $root");
+}
+
+
 
 
 
@@ -853,6 +874,8 @@ function GROUPOFFICE_INSTALL($servername,$root,$hash=array()){
 		
 		events("Starting install GroupOffice $root/config.php done...");
 }
+
+
 
 
 function ROUNDCUBE_INSTALL($servername,$root,$hash=array()){

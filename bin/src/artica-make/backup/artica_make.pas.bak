@@ -84,7 +84,7 @@ begin
   zinstall:=tinstall.Create;
 
 
-   if ParamStr(1)='--empty-cacher' then begin
+   if ParamStr(1)='--empty-cache' then begin
       zinstall.EMPTY_CACHE();
       halt(0);
    end;
@@ -795,10 +795,6 @@ begin
 
   if ParamStr(1)='APP_C_ICAP' then begin
          fpsystem('/usr/share/artica-postfix/bin/setup-ubuntu --check-base-system');
-         clamav:=tsetup_clamav.Create;
-         clamav.install_clamav();
-         squid:=tsetup_squid.Create;
-         squid.xinstall();
          ccicap:=cicap.Create;
          if ParamStr(2)='-configure' then begin
             ccicap.configure();
@@ -806,7 +802,6 @@ begin
             halt(0);
          end;
          ccicap.xinstall();
-
          halt(0);
    end;
 

@@ -973,6 +973,13 @@ begin
                  exit();
               end;
 
+            if ParamStr(2)='proxy-pac' then begin
+                 zsquid.PROXY_PAC_STOP();
+                 exit();
+              end;
+
+
+
            if ParamStr(2)='kav4proxy' then begin
                  kav4proxy.KAV4PROXY_STOP();
                  exit();
@@ -1186,7 +1193,7 @@ begin
                writeln('|tail|daemon|clammilter|dnsmasq|stunnel|dkim|postfix|mailgraph|mimedefang|roundcube|kav4samba|bind9|obm|p3scan|syslogng|mailarchiver|bogom');
                writeln('|collectd|fetchmail|mailspy|amavis|retranslator|retranslator-tsk|watchdog|dotclear|jcheckmail|mailman|kas3|dhcp|cicap|openvpn|postfix-logger');
                writeln('|dansguardian-tail|cups|dstat|dstat-top-mem|dstat-top-cpu|rsync|smartd|policydw|mysql-cluster|assp|pdns|gluster|gluster-cli|sysloger');
-               writeln('|zabbix|hamachi|kav4proxy|postfilter|vmtools|zarafa|zarafa-web|monit|wifi');
+               writeln('|zabbix|hamachi|kav4proxy|postfilter|vmtools|zarafa|zarafa-web|monit|wifi[proxy-pac');
                exit();
             end;
 
@@ -1630,6 +1637,11 @@ begin
                  exit();
               end;
 
+              if ParamStr(2)='proxy-pac' then begin
+                 zsquid.PROXY_PAC_START();
+                 exit();
+              end;
+
               if ParamStr(2)='squid-tail' then begin
                  zsquid.TAIL_START();
                  exit();
@@ -1746,7 +1758,7 @@ begin
 
               if ParamStr(2)='daemon' then begin
                  if not SYS.BuildPids() then exit();
-                 GLOBAL_INI.SYSTEM_START_MINIMUM_DAEMON();
+                 GLOBAL_INI.SYSTEM_START_ARTICA_DAEMON();
                  monit.START();
                  exit();
               end;
@@ -1920,7 +1932,7 @@ begin
 
            if ParamStr(2)='all' then begin
                 fpsystem(GLOBAL_INI.get_ARTICA_PHP_PATH()+'/bin/process1 --force &');
-                GLOBAL_INI.SYSTEM_START_MINIMUM_DAEMON();
+                GLOBAL_INI.SYSTEM_START_ARTICA_DAEMON();
                 GLOBAL_INI.START_ALL_DAEMONS();
                 fpsystem(SYS.LOCATE_PHP5_BIN() +' ' + GLOBAL_INI.get_ARTICA_PHP_PATH() +'/exec.ldap.rebuild.php >/dev/null &');
                 exit();
@@ -1934,14 +1946,14 @@ begin
                writeln('|daemon|clammilter|dnsmasq|stunnel|postfix|mailgraph|mimedefang|roundcube|kav4samba|bind9|obm|yorel|p3scan|syslogng|mailarchive|bogom');
                writeln('|collectd|mysql|fetchmail|mailspy|amavis|retranslator|spfmilter|dotclear|jcheckmail|mailman|kas3|dhcp|cicap[openvpn|postfix-logger');
                writeln('|dansguardian-tail|apache-groupware|cups|dstat|dstat-top-mem|dstat-top-cpu|rsync|policydw|autofs|mysql-cluster|assp|pdns|gluster|gluster-cli');
-               writeln('|syslogger|zabbix|kav4proxy|postfilter|vmtools|zarafa|zarafa-web|monit|wifi');
+               writeln('|syslogger|zabbix|kav4proxy|postfilter|vmtools|zarafa|zarafa-web|monit|wifi|proxy-pac');
                exit();
             end;
 
             
 
-              fpsystem(GLOBAL_INI.get_ARTICA_PHP_PATH()+'/bin/process1 --force &');
-              GLOBAL_INI.SYSTEM_START_MINIMUM_DAEMON();
+              fpsystem(SYS.LOCATE_GENERIC_BIN('nohup')+' '+ GLOBAL_INI.get_ARTICA_PHP_PATH()+'/bin/process1 --force & >/dev/null 2>&1');
+              GLOBAL_INI.SYSTEM_START_ARTICA_DAEMON();
               fpsystem(SYS.LOCATE_PHP5_BIN() +' ' + GLOBAL_INI.get_ARTICA_PHP_PATH() +'/exec.ldap.rebuild.php >/dev/null &');
               writeln('');
               writeln('');

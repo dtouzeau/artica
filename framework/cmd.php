@@ -119,6 +119,12 @@ if(isset($_GET["ChangeSSLCertificate"])){ChangeSSLCertificate();exit;}
 if(isset($_GET["postfix-certificate"])){postfix_certificate();exit;}
 if(isset($_GET["certificate-viewinfos"])){certificate_infos();exit;}
 
+//postmulti
+
+if(isset($_GET["postfix-multi-status"])){postfix_multi_status();exit;}
+if(isset($_GET["postfix-multi-reconfigure"])){postfix_multi_reconfigure();exit;}
+if(isset($_GET["postfix-multi-relayhost"])){postfix_multi_relayhost();exit;}
+
 
 
 //opengoo
@@ -184,6 +190,8 @@ if(isset($_GET["squid-GetOrginalSquidConf"])){squid_originalconf();exit;}
 if(isset($_GET["MalwarePatrol"])){MalwarePatrol();exit;}
 if(isset($_GET["force-upgrade-squid"])){SQUID_FORCE_UPGRADE();exit;}
 if(isset($_GET["squid-cache-infos"])){SQUID_CACHE_INFOS();exit;}
+
+if(isset($_GET["proxy-pac-build"])){SQUID_PROXY_PAC_REBUILD();exit;}
 
 
 if(isset($_GET["reload-squidguard"])){SQUIDGUARD_RELOAD();exit;}
@@ -1537,6 +1545,12 @@ function postfix_multi_configure(){
 function postfix_multi_disable(){
 	sys_THREAD_COMMAND_SET(LOCATE_PHP5_BIN2()." /usr/share/artica-postfix/exec.postfix-multi.php --removes");
 }
+function postfix_multi_configure_hostname(){
+	sys_THREAD_COMMAND_SET(LOCATE_PHP5_BIN2()." /usr/share/artica-postfix/exec.postfix-multi.php --instance-reconfigure {$_GET["postfix-multi-configure-hostname"]}");
+}
+
+
+
 
 
 function zabbix_restart(){
@@ -2277,10 +2291,10 @@ function samba_logon_scripts(){
 function TCP_VIRTUALS(){
 	if(isset($_GET["stay"])){
 
-		sys_THREAD_COMMAND_SET(LOCATE_PHP5_BIN2()." /usr/share/artica-postfix/exec.postfix-multi.php --virtuals");
+		shell_exec(LOCATE_PHP5_BIN2()." /usr/share/artica-postfix/exec.virtuals-ip.php");
 		return;
 	}
-	sys_THREAD_COMMAND_SET(LOCATE_PHP5_BIN2()." /usr/share/artica-postfix/exec.postfix-multi.php --virtuals");
+	sys_THREAD_COMMAND_SET(LOCATE_PHP5_BIN2()." /usr/share/artica-postfix/exec.virtuals-ip.php");
 }
 
 function MalwarePatrol(){
@@ -3569,6 +3583,43 @@ function openvpn_client_sesssions(){
 function postfix_get_main_cf(){
 	$array=explode("\n",@file_get_contents("/etc/postfix/main.cf"));
 	echo "<articadatascgi>". base64_encode(serialize($array))."</articadatascgi>";	
+}
+
+function postfix_multi_status(){
+	$hostname=$_GET["postfix-multi-status"];
+	writelogs_framework("Statusof \"$hostname\"",__FUNCTION__,__FILE__,__LINE__);
+	$pidfile="/var/spool/postfix-$hostname/pid/master.pid";
+	$unix=new unix();
+	$pid=$unix->get_pid_from_file($pidfile);
+	
+	writelogs_framework("Statusof \"$hostname\" $pidfile=$pid",__FUNCTION__,__FILE__,__LINE__);
+	
+	if($unix->process_exists($pid)){
+		$array["PID"]=$pid;
+	}
+	
+	if(!is_array($array)){return null;}
+	echo "<articadatascgi>". base64_encode(serialize($array))."</articadatascgi>";	
+	
+	
+}
+
+function postfix_multi_reconfigure(){
+	$hostname=$_GET["postfix-multi-reconfigure"];
+	sys_THREAD_COMMAND_SET(LOCATE_PHP5_BIN2()." /usr/share/artica-postfix/exec.postfix-multi.php --instance-reconfigure \"$hostname\"");	
+}
+function postfix_multi_relayhost(){
+	$hostname=$_GET["postfix-multi-relayhost"];
+	sys_THREAD_COMMAND_SET(LOCATE_PHP5_BIN2()." /usr/share/artica-postfix/exec.postfix-multi.php --instance-relayhost \"$hostname\"");	
+}
+
+function postfix_multi_reconfigure_all(){
+	sys_THREAD_COMMAND_SET(LOCATE_PHP5_BIN2()." /usr/share/artica-postfix/exec.postfix-multi.php");
+}
+
+function SQUID_PROXY_PAC_REBUILD(){
+	sys_THREAD_COMMAND_SET("/etc/init.d/artica-postfix restart proxy-pac");
+	
 }
 
 

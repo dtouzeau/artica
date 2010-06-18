@@ -9,6 +9,7 @@ include_once(dirname(__FILE__) . '/ressources/class.system.network.inc');
 include_once(dirname(__FILE__) . '/ressources/class.postfix-multi.inc');
 include_once(dirname(__FILE__) . '/ressources/class.main_cf.inc');
 include_once(dirname(__FILE__) . '/ressources/class.assp-multi.inc');
+include_once(dirname(__FILE__) . '/ressources/class.maincf.multi.inc');
 
 
 $_GET["LOGFILE"]="/usr/share/artica-postfix/ressources/logs/web/interface-postfix.log";
@@ -17,48 +18,38 @@ if(preg_match("#--verbose#",implode(" ",$argv))){$GLOBALS["DEBUG"]=true;$GLOBALS
 if(preg_match("#--reload#",implode(" ",$argv))){$GLOBALS["RELOAD"]=true;}
 $sock=new sockets();
 $GLOBALS["EnablePostfixMultiInstance"]=$sock->GET_INFO("EnablePostfixMultiInstance");
+if($GLOBALS["EnablePostfixMultiInstance"]<>1){echo "Starting......: Multi-instances is not enabled ({$GLOBALS["EnablePostfixMultiInstance"]})\n";PostfixMultiDisable();die();}
 $unix=new unix();
 $GLOBALS["postmulti"]=$unix->find_program("postmulti");
 $GLOBALS["postconf"]=$unix->find_program("postconf");
+$GLOBALS["postmap"]=$unix->find_program("postmap");
 
 if($argv[1]=='--removes'){PostfixMultiDisable();die();}
-if($GLOBALS["EnablePostfixMultiInstance"]<>1){
-	echo "Starting......: Multi-instances is not enabled ({$GLOBALS["EnablePostfixMultiInstance"]})\n";
-	die();
-}
-main_inet_interface();
-InstancesList();
-running();
-virtuals();
-
-if($argv[1]=='--virtuals'){virtuals();die();}
-if($argv[1]=='--org'){ConfigureMainCF($argv[2]);die();}
-
+if($argv[1]=='--instance-reconfigure'){reconfigure_instance($argv[2]);die();}
+if($argv[1]=='--instance-relayhost'){reconfigure_instance_relayhost($argv[2]);die();}
 
 reconfigure();
 
 
 function reconfigure(){
-	
-	
 	echo "Starting......: Enable Postfix multi-instances\n";
-	shell_exec("{$GLOBALS["postmulti"]} -e init >/dev/null 2>&1");
-	if(!$GLOBALS["INSTANCE"]["postfix-hub"]){
-		echo "Starting......: Activate Postfix HUB\n";
-		shell_exec("{$GLOBALS["postmulti"]} -I postfix-hub -G hub -e create >/dev/null 2>&1");
-	}
-	shell_exec("{$GLOBALS["postmulti"]} -i postfix-hub -e enable >/dev/null 2>&1");
-	shell_exec("{$GLOBALS["postconf"]} -e inet_interfaces = 127.0.0.1 >/dev/null 2>&1");
-	CheckOU();
-	
+	shell_exec("{$GLOBALS["postmulti"]} -e init >/dev/null 2>&1");	
+	InstancesList();
+	CheckInstances();
 }
 
 
 function InstancesList(){
 	$unix=new unix();
+	if(is_dir("/etc/postfix-hub")){
+		if(!is_file("/etc/postfix-hub/dynamicmaps.cf")){@file_put_contents("/etc/postfix-hub/dynamicmaps.cf","#");}
+	}
 	exec("{$GLOBALS["postmulti"]} -l -a",$results);
 	while (list ($num, $ligne) = each ($results) ){
 		if(preg_match("#^(.+?)\s+#",$ligne,$re)){
+			$re[1]=trim($re[1]);
+			if($re[1]=='-'){continue;}
+			echo "Starting......: Detecting instance {$re[1]}\n";
 			$GLOBALS["INSTANCE"][$re[1]]=true;
 		}
 	}
@@ -70,123 +61,84 @@ function InstancesList(){
 	
 }
 
-function CheckOU(){
-	$ldap=new clladp();
-	$hash=$ldap->hash_get_ou();
-	while (list ($num, $ou) = each ($hash) ){
-		$ou=str_replace(" ","-",$ou);
-		if(!$GLOBALS["INSTANCE"]["postfix-$ou"]){
-			echo "Starting......: Postfix activate HUB for $ou\n";
-			shell_exec("{$GLOBALS["postmulti"]} -I postfix-$ou -G orgs -e create");
-			
-		}
-	}
-	
-	reset($hash);
-	while (list ($num, $ou) = each ($hash) ){
-		
-		ConfigureMainCF($ou);
-		
-		$instance=str_replace(" ","-",$ou);
-		echo "Starting......: Postfix activate instance for $ou ip={$GLOBALS["IP"]["postfix-$instance"]}, running={$GLOBALS["running"]["postfix-$instance"]}\n";
-		shell_exec("{$GLOBALS["postmulti"]} -i postfix-$instance -e enable");
-		if($GLOBALS["IP"]["postfix-$instance"]==null){
-			shell_exec("{$GLOBALS["postmulti"]} -i postfix-$instance -x postconf -e master_service_disable=\"inet\"");
-		}else{
-			shell_exec("{$GLOBALS["postmulti"]} -i postfix-$instance -x postconf -e master_service_disable=\"\"");
-			shell_exec("{$GLOBALS["postmulti"]} -i postfix-$instance -x postconf -e inet_interfaces=\"{$GLOBALS["IP"]["postfix-$instance"]}\"");
-		}
-		if(!$GLOBALS["running"]["postfix-$instance"]){
-			shell_exec("{$GLOBALS["postmulti"]} -i postfix-$instance -p start");
-		}else{
-			shell_exec("{$GLOBALS["postmulti"]} -i postfix-$instance -p reload");
-		}
-		
-		
-		
-	}	
-	
-	
-}
+function CheckInstances(){
+		$maincf=new maincf_multi("");
+		$maincf->PostfixMainCfDefaultInstance();
+		$sql="SELECT `value` FROM postfix_multi WHERE `key`='myhostname' GROUP BY `value`";
+		echo "Starting......: Postfix activate HUB(s)\n";
 
-function running(){
-	if($GLOBALS["DEBUG"]){echo "running() function\n";}
-	$ldap=new clladp();
-	$unix=new unix();
-	$hash=$ldap->hash_get_ou();
-	while (list ($num, $ou) = each ($hash) ){
-		$ou=str_replace(" ","-",$ou);
-		if($GLOBALS["DEBUG"]){echo "unix->POSTFIX_MULTI_PID($ou)\n";}
-		$pid=$unix->POSTFIX_MULTI_PID($ou);
-		if(!is_file("/proc/$pid/exe")){continue;}
-		$GLOBALS["running"]["postfix-$ou"]=true;
-	}
-}
-
-function virtuals(){
-	$q=new mysql();
-	$net=new networking();
-	$sql="SELECT * FROM nics_virtuals ORDER BY ID DESC";
-	$q=new mysql();
-	$results=$q->QUERY_SQL($sql,"artica_backup");	
-	while($ligne=@mysql_fetch_array($results,MYSQL_ASSOC)){	
-		$ou=$ligne["org"];
-		if($ou==null){continue;}
-		$ou=str_replace(" ","-",$ou);
-		if($ligne["ipaddr"]==null){
-			if($ligne["nic"]<>null){
-				$ligne["ipaddr"]=$net->array_TCP[$ligne["nic"]];
-			}
+		$q=new mysql();
+		$results=$q->QUERY_SQL($sql,"artica_backup");
+		while($ligne=@mysql_fetch_array($results,MYSQL_ASSOC)){	
+			$myhostname=trim($ligne["value"]);
+			if($myhostname==null){continue;}
+			echo "Starting......: Postfix checking HUB $myhostname\n";
+			ConfigureMainCF($myhostname);
 		}
-		$GLOBALS["IP"]["postfix-$ou"]=$ligne["ipaddr"];
-	}
-}
-
-function main_inet_interface(){
-	$unix=new unix();
-	$inet_interfaces=$unix->POSTCONF_GET("inet_interfaces");
-	if($inet_interfaces=="127.0.0.1"){return;}
-	if($inet_interfaces=="loopback-only"){return;}
-		echo "Starting......: Postfix change to loopback for the main instance (currently $inet_interfaces)\n";
-		$unix->POSTCONF_SET("inet_interfaces","loopback-only");
-		$postfix=$unix->find_program("postfix");
-		shell_exec("$postfix stop");
-		shell_exec("$postfix start");
 	
 }
 
 
-function ConfigureMainCF($ou){
-	$instance=str_replace(" ","-",$ou);
+
+function reconfigure_instance($hostname){
 	$users=new usersMenus();
 	$unix=new unix();
-	echo "Starting......: Postfix checkign organization $ou\n";
-	$main=new main_multi($ou);
+	echo "Starting......: Postfix checking instance $hostname\n";
+	$instance_path="/etc/postfix-$hostname";	
+	$maincf=new maincf_multi($hostname);
+	$maincf->buildconf();	
+	echo "Starting......: Postfix {$GLOBALS["postmulti"]} -i postfix-$hostname -p reload\n";
+	shell_exec("{$GLOBALS["postmulti"]} -i postfix-$hostname -p reload");
 	
+}
+
+function reconfigure_instance_relayhost($hostname){
+	$maincf=new maincf_multi($hostname);
+	$maincf->buildconf();	
+	$maincf->postmap_relayhost();
+	echo "Starting......: Postfix {$GLOBALS["postmulti"]} -i postfix-$hostname -p reload\n";		
+	shell_exec("{$GLOBALS["postmulti"]} -i postfix-$hostname -p reload");
+}
+
+
+function ConfigureMainCF($hostname){
+	if(strlen(trim($hostname))<3){return null;}
+	$users=new usersMenus();
+	$unix=new unix();
+	echo "Starting......: Postfix checking instance $hostname\n";
 	
-	if($users->cyrus_imapd_installed){
-		echo "Starting......: Postfix change $ou cyrus is installed\n";
-		$unix->POSTCONF_MULTI_SET($instance,"mailbox_transport","lmtp:unix:$users->cyrus_lmtp_path");
-		$unix->POSTCONF_MULTI_SET($instance,"virtual_transport","\$mailbox_transport");
-	}else{
-		$unix->POSTCONF_MULTI_SET($instance,"mailbox_transport","");
-		$unix->POSTCONF_MULTI_SET($instance,"virtual_transport","\$mailbox_transport");
+
+	
+	$instance_path="/etc/postfix-$hostname";
+	if(!is_file("$instance_path/dynamicmaps.cf")){
+		echo "Starting......: Postfix $hostname creating dynamicmaps.cf\n";
+		@file_put_contents("$instance_path/dynamicmaps.cf","#");
 	}
 	
+	
+	$maincf=new maincf_multi($hostname);
+	$maincf->buildconf();
 	$assp=new assp_multi($ou);
 	if($assp->AsspEnabled==1){
 		shell_exec(LOCATE_PHP5_BIN2()." ". dirname(__FILE__)."/exec.assp-multi.php --org \"$ou\"");
 	}
 	
-	shell_exec("{$GLOBALS["postmulti"]} -i postfix-$instance -e enable");
-if(!$GLOBALS["running"]["postfix-$instance"]){
-			echo "Starting......: Postfix start postfix-$instance\n";
-			shell_exec("{$GLOBALS["postmulti"]} -i postfix-$instance -p start");
+
+	
+
+                                    
+	
+	
+	
+	shell_exec("{$GLOBALS["postmulti"]} -i postfix-$hostname -e enable");
+	if(!$GLOBALS["running"]["postfix-$instance"]){
+			echo "Starting......: Postfix start postfix-$hostname\n";
+			shell_exec("{$GLOBALS["postmulti"]} -i postfix-$hostname -p start");
 			
 		}else{
-			echo "Starting......: Postfix restart postfix-$instance\n";
-			shell_exec("{$GLOBALS["postmulti"]} -i postfix-$instance -p stop");
-			shell_exec("{$GLOBALS["postmulti"]} -i postfix-$instance -p start");
+			echo "Starting......: Postfix restart postfix-$hostname\n";
+			shell_exec("{$GLOBALS["postmulti"]} -i postfix-$hostname -p stop");
+			shell_exec("{$GLOBALS["postmulti"]} -i postfix-$hostname -p start");
 		}
 
 //ConfigureMainMaster();		
@@ -217,8 +169,9 @@ function PostfixMultiDisable(){
 	$unix=new unix();
 	$unix->POSTCONF_SET("multi_instance_enable","no");
 	$unix->POSTCONF_SET("inet_interfaces","all");
-	shell_exec(LOCATE_PHP5_BIN2()." ".dirname(__FILE__)."/exec.postfix.maincf.php --reconfigure");
-	shell_exec($unix->find_program("postfix")." start");
+	$unix->POSTCONF_SET("multi_instance_directories","");
+	system(LOCATE_PHP5_BIN2()." ".dirname(__FILE__)."/exec.postfix.maincf.php --reconfigure");
+	
 	
 }
 

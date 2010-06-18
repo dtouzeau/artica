@@ -344,40 +344,95 @@ function main_tabs(){
 
 
 function main_config(){
-$html=GET_CACHED(__FILE__,__FUNCTION__,__FUNCTION__,true);
+$html=GET_CACHED(__FILE__,__FUNCTION__,__FUNCTION__);
 if($html<>null){return $html;}
 $page=CurrentPageName();
-$html="
-<table style='width:100%'>
-<tr>
-	<td valign='top'>" . Paragraphe('folder-realyrules-64.png','{your_network}','{your_network_text}',"javascript:Loadjs('squid.popups.php?script=network')")."</td>
-	<td valign='top'>" . Paragraphe('network-connection2.png','{listen_port}','{listen_port_text}',"javascript:Loadjs('squid.popups.php?script=listen_port')")."</td>
-	<td valign='top'>" . Paragraphe('64-bind.png','{dns_servers}','{dns_servers_text}',"javascript:Loadjs('squid.popups.php?script=dns')")."</td>
-	
-</tr>
-	<td valign='top'><span id='applysquid'>" . applysquid_icon()."</span></td>
-	<td valign='top'>" . Paragraphe('members-priv-64.png','{authenticate_users}','{authenticate_users_text}',"javascript:Loadjs('squid.popups.php?script=ldap')")."</td>
-	<td valign='top'>" . Paragraphe('64-work-station-linux.png','{visible_hostname}','{visible_hostname_intro}',"javascript:Loadjs('squid.popups.php?script=visible_hostname')")."</td>
-</tr>
-<tr>
-	<td valign='top'>" . Paragraphe('64-win-nic-loupe.png','{your_network_loupe}','{your_network_loupe_text}',"javascript:Loadjs('$page?squid-net-loupe-js=yes')")."</td>
-	<td valign='top'>" . Paragraphe('relayhost.png','{transparent_mode}','{transparent_mode_text}',"javascript:Loadjs('$page?squid-transparent-js=yes')")."</td>
-	<td valign='top'>" . Paragraphe('bg-server-settings-64.png','{enable_squid_service}','{enable_squid_service_text}',"javascript:EnableDisableSQUID()")."</td>
-	
-</tr>
-<tr>
-	<td valign='top'>" . Paragraphe('64-settings.png','{squid_advanced_parameters}','{squid_advanced_parameters_text}',"javascript:Loadjs('squid.advParameters.php')")."</td>
-	<td valign='top'>" . Paragraphe('server-redirect-64.png','{squid_parent_proxy}','{squid_parent_proxy_text}',"javascript:Loadjs('squid.parent.proxy.php')")."</td>
-	<td valign='top'></td>
-	
-</tr>
-</table>";
+$sock=new sockets();
 
+
+	$your_network=Paragraphe('folder-realyrules-64.png','{your_network}','{your_network_text}',"javascript:Loadjs('squid.popups.php?script=network')");
+	$listen_port=Paragraphe('network-connection2.png','{listen_port}','{listen_port_text}',"javascript:Loadjs('squid.popups.php?script=listen_port')");
+	$dns_servers=Paragraphe('64-bind.png','{dns_servers}','{dns_servers_text}',"javascript:Loadjs('squid.popups.php?script=dns')");
+	$applysquid=applysquid_icon();
+
+	$authenticate_users=Paragraphe('members-priv-64.png','{authenticate_users}','{authenticate_users_text}',"javascript:Loadjs('squid.popups.php?script=ldap')");
+	$visible_hostname=Paragraphe('64-work-station-linux.png','{visible_hostname}','{visible_hostname_intro}',"javascript:Loadjs('squid.popups.php?script=visible_hostname')");
+	$your_network_loupe=Paragraphe('64-win-nic-loupe.png','{your_network_loupe}','{your_network_loupe_text}',"javascript:Loadjs('$page?squid-net-loupe-js=yes')");
+	$transparent_mode=Paragraphe('relayhost.png','{transparent_mode}','{transparent_mode_text}',"javascript:Loadjs('$page?squid-transparent-js=yes')");
+	$enable_squid_service=Paragraphe('bg-server-settings-64.png','{enable_squid_service}','{enable_squid_service_text}',"javascript:EnableDisableSQUID()");
+	
+	$squid_advanced_parameters=Paragraphe('64-settings.png','{squid_advanced_parameters}','{squid_advanced_parameters_text}',"javascript:Loadjs('squid.advParameters.php')");
+	$squid_parent_proxy=Paragraphe('server-redirect-64.png','{squid_parent_proxy}','{squid_parent_proxy_text}',"javascript:Loadjs('squid.parent.proxy.php')");
+	$squid_reverse_proxy=Paragraphe('squid-reverse-64.png','{squid_reverse_proxy}','{squid_reverse_proxy_text}',"javascript:Loadjs('squid.reverse.proxy.php')");
+
+    $proxy_pac=Paragraphe('user-script-64.png','{proxy_pac}','{proxy_pac_text}',"javascript:Loadjs('squid.proxy.pac.php')");
+    $proxy_pac_rules=Paragraphe('proxy-pac-rules-64.png','{proxy_pac_rules}','{proxy_pac_text}',"javascript:Loadjs('squid.proxy.pac.rules.php')");
+    
+    
+$SquidEnableProxyPac=$sock->GET_INFO("SquidEnableProxyPac");	
+	
+	if($sock->GET_INFO("SquidActHasReverse")==1){
+		$listen_port=null;
+		$proxy_pac=null;
+		$proxy_pac_rules=null;
+		$SquidEnableProxyPac=0;
+		$squid_accl_websites=Paragraphe('website-64.png','{squid_accel_websites}','{squid_accel_websites_text}',"javascript:Loadjs('squid.reverse.websites.php')");
+	}
+	
+	if($sock->GET_INFO("hasProxyTransparent")==1){
+		$proxy_pac=null;
+		$proxy_pac_rules=null;
+		$SquidEnableProxyPac=0;
+	}
+	
+	
+if($sock->GET_INFO("SquidEnableProxyPac")<>1){$proxy_pac_rules=null;}	
+	
+	
+	
+	
+	$tr[]=$your_network;
+	$tr[]=$your_network_loupe;
+	$tr[]=$transparent_mode;
+	$tr[]=$squid_parent_proxy;
+	$tr[]=$squid_reverse_proxy;	
+	$tr[]=$listen_port;
+	$tr[]=$squid_accl_websites;
+	$tr[]=$dns_servers;
+	$tr[]=$applysquid;
+	$tr[]=$authenticate_users;
+	$tr[]=$proxy_pac;
+	$tr[]=$proxy_pac_rules;
+	$tr[]=$visible_hostname;
+	$tr[]=$squid_advanced_parameters;
+	$tr[]=$enable_squid_service;	
+	
+
+	
+$tables[]="$SquidActHasReverse<table style='width:100%'><tr>";
+$t=0;
+while (list ($key, $line) = each ($tr) ){
+		$line=trim($line);
+		if($line==null){continue;}
+		$t=$t+1;
+		$tables[]="<td valign='top'>$line</td>";
+		if($t==3){$t=0;$tables[]="</tr><tr>";}
+		
+}
+if($t<3){
+	for($i=0;$i<=$t;$i++){
+		$tables[]="<td valign='top'>&nbsp;</td>";				
+	}
+}
+				
+$tables[]="</table>";	
+	
+	$html=$html.implode("\n",$tables);
 	
 $tpl=new templates();
 $html= $tpl->_ENGINE_parse_body($html,'squid.index.php');
 SET_CACHED(__FILE__,__FUNCTION__,__FUNCTION__,$html);
-return $html;
+echo $html;
 	
 }
 
@@ -412,7 +467,8 @@ function main_filter(){
 $page=CurrentPageName();
 $squid=new squidbee();
 $tpl=new templates();
-
+$sock=new sockets();
+$SquidActHasReverse=$sock->GET_INFO("SquidActHasReverse");
 
 
 $filetype=Paragraphe("pieces-jointes.png","{file_blocking}","{file_blocking_text}","javascript:acl_fileblock()");
@@ -458,6 +514,11 @@ if($users->SQUIDGUARD_INSTALLED){
 
 	$apply="<span id='applysquid'>" . applysquid_icon()."</span>";
 	$plugins=Paragraphe('folder-lego.png','{activate_plugins}','{activate_plugins_text}',"javascript:Loadjs('squid.popups.php?script=plugins')");	
+	
+	if($SquidActHasReverse==1){
+		$dansguardian=null;
+	}
+	
 	
 	$tr[]=$apply;
 	$tr[]=$plugins;
@@ -1443,7 +1504,80 @@ function net_control_center_js(){
 }
 
 
+function net_control_center_reverse_popup(){
+	$sock=new sockets();
+	$listen_port=$sock->GET_INFO("SquidActHasReverseListenPort");
+	if($listen_port==null){$listen_port=80;}
+	$www_names=net_control_center_websites_list();
+	$www_namesips=net_control_center_websites_list(false);
+	$ip=new networking();
+	if(is_array($ip->array_TCP)){
+		while (list ($num, $val) = each ($ip->array_TCP)){
+			if($val==null){continue;}
+			$internals_proxy=$internals_proxy."<li>$val:$listen_port</li>";
+		}
+	}	
+	
+	
+$squid_accl_websites=Paragraphe('website-64.png','{squid_accel_websites}','{squid_accel_websites_text}',"javascript:Loadjs('squid.reverse.websites.php')");
+$squid_reverse_proxy=Paragraphe('squid-reverse-64.png','{squid_reverse_proxy}','{squid_reverse_proxy_text}',"javascript:Loadjs('squid.reverse.proxy.php')");	
+	
+$panel="<div style='position:absolute;top:80px;left:600px;width:230px;'>
+ <table style='width:100%'>
+ <tr>
+ 	<td valign='top'>$squid_accl_websites</td>
+ </tr>
+	<td valign='top'>$squid_reverse_proxy</td>
+</tr>
+ </table>
+ </div>";	
+	
+	
+	$www_names="<div style='position:absolute;top:150px;left:400px;font-size:14px;font-weight:bold'>$www_names</div>";
+	
+	$www_namesips="<div style='position:absolute;top:420px;left:200px;font-size:14px;font-weight:bold'>$www_namesips</div>";
+	
+	$listen_port="<div style='position:absolute;top:300px;left:290px;font-size:14px;font-weight:bold'>
+	<H3>NAT TO:</H3>
+	<ul>$internals_proxy</ul></div>";
+	$html="
+	<div style='width:100%;background-image:url(img/squid-net-reverse.jpg);height:481px;background-repeat:no-repeat;width:550px;border:1px dotted #CCCCCC'>
+	$www_names$listen_port$www_namesips$panel
+	</div>";
+	
+	$tpl=new templates();
+		echo $tpl->_ENGINE_parse_body($html,'squid.index.php');	
+	
+}
+
+function net_control_center_websites_list($asname=true){
+	
+			$sql="SELECT * FROM squid_accel ORDER BY ID DESC";
+			$q=new mysql();
+			$results=$q->QUERY_SQL($sql,"artica_backup");
+			while($ligne=@mysql_fetch_array($results,MYSQL_ASSOC)){	
+				$website_name=$ligne["website_name"];
+				$ip=$ligne["website_ip"];
+				$port=$ligne["website_port"];
+				if($port==null){$port=80;}
+				if($website_name==null){continue;}
+				if($ip==null){continue;}
+				if($asname){
+					$html=$html."<li>$website_name</li>";
+					}else{
+						$html=$html."<li>$ip:$port (<span style='font-size:11px'>$website_name</span>)</li>";				
+					}
+			}	
+	
+	return "<ul>$html</ul>";
+}
+
+
 function net_control_center_popup(){
+	
+	$sock=new sockets();
+	$SquidActHasReverse=$sock->GET_INFO("SquidActHasReverse");
+	if($SquidActHasReverse==1){net_control_center_reverse_popup();exit;}
 	
 	$ip=new networking();
 	$squid=new squidbee();
@@ -1559,7 +1693,7 @@ $network_d="
  </table>
  </div>";
 	
-	$html="<H1 style='width:101.7%'>{your_network_loupe}</H1>
+	$html="<H1>{your_network_loupe}</H1>
 	<div style='width:100%;background-image:url(img/squid-net-550.png);height:481px;background-repeat:no-repeat'>
 	$transparent$gayteway$dns_div$network_d$proxy_port$panel
 	</div>

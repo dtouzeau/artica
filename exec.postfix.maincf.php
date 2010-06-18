@@ -814,8 +814,9 @@ function sender_bcc_maps(){
 }
 
 function OthersValues(){
-	$main=new main_cf();
 	$sock=new sockets();
+	if($sock->GET_INFO("EnablePostfixMultiInstance")==1){return;}	
+	$main=new main_cf();
 	$main->FillDefaults();	
 	echo "Starting......: Fix others settings\n";
 	
@@ -852,7 +853,7 @@ function OthersValues(){
 
 function inet_interfaces(){
 	$sock=new sockets();
-	$sock=new sockets();
+	if($sock->GET_INFO("EnablePostfixMultiInstance")==1){return;}
 	$table=explode("\n",$sock->GET_INFO("PostfixBinInterfaces"));	
 	if(!is_array($table)){$table[]="all";}
 	

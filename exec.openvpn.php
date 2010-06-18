@@ -25,6 +25,9 @@ if($argv[1]=="--iptables-delete"){iptables_delete_rules();die();}
 if($argv[1]=="--client-conf"){BuildOpenVpnClients();die();}
 if($argv[1]=="--client-start"){StartOPenVPNCLients();die();}
 if($argv[1]=="--client-stop"){StopOpenVPNCLients();die();}
+if($argv[1]=="--default-eth"){OpenVpnClientGetDefaultethLink();die();}
+
+
 
 if($argv[1]=="--client-restart"){
 	StopOpenVPNCLients();
@@ -349,8 +352,13 @@ function BuildOpenVpnClients(){
 }
 
 function vpn_client_pid($id){
+	
+	if(is_file("/etc/artica-postfix/openvpn/clients/$id/pid")){
+		return trim(@file_get_contents("/etc/artica-postfix/openvpn/clients/$id/pid"));
+	}
+	
 	$unix=new unix();
-	exec($unix->find_program("pgrep"). " -f \"openvpn --config /etc/artica-postfix/openvpn/clients/$id/settings.ovpn\" -l",$re);
+	exec($unix->find_program("pgrep"). " -f \"openvpn.+?\/etc\/artica-postfix\/openvpn\/clients\/$id\/settings\.ovpn\" -l",$re);
 	
 	while (list ($num, $ligne) = each ($re) ){
 		if(!preg_match("#^([0-9]+)\s+(.+)#",$ligne,$ri)){continue;}
@@ -435,10 +443,18 @@ function BuildIpTablesClient($eth,$tun_id){
 		echo "Starting......: OpenVPN no prerouting set (IPTABLES_ETH)\n";
 		return false;
 	}
+	
+	echo "Starting......: OpenVPN tun$tun_id Enable IP Forwarding\n";
+    shell_exec("sysctl -w net.ipv4.ip_forward=1");         
+   
 	shell_exec("/sbin/iptables -A INPUT -i tun$tun_id -j ACCEPT -m comment --comment \"ArticaVPNClient_$tun_id\"");
 	shell_exec("/sbin/iptables -A FORWARD -i tun$tun_id -j ACCEPT -m comment --comment \"ArticaVPNClient_$tun_id\"");
 	shell_exec("/sbin/iptables -A OUTPUT -o tun$tun_id -j ACCEPT -m comment --comment \"ArticaVPNClient_$tun_id\"");
 	shell_exec("/sbin/iptables -t nat -A POSTROUTING -o $eth -j MASQUERADE -m comment --comment \"ArticaVPNClient_$tun_id\"");
+	
+	//iptables -t nat -A POSTROUTING -i tun8 -o eth0 -j MASQUERADE
+	//iptables -t nat -A POSTROUTING -i eth0 -o tun0 -j MASQUERADE
+	
 
 	shell_exec("/sbin/iptables -A INPUT -i $eth -j ACCEPT -m comment --comment \"ArticaVPNClient_$tun_id\"");
 	shell_exec("/sbin/iptables -A FORWARD -i $eth -j ACCEPT -m comment --comment \"ArticaVPNClient_$tun_id\"");
@@ -486,8 +502,8 @@ function OpenVPNCLientStart($id){
 	if($tun<>null){
 	if(!is_file("/dev/net/$tun")){
 		echo "Starting......: OpenVPN client $id,creating dev \"$tun\"\n";
-		system($unix->find_program("mknod") ." /dev/net/$tun c 10 200");
-		system($unix->find_program("chmod"). " 600 /dev/net/$tun");
+		system($unix->find_program("mknod") ." /dev/net/$tun c 10 200 >/dev/null 2>&1");
+		system($unix->find_program("chmod"). " 600 /dev/net/$tun >/dev/null 2>&1");
 	}}
 	
 
@@ -496,15 +512,26 @@ function OpenVPNCLientStart($id){
 	$cmd=$cmd. " --status $main_path/$id/openvpn-status.log 10";
 	shell_exec($cmd);	
 	$count=0;
+	$pid=vpn_client_pid($id);
 	for($i=0;$i<7;$i++){
 		$count++;
+		echo "Starting......: OpenVPN client [$id] (pid=$pid), waiting for pid $i/7\n";
+		
 		if($count>5){
 			echo "Starting......: OpenVPN client $id, time-out\n";
 			break;
 		}
 		$pid=vpn_client_pid($id);
-		if($unix->process_exists($id)){break;}
-		sleep(1);
+		
+		if($pid==null){
+			sleep(5);
+			continue;
+		}
+		
+		if($unix->process_exists($id)){
+			break;
+		}
+		sleep(5);
 	}
 	
 	
@@ -517,11 +544,34 @@ function OpenVPNCLientStart($id){
 	echo "Starting......: OpenVPN client $id, success running pid number $pid\n";
 	
 	$ethlink=trim(@file_get_contents("$main_path/$id/ethlink"));
+	
+	if(trim($ethlink)==null){
+		$ethlink=OpenVpnClientGetDefaultethLink();
+		echo "Starting......: OpenVPN client $id, no ethlink...create a default one for $ethlink\n";
+		@file_put_contents("$main_path/$id/ethlink",$ethlink);
+	}
+	
 	if($ethlink<>null){
 		BuildIpTablesClient($ethlink,$id);
 	}else{
 		echo "Starting......: OpenVPN client $id, no ethlink...in $main_path/$id/ethlink\n";
 	}
+	
+}
+
+
+function OpenVpnClientGetDefaultethLink(){
+$nic=new networking();
+
+while (list ($num, $ligne) = each ($nic->array_TCP) ){
+	if($ligne==null){continue;}
+		if(!preg_match("#^eth[0-9]+#",$num)){continue;}
+		$eths[]=$num;
+		$ethi[$num]=$ligne;
+	} 
+	
+
+	if(is_array($eths)){return $eths[0];}
 	
 }
 

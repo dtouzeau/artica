@@ -30,6 +30,8 @@ private
 
 
 public
+    SambaEnabled                        :integer;
+    EnableKav4Samba                     :integer;
     procedure   Free;
     constructor Create;
     function    bin_path():string;
@@ -44,8 +46,7 @@ public
     function    PATTERN_DATE():string;
     function    LICENCE_STATUS():string;
     procedure   REMOVE();
-    SambaEnabled                        :integer;
-    EnableKav4Samba                     :integer;
+
 
 END;
 

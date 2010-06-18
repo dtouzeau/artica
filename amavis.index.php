@@ -48,9 +48,18 @@ function ajax_js(){
 	$tpl=new templates();
 	$title=$tpl->_ENGINE_parse_body("{APP_AMAVIS}");
 	$datas=file_get_contents('js/amavis.js');
+	$page=CurrentPageName();
+	
+	$start="YahooWin0(730,'$page?ajax-pop=yes','$title');";
+	
+	if(isset($_GET["in-front-ajax"])){
+		$start="$('#BodyContent').load('$page?ajax-pop=yes');";	
+	}
+	
 	$html="
+	$start
 	$datas
-	YahooWin0(730,'amavis.index.php?ajax-pop=yes','$title');";
+	";
 	
 	echo $html;
 	}

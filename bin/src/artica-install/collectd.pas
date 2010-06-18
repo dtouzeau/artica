@@ -182,10 +182,6 @@ end;
  //##############################################################################
 procedure tcollectd.START();
 var
-   pid:string;
-   parms:string;
-   count:integer;
-   mechanism:string;
    pidpath:string;
 begin
 
@@ -236,10 +232,10 @@ function tcollectd.PHP_DATA_DIR():string;
             CRLF = CR + LF;
 var
 
-    i,z:integer;
+    i:integer;
     dir:string;
     FileDatas:TStringList;
-    FileList:TstringList;
+
     line:string;
     newpath:string;
     D:boolean;
@@ -255,7 +251,6 @@ begin
    end;
   FileDatas:=TStringList.Create;
   FileDatas.AddStrings(SYS.DirDir(dir));
-  FileList:=TstringList.Create;
   if FileDatas.Count=0 then begin
      if D then writeln(dir,' no directories count...');
      result:='$_GLOBAL["COLLECTD_RRD"]=Array();';

@@ -6,7 +6,7 @@ unit stunnel4;
 interface
 
 uses
-    Classes, SysUtils,variants,strutils,IniFiles, Process,logs,unix,RegExpr in 'RegExpr.pas',zsystem;
+    Classes, SysUtils,variants,strutils, Process,logs,unix,RegExpr in 'RegExpr.pas',zsystem;
 
   type
   tstunnel=class
@@ -14,8 +14,6 @@ uses
 
 private
      LOGS:Tlogs;
-     D:boolean;
-     GLOBAL_INI:TiniFIle;
      SYS:TSystem;
      artica_path:string;
      sTunnel4enabled:integer;
@@ -89,14 +87,8 @@ begin
 end;
 //##############################################################################
 function tstunnel.STUNNEL_PID():string;
-var
-   path:string;
-    pid:string;
 begin
-
 result:=SYS.PIDOF_PATTERN(DAEMON_BIN_PATH()+' /etc/stunnel/stunnel.conf');
-
-
 end;
 //##############################################################################
 procedure tstunnel.ETC_DEFAULT();
@@ -184,10 +176,8 @@ var
    cert:string;
    setuid:string;
    setgid:string;
-   D:boolean;
-   cmd:string;
+
 begin
-    D:=logs.COMMANDLINE_PARAMETERS('html');
     cert:=READ_CONF('cert');
     setuid:=READ_CONF('setuid');
     setgid:=READ_CONF('setgid');
@@ -228,7 +218,6 @@ end;
 procedure tstunnel.STUNNEL_START();
 var
    pid:string;
-   D:boolean;
    count:integer;
 begin
     if not FileExists(DAEMON_BIN_PATH()) then begin
@@ -312,7 +301,7 @@ end;
 //##############################################################################
 procedure tstunnel.STUNNEL_STOP();
 var
-   D:boolean;
+
    PID:string;
 begin
     if not FileExists(DAEMON_BIN_PATH()) then begin
@@ -354,13 +343,10 @@ begin
        end;
 
     if SYS.PROCESS_EXIST(STUNNEL_PID()) then begin
-       if D then  if D then begin
-          writeln('Stopping stunnel failed to stop');
-       end else begin
-        writeln('Stopping stunnel4  daemon ' + STUNNEL_PID() + ' PID (failed to stop)');
-       end;
-       exit;
+       writeln('Stopping stunnel4  daemon ' + STUNNEL_PID() + ' PID (failed to stop)');
     end;
+
+
 end;
 //##############################################################################
 

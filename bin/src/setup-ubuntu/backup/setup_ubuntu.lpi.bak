@@ -44,8 +44,8 @@
         <Filename Value="setup_ubuntu_class.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="setup_ubuntu_class"/>
-        <CursorPos X="1" Y="824"/>
-        <TopLine Value="775"/>
+        <CursorPos X="26" Y="775"/>
+        <TopLine Value="724"/>
         <EditorIndex Value="5"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
@@ -129,7 +129,7 @@
         <IsPartOfProject Value="True"/>
         <UnitName Value="distriDetect"/>
         <CursorPos X="22" Y="284"/>
-        <TopLine Value="230"/>
+        <TopLine Value="231"/>
         <EditorIndex Value="7"/>
         <UsageCount Value="201"/>
         <Loaded Value="True"/>

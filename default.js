@@ -1430,6 +1430,8 @@ var x_CacheOff= function (obj) {
 	var response=obj.responseText;
 	if(response){alert(response);}
 	RefreshLeftMenu();
+	if(document.getElementById('squid_main_config')){RefreshTab('RefreshTab');}
+	 
 }
 
 function CacheOff(){
@@ -2342,17 +2344,20 @@ function loadssfile(filename){
 
 
 function SwitchPassword(md,field){
-var style=document.getElementById(field).style.width;
+var fontsize=document.getElementById(field).style.fontSize;
+var stylesize=document.getElementById(field).style.width;
 var type=document.getElementById(field).type;
 var value=document.getElementById(field).value;
-
+var padding=document.getElementById(field).style.padding;
 if(type=='password'){
      document.getElementById(md).innerHTML="<input type='text' id='"+field+"' name='"+field+"' value='"+value+"'>";
-     document.getElementById(field).style.width=style;
+
 }else{
     document.getElementById(md).innerHTML="<input type='password' id='"+field+"' name='"+field+"' value='"+value+"'>";
-    document.getElementById(field).style.width=style;
 }
+document.getElementById(field).style.fontSize=fontsize;
+document.getElementById(field).style.width=stylesize;
+document.getElementById(field).style.padding=padding;
 
 
 

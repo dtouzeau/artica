@@ -25,6 +25,9 @@ include_once (dirname(__FILE__) .'/ressources/jpgraph-3/src/jpgraph_pie3d.php');
 	if(isset($_GET["week"])){today();exit;}
 	if(isset($_GET["month"])){today();exit;}
 	if(isset($_GET["users-table"])){users_table();exit;}
+	if(isset($_GET["top-users"])){top_users();exit;}
+	if(isset($_GET["top-hits"])){top_hits();exit;}
+	
 	
 	js();
 	
@@ -47,6 +50,42 @@ function js(){
 	
 }
 
+
+function top_hits(){
+$sql="SELECT COUNT( ID ) AS tcount, uri FROM dansguardian_events WHERE 
+sitename = '{$_GET["top-hits"]}' GROUP BY uri ORDER BY tcount DESC LIMIT 0 , 50";
+
+$html="
+<p style='font-size:14px'>{SQUID_TOP_HITS_STAT_EXPLAIN}</p>
+
+<table style='width:100%'>
+<tr>
+	<th colspan=2>{uri}</th>
+	<th colspan=2>{hits}</th>
+</tr>
+";
+
+	$q=new mysql();
+	$results=$q->QUERY_SQL($sql,"artica_events");
+	while($ligne=@mysql_fetch_array($results,MYSQL_ASSOC)){
+		$js="s_PopUp('{$ligne["uri"]}',800,800);";
+	$html=$html."
+	<tr ". CellRollOver($js).">
+	<td width=1%><img src='img/icon-link.png'></td>
+	<td><strong style='font-size:13px'>{$ligne["uri"]}</td>
+	<td width=1%><strong style='font-size:13px'>{$ligne["tcount"]}</td>
+	</tr>
+	";
+		
+		
+	}
+
+$html=$html."</table>";
+$tpl=new templates();
+echo $tpl->_ENGINE_parse_body($html);	
+	
+}
+
 function popup(){
 	$page=CurrentPageName();
 	$tpl=new templates();
@@ -54,11 +93,20 @@ function popup(){
 	$array["today"]='{today}';
 	$array["week"]='{this_week}';
 	$array["month"]='{this_month}';
+	$array["top-users"]='{top_users}';
+	$array["categories"]='{categories}';
+	$array["top-hits"]='{top_hits}';
 
 	
 
 	
 	while (list ($num, $ligne) = each ($array) ){
+		
+		if($num=="categories"){
+			$html[]= $tpl->_ENGINE_parse_body("<li><a href=\"squid.categorize.php?load-js=$domain\"><span>$ligne</span></li>\n");
+			continue;
+		}
+		
 		$html[]= $tpl->_ENGINE_parse_body("<li><a href=\"$page?$num=$domain\"><span>$ligne</span></li>\n");
 	}
 	
@@ -81,6 +129,45 @@ function popup(){
 			
 			});
 		</script>";	
+	
+}
+
+function top_users(){
+	
+	
+$sql="SELECT COUNT( ID ) AS tcount, CLIENT FROM dansguardian_events WHERE 
+sitename = '{$_GET["top-users"]}' GROUP BY CLIENT ORDER BY tcount DESC LIMIT 0 , 50";
+
+$html="
+<p style='font-size:14px'>{SQUID_TOP_USERS_STAT_EXPLAIN}</p>
+
+<table style='width:100%'>
+<tr>
+	<th colspan=2>{members}</th>
+	<th colspan=2>{hits}</th>
+</tr>
+";
+
+	$q=new mysql();
+	$results=$q->QUERY_SQL($sql,"artica_events");
+	while($ligne=@mysql_fetch_array($results,MYSQL_ASSOC)){
+	$html=$html."
+	<tr ". CellRollOver().">
+	<td width=1%><img src='img/base.gif'></td>
+	<td><strong style='font-size:13px'>{$ligne["CLIENT"]}</td>
+	<td width=1%><strong style='font-size:13px'>{$ligne["tcount"]}</td>
+	</tr>
+	";
+		
+		
+	}
+
+$html=$html."</table>";
+$tpl=new templates();
+echo $tpl->_ENGINE_parse_body($html);
+
+
+
 	
 }
 

@@ -6,7 +6,7 @@ unit clamav;
 interface
 
 uses
-    Classes, SysUtils,variants,strutils,IniFiles, Process,logs,unix,RegExpr in 'RegExpr.pas',zsystem,
+    Classes, SysUtils,variants,strutils,Process,logs,unix,RegExpr in 'RegExpr.pas',zsystem,
     postfix_class   in '/home/dtouzeau/developpement/artica-postfix/bin/src/artica-install/postfix_class.pas';
 
 type LDAP=record
@@ -24,7 +24,6 @@ type LDAP=record
 private
      LOGS:Tlogs;
      SYS:Tsystem;
-     GLOBAL_INI:TiniFIle;
      artica_path:string;
      postfix:tpostfix;
      FreshClam_pidpath:string;

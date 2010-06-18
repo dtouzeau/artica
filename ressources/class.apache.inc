@@ -17,9 +17,15 @@ class vhosts{
 	"OPENGOO"=>"opengoo-128.png",
 	"ROUNDCUBE"=>"roundcube3logo.png",
 	"GROUPOFFICE"=>"groupoffice-128.png",
+	"ZARAFA"=>"zarafa-logo-128.png",
+	"ZARAFA_MOBILE"=>"zarafa-logo-128.png"
 	
 	);
-	var $noneeduser=array("JOOMLA"=>true,"ROUNDCUBE"=>true,"ARTICA_USR"=>true);
+	var $noneeduser=array("JOOMLA"=>true,"ROUNDCUBE"=>true,"ARTICA_USR"=>true,"ZARAFA_MOBILE"=>true,"ZARAFA"=>true);
+	var $noneeduser_mysql=array("ARTICA_USR"=>true,"ZARAFA_MOBILE"=>true,"ZARAFA"=>true);
+	
+	
+	
 	var $TEXT_ARRAY=array(
 	"LMB"=>array("TITLE"=>"APP_LMB","TEXT"=>"APP_LMB_TEXT"),
 	"JOOMLA"=>array("TITLE"=>"APP_JOOMLA","TEXT"=>"APP_JOOMLA_TEXT"),
@@ -29,6 +35,8 @@ class vhosts{
 	"OBM2"=>array("TITLE"=>"APP_OBM2","TEXT"=>"APP_OBM2_TEXT"),
 	"OPENGOO"=>array("TITLE"=>"APP_OPENGOO","TEXT"=>"APP_OPENGOO_TEXT"),
 	"GROUPOFFICE"=>array("TITLE"=>"APP_GROUPOFFICE","TEXT"=>"APP_GROUPOFFICE_TEXT"),
+	"ZARAFA"=>array("TITLE"=>"APP_ZARAFA","TEXT"=>"APP_ZARAFA_TEXT"),
+	"ZARAFA_MOBILE"=>array("TITLE"=>"APP_ZARAFA_MOBILE_ACCESS","TEXT"=>"APP_ZARAFA_TEXT"),
 	);
 	
 	function vhost($ou){

@@ -153,7 +153,8 @@ function main_little_status(){
 	$array[]="KAV4PROXY";
 	$array[]="DANSGUARDIAN";
 	$array[]="C-ICAP";
-	echo "hhh";
+	$array[]="APP_PROXY_PAC";
+	
 	$squid=new squidbee();
 	print_r($squid->network_array);
 	if(!is_array($squid->network_array)){
@@ -218,6 +219,8 @@ function main_status(){
 	$dansguardian_status=DAEMON_STATUS_ROUND("DANSGUARDIAN",$ini);
 	$kav=DAEMON_STATUS_ROUND("KAV4PROXY",$ini);
 	$cicap=DAEMON_STATUS_ROUND("C-ICAP",$ini);
+	$APP_PROXY_PAC=DAEMON_STATUS_ROUND("APP_PROXY_PAC",$ini);
+	
 	$md=md5(date('Ymhis'));
 	
 	$squid=new squidbee();
@@ -230,7 +233,7 @@ function main_status(){
 	$html="<table style='width:99%'>
 	<tr>
 		<td valign='top'>$net$squid_status$kav</td>
-		<td valign='top'>$dansguardian_status$cicap</td>
+		<td valign='top'>$dansguardian_status$cicap$APP_PROXY_PAC</td>
 	</tr>
 	
 	
@@ -2090,6 +2093,7 @@ function page_index_status(){
 	$dansguardian_status=DAEMON_STATUS_LINE("DANSGUARDIAN",$ini,null,1);
 	$kav=DAEMON_STATUS_LINE("KAV4PROXY",$ini,null,1);
 	$cicap=DAEMON_STATUS_LINE("C-ICAP",$ini,null,1);
+	$proxy_pac=DAEMON_STATUS_LINE("APP_PROXY_PAC",$ini,null,1);
 	$md=md5(date('Ymhis'));
 	
 	$squid=new squidbee();
@@ -2104,6 +2108,7 @@ function page_index_status(){
 	if($dansguardian_status<>null){$dansguardian_status="<tr><td valign='top'>$dansguardian_status</td></tr>";}
 	if($kav<>null){$kav="<tr><td valign='top'>$kav</td></tr>";}
 	if($cicap<>null){$cicap="<tr><td valign='top'>$cicap</td></tr>";}
+	if($proxy_pac<>null){$proxy_pac="<tr><td valign='top'>$proxy_pac</td></tr>";}
 	
 
 	$html="
@@ -2116,6 +2121,7 @@ function page_index_status(){
 		$kav
 		$cicap
 		$dansguardian_status
+		$proxy_pac
 	</table>
 	</td>
 	</tr>

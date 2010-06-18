@@ -2095,11 +2095,14 @@ public function SquidGuardDatabasesStatus($all=0){
 		
 function BuildSquidConf(){
 		$sock=new sockets();
-
-		if($this->ASROOT){echo "Starting......: Squid Version $this->SQUID_BIN_VERSION\n";}
-		
-		$squidGuard=$this->squidGuard();
+		$SquidActHasReverse=$sock->GET_INFO("SquidActHasReverse");
 		$EnableMalwarePatrol=$sock->GET_INFO("EnableMalwarePatrol");
+		if($this->ASROOT){echo "Starting......: Squid Version $this->SQUID_BIN_VERSION\n";}
+		if($SquidActHasReverse<>1){
+			$squidGuard=$this->squidGuard();
+		}
+		
+		
 		$kav_rules=$this->icap_kav_services_3();
 		$kav_acl="acl acl_kav_GET method GET\n";
 		$kav_acl=$this->acls_multimedias();
@@ -2125,15 +2128,18 @@ function BuildSquidConf(){
 		$conf=$conf . "half_closed_clients off\n";
 		$access_blocked_sites="http_access deny blockedsites\n";
 		$conf=$conf.$squidGuard;
-		
 		$conf=$conf . $this->cache_peer();
 		
 		
 
 		$conf=$conf  ."\n#--------- acls\n";
-		if($EnableMalwarePatrol==1){
-			$conf=$conf  ."acl malware_block_list url_regex -i \"/etc/squid3/malwares.acl\"\n";
+		if($SquidActHasReverse<>1){
+			if($EnableMalwarePatrol==1){
+				$conf=$conf  ."acl malware_block_list url_regex -i \"/etc/squid3/malwares.acl\"\n";
+			}
 		}
+		
+		
 		$conf=$conf  .$acl_blocked_sites;
 		$conf=$conf ."acl localhost src 127.0.0.1/32\n";
 		$conf=$conf ."acl to_localhost dst 127.0.0.0/32\n";
@@ -2176,10 +2182,6 @@ function BuildSquidConf(){
 		if(count($this->network_array)>0){
 			$office_network="http_access allow office_network\n";
 		}
-		
-
-		
-		
 	
 		if($this->LDAP_AUTH==1){
 			$conf=$conf ."acl group_password external ldap_group\n";
@@ -2217,9 +2219,10 @@ function BuildSquidConf(){
 				if(posix_getuid()==0){shell_exec("chgrp squid /var/cache/samba/winbindd_privileged/");}
 				$office_network=null;
 		}		
-		
-		if($this->enable_dansguardian==1){
+		if($SquidActHasReverse<>1){
+			if($this->enable_dansguardian==1){
 				$office_network=null;
+			}
 		}		
 		
 
@@ -2289,6 +2292,15 @@ function BuildSquidConf(){
 
 		$conf=$conf."\n";
 		$conf=$conf."\n";
+		
+		if($SquidActHasReverse==1){
+			$conf=$conf."\n# -> Reverse Proxy is enabled <-\n";
+			$transparent=" accel vhost";
+			$listen_port=$sock->GET_INFO("SquidActHasReverseListenPort");
+			if($listen_port==null){$listen_port=80;}
+			$conf=$conf.$this->squid_reverse_websites();
+		}
+		
 		$conf=$conf."#http ports\n";
 		$conf=$conf."http_port $listen_port$transparent\n";
 		$conf=$conf."\n";
@@ -2351,6 +2363,42 @@ function BuildSquidConf(){
 		return $conf;	
 		
 		}
+		
+	private function squid_reverse_websites(){
+		
+			$sql="SELECT * FROM squid_accel ORDER BY ID DESC";
+			$q=new mysql();
+			$results=$q->QUERY_SQL($sql,"artica_backup");
+			while($ligne=@mysql_fetch_array($results,MYSQL_ASSOC)){	
+				$website_name=$ligne["website_name"];
+				$website_name=str_replace("http://","",$website_name);
+				$website_name=str_replace("https://","",$website_name);
+				if(preg_match("#^.+?\.(.+?)\.(.+?)$#",$website_name,$re)){$acl_addwww=" .{$re[1]}.{$re[2]}";}else{$acl_addwww=$website_name;}
+				$ip=$ligne["website_ip"];
+				$port=$ligne["website_port"];
+				if($port==null){$port=80;}
+				if($website_name==null){continue;}
+				if($ip==null){continue;}
+				$website_name_name=str_replace(".","_",$website_name);
+				$conf[]="cache_peer $ip parent $port 0 no-query no-digest originserver name=$website_name_name";
+				$acls[]="acl acl_$website_name_name dstdomain $acl_addwww";
+				$cache_peer_access[]="cache_peer_access $website_name_name allow acl_$website_name_name";
+				$http_access[]="http_access allow acl_$website_name_name all";
+				
+			}
+		
+			if(is_array($conf)){
+				$ii[]=implode("\n",$conf);
+				$ii[]="";
+				$ii[]=implode("\n",$acls);
+				$ii[]="";
+				$ii[]=implode("\n",$cache_peer_access);	
+				$ii[]="";
+				$ii[]=implode("\n",$http_access);		
+				return "\n".implode("\n",$ii)."\n";						
+			}
+		
+	}
 		
 private function refresh_pattern_list(){
 	$sql="SELECT * FROM `squid_speed` WHERE `domain` IS NOT NULL";
@@ -2519,6 +2567,7 @@ class cicap{
 	public function buildconf(){
 		$this->BuildDefaults();
 		$sock=new sockets();
+		$SquidActHasReverse=$sock->GET_INFO("SquidActHasReverse");
 			$usermenus=new usersMenus();
 			$user="squid";
 			$modules_path=$this->LOCATE_MODULES_DIR();
@@ -2587,30 +2636,32 @@ class cicap{
 				$conf[]="";	
 			}
 			
-			if(is_file("$modules_path/dnsbl_tables.so")){$conf[]="Module common bdb_tables.so";}
-			$conf[]="Module common dnsbl_tables.so";
-			$conf[]="Service url_check_module srv_url_check.so";
-			$conf[]="";	
-			
-			if(is_file("$modules_path/dnsbl_tables.so")){
-				if($sock->GET_INFO("DisableCicapDNBSL")<>1){
-					$array=$this->DNBSL_LIST();
-					echo "Starting......: c-icap using ". count($array) ." DNSBL services\n";
-					if(count($array)>0){
-						$this->cicap_whitelisted_servers();
-						echo "Starting......: c-icap using DNSBL\n";
-						$conf[]="#DNSBL";
-						$conf[]="url_check.LookupTableDB whitelist domain hash:/etc/squid3/c-icap.whitelist.txt";
-						$conf[]="url_check.Profile default pass whitelist";
-						$conf[]=implode("\n",$this->DNBSL_LIST());
-						$conf[]="";	
+			if($SquidActHasReverse<>1){
+				if(is_file("$modules_path/dnsbl_tables.so")){$conf[]="Module common bdb_tables.so";}
+				$conf[]="Module common dnsbl_tables.so";
+				$conf[]="Service url_check_module srv_url_check.so";
+				$conf[]="";	
+				
+				if(is_file("$modules_path/dnsbl_tables.so")){
+					if($sock->GET_INFO("DisableCicapDNBSL")<>1){
+						$array=$this->DNBSL_LIST();
+						echo "Starting......: c-icap using ". count($array) ." DNSBL services\n";
+						if(count($array)>0){
+							$this->cicap_whitelisted_servers();
+							echo "Starting......: c-icap using DNSBL\n";
+							$conf[]="#DNSBL";
+							$conf[]="url_check.LookupTableDB whitelist domain hash:/etc/squid3/c-icap.whitelist.txt";
+							$conf[]="url_check.Profile default pass whitelist";
+							$conf[]=implode("\n",$this->DNBSL_LIST());
+							$conf[]="";	
+						}
+					}else{
+						echo "Starting......: c-icap Disabled DNSBL service\n";
 					}
-				}else{
-					echo "Starting......: c-icap Disabled DNSBL service\n";
-				}
-			}			
-	
-			$conf[]=$icc->GetSquidGuarddbs();
+				}			
+		
+				$conf[]=$icc->GetSquidGuarddbs();
+			}
 			
 			
 			

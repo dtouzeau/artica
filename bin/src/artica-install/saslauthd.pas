@@ -6,7 +6,7 @@ unit saslauthd;
 interface
 
 uses
-    Classes, SysUtils,variants,strutils,IniFiles, Process,md5,logs,unix,RegExpr in 'RegExpr.pas',zsystem,
+    Classes, SysUtils,variants,strutils,Process,logs,unix,RegExpr in 'RegExpr.pas',zsystem,
     cyrus        in '/home/dtouzeau/developpement/artica-postfix/bin/src/artica-install/cyrus.pas';
 
 
@@ -17,10 +17,8 @@ uses
 
 private
      LOGS:Tlogs;
-     D:boolean;
      SYS:TSystem;
      artica_path:string;
-     inif:TiniFile;
      CCYRUS:Tcyrus;
      EnableVirtualDomainsInMailBoxes:integer;
      procedure CHANGE_INITD();
@@ -99,9 +97,6 @@ end;
 
 procedure tsaslauthd.START();
 var
-   l:TstringList;
-   pid:string;
-   parms:string;
    count:integer;
    mechanism:string;
    moinsr:string;
@@ -142,7 +137,7 @@ end;
        logs.DebugLogs('Starting......: saslauthd authentification "'+mechanism+'"');
        cmd:=SASLAUTHD_PATH() + ' '+moinsr+' -a ' +mechanism+' -c -m /var/run/saslauthd -n 5';
        logs.OutputCmd(cmd);
-       
+       count:=0;
         while not SYS.PROCESS_EXIST(SASLAUTHD_PID()) do begin
               sleep(150);
               inc(count);

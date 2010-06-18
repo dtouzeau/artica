@@ -91,6 +91,15 @@ if(preg_match("#cyrus\/cyr_expire\[[0-9]+#",$buffer)){return null;}
 
 
 
+if(preg_match("#spamd\[[0-9]+.+?Can.+?locate\s+Mail\/SpamAssassin\/CompiledRegexps\/body_0\.pm#",$buffer,$re)){
+	SpamAssassin_error_saupdate($buffer);
+	return null;
+}
+
+if(preg_match("#zarafa-monitor.+?:\s+Unable to get store entry id for company\s+(.+?), error code#",$buffer,$re)){
+	zarafa_store_error($buffer);
+	return null;
+}
 
 if(preg_match("#smtp.+?status=deferred.+?connect.+?\[127\.0\.0\.1\]:10024: Connection refused#",$buffer,$re)){
 	AmavisConfigErrorInPostfix($buffer);
@@ -1436,6 +1445,23 @@ function AmavisConfigErrorInPostfix($buffer){
 	}
 }
 
+function SpamAssassin_error_saupdate($buffer){
+$file="/etc/artica-postfix/cron.1/".__FUNCTION__;
+	$timeFile=file_time_min($file);
+	if($timeFile<15){
+		events("*** $buffer ****");
+		events("Spamassassin no operations, blocked by timefile $timeFile Mn!!!");
+		return null;}	
+	events("Spamassassin error time:$timeFile Mn!!!");
+	email_events("SpamAssassin error Regex","SpamAssassin claim \"$buffer\", Artica will run /usr/bin/sa-update to fix it",'postfix');
+	THREAD_COMMAND_SET("/usr/bin/sa-update");
+	@unlink($file);
+	@file_put_contents($file,"#");	
+	if(!is_file($file)){
+		events("error writing time file:$file");
+	}	
+}
+
 function miltergreylist_error($buffer,$socket){
 	$file="/etc/artica-postfix/cron.1/".__FUNCTION__;
 	if(file_time_min($file)<15){return null;}	
@@ -1577,5 +1603,18 @@ function hackPOP($ip,$logon,$buffer){
 	}
 	file_put_contents($file,"#");	
 }
+
+
+function zarafa_store_error(){
+	$file="/etc/artica-postfix/cron.1/".__FUNCTION__.".store.error";
+	if(file_time_min($file)<15){return null;}
+	@unlink($file);
+	$cmd=LOCATE_PHP5_BIN()." ".dirname(__FILE__)."/exec.zarafa.build.stores.php";
+	events("$cmd");
+	THREAD_COMMAND_SET($cmd);
+	email_events("Zarafa mailbox server store error","Zarafa claim \"$buffer\" Artica will try to reactivate stores and accounts",'mailbox');
+	@file_put_contents($file,"#");	
+}
+
 
 ?>

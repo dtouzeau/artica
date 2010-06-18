@@ -24,7 +24,6 @@ type LDAP=record
 private
      LOGS:Tlogs;
      SYS:Tsystem;
-     GLOBAL_INI:TiniFIle;
      artica_path:string;
      postfix:tpostfix;
      FreshClam_pidpath:string;
@@ -1442,6 +1441,7 @@ fpsystem(Binpath+' --version >'+tmpstr);
 
 if strversion='' then strversion:='0';
 strversion:=AnsiReplaceText(strversion,'.','');
+
 TryStrToInt(strversion,result);
 RegExpr.free;
 FileDatas.Free;
@@ -1512,7 +1512,12 @@ begin
  l:=TStringList.Create;
  
  RegExpr:=TRegExpr.Create;
- l.LoadFromFile(CLAMD_CONF_PATH());
+ try
+    l.LoadFromFile(CLAMD_CONF_PATH());
+ except
+    logs.Debuglogs('CLAMD_GETINFO:: Fatal error');
+    exit;
+ end;
  RegExpr.Expression:='^' + Key + '\s+(.+)';
  For i:=0 to l.Count-1 do begin
      if RegExpr.Exec(l.Strings[i]) then begin

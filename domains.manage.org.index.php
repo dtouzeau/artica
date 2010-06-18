@@ -56,6 +56,12 @@ function js(){
 	$prefix=str_replace(".","_",$page);
 	$js1=file_get_contents("js/artica_organizations.js");
 	$js2=file_get_contents("js/artica_domains.js");
+	$LoadSingleOrg="LoadWinORG2('760','$page?js-pop=yes&ou=$ou_encoded','$title');";
+	
+	if(isset($_GET["in-front-ajax"])){
+		$LoadSingleOrg="$('#BodyContent').load('$page?js-pop=yes&ou=$ou_encoded');";	
+	}
+	
 	$start_function="LoadSingleOrg()";
 	
 	if(isset($_GET["panel"])){
@@ -66,7 +72,7 @@ function js(){
 	var {$prefix}timeout=0;
 	
 	function LoadSingleOrg(){
-		LoadWinORG2('760','$page?js-pop=yes&ou=$ou_encoded','$title');
+		$LoadSingleOrg
 		
 	}
 	
@@ -441,9 +447,24 @@ function popup_tabs(){
 		if($user->AsMessagingOrg){
 			$array["postfix"]='{messaging}';
 		}
+
+		if($user->AsOrgPostfixAdministrator){
+			$array["postfix-multi"]='{messaging_servers}';
+			
+		}
+		
+		
 	}
+	
+	
+	
+	
 
 	while (list ($num, $ligne) = each ($array) ){
+		if($num=="postfix-multi"){
+			$a[]="<li><a href=\"domains.postfix.multi.php?org={$_GET["ou"]}\"><span>$ligne</span></a></li>\n";	
+			continue;
+		}
 		$a[]="<li><a href=\"$page?org_section=$num&SwitchOrgTabs={$_GET["ou"]}&ou={$_GET["ou"]}&mem=yes\"><span>$ligne</span></a></li>\n";
 			
 		}	
@@ -584,13 +605,13 @@ if($usersmenus->ZABBIX_INSTALLED){
 }
 	
 	
-	if($EnablePostfixMultiInstance<>1){
+	
 		$network=null;
 		$restrictions=null;
 		$whitelists=null;
 		$dnsbl=null;
 		$assp=null;
-	}
+	
 	
 	$html="<div style='width:700px'>
 	$transport$network$zarafa$zarafa_migration$buildAllmailboxes$restrictions$whitelists$dnsbl
@@ -984,25 +1005,42 @@ if($usersmenus->SMTP_LEVEL>0){
 }
 
 function organization_groupwares(){
+	$users=new usersMenus();
+	$MEM_TOTAL_INSTALLEE=$users->MEM_TOTAL_INSTALLEE;
+	
+	if($MEM_TOTAL_INSTALLEE<526300){
+		$tpl=new templates();
+		
+		$html="
+		<center>
+		<table style='width:350px'>
+		<tr>
+		<td valign='top' width=1%>
+		<img src='img/64-infos.png'>
+		</td>
+		<td valign='top'>
+		<H2>{MEM_TOTAL_INF_512}</h2>
+		<p style='font-size:15px'>{MEM_TOTAL_INF_512_TEXT}</p>
+		</td>
+		</tr>
+		<Table>
+		</center>
+		";
+		return $html;
+		
+	}
+
 $ou=$_GET["ou"];
 	$usersmenus=new usersMenus();
 	$lmb=Paragraphe('logo_lmb-64.png','{APP_LMB}','{feature_not_installed}',"",null,210,0,0,true);
 	
 if($usersmenus->AsOrgAdmin){
-
-		
-				
-		
-		if($usersmenus->roundcube_installed){
+	if($usersmenus->roundcube_installed){
 			$roundcube=Paragraphe('64-roundcube.png','{APP_ROUNDCUBE}','{manage_your_roundcube_text}',"javascript:Loadjs('domains.roundcube.php?ou=$ou')",null,210,0,0,true);				
 		}
-		
-		
-		
 		$createVhost=Paragraphe('www-add-64.png','{ADD_WEB_SERVICE}','{ADD_WEB_SERVICE_TEXT}',"javascript:Loadjs('domains.www.php?ou=$ou&add=yes')",null,210,0,0,true);		
 		$vhosts=organization_vhostslist($ou);
-
-	}
+		}
 
 	
 //$roundcube
@@ -1017,7 +1055,9 @@ $html="<div style='width:700px'>
 	</div>
 </td>
 <td valign='top'>
-	". RoundedLightGrey("<div style='width:350px;height:350px;overflow:auto' id='ORG_VHOSTS_LIST'>$vhosts</div>")."
+	<div style='width:420px;height:350px;overflow:auto;padding:3px;border:1px dotted #CCCCCC;text-align:center' id='ORG_VHOSTS_LIST'>
+		$vhosts
+	</div>
 	
 </td>
 </tr>
@@ -1038,6 +1078,9 @@ if($usersmenus->SMTP_LEVEL>0){
 
 function organization_vhostslist($ou){
 	$sock=new sockets();
+	
+
+	
 	$ApacheGroupWarePort=$sock->GET_INFO("ApacheGroupWarePort");
 	$apache=new vhosts();
 	$hash=$apache->LoadVhosts($ou);
@@ -1061,6 +1104,8 @@ function organization_vhostslist($ou){
 			case "OBM2":$img="obm-32.png";break;
 			case "OPENGOO":$img="opengoo-32.png";break;
 			case "GROUPOFFICE":$img="groupoffice-32.png";break;
+			case "ZARAFA":$img="zarafa-logo-32.png";break;
+			case "ZARAFA_MOBILE":$img="zarafa-logo-32.png";break;
 			default:
 				;
 			break;
@@ -1072,7 +1117,7 @@ function organization_vhostslist($ou){
 		}
 		
 		$html=$html . "
-			<tr>
+			<tr ". CellRollOver().">
 				<td width=1%><img src='img/$img'></td>
 				<td width=1%>$warn</td>
 				<td><strong>".texttooltip($host,$host,"Loadjs('domains.www.php?ou=$ou&add=yes&host=$host')","",0,'font-size:14px')."</strong>

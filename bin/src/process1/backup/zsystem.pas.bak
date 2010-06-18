@@ -1069,11 +1069,15 @@ var
    S    : TDateTime;
    maint:TDateTime;
 begin
+result:=0;
 if not FileExists(filepath) then exit(0);
-    fa:=FileAge(filepath);
-    maint:=Now;
-    S:=FileDateTodateTime(fa);
-    result:=MinutesBetween(maint,S);
+    try
+       fa:=FileAge(filepath);
+       maint:=Now;
+       S:=FileDateTodateTime(fa);
+       result:=MinutesBetween(maint,S);
+    finally
+    end;
 end;
 //##############################################################################
 function Tsystem.FILE_TIME_BETWEEN_SEC(filepath:string):LongInt;
@@ -1859,9 +1863,13 @@ begin
      end;
   end;
   try
-  ini:=TiniFile.Create('/etc/artica-postfix/versions.cache');
-  result:=ini.ReadString(APP_NAME,'VERSION','');
-  finally
+     ini:=TiniFile.Create('/etc/artica-postfix/versions.cache');
+
+except
+     exit;
+  end;
+     result:=ini.ReadString(APP_NAME,'VERSION','');
+
     ini.Free;
   end;
 
@@ -4062,9 +4070,15 @@ begin
 if not FileExists('/etc/artica-postfix/performances.conf') then begin
   fpsystem('/bin/touch /etc/artica-postfix/performances.conf');
 end;
+
 Ini:=TinIFile.Create('/etc/artica-postfix/performances.conf');
-ini.WriteString('PERFORMANCES',key,value);
-ini.UpdateFile;
+try
+   ini.WriteString('PERFORMANCES',key,value);
+   ini.UpdateFile;
+
+except
+ writeln('Tsystem.SET_PERFS() Fatal error while writing ',key,'->',value,' in ','/etc/artica-postfix/performances.conf');
+end;
 Ini.Free;
 end;
 //#############################################################################
@@ -7757,7 +7771,7 @@ var
 begin
 tmpstr:=FILE_TEMP();
 ArchStructLogs:=Tlogs.Create;
-fpsystem('uname -m >'+tmpstr +' 2>&1');
+fpsystem(LOCATE_GENERIC_BIN('uname')+ ' -m >'+tmpstr +' 2>&1');
 data:=trim(ArchStructLogs.ReadFromFile(tmpstr));
 ArchStructLogs.free;
 fpsystem('/bin/rm '+tmpstr+' >/dev/null 2>&1');

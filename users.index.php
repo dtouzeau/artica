@@ -4,8 +4,9 @@ include_once('ressources/class.mysql.inc');
 include_once('ressources/class.status.inc');
 include_once('ressources/class.rtmm.tools.inc');
 session_start();
-$ldap=new clladp();
 if(isset($_GET["loadhelp"])){loadhelp();exit;}
+
+
 
 
 if(!isset($_SESSION["uid"])){
@@ -44,6 +45,17 @@ if(isset($_GET["messaging"])){section_messaging();exit;}
 
 
 OVERVIEWUSER();
+
+function loadhelp(){
+	$tpl=new templates();
+	$html="
+	<div style='height:300px;padding:5px;border:1px dotted #CCCCCC;overflow:auto;font-size:13px'>{{$_GET["loadhelp"]}}</div>
+	
+	";
+	
+	echo $tpl->_ENGINE_parse_body($html);
+	
+}
 
 
 function OVERVIEWUSER(){

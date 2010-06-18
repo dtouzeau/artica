@@ -7,12 +7,12 @@
 	
 	
 $usersmenus=new usersMenus();
+if(isset($_GET["mynet_ipfrom"])){CalculCDR();exit;}
 if($usersmenus->AsPostfixAdministrator==false){header('location:users.index.php');exit;}
 
 if(isset($_GET["main"])){switch_popup();exit;}
 if($_GET["section"]=="BindInterfaceForm"){echo BindInterfaceForm();exit;}
 if($_GET["section"]=="networkint"){echo NetworkInterfacesForm();exit;}
-if(isset($_GET["mynet_ipfrom"])){CalculCDR();exit;}
 if(isset($_GET["ReloadInterfaceTable"])){echo BindInterfaceTable();exit;}
 if(isset($_GET["ReloadNetworkTable"])){echo mynetworks_table();exit;}
 if(isset($_GET["EnablePostfixMultiInstance"])){POSTFIX_MULTI_INSTANCE_SAVE();exit;}
@@ -94,31 +94,6 @@ while (list ($num, $ligne) = each ($array) ){
 
 function popup(){
 	$tab=popuptabs();
-	/*$html="$tab
-
-	<table style='width:100%'>
-	<tr>
-	<td valign='top' width=99%'>
-	<div style='width:100%;height:450px;overflow:auto' id='postfixnetsettings'>
-	
-	<div id='dns' style='display:none'>
-		".QueryDNSForm()."
-		<div id='bind9Options'></div>
-	</div>
-	". popuptabs()."
-	
-	
-	<div id='networkint' style='display:none'></div>
-	
-	</div>
-	</td>
-	<div id='bind9Implent'></div>
-	</td>
-	</tr>
-	</table>
-	";
-*/
-	
 	$tpl=new templates();
 	echo $tpl->_ENGINE_parse_body($tab);
 	

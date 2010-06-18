@@ -308,7 +308,7 @@ function js_popup(){
 	$title=$ou . ":&nbsp;{groups}";
 	$users=new usersMenus();
 	$POSTFIX_INSTALLED=$users->POSTFIX_INSTALLED;
-	
+	if($users->ZARAFA_INSTALLED){$users->cyrus_imapd_installed=true;}
 	
 	$add_local_domain=Paragraphe("64-localdomain-add.png",'{add_local_domain}','{add_local_domain_text}',"javascript:AddLocalDomain_form()","add_local_domain",210);
 	$add_remote_domain=Paragraphe("64-remotedomain-add.png",'{add_relay_domain}','{add_relay_domain_text}',"javascript:AddRemoteDomain_form(\"$ou\",\"new domain\")","add_relay_domain",210);
@@ -888,9 +888,6 @@ function AddNewInternetDomain(){
 	$ldap=new clladp();
 	
 	$hashdoms=$ldap->hash_get_all_domains();
-	
-	
-	
 	writelogs("hashdoms[$domain]={$hashdoms[$domain]}",__FUNCTION__,__FILE__);
 	
 	if($hashdoms[$domain]<>null){
@@ -903,9 +900,14 @@ function AddNewInternetDomain(){
 	if($ldap->ldap_last_error<>null){
 		echo $ldap->ldap_last_error;
 		}else{ 
-			echo html_entity_decode($tpl->_ENGINE_parse_body('{success}'));
+			
 			$sock=new sockets();
-			$sock->getFrameWork("cmd.php?cyrus-check-cyr-accounts=yes");
+			if($usr->cyrus_imapd_installed){
+				$sock->getFrameWork("cmd.php?cyrus-check-cyr-accounts=yes");
+			}
+			
+			
+			
 		}
 	}
 	

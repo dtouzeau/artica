@@ -451,6 +451,9 @@ class templates{
 							$text=str_ireplace('[b12]','<strong style="font-size:12px">',$text);							
 							$text=str_ireplace('[/b12]','</strong>',$text);
 							
+							$text=str_ireplace('%u201C','&laquo;',$text);
+							$text=str_ireplace('%u201D','&raquo;',$text);
+							
 							$text=str_ireplace('[u]','<u>',$text);
 							
 							$text=str_ireplace('[blk]','<blockquote>',$text);	
@@ -815,7 +818,7 @@ function Field_password($name,$value=null,$style=null,$class=null,$OnChange=null
 		$help=help_icon($help);
 		}
 		else{
-		$OnMouseOver="OnMouseOver=\"javascript:AffBulle('$help');lightup(this, 100);\" ";
+		$OnMouseOver="OnMouseOver=\"javascript:AffBulle('$help');lightup(this, 100);\"";
 		$OnMouseOut="OnMouseOut=\"javascript:HideBulle();lightup(this, 50);\"";
 		$help=null;
 		}
@@ -922,11 +925,11 @@ function tooltipjs($tooltip,$noalpha=0){
 	$tooltip=ParseTooltip($tooltip);
 	$lightup1="lightup(this, 100);";
 	
-	$lightup1="\$(this).fadeOut('slow');\"";
+	$lightup1="\$(this).fadeOut('slow');";
 	
 	//$lightup2="lightup(this, 50);";
 	
-	$lightup1="\$(this).fadeOut('slow');$(this).fadeIn('fast');AffBulle('$tooltip');\"";
+	$lightup1="\$(this).fadeOut('slow');$(this).fadeIn('fast');AffBulle('$tooltip');";
 	//$lightup1="\$(this).slideUp('slow');$(this).fadeIn('fast');\"";	
 	
 	if($noalpha==1){$alpha=null;$lightup1=null;$lightup2=null;}
@@ -2667,6 +2670,17 @@ function CheckSessions(){
 					if(!$noback[$page]){
 						include_once(dirname(__FILE__).'/logs.inc');
 						error_log("$page is not allowed, no session, die.. in ".__FILE__." line ". __LINE__);
+						
+						echo "
+						<html>
+						<head>
+						<META HTTP-EQUIV=\"Refresh\" CONTENT=\"0; URL=logoff.php\"> 
+						</head>
+						<body>
+						<script>document.location.href='logoff.php';</script>
+						</body>
+						</html>";die();
+						
 						echo header('location:logoff.php');die();
 					
 						}

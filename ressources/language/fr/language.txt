@@ -121,6 +121,7 @@ Ajouter une liste : exe,pif,bat,doc</add_attachment_blocking_text_explain>
 <add_a_new_tab>Ajoutez un nouvel onglet</add_a_new_tab>
 <add_a_new_tab_text>Ajoutez un nouvel onglet afin d'y placer des nouveaux gadgets</add_a_new_tab_text>
 <add_a_parent_proxy>Ajouter un proxy parent</add_a_parent_proxy>
+<add_a_proxy>Ajouter un proxy</add_a_proxy>
 <add_block_site_explain>Ajouter un site web qui sera stock&eacute; dans cette cat&eacute;gorie</add_block_site_explain>
 <ADD_COMPUTER>Ajouter un nouvel ordinateur</ADD_COMPUTER>
 <add_computer_access>Ajouter un acc&egrave;s ordinateur</add_computer_access>
@@ -135,7 +136,9 @@ Ajouter une liste : exe,pif,bat,doc</add_attachment_blocking_text_explain>
 <add_invisible_disk_text>Ajouter manuellement un disque dans la biblioth&egrave;que si celui-ci n'est pas reconnu par Artica.</add_invisible_disk_text>
 <add_ip_address>Ajouter une adresse TCP/IP</add_ip_address>
 <add_Kav_LicenseDomain>Ajoutez un domaine &agrave; la licence</add_Kav_LicenseDomain>
+<add_localHostOrDomainIs>Ajoutez un serveur sans proxy</add_localHostOrDomainIs>
 <add_local_domain>Ajouter un domaine local</add_local_domain>
+<add_mail_server>Ajouter un serveur de messagerie</add_mail_server>
 <add_member>Ajouter un membre</add_member>
 <add_member_to_group>Ajouter un membre &agrave; ce groupe</add_member_to_group>
 <add_new_account>Ajouter un nouveau compte</add_new_account>
@@ -408,6 +411,7 @@ Si vous utilisez les produits Kaspersky sur ce serveur (antivirus de messagerie,
 <APP_MILTERGREYLIST>Liste grise Milter</APP_MILTERGREYLIST>
 <APP_MIMEDEFANG>MimeDefang</APP_MIMEDEFANG>
 <APP_MIMEDEFANGX>Multiplexeur MimeDefang</APP_MIMEDEFANGX>
+<APP_MONIT>Moniteur de d&eacute;mons temps r&eacute;el</APP_MONIT>
 <APP_MONIT_EXPLAIN>Cette section conduit le d&eacute;mon &quot;watchdog&quot;. Ce d&eacute;mon s'assure que le service est toujours d&eacute;marr&eacute;.[br]
 Vous pouvez modifier les param&egrave;tres afin de d&eacute;finir &agrave; quel moment vous allez &ecirc;tre notifi&eacute; d'un dysfonctionnement.</APP_MONIT_EXPLAIN>
 <APP_MSMTP>msmtp (client SMTP)</APP_MSMTP>
@@ -461,6 +465,7 @@ Policyd caches la combinaison des poids des destinataires/exp&eacute;diteur les 
 <APP_POSTFIX>Messagerie Postfix</APP_POSTFIX>
 <APP_PRELOAD>Pr&eacute;charger le d&eacute;mon</APP_PRELOAD>
 <APP_PROCMAIL>Traitement Procmail</APP_PROCMAIL>
+<APP_PROXY_PAC>service web proxy.pac</APP_PROXY_PAC>
 <APP_PUREFTPD>Pure-ftpd</APP_PUREFTPD>
 <APP_QUEUEGRAPH>QueueGraph</APP_QUEUEGRAPH>
 <APP_RENATTACH>Renattach</APP_RENATTACH>
@@ -532,9 +537,11 @@ Squid optimise donc de fa&ccedil;on cons&eacute;quente le flux de donn&eacute;es
 <APP_ZARAFA_DAGENT>Zarafa Agent postier</APP_ZARAFA_DAGENT>
 <APP_ZARAFA_GATEWAY>Passerelle Zarafa</APP_ZARAFA_GATEWAY>
 <APP_ZARAFA_ICAL>Passerelle iCal, CalDav</APP_ZARAFA_ICAL>
+<APP_ZARAFA_MOBILE_ACCESS>WebMail Zarafa pour Mobiles</APP_ZARAFA_MOBILE_ACCESS>
 <APP_ZARAFA_MONITOR>Moniteur Zarafa</APP_ZARAFA_MONITOR>
 <APP_ZARAFA_SERVER>Serveur Zarafa</APP_ZARAFA_SERVER>
 <APP_ZARAFA_SPOOLER>Spouleur Zarafa</APP_ZARAFA_SPOOLER>
+<APP_ZARAFA_TEXT>ujourd'hui, le courrier &eacute;lectronique est devenu l'une des applications cruciales de l'entreprise.[br] Zarafa allie l'ergonomie d'Outlook &agrave; la stabilit&eacute; et la flexibilit&eacute; d'un serveur Linux.[br] Non seulement Outlook est pris en charge nativement, mais l'utilisateur final peut &eacute;galement recourir au logiciel Web 2.0 WebAcces, offrant l'apparence et la convivialit&eacute; d'Outlook, sur tout appareil mobile compatible ActiveSync ou Blackberry via BES (Blackberry Enterprise Server)</APP_ZARAFA_TEXT>
 <APP_ZARAFA_WEB>Serveur Web Zarafa</APP_ZARAFA_WEB>
 <APP_ZARAFA_WEB_TEXT>Administrer le serveur Web Zarafa qui fournit l'acc&egrave;s aux applications</APP_ZARAFA_WEB_TEXT>
 <april>Avril</april>
@@ -1203,7 +1210,7 @@ supports the X-Forward extension for Postfix protocol only if [b]smtp[/b] is use
 <enable tls postfix>Activer le TLS dans Postfix</enable tls postfix>
 <EnableArticaWatchDog>Activer le watchdog</EnableArticaWatchDog>
 <EnableArticaWatchDog_explain>Si activ&eacute;, Artica va s'assurer toutes les 10Mn que les services sont correctement d&eacute;marr&eacute;s. Si certains sont arr&ecirc;t&eacute;s, il les red&eacute;marrera.[br]
-Durant cette op&eacute;ration, il peut avoir un cosommation CPU non n&eacute;gligeable.</EnableArticaWatchDog_explain>
+Durant cette op&eacute;ration, il peut avoir un consommation CPU non n&eacute;gligeable.</EnableArticaWatchDog_explain>
 <EnableBlockUsersTroughInternet_not_activated_text>Cette fonctionnalit&eacute; n'est pas activ&eacute; sur votre serveur. Si vous souhaitez interdire cet utilisateur d'&eacute;mettre des messages sur Internet, il ne sera pas filtr&eacute;.</EnableBlockUsersTroughInternet_not_activated_text>
 <enabled>activ&eacute;</enabled>
 <EnableDHCPServer_text>Activer le service et transformer le serveur Artica en serveur DHCP</EnableDHCPServer_text>
@@ -1257,6 +1264,14 @@ Cette fonctionnalit&eacute; est &quot;ergonomique&quot;. [br]Si vous la rendez i
 <enable_squidguard>Activer squidGuard</enable_squidguard>
 <enable_squidguard_text>squidGuard est un redirecteur de pages pour Squid qui utilise des listes noires de sites web</enable_squidguard_text>
 <enable_squid_parent>Activer la liaison avec le ou les proxys parents</enable_squid_parent>
+<enable_squid_proxy_pac>Activer le service d'Auto-configuration</enable_squid_proxy_pac>
+<enable_squid_proxy_pac_text>Si vous activez cette fonctionnalit&eacute;, Artica va d&eacute;marrer un serveur web sur le port indiqu&eacute; afin de fournir le fichier de configuration automatique (proxy.pac).[br]
+Vous serez alors en mesure de rajouter le lien web dans les navigateurs afin de d&eacute;finir les param&egrave;tres de configuration par d&eacute;faut du ou des proxy disponibles.</enable_squid_proxy_pac_text>
+<enable_squid_reverse>Activ&eacute; SQUID en tant que proxy invers&eacute;</enable_squid_reverse>
+<enable_squid_reverse_text>Le but premier de SQUID &eacute;tait de %u201Ccacher%u201D les contenu web pour les petites infrastructure a l'&eacute;poque ou les liaisons haut-d&eacute;bit &eacute;taient peu courante et coutaient aussi tres ch&egrave;res.[br]
+Il permet aussi de faire l'inverse d'un proxy, a savoir cacher du contenu g&eacute;n&eacute;r&eacute; par un ou plusieurs serveur web pour des %u201Cclients%u201D (comprendre visiteurs d'un site).[br]
+L'apport premier de ce mode de fonctionnement est de permettre, par cette mise en cache, de soulager des serveurs web qui generent souvent le meme contenu pour different visiteurs.[br]
+De fait le %u201Ctemps processeur%u201D n'est pas gach&eacute; a refaire continuellement les memes choses qui n'ont pas &eacute;t&eacute; modifi&eacute; et peut etre employ&eacute; a d'autre chose (d'autre page a generer), et permet de diminuer les couts des serveurs web.</enable_squid_reverse_text>
 <enable_ssl>Activer SSL</enable_ssl>
 <enable_this_filter>Activer ce filtre</enable_this_filter>
 <enable_this_option>Activer cette fonctionnalit&eacute;</enable_this_option>
@@ -1594,6 +1609,7 @@ Log the optional text if  specified,[br]otherwise log a generic message.
 <hostname>nom d'h&ocirc;te</hostname>
 <hosts>h&ocirc;tes</hosts>
 <hosts_number>Nombre d'h&ocirc;tes</hosts_number>
+<hosts_without_proxy>Les h&ocirc;tes sans proxy</hosts_without_proxy>
 <hotmail>Hotmail &amp; Live</hotmail>
 <hour>heure</hour>
 <hourly>horraire</hourly>
@@ -1830,6 +1846,8 @@ With the default 100 SMTP server process limit, "in flow delay as 1s" limits the
 <is not regex>Expression r&eacute;guli&egrave;re ne correspond pas</is not regex>
 <is regex>Expression r&eacute;guli&egrave;re correspond</is regex>
 <is up>est sup&eacute;rieur</is up>
+<isInNetProxy>R&eacute;seau sans proxy</isInNetProxy>
+<isInNet_explain>Les navigateurs n'utiliseront pas de proxy si les ordinateurs sont dans les r&eacute;seaux list&eacute;s ci-dessous: [br]Exemple: 192.168.1.0 - 255.255.255.0</isInNet_explain>
 <isnot>n'est pas</isnot>
 <ISP>Fournisseur Internet</ISP>
 <ISP_MODE>Mode fournisseur d'acc&egrave;s</ISP_MODE>
@@ -1927,6 +1945,7 @@ With the default 100 SMTP server process limit, "in flow delay as 1s" limits the
 <local network>R&eacute;seau local</local network>
 <localdomains>Domaines de messagerie</localdomains>
 <localdomains_text>Administration des domaines Internet SMTP</localdomains_text>
+<localHostOrDomainIs_explain>Les navigateurs n'utiliseront pas de proxy lors des tentatives de connexion sur les serveurs list&eacute;s ci-dessous.[br]Exemple : www.google.fr ou intranet.server.tld...</localHostOrDomainIs_explain>
 <localityName>nom de la localit&eacute;</localityName>
 <localmx>MX Locale</localmx>
 <localmx_text>Return an MX record pointing to the MX Target for all local machines.</localmx_text>
@@ -2097,8 +2116,10 @@ La valeur par d&eacute;faut est d.[br]Sp&eacute;cifiez 0 si vous d&eacute;sirez 
 <memory_use>Utilisation m&eacute;moire</memory_use>
 <mem_size>taille m&eacute;moire</mem_size>
 <mem_stat>Utilisation M&eacute;moire</mem_stat>
+<MEM_TOTAL_INF_512>M&eacute;moire install&eacute;e inf&eacute;rieure &agrave; 512Mb</MEM_TOTAL_INF_512>
+<MEM_TOTAL_INF_512_TEXT>Afin de maintenir les performances de l'ordinateur, Artica a d&eacute;sactiv&eacute;  certains services consommateurs de m&eacute;moire.[br]Augmentez la capacit&eacute; m&eacute;moire sup&eacute;rieur &agrave; 512Mb de l'ordinateur pour en b&eacute;n&eacute;ficier.</MEM_TOTAL_INF_512_TEXT>
 <MEM_TOTAL_INF_700>M&eacute;moire install&eacute;e inf&eacute;rieure &agrave; 750Mb</MEM_TOTAL_INF_700>
-<MEM_TOTAL_INF_700_TEXT>Afin de maintenir les performances de l'ordinateur, Artica a d&eacute;sactiv&eacute;  certains services consommateurs de m&eacute;moire.[br]Augmentez la capacit&eacute; m&eacute;moire de l'ordinateur pour en b&eacute;n&eacute;ficier.</MEM_TOTAL_INF_700_TEXT>
+<MEM_TOTAL_INF_700_TEXT>Afin de maintenir les performances de l'ordinateur, Artica a d&eacute;sactiv&eacute;  certains services consommateurs de m&eacute;moire.[br]Augmentez la capacit&eacute; m&eacute;moire de l'ordinateur sup&eacute;rieure &agrave; 700Mb pour en b&eacute;n&eacute;ficier.</MEM_TOTAL_INF_700_TEXT>
 <menus_left_main>section d'accueil</menus_left_main>
 <messages_performance>Performance de Messagerie</messages_performance>
 <messages_performance_text>Statistiques et graphiques selon les e-mails vous &eacute;tant envoy&eacute;s...</messages_performance_text>
@@ -2110,6 +2131,7 @@ La valeur par d&eacute;faut est d.[br]Sp&eacute;cifiez 0 si vous d&eacute;sirez 
 <message_size_limit_text>C'est Taille maximale d'un message, y compris les informations d'enveloppe que le relais accepte</message_size_limit_text>
 <message_usage>Utilisation de Messagerie</message_usage>
 <messaging>Messagerie</messaging>
+<messaging_servers>Serveurs de messagerie</messaging_servers>
 <messaging_service>Service de messagerie</messaging_service>
 <messaging_service_text>Le service de messagerie vous autorise &agrave; fournir un relais de messagerie fournissant toutes les s&eacute;curit&eacute;s comme l'anti-spam, l'antivirus...</messaging_service_text>
 <mime_nesting_limit>Niveau Max d'embo&icirc;tement de messages</mime_nesting_limit>
@@ -2505,6 +2527,7 @@ or when the address is an authorized destination (see "permit auth destination" 
 <postfix_last_error>Dernier erreur postfix trouv&eacute;e</postfix_last_error>
 <postfix_last_errors>Derniers erreurs postfix/cyrus</postfix_last_errors>
 <postfix_main_settings>Param&egrave;tres Postfix</postfix_main_settings>
+<postfix_multi_add_mailserver>Ajouter un nouveau serveur de messagerie dans votre organisation.</postfix_multi_add_mailserver>
 <POSTFIX_MULTI_INSTANCE>Multiples instances Postfix</POSTFIX_MULTI_INSTANCE>
 <POSTFIX_MULTI_INSTANCE_HOWTO>Lors de l'activation d'instances multiples Postfix, le processus principal sera d&eacute;sactiv&eacute; et n'&eacute;coutera que l'interface r&eacute;seau locale (127.0.0.1) afin de servir uniquement les services web.[br]
 Chaque organisation sera en mesure d'administrer leur propre instance serveur et la console web sera modifi&eacute;e afin de fournir cette fonctionnalit&eacute;</POSTFIX_MULTI_INSTANCE_HOWTO>
@@ -2561,6 +2584,12 @@ This is because Postfix needs to open lookup tables ahead of time, but the reade
 <protocol>protocole</protocol>
 <province>Province</province>
 <ProxyAddress>Adresse du Proxy</ProxyAddress>
+<proxys_list>Liste des proxys</proxys_list>
+<proxy_addr>Adresse du serveur proxy</proxy_addr>
+<proxy_pac>Configuration automatique</proxy_pac>
+<proxy_pac_rules>R&egrave;gles d'Auto-configuration</proxy_pac_rules>
+<proxy_pac_rules_text>Personnalisez le fichier d'auto-configuration pour vos utilisateurs</proxy_pac_rules_text>
+<proxy_pac_text>Utilisez un fichier d'auto-configuration afin de personnaliser tous les navigateurs de vos utilisateurs</proxy_pac_text>
 <pureftpd_main_settings>Param&egrave;tres Pure-ftpd</pureftpd_main_settings>
 <pureftpd_satus>Statut Pure-ftpd</pureftpd_satus>
 <put_user_quarantine>envoyer les mails vers la quarantaine utilisateur</put_user_quarantine>
@@ -2640,6 +2669,7 @@ Les bo&icirc;tes aux lettres d&eacute;j&agrave; cr&eacute;es ne seront pas impac
 <recommend_restart_postfix>Il est obligatoire de red&eacute;marrer postfix pour accepter du courrier</recommend_restart_postfix>
 <recommend_update_kaspersky>Vous devez mettre &agrave; jour des bases antivirus Kaspersky, la version actuelle n'est plus &agrave; jour [br] Kaspersky recommande de mettre &agrave; jour la base de donn&eacute;es chaque heure</recommend_update_kaspersky>
 <reconnect_vpn_clients>Reconnecter tous les connexions VPN</reconnect_vpn_clients>
+<reconstruct_virtual_ips>Reconstruire les cartes virtuelles</reconstruct_virtual_ips>
 <recreation_humor>Tout ce qui concerne l'humour ou les histoires dr&ocirc;les</recreation_humor>
 <recreation_sports>Tout ce qui concerne le sport</recreation_sports>
 <recreation_travel>Sites d'informations sur les pays &eacute;trangers, les soci&eacute;t&eacute;s Voyage  et tout ce qui a &agrave; voir avec les voyages</recreation_travel>
@@ -3305,6 +3335,8 @@ by changing 5xx reply codes into 4xx. However, this option is no cure for addres
 <squidguard_status_text>Afficher l'&eacute;tat du filtre web</squidguard_status_text>
 <squidguard_testrules>V&eacute;rification des r&egrave;gles squidGuard</squidguard_testrules>
 <squidguard_testrules_explain>Cette section vous permet de tester si un site est correctement bloqu&eacute; ou si le filtre laisse passer la requ&ecirc;te.[br]Vous pouvez d&eacute;finir en premier une adresse web &agrave; v&eacute;rifier et dans le deuxi&egrave;me champ une adresse IP ou un compte utilisateur qui devrait appartenir &agrave; une r&egrave;gle</squidguard_testrules_explain>
+<squid_accel_websites>serveurs Web</squid_accel_websites>
+<squid_accel_websites_text>Indiquez ici les serveurs web qui seront mise en cache et prot&eacute;g&eacute;s par votre proxy.</squid_accel_websites_text>
 <squid_advanced_parameters>Param&egrave;tres avanc&eacute;s</squid_advanced_parameters>
 <squid_advanced_parameters_text>Personnalisation et param&egrave;tres avanc&eacute;s du proxy SQUID</squid_advanced_parameters_text>
 <squid_events>&Eacute;v&egrave;nements de Squid</squid_events>
@@ -3325,8 +3357,12 @@ Trois valeurs possible :[ul]
 [li][b]multicast :[/b][br]La requ&ecirc;te est &eacute;mise vers plusieurs cache via une adresse multicast.[br][/li]
 [/ul]</squid_parent_sibling_how_to>
 <squid_refresh_pattern_explain>C'est la section permettant de d&eacute;finir la r&eacute;tention du cache pour un site web</squid_refresh_pattern_explain>
+<squid_reverse_proxy>Proxy invers&eacute;</squid_reverse_proxy>
+<squid_reverse_proxy_text>Utiliser SQUID en tant que &quot;frontal&quot; de vos serveurs web</squid_reverse_proxy_text>
 <squid_sizelimit>Limite des requ&ecirc;tes</squid_sizelimit>
 <squid_status>Statut de Squid</squid_status>
+<SQUID_TOP_HITS_STAT_EXPLAIN>Vous trouverez ici le top 50 des pages les plus visit&eacute;es par vos utilisateurs</SQUID_TOP_HITS_STAT_EXPLAIN>
+<SQUID_TOP_USERS_STAT_EXPLAIN>Vous trouverez ici le top 50 des utilisateurs qui utilisent le plus ce site web. Et ce, depuis le d&eacute;but de l'enregistrement des &eacute;v&egrave;nements.</SQUID_TOP_USERS_STAT_EXPLAIN>
 <srv_artica>Services d'Artica</srv_artica>
 <srv_kav_mail>Antivirus Kaspersky pour Postfix</srv_kav_mail>
 <srv_postfix>Statut des services Postfix</srv_postfix>
@@ -3414,7 +3450,8 @@ Il autorise Artica &agrave; lancer X processus php/binaire en m&ecirc;me temps.[
 Plus de processus sont ex&eacute;cut&eacute;s, plus vous disposez d'une information r&eacute;active et en temps r&eacute;el mais au d&eacute;triment de la charge machine.
 Moins de processus ex&eacute;cut&eacute;s vous permet de conserver de la puissance machine mais r&eacute;duit la qualit&eacute; d'information de la console Artica.</systemForkProcessesNumber_explain>
 <systemMaxOverloaded>Surcharge maximale</systemMaxOverloaded>
-<systemMaxOverloaded_explain>Si le syst&egrave;me d&eacute;passe cette limite, Artica va geler tous ses ordres et op&eacute;rations en cours (d&eacute;marrage des services, ex&eacute;cution de t&acirc;ches). Ceci afin de sauvegarder la puissance syst&egrave;me.</systemMaxOverloaded_explain>
+<systemMaxOverloaded_explain>Si la charge syst&egrave;me d&eacute;passe cette limite, Artica va geler tous ses ordres et op&eacute;rations en cours (d&eacute;marrage des services, ex&eacute;cution de t&acirc;ches). Ceci afin de sauvegarder la puissance syst&egrave;me pour les applications principales du syst&egrave;me (messagerie, OpenLDAP, serveur Web etc..).[br]
+Le chiffre par d&eacute;faut est cacul&eacute; en fonction du nombre de processeurs que vous avez et de la m&eacute;moire vive install&eacute;e.[br]Il ne refl&egrave;te pas les standards Unix sur le &quot;Load&quot; Maximal habituellement cacul&eacute;, il est plus permissif.</systemMaxOverloaded_explain>
 <SystemV5CacheEnabled>Activation du cache syst&egrave;me V5</SystemV5CacheEnabled>
 <SystemV5CacheEnabled_explain>Artica peut utiliser la m&eacute;moire syst&egrave;me du serveur.[br]Cela veut dire que les pages g&eacute;n&eacute;r&eacute;es/param&egrave;tres sont stock&eacute;s directement dans la m&eacute;moire partag&eacute;e du syst&egrave;me.[br]L'utilisation du cache syst&egrave;me V5 conserve le cache m&ecirc;me lorsque que vous vous fermez votre session sur l'interface d'administration.[br]
 Le cache est alors permanent.[br]
@@ -3653,7 +3690,9 @@ Each logging level also includes the information that is logged at a lower loggi
 <TOO_MANY_STOPPED_SERVICES>Trop de services arr&ecirc;t&eacute;s</TOO_MANY_STOPPED_SERVICES>
 <top>top</top>
 <topten>TOP 10</topten>
+<top_hits>Top des acc&egrave;s</top_hits>
 <top_ressources>TOP des ressources</top_ressources>
+<top_users>Top utilisateurs</top_users>
 <total>total.</total>
 <town>ville</town>
 <to_ip_address>vers l'adresse tcp/ip</to_ip_address>
@@ -3732,6 +3771,7 @@ Si il est en rouge, vous allez devoir maintenir la base des utilisateurs.[br]Cet
 <upload_new_license>T&eacute;l&eacute;charger une nouvel licence</upload_new_license>
 <upload_vpn_configuration>Charger les param&egrave;tres VPN</upload_vpn_configuration>
 <uptime>temps de vie</uptime>
+<uri_add_in_browser>Lien web &agrave; rajouter dans les param&egrave;tres des navigateurs</uri_add_in_browser>
 <uri_dnsbl>Lien DNSBL</uri_dnsbl>
 <uri_test>adresse web &agrave; tester</uri_test>
 <urls>Urls</urls>
@@ -3840,6 +3880,7 @@ Il offre aussi le filtrage de contenu avec un antivirus et le filtrage des pages
 <WHEN_TO_BACKUP_TEXT>D&eacute;finissez l'ordonnancement de l'ex&eacute;cution de la sauvegarde</WHEN_TO_BACKUP_TEXT>
 <white list>Liste Blanche</white list>
 <white list explain>Gestion de la liste des adresses.[br] Les messages de ces adresses ne sont pas v&eacute;rifi&eacute;es pour la pr&eacute;sence de spam</white list explain>
+<whitelisted_networks>R&eacute;seaux en liste blanche</whitelisted_networks>
 <width>largeur</width>
 <width_action>largeur</width_action>
 <WifiConnectAPDisabled>Le mode client Wifi est d&eacute;sactiv&eacute;, aucune op&eacute;ration cliente n'est permise</WifiConnectAPDisabled>

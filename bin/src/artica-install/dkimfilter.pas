@@ -6,7 +6,7 @@ unit dkimfilter;
 interface
 
 uses
-    Classes, SysUtils,variants,strutils,IniFiles, Process,logs,unix,RegExpr in 'RegExpr.pas',zsystem;
+    Classes, SysUtils,variants,strutils, Process,logs,unix,RegExpr in 'RegExpr.pas',zsystem;
 
   type
   tdkim=class
@@ -14,8 +14,6 @@ uses
 
 private
      LOGS:Tlogs;
-     D:boolean;
-     GLOBAL_INI:TiniFIle;
      SYS:TSystem;
      artica_path:string;
     dbg:boolean;
@@ -155,6 +153,7 @@ var
     found:boolean;
     main_path:string;
 begin
+ result:='';
  found:=false;
  main_path:=MAIN_CONF_PATH();
  if not FileExists(main_path) then exit;
@@ -232,15 +231,8 @@ end;
 procedure tdkim.SAVE_CERTIFICATE();
 var
    cert:string;
-   selector:string;
-   setgid:string;
-   D:boolean;
-   cmd:string;
-begin
-    D:=false;
-    D:=logs.COMMANDLINE_PARAMETERS('html');
 
-    selector:=READ_CONF('Selector');
+begin
     forcedirectories('/etc/mail');
     WRITE_CONF('PidFile','/var/run/dkim-filter/dkim-filter.pid');
     WRITE_CONF('Socket','local:/var/run/dkim-filter/dkim-filter.sock');

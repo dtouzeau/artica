@@ -189,6 +189,7 @@ end;
  if ParamStr(1)='--cleanlogs' then begin
          P1:=Tprocess1.Create();
          P1.cleanlogs();
+         writeln('Memory used: ',SYS.PROCESS_MEMORY(mypid));
          halt(0);
      end;
 

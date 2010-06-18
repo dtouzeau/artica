@@ -89,7 +89,6 @@ var
     RegExpr:TRegExpr;
     FileDatas:TStringList;
     i:integer;
-    BinPath:string;
     filetmp:string;
 begin
 

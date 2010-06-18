@@ -1791,8 +1791,10 @@ The default time unit is d (days).[br]Specify 0 when mail delivery should be tri
 <memory_usage>memory usage</memory_usage>
 <memory_use>Memory use</memory_use>
 <mem_stat>Memory Usage</mem_stat>
+<MEM_TOTAL_INF_512>Installed memory under 512Mb</MEM_TOTAL_INF_512>
 <MEM_TOTAL_INF_700>Installed memory under 750Mb</MEM_TOTAL_INF_700>
 <MEM_TOTAL_INF_700_TEXT>To maintain computer performance, Artica has disabled some services that consume memory, increase the server memory up to 700Mb</MEM_TOTAL_INF_700_TEXT>
+<MEM_TOTAL_INF_512_TEXT>To maintain computer performance, Artica has disabled some services that consume memory, increase the server memory up to 512Mb</MEM_TOTAL_INF_512_TEXT> 
 <menus_left_main>Index section</menus_left_main>
 <messages_performance>Messages performance</messages_performance>
 <messages_performance_text>Statistics and charts according eMails sent to you...</messages_performance_text>
@@ -3895,5 +3897,46 @@ Fill username:password in the field.</parent_options_proxy_login>
 <parent_options_proxy_connect_timeout>Specify a peer specific connect timeout.</parent_options_proxy_connect_timeout>
 <parent_options_proxy_digest_url>To tell Squid to fetch the cache digest (if digests are enabled) for this host from the specified URL rather than the Squid default location.</parent_options_proxy_digest_url>
 <enable_squid_parent>Activate using parent proxy feature</enable_squid_parent>
-
- 
+<APP_ZARAFA_TEXT>Nowadays, e-mail is one of the mission critical applications of a company.[br]
+Zarafa combines the usabillity of Outlook with the stability and flexibility of a Linux server.[br]
+Not only Outlook is supported natively, but users can use also the web 2.0 Outlook "Look & Feel" webaccess, 
+all ActiveSync compatible mobile devices and Blackberry via the Blackberry Enterprise Server</APP_ZARAFA_TEXT>
+<APP_ZARAFA_MOBILE_ACCESS>Zarafa Mobile Webaccess</APP_ZARAFA_MOBILE_ACCESS>
+<APP_MONIT>Realtime Daemons monitor</APP_MONIT>
+<SQUID_TOP_USERS_STAT_EXPLAIN>You will find here the 50 best users that browsing this web site since the first time Artica store logs</SQUID_TOP_USERS_STAT_EXPLAIN>
+<top_users>TOP Users</top_users>
+<top_hits>TOP Hits</top_hits>
+<SQUID_TOP_HITS_STAT_EXPLAIN>You will find here the 50 best web pages opened by your users</SQUID_TOP_HITS_STAT_EXPLAIN>
+<reconstruct_virtual_ips>Reconstruct virtuals IPs</reconstruct_virtual_ips>
+<messaging_servers>Messaging servers</messaging_servers>
+<add_mail_server>Add mail server</add_mail_server>
+<postfix_multi_add_mailserver>Add a new mail server in your organization</postfix_multi_add_mailserver>
+<squid_reverse_proxy>Reverse Proxy</squid_reverse_proxy>
+<squid_reverse_proxy_text>Make one accelerator act as a single front-end for multiple servers</squid_reverse_proxy_text>
+<enable_squid_reverse>Activate SQUID is Reverse Proxy</enable_squid_reverse>
+<enable_squid_reverse_text>Reverse proxy cache, also known as Web Server Acceleration, 
+is a method of reducing the load on a busy web server by using a web cache between the server and the internet.[br]
+Another benefit that can be gained is improved security.[br]
+It's one of many ways to improve scalability without increasing the complexity of maintenence too much.[br]
+A good use of a reverse proxy is to ease the burden on a web server that provides both static and dynamic content.[br]
+The static content can be cached on the reverse proxy while the web server will be freed up to better handle the dynamic content</enable_squid_reverse_text>
+<squid_accel_websites>Web servers</squid_accel_websites>
+<squid_accel_websites_text>Define the web servers that will be cached and protected by your proxy server</squid_accel_websites_text>
+<proxy_pac>Autoconfiguration File</proxy_pac>
+<proxy_pac_text>Use a client autoconfiguration file to configure all of your Navigator clients</proxy_pac_text>
+<enable_squid_proxy_pac>Activate the Autoconfiguration file service</enable_squid_proxy_pac>
+<enable_squid_proxy_pac_text>If you activate this feature, Artica will run a web server on the defined port in order to provide the pac file.[br]
+You will be able to enter the uri to the pac file into browsers in order to set default proxy settings</enable_squid_proxy_pac_text>
+<proxy_pac_rules>Autoconfiguration file rules</proxy_pac_rules>
+<proxy_pac_rules_text>Define the Autoconfiguration file settings for your users</proxy_pac_rules_text>
+<add_a_proxy>Add a proxy</add_a_proxy>
+<proxy_addr>Proxy address</proxy_addr>
+<proxys_list>Proxy(s) list</proxys_list>
+<add_localHostOrDomainIs>Add a white listed server</add_localHostOrDomainIs>
+<localHostOrDomainIs_explain>Browsers will not use proxy when trying to connect to listed servers[br]Example: www.google.fr or intranet.server.tld...</localHostOrDomainIs_explain>
+<hosts_without_proxy>Hosts without proxy</hosts_without_proxy>
+<isInNetProxy>Add a white listed network</isInNetProxy>
+<isInNet_explain>Browsers will not use proxy if computers is a part of listed networks[br]Example: 192.168.1.0 - 255.255.255.0</isInNet_explain>
+<whitelisted_networks>Whitelisted network</whitelisted_networks>
+<uri_add_in_browser>Uri to add in browsers settings</uri_add_in_browser>
+<APP_PROXY_PAC>proxy.pac web service</APP_PROXY_PAC>

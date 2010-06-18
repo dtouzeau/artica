@@ -651,7 +651,8 @@ function SERVICES_STATUS(){
 			$html=$html . BuildRow($users,$ini->_params["APP_ARTICA_SQUID_TAIL"],"{APP_ARTICA_SQUID_TAIL}");		
 			$html=$html . BuildRow($users,$ini->_params["KAV4PROXY"],"{APP_KAV4PROXY}");
 			$html=$html . BuildRow($users,$ini->_params["DANSGUARDIAN"],"{APP_DANSGUARDIAN}");
-			$html=$html . BuildRow($users,$ini->_params["ARTICA_DANS_TAIL"],"{APP_ARTICA_DANSGUARDIAN_TAIL}");					
+			$html=$html . BuildRow($users,$ini->_params["ARTICA_DANS_TAIL"],"{APP_ARTICA_DANSGUARDIAN_TAIL}");
+			$html=$html . BuildRow($users,$ini->_params["APP_PROXY_PAC"],"{APP_PROXY_PAC}");		
 			$html=$html . "</table></div>";
 			$html_C=$html;	
 			}

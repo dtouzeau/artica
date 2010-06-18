@@ -721,22 +721,26 @@ function backup_save(){
 
 function sasl_script(){
 	$page=CurrentPageName();
-	$html=
-	"YahooWin2(700,'$page?popup-auth=yes','SASL...',''); 
+	$tpl=new templates();
+	$sasl_title=$tpl->_ENGINE_parse_body("{sasl_title}");
+	
+	$html="
+	function sals_script_start(){
+		YahooWin2(700,'$page?popup-auth=yes','$sasl_title'); 
+	}
 	
 var X_enable_auth= function (obj) {
 	var results=obj.responseText;
-	alert(results);
-	YahooWin2(700,'$page?popup-auth=yes','SASL...',''); 
+	if(results.length>0){alert(results);
+	sals_script_start(); 
 	}	
 	
 	function SaslStatus(){
-		YahooWin3(650,'$page?popup-auth-status=yes','SASL...',''); 
-		
+		YahooWin3(650,'$page?popup-auth-status=yes','$sasl_title'); 
 	}
 	
 	function SasladvOptions(){
-		YahooWin3(550,'$page?popup-auth-adv=yes','SASL...',''); 
+		YahooWin3(550,'$page?popup-auth-adv=yes','$sasl_title'); 
 		
 	}	
 	
@@ -744,10 +748,11 @@ var X_enable_auth= function (obj) {
 		var XHR = new XHRConnection();
 		XHR.appendData('save_auth',document.getElementById('enable_auth').value);
 		XHR.appendData('PostfixEnableSubmission',document.getElementById('PostfixEnableSubmission').value);
-		document.getElementById('dialog2').innerHTML='<center style=\"margin:20px;padding:20px\"><img src=\"img/wait_verybig.gif\"></center>';
+		document.getElementById('sasl-id').innerHTML='<center style=\"margin:20px;padding:20px\"><img src=\"img/wait_verybig.gif\"></center>';
 		XHR.sendAndLoad('$page', 'GET',X_enable_auth);	
 	
 	}
+	sals_script_start();
 ";
 	return $html;
 	}
@@ -994,7 +999,7 @@ function sasl_popup(){
 	
 	
 $html="
-	<H1>{sasl_title}</H1>
+	<div id='sasl-id'>
 	<table style='width:100%'>
 	<tr>
 		<td valign='top'>
@@ -1011,6 +1016,7 @@ $html="
 	</td>
 	</tr>
 	</table>
+	</div>
 	";
 
 
@@ -1473,30 +1479,7 @@ if($t<3){
 $tables[]="</table>";	
 	
 	$html=implode("\n",$tables);
-$html="
-	<div style='width:700px'>
-	<table style='width:100%'>
-	<tr>
-		<td valign='top'>$apply</td>
-		<td valign='top'>$activate</td>
-		<td valign='top'>$kas3</td>
-	</tr>
-	<tr>
-		<td valign='top'>$kasper</td>
-		<td valign='top'>$quarantine</td>	
-		<td valign='top'>$quarantine_admin</td>			
-	</tr>
-	
-	<tr>
-		
-		<td valign='top'>$quarantine_report</td>
-		<td valign='top'>$wbl</td>
-		<td valign='top'>$mailspy</td>		
 
-	</tr>
-	</table>
-
-</div>";	
 
 
 	$tpl=new templates();

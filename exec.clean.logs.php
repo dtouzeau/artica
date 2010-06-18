@@ -199,7 +199,12 @@ if($path==null){return;}
 }
 
 
+function systemLogs(){
+$f[]="/var/log/daemons/errors.log";
+$f[]="/var/log/daemons/info.log";
+$f[]="/var/log/daemons/warnings.log";
 
+}
 
 
 

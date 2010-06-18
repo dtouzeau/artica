@@ -461,12 +461,11 @@ end;
 //#########################################################################################
 function tbogom.Learn_spam(mailpath:string;spam:boolean):boolean;
 var
-   cmd_line,userpath:string;
-   tmp_file:string;
+   cmd_line:string;
    spam_com:string;
 begin
+     result:=false;
      if spam then spam_com:='--register-spam' else spam_com:='--register-ham';
-     tmp_file:=logs.FILE_TEMP();
      cmd_line:=BOGOFILTER_BIN_PATH()+' '+spam_com+' --config-file=/etc/bogofilter.cf --no-header-tags --use-syslog --input-file=' + mailpath + ' >' +ExtractFilePath(mailpath)+'tmp.bogo 2>&1';
      LOGS.outputCmd(cmd_line);
 
