@@ -80,8 +80,16 @@ if(!$usersmenus->fetchmail_installed){
 }
 
 
+
+
 $md=md5(date('Ymdhis'));
 $title=$tpl->_ENGINE_parse_body('{APP_FETCHMAIL}');
+$startcmd="YahooWin0(720,'fetchmail.index.php?popup=yes&md=$md','$title');";
+	
+if(isset($_GET["in-front-ajax"])){
+	$startcmd="$('#BodyContent').load('fetchmail.index.php?popup=yes&md=$md');";
+}
+
 $html="
 
 var fetch_timerID  = null;
@@ -134,9 +142,8 @@ function ReloadFetchMail(){
 
 
 function LoadFetchIndex(){
-var title='$title';
-YahooWin0(720,'fetchmail.index.php?popup=yes&md=$md',title);
-setTimeout(\"reloadStatus()\",2000);
+	$startcmd
+	setTimeout(\"reloadStatus()\",2000);
 }
 
 LoadFetchIndex();

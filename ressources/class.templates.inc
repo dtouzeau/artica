@@ -3869,7 +3869,9 @@ function pourcentage($pourc){
 
 function GET_CACHED($file,$function,$token=null,$return=false,$maxmin=0){
 	$md5=md5($file.$function.$token.$_SESSION["detected_lang"]);
+	if($GLOBALS["LOGON-PAGE"]){error_log("-> _SESSION[\"cached-pages\"][$md5]". basename(__FILE__). " line ". __LINE__);}
 	$data=trim($_SESSION["cached-pages"][$md5]);
+	if($GLOBALS["LOGON-PAGE"]){error_log("-> _SESSION[\"cached-pages\"][$md5]=". strlen($data)." bytes " . __FILE__. " line ". __LINE__);}
 	if($data<>null){
 		if($return){return $data;}
 		if($data==null){return false;}
@@ -3879,6 +3881,7 @@ function GET_CACHED($file,$function,$token=null,$return=false,$maxmin=0){
 	
 	if($token==null){$token=$function;}
 	
+	if($GLOBALS["LOGON-PAGE"]){error_log("->new sockets() ". basename(__FILE__). " line ". __LINE__);}
 	$sock=new sockets();
 	$data=trim($sock->DATA_CACHE($md5,false,$maxmin));
 	if($data<>null){$_SESSION["cached-pages"][$md5]=$data;}
@@ -3886,6 +3889,7 @@ function GET_CACHED($file,$function,$token=null,$return=false,$maxmin=0){
 		writelogs("\"$md5\"  get cache  $function/". basename($file) ." ($token) is null",__FUNCTION__,__FILE__,__LINE__);
 		return false;
 	}
+	if($GLOBALS["LOGON-PAGE"]){error_log("finish.. ". basename(__FILE__). " line ". __LINE__);}
 	if($return){return $data;}
 	if($data==null){return false;}
 	echo $data;
@@ -3994,6 +3998,27 @@ function finduser_format($array){
 return $html;
 	
 }
+ function is_base64_encoded($encodedString) {
+    $length = strlen($encodedString);
+   
+    // Check every character.
+    for ($i = 0; $i < $length; ++$i) {
+      $c = $encodedString[$i];
+      if (
+        ($c < '0' || $c > '9')
+        && ($c < 'a' || $c > 'z')
+        && ($c < 'A' || $c > 'Z')
+        && ($c != '+')
+        && ($c != '/')
+        && ($c != '=')
+      ) {
+        // Bad character found.
+        return false;
+      }
+    }
+    // Only good characters found.
+    return true;
+  }
 
 
 

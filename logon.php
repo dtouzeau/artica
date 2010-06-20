@@ -127,7 +127,8 @@ echo $html;
 }
 
 function pagelogon(){
-error_log("-> buildFrontEnd  ". __FILE__. " line ". __LINE__);	
+$GLOBALS["LOGON-PAGE"]=true;	
+error_log("-> buildFrontEnd GET_CACHED? ". __FILE__. " line ". __LINE__);	
 if(GET_CACHED(__FILE__,__FUNCTION__,__FUNCTION__)){
 	error_log("->Return cache  ". __FILE__. " line ". __LINE__);
 	return;
@@ -136,6 +137,7 @@ if(GET_CACHED(__FILE__,__FUNCTION__,__FUNCTION__)){
 error_log("-> No cache, build the page  ". __FILE__. " line ". __LINE__);	
 $sock=new sockets();
 $user=new usersMenus();
+
 error_log("logon form ". __FILE__. " line ". __LINE__);
 $fixed_template=$sock->GET_INFO('ArticaFixedTemplate');
 error_log("init fixed template=$fixed_template in ". __FILE__. " line ". __LINE__);

@@ -123,6 +123,23 @@ if(preg_match("#kavmilter\[.+?:\s+KAVMilter Error\(13\):\s+Active key expired.+?
 	return null;
 }
 
+if(preg_match("#.+?\/(.+?)\[.+?:\s+fatal:\s+open\s+(.+?):\s+No such file or directory#",$buffer,$re)){
+	postfix_nosuch_fileor_directory($re[1],$re[2],$buffer);
+	return null;
+}
+if(preg_match("#.+?\/(.+?)\[.+?:\s+fatal:\s+open\s+(.+?)\.db:\s+Bad file descriptor#",$buffer,$re)){
+	postfix_baddb($re[1],$re[2],$buffer);
+	return null;
+}
+
+if(preg_match("#postfix\/qmgr.+?:\s+(.+?):\s+from=<(.*?)>,\s+status=expired, returned to sender#",$buffer,$re)){
+	event_finish($re[1],null,"expired","expired",$re[2],$buffer);
+	return null;
+}
+
+
+
+
 
 if(preg_match("#cyrus\/.+?\[.+?IOERROR: fstating sieve script\s+(.+?):\s+No such file or directory#",$buffer,$re)){
 	@mkdir(dirname($re[1]),null,true);
@@ -1060,6 +1077,7 @@ function event_finish($postfix_id,$to,$status,$bounce_error,$from=null,$buffer=n
     if($status='bounced'){$delivery_success='no';}
 	if($status='deferred'){$delivery_success='no';}
 	if($status='reject'){$delivery_success='no';}
+	if($status='expired'){$delivery_success='no';}
     
 	if(preg_match("#Queued mail for delivery#",$bounce_error)){
 		$status="Deliver";
@@ -1090,6 +1108,13 @@ function event_finish($postfix_id,$to,$status,$bounce_error,$from=null,$buffer=n
 			$delivery_success="no";
 			$bounce_error="RBL";
 	}
+	
+	if(preg_match("#554 : Recipient address rejected: Access denied#",$bounce_error)){
+			$status="rejected";
+			$delivery_success="no";
+			$bounce_error="Access denied";
+	}	
+	
 	
 	
 	
@@ -1616,5 +1641,53 @@ function zarafa_store_error(){
 	@file_put_contents($file,"#");	
 }
 
+function postfix_nosuch_fileor_directory($service,$targetedfile,$buffer){
+	$file="/etc/artica-postfix/cron.1/".__FUNCTION__.md5($targetedfile).".postfix.file";
+	if(file_time_min($file)<15){return null;}	
+	@unlink($file);
+	
+	$targetedfile=trim($targetedfile);
+	if($targetedfile==null){return;}
+	if(preg_match("#(.+?)\.db$#",$targetedfile,$re)){
+		$unix=new unix();
+		$postmap=$unix->find_program("postmap");
+		$cmd="/bin/touch {$re[1]}";
+		events(__FUNCTION__. " <$cmd>");
+		THREAD_COMMAND_SET($cmd);
+		$cmd="$postmap hash:{$re[1]}";
+		events(__FUNCTION__. " <$cmd>");
+		THREAD_COMMAND_SET($cmd);
+		email_events("missing database ". basename($file),"Service postfix/$service claim \"$buffer\" Artica will create a blank $targetedfile",'smtp');
+		THREAD_COMMAND_SET("postfix reload");
+		@file_put_contents($file,"#");	
+		return;		
+	 }
+	
 
+	
+	$cmd="/bin/touch $targetedfile";
+	events("$cmd");
+	THREAD_COMMAND_SET($cmd);
+	THREAD_COMMAND_SET("postfix reload");
+	email_events("missing ". basename($file),"Service postfix/$service claim \"$buffer\" Artica will create a blank $targetedfile",'smtp');
+	@file_put_contents($file,"#");		
+}
+function postfix_baddb($service,$targetedfile,$buffer){
+	$file="/etc/artica-postfix/cron.1/".__FUNCTION__.md5($targetedfile).".postfix.file";
+	if(file_time_min($file)<15){return null;}	
+	@unlink($file);
+	$targetedfile=trim($targetedfile);
+	if($targetedfile==null){return;}	
+	$unix=new unix();
+	$postmap=$unix->find_program("postmap");
+	$cmd="$postmap hash:$targetedfile";
+	events(__FUNCTION__. " <$cmd>");
+	THREAD_COMMAND_SET($cmd);
+	email_events("corrupted database ". basename($file),"Service postfix/$service claim \"$buffer\" Artica will rebuild $targetedfile.db",'smtp');
+	THREAD_COMMAND_SET("postfix reload");
+	@file_put_contents($file,"#");	
+	return;			
+}
+
+ 
 ?>

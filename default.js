@@ -124,6 +124,26 @@ function LoadAjax(ID,uri,concatene) {
 	}
 
 }
+
+function LoadAjaxSequence(ID,uri,next) {
+	var uri_add='';
+	var datas='';
+	var xurl='';
+	if(concatene){
+		uri_add='&datas='+concatene;
+	}
+	uri=uri+uri_add;
+	if(document.getElementById(ID)){ 
+			var WAITX=ID+'_WAITX';
+			if(document.getElementById(WAITX)){return;}
+	        document.getElementById(ID).innerHTML='<center style="margin:20px;padding:20px" id='+WAITX+'><img src="img/ajax-loader.gif"></center>';
+	        $('#'+ID).load(uri, next);
+	        
+	}	
+	
+}
+
+
 function LoadAjaxTiny(ID,uri,concatene) {
 	var uri_add='';
 	var datas='';

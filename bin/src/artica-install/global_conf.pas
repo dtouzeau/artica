@@ -5503,6 +5503,7 @@ begin
        if FileExists(pidof_path) then logs.OutputCmd('/bin/ln -s '+pidof_path+' /bin/pidof');
     end;
 
+    if not FileExists('/etc/artica-postfix/settings/Daemons/SystemV5CacheEnabled') then SYS.set_INFO('SystemV5CacheEnabled','0');
 
     SYSTEM_VERIFY_ISO();
 

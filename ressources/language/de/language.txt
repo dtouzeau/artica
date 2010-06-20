@@ -126,10 +126,10 @@ The address verification status is not updated when the probe fails (optimistic 
 [strong]Time units: s (seconds), m (minutes), h (hours), d (days), w (weeks). [/strong]
 </address_verify_positive_refresh_time_text>
 <address_verify_sender>eMail for sender notifications</address_verify_sender>
-<address_verify_sender_text> The sender address to use in address verification probes; prior the default was "postmaster".[br]
+<address_verify_sender_text> The sender address to use in address verification probes; prior the default was &quot;postmaster&quot;.[br]
 To avoid problems with address probes that are sent in response to address probes, the Postfix SMTP server excludes the probe sender address from all SMTPD access blocks.
-Specify an empty value (address_verify_sender =) or <> if you want to use the null sender address.[br]
-[i]Beware, some sites reject mail from <>, even though RFCs require that such addresses be accepted[/i].
+Specify an empty value (address_verify_sender =) or  if you want to use the null sender address.[br]
+[i]Beware, some sites reject mail from , even though RFCs require that such addresses be accepted[/i].
 </address_verify_sender_text>
 <add_action>add new operation</add_action>
 <add_artica_tasks>Add predefined tasks</add_artica_tasks>
@@ -766,9 +766,8 @@ Specify 0 when mail delivery should be tried only once.</bounce_queue_lifetime_t
 [br]By default, these notifications are generated from built-in templates with message headers and message text.
 [br]This option allows you to override the built-in information</bounce_template_file_text>
 <BP>Post Office Box</BP>
-<br>
- In a parent relationship, the child cache will forward requests to its parent cache.<br>
-  If the parent does not hold a requested object, it will forward the request on behalf of the child<br></br>
+<br> In a parent relationship, the child cache will forward requests to its parent cache.[br]
+  If the parent does not hold a requested object, it will forward the request on behalf of the child[br]</br>
 <broadcast>Broadcast</broadcast>
 <broken_sasl_auth_clients>obsolete SMTP clients compatibility</broken_sasl_auth_clients>
 <broken_sasl_auth_clients_text>Enable inter-operability with SMTP clients that implement an obsolete version of the AUTH command (RFC 4954).[br]
@@ -1115,6 +1114,9 @@ Setting this parameter to a value of 1 changes the meaning of the corresponding 
 <delete_organisation_text>Really sure to delete this organization ?</delete_organisation_text>
 <delete_ou>Delete This organization</delete_ou>
 <delete_ou_text>Delete all items about this organization (include users)</delete_ou_text>
+<delete_postfix_instance>Delete this SMTP service</delete_postfix_instance>
+<delete_postfix_instance_sure>Confirm removing this SMTP service...</delete_postfix_instance_sure>
+<delete_postfix_instance_text>Remove the SMTP service, this include all settings (messages in queues will not be deleted)</delete_postfix_instance_text>
 <delete_quarantine>Delete your quarantine area</delete_quarantine>
 <delete_thisuser>Delete this user</delete_thisuser>
 <delete_this_user>Delete this user</delete_this_user>
@@ -1511,6 +1513,7 @@ Fetchmail is licensed under the GNU General Public License</fetchmail_about>
 <fetch_hotmail>Fetch your mails from hotmail and live account</fetch_hotmail>
 <fetch_mails>Fetch emails</fetch_mails>
 <fetch_mails_family_products>Fetch mails softwares</fetch_mails_family_products>
+<fetch_messages_every>Fetch messages every</fetch_messages_every>
 <field>field</field>
 <file>file</file>
 <filedate>File date</filedate>
@@ -1980,7 +1983,7 @@ With the default 100 SMTP server process limit, "in flow delay as 1s" limits the
 <left_menu_internal_hard_drives>Hard drives</left_menu_internal_hard_drives>
 <left_menu_net_settings>Networks</left_menu_net_settings>
 <level>level</level>
-<li><strong>sibling:</li>
+<li>....</li>
 <licence operations>licence operations</licence operations>
 <licence status>licence status</licence status>
 <license>license</license>
@@ -2016,7 +2019,7 @@ With the default 100 SMTP server process limit, "in flow delay as 1s" limits the
 <LocalSocketPath>Local Socket path</LocalSocketPath>
 <local_destination_concurrency_limit>local destination concurrency limit</local_destination_concurrency_limit>
 <local_destination_concurrency_limit_text>The maximal number of parallel deliveries via the local mail delivery transport to the same recipient 
-(when "local destination recipient limit = 1") or the maximal number of parallel deliveries to the same local domain (when "local destination recipient limit > 1").[br]
+(when &quot;local destination recipient limit = 1&quot;) or the maximal number of parallel deliveries to the same local domain (when &quot;local destination recipient limit &amp;raquo; 1&quot;).[br]
 This limit is enforced by the queue manager.[br]
 The message delivery transport name is the first field in the entry in the master.cf file.[br]
 [strong]A low limit of 2 is recommended[/strong], just in case someone has an expensive shell command in a .forward file or in an alias (e.g., a mailing list manager).[br]
@@ -2367,6 +2370,7 @@ don't forget to - Save & Apply settings - to make them in production mode</notif
 <no_mailboxes>No mailboxes saved..</no_mailboxes>
 <no_mailbox_cause_transport>This domain does not store aliases cause all emails will be forwarded to another service/server</no_mailbox_cause_transport>
 <no_memory_free_to_empty_cache>No memory free to perform empty cache, you should reboot or stop some services</no_memory_free_to_empty_cache>
+<no_plugins_can_be_enabled>No plugin can be enabled for the moment, check your Master Administrator if you are allowed to enable content filters</no_plugins_can_be_enabled>
 <NO_POSTFIX_NETWORK_SET>No Networks in Postfix</NO_POSTFIX_NETWORK_SET>
 <NO_POSTFIX_NETWORK_SET_EXPLAIN>You should add your local network in order to allow your users send mails trough this server</NO_POSTFIX_NETWORK_SET_EXPLAIN>
 <no_privileges>You have not enough privileges to perform this operation</no_privileges>
@@ -2609,6 +2613,10 @@ but it shares all Postfix program and documentation files with other instances</
 <POSTFIX_PROCESS_NUMBER>Messaging processes number</POSTFIX_PROCESS_NUMBER>
 <postfix_realtime_events>Postfix realtime flow</postfix_realtime_events>
 <postfix_realtime_events_text>Display routed mails in realtime</postfix_realtime_events_text>
+<postfix_reload>Reload SMTP service</postfix_reload>
+<postfix_reload_text>Force the SMTP service to refresh databases, settings and current tasks</postfix_reload_text>
+<postfix_restart>Restart SMTP service</postfix_restart>
+<postfix_restart_text>Force the SMTP service to shutdown and start it just after down</postfix_restart_text>
 <postfix_restrictions_classes>Restrictions classes</postfix_restrictions_classes>
 <postfix_restrictions_classes_text>Postfix restriction classes allow you to give easy-to-remember names to groups of UCE restrictions(unsolicited commercial email)(such as "permissive", "restrictive", and so on).
 [br]The real reason for the existence of Postfix restriction classes is more mundane:[br]
@@ -2950,6 +2958,7 @@ Once backup task selected, you will choose the backup date in order to browse yo
 <routing_rule>Routing rule</routing_rule>
 <row>row</row>
 <rows>rows</rows>
+<RTMM_NO_GEOIP_OR_LOOPBACK>The system cannot retreive sender server informations.[br]Check if the GeoIp module is correctly activated or not that this behavior is normal if mails are retreived from fetchmail or any other retreiver modules</RTMM_NO_GEOIP_OR_LOOPBACK>
 <rule>rule</rule>
 <rulegeneral>Rules - General</rulegeneral>
 <rules>Rules</rules>
@@ -3582,9 +3591,9 @@ you will be redirected to the new IP address in 15 seconds
 <templates>Templates</templates>
 <test>test</test>
 <text>This page show you every 10 seconds events generated by Postfix mail system.</text>
-<text1>These settings allows you to pe<title>Kaspersky For Mail server Global settings</text1>
+<text1>....</text1>
 <text_add_domain_entity>Give the emails domain of this entity:
-example : user.name@domain.tlb -> domain.tlb
+example : user.name@domain.tlb -&amp;raquo; domain.tlb
 </text_add_domain_entity>
 <text_add_entity>Give the name of the new entity:</text_add_entity>
 <text_logs>This is realtime logs of the current daemon of Kaspersky For Mail server[br]These page is refresh every 5 seconds</text_logs>
@@ -3771,8 +3780,8 @@ TLS [TLS], more commonly known as SSL, is a popular mechanism for  enhancing TCP
 <tls_logging> Server-side TLS activity logging</tls_logging>
 <tls_logging_intro>To get additional information about Postfix SMTP server TLS activity you can increase the log level.[br]
 Each logging level also includes the information that is logged at a lower logging level.[br]
-<ul style=margin:5px>[li]Use log level "{tls_log_field_3}" [br]only in case of problems.[/li]
-[li]Use of log level "{tls_log_field_4}" [br]is strongly discouraged[/li][/ul]
+[ul][li]Use log level &quot;{tls_log_field_3}&quot; [br]only in case of problems.[/li]
+[li]Use of log level &quot;{tls_log_field_4}&quot; [br]is strongly discouraged[/li][/ul]
 </tls_logging_intro>
 <tls_log_field_0>Disable logging of TLS activity</tls_log_field_0>
 <tls_log_field_1>Log TLS handshake and certificate information</tls_log_field_1>
@@ -3857,6 +3866,7 @@ The rules for transferring (routing) are set in this section.[br]
 <UPDATE_CLAMAV>Update ClamAV antivirus</UPDATE_CLAMAV>
 <UPDATE_CLAMAV_EXPLAIN>Perform ClamAV pattern files and Scan Engine update</UPDATE_CLAMAV_EXPLAIN>
 <update_events>Update events</update_events>
+<update_fetchmail_now>Restart fetchmail in order to force it to fetch all rules</update_fetchmail_now>
 <UPDATE_KAS3>Update Anti-Spam databases</UPDATE_KAS3>
 <UPDATE_KAS3_TEXT>Update databases now in order to increase detection rate</UPDATE_KAS3_TEXT>
 <update_kaspersky_database_title>Update antivirus database</update_kaspersky_database_title>
@@ -3889,8 +3899,7 @@ The rules for transferring (routing) are set in this section.[br]
 <users_allow>Users privileges</users_allow>
 <user_backup_emails_query_text>Search and restore backuped mails directly from messaging router backup feature</user_backup_emails_query_text>
 <user_class>Personalized class</user_class>
-<user_class_text></user_class_text>
-<note>Description</user_class_text>
+<user_class_text>.....</user_class_text>
 <user_disclaimer_explain>Add a specific disclaimer to your outbound and/or Inbound messages.</user_disclaimer_explain>
 <user_email_text>Set the first email address of this user,this email will be the master email address of this account</user_email_text>
 <user_interface>User interface</user_interface>

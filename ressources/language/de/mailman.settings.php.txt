@@ -313,7 +313,7 @@ headers, but this is not recommended (and in fact, your ability to[br]
 disable these headers may eventually go away).
 [br]</include_rfc2369_headers_text>
 <info>Info</info>
-<info_text> The text will be treated as html except that newlines will be translated to < br >[br]
+<info_text> The text will be treated as html except that newlines will be translated to[br]
 - so you can use links, preformatted text, etc, [br]
 but don't put in carriage returns except where you mean to separate paragraphs.[br]
 And review your changes - bad html (like some unterminated HTML constructs)[br]
@@ -392,7 +392,7 @@ Mailman prefixes Subject: headers with text you can customize and normally, this
 You can set this option to No to disable the prefix on gated messages. [br]Of course, if you turn off normal Subject: prefixes, they won't be prefixed for gated messages either
 </news_prefix_subject_too_text>
 <new_member_options>New member options</new_member_options>
-<new_member_options_text>When a new member is subscribed to this list, their initial set of<br>options is taken from the this variable's setting.</new_member_options_text>
+<new_member_options_text>When a new member is subscribed to this list, their initial set of[br]options is taken from the this variable's setting.</new_member_options_text>
 <nntp_host>NNTP Host</nntp_host>
 <nntp_host_text>The hostname of the machine your news server is running on.[br]
 This value may be either the name of your news server, or optionally of the format name:port, where port is a port number.
@@ -489,7 +489,7 @@ Note that members may disable their own individual password reminders.</send_rem
 <subject_prefix_text>This text will be prepended to subject lines of messages posted to the list,[br]
 to distinguish mailing list messages in mailbox summaries.[br]Brevity is premium here, it's ok to shorten long mailing list names to[br]
 something more concise, as long as it still identifies the mailing list.[br][br] You can also add a sequential number by %d substitution
-directive. eg.; [ul][li][listname %d] -> [listname 123][/li][li] (listname %05d) -> (listname 00123)[/li][/ul]</subject_prefix_text>
+directive. eg.; [ul][li][listname %d] -&amp;raquo; [listname 123][/li][li] (listname %05d) -&amp;raquo; (listname 00123)[/li][/ul]</subject_prefix_text>
 <subscribe_policy>Subscribe Policy</subscribe_policy>
 <subscribe_policy_text>What steps are required for subscription?[br]
 [ul][li]Confirm (*) - email confirmation required[/li]

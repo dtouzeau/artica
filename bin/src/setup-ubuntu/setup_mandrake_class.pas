@@ -483,6 +483,8 @@ l.Add('libcdio');
 l.Add('curl');
 l.add('cryptsetup');
 
+l.add('udisks');
+
 
 
 

@@ -80,10 +80,20 @@ function format_line($line){
 	
 	
 	$today=date('Y-m-d');
-	$time=str_replace($today,"{today}",$time);
-	$flag_infos="$Country ($Region) $smtp_sender";
+	$time=str_replace($today,"",$time);
+	$flag_infos=trim("$Country ($Region) $smtp_sender");
+	$flag_infos=str_replace("()","");
+	if($flag_infos==null){
+		$flag_infos="{RTMM_NO_GEOIP_OR_LOOPBACK}";
+	}
+	
+	
 	if(trim($bounce_error)==null){$bounce_error="Sended";}
-
+	if(preg_match("#(.+?)\s+(.+)#",$time,$re)){
+		$time=texttooltip($re[2],"<strong style=font-size:14px>$time</strong>",null);
+	}else{
+		$time=texttooltip($time,"<strong style=font-size:14px>{today}</strong>",null);
+	}
 	
 	if($mailfrom==null){$mailfrom="&nbsp;";}
 
@@ -92,11 +102,15 @@ function format_line($line){
 	if($bounce_error=="Mailbox unknown"){$bg_color="background-color:{$ini->_params["User_unknown"]["row_color"]};color:{$ini->_params["User_unknown"]["text_color"]}";}
 	
 	
-	if(strlen($mailfrom)>30){$mailfrom=substr($mailfrom,0,30)."...";}
-	if(strlen($rcpt)>30){$rcpt=substr($rcpt,0,30)."...";}
+	if(strlen($mailfrom)>23){
+		$mailfrom =texttooltip(substr($mailfrom,0,20)."...","<strong style=font-size:14px>$mailfrom</strong>");
+	}
+	if(strlen($rcpt)>23){
+		$rcpt =texttooltip(substr($rcpt,0,20)."...","<strong style=font-size:14px>$rcpt</strong>");
+	}
 	$html="
 	<tr style='$bg_color'>
-		<td width=1% style='background-color:white'>" . imgtootltip($country_img,$flag_infos)."</td>
+		<td width=1% style='background-color:white'>" . imgtootltip($country_img,"<strong style=font-size:14px>$flag_infos</strong>")."</td>
 		<td width=1% nowrap><strong>$time</strong></td>
 		<td><strong>$mailfrom</td>
 		<td width=1%><img src='img/fw_bold.gif'></td>

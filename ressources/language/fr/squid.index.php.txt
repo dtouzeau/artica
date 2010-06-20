@@ -67,7 +67,7 @@ cache_peer_access mycache_mydomain.net deny all[/b]</acl_dst_as_text>
 <acl_external>Programme externe</acl_external>
 <acl_external_text>[b]Example:[/b]
 [br]
-auth_param basic program &lt; placez votre authentificateur ici &gt;[br]
+auth_param basic program placez votre authentificateur ici[br]
 auth_param basic children 20[br]
 auth_param basic realm Squid proxy-caching web server[br]
 auth_param basic credentialsttl 1800 seconds[br]

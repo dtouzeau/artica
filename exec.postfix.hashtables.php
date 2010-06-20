@@ -36,6 +36,14 @@ if($ldap->ldapFailed){
 	die();
 }
 
+
+if($GLOBALS["EnablePostfixMultiInstance"]==1){
+	system(LOCATE_PHP5_BIN2()." ". dirname(__FILE__)."/exec.postfix-multi.php");
+	die();
+}
+
+
+
 if($argv[1]=="--bcc"){
 	recipient_bcc_maps();
 	recipient_bcc_maps_build();

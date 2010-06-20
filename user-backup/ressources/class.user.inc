@@ -864,7 +864,7 @@ class user{
 	function add_Canonical(){
 		$array["SenderCanonical"]=$this->SenderCanonical;
 		$ldap=new clladp();
-		if(!$ldap->Ldap_modify($this->dn,$array)){echo $ldap->ldap_last_error;return;}else{echo "Canonical:$this->SenderCanonical\n";}
+		if(!$ldap->Ldap_modify($this->dn,$array)){echo $ldap->ldap_last_error;return;}
 		$sock=new sockets();
 		$sock->getFrameWork("cmd.php?postfix-hash-tables=yes");
 	}

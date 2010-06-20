@@ -66,7 +66,7 @@ $fetchmail_daemon="
 		
 		
 		function SaveFetchMailDaemon(){
-			var XHR = new XHRConnection();
+			var XHR = new XHRConnection();		
 			XHR.appendData('FetchmailDaemonPostmaster',document.getElementById('FetchmailDaemonPostmaster').value);
 			XHR.appendData('FetchmailPoolingTime',document.getElementById('FetchmailPoolingTime').value);
 			document.getElementById('fetchdaemondiv').innerHTML='<center><img src=\"img/wait_verybig.gif\"></center>';	
@@ -100,7 +100,7 @@ $fetchmail_daemon=RoundedLightGrey("
 					
 					<table>
 					<tr>
-						<td align='right' nowrap><strong>{daemon} {pool} </strong></td>
+						<td align='right' nowrap><strong>{fetch_messages_every} </strong></td>
 						<td align='left'>$list  (minutes)</td>
 					</tr>
 					<tr>
@@ -159,7 +159,6 @@ function section_fetchmail_daemon_save(){
 	$fetch=new fetchmail();
 	$fetch->FetchmailDaemonPostmaster=$_GET["FetchmailDaemonPostmaster"];
 	$fetch->FetchmailPoolingTime=$_GET["FetchmailPoolingTime"];
-	
 	echo $fetch->Save();
 	
 }

@@ -72,7 +72,6 @@ class fetchmail{
 		$sock->SET_INFO("FetchmailPoolingTime",$this->FetchmailPoolingTime);
 		$sock->SET_INFO("FetchmailDaemonPostmaster",$this->FetchmailDaemonPostmaster);
 		$sock->getFrameWork('cmd.php?restart-fetchmail=yes');	
-	  	
 	}
 	
 	
@@ -81,10 +80,7 @@ class fetchmail{
 
 
 class Fetchmail_settings{
-	
 	var $main_array;
-	
-	
 	function parse_config($datas){
 		$tb=explode("\n",$datas);
 		//writelogs("spliting=\"" . count($tb) . "\" lines",__CLASS__.'/'.__FUNCTION__,__FILE__);

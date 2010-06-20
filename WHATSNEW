@@ -17,6 +17,7 @@ Messaging Changes:
 1.4.060401: Fix demime error before backup mails. This cause illimited stored mysql error files in /var/log/artica-postfix that cause crash server.
 1.4.061220: Adding Zarafa ICal/CalDav process startup/monitor.
 1.4.061320: Fix unable to start amavis when detected server name match xxx.(none)
+1.4.062001: Rebuild totally the multiple postfix instances engine (now each organization can store multiple mail servers)
  
 
 Proxy Changes:

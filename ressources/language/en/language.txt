@@ -3940,3 +3940,15 @@ You will be able to enter the uri to the pac file into browsers in order to set 
 <whitelisted_networks>Whitelisted network</whitelisted_networks>
 <uri_add_in_browser>Uri to add in browsers settings</uri_add_in_browser>
 <APP_PROXY_PAC>proxy.pac web service</APP_PROXY_PAC>
+<no_plugins_can_be_enabled>No plugin can be enabled for the moment, check your Master Administrator if you are allowed to enable content filters</no_plugins_can_be_enabled>
+<RTMM_NO_GEOIP_OR_LOOPBACK>The system cannot retreive sender server informations.[br]Check if the GeoIp module is correctly activated or not that this behavior is normal if mails are retreived from fetchmail or any other retreiver modules</RTMM_NO_GEOIP_OR_LOOPBACK>
+<postfix_reload>Reload SMTP service</postfix_reload>
+<postfix_reload_text>Force the SMTP service to refresh databases, settings and current tasks</postfix_reload_text>
+<postfix_restart>Restart SMTP service</postfix_restart>
+<postfix_restart_text>Force the SMTP service to shutdown and start it just after down</postfix_restart_text>
+<delete_postfix_instance>Delete this SMTP service</delete_postfix_instance>
+<delete_postfix_instance_text>Remove the SMTP service, this include all settings (messages in queues will not be deleted)</delete_postfix_instance_text>
+<delete_postfix_instance_sure>Confirm removing this SMTP service...</delete_postfix_instance_sure>
+<fetch_messages_every>Fetch messages every</fetch_messages_every>
+<update_fetchmail_now>Restart fetchmail in order to force it to fetch all rules</update_fetchmail_now>
+ 

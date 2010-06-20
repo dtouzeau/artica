@@ -13,6 +13,8 @@ include_once(dirname(__FILE__)."/framework/frame.class.inc");
 if(preg_match("#--verbose#",implode(" ",$argv))){$GLOBALS["DEBUG"]=true;}
 if(preg_match("#--reload#",implode(" ",$argv))){$GLOBALS["RELOAD"]=true;}
 
+if($argv[1]=="--multi-start"){MultiBuildRules();die();}
+
 BuildRules();
 
 
@@ -62,7 +64,37 @@ function BuildRules(){
 		@chmod("/etc/fetchmailrc",600);
 		echo "Starting......: fetchmail saving configuration file done\n";
 			
-}		
+}
+
+function MultiBuildRules(){
+	
+	
+	
+	$sql="SELECT uid FROM fetchmail_rules WHERE enabled=1";
+	$q=new mysql();
+	$results=$q->QUERY_SQL($sql,"artica_backup");
+	
+	
+	
+	
+	
+}
+
+function MultiBuildServerArray(){
+	$sock=new sockets();
+	$config=unserialize(base64_decode($sock->GET_INFO("PostfixMultiFetchMail")));
+	if(!is_array($config)){
+		echo "Starting......: fetchmail no enabled rules, aborting\n";
+		return;	
+	}
+	
+	while (list ($servername, $array) = each ($config) ){
+		if($array["enabled"]<>1){continue;}
+		$ou=$array["ou"];
+		
+	}
+	
+}
 
 
 ?>

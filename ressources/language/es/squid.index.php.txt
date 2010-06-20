@@ -71,10 +71,9 @@ cache_peer_access mycache_mydomain.net deny all[/b]
 [/ul]</acl_dst_text>
 <acl_dst_title>Same as "Client Address" but looks for destination IP Address</acl_dst_title>
 <acl_external>External Program</acl_external>
-<acl_external_text>
-[b]Example:[/b]
+<acl_external_text>[b]Example:[/b]
 [br]
-auth_param basic program < put your authenticator here >[br]
+auth_param basic program put your authenticator here[br]
 auth_param basic children 20[br]
 auth_param basic realm Squid proxy-caching web server[br]
 auth_param basic credentialsttl 1800 seconds[br]

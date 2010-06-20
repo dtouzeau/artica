@@ -1251,8 +1251,10 @@ class mysql{
 				  `aka` varchar(255) NOT NULL,
 				  `nokeep` int(1) NOT NULL DEFAULT '0',
 				  `multidrop` int(1) NOT NULL DEFAULT '0',
+				  `smtp_host` VARCHAR( 75 ) NOT NULL DEFAULT '127.0.0.1',
 				  PRIMARY KEY (`ID`),
 				  UNIQUE KEY `md5` (`md5`),
+				  KEY `smtp_host` (`smtp_host`),
 				  KEY `uid` (`uid`)
 				) ";
 			
@@ -1263,7 +1265,12 @@ class mysql{
 				$sql="ALTER TABLE `fetchmail_rules` ADD `nokeep` INT( 1 ) NOT NULL DEFAULT '0'";
 				$this->QUERY_SQL($sql,'artica_backup');
 		}
-  
+		
+		if(!$this->FIELD_EXISTS("fetchmail_rules","smtp_host","artica_backup")){
+				$sql="ALTER TABLE `fetchmail_rules` ADD `smtp_host` VARCHAR( 75 ) NOT NULL,ADD INDEX ( `smtp_host` )";
+				$this->QUERY_SQL($sql,'artica_backup');
+		}		
+		
 	if(!$this->TABLE_EXISTS('postfix_multi','artica_backup')){
 		
 			$sql="CREATE TABLE IF NOT EXISTS `postfix_multi` (
@@ -1271,7 +1278,7 @@ class mysql{
 				  `key` varchar(255) NOT NULL,
 				  `value` varchar(255) NOT NULL,
 				  `ou` varchar(255) NOT NULL,
-				  `ValueTEXT` text NOT NULL,
+				  `ValueTEXT` longtext NOT NULL,
 				  `uuid` VARCHAR( 255 ) NOT NULL ,
 				  `ip_address` VARCHAR( 16 ) NOT NULL,
 				  PRIMARY KEY (`ID`),

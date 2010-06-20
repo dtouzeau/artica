@@ -6,14 +6,11 @@ Give the password for this user</add_pop3_imap_text>
 <edit_pop3_imap_text>If you want to edit this user,
 you must set the password for this user
 Set the new or old password</edit_pop3_imap_text>
-<ERROR_CANNOT_ADD_TRANSPORT_EXISTS>
-<div class="error">
-You have already set a rule for this domain to relay all emails to an another mail server.<br>
+<ERROR_CANNOT_ADD_TRANSPORT_EXISTS>You have already set a rule for this domain to relay all emails to an another mail server.[br]
 In this case, you are not allowed to add alias/domain/Mailbox system.
 </ERROR_CANNOT_ADD_TRANSPORT_EXISTS>
-<ERROR_CANNOT_ADD_TRANSPORT_EXISTS>
-Are you sure to remove this transport rule?
-aliases generated for this domain will be removed too
+<ERROR_CANNOT_ADD_TRANSPORT_EXISTS>You have already set a rule for this domain to relay all emails to an another mail server.[br]
+In this case, you are not allowed to add alias/domain/Mailbox system.
 </ERROR_CANNOT_ADD_TRANSPORT_EXISTS>
 <expand_domain>ADDRESS</expand_domain>
 <expand_domain_goto>&nbsp;</expand_domain_goto>

@@ -876,15 +876,22 @@ hash_postfix_allowed_connections();
 
 postmap_standard_db();
 
-logs.DebugLogs('Starting......: Postfix, please wait, compiling main.cf...');
-fpsystem(SYS.LOCATE_PHP5_BIN()+' /usr/share/artica-postfix/exec.postfix.maincf.php --write-maincf no-restart');
-logs.DebugLogs('Starting......: Postfix, please wait, compiling Policyd Daemon settings...');
-fpsystem(SYS.LOCATE_PHP5_BIN()+' /usr/share/artica-postfix/exec.policyd-weight.php >/dev/null 2>&1');
 
-CLEAN_MASTER_CF();
-logs.DebugLogs('Starting......: Postfix, please wait, Checking Artica-filter');
-fpsystem(SYS.LOCATE_PHP5_BIN()+' /usr/share/artica-postfix/exec.postfix.maincf.php --artica-filter');
-logs.DebugLogs('Starting......: Postfix, compiling settings done..');
+if(EnablePostfixMultiInstance=1) then begin
+    logs.DebugLogs('Starting......: Postfix, please wait, compiling main.cf for multiple instances...');
+   fpsystem(SYS.LOCATE_PHP5_BIN()+' /usr/share/artica-postfix/exec.postfix-multi.php');
+end else begin
+    logs.DebugLogs('Starting......: Postfix, please wait, compiling main.cf...');
+    fpsystem(SYS.LOCATE_PHP5_BIN()+' /usr/share/artica-postfix/exec.postfix.maincf.php --write-maincf no-restart');
+    logs.DebugLogs('Starting......: Postfix, please wait, compiling Policyd Daemon settings...');
+    fpsystem(SYS.LOCATE_PHP5_BIN()+' /usr/share/artica-postfix/exec.policyd-weight.php >/dev/null 2>&1');
+    logs.DebugLogs('Starting......: Postfix, please wait, Checking Artica-filter');
+    fpsystem(SYS.LOCATE_PHP5_BIN()+' /usr/share/artica-postfix/exec.postfix.maincf.php --artica-filter');
+    logs.DebugLogs('Starting......: Postfix, compiling settings done..');
+
+end;
+    CLEAN_MASTER_CF();
+
 
 
 if FIleExists('/etc/init.d/sendmail') then begin

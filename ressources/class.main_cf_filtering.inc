@@ -251,13 +251,13 @@ class main_header_check{
 		
 	
 
-function import_examples(){
+function import_examples($hasHash=false){
 	$datas=explode("\n",file_get_contents(dirname(__FILE__) . "/databases/examples.header_checks.db"));
 	if(!is_array($datas)){return null;}
 	while (list ($num, $ligne) = each ($datas) ){
 		$lin=$this->ParseRegexLine($ligne);
 		if(is_array($lin)){
-			$this->saverule($ligne);
+			if($hasHash){$arr[]=$ligne;}else{$this->saverule($ligne);}
 		}
 		
 		

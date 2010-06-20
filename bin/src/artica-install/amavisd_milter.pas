@@ -102,12 +102,6 @@ begin
        if not TryStrToInt(SYS.GET_INFO('EnablePostfixMultiInstance'),EnablePostfixMultiInstance) then EnablePostfixMultiInstance:=0;
 
 
-       if EnablePostfixMultiInstance=1 then begin
-           EnableAmavisDaemon:=0;
-           JCheckMailEnabled:=0;
-           EnableAmavisInMasterCF:=0;
-       end;
-
        if EnableAmavisDaemon=1 then begin
           if not SYS.ISMemoryHiger1G() then begin
              logs.NOTIFICATION('[ARTICA]: ('+SYS.HOSTNAME_g()+') Warning: your memory is under 1GB ['+IntToStr(mem_installee)+'], amavis is now disabled','Amavis is disabled because your computer is not "memory compliance"','system');

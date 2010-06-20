@@ -27,6 +27,12 @@ $GLOBALS["postmap"]=$unix->find_program("postmap");
 if($argv[1]=='--removes'){PostfixMultiDisable();die();}
 if($argv[1]=='--instance-reconfigure'){reconfigure_instance($argv[2]);die();}
 if($argv[1]=='--instance-relayhost'){reconfigure_instance_relayhost($argv[2]);die();}
+if($argv[1]=='--instance-ssl'){reconfigure_instance_ssl($argv[2]);die();}
+if($argv[1]=='--instance-settings'){reconfigure_instance_minimal($argv[2]);die();}
+if($argv[1]=='--instance-mastercf'){reconfigure_instance_mastercf($argv[2]);die();}
+
+
+
 
 reconfigure();
 
@@ -100,6 +106,31 @@ function reconfigure_instance_relayhost($hostname){
 	shell_exec("{$GLOBALS["postmulti"]} -i postfix-$hostname -p reload");
 }
 
+function reconfigure_instance_ssl($hostname){
+	$maincf=new maincf_multi($hostname);
+	$maincf->certificate_generate();
+	$maincf->buildconf();	
+	echo "Starting......: restarting Postfix {$GLOBALS["postmulti"]} -i postfix-$hostname -p stop\n";		
+	shell_exec("{$GLOBALS["postmulti"]} -i postfix-$hostname -p stop");
+	shell_exec("{$GLOBALS["postmulti"]} -i postfix-$hostname -p start");
+	
+}
+
+function reconfigure_instance_minimal($hostname){
+	$maincf=new maincf_multi($hostname);
+	$maincf->buildconf();	
+	echo "Starting......: Postfix {$GLOBALS["postmulti"]} -i postfix-$hostname -p reload\n";		
+	shell_exec("{$GLOBALS["postmulti"]} -i postfix-$hostname -p reload");		
+}
+function reconfigure_instance_mastercf($hostname){
+	$maincf=new maincf_multi($hostname);
+	$maincf->buildmaster();
+	echo "Starting......: restarting Postfix {$GLOBALS["postmulti"]} -i postfix-$hostname -p stop\n";		
+	shell_exec("{$GLOBALS["postmulti"]} -i postfix-$hostname -p stop");
+	shell_exec("{$GLOBALS["postmulti"]} -i postfix-$hostname -p start");	
+	
+}
+
 
 function ConfigureMainCF($hostname){
 	if(strlen(trim($hostname))<3){return null;}
@@ -123,27 +154,26 @@ function ConfigureMainCF($hostname){
 		shell_exec(LOCATE_PHP5_BIN2()." ". dirname(__FILE__)."/exec.assp-multi.php --org \"$ou\"");
 	}
 	
-
-	
-
-                                    
-	
-	
-	
 	shell_exec("{$GLOBALS["postmulti"]} -i postfix-$hostname -e enable");
-	if(!$GLOBALS["running"]["postfix-$instance"]){
-			echo "Starting......: Postfix start postfix-$hostname\n";
-			shell_exec("{$GLOBALS["postmulti"]} -i postfix-$hostname -p start");
-			
-		}else{
-			echo "Starting......: Postfix restart postfix-$hostname\n";
-			shell_exec("{$GLOBALS["postmulti"]} -i postfix-$hostname -p stop");
-			shell_exec("{$GLOBALS["postmulti"]} -i postfix-$hostname -p start");
-		}
-
-//ConfigureMainMaster();		
-		
+	_start_instance($hostname);
 }
+
+function _start_instance($hostname){
+	
+	$pidfile="/var/spool/postfix-$hostname/pid/master.pid";
+	$unix=new unix();
+	$pid=$unix->get_pid_from_file($pidfile);
+	
+	
+	
+	if($unix->process_exists($pid)){
+		shell_exec("{$GLOBALS["postmulti"]} -i postfix-$hostname -p reload");
+	}	
+	
+	shell_exec("{$GLOBALS["postmulti"]} -i postfix-$hostname -p start");
+	
+}
+
 
 function ConfigureMainMaster(){
 	$main=new main_cf();
@@ -174,6 +204,7 @@ function PostfixMultiDisable(){
 	
 	
 }
+
 
 
 

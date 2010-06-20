@@ -1144,6 +1144,7 @@ begin
              amavishostname:=AnsiReplaceText(amavishostname,'''','');
              amavishostname:=AnsiReplaceText(amavishostname,'=','');
              amavishostname:=AnsiReplaceText(amavishostname,';','');
+             amavishostname:=AnsiReplaceText(amavishostname,'.(none)','');
              amavishostname:=trim(amavishostname);
              RegExpr.Expression:='(.+)\.(.+)';
              if not RegExpr.Exec(amavishostname) then begin

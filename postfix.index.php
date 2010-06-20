@@ -729,10 +729,10 @@ function sasl_script(){
 		YahooWin2(700,'$page?popup-auth=yes','$sasl_title'); 
 	}
 	
-var X_enable_auth= function (obj) {
-	var results=obj.responseText;
-	if(results.length>0){alert(results);
-	sals_script_start(); 
+	var X_enable_auth= function (obj) {
+		var results=obj.responseText;
+		if(results.length>0){alert(results);}
+		sals_script_start(); 
 	}	
 	
 	function SaslStatus(){
@@ -752,8 +752,7 @@ var X_enable_auth= function (obj) {
 		XHR.sendAndLoad('$page', 'GET',X_enable_auth);	
 	
 	}
-	sals_script_start();
-";
+	sals_script_start();";
 	return $html;
 	}
 	
@@ -922,7 +921,6 @@ function antispam_popup(){
 	}
 	
 	if($EnablePostfixMultiInstance==1){
-		$amavis=Paragraphe_switch_disable('{enable_amavis}','{feature_disabled_multiple_postfix_instances_enabled}','{ressources_insuffisantes}');
 		$spamassin=Paragraphe_switch_disable('{enable_spamasssin}','{feature_disabled_multiple_postfix_instances_enabled}','{feature_disabled_multiple_postfix_instances_enabled}');
 		$miltergreylist=Paragraphe_switch_disable('{APP_MILTERGREYLIST}','{feature_disabled_multiple_postfix_instances_enabled}','{feature_disabled_multiple_postfix_instances_enabled}');
 		$assp=Paragraphe_switch_disable('{enable_assp}','{feature_disabled_multiple_postfix_instances_enabled}','{feature_disabled_multiple_postfix_instances_enabled}');

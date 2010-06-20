@@ -1013,7 +1013,6 @@ var
    socket_path:string;
    daemon_path:string;
    pidfile:string;
-   daemon_option:string;
    cmd:string;
    ClamavMilterEnabled:integer;
    pid:string;
@@ -1024,7 +1023,7 @@ var
 begin
    socket_path:='/var/spool/postfix/var/run/clamav/clamav-milter.ctl';
    pidfile:='/var/spool/postfix/var/run/clamav/clamav-milter.pid';
-   daemon_option:='-q -f '+socket_path;
+
    daemon_path:=MILTER_DAEMON_PATH();
    pid:='';
    count:=0;
@@ -1246,7 +1245,6 @@ procedure TClamav.MILTER_STOP();
 var
 count:integer;
 pids:string;
-D:boolean;
 begin
   if not FileExists(MILTER_DAEMON_PATH()) then begin
      writeln('Stopping clamav-milter.......: Not installed');
@@ -1570,8 +1568,6 @@ end;
 function TClamav.CLAMD_WRITE_CONF():boolean;
 var
    l:TstringList;
-   i:integer;
-
 begin
 if not FileExists(CLAMD_CONF_PATH()) then exit;
 result:=false;

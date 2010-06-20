@@ -20,8 +20,8 @@
 <option_12>Adresse sans nom de domaine</option_12>
 <option_13>SUBJECT is longeopcheck1r than 250 symbols</option_13>
 <option_14>Le SUJET contient des tas d'espaces ou des points</option_14>
-<option_15>SUJET contient des num&eacute;ro ou de l'horodatages
-&lt;br&gt;&lt;i&gt; (par exemple: 14:30:35')</option_15>
+<option_15>SUJET contient des num&eacute;ro ou de l'horodatage
+[br][i] (par exemple: 14:30:35')[/i]</option_15>
 <option_17>Cor&eacute;en (iso-ir-149)</option_17>
 <option_18>Thai (windows, dos-874)</option_18>
 <option_19>Japonais (iso-2022-jp)</option_19>

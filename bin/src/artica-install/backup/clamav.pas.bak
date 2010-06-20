@@ -6,7 +6,7 @@ unit clamav;
 interface
 
 uses
-    Classes, SysUtils,variants,strutils,IniFiles, Process,logs,unix,RegExpr in 'RegExpr.pas',zsystem,
+    Classes, SysUtils,variants,strutils,Process,logs,unix,RegExpr in 'RegExpr.pas',zsystem,
     postfix_class   in '/home/dtouzeau/developpement/artica-postfix/bin/src/artica-install/postfix_class.pas';
 
 type LDAP=record
@@ -1246,7 +1246,6 @@ procedure TClamav.MILTER_STOP();
 var
 count:integer;
 pids:string;
-D:boolean;
 begin
   if not FileExists(MILTER_DAEMON_PATH()) then begin
      writeln('Stopping clamav-milter.......: Not installed');
@@ -1570,8 +1569,6 @@ end;
 function TClamav.CLAMD_WRITE_CONF():boolean;
 var
    l:TstringList;
-   i:integer;
-
 begin
 if not FileExists(CLAMD_CONF_PATH()) then exit;
 result:=false;

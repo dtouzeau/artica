@@ -9797,6 +9797,7 @@ INSTANT_SEARCH();
       ini:=ini+dansguardian.DANSGUARDIAN_STATUS()+CRLF;
       ini:=ini+SYSLOGER_STATUS()+CRLF;
       ini:=ini+squid.TAIL_STATUS()+CRLF;
+      ini:=ini+ squid.PROXY_PAC_STATUS()+CRLF;
    end;
 
    POSFTIX_POSTCONF_PATH:=postfix.POSFTIX_POSTCONF_PATH();

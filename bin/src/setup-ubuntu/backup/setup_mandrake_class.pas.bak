@@ -476,6 +476,7 @@ l.add('perl-Geo-IP');
 
 l.Add('ntp');
 l.Add('iproute');
+l.add('hostapd');
 l.Add('libusb-compat0.1-static-devel');
 l.Add('perl-Inline');
 l.Add('libcdio');

@@ -120,13 +120,12 @@ There is no measurable perfomance loss.[br]
 <enable_sqlgrey>Enable SQLGrey Policy server</enable_sqlgrey>
 <enable_sqlgrey_text>If enabled, artica will add the policy server into it's confugration in order to force postfix asking what he do when receiving mails</enable_sqlgrey_text>
 <fqdn_white_list>FQDN white list</fqdn_white_list>
-<fqdn_white_list_text>
-SQLgrey expects the following expressions:[br][br]
+<fqdn_white_list_text>SQLgrey expects the following expressions:[br][br]
 [b]hostname.domain.com[/b] whole system name (least CPU intensive)[br]
 [b]*.domain.com[/b] whitelist any fqdn in the domain 'domain.com'[br]
 [b]/regexp/[/b] whitelist any fqdn matching the regexp (by far most CPU intensive)[br]
 [br]
-[i]Note you need the following two lines to allow both <lots of mtas>.example.com and example.com [b]*.example.com example.com[/b][/i]
+[i]Note you need the following two lines to allow both lots of mtas.example.com and example.com [b]*.example.com example.com[/b][/i]
 </fqdn_white_list_text>
 <full>greylist by IP address</full>
 <greymethod>Greylisting method</greymethod>

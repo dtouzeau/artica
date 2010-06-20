@@ -773,6 +773,7 @@ l.add('libcairo-ruby1.8');
 l.add('cryptsetup');
 l.add('monit');
 l.add('libtommath-devel'); //clamav
+l.add('udisks');
 
 
 l.add('rsync');

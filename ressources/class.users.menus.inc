@@ -829,6 +829,7 @@ private function build_user_left_menus(){
 	function BuildLeftMenus(){
 		$sock=new sockets();
 		$SquidActHasReverse=$sock->GET_INFO("SquidActHasReverse");
+		$EnablePostfixMultiInstance=$sock->GET_INFO("EnablePostfixMultiInstance");
 		$currentPageName=CurrentPageName();
 		error_log("page=$currentPageName ".__FUNCTION__.' in '.__FILE__. " in line ". __LINE__);
 		if($_SESSION["UsersInterfaceDatas"]<>null){
@@ -986,7 +987,17 @@ private function build_user_left_menus(){
 				$OU_encoded=base64_encode($OU);
 				$array[$OU_TEXT]["MAIN"]="javascript:Loadjs('domains.manage.org.index.php?js=yes&ou=$OU_encoded&encoded=yes');";
 				$array[$OU_TEXT]["SUB"]["{main_parameters}"]="javascript:Loadjs('domains.manage.org.index.php?js=yes&ou=$OU_encoded&encoded=yes&in-front-ajax=yes');";
-				$array[$OU_TEXT]["SUB"]["{domains}"]="javascript:Loadjs('domains.edit.domains.php?js=yes&ou=$OU_encoded&encoded=yes');";
+				
+				if($this->AsOrgPostfixAdministrator){
+					if($this->POSTFIX_INSTALLED){
+						if($EnablePostfixMultiInstance==1){
+							$array[$OU_TEXT]["SUB"]["{messaging_servers}"]="javascript:Loadjs('domains.postfix.multi.php?ou=$OU_encoded&encoded=yes&in-front-ajax=yes');";
+						}
+					}
+				}
+				
+				
+				$array[$OU_TEXT]["SUB"]["{domains}"]="javascript:Loadjs('domains.edit.domains.php?js=yes&ou=$OU_encoded&encoded=yes&in-front-ajax=yes');";
 				$array[$OU_TEXT]["SUB"]["{add_user}"]="javascript:Loadjs('domains.add.user.php?ou=$OU_encoded&encoded=yes');";
 				$array[$OU_TEXT]["SUB"]["{members}"]="javascript:Loadjs('domains.manage.org.index.php?finduser-js=es&ou=$OU_encoded&encoded=yes');";
 				$array[$OU_TEXT]["SUB"]["{groups}"]="javascript:Loadjs('domains.edit.group.php?ou=$OU_encoded&js=yes&encoded=yes');";
@@ -1080,6 +1091,12 @@ private function build_user_left_menus(){
 				
 			  if($this->ZARAFA_APPLIANCE){
 			  	$array["{messaging}"]["SUB"]["{APP_ZARAFA_WEB}"]="javascript:Loadjs('zarafa.web.php')";
+			  }
+			  
+			  if($this->fetchmail_installed){
+			  	if($EnablePostfixMultiInstance<>1){
+			  		$array["{messaging}"]["SUB"]["fetchmail"]="javascript:Loadjs('fetchmail.index.php?ajax=yes&in-front-ajax=yes')";
+			  	}
 			  }
 				
 				if($this->AMAVIS_INSTALLED){

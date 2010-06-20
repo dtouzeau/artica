@@ -418,7 +418,7 @@ function DeleteOU(){
 function popup_tabs(){
 	$_GET["ou"]=base64_decode($_GET["ou"]);
 	if(GET_CACHED(__FILE__,__FUNCTION__,"js:{$_GET["ou"]}")){return null;}
-	
+	$sock=new sockets();
 	
 	$page=CurrentPageName();
 	
@@ -448,18 +448,13 @@ function popup_tabs(){
 			$array["postfix"]='{messaging}';
 		}
 
-		if($user->AsOrgPostfixAdministrator){
-			$array["postfix-multi"]='{messaging_servers}';
-			
+		if($sock->GET_INFO("EnablePostfixMultiInstance")==1){
+			if($user->AsOrgPostfixAdministrator){$array["postfix-multi"]='{messaging_servers}';}
 		}
 		
 		
 	}
 	
-	
-	
-	
-
 	while (list ($num, $ligne) = each ($array) ){
 		if($num=="postfix-multi"){
 			$a[]="<li><a href=\"domains.postfix.multi.php?org={$_GET["ou"]}\"><span>$ligne</span></a></li>\n";	
@@ -1260,13 +1255,18 @@ function organization_users_list(){
 
 function organization_users_find_member(){
 	$tofind=$_GET["finduser"];
-	if($_SESSION["uid"]==-100){$ou=base64_decode($_GET["ou"]);}else{$ou=$_SESSION["ou"];}
+	if(is_base64_encoded($_GET["ou"])){$ou=base64_decode($_GET["ou"]);}else{$ou=$_GET["ou"];}
+	
+	
+	if($_SESSION["uid"]<>-100){$ou=$_SESSION["ou"];}
 	$ldap=new clladp();
 	if($tofind==null){$tofind='*';}else{$tofind="*$tofind*";}
 	$filter="(&(objectClass=userAccount)(|(cn=$tofind)(mail=$tofind)(displayName=$tofind)(uid=$tofind) (givenname=$tofind)))";
 	$attrs=array("displayName","uid","mail","givenname","telephoneNumber","title","sn","mozillaSecondEmail","employeeNumber");
 	$dn="ou=$ou,dc=organizations,$ldap->suffix";
 	$hash=$ldap->Ldap_search($dn,$filter,$attrs,150);
+	
+	writelogs("Find users $tofind in ou=$ou ({$_GET["ou"]})",__FUNCTION__,__FILE__,__LINE__);
 	
 	$users=new user();
 	

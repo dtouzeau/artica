@@ -734,9 +734,8 @@ Specify 0 when mail delivery should be tried only once.</bounce_queue_lifetime_t
 [br]By default, these notifications are generated from built-in templates with message headers and message text.
 [br]This option allows you to override the built-in information</bounce_template_file_text>
 <BP>Boite Postale</BP>
-<br>
- In a parent relationship, the child cache will forward requests to its parent cache.<br>
-  If the parent does not hold a requested object, it will forward the request on behalf of the child<br></br>
+<br> In a parent relationship, the child cache will forward requests to its parent cache.[br]
+  If the parent does not hold a requested object, it will forward the request on behalf of the child[br]</br>
 <broadcast>Broadcast</broadcast>
 <broken_sasl_auth_clients>interoperabilit&eacute; avec les clients SMTP obsol&egrave;tent</broken_sasl_auth_clients>
 <broken_sasl_auth_clients_text>Active l'interoperabilit&eacute; avec les clients SMTP qui impl&eacute;mentent une version obsolete de la commande AUTH (RFC 2554). [br]MicroSoft Outlook Express version 4 et MicroSoft Exchange version 5.0 sont des exemples de tels clients.</broken_sasl_auth_clients_text>
@@ -1071,6 +1070,9 @@ Vous pouvez ajouter des privil&egrave;ges de groupe afin d'autoriser certains ut
 <delete_organisation_text>Supprimer cette organisation?</delete_organisation_text>
 <delete_ou>Supprimez cette organisation</delete_ou>
 <delete_ou_text>Supprimez tous les &eacute;l&eacute;ments &agrave; propos de cette organisation (incluant les utilisateurs)</delete_ou_text>
+<delete_postfix_instance>Supprimer ce service SMTP</delete_postfix_instance>
+<delete_postfix_instance_sure>Confirmez la suppression de ce service SMTP</delete_postfix_instance_sure>
+<delete_postfix_instance_text>Supprimer ce service SMTP incluant tous les param&egrave;tres (les messages en file d'attente ne seront pas supprim&eacute;s).</delete_postfix_instance_text>
 <delete_quarantine>Supprimer votre zone de quarantaine</delete_quarantine>
 <delete_thisuser>Supprimez cet utilisateur</delete_thisuser>
 <delete_this_user>Supprimez cet utilisateur</delete_this_user>
@@ -1455,6 +1457,7 @@ Il retransfert les messages sur un autre serveur sur le port 25.[br]Fetchmail n'
 <fetch_hotmail>Rapatriez vos messages provenant de HotMail ou Live</fetch_hotmail>
 <fetch_mails>emails r&eacute;cup&eacute;r&eacute;s</fetch_mails>
 <fetch_mails_family_products>Logiciels de r&eacute;cup&eacute;ration de courriers</fetch_mails_family_products>
+<fetch_messages_every>R&eacute;cup&eacute;ration des messages chaque</fetch_messages_every>
 <field>champ</field>
 <file>fichier</file>
 <filedate>Date du fichier</filedate>
@@ -1916,7 +1919,7 @@ With the default 100 SMTP server process limit, "in flow delay as 1s" limits the
 <left_menu_internal_hard_drives>Disques durs</left_menu_internal_hard_drives>
 <left_menu_net_settings>R&eacute;seaux</left_menu_net_settings>
 <level>niveau</level>
-<li><strong>sibling:</li>
+<li>....</li>
 <licence operations>op&eacute;rations de licence</licence operations>
 <licence status>status de la licence</licence status>
 <license>licence</license>
@@ -1952,7 +1955,7 @@ With the default 100 SMTP server process limit, "in flow delay as 1s" limits the
 <LocalSocketPath>Chemin du socket local</LocalSocketPath>
 <local_destination_concurrency_limit>local destination concurrency limit</local_destination_concurrency_limit>
 <local_destination_concurrency_limit_text>The maximal number of parallel deliveries via the local mail delivery transport to the same recipient 
-(when "local destination recipient limit = 1") or the maximal number of parallel deliveries to the same local domain (when "local destination recipient limit > 1").[br]
+(when &quot;local destination recipient limit = 1&quot;) or the maximal number of parallel deliveries to the same local domain (when &quot;local destination recipient limit &amp;raquo; 1&quot;).[br]
 This limit is enforced by the queue manager.[br]
 The message delivery transport name is the first field in the entry in the master.cf file.[br]
 [strong]A low limit of 2 is recommended[/strong], just in case someone has an expensive shell command in a .forward file or in an alias (e.g., a mailing list manager).[br]
@@ -2303,6 +2306,7 @@ The default is to use the local machine name, $myhostname, which defaults to the
 <no_mailboxes>Pas de boites aux lettres sauvegard&eacute;es</no_mailboxes>
 <no_mailbox_cause_transport>Ce domaine ne stocke pas les alias car tous les courriels seront transmis &agrave; un autre service / serveur</no_mailbox_cause_transport>
 <no_memory_free_to_empty_cache>Il n'y a pas assez de m&eacute;moire libre pour effectuer le vidage du cache,vous devriez red&eacute;marrer la machine ou stopper des services.</no_memory_free_to_empty_cache>
+<no_plugins_can_be_enabled>Aucun plugin ne peut &ecirc;tre activ&eacute; pour le moment, v&eacute;rifiez avec le Super-Administrateur si vous &ecirc;tes autoris&eacute; &agrave; utiliser les plugins.</no_plugins_can_be_enabled>
 <NO_POSTFIX_NETWORK_SET>Pas de r&eacute;seaux dans Postfix</NO_POSTFIX_NETWORK_SET>
 <NO_POSTFIX_NETWORK_SET_EXPLAIN>Vous devriez ajouter votre r&eacute;seau local afin d'autoriser vos utilisateurs &agrave; &eacute;mettre des messages sur ce serveur.</NO_POSTFIX_NETWORK_SET_EXPLAIN>
 <no_privileges>Vous n'avez pas assez de privil&egrave;ges pour effectuer cette op&eacute;ration</no_privileges>
@@ -2538,6 +2542,10 @@ Chaque organisation sera en mesure d'administrer leur propre instance serveur et
 <POSTFIX_PROCESS_NUMBER>Nombre de processus de messagerie</POSTFIX_PROCESS_NUMBER>
 <postfix_realtime_events>Flux en temps r&eacute;el Postfix</postfix_realtime_events>
 <postfix_realtime_events_text>Afficher les mails rout&eacute;s en temps r&eacute;el</postfix_realtime_events_text>
+<postfix_reload>Recharger le service SMTP</postfix_reload>
+<postfix_reload_text>Forcer le service SMTP &agrave; rafra&icirc;chir ses bases, ses param&egrave;tres et ses t&acirc;ches courantes</postfix_reload_text>
+<postfix_restart>Red&eacute;marrer le service SMTP</postfix_restart>
+<postfix_restart_text>Forcer le service SMTP &agrave; s'arr&ecirc;ter et le red&eacute;marrer juste apr&egrave;s.</postfix_restart_text>
 <postfix_restrictions_classes>Classes de restrictions</postfix_restrictions_classes>
 <postfix_restrictions_classes_text>Postfix restriction classes allow you to give easy-to-remember names to groups of UCE restrictions(unsolicited commercial email)(such as "permissive", "restrictive", and so on).
 [br]The real reason for the existence of Postfix restriction classes is more mundane:[br]
@@ -2870,6 +2878,7 @@ Placer une limite sur les ent&ecirc;tes HTTP peut r&eacute;soudre certains probl
 <routing_rule>R&egrave;gle de routage</routing_rule>
 <row>ligne</row>
 <rows>lignes</rows>
+<RTMM_NO_GEOIP_OR_LOOPBACK>Le syst&egrave;me n'a pas put retrouver les informations du serveur &eacute;metteur.[br]V&eacute;rifiez si le module GeoIP est correctement activ&eacute;/install&eacute;.[br][b]Sachez que ce comportement est normal si l'&eacute;metteur est fetchmail ou tout autre r&eacute;cup&eacute;rateur de messages.[/b]</RTMM_NO_GEOIP_OR_LOOPBACK>
 <rule>r&egrave;gle</rule>
 <rulegeneral>R&egrave;gles-G&eacute;n&eacute;rale</rulegeneral>
 <rules>R&egrave;gles</rules>
@@ -2888,7 +2897,6 @@ Pour cette raison, nous vous recommandons d'utiliser cette fonctionnalit&eacute;
 <SAMBA_NEWVERSION>Nouvelle version de Samba</SAMBA_NEWVERSION>
 <SAMBA_NEWVERSION_TEXT>Il est recommand&eacute; de mettre &agrave; jour votre version de Samba, V&eacute;rifiez le Centre de Contr&ocirc;le de Applications et mettez &agrave; jour votre Samba</SAMBA_NEWVERSION_TEXT>
 <sasl_intro>Le support SASL de Postfix peut &ecirc;tre utilis&eacute; pour authentifier les clients SMTP distants sur le serveur SMTP de Postfix et pour authentifier le client SMTP de Postfix aupr&egrave;s des serveurs SMTP distants.
-
 Lorsqu'un message arrive, Postfix enregistre le nom d'utilisateur fournit, la m&eacute;thode d'authentification et l'adresse de l'exp&eacute;diteur dans le fichier de logs et &eacute;ventuellement autorise l'acc&egrave;s.</sasl_intro>
 <sasl_little_title>Authentification SMTP</sasl_little_title>
 <sasl_title>Simple Authentication and Security Layer (SSL)</sasl_title>
@@ -3483,7 +3491,7 @@ Si vous d&eacute;sactivez cette option, Artica utilisera uniquement un cache de 
 <templates>Mod&egrave;les</templates>
 <test>test</test>
 <text>Cette page vous montre toutes les 10 secondes les &eacute;v&eacute;nements g&eacute;n&eacute;r&eacute;s par le syst&egrave;me de messagerie Postfix.</text>
-<text1>These settings allows you to pe<title>Kaspersky For Mail server Global settings</text1>
+<text1>....</text1>
 <text_add_domain_entity>Donnez les domaines de messagerie de cette entit&eacute; :
 Exemple: user.name@domain.tlb -&gt; domain.tlb</text_add_domain_entity>
 <text_add_entity>Donner le nom de la nouvel entit&eacute;:</text_add_entity>
@@ -3670,8 +3678,8 @@ TLS [TLS], more commonly known as SSL, is a popular mechanism for  enhancing TCP
 <tls_logging>Enregistrement des activit&eacute;es TLS</tls_logging>
 <tls_logging_intro>To get additional information about Postfix SMTP server TLS activity you can increase the log level.[br]
 Each logging level also includes the information that is logged at a lower logging level.[br]
-<ul style=margin:5px>[li]Use log level "{tls_log_field_3}" [br]only in case of problems.[/li]
-[li]Use of log level "{tls_log_field_4}" [br]is strongly discouraged[/li][/ul]
+[ul][li]Use log level &quot;{tls_log_field_3}&quot; [br]only in case of problems.[/li]
+[li]Use of log level &quot;{tls_log_field_4}&quot; [br]is strongly discouraged[/li][/ul]
 </tls_logging_intro>
 <tls_log_field_0>D&eacute;sactiver la journalisation de l'activit&eacute; TLS</tls_log_field_0>
 <tls_log_field_1>Enregistrer les &eacute;changes TLS et les informations du certificat</tls_log_field_1>
@@ -3757,6 +3765,7 @@ Si il est en rouge, vous allez devoir maintenir la base des utilisateurs.[br]Cet
 <UPDATE_CLAMAV>Mettez &agrave; jour la base antivirus ClamAV</UPDATE_CLAMAV>
 <UPDATE_CLAMAV_EXPLAIN>Lancez la mise &agrave; jour du moteur de scan et des fichiers de signatures ClamAV</UPDATE_CLAMAV_EXPLAIN>
 <update_events>Ev&egrave;nement de mise &agrave; jours</update_events>
+<update_fetchmail_now>Red&eacute;marrer le service fetchmail afin de le forcer &agrave; ex&eacute;cuter ses t&acirc;ches de rapatriement.</update_fetchmail_now>
 <UPDATE_KAS3>Mettre &agrave; jour les bases anti-spam</UPDATE_KAS3>
 <UPDATE_KAS3_TEXT>Mettre &agrave; jour les bases antivirus afin d'accro&icirc;tre le niveau de d&eacute;tection.</UPDATE_KAS3_TEXT>
 <update_kaspersky_database_title>Base de donn&eacute;es de mise &agrave; jour antivirale</update_kaspersky_database_title>

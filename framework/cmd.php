@@ -124,6 +124,14 @@ if(isset($_GET["certificate-viewinfos"])){certificate_infos();exit;}
 if(isset($_GET["postfix-multi-status"])){postfix_multi_status();exit;}
 if(isset($_GET["postfix-multi-reconfigure"])){postfix_multi_reconfigure();exit;}
 if(isset($_GET["postfix-multi-relayhost"])){postfix_multi_relayhost();exit;}
+if(isset($_GET["postfix-multi-sasl"])){postfix_multi_ssl();exit;}
+if(isset($_GET["postfix-multi-settings"])){postfix_multi_settings();exit;}
+if(isset($_GET["postfix-multi-mastercf"])){postfix_multi_mastercf();exit;}
+if(isset($_GET["postfix-multi-perform-reload"])){postfix_multi_perform_reload();exit;}
+if(isset($_GET["postfix-multi-perform-restart"])){postfix_multi_perform_restart();exit;}
+if(isset($_GET["postfix-multi-perform-flush"])){postfix_multi_perform_flush();exit;}
+if(isset($_GET["postfix-multi-reconfigure-all"])){postfix_multi_reconfigure_all();exit;}
+
 
 
 
@@ -3612,6 +3620,20 @@ function postfix_multi_relayhost(){
 	$hostname=$_GET["postfix-multi-relayhost"];
 	sys_THREAD_COMMAND_SET(LOCATE_PHP5_BIN2()." /usr/share/artica-postfix/exec.postfix-multi.php --instance-relayhost \"$hostname\"");	
 }
+function postfix_multi_ssl(){
+	$hostname=$_GET["postfix-multi-sasl"];
+	sys_THREAD_COMMAND_SET(LOCATE_PHP5_BIN2()." /usr/share/artica-postfix/exec.postfix-multi.php --instance-ssl \"$hostname\"");	
+}
+function postfix_multi_settings(){
+	$hostname=$_GET["postfix-multi-settings"];
+	sys_THREAD_COMMAND_SET(LOCATE_PHP5_BIN2()." /usr/share/artica-postfix/exec.postfix-multi.php --instance-settings \"$hostname\"");	
+}
+function postfix_multi_mastercf(){
+	$hostname=$_GET["postfix-multi-mastercf"];
+	sys_THREAD_COMMAND_SET(LOCATE_PHP5_BIN2()." /usr/share/artica-postfix/exec.postfix-multi.php --instance-mastercf \"$hostname\"");	
+}
+
+
 
 function postfix_multi_reconfigure_all(){
 	sys_THREAD_COMMAND_SET(LOCATE_PHP5_BIN2()." /usr/share/artica-postfix/exec.postfix-multi.php");
@@ -3621,6 +3643,28 @@ function SQUID_PROXY_PAC_REBUILD(){
 	sys_THREAD_COMMAND_SET("/etc/init.d/artica-postfix restart proxy-pac");
 	
 }
+
+function postfix_multi_perform_reload(){
+	$unix=new unix();
+	$hostname=$_GET["postfix-multi-perform-reload"];
+	$postmulti=$unix->find_program("postmulti");
+	shell_exec("$postmulti -i postfix-$hostname -p reload");
+	}
+function postfix_multi_perform_restart(){
+	$unix=new unix();
+	$hostname=$_GET["postfix-multi-perform-restart"];
+	$postmulti=$unix->find_program("postmulti");
+	shell_exec("$postmulti -i postfix-$hostname -p stop");
+	shell_exec("$postmulti -i postfix-$hostname -p start");
+	}
+function postfix_multi_perform_flush(){
+	$unix=new unix();
+	$hostname=$_GET["postfix-multi-perform-flush"];
+	$postmulti=$unix->find_program("postmulti");
+	shell_exec("$postmulti -i postfix-$hostname -p flush");
+	}			
+	
+
 
 
 

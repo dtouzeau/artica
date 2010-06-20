@@ -34,7 +34,7 @@ Defines the minimum score that must be accumulated within a particular category 
 [br]All categories under which the page scores positively will be logged; those that were not displayed to the user appear in brackets.[br]
 -1 = display only the highest scoring category
 [br]0 = display all categories (default)
-[br]> 0 = minimum score for a category to be displayed</categorydisplaythreshold_text>
+[br]above 0 = minimum score for a category to be displayed</categorydisplaythreshold_text>
 <chat>Chats, communications related sites</chat>
 <cleaning>Sites to disinfect, update and protect computers.</cleaning>
 <conspiracy>Conspiracy related sites</conspiracy>

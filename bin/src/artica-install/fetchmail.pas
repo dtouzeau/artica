@@ -19,6 +19,7 @@ private
      SYS:TSystem;
      artica_path:string;
      EnableFetchmail:integer;
+     EnablePostfixMultiInstance:integer;
      procedure FETCHMAIL_APPLY_GETLIVE_PARAMETERS(account_id:string);
 
 
@@ -57,6 +58,10 @@ begin
        SYS:=zSYS;
        FETCHMAIL_LOGGER_STARTUP:=SYS.LOCATE_PHP5_BIN()+' /usr/share/artica-postfix/exec.fetmaillog.php';
        if not TryStrToInt(SYS.GET_INFO('EnableFetchmail'),EnableFetchmail) then EnableFetchmail:=0;
+       if not TryStrToInt(SYS.GET_INFO('EnablePostfixMultiInstance'),EnablePostfixMultiInstance) then EnablePostfixMultiInstance:=0;
+
+       if EnablePostfixMultiInstance=1 then EnableFetchmail:=0;
+
        if not DirectoryExists('/usr/share/artica-postfix') then begin
               artica_path:=ParamStr(0);
               artica_path:=ExtractFilePath(artica_path);
@@ -124,6 +129,9 @@ var
    stime:string;
    EnableFetchmail:integer;
 begin
+
+
+
 if not TryStrToInt(SYS.GET_INFO('EnableFetchmail'),EnableFetchmail) then EnableFetchmail:=0;
 
 if EnableFetchmail=0 then begin
@@ -242,7 +250,15 @@ begin
      EnableFetchmail:=0;
 
 
+
      if not TryStrToInt(SYS.GET_INFO('EnableFetchmail'),EnableFetchmail) then EnableFetchmail:=0;
+
+if EnablePostfixMultiInstance=1 then begin
+   logs.DebugLogs('Starting......: multi-postfix instances enabled, switch to artica-cron.');
+   fpsystem(SYS.LOCATE_PHP5_BIN()+' /usr/share/artica-postfix/exec.fetchmail.php --multi-start');
+   exit;
+end;
+
      fetchmailpid:=FETCHMAIL_PID();
 
 

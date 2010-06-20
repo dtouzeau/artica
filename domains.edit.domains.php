@@ -281,6 +281,12 @@ function js_script(){
 	$tpl=new templates();
 	$title=$tpl->_ENGINE_parse_body("$ou:&nbsp;{localdomains}");
 	$datas=file_get_contents("js/edit.localdomain.js");
+	$startup="LoadOuDOmainsIndex();";
+	
+	if(isset($_GET["in-front-ajax"])){
+		$startup="LoadOuDOmainsIndexInFront();";
+	}
+	
 	$html="
 	var timeout=0;
 	$datas
@@ -290,9 +296,11 @@ function js_script(){
 		
 	}
 	
-
+	function LoadOuDOmainsIndexInFront(){
+		$('#BodyContent').load('$page?ajax=yes&ou=$ou_encrypted');
+	}	
 	
-	LoadOuDOmainsIndex();
+	$startup
 	";
 	
 	

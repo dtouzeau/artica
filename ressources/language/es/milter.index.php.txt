@@ -220,9 +220,9 @@ environment variable http_proxy is searched for it.</ProxyAddress_text>
 <services>Services</services>
 <ServiceSocket>Socket Service</ServiceSocket>
 <ServiceSocket_text>The milter tcp or unix socket on which to listen for sendmail connections.
-<br>This should be either:<br>
-<br>inet:port@ip-address  - listen on specified port (use inet6 for IPv6);
-<br>local:/path/to/socket - listen on local Unix socket.</ServiceSocket_text>
+[br]This should be either:[br]
+[br]inet:port@ip-address  - listen on specified port (use inet6 for IPv6);
+[br]local:/path/to/socket - listen on local Unix socket.</ServiceSocket_text>
 <SuspiciousAction>Suspicious</SuspiciousAction>
 <SuspiciousAction_text>
 When the scanned message part is found to be suspicious, the following actions can be taken:

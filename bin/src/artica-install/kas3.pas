@@ -462,7 +462,11 @@ begin
      if length(result)>0 then exit;
      FileData:=TStringList.Create;
      RegExpr:=TRegExpr.Create;
+     try
      FileData.LoadFromFile(path);
+     except
+      exit;
+     end;
      RegExpr.Expression:='CUR_PRODUCT_VERSION="([0-9\.]+)"';
      for i:=0 to FileData.Count -1 do begin
           if RegExpr.Exec(FileData.Strings[i]) then  begin

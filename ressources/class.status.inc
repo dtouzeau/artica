@@ -597,10 +597,10 @@ $html="
 return $html;	
 }
 
-function Postfix_multi_status($ou){
-	$instance=str_replace(" ","-",$ou);
+function Postfix_multi_status($hostname){
+	
 	$sock=new sockets();
-	$array=unserialize(base64_decode($sock->getFrameWork("cmd.php?postfix-multi-queues=$instance")));
+	$array=unserialize(base64_decode($sock->getFrameWork("cmd.php?postfix-multi-queues=$hostname")));
 	$tot=$array["incoming"]+$array["active"]+$array["deferred"]+$array["corrupt"];
 	
 	
@@ -636,7 +636,7 @@ $status_queues="
 				
 			</table>";	
 			
-$stat=unserialize(base64_decode($sock->getFrameWork("cmd.php?postfix-mutli-stat=$instance")));
+$stat=unserialize(base64_decode($sock->getFrameWork("cmd.php?postfix-mutli-stat=$hostname")));
 
 	switch ($stat[0]) {
 		
@@ -661,9 +661,10 @@ $stat=unserialize(base64_decode($sock->getFrameWork("cmd.php?postfix-mutli-stat=
 	}
 
 	$design="
-	<div style='background-image:url(img/$img);background-repeat:no-repeat;width:350px;height:270px'>
+	<div style='background-image:url(img/$img);background-repeat:no-repeat;width:400px;height:210px'>
 	<div style='padding-left:155px'>
 	<span style='font-size:16px;font-weight:bold;color:#005447'>{APP_POSTFIX}</span>
+	<div style='font-size:11px;font-weight:bold;color:#005447;text-align:right;padding-top:4px;border-top:1px solid #005447;margin:4px'>$hostname</div>
 	<br><span style='font-size:11px;font-weight:bold'><i style='color:black'>$text</i>
 		$status_queues
 	</div>

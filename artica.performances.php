@@ -562,7 +562,7 @@ $cpulimit=trim($sock->GET_INFO("cpulimit"));
 $cpuLimitEnabled=trim($sock->GET_INFO("cpuLimitEnabled"));
 $SystemV5CacheEnabled=trim($sock->GET_INFO("SystemV5CacheEnabled"));
 
-if(strlen(trim($SystemV5CacheEnabled))==0){$SystemV5CacheEnabled=1;}
+if(strlen(trim($SystemV5CacheEnabled))==0){$SystemV5CacheEnabled=0;}
 
 $systemMaxOverloaded=trim($sock->GET_INFO("systemMaxOverloaded"));
 

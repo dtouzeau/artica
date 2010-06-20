@@ -20,7 +20,7 @@
 <option_12>Address with no domain name</option_12>
 <option_13>SUBJECT is longeopcheck1r than 250 symbols</option_13>
 <option_14>SUBJECT contains lots of spaces or dots</option_14>
-<option_15>SUBJECT contains Digit ID or Timestamp <br><i>(like 'Time: 14:30:35')</option_15>
+<option_15>SUBJECT contains Digit ID or Timestamp [br][i](like 'Time: 14:30:35')[/i]</option_15>
 <option_17>Korean (iso-ir-149)</option_17>
 <option_18>Thai (windows, dos-874)</option_18>
 <option_19>Japanese (iso-2022-jp)</option_19>
@@ -44,7 +44,7 @@
 <OPT_FILTRATION_ON_TEXT>If disabled, ALL checks will be skipped</OPT_FILTRATION_ON_TEXT>
 <OPT_HEADERS_SUBJECT_DIGIT_OR_TIME_ID>Digit ID or Timestamp</OPT_HEADERS_SUBJECT_DIGIT_OR_TIME_ID>
 <OPT_HEADERS_SUBJECT_DIGIT_OR_TIME_ID_TEXT>SUBJECT contains Digit ID or Timestamp (like 'Time: 14:30:35')</OPT_HEADERS_SUBJECT_DIGIT_OR_TIME_ID_TEXT>
-<OPT_HEADERS_SUBJECT_TOO_LONG>SUBJECT>250</OPT_HEADERS_SUBJECT_TOO_LONG>
+<OPT_HEADERS_SUBJECT_TOO_LONG>SUBJECT&amp;raquo;250</OPT_HEADERS_SUBJECT_TOO_LONG>
 <OPT_HEADERS_SUBJECT_TOO_LONG_TEXT>SUBJECT is longer than 250 symbols</OPT_HEADERS_SUBJECT_TOO_LONG_TEXT>
 <OPT_HEADERS_SUBJECT_WS_OR_DOTS>SUBJECT spaces or dots</OPT_HEADERS_SUBJECT_WS_OR_DOTS>
 <OPT_HEADERS_SUBJECT_WS_OR_DOTS_TEXT>SUBJECT contains lots of spaces or dots</OPT_HEADERS_SUBJECT_WS_OR_DOTS_TEXT>

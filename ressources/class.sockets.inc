@@ -150,8 +150,10 @@ function downloadFile($url,$hostname)  {
    }
 
    function GET_INFO($key,$nocache=false){
-   	
+   if($GLOBALS["LOGON-PAGE"]){error_log("->GET_INFO($key,$nocache) ". basename(__FILE__). " line ". __LINE__);}
+
    	if(!$nocache){
+			if($GLOBALS["LOGON-PAGE"]){error_log("->APC_GET($key)". __FILE__. " line ". __LINE__); }	
    			$data=$this->APC_GET($key);
    			if($data<>null){return $data;}
    	
@@ -161,16 +163,20 @@ function downloadFile($url,$hostname)  {
    			if($uid==0){
 				$value=trim(@file_get_contents("/etc/artica-postfix/settings/Daemons/$key"));
    				$GLOBALS["GET_INFO"][$key]=$value;
+   				if($GLOBALS["LOGON-PAGE"]){error_log("->SET_APC_STORE($key,$value) ". basename(__FILE__). " line ". __LINE__);}
    				$this->SET_APC_STORE($key,$value);
    				return $value;
    				}
    	}
    			
    			
-   			
+    if($GLOBALS["LOGON-PAGE"]){error_log("->getFrameWork(getinfos.php?key=$key&uid=$uid) ". basename(__FILE__). " line ". __LINE__);}		
    	$value=trim($this->getFrameWork("getinfos.php?key=$key&uid=".$uid));
     $GLOBALS["GET_INFO"][$key]=$value;
-   	if(!$nocache){$this->SET_APC_STORE($key,$value);}
+   	if(!$nocache){
+   		if($GLOBALS["LOGON-PAGE"]){error_log("->SET_APC_STORE($key,$value) ". basename(__FILE__). " line ". __LINE__);}
+   		$this->SET_APC_STORE($key,$value);
+   	}
    	return trim($value);
    
    	}
@@ -352,16 +358,22 @@ function GET_MYSQL_ROOT($key){
 	private function SYSTEMV5_ENABLED(){
 		
 		
-		
+		if($GLOBALS["LOGON-PAGE"]){error_log("->SYSTEMV5_ENABLED() posix={$GLOBALS["posix_getuid"]}". basename(__FILE__). " line ". __LINE__);}
 		if($GLOBALS["SystemV5CacheEnabled"]<>null){
-			if($GLOBALS["SystemV5CacheEnabled"]==1){return true;}
+			if($GLOBALS["SystemV5CacheEnabled"]==1){
+				if($GLOBALS["LOGON-PAGE"]){error_log("->SYSTEMV5_ENABLED() {$GLOBALS["SystemV5CacheEnabled"]} TRUE ". basename(__FILE__). " line ". __LINE__);}
+				return true;
+			
+			}
+			if($GLOBALS["LOGON-PAGE"]){error_log("->SYSTEMV5_ENABLED() FALSE ". basename(__FILE__). " line ". __LINE__);}
 			return false;
 		}
 		
 		if($GLOBALS["posix_getuid"]>0){
 			if(strlen(trim($_SESSION["SystemV5CacheEnabled"]))==0){
+				if($GLOBALS["LOGON-PAGE"]){error_log("->this->GET_INFO(SystemV5CacheEnabled) ". basename(__FILE__). " line ". __LINE__);}
 				$_SESSION["SystemV5CacheEnabled"]=$this->GET_INFO("SystemV5CacheEnabled",true);
-				if(strlen(trim($_SESSION["SystemV5CacheEnabled"]))==0){$_SESSION["SystemV5CacheEnabled"]=1;}
+				if(strlen(trim($_SESSION["SystemV5CacheEnabled"]))==0){$_SESSION["SystemV5CacheEnabled"]=0;}
 				$GLOBALS["SystemV5CacheEnabled"]=$_SESSION["SystemV5CacheEnabled"];
 			}else{
 				$GLOBALS["SystemV5CacheEnabled"]=$_SESSION["SystemV5CacheEnabled"];
@@ -371,7 +383,7 @@ function GET_MYSQL_ROOT($key){
 			
 		}else{
 			$GLOBALS["SystemV5CacheEnabled"]=$this->GET_INFO("SystemV5CacheEnabled",true);
-			if(strlen(trim($GLOBALS["SystemV5CacheEnabled"]))==0){$GLOBALS["SystemV5CacheEnabled"]=1;}
+			if(strlen(trim($GLOBALS["SystemV5CacheEnabled"]))==0){$GLOBALS["SystemV5CacheEnabled"]=0;}
 			
 		}
 		
@@ -385,11 +397,13 @@ function GET_MYSQL_ROOT($key){
 	
 	
 	function DATA_CACHE_SAVE($key,$value,$IsAnArray=false){
+		if($GLOBALS["LOGON-PAGE"]){error_log("DATA_CACHE_SAVE() -> $key". basename(__FILE__). " line ". __LINE__);}
 		if(!$this->SYSTEMV5_ENABLED()){
 			$_SESSION["APC"][$key]=$value;
 			$_SESSION["APC"]["{$key}-time"]=time();
 			return;
 		}
+		if($GLOBALS["LOGON-PAGE"]){error_log("DATA_CACHE_SAVE() -> semaphores". basename(__FILE__). " line ". __LINE__);}
 		$shm=new semaphores($this->semaphore_key,$this->semaphore_memory);
 		$shm->SET($key,$value);
 		$shm->SET("{$key}-time",time());
@@ -397,6 +411,7 @@ function GET_MYSQL_ROOT($key){
 		}
 		
 	function DATA_CACHE($key,$IsAnArray=false,$maxtime=0){
+			if($GLOBALS["LOGON-PAGE"]){error_log("DATA_CACHE() -> $key". basename(__FILE__). " line ". __LINE__);}
 			if(!$this->SYSTEMV5_ENABLED()){
 				$value=$_SESSION["APC"][$key];
 				$data1=$_SESSION["APC"]["{$key}-time"];
@@ -406,6 +421,7 @@ function GET_MYSQL_ROOT($key){
 				if($min>$maxtime){$value=null;}
 				return $value;   			
    			}
+		if($GLOBALS["LOGON-PAGE"]){error_log("->semaphores()". basename(__FILE__). " line ". __LINE__);}	
    		$shm=new semaphores($this->semaphore_key,$this->semaphore_memory);
 		$value=$shm->GET($key);
 		$time=$shm->GET("{$key}-time");
@@ -426,6 +442,7 @@ function GET_MYSQL_ROOT($key){
 	}		
 	
 	function LANGUAGE_CACHE_IMPORT($array_keys,$lang){
+		if($GLOBALS["LOGON-PAGE"]){error_log("LANGUAGE_CACHE_IMPORT() ". basename(__FILE__). " line ". __LINE__);}
 		if(!$this->SYSTEMV5_ENABLED()){return null;}
 		$shm=new semaphores($this->semaphore_key,$this->semaphore_memory,2);
 		$shm->SET($lang,$array_keys);
@@ -435,6 +452,7 @@ function GET_MYSQL_ROOT($key){
 
 
 	function LANGUAGE_DUMP($lang){
+		if($GLOBALS["LOGON-PAGE"]){error_log("LANGUAGE_DUMP() ". basename(__FILE__). " line ". __LINE__);}
 		if($this->SYSTEMV5_ENABLED()){
 			$shm=new semaphores($this->semaphore_key,$this->semaphore_memory,2);
 			if($shm->ok){
@@ -482,10 +500,13 @@ function GET_MYSQL_ROOT($key){
 	
 	
 	function SET_APC_STORE($key,$value){
+		if($GLOBALS["LOGON-PAGE"]){error_log("SET_APC_STORE($key,...) ". basename(__FILE__). " line ". __LINE__);}
 		if($this->SYSTEMV5_ENABLED()){
+			if($GLOBALS["LOGON-PAGE"]){error_log("semaphores($this->semaphore_key,$this->semaphore_memory,3)". basename(__FILE__). " line ". __LINE__);}
 			$shm=new semaphores($this->semaphore_key,$this->semaphore_memory,3);
 			$shm->SET($key,$value);
 			$shm->SET("{$key}-time",time());
+			if($GLOBALS["LOGON-PAGE"]){error_log("shm->CLOSE(); ". basename(__FILE__). " line ". __LINE__);}
 			$shm->CLOSE();
 		}
 		
