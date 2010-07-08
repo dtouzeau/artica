@@ -51,6 +51,7 @@ class usersMenus {
 	var $AllowViewStatistics=false;
 	var $AllowChangeAntiSpamSettings=false;
 	var $AsOrgAdmin=false;
+	var $AseMailCampaignsAdmin=false;
 	var $uid=null;
 	var $groupid=-900;
 	var $IptablesEnabled;
@@ -343,6 +344,9 @@ class usersMenus {
 	var $SQUIDGUARD_BIN_PATH="";
 	var $RSYNC_INSTALLED=false;
 	var $ZARAFA_APPLIANCE=false;
+	var $mysqld_datadir;
+	var $DRUPAL_INSTALLED=false;
+	var $MAIL_DKIM_VERSION=null;
 	
 	function usersMenus($priv=null,$nobuild=0,$hostname=null){
 
@@ -610,8 +614,12 @@ class usersMenus {
 			$this->ArchStruct=$_GLOBAL["ArchStruct"];
 			$this->RSYNC_INSTALLED=$_GLOBAL["RSYNC_INSTALLED"];
 			$this->ZARAFA_APPLIANCE=$_GLOBAL["ZARAFA_APPLIANCE"];
+			$this->mysqld_datadir=$_GLOBAL["mysqld_datadir"];
+			$this->DRUPAL_INSTALLED=$_GLOBAL["DRUPAL_INSTALLED"];
+			$this->MAIL_DKIM_VERSION=trim($_GLOBAL["MAIL_DKIM_VERSION"]);
 			
 			$this->hostname=str_replace('.(none)','',$this->hostname);
+			$this->fqdn=str_replace('.(none)','',$this->fqdn);
 			
 			if($this->SAMBA_INSTALLED){
 				if($this->LOCAL_SID==null){
@@ -667,7 +675,7 @@ class usersMenus {
 	
 	private function postfixmutli(){
 	$vers=explode(".",$this->POSTFIX_VERSION);
-	if($vers[0]>=2){if($vers[1]>=7){return true;}}
+	if($vers[0]>=2){if($vers[1]>=5){return true;}}
 	}
 	
 	function SessionExpired(){}
@@ -795,7 +803,10 @@ private function roundcube_detect_version(){
 private function build_user_left_menus(){
 	
 		
-	if(($this->AsOrgAdmin) or ($this->AllowAddUsers) or ($this->AsMessagingOrg)){
+	if($this->BuildLeftMenus_can_manage_org()){
+			$sock=new sockets();
+			$EnablePostfixMultiInstance=$sock->GET_INFO("EnablePostfixMultiInstance");
+		
 			$OU=trim($_GET["ou"]);
 			if($OU==null){
 				include_once(dirname(__FILE__).'/class.user.inc');
@@ -805,13 +816,26 @@ private function build_user_left_menus(){
 
 			if($OU<>null){
 				if(strlen($OU)>13){$OU_TEXT=substr($OU,0,10).'...';}else{$OU_TEXT=$OU;}
-				$array[$OU_TEXT]["MAIN"]="javascript:Loadjs('domains.manage.org.index.php?js=yes&ou=$OU');";
-				$array[$OU_TEXT]["SUB"]["{main_parameters}"]="javascript:Loadjs('domains.manage.org.index.php?js=yes&ou=$OU');";
-				$array[$OU_TEXT]["SUB"]["{domains}"]="javascript:Loadjs('domains.edit.domains.php?js=yes&ou=$OU');";
-				$array[$OU_TEXT]["SUB"]["{add_user}"]="javascript:Loadjs('domains.add.user.php?ou=$OU');";
-				$array[$OU_TEXT]["SUB"]["{members}"]="javascript:Loadjs('domains.manage.org.index.php?finduser-js=es&ou=$OU');";
-				$array[$OU_TEXT]["SUB"]["{groups}"]="javascript:Loadjs('domains.edit.group.php?ou=$OU&js=yes');";
-				$array[$OU_TEXT]["SUB"]["{search}"]="javascript:Loadjs('domains.find.user.php?ou=$OU');";
+				
+				$OU_encoded=base64_encode($OU);
+				$array[$OU_TEXT]["MAIN"]="javascript:Loadjs('domains.manage.org.index.php?js=yes&ou=$OU_encoded&encoded=yes');";
+				$array[$OU_TEXT]["SUB"]["{main_parameters}"]="javascript:Loadjs('domains.manage.org.index.php?js=yes&ou=$OU_encoded&encoded=yes&in-front-ajax=yes');";
+				
+				if($this->AsOrgPostfixAdministrator){
+					if($this->POSTFIX_INSTALLED){
+						if($EnablePostfixMultiInstance==1){
+							$array[$OU_TEXT]["SUB"]["{messaging_servers}"]="javascript:Loadjs('domains.postfix.multi.php?ou=$OU_encoded&encoded=yes&in-front-ajax=yes');";
+						}
+					}
+				}
+				
+				
+				$array[$OU_TEXT]["SUB"]["{domains}"]="javascript:Loadjs('domains.edit.domains.php?js=yes&ou=$OU_encoded&encoded=yes&in-front-ajax=yes');";
+				$array[$OU_TEXT]["SUB"]["{add_user}"]="javascript:Loadjs('domains.add.user.php?ou=$OU_encoded&encoded=yes');";
+				$array[$OU_TEXT]["SUB"]["{members}"]="javascript:Loadjs('domains.manage.org.index.php?finduser-js=es&ou=$OU_encoded&encoded=yes');";
+				$array[$OU_TEXT]["SUB"]["{groups}"]="javascript:Loadjs('domains.edit.group.php?ou=$OU_encoded&js=yes&encoded=yes&in-front-ajax=yes');";
+				$array[$OU_TEXT]["SUB"]["{search}"]="javascript:Loadjs('domains.find.user.php?ou=$OU_encoded&encoded=yes');";
+			
 			}	
 		}
 			
@@ -823,6 +847,16 @@ private function build_user_left_menus(){
 	
 	
 }
+
+
+   function BuildLeftMenus_can_manage_org(){
+   	if($this->AsOrgAdmin){return true;}
+   	if($this->AllowAddUsers){return true;}
+   	if($this->AsMessagingOrg){return true;}
+   	if($this->AsOrgPostfixAdministrator){return true;}
+   	if($this->AseMailCampaignsAdmin){return true;}
+   	return false;
+   }
 
 	
 	
@@ -868,61 +902,20 @@ private function build_user_left_menus(){
 		if($_SESSION["uid"]==-100){$asSuperAdmin=true;}
 		
 		if($this->AsArticaAdministrator==true){
-			$sub_array_pages["ARTICA"]["system.index.php"]='MAIN';
-			$this->main_left_menus["system.index.php"]=array(
-				"TITLE"=>"{system}",
-				"IMG"=>"folder-tasks2-64.png",
-				"TEXT"=>"{menu_system_text}"
-				);
-		
-
-		$sub_array_pages["ORG"]["domains.index.php"]='MAIN';
-			$this->main_left_menus["domains.index.php"]=array(
-				"TITLE"=>"{organizations}",
-				"IMG"=>"member-64.png",
-				"TEXT"=>"{menu_organizations_text}",
-				"NOAJAX"=>false,
-				"AJAX"=>"Loadjs('domains.index.php?js=yes')",
-				);
+				$sub_array_pages["ORG"]["domains.index.php"]='MAIN';
 			}
 		
 		if($this->AsPostfixAdministrator==true){
 			if($this->POSTFIX_INSTALLED==true){
-					$sub_array_pages["POSTFIX"]["postfix.index.php"]='MAIN';
-					$this->main_left_menus["postfix.index.php"]=array(
-				"TITLE"=>"{messaging}",
-				"IMG"=>"folder-64-fetchmail.png",
-				"TEXT"=>"{menu_messaging_text}",
-				"NOAJAX"=>false);
-
-					
-					}
-				}
-		
-		
-		
-		/*if(!$this->BIND9_INSTALLED){
-			if($this->dnsmasq_installed==true){
-				$sub_array_pages["DNSMASQ"]=array(
-					'dnsmasq.index.php'=>'MAIN',
-					'dnsmasq.dns.settings.php'=>'{dnsmasq_settings}',
-					'dnsmasq.records.settings.php'=>'{dnsmasq_DNS_records}',
-					'dnsmasq.daemon.events.php'=>'{events}'
-					);
+				$sub_array_pages["POSTFIX"]["postfix.index.php"]='MAIN';
 			}
-		}*/
+		}
 		
 		if($this->AsSambaAdministrator==true){
 			if(!$this->KASPERSKY_SMTP_APPLIANCE){
 				if($this->SAMBA_INSTALLED){
 					$sub_array_pages["{fileshare}"]["fileshares.index.php"]='MAIN';
-					$this->main_left_menus["fileshares.index.php"]=array(
-					"TITLE"=>"{fileshare}",
-					"IMG"=>"folder-64-share.png",
-					"TEXT"=>"{menu_share_text}",
-					"NOAJAX"=>false,
-					"AJAX"=>"Loadjs('fileshares.index.php?js=yes')",
-					);				
+							
 					}
 			}
 		}		
@@ -934,8 +927,11 @@ private function build_user_left_menus(){
 		
 		$array["{index page}"]["MAIN"]="javascript:document.location.href='users.index.php'";
 		$array["{index page}"]["SUB"]["{master_panel}"]="javascript:document.location.href='users.index.php';";
-	
+		if($this->AsSystemAdministrator){
+			$array["{index page}"]["SUB"]["{backup}"]="javascript:Loadjs('backup.tasks.php');";	
+		}
 
+		
 			
 		
 			$OU=trim($_GET["ou"]);
@@ -981,7 +977,7 @@ private function build_user_left_menus(){
 		}
 		
 		
-		if(($this->AsOrgAdmin) or ($this->AllowAddUsers)){
+		if($this->BuildLeftMenus_can_manage_org()){
 			if($OU<>null){
 				if(strlen($OU)>13){$OU_TEXT=substr($OU,0,10).'...';}else{$OU_TEXT=$OU;}
 				$OU_encoded=base64_encode($OU);
@@ -999,8 +995,8 @@ private function build_user_left_menus(){
 				
 				$array[$OU_TEXT]["SUB"]["{domains}"]="javascript:Loadjs('domains.edit.domains.php?js=yes&ou=$OU_encoded&encoded=yes&in-front-ajax=yes');";
 				$array[$OU_TEXT]["SUB"]["{add_user}"]="javascript:Loadjs('domains.add.user.php?ou=$OU_encoded&encoded=yes');";
-				$array[$OU_TEXT]["SUB"]["{members}"]="javascript:Loadjs('domains.manage.org.index.php?finduser-js=es&ou=$OU_encoded&encoded=yes');";
-				$array[$OU_TEXT]["SUB"]["{groups}"]="javascript:Loadjs('domains.edit.group.php?ou=$OU_encoded&js=yes&encoded=yes');";
+				$array[$OU_TEXT]["SUB"]["{members}"]="javascript:Loadjs('domains.manage.org.index.php?finduser-js=es&ou=$OU_encoded&encoded=yes&in-front-ajax=yes');";
+				$array[$OU_TEXT]["SUB"]["{groups}"]="javascript:Loadjs('domains.edit.group.php?ou=$OU_encoded&js=yes&encoded=yes&in-front-ajax=yes');";
 				$array[$OU_TEXT]["SUB"]["{search}"]="javascript:Loadjs('domains.find.user.php?ou=$OU_encoded&encoded=yes');";
 			}			
 		}
@@ -1091,6 +1087,10 @@ private function build_user_left_menus(){
 				
 			  if($this->ZARAFA_APPLIANCE){
 			  	$array["{messaging}"]["SUB"]["{APP_ZARAFA_WEB}"]="javascript:Loadjs('zarafa.web.php')";
+			  }else{
+			  	if($this->cyrus_imapd_installed){
+			  		$array["{messaging}"]["SUB"]["{mailboxes}"]="javascript:Loadjs('cyrus.index.php?in-front-ajax=yes')";
+			  	}
 			  }
 			  
 			  if($this->fetchmail_installed){
@@ -1104,6 +1104,12 @@ private function build_user_left_menus(){
 						$array["{messaging}"]["SUB"]["{APP_AMAVIS}"]="javascript:Loadjs('amavis.index.php?ajax=yes&in-front-ajax=yes')";
 					}
 				}
+				
+				if($this->MILTERGREYLIST_INSTALLED){
+					$array["{messaging}"]["SUB"]["{APP_MILTERGREYLIST}"]="javascript:Loadjs('milter.greylist.index.php?js=yes&in-front-ajax=yes')";
+				}
+				
+				
 				$array["{messaging}"]["SUB"]["{postfix_events}"]="javascript:s_PopUp('postfix.events.php?pop=true',450,400)";
 				
 			}
@@ -1123,6 +1129,9 @@ private function build_user_left_menus(){
 			}
 		
 		}	
+		
+		
+// ------------------------ EVENTS	------------------------	
 
 		if($this->AsAnAdministratorGeneric){
 			$array["{events}"]["MAIN"]="";
@@ -1132,6 +1141,11 @@ private function build_user_left_menus(){
 			if($this->fetchmail_installed){
 				$array["{events}"]["SUB"]["fetchmail"]="javascript:Loadjs('fetchmail.events.php');";
 			}
+			
+			if($this->SAMBA_INSTALLED){
+			if($this->AsSambaAdministrator){$array["{events}"]["SUB"]["samba"]="javascript:Loadjs('samba.events.php?ajax=yes');";}
+			}
+			
 		}
 		
 		if($this->KASPERSKY_SMTP_APPLIANCE){
@@ -1472,6 +1486,8 @@ private function build_user_left_menus(){
 		if($priv["AsDansGuardianGroupRule"]=='yes'){$this->AsDansGuardianGroupRule=true;}
 		if($priv["AsMessagingOrg"]=='yes'){$this->AsMessagingOrg=true;}
 		if($priv["AsOrgAdmin"]=='yes'){$this->AsOrgAdmin=true;}
+		if($priv["AseMailCampaignsAdmin"]=='yes'){$this->AseMailCampaignsAdmin=true;}
+		
 		
 		
 		
@@ -1481,6 +1497,7 @@ private function build_user_left_menus(){
 			$this->AllowDansGuardianBanned=true;
 			$this->AllowManageOwnComputers=true;
 			$this->AsDansGuardianGroupRule=true;
+			$this->AseMailCampaignsAdmin=true;
 		}
 		
 		
@@ -1516,6 +1533,7 @@ private function build_user_left_menus(){
 			$this->AllowChangeKas=true;
 			$this->AllowAddUsers=true;
 			$this->AsOrgAdmin=true;
+			$this->AseMailCampaignsAdmin=true;
 			$this->AllowViewStatistics=true;
 			$this->AllowEditOuSecurity=true;
 			$this->AsSquidAdministrator=true;
@@ -1545,11 +1563,10 @@ private function build_user_left_menus(){
 	}
 	
 	function IfIsAnuser($log=false){
-			if($this->AsMessagingOrg){
-				if($log){writelogs("AsMessagingOrg=TRUE",__CLASS__.'/'.__FUNCTION__,__FILE__);}
-				return false;
+			if($this->AsMessagingOrg){return false;}
+			if($this->AseMailCampaignsAdmin){return false;}
+			if($this->AsOrgPostfixAdministrator){return false;}			
 			
-			}
 			if($this->AsSystemAdministrator){
 			if($log){writelogs("AsSystemAdministrator=TRUE",__CLASS__.'/'.__FUNCTION__,__FILE__);}
 				return false;}

@@ -2,11 +2,8 @@
 Grey liste est la mise en oeuvres de l'hypoth&egrave;se que, contrairement au l&eacute;gitime MTA, les moteurs de spam ne feront pas de tentative d'envoi de leur courrier ind&eacute;sirable sur une erreur temporaire. [Br]
 Le filtre rejetera toujours le mail temporairement sur une premi&egrave;re tentative, et l'acceptera lorsque qu'un certain temps se sera &eacute;coul&eacute;.</about>
 <acl>Liste d'acc&egrave;s</acl>
-<acl_text>
-The primary use of this feautre is to setup milter-greylist whitelist.[br] It also offers a handy blacklist feature.[br] 
-Access-lists (ACL) are used to do that.[br] ACL enable the administrator  to  specify  complex  conditions  on sender IP, sender DNS address,
-sender e-mail address, and recipient e-mail address.[br]
-If support for DNSRBL was built-in, it is even possible to use DNSRBL in ACL.</acl_text>
+<acl_text>La premi&egrave;re fonctionnalit&eacute; de cette section est d'indiquer les listes blanches au moteur de liste grise.[br]
+Les ACL o&ugrave; &quot;Liste de contr&ocirc;le d'acc&egrave;s&quot; sont la pour ca.[br]ACL offre &agrave; l'administrateur la possibilit&eacute; de d&eacute;finir des conditions en fonction de l'&eacute;metteur, du destinataire, adresse IP.[br]Elle support aussi les DNSRBL.</acl_text>
 <addr>Adresse IP</addr>
 <addr_text>Ce param&egrave;tre est utilis&eacute; afin de sp&eacute;cifier un groupe d'adresses IP.[br]
 La syntaxe est une adresse IP suivie par une barre oblique et le masque CDIR.[br]
@@ -63,5 +60,5 @@ will include DSL and cable customers pools, which are well known to be massively
 <urlcheck>Url dans le corps de mail</urlcheck>
 <urlcheck_text>milter-greylist est en mesure d'interroger des sources externes d'information par le biais de divers URL[br] 
 Par exemple: http://www.example.net/mgl-config?rcpt=%r</urlcheck_text>
-<whitelist>whiteliste</whitelist>
+<whitelist>Liste blanche</whitelist>
 <_text>S&eacute;lectionnez une valeur dans la liste</_text>

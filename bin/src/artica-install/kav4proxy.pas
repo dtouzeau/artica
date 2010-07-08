@@ -196,7 +196,6 @@ end;
 function tkav4proxy.VERSION():string;
 var
    RegExpr        :TRegExpr;
-   D              :boolean;
    F              :TstringList;
    T              :string;
    i              :integer;
@@ -390,11 +389,9 @@ end;
 //##############################################################################
 function tkav4proxy.KAV4PROXY_CHECKLICENSE():string;
 var
-tmp:string;
 RegExpr:TRegExpr;
 l:TstringList;
 i:Integer;
-spattern_date:string;
 cachefile:string;
 begin
    if not FileExists('/opt/kaspersky/kav4proxy/bin/kav4proxy-licensemanager') then exit;
@@ -404,8 +401,8 @@ begin
    fpsystem('/opt/kaspersky/kav4proxy/bin/kav4proxy-licensemanager -i >'+cachefile + ' 2>&1');
     logs.OutputCmd('/bin/chown -R kluser:klusers /var/opt/kaspersky/kav4proxy');
 l:=TstringList.Create;
-l.LoadFromFile(tmp);
-logs.DeleteFile(tmp);
+l.LoadFromFile(cachefile);
+logs.DeleteFile(cachefile);
 RegExpr:=TRegExpr.Create;
 RegExpr.Expression:='^Error loading license';
 
@@ -433,6 +430,7 @@ i:Integer;
 spattern_date:string;
 Retranslator_g:string;
 begin
+result:='';
 if not FileExists('/opt/kaspersky/kav4proxy/bin/kav4proxy-keepup2date') then exit;
 if SYS.GET_INFO('ArticaEnableKav4ProxyInSquid')<>'1' then exit;;
 

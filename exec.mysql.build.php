@@ -17,11 +17,10 @@ if(!Build_pid_func(__FILE__,"MAIN")){
 	die();
 }
 
-if($argv[1]=='--tables'){
-	$mysql=new mysql();
-	$mysql->BuildTables();
-	die();
-}
+if($argv[1]=='--tables'){$mysql=new mysql();$mysql->BuildTables();die();}
+if($argv[1]=='--imapsync'){rebuild_imapsync();die();}
+if($argv[1]=='--rebuild-zarafa'){rebuild_zarafa();die();}
+
 $q=new mysqlserver();
 
 $unix=new unix();
@@ -39,5 +38,22 @@ if(!is_file($argv[1])){echo "Starting......: Mysql my.cnf........: unable to sta
 
 @file_put_contents($argv[1],$datas);
 echo "Starting......: Mysql my.cnf........: Updating \"{$argv[1]}\" success ". strlen($datas)." bytes\n";
+
+
+function rebuild_imapsync(){
+	$q=new mysql();
+	writelogs("DELETE imapsync table...",__FUNCTION__,__FILE__,__LINE__);
+	$sql="DROP TABLE `imapsync`";
+	$q->QUERY_SQL($sql,"artica_backup");
+	if(!$q->ok){echo "$sql:: $q->mysql_error\n";}
+	writelogs("Rebuild tables",__FUNCTION__,__FILE__,__LINE__);
+	$q->BuildTables();
+	}
+	
+function rebuild_zarafa(){
+	$q=new mysql();
+	$q->DELETE_DATABASE("zarafa");
+	shell_exec("/etc/init.d/artica-postfix restart zarafa");
+	}
 
 ?>

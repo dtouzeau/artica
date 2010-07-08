@@ -92,7 +92,7 @@ function GroupPrivilegesjs(){
 
 
 function js(){
-if(isset($_GET["encoded"])){$_GET["ou"]=base64_decode($_GET["ou"]);}
+if(is_base64_encoded($_GET["ou"])){$_GET["ou"]=base64_decode($_GET["ou"]);}
 $ou=$_GET["ou"];	
 $ou_encrypted=base64_encode($ou);
 $cfg[]="js/edit.group.js";
@@ -104,6 +104,7 @@ $cfg[]="js/users.kas.php.js";
 $title=$ou . ":&nbsp;{groups}";
 $tpl=new templates();
 $title=$tpl->_ENGINE_parse_body($title);
+$warning_delete_all_users=$tpl->javascript_parse_text("{warning_delete_all_users}");
 $page=CurrentPageName();
 $prefix=str_replace('.','_',$page);
 
@@ -116,14 +117,60 @@ while (list ($num, $ligne) = each ($cfg) ){
 	
 }
 
+$start="LoadGroupAjaxSettingsPage();";
+
+
+if(isset($_GET["in-front-ajax"])){
+	$start="LoadGroupAjaxSettingsInFront();";
+}
+
 
 $html="
 {$prefix}timeout=0;
 $jsadd
+
+function LoadGroupAjaxSettingsInFront(){
+	$('#BodyContent').load('$page?popup=yes&ou=$ou_encrypted&crypted=yes');
+	setTimeout('DisplayDivs()',900);
+}
+
 function LoadGroupAjaxSettingsPage(){
-	YahooWinS('750','$page?popup=yes&ou=$ou_encrypted','$title');
+	YahooWinS('750','$page?popup=yes&ou=$ou_encrypted&crypted=yes','$title');
 	setTimeout('DisplayDivs()',900);
 	}
+	
+	function DomainEditGroupPressKey(e){
+		if(checkEnter(e)){addgroup();}
+	}
+
+	var x_addgroup= function (obj) {
+			var tempvalue=obj.responseText;
+			if(tempvalue.length>0){alert(tempvalue)};
+			$start
+		}
+		
+	
+	var x_DeleteMembersGroup= function (obj) {
+			var tempvalue=obj.responseText;
+			if(tempvalue.length>0){alert(tempvalue)};
+			RefreshTab('main_group_config');
+		}
+		
+function DeleteMembersGroup(groupid){
+	if(confirm('$warning_delete_all_users')){
+			var XHR = new XHRConnection();
+			XHR.appendData('ou','$ou');
+			XHR.appendData('DeleteMembersForGroup',groupid);
+			XHR.sendAndLoad('$page', 'GET',x_DeleteMembersGroup);
+		}
+}			
+
+function addgroup(){
+	var XHR = new XHRConnection();
+	XHR.appendData('addgroup',document.getElementById('group_add').value);
+	XHR.appendData('ou','$ou');
+	XHR.sendAndLoad('$page', 'GET',x_addgroup);	
+	}	
 	
 function DisplayDivs(){
 		{$prefix}timeout={$prefix}timeout+1;
@@ -140,7 +187,7 @@ function DisplayDivs(){
 		$loadgp
 	}
 	
-LoadGroupAjaxSettingsPage();	
+$start	
 	";
 
 echo $html;
@@ -156,16 +203,16 @@ function popup(){
 	
 	$add_group="	<table style='width:100%'>
 	<tr>
-	<td align='right'>
+	<td align='right' nowrap>
 	<strong>{add_group}:&nbsp;</strong></td>
 	<td>" . Field_text('group_add',null,'width:100%',null,null,null,false,"DomainEditGroupPressKey(event)") ."</td>
-	<td><input type='button' value='{add}&nbsp;&raquo;' OnClick=\"javascript:addgroup();\"></td>
+	
 	</tr>
 	</table>";
 	
 	
 	
-	$html=RoundedLightGrey("
+	$html="
 	<input type='hidden' id='inputbox delete' value=\"{are_you_sure_to_delete}\">
 	<input type='hidden' id='ou' value='$ou'>
 	<input type='hidden' id='warning_delete_all_users' value='{warning_delete_all_users}'>
@@ -175,7 +222,6 @@ function popup(){
 		<td valign='top'><span id='grouplist'></span>
 		</td>
 		</table>
-	")."
 	<br>
 	<div id='GroupSettings'></div>
 	<div id='MembersList'></div>
@@ -192,20 +238,19 @@ function INDEX(){
 	$page=CurrentPageName();
 	$title=$ou . ":&nbsp;{groups}";
 	$ou_encoded=base64_encode($ou);
-	$html=RoundedLightGrey("
+	$html="
 	<input type='hidden' id='inputbox delete' value=\"{are_you_sure_to_delete}\">
 	<input type='hidden' id='ou' value='$ou_encoded'>
 	<input type='hidden' id='warning_delete_all_users' value='{warning_delete_all_users}'>
 	<table style='width:300px'>
 	<tr>
-	<td align='right'>
+	<td align='right' nowrap>
 	<strong>{add_group}:&nbsp;</strong></td>
-	<td>" . Field_text('group_add',null,'width:100%') ."</td>
+	<td>" . Field_text('group_add',null,'width:90px') ."</td>
 	<td><input type='button' value='{add}&nbsp;&raquo;' OnClick=\"javascript:addgroup();\"></td>
 	</tr>
 	</table>
 	<span id='grouplist'></span>
-	")."
 	<br>
 	<div id='GroupSettings'></div>
 	<div id='MembersList'></div>
@@ -330,9 +375,10 @@ function GROUP_SIEVE_UPDATE(){
 	
 function GROUPS_LIST($OU){
 	writelogs("startup ou=$OU",__FUNCTION__,__FILE__);
+	$page=CurrentPageName();
 	$ou=$OU;
-	$ou_conn=base64_decode($ou);
-	if($ou_conn<>null){$ou=$ou_conn;$_GET["ou"]=$ou_conn;}
+	if(is_base64_encoded($ou)){$ou=base64_decode($ou);}
+	
 	
 	
 	writelogs("ou=$ou,{$_SESSION["uid"]}",__FUNCTION__,__FILE__);
@@ -444,35 +490,109 @@ function GROUP_DEFAULT_PASSWORD_SAVE(){
 }
 
 function GROUP_SETTINGS_PAGE(){
+	
+	if(isset($_GET["tab"])){GROUP_SETTINGS_PAGE_CONTENT();exit;}
+	$users=new usersMenus();
+	$page=CurrentPageName();
+	$tpl=new templates();
+	
+	
+	$array["config"]='{group_settings}';
+	$array["members"]='{members}';
+	
+	
+	if($users->POSTFIX_INSTALLED){
+		$array["asav"]='{asav}';
+	}
+	if($users->SQUID_INSTALLED){
+		$array["proxy"]='{proxy}';
+	}
+	$array["options"]='{advanced_options}';
+	
+	if(!$users->AsArticaAdministrator){
+	if($users->AllowAddUsers){return null;}
+	}
+	
+	
+	while (list ($num, $ligne) = each ($array) ){
+		$ligne=$tpl->_ENGINE_parse_body($ligne);
+		
+		if($num=="members"){
+			$html[]= "<li><a href=\"$page?MembersList={$_GET["LoadGroupSettings"]}&ou={$_GET["ou"]}\"><span>$ligne</span></li>\n";
+			continue;
+		}
+		
+		$html[]= "<li><a href=\"$page?LoadGroupSettings={$_GET["LoadGroupSettings"]}&tab=$num&ou={$_GET["ou"]}\"><span>$ligne</span></li>\n";
+	}
+	
+	
+	echo "
+	<div id=main_group_config style='width:100%;height:550px;overflow:auto'>
+		<ul>". implode("\n",$html)."</ul>
+	</div>
+		<script>
+				$(document).ready(function(){
+					$('#main_group_config').tabs({
+				    load: function(event, ui) {
+				        $('a', ui.panel).click(function() {
+				            $(ui.panel).load(this.href);
+				            return false;
+				        });
+				    }
+				});
+			
+			
+			});
+		</script>";		
+	
+		
+	
+}
+
+
+
+function GROUP_SETTINGS_PAGE_CONTENT(){
 	$ldap=new clladp();
 	$page=CurrentPageName();
 	$num=$_GET["LoadGroupSettings"];
 	$ou_conn=$_GET["ou"];
-	$ou_conn=base64_decode($_GET["ou"]);
-	if($ou_conn<>null){$_GET["ou"]=$ou_conn;}
+	
+	if(is_base64_encoded($_GET["ou"])){$_GET["ou"]=base64_decode($_GET["ou"]);}
+
 	
 	if(!is_numeric($num)){return null;}
 	if(trim($num)==null){$num=0;}
 	if($num==0){
-		if(isset($_GET["byGroupName"])){$num=$ldap->GroupIDFromName($_GET["ou"],$_GET["byGroupName"]);}else{return null;}
-	}	
+		if(isset($_GET["byGroupName"])){
+			$num=$ldap->GroupIDFromName($_GET["ou"],$_GET["byGroupName"]);
+			writelogs("Numeric identifier=0, try to get numeric identifier by {$_GET["ou"]}/{$_GET["byGroupName"]}=$num",__FUNCTION__,__FILE__,__LINE__);
+			if($num==0){return;}
+		}
+	}
+		
 	
 	$group=new groups($num);
 	if(trim($_GET["ou"])<>null){
 		if($group->ou<>$_GET["ou"]){
 			$tpl=new templates();
-			$error="<center style='border:2px solid red;padding:10px;margin:10px'><span style='font-size:13px;font-weight:bold;color:red'>Group: $num<br> {error_group_not_in_your_organization}</span></center>";
+			$error="<center style='border:2px solid red;padding:10px;margin:10px'><span style='font-size:13px;font-weight:bold;color:red'>Group: $num/{$_GET["ou"]}<br> {error_group_not_in_your_organization}</span></center>";
 			echo $tpl->_ENGINE_parse_body($error);
-			writelogs("ERROR: group organization $group->ou is different from requested organization \"{$_GET["ou"]}\"",__FUNCTION__,__FILE__);
+			writelogs("ERROR: group $num from organization \"$group->ou\" is different from requested organization \"{$_GET["ou"]}\"",__FUNCTION__,__FILE__);
 			return null;
 			}
 	}
 	
 	
 	$text_disbaled="{ERROR_NO_PRIVILEGES_OR_PLUGIN_DISABLED}";
+
+	
+	
+	
 	$user=new usersMenus();
 	$user->LoadModulesEnabled();
-	$tab=GROUP_SETTING_PAGE_TAB();
+	
+	
+	
 	
 	$group=new groups($num);
 	$SAMBA_GROUP=Paragraphe('64-group-samba-grey.png','{MK_SAMBA_GROUP}',$text_disbaled,'');
@@ -546,13 +666,13 @@ function GROUP_SETTINGS_PAGE(){
 	<table style='width:100%'>
 	<tr>
 	<td valign='top'>".Paragraphe('members-priv-64.png','{privileges}','{privileges_text}',"javascript:GroupPrivileges($num)") ."</td>
-	<td valign='top'>".Paragraphe('member-64.png',"($members) {members}","{members_text}","javascript:YahooWin(650,'$page?MembersList=$num&ou=$ou_encoded','{members}::{$_GET["ou"]}');") ."</td>
 	<td valign='top'>$COMPUTERS</td>
+	<td valign='top'>$SAMBA_GROUP</td>
 	</tr>
 	<tr>
-	<td valign='top'>$SAMBA_GROUP</td>
 	<td valign='top'>$mailing_list</td>
 	<td valign='top'>$automount</td>
+	<td valign='top'></td>
 	</tr>
 	</table>";
 	
@@ -622,33 +742,11 @@ function GROUP_SETTINGS_PAGE(){
 	
 	";
 	
-	echo $tpl->_ENGINE_parse_body("$barre_principale$tab" .RoundedLightGrey($html));
+	echo $tpl->_ENGINE_parse_body("$barre_principale$tab$html");
 	}
 
 function GROUP_SETTING_PAGE_TAB(){
-	if(!isset($_GET["tab"])){$_GET["tab"]="config";}
-	if($_GET["hostname"]==null){$hostname=$users->hostname;$_GET["hostname"]=$hostname;}else{$hostname=$_GET["hostname"];}
-	$users=new usersMenus();
-	$page=CurrentPageName();
-	$array["config"]='{group_settings}';
-	if($users->POSTFIX_INSTALLED){
-		$array["asav"]='{asav}';
-	}
-	if($users->SQUID_INSTALLED){
-		$array["proxy"]='{proxy}';
-	}
-	$array["options"]='{advanced_options}';
 	
-	if(!$users->AsArticaAdministrator){
-	if($users->AllowAddUsers){return null;}
-	}
-	
-	while (list ($num, $ligne) = each ($array) ){
-		if($_GET["tab"]==$num){$class="id=tab_current";}else{$class=null;}
-		$html=$html . "<li><a href=\"javascript:LoadGroupSettings('$num');\" $class>$ligne</a></li>\n";
-			
-		}
-	return "<div id=tablist>$html</div>";		
 }
 
 
@@ -712,19 +810,24 @@ function MEMBERS_LIST($gid){
 	
 	$group=new groups($gid);
 	$js_addmember="Loadjs('domains.add.user.php?ou=$group->ou&gpid=$gid')";
+	$js_impotmember="Loadjs('domains.import.user.php?ou=". base64_encode($group->ou)."&gpid=$gid')";
 $html="
 <input type='hidden' id='groups-section-from-members' value='$gid'>
-<H1>&laquo;{$group->groupName}&raquo;&nbsp;{members}</H1>
+<H2>&laquo;{$group->groupName}&raquo;&nbsp;{members}</H2>
 <div id='delete_this_user' value='{delete_this_user}'>
 <input type='hidden' name='sure_to_delete_selected_user' id='sure_to_delete_selected_user' value='{sure_to_delete_selected_user}'>
-<br>
 	<table style='width:100%'>
 	<td valign='top'><div id='members_area'>".(MEMBERS_LIST_LIST($gid)) ."</div></td>
 	<td valign='top' width=5%>
 	<table style='width:100%'>
 		<tr>
 		<td>".  imgtootltip('member-add-64.png','{add_member}',$js_addmember)."</td>
-		</tr>	
+		</tr>
+		<tr>
+		<td>".  imgtootltip('64-import-member.png','{add_already_member}',$js_impotmember)."</td>
+		</tr>
+		
+		
 		<tr>
 		<td>". imgtootltip('member-64-import.png','{import}',"Loadjs('domains.import.members.php?gid=$gid')")."</td>
 		</tr>

@@ -496,16 +496,10 @@ public static function IsvalidMAC($MAC){
         return (($unsignedIP >= $start) && ($unsignedIP <= $end));
     }
 
-    /**
-     * Convert some unusual representations of IPv4 addresses to their
-     * canonical dotted quad representation.
-     *
-     * This currently only checks a few IPV4-to-IPv6 related cases.  More
-     * unusual representations may be added later.
-     *
-     * @param $addr something that might be an IP address
-     * @return valid dotted quad IPv4 address or null
-     */
+
+   
+    
+    
     public static function canonicalize( $addr ) {
 	if ( self::isValid( $addr ) )
 	    return $addr;

@@ -5,7 +5,7 @@ include_once(dirname(__FILE__) . '/class.ssl.certificate.inc');
 include_once(dirname(__FILE__) . '/class.artica.inc');
 include_once(dirname(__FILE__) . '/class.mimedefang.inc');
 include_once(dirname(__FILE__) . '/class.tcpip.inc');
-include_once('/usr/share/artica-postfix/framework/class.unix.inc');
+if(!class_exists("unix")){include_once('/usr/share/artica-postfix/framework/class.unix.inc');}
 
 
 
@@ -619,7 +619,7 @@ private function loadLdapConfig(){
 		
 		if($ldap->Ldap_modify($dn,$upd)){return $ldap->ldap_last_error;}
 		$sock=new sockets();
-		$sock->getFrameWork("cmd.php?reconfigure-postfix=yes");
+		$sock->getFrameWork("cmd.php?postfix-networks=yes");
 		
 	}
 	function delete_my_networks($index){
@@ -635,7 +635,7 @@ private function loadLdapConfig(){
 		
 		$ldap->Ldap_modify($dn,$upd);
 		$sock=new sockets();
-		$sock->getFrameWork("cmd.php?reconfigure-postfix=yes");		
+		$sock->getFrameWork("cmd.php?postfix-networks=yes");	
 	}
 
 private	function Create_mynetworks_maps_ldap(){
@@ -657,41 +657,15 @@ private	function Create_mynetworks_maps_ldap(){
 		include_once(dirname(__FILE__) . '/class.ldap.inc');
 		$ldap=new clladp();
 		$this->Create_mynetworks_maps_ldap();
-		$dn="cn=mynetworks_maps,cn=artica,$ldap->suffix";
-		$sr =@ldap_read($ldap->ldap_connection,$dn,'objectClass=PostfixMynetworks');
-		if ($sr) {
-			$hash=ldap_get_entries($ldap->ldap_connection,$sr);	
-			if($hash[0]["mynetworks"]["count"]==0){
-				writepostfixlogs("No networks found in ldap database using this dn \"$dn\" with cn=$ldap->ldap_admin,$ldap->suffix\"",__CLASS__.'/'.__FUNCTION__,__FILE__);	
-				writepostfixlogs("trying to found the \"mynetworks\" attribute in main.cf",__CLASS__.'/'.__FUNCTION__,__FILE__);	
-
-				$hash=$this->build_default_my_networks();
-				if($hash[0]["mynetworks"]["count"]==0){
-					writepostfixlogs("No networks found on the system",__CLASS__.'/'.__FUNCTION__,__FILE__);
-					return null;	
-					}
-				}
-			
-			for($i=0;$i<$hash[0]["mynetworks"]["count"];$i++){
-				if(trim($hash[0]["mynetworks"][$i])==null){continue;}
-				writepostfixlogs("$i) {$hash[0]["mynetworks"][$i]}",__CLASS__.'/'.__FUNCTION__,__FILE__);
-				$this->array_mynetworks[]=$hash[0]["mynetworks"][$i];
-				}
+		$Nets=$ldap->load_mynetworks();
+		if(!is_array($Nets)){
+			$this->build_default_my_networks();
+			$Nets=$ldap->load_mynetworks();
 			}
+		$this->array_mynetworks=$Nets;
 		}
 		
 private function build_default_my_networks(){
-	$Nets=explode(",",$this->main_array["mynetworks"]);
-	if(is_array($Nets)){
-		
-		while (list ($num, $val) = each ($Nets) ){
-			if(trim($val)==null){continue;}
-			$hash[0]["mynetworks"][]=$val;
-		}
-		$hash[0]["mynetworks"]["count"]=count($hash[0]["mynetworks"]);
-	}
-	
-	if($hash[0]["mynetworks"]["count"]>0){return $hash;}
 	
 	
 	include_once(dirname(__FILE__).'/class.system.network.inc');
@@ -699,7 +673,7 @@ private function build_default_my_networks(){
 	$interfaces=new networking();
 	if(!is_array($interfaces->array_TCP)){
 		writepostfixlogs("There is a real problem getting interfaces eth0,eth1... using articcgi...",__CLASS__.'/'.__FUNCTION__,__FILE__);
-		writepostfixlogs("is boa web server is loaded ???",__CLASS__.'/'.__FUNCTION__,__FILE__);
+		writepostfixlogs("is framework web server is loaded ???",__CLASS__.'/'.__FUNCTION__,__FILE__);
 		return null;
 	}
 	
@@ -709,13 +683,17 @@ private function build_default_my_networks(){
 		$ipfirst="{$re[1]}.{$re[2]}.{$re[3]}.0";
 		$cdir=$ip->ip2cidr($ipfirst,"{$re[1]}.{$re[2]}.{$re[3]}.255");
 		writepostfixlogs("Scanning $num for $val ($cdir)",__CLASS__.'/'.__FUNCTION__,__FILE__);
-	    if($cdir){$newCDIR[]=$cdir;}
+	    if($cdir){
+	    	$this->add_my_networks($cdir);
+	    	$newCDIR[]=$cdir;
+	    }
 	    
 	}
 	if(is_array($newCDIR)){
 		$newCDIR[]="127.0.0.0/8";
 		$hash[0]["mynetworks"]["count"]=count($newCDIR);
 		while (list ($num, $val) = each ($newCDIR) ){
+			
 			$hash[0]["mynetworks"][]=$val;
 		}
 	

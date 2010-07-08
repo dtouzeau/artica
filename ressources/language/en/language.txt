@@ -3951,4 +3951,142 @@ You will be able to enter the uri to the pac file into browsers in order to set 
 <delete_postfix_instance_sure>Confirm removing this SMTP service...</delete_postfix_instance_sure>
 <fetch_messages_every>Fetch messages every</fetch_messages_every>
 <update_fetchmail_now>Restart fetchmail in order to force it to fetch all rules</update_fetchmail_now>
+<add_virtual_ip_addr_explain_js>Click on this cross in order to add a new virtual IP address based on this NIC informations</add_virtual_ip_addr_explain_js>
+<POSTFIX_MULTI_INSTANCE_TINY_TEXT>Transform your server to a multi-SMTP server for your organizations</POSTFIX_MULTI_INSTANCE_TINY_TEXT>
+<ENABLE_POSTFIX_MULTI_INSTANCE>Activate multiple instances</ENABLE_POSTFIX_MULTI_INSTANCE>
+<flush_queue>Flush queues</flush_queue>
+<flush_queue_text>Force SMTP service to route all messages stored in defered queues</flush_queue_text> 
+ <local_smtp_host>Local SMTP host</local_smtp_host>
+ <add_virtual_ip_address>Add new virtual IP address</add_virtual_ip_address>
+ <BRIDGE_ADDR>VPN server IP address</BRIDGE_ADDR>
+ <ERROR_COMPRESSOR>Error occurred in the compressor engine</ERROR_COMPRESSOR>
+ <add_task>Add a new task</add_task>
+ <postfix_reconfigure>Reconfigure SMTP Service</postfix_reconfigure>
+ <postfix_reconfigure_text>Rebuild all parameters and restart the SMTP service</postfix_reconfigure_text>
+ <APP_SPF>Sender Policy Framework</APP_SPF>
+ <APP_SPF_TINY_TEXT>SPF is an e-mail validation system designed to prevent e-mail spam by addressing a common vulnerability, source address spoofing</APP_SPF_TINY_TEXT>
+ <APP_SPF_TEXT>Sender Policy Framework (SPF), as defined in RFC 4408, is an e-mail validation system designed to prevent e-mail spam by addressing a common vulnerability, source address spoofing.[br]
+ SPF allows administrators to specify which hosts are allowed to send e-mail 
+ from a given domain by creating a specific DNS SPF record in the public DNS.[br]
+  Mail exchangers then use the DNS to check that mail from a given domain is being sent by a host sanctioned by that domain's administrators.</APP_SPF_TEXT>
+ <SPAMASS_SCORES_EXPLAIN>Score that pilot the Bayesian classifier can have 1 or 4 parameters.[br]If there is only one parameter (the norm) then that score is used all the time.[br]
+ Rules with a score set to 0 are not evaluated at all.[br] 
+[ul]
+[li]The first parameter applies when the Bayesian classifier and network tests are not in use.[/li]
+[li]The second parameter applies when the Bayesian classifier is not in use, but the network tests are[/li]
+[li]The third parameter applies when the Bayesian classifier is in use, but network tests are not[/li]
+[li]The fourth parameter applies when the Bayesian classifier and network tests are both in use[/li]  
+[/ul]  
+ </SPAMASS_SCORES_EXPLAIN>
+ <SPF_PASS>Pass</SPF_PASS>
+ <SPF_PASS_HELP>The SPF record designates the host to be allowed to send</SPF_PASS>
+ <SPF_HELO_PASS>Pass HELO</SPF_HELO_PASS>
+ <SPF_FAIL>Fail</SPF_FAIL>
+ <SPF_FAIL_HELP>The SPF record has designated the host as NOT being allowed to send</SPF_FAIL_HELP>
+ <SPF_HELO_FAIL>Fail HELO</SPF_HELO_FAIL>
+ <SPF_HELO_NEUTRAL>Neutral HELO</SPF_HELO_NEUTRAL>
+ <SPF_NEUTRAL_HELP>The SPF record specifies explicitly that nothing can be said about validity</SPF_NEUTRAL_HELP>
+ <SPF_SOFTFAIL>Soft Fail</SPF_SOFTFAIL>
+ <SPF_HELO_SOFTFAIL>Soft fail HELO</SPF_HELO_SOFTFAIL>
+ <SPF_SOFTFAIL_HELP>The SPF record has designated the host as NOT being allowed to send but is in transition</SPF_SOFTFAIL_HELP>
+ <ACTIVATE_SPF>Activate Sender Policy Framework checking</ACTIVATE_SPF>
+ <ACTIVATE_SPF_TEXT>If this feature is enabled, anti-spam scores will be modified with sender verification SPF method</ACTIVATE_SPF_TEXT>
+ <whitelist_text>Whitelist</whitelist_text>
+ <SPF_SPAMMASS_ADD_WL_TEXT>Add here sender domain or email address.
+ you can set joe@domain.tld or *@domain.tld</SPF_SPAMMASS_ADD_WL_TEXT>
+ <add_already_member>Add a member already stored in this organisation</add_already_member>
+ <ExecBackupTemporaryPath>Temporary working folder path</ExecBackupTemporaryPath>
+ <TIME_AM>AM</TIME_AM>
+ <TIME_PM>PM</TIME_PM>
+ <email_campaigns>eMail Campaigns</email_campaigns>
+ <import_contacts_db>Import contacts</import_contacts_db>
+ <import_contacts_db_text>Import mass contacts in database from an external source</import_contacts_db_text>
+ <import_contacts_db_explain>This area will import contacts from a CSV file, the csv file must be formatted:</import_contacts_db_explain>
+ <WgetBindIpAddress>Bind local IP address</WgetBindIpAddress>
+ <contacts_databases>Contacts databases</contacts_databases>
+ <gender>gender</gender>
+ <use_compressed_zip_file>put a compressed file using ZIP compressor</use_compressed_zip_file>
+ <file_to_upload>File to upload</file_to_upload>
+ <select_this_file>Select this file</select_this_file>
+ <local_file>local file</local_file>
+ <upload_a_file>upload a file</upload_a_file>
+ <APP_DRUPAL>Drupal</APP_DRUPAL>
+ <APP_DRUPAL_TEXT>Drupal is a free software package that allows an individual, a community of users, or an enterprise to easily publish, manage and organize a wide variety of content on a website.[br]
+ Hundreds of thousands of people and organizations are using Drupal  to power an endless variety of web sites.</APP_DRUPAL_TEXT>
+ <file_path>File path</file_path>
+ <ssl_fingerprint>SSL fingerprint</ssl_fingerprint>
+ <sslcertck>Strictly check the server certificate</sslcertck>
+ <sslcertck_text>Causes fetchmail to strictly check the server certificate against a set of local trusted certificates.[br]
+ If the server certificate cannot be obtained or is not signed by one of the trusted ones (directly or indirectly), 
+ the SSL connection will fail, regardless of the SSL fingerprint option.
+[br]Note that CRL (certificate revocation lists) are only supported in OpenSSL 0.9.7 and newer!
+[br]Your system clock should also be reasonably accurate when using this option.
+[br]Note that this optional behavior may become default behavior in future fetchmail versions
+</sslcertck_text>
+<import_fingerprint>Import SSL fingerprint</import_fingerprint>
+<importing>importing</importing>
+<contacts>contacts</contacts>
+ <template_add>Add a new template</template_add>
+ <template_add_emailing_text>Build your message that will be used to send the mass mailling</template_add_emailing_text>
+ <migrate_user_tini_text>Import this database to your organization, and tranform these contacts to users</migrate_user_tini_text>
+ <migrate_user_text>This operation will tranform all contacts from the selected database to local users in your organization.[br]If any mailbox server is installed, all users will have a new mailbox created.[br]
+ Select in this form the group that will store new users.</migrate_user_text>
+<about_cyrus>Cyrus is a highly scalable enterprise mail system designed for use in
+enterprise environments of various sizes using standards based technologies.[br]
+Cyrus technologies scale from independent use in email departments to a system centrally managed in a large enterprise</about_cyrus>
+<cyrus_net_behavior>Cyrus hooking behavior</cyrus_net_behavior>
+<cyrus_net_behavior_text>Define the behavior when SMTP server send messages to the mailbox service</cyrus_net_behavior_text>
+ <cyrus_lmtp_howto>By default, the Cyrus mailboxes service listen a local unix socket in a specific directory.[br]This behavior force the SMTP service to use this local socket in order to send mail.[br]
+ You can change it by using a network socket.[br]Using a network socket allow others remote SMTP servers to directly send messages to this server.[br]
+ It is more easy to use because Artica did not need to check file system securities settings.[br]Using a unix local socket will not load the Network card and avoid network security issues.
+ </cyrus_lmtp_howto>
+ <postmaster_explain>email address will receive notifications from this system,
+  this means SMTP errors (bounce errors, forward errors...), scheduled tasks notifications</postmaster_explain> 
+ <postmaster_identity>Postmaster identity</postmaster_identity>
+ <postmaster_identity_text>Define the sender email address of the mail notifications</postmaster_identity_text>
+ <postmaster_identity_explain>This option make sense if you using a mail relay server that perform sender email address verification.[br]
+ by default, postfix use the server hostname and MAILTER-DAEMON to send emails.</postmaster_identity_explain>
+ <POSTMASTER_NOT_EDITED>Postmaster recipient not defined</POSTMASTER_NOT_EDITED>
+ <POSTMASTER_NOT_EDITED_TEXT>You need to define recipient in order to receive notifications from the smtp service.</POSTMASTER_NOT_EDITED_TEXT>
+<enable_lmtp_unix>Enable LMTP in unix socket</enable_lmtp_unix>
+<SQUID_CACHES_OVER>Proxy caches over !</SQUID_CACHES_OVER>
+<SQUID_CACHES_OVER_TEXT>It seems that your cache storage exceed the limit, in order to get better performances when surfing you need to increase your cache size or adding a new cache repository</SQUID_CACHES_OVER_TEXT>
+<default_password>Default password</default_password>
+<EXPORT_OPERATION_IN_BACKGROUND>The export operation will be run in background mode, check the logs to see results</EXPORT_OPERATION_IN_BACKGROUND>
+<exporting>exporting</exporting>
+<generate_a_signing_key>Generate a signing key</generate_a_signing_key>
+<generate_a_signing_key_nokey_text>You need first to generate a signing key to enable the DKIM verification.[br]Just click on the button it generate a new one for you</generate_a_signing_key_nokey_text>
+<enable_dkim_verification>enable DKIM signatures verification in incoming mails</enable_dkim_verification>
+<enable_dkim_signing>Enables dkim signing for outgoing mail</enable_dkim_signing>
+<dkim_showkeys_text>You need to set up the DNS record of each domain listed above.[br]Each DNS record will should have a 'TXT' type DNS record.</dkim_showkeys_text>
+<DNS_RECORDS>DNS records</DNS_RECORDS>
+<DNS_RECORDS_TESTS>DNS records validations</DNS_RECORDS_TESTS>
+<dkim_testkeys_text>If TXT DNS records are successfully added, this section should display your domains and the records DKIM success validation.</dkim_testkeys_text> 
+<DKIM_SPAMASS_WBL_HOWTO>Servers listed in this section will reduce the anti-spam score behavior</DKIM_SPAMASS_WBL_HOWTO>
+<dkim_about2>This technology is a combination between signed messages and DNS servers, all mails signed will be verified with the public DNS checking method (the TXT field).[br]For incoming mails, not-signed emails will increase the anti-spam score, in the opposite, signed mail decrease scores.[br]
+Outgoing mails can be signed with your certificates in order to be verified by others mails servers.</dkim_about2>
+<template_name>Template name</template_name>
+<search>Search</search>
+<hdparm_infos_text>
+Computer performances means Hard drives performances too. Especially if your system run on a virtual machine..[br]
+Artica check speed disks every 60mn.[br]you see here the result of the latest test.[br]
+tests has been based on a disk speed to 100MB/sec has a good rate for a server.[br]
+If test speed display 75% that means your disk reach 75MB/sec.[br]
+If you speed is under 30% you need to review your computer hardware performances by increasing the disks quality.
+</hdparm_infos_text>
+<performance>Performance</performance>
+<SPAMASSASSIN_DNS_BLACKLIST>DNS Blacklist</SPAMASSASSIN_DNS_BLACKLIST>
+<SPAMASSASSIN_DNS_BLACKLIST_TEXT>Enable DNS Blacklist tests in Spamassassin in order to increase detection rate</SPAMASSASSIN_DNS_BLACKLIST_TEXT>
+<VISIT_WEB_SITE_INFOS>Visit the website for more informations</VISIT_WEB_SITE_INFOS>
+<DNSBL_EXPLAIN>A DNSBL (DNS-based Blackhole List, Block List, or Blacklist; see below) is a list of IP addresses published through the 
+Internet Domain Name Service in a particular format.[br]
+DNSBLs are most often used to publish the addresses of computers or networks linked to spamming;
+ most mail server software can be configured to reject or flag messages which have been sent from a site listed on one or more such lists.[br]
+"DNSBL" is a software mechanism, rather than a specific list or policy.[br]
+There are dozens of DNSBLs in existence,[1][2] which use a wide array of standards for listing and delisting of addresses.[br]
+These may include listing the addresses of zombie computers or other machines being used to send spam, listing the addresses of ISPs who willingly host spammers, or listing addresses which have sent spam to a honeypot system.[br]
+Since the creation of the first DNSBL in 1997, the operation and policies of these lists have been frequently controversial, both in Internet advocacy and occasionally in lawsuits. Many mail system operators and users consider DNSBLs a valuable tool to share information about spam sources, but others including prominent Internet activists have objected to them as a form of censorship. In addition, a small number of DNSBL operators have been the target of lawsuits filed by spammers seeking to have the lists shut down.
+</DNSBL_EXPLAIN>
+
+
  

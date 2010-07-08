@@ -527,9 +527,11 @@ function kaspersky(){
 }
 
 function postmaster(){
+$sock=new sockets();
+if($sock->GET_INFO("EnablePostfixMultiInstance")==1){return null;}	
 $users=new usersMenus();
 if(!$users->POSTFIX_INSTALLED){return false;}	
-return LocalParagraphe("postmaster","postmaster_text","Loadjs('configure.server.php?script=postmaster_script')","folder-useraliases2-48.png");	
+return LocalParagraphe("postmaster","postmaster_text","Loadjs('postfix.postmaster.php')","folder-useraliases2-48.png");	
 }
 
 function Firstwizard(){

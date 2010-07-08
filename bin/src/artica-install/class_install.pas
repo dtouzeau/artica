@@ -10,6 +10,7 @@ uses
   BaseUnix,unix,global_conf,zsystem,logs,geoip,debian,spamass,openldap,clamav,cyrus,squid,postfix_class,samba,awstats,process_infos,pureftpd,ntpd,spfmilter,
   mailgraph_daemon, miltergreylist,lighttpd, roundcube,dansguardian,kav4samba,mimedefang,stunnel4,dkimfilter,kav4proxy,bind9,obm,mysql_daemon,p3scan,syslogng,openvpn,cups,
   jcheckmail,dhcp_server,dstat,rsync,smartd,tcpip,policyd_weight,apache_artica,autofs,assp,pdns,gluster,nfsserver,zabbix,hamachi,postfilter, vmwaretools,zarafa_server,monit,wifi,
+  fail2ban,
   mailarchiver in '/home/dtouzeau/developpement/artica-postfix/bin/src/artica-install/mailarchiver.pas',
   kas3         in '/home/dtouzeau/developpement/artica-postfix/bin/src/artica-install/kas3.pas',
   kavmilter    in '/home/dtouzeau/developpement/artica-postfix/bin/src/artica-install/kavmilter.pas',
@@ -657,6 +658,13 @@ begin
                monit.STOP();
                logs.DeleteFile('/etc/cron.d/artica-cron');
                logs.DeleteFile('/etc/cron.d/artica-process1');
+               cron.free;
+               exit();
+            end;
+
+           if ParamStr(2)='fcron' then begin
+               cron:=tcron.Create(GLOBAL_INI.SYS);
+               cron.STOP();
                cron.free;
                exit();
             end;
@@ -1468,6 +1476,13 @@ begin
                cron:=tcron.Create(GLOBAL_INI.SYS);
                cron.START();
                monit.START();
+               cron.free;
+               exit();
+            end;
+
+              if ParamStr(2)='fcron' then begin
+               cron:=tcron.Create(GLOBAL_INI.SYS);
+               cron.START();
                cron.free;
                exit();
             end;

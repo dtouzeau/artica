@@ -15,6 +15,7 @@ if(isset($_GET["wizard-server"])){wizard_server();exit;}
 if(isset($_GET["wizard-finish"])){wizard_finish();exit;}
 if(isset($_GET["KEY_COUNTRY_NAME"])){SaveCertificate();exit;}
 if(isset($_GET["ENABLE_SERVER"])){SaveServerConf();exit;}
+if(isset($_GET["ENABLE_BRIDGE"])){SaveBridgeMode();exit;}
 if(isset($_GET["VPN_DNS_DHCP_1"])){SaveServerConf();exit;}
 if(isset($_GET["restart-server"])){RestartServer();exit;}
 if(isset($_GET["server-settings"])){server_settings();exit;}
@@ -325,7 +326,9 @@ function js(){
 		if(document.getElementById('LOCAL_BIND')){XHR.appendData('LOCAL_BIND',document.getElementById('LOCAL_BIND').value);}
 		if(document.getElementById('IPTABLES_ETH')){XHR.appendData('IPTABLES_ETH',document.getElementById('IPTABLES_ETH').value);}
 		if(document.getElementById('OpenVpnPasswordCert')){XHR.appendData('OpenVpnPasswordCert',document.getElementById('OpenVpnPasswordCert').value);}
-
+		if(document.getElementById('BRIDGE_ADDR')){XHR.appendData('BRIDGE_ADDR',document.getElementById('BRIDGE_ADDR').value);}
+		
+		
 		
 		
 		if(document.getElementById('OPENVPN_CLIENT_SETTINGS')){
@@ -343,8 +346,11 @@ function js(){
 	
 	function OpenVPNChangeServerMode(){
 		var XHR = new XHRConnection();
-		var DEV_TYPE=document.getElementById('DEV_TYPE').value;
-		XHR.appendData('OpenVPNChangeServerMode',DEV_TYPE);
+		if(document.getElementById('ENABLE_BRIDGE').checked){
+			XHR.appendData('ENABLE_BRIDGE',1);
+		}else{
+			XHR.appendData('ENABLE_BRIDGE',0);
+		}
 		document.getElementById('OPENVPN_SERVER_SETTINGS').innerHTML='<center><img src=\"img/wait_verybig.gif\"></center>';
 		XHR.sendAndLoad('$page', 'GET',x_SaveServerSettings);
 		
@@ -720,7 +726,6 @@ $ipeth[null]="{none}";
 	
 $nics=Field_array_Hash($arr,'BRIDGE_ETH',$vpn->main_array["GLOBAL"]["BRIDGE_ETH"],'OpenVPNChangeNIC()');
 $ips=Field_array_Hash($ips,'LOCAL_BIND',$vpn->main_array["GLOBAL"]["LOCAL_BIND"]);
-
 $IPTABLES_ETH=Field_array_Hash($ipeth,'IPTABLES_ETH',$vpn->main_array["GLOBAL"]["IPTABLES_ETH"],null,null,0,'font-size:13px;padding:3px');
 
 //openvpn_access_interface
@@ -755,11 +760,28 @@ $entete="
 <table style='width:100%'>
 			<tr>
 				<td class=legend style='font-size:13px'>{enable_openvpn_server_mode}:</td>
-				<td style='font-size:13px'>" . Field_checkbox('ENABLE_SERVER','1',$vpn->main_array["GLOBAL"]["ENABLE_SERVER"])."</td>
+				<td style='font-size:13px' width=1%>" . Field_checkbox('ENABLE_SERVER','1',$vpn->main_array["GLOBAL"]["ENABLE_SERVER"])."</td>
 				<td class=legend style='font-size:13px'>{tunnel_type}:</td>
-				<td style='font-size:13px'>$dev</td>
+				<td style='font-size:13px' nowrap>$dev</td>
+			</tr>
+			<tr>
+				<td>&nbsp;</td>
+				<td>&nbsp;</td>
+				<td class=legend style='font-size:13px'>{ethernet_tunnel}</td>
+				<td style='font-size:13px' width=1%>" . Field_checkbox('ENABLE_BRIDGE','1',$vpn->main_array["GLOBAL"]["ENABLE_BRIDGE_MODE"],"OpenVPNChangeServerMode()")."</td>
+				
 			</tr>
 </table>";
+				
+$openvpn_local="
+			<tr>
+				<td class=legend style='font-size:13px'>{openvpn_local}:</td>
+				<td>$ips&nbsp;</td>
+				<td>".help_icon("{openvpn_local_text}")."</td>
+			</tr>";				
+				
+
+if($vpn->main_array["GLOBAL"]["ENABLE_BRIDGE_MODE"]==1){$openvpn_local=null;}
 
 
 $mandatories="<table style='width:100%'>
@@ -768,11 +790,7 @@ $mandatories="<table style='width:100%'>
 				<td>" . Field_text('LISTEN_PORT',$vpn->main_array["GLOBAL"]["LISTEN_PORT"],'width:90px;font-size:13px;padding:3px')."&nbsp;$protocol</td>
 				<td>&nbsp;</td>
 			</tr>
-			<tr>
-				<td class=legend style='font-size:13px'>{openvpn_local}:</td>
-				<td>$ips&nbsp;</td>
-				<td>".help_icon("{openvpn_local_text}")."</td>
-			</tr>			
+			$openvpn_local
 			<tr>
 				<td class=legend style='font-size:13px'>{public_ip_addr}:</td>
 				<td>" . Field_text('PUBLIC_IP',$vpn->main_array["GLOBAL"]["PUBLIC_IP"],'width:210px;;font-size:13px;padding:3px')."</td>
@@ -783,11 +801,7 @@ $mandatories="<table style='width:100%'>
 				<td>" . Field_password('OpenVpnPasswordCert',$OpenVpnPasswordCert,'width:210px;;font-size:13px;padding:3px')."</td>
 				<td>&nbsp;</td>
 			<tr>
-			<tr>
-				<td class=legend style='font-size:13px'>{password}:</td>
-				<td>" . Field_text('PUBLIC_IP',$vpn->main_array["GLOBAL"]["PUBLIC_IP"],'width:210px;;font-size:13px;padding:3px')."</td>
-				<td>&nbsp;</td>
-			<tr>			
+		
 
 			
 			
@@ -831,61 +845,59 @@ $mode_tun="<table style='width:100%'>
 	$VPN_DHCP_TO=$vpn->main_array["GLOBAL"]["VPN_DHCP_TO"];
 	
 
-$tcp=new networking();
-	if($vpn->main_array["GLOBAL"]["BRIDGE_ETH"]=null){$vpn->main_array["GLOBAL"]["BRIDGE_ETH"]="eth0";}
+	$tcp=new networking();
+	if($vpn->main_array["GLOBAL"]["BRIDGE_ETH"]==null){$vpn->main_array["GLOBAL"]["BRIDGE_ETH"]="eth0";}
 	$array_ip=$tcp->GetNicInfos($vpn->main_array["GLOBAL"]["BRIDGE_ETH"]);
 	if($vpn->main_array["GLOBAL"]["VPN_SERVER_IP"]==null){$vpn->main_array["GLOBAL"]["VPN_SERVER_IP"]=$array_ip["IPADDR"];}
 	if($vpn->main_array["GLOBAL"]["NETMASK"]==null){$vpn->main_array["GLOBAL"]["NETMASK"]=$array_ip["NETMASK"];}
 	
-		
+if($vpn->main_array["GLOBAL"]["ENABLE_BRIDGE_MODE"]==1){
+	
+	$nics=Field_array_Hash($vpn->virtual_ip_lists(),'BRIDGE_ETH',$vpn->main_array["GLOBAL"]["BRIDGE_ETH"]);
+}
 
 $mode_tap="
-<table style='width:100%'>
-<tr>
-<td valign='top'>
-<table style='width:100%'>
-	<tr>
-		<td colspan=2><br>
+<div style='width:100%;margin-bottom:5px'><div id='nicvpninfo' style='float:right;margin:5px;'>".ShowIPConfig($vpn->main_array["GLOBAL"]["BRIDGE_ETH"])."</div>
 			<p class=caption>{SERVER_MODE_TAP}</p>
-		</td>
-	</tr>
+		</div>
+<table style='width:100%'>
 	<tr>
-		<td class=legend>{BRIDGE_ETH}:</td>
-			<td>$nics</td>
-		<tr>
-
+		<td class=legend nowrap style='font-size:13px'>{BRIDGE_ETH}:</td>
+		<td width=1% nowrap>$nics</td>
+		<td align='left' width=1% nowrap>". texttooltip("{add_virtual_ip_address}","{add_virtual_ip_address}","Loadjs('system.nic.config.php?js-add-nic=yes')",null,0,"font-size:13px;padding:3px")."</td>
 	<tr>
-		<td class=legend>{VPN_SERVER_IP}:</td>
-		<td>" . Field_text('VPN_SERVER_IP',$vpn->main_array["GLOBAL"]["VPN_SERVER_IP"],'width:210px')."</td>
-	</tr>
 	<tr>
-		<td class=legend>{netmask}:</td>
-		<td>" . Field_text('NETMASK',$vpn->main_array["GLOBAL"]["NETMASK"],'width:210px')."</td>
+		<td class=legend nowrap style='font-size:13px'>{BRIDGE_ADDR}:</td>
+		<td width=1% nowrap>" . Field_text('BRIDGE_ADDR',$vpn->main_array["GLOBAL"]["BRIDGE_ADDR"],'width:120px;font-size:13px;padding:3px')."</td>
+		<td>&nbsp;</td>
 	</tr>	
 	<tr>
-		<td class=legend>{VPN_DHCP_FROM}:</td>
-		<td>" . Field_text('VPN_DHCP_FROM',$vpn->main_array["GLOBAL"]["VPN_DHCP_FROM"],'width:210px')."</td>
+		<td class=legend nowrap style='font-size:13px'>{VPN_DHCP_FROM}:</td>
+		<td width=1% nowrap>" . Field_text('VPN_DHCP_FROM',$vpn->main_array["GLOBAL"]["VPN_DHCP_FROM"],'width:120px;font-size:13px;padding:3px')."</td>
+		<td>&nbsp;</td>
 	</tr>
 	<tr>
-		<td class=legend>{VPN_DHCP_TO}:</td>
-		<td>" . Field_text('VPN_DHCP_TO',$vpn->main_array["GLOBAL"]["VPN_DHCP_TO"],'width:210px')."</td>
+		<td class=legend nowrap style='font-size:13px'>{VPN_DHCP_TO}:</td>
+		<td width=1% nowrap>" . Field_text('VPN_DHCP_TO',$vpn->main_array["GLOBAL"]["VPN_DHCP_TO"],'width:120px;font-size:13px;padding:3px')."</td>
+		<td>&nbsp;</td>
 	</tr>			
 			<tr>
-				<td colspan=2 align='right'>
-					<input type='button' OnClick=\"javascript:SaveServerSettings()\" value='{edit}&nbsp;&raquo;'>
+				<td colspan=3 align='right'><hr>". button("{apply}","SaveServerSettings()")."
+					
 				</td>
 			</tr>				
 </table>
-</td>
-<td valign='top'><div id='nicvpninfo'>".ShowIPConfig($vpn->main_array["GLOBAL"]["BRIDGE_ETH"])."</DIV>
-</td>
-</tr>
-</table>";
+";
 
 $mode=$mode_tun;
 if($vpn->main_array["GLOBAL"]["DEV_TYPE"]=="tap0"){
 	$mode=$mode_tap;
 }
+
+if($vpn->main_array["GLOBAL"]["ENABLE_BRIDGE_MODE"]==1){
+	$mode=$mode_tap;
+}
+
 
 $html="
 <div style='text-align:right;padding-bottom:4px'>$restart</div>
@@ -909,16 +921,16 @@ echo $tpl->_ENGINE_parse_body($html);
 }
 
 function ShowIPConfig($eth){
-	$tcp=new networking();
-	$array_ip=$tcp->GetNicInfos($eth);
-	if($array_ip["IPADDR"]==null){
-		$array_ip=$tcp->GetNicInfos("br0");
-	}
+	
+	
+	$openvpn=new openvpn();
+	$array_ip=$openvpn->virtual_ip_information();
+	
 	
 	$html="<table style='width:100%'>
 	<tr>
 		<td class=legend nowrap>{BRIDGE_ETH}:</td>
-		<td><span style='font-weight:bold;font-size:11px'>{$array_ip["DEVICE"]}</span></td>
+		<td><span style='font-weight:bold;font-size:11px'>$eth</span></td>
 	</tr>	
 	<tr>
 		<td class=legend nowrap>{ip_address}:</td>
@@ -1241,6 +1253,12 @@ if(is_array($route)){
 	
 $tpl=new templates();
 echo $tpl->_ENGINE_parse_body($html);	
+}
+
+function SaveBridgeMode(){
+	$vpn=new openvpn();
+	$vpn->main_array["GLOBAL"]["ENABLE_BRIDGE_MODE"]=$_GET["ENABLE_BRIDGE"];
+	$vpn->Save();
 }
 
 

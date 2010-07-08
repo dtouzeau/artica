@@ -6,7 +6,7 @@ unit mailarchiver;
 interface
 
 uses
-    Classes, SysUtils,variants,strutils,IniFiles, Process,logs,unix,amavisd_milter,
+    Classes, SysUtils,variants,strutils,Process,logs,unix,amavisd_milter,
     RegExpr      in '/home/dtouzeau/developpement/artica-postfix/bin/src/artica-install/RegExpr.pas',
     zsystem      in '/home/dtouzeau/developpement/artica-postfix/bin/src/artica-install/zsystem.pas';
 
@@ -86,8 +86,6 @@ var
    pid:string;
    parms:string;
    count:integer;
-   MailArchiverEnabled:integer;
-
 begin
 
 

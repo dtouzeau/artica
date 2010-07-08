@@ -28,7 +28,6 @@ public
     function    BIN_PATH():string;
     function    VERSIONNUM():integer;
     procedure   START();
-    procedure   STOP();
     function    STATUS:string;
     procedure   RELOAD();
     procedure   BuildStatus();
@@ -124,23 +123,6 @@ fpsystem(BIN_PATH()+' -c /etc/monit/monitrc -p /var/run/monit/monit.pid reload')
 end;
 //#############################################################################
 
-procedure tsquidguard.STOP();
-var
-   count:integer;
-   pid:string;
-   tmp:string;
-   l:Tstringlist;
-   i:integer;
-   tt:integer;
-   path:string;
-    RegExpr:TRegExpr;
-begin
-
-
-end;
-
-
-//#############################################################################
 function tsquidguard.STATUS:string;
 var
 ini:TstringList;

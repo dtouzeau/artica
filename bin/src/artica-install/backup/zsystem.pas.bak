@@ -1300,8 +1300,11 @@ begin
    end;
 
    if not FileExists('/etc/artica-postfix/settings/Daemons/MonitServicesSettings') then fpsystem(LOCATE_PHP5_BIN()+' /usr/share/artica-postfix/exec.first.settings.php --monit >/dev/null 2>&1');
-   conf:=TiniFile.Create('/etc/artica-postfix/settings/Daemons/MonitServicesSettings');
-
+   try
+      conf:=TiniFile.Create('/etc/artica-postfix/settings/Daemons/MonitServicesSettings');
+   Except
+   exit;
+   end;
    if not FileExists('/usr/sbin/'+internal_name+'-start.sh') then begin
       l.Add('#!/bin/sh');
       l.Add('PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/X11R6/bin');
@@ -2769,6 +2772,7 @@ begin
    if not FileExists('/proc/'+pid+'/status') then exit;
    l:=TstringList.Create;
    try
+      if not FileExists('/proc/'+pid+'/status') then exit;
       l.LoadFromFile('/proc/'+pid+'/status');
    except
      exit;
@@ -2995,6 +2999,7 @@ begin
   if not FileExists('/proc/'+PID+'/status') then exit(false);
   l:=Tstringlist.Create;
   try
+      if not FileExists('/proc/'+pid+'/status') then exit;
      l.LoadFromFile('/proc/'+PID+'/status');
   except
     exit();
@@ -3097,7 +3102,7 @@ begin
    for i:=0 to l.Count-1 do begin
 
       if FileExists(l.Strings[i]+'/status') then begin
-           s.LoadFromFile(l.Strings[i]+'/status');
+           try s.LoadFromFile(l.Strings[i]+'/status'); except  result:=raz;  exit; end;
            for z:=0 to s.Count-1 do begin
                RegExpr.Expression:='^Pid:\s+([0-9]+)';
                if RegExpr.Exec(s.Strings[z]) then lefils:=RegExpr.Match[1];
@@ -3133,7 +3138,7 @@ if not FileExists(PidPath) then begin
        exit(0);
      end;
 
- s:=TStringList.Create;
+ try s:=TStringList.Create; except exit; end;
  s.LoadFromFile(PidPath);
 
   RegExpr:=TRegExpr.Create;
@@ -3579,7 +3584,7 @@ begin
         exit(0);
      end;
      s:=TStringList.Create;
-     S.LoadFromFile('/proc/' + trim(PID) + '/status');
+     try S.LoadFromFile('/proc/' + trim(PID) + '/status'); except exit; end;
 
      RegExpr:=TRegExpr.Create;
      RegExpr.Expression:='^VmRSS:\s+([0-9]+)';
@@ -3643,7 +3648,7 @@ begin
         exit('0');
      end;
      s:=TStringList.Create;
-     S.LoadFromFile('/proc/' + trim(PID) + '/status');
+     try S.LoadFromFile('/proc/' + trim(PID) + '/status'); except exit; end;
      if D then writeln('SYSTEM_PROCESS_STATUS:: /proc/' + trim(PID) + '/status');
 
      RegExpr.Expression:='^State:\s+([A-Z])\s+\(([a-zA-Z]+)\)';
@@ -7337,6 +7342,9 @@ logs:=Tlogs.Create;
 tmpstr:=logs.FILE_TEMP();
 RegExpr:=TRegExpr.Create;
 fpsystem('/sbin/route -n >' +tmpstr+' 2>&1');
+l:=tstringlist.Create;
+l.LoadFromFile(tmpstr);
+logs.DeleteFile(tmpstr);
 for i:=0 to l.count-1 do begin
      RegExpr.Expression:='([0-9\.]+)\s+([0-9\.]+)\s+([0-9\.]+)\s+([A-Z]+)\s+.+?'+eth;
      if RegExpr.Exec(l.Strings[i]) then begin

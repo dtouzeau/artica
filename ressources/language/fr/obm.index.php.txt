@@ -14,7 +14,6 @@ pour https: // extranet.aliasource.fr/obm/[br] url externe = extranet.aliasource
 <group_failed>Groupe &agrave; &eacute;chou&eacute;</group_failed>
 <group_updated>Groupe mise &agrave; jour/ajout&eacute;</group_updated>
 <https_port>Port HTTPS du serveur web</https_port>
-<main_settings>Param&egrave;tres g&eacute;n&eacute;raux</main_settings>
 <OBMSyncCron>Intervalle de synchronisation</OBMSyncCron>
 <OBMSyncCron_text>OBM utilise une base de donn&eacute;es MySQL pour stocker les utilisateurs[br]Vous devez exporter les utilisateurs de la base de donn&eacute;es LDAP vers la base de donn&eacute;es d'OBM pour leur permettre de se connecter[br]Vous pouvez programmer artica pour qu'il exporte toutes les heures/minutes.</OBMSyncCron_text>
 <obm_connect_has_admin>Se connecter &agrave; OBM en utilisant le m&ecirc;me login/pass que celui d'Artica</obm_connect_has_admin>

@@ -684,7 +684,7 @@ function finduser(){
 			
 			
 			if(($ligne["uid"][0]==null) && ($ligne["employeenumber"][0]==null)){continue;}
-			
+			if($ligne["uid"][0]=="squidinternalauth"){$count=$count-1;continue;}
 			
 			$edit_config_user=MEMBER_JS($ligne["uid"][0],1);
 			

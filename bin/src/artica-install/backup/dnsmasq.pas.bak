@@ -17,9 +17,7 @@ uses
 
 private
      LOGS:Tlogs;
-     D:boolean;
      artica_path:string;
-     inif:TiniFile;
      SYS:Tsystem;
      bind9:Tbind9;
 
@@ -96,7 +94,6 @@ var
     RegExpr:TRegExpr;
     FileDatas:TStringList;
     i:integer;
-    ValueResulted:string;
 begin
    if not FileExists('/etc/dnsmasq.resolv.conf') then  exit;
    FileDatas:=TStringList.Create;
@@ -275,6 +272,8 @@ service_disabled:='1';
 if not FileExists('/etc/dnsmasq.conf') then service_disabled:='0';
 if FileExists(bind9.bin_path()) then  service_disabled:='0';
    bind9.free;
+
+
    ini.Add('[DNSMASQ]');
    ini.Add('service_name=APP_DNSMASQ');
    ini.Add('service_cmd=dnsmasq');

@@ -6,7 +6,7 @@ unit postfix_class;
 interface
 
 uses
-    Classes, SysUtils,variants,strutils,IniFiles, Process,md5,logs,unix,RegExpr in 'RegExpr.pas',zsystem,openldap,policyd_weight,miltergreylist,lighttpd,cyrus;
+    Classes, SysUtils,variants,strutils,IniFiles, Process,logs,unix,RegExpr in 'RegExpr.pas',zsystem,openldap,miltergreylist,lighttpd,cyrus;
 
   type
   tpostfix=class
@@ -15,7 +15,6 @@ uses
 private
      LOGS:Tlogs;
      D:boolean;
-     GLOBAL_INI:TiniFIle;
      SYS:TSystem;
      artica_path:string;
      postfixServices:TstringList;
@@ -168,7 +167,6 @@ end;
 //##############################################################################
 function tpostfix.gnarwl_VERSION():string;
 var
-    path,ver:string;
     tmp:string;
     RegExpr:TRegExpr;
     l:Tstringlist;
@@ -210,10 +208,6 @@ end;
 //#############################################################################
 
 procedure tpostfix.REMOVE();
-var
-l:TstringList;
-xldap:topenldap;
-
 begin
 POSTFIX_STOP();
 fpsystem('/usr/share/artica-postfix/bin/setup-ubuntu --remove "postfix"');
@@ -288,7 +282,7 @@ end;
 
 function tpostfix.POSTFIX_VERSION():string;
 var
-    path,ver:string;
+    ver:string;
     tmp:string;
     RegExpr:TRegExpr;
 
@@ -312,7 +306,6 @@ end;
 //#############################################################################
 function tpostfix.MSMTP_VERSION():string;
 var
-    path,ver:string;
     tmp:string;
     RegExpr:TRegExpr;
     l:TstringList;
@@ -344,7 +337,6 @@ end;
 //#############################################################################
 function tpostfix.PFLOGSUMM_VERSION():string;
 var
-    path,ver:string;
     tmp:string;
     RegExpr:TRegExpr;
     l:TstringList;
@@ -379,7 +371,7 @@ end;
 //#############################################################################
 function tpostfix.POSTFIX_INT_VERSION(string_version:string):longint;
 var
-    ver,vercompile:string;
+    vercompile:string;
     int:longint;
     RegExpr:TRegExpr;
 
@@ -410,7 +402,7 @@ end;
 //#############################################################################
 function tpostfix.POSTFIX_QUEUE_DIRECTORY():string;
 var
-    path,ver:string;
+    ver:string;
     tmp:string;
 begin
    if not FileExists(POSFTIX_POSTCONF_PATH()) then exit;
@@ -464,6 +456,7 @@ var
     found:boolean;
     main_path:string;
 begin
+result:='';
  found:=false;
  main_path:=MAIN_CONF_PATH();
  if not FileExists(main_path) then exit;
@@ -524,8 +517,6 @@ procedure tpostfix.POSFTIX_VERIFY_MAINCF();
 
 var
    inet_interfaces,mailbox_transport:string;
-   D:boolean;
-   list2:Tstringlist;
 begin
 
 
@@ -536,32 +527,31 @@ begin
 
 
         if FileExists('/etc/postfix/post-install') then begin
-           if D then writeln('POSFTIX_VERIFY_MAINCF() -> /etc/postfix/post-install create-missing');
-           fpsystem('/etc/postfix/post-install create-missing');
+           if FIleExists('/usr/lib/postfix/postfix-files') then fpsystem('/etc/postfix/post-install create-missing config_directory=/etc/postfix daemon_directory=/usr/lib/postfix');
         end;
 
 
 
 
   if EnablePostfixMultiInstance=1 then begin
-        fpsystem(POSFTIX_POSTCONF_PATH() + ' -e "inet_interfaces=loopback-only"');
+        fpsystem(POSFTIX_POSTCONF_PATH() + ' -e "inet_interfaces=127.0.0.1"');
   end else begin
-        logs.Debuglogs('POSFTIX_VERIFY_MAINCF() -> POSTFIX_EXTRACT_MAINCF(inet_interfaces)');
+
         inet_interfaces:=POSTFIX_EXTRACT_MAINCF('inet_interfaces');
-        logs.Debuglogs('POSFTIX_VERIFY_MAINCF:inet_interfaces=' + inet_interfaces);
+        logs.Debuglogs('Starting......: Postfix inet_interfaces=' + inet_interfaces);
 
         if length(inet_interfaces)=0 then begin
-           logs.Debuglogs('POSFTIX_VERIFY_MAINCF:inet_interfaces is null change to "inet_interfaces=all"');
+           logs.Debuglogs('Starting......: Postfix inet_interfaces is null change to "inet_interfaces=all"');
            fpsystem(POSFTIX_POSTCONF_PATH() + ' -e "inet_interfaces=all"');
         end;
 
         if inet_interfaces=', localhost' then begin
-           logs.Debuglogs('POSFTIX_VERIFY_MAINCF:inet_interfaces is ", localhost" change to "inet_interfaces=all"');
+           logs.Debuglogs('Starting......: Postfix inet_interfaces is ", localhost" change to "inet_interfaces=all"');
            fpsystem(POSFTIX_POSTCONF_PATH() +' -e "inet_interfaces=all"');
         end;
 
         if inet_interfaces='localhost' then begin
-           logs.Debuglogs('POSFTIX_VERIFY_MAINCF:inet_interfaces is "localhost" change to "inet_interfaces=all"');
+           logs.Debuglogs('Starting......: Postfix inet_interfaces is "localhost" change to "inet_interfaces=all"');
            fpsystem(POSFTIX_POSTCONF_PATH() +' -e "inet_interfaces=all"');
         end;
    end;
@@ -576,7 +566,7 @@ begin
 
 
         mailbox_transport:=POSTFIX_EXTRACT_MAINCF('mailbox_transport');
-        logs.Debuglogs('POSFTIX_VERIFY_MAINCF:mailbox_transport=' + mailbox_transport);
+        logs.Debuglogs('Starting......: Postfix mailbox_transport=' + mailbox_transport);
 
 
 
@@ -740,9 +730,7 @@ end;
 procedure tpostfix.MYSQMAIL_STOP();
 var
    pid:string;
-   log_path:string;
 begin
-log_path:=SYS.MAILLOG_PATH();
 pid:=MYSQMAIL_PID();
 
 if SYS.PROCESS_EXIST(pid) then begin
@@ -803,7 +791,7 @@ procedure tpostfix.VERIFY_BOUNCE_TEMPLATE();
 var bounce_template_file:string;
 
 begin
-  bounce_template_file:=POSTFIX_EXTRACT_MAINCF(bounce_template_file);
+  bounce_template_file:=POSTFIX_EXTRACT_MAINCF('bounce_template_file');
   if length(bounce_template_file)=0 then exit;
   if not FileExists(bounce_template_file) then begin
         logs.DebugLogs('Starting......: Postfix daemon load default bounce template file');
@@ -861,8 +849,6 @@ ARTICA_ROBOT_SPAM_MASTERCF_SERVICE();
 ARTICA_ROBOT_ZARAFA_SERVICE();
 
 GENERATE_CERTIFICATE();
-
-MYSQMAIL_STOP();
 
 MYSQMAIL_START();
 
@@ -973,7 +959,6 @@ function tpostfix.POSTFIX_LDAP_COMPLIANCE():boolean;
 var
    LIST:TstringList;
    i:integer;
-   D:Boolean;
 begin
   result:=false;
  if not FileExists(POSFTIX_POSTCONF_PATH()) then exit;
@@ -989,7 +974,6 @@ begin
  LIST.LoadFromFile('/etc/artica-postfix/postconf-m.conf');
  for i:=0 to LIST.Count -1 do begin
      if trim(list.Strings[i])='ldap' then begin
-        if D then logs.Debuglogs('POSTFIX_LDAP_COMPLIANCE:: ->TRUE');
         result:=true;
         list.free;
         exit;
@@ -999,17 +983,10 @@ begin
 end;
 //##############################################################################
 procedure tpostfix.SAVE_CERTIFICATE();
-var
-   cert:string;
-   selector:string;
-   setgid:string;
-   D:boolean;
-   cmd:string;
 begin
     D:=false;
     D:=logs.COMMANDLINE_PARAMETERS('html');
 
-    selector:=READ_CONF('Selector');
     forcedirectories('/etc/mail');
     WRITE_CONF('PidFile','/var/run/dkim-filter/dkim-filter.pid');
     WRITE_CONF('Socket','local:/var/run/dkim-filter/dkim-filter.sock');
@@ -1030,7 +1007,7 @@ begin
     fpsystem('/bin/chown postfix:postfix /etc/mail/localdomains.txt'+ ' >/dev/null 2>&1');
     fpsystem('/bin/chown postfix:postfix /etc/mail/localNetworks.txt'+ ' >/dev/null 2>&1');
 
-    cert:=READ_CONF('KeyFile');
+
 
    GENERATE_CERTIFICATE();
 
@@ -1105,10 +1082,6 @@ var
    CertificateIniFile:string;
    certini:Tinifile;
    tmpstr,cmd:string;
-   smtpd_tls_key_file:string;
-   smtpd_tls_cert_file:string;
-   smtpd_tls_CAfile:string;
-   openssl_path:string;
    POSFTIX_POSTCONF:string;
    l:TstringList;
    generate:boolean;
@@ -1349,7 +1322,6 @@ var
    queue:string;
    l:TstringList;
    i:integer;
-   Cyrus_get_lmtpsocket:string;
 begin
 
 queue:=POSTFIX_QUEUE_DIRECTORY();
@@ -1379,34 +1351,21 @@ end;
    forcedirectories(queue + '/bounce');
    forcedirectories(queue + '/public');
 
+
    Logs.OutputCmd('/bin/chmod -R 0755 '+queue);
    Logs.OutputCmd('/bin/chmod -R 0755 '+queue+'/etc');
    Logs.OutputCmd('/bin/chown -R root:root '+queue+'/etc');
-
    Logs.OutputCmd('/bin/chown -R root:root /usr/libexec/postfix');
    Logs.OutputCmd('/bin/chmod -R 0755 /usr/libexec/postfix/*');
-
-
-
-
-
-
    Logs.OutputCmd('/bin/chown -R postfix:postdrop '+queue+'/public');
+
    forcedirectories(queue + '/var');
    forcedirectories(queue+'/var/run/cyrus/socket');
-
    cyrus:=Tcyrus.Create(SYS);
-   Cyrus_get_lmtpsocket:=cyrus.Cyrus_get_lmtpsocket();
    Logs.OutputCmd('/bin/chown -R postfix:postfix '+queue+'/var');
-
-
-
-
 
    Logs.OutputCmd('/bin/chown -R root:root '+queue+'/pid');
    Logs.OutputCmd('/bin/chmod -R 0755 '+queue+'/pid');
-
-
    Logs.OutputCmd('/bin/chown root:postdrop /usr/sbin/postqueue');
    Logs.OutputCmd('/bin/chmod 2755 /usr/sbin/postqueue');
 
@@ -1632,17 +1591,27 @@ begin
 end;
 //##############################################################################
 procedure tpostfix.POSTFIX_STOP();
-var pid:string;
+var
+   pid:string;
+   pidnum:integer;
 begin
 pid:=POSTFIX_PID();
+pidnum:=0;
 if SYS.PROCESS_EXIST(pid) then begin
    writeln('Stopping Postfix.............: ' + pid + ' PID..');
    if fileExists('/usr/sbin/postfix') then begin
       fpsystem('/usr/sbin/postfix stop >/dev/null 2>&1');
       POSTFIX_INI_TD();
-      MYSQMAIL_STOP();
       exit;
    end;
+end;
+
+if FIleExists('/usr/lib/postfix/master') then begin
+    if not TryStrToInt(SYS.PIDOF('/usr/lib/postfix/master'),pidnum) then pidnum:=0;
+    if pidnum>0 then begin
+       writeln('Stopping Postfix.............: ' ,pidnum, ' PID..');
+       fpsystem('/bin/kill '+ IntToStr(pidnum));
+    end;
 end;
 
 end;
@@ -1768,9 +1737,8 @@ end;
 function tpostfix.VERIF_MASTERCF_SERVICES(service:string):boolean;
 var
 i:integer;
-D:Boolean;
+
 begin
-  D:=SYS.COMMANDLINE_PARAMETERS('debug');
   if postfixServices.Count=0 then LOAD_MASTERCF_SERVICES();
 
 
@@ -2444,7 +2412,7 @@ end;
 //#########################################################################################
 function tpostfix.MAILLOG_TAIL(Filter:string):string;
 var maillog_path,cmdline:string;
-filetemp,loglines:string;
+loglines:string;
 begin
     loglines:='200';
     result:='';
@@ -2454,7 +2422,7 @@ begin
        writeln('unable to stat mail.log path "' + maillog_path+'"');
        exit;
     end;
-    filetemp:=LOGS.FILE_TEMP();
+
 
     if length(Filter)>0 then begin
        filter:='|grep "'+Filter+'"';

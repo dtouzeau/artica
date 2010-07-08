@@ -97,7 +97,7 @@ install.INSTALL_STATUS('APP_MILTERGREYLIST',10);
      exit;
   end else begin
      install.INSTALL_STATUS('APP_MILTERGREYLIST',100);
-     install.INSTALL_PROGRESS('APP_MILTERGREYLIST','{failed}');
+     install.INSTALL_PROGRESS('APP_MILTERGREYLIST','{installed}');
 
      fpsystem('/etc/init.d/artica-postfix restart mgreylist');
   end;

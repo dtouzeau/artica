@@ -131,7 +131,6 @@ Il n'y a pas de perte de performances mesurables.[br]</discrimination_text>
 <group_domain_level_text>Attente de la validation de l'adresses  X pour ajouter un domaine complet dans la liste blanche automatique</group_domain_level_text>
 <ip_white_list>Liste blanche IP</ip_white_list>
 <ip_white_list_text>Ajoutez ici seulement l'addresse IP du serveur qui sera exclue du processus SQLGrey</ip_white_list_text>
-<main_settings>Param&egrave;tres g&eacute;n&eacute;raux</main_settings>
 <max_connect_age>temps max de connexion</max_connect_age>
 <max_connect_age_text>ne permet pas une reconnexion apr&egrave;s x heures</max_connect_age_text>
 <optmethod>Optin / OptOut</optmethod>

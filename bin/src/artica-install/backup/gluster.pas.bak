@@ -6,7 +6,7 @@ unit gluster;
 interface
 
 uses
-    Classes, SysUtils,variants,strutils,IniFiles, Process,logs,unix,RegExpr,zsystem,openldap,mysql_daemon,tcpip,cyrus;
+    Classes, SysUtils,variants,strutils, Process,logs,unix,RegExpr,zsystem,cyrus;
 
 
 
@@ -18,10 +18,8 @@ private
      LOGS:Tlogs;
      SYS:TSystem;
      artica_path:string;
-     zldap:Topenldap;
-     EnableASSP:integer;
      EnableGluster:integer;
-cyrus        :Tcyrus;
+     cyrus        :Tcyrus;
      function PID_NUM():string;
      function TARGER_MOUNT_FOLDERS(conffile:string):string;
 public
@@ -140,6 +138,7 @@ function tgluster.RELOAD():string;
 var
    pid:string;
 begin
+   result:='';
    pid:=PID_NUM();
    if not SYS.PROCESS_EXIST(pid) then begin
       START();
@@ -182,7 +181,7 @@ begin
    fpsystem(cmd);
 
    pid:=PID_NUM();
-
+       ck:=0;
        while not SYS.PROCESS_EXIST(pid) do begin
            pid:=PID_NUM();
            sleep(100);
@@ -210,8 +209,7 @@ end;
 procedure tgluster.STOP();
 var
  pid:string;
- count,i:integer;
- pids:Tstringlist;
+ count:integer;
 begin
 
   pid:=PID_NUM();
@@ -257,7 +255,6 @@ end;
 
 procedure tgluster.START_CLIENT();
 var
-   EnableReplicator:integer;
    i:integer;
    RegExpr:TRegExpr;
    direct,confpath,cmd:string;
@@ -279,7 +276,7 @@ begin
           cmd:='/usr/sbin/glusterfs --log-file=/var/log/glusterfs/'+SYS.DirListFiles.Strings[i]+'.log --log-level=DEBUG -f '+confpath+' '+direct;
           logs.DebugLogs('Starting......: Gluster replicator mount '+direct );
           logs.OutputCmd(cmd);
-
+          count:=0;
           while not SYS.IS_GLFS_MOUNTED(direct) do begin
               sleep(100);
               inc(count);
@@ -307,7 +304,7 @@ end;
 
 function tgluster.TARGER_MOUNT_FOLDERS(conffile:string):string;
 var
-   l:tstringlist;
+
    i:integer;
    RegExpr:TRegExpr;
    tmpstr:Tstringlist;
@@ -317,7 +314,7 @@ begin
    tmpstr.LoadFromFile(conffile);
    RegExpr:=TRegExpr.Create;
    RegExpr.Expression:='<DIR>(.+?)</DIR>';
-   l:=Tstringlist.Create;
+
 
    for i:=0 to tmpstr.Count-1 do begin
        if RegExpr.Exec(tmpstr.Strings[i]) then begin
@@ -358,7 +355,6 @@ end;
 
 procedure tgluster.STOP_CLIENT();
 var
-   EnableReplicator:integer;
    i:integer;
    tmpstr:tSTRINGLIST;
 begin

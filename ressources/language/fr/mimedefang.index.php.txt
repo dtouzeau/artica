@@ -32,7 +32,7 @@ If the message has no text or html part, then a separate MIME part is still used
 <backup_rows>Nombres de mails dans le stockage de sauvegarde</backup_rows>
 <bad_exts>Mauvaises Extensions</bad_exts>
 <BIGHTML_ENABLED>Strip big extensions feature</BIGHTML_ENABLED>
-<config>Fichier de Configuration Main</config>
+<config>Fichier de Configuration</config>
 <CONVERT_TNEF>Convertir TNEF</CONVERT_TNEF>
 <CONVERT_TNEF_text>convert those pesky winmail.dat into their attachment(s).</CONVERT_TNEF_text>
 <DaemonAddress>Adresse du D&eacute;mon</DaemonAddress>

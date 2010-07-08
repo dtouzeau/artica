@@ -4,7 +4,7 @@
 <CYRUS_MURDER_CONNECT_BACKEND_EXPLAIN>In the following form, give the backend server address and credentials to connect to the remote Artica SSL web console</CYRUS_MURDER_CONNECT_BACKEND_EXPLAIN>
 <CYRUS_MURDER_CONNECT_BACKEND_TEXT>Indiquez ce serveur comme un frontal et notifiez le serveur en arri&egrave;re-plan.</CYRUS_MURDER_CONNECT_BACKEND_TEXT>
 <IS_DIFFERENT_THAN>est diff&eacute;rent de</IS_DIFFERENT_THAN>
-<MURDER_BACKEND_SERVER>Backend server name</MURDER_BACKEND_SERVER>
+<MURDER_BACKEND_SERVER>nom du serveur de stockage</MURDER_BACKEND_SERVER>
 <MURDER_HAS_FRONTEND>This server is a frontend server</MURDER_HAS_FRONTEND>
 <MURDER_HAS_FRONTEND_TEXT>Ce serveur est connect&eacute; sur le serveur de production des bo&icirc;tes aux lettres. Si vous voulez le d&eacute;connecter, changez en rouge le rond.</MURDER_HAS_FRONTEND_TEXT>
 <murder_link_now>Link this server to backend server now</murder_link_now>
@@ -12,5 +12,5 @@
 <MURDER_VERIFY_GO>[be]Faites attention, ce serveur va utiliser le serveur de stockage pour la base d'utilisateurs, organisations et autres.[/b][br]
 V&eacute;rifiez que les ports 389 et 3905 sont ouverts sur votre pare-feux entre ce serveur et le serveur de stockage.</MURDER_VERIFY_GO>
 <MURDER_VERIFY_GO_SUCCESS>Ce serveur frontal &agrave; &eacute;t&eacute; ajout&eacute; avec succ&egrave;s au serveur de bases, tous les services de messagerie vont &ecirc;tre red&eacute;marr&eacute;s afin d'appliquer les nouveaux param&egrave;tres</MURDER_VERIFY_GO_SUCCESS>
-<REQUIRE_FULL_HOSTNAME>A full hostname is required</REQUIRE_FULL_HOSTNAME>
+<REQUIRE_FULL_HOSTNAME>Un nom DNS complet est requis</REQUIRE_FULL_HOSTNAME>
 <SERVER_REQUESTED>The backed server you set:</SERVER_REQUESTED>

@@ -28,7 +28,7 @@ si l'utilisateur envoie &agrave; l'ext&eacute;rieur du domaine, le courrier sera
 <backup_parameters>Param&egrave;tres de sauvegarde</backup_parameters>
 <backup_parameters_text>D&eacute;finissez le service de sauvegarde pour cet utilisateur</backup_parameters_text>
 <build>Antispam</build>
-<change_password_text>Changez le compte utilisateur principale</change_password_text>
+<change_password_text>Modifiez le mot de passe de cet utilisateur</change_password_text>
 <change_uid>Changer d'identifiant</change_uid>
 <change_uid_explain>Changer l'identificateur unique est une op&eacute;ration lourde, sur la base de donn&eacute;es chaque utilisateur se retrouve par son uid, ce uid permet aux utilisateurs de se connecter &agrave; l'interface et aux services du syst&egrave;me comme Samba, Imap, mail ... [br]
 Si vous changez le nom d'utilisateur, artica va essayer de reconstruire cet utilisateur vers le nouveau nom d'utilisateur que vous avez fix&eacute;, [BR]

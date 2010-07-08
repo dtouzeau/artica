@@ -16,7 +16,6 @@ external protocol = https[br]</external_url_text>
 <group_failed>Group Failed</group_failed>
 <group_updated>Group updated/added</group_updated>
 <https_port>HTTPS port of the web server</https_port>
-<main_settings>Main settings</main_settings>
 <OBMSyncCron>Sync Period</OBMSyncCron>
 <OBMSyncCron_text>OBM use Mysql database to store users[br]You need to export LDAP users to the OBM database in order to allow them access on it[br]
 To do you can program a period in minutes or  hour (m or h ) that allow artica to perform periodically exportation.

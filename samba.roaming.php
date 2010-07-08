@@ -39,8 +39,8 @@ $html="
 	}
 	
 var X_EnableProfileSamba= function (obj) {
-	var results=obj.responseText;
-	alert(results);
+	var results=trim(obj.responseText);
+	if(results.length>0){alert(results);}
 	{$prefix}LoadPage();
 	}	
 	

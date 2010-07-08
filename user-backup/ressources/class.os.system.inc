@@ -687,6 +687,9 @@ function html_Memory_usage(){
 	$mem_used_kb=FormatBytes($hash_mem["ram"]["used"]);
 	$total=FormatBytes($hash_mem["ram"]["total"]);
 	
+	$sock=new sockets();
+	$hdparms=unserialize(base64_decode($sock->GET_INFO("HdparmInfos")));
+	
 	$users=new usersMenus();
 	$Disks=$users->disks_size;
 	if($Disks<>null){
@@ -698,11 +701,30 @@ function html_Memory_usage(){
 					$dc=$dc+1;
 					$disk=$values[0];
 					$disk=str_replace("mapper/","",$disk);
+					$disk_name=$disk;
 					$size=$values[1];
 					$occ=$values[2];
 					$disp=$values[3];
 					$pourc=$values[4];
 					if(!$array_dup[$disk]){$array_dup[$disk]=true;}else{continue;}
+					if(preg_match("#([a-z\_\-]+)[0-9]+$#",$disk_name,$rt)){$disk_name=$rt[1];}
+					
+					if($hdparms[$disk_name]<>null){
+						$hdparms_info=intval($hdparms[$disk_name]);
+						$hdparms_color="#5DD13D";
+						if($hdparms_info<70){$hdparms_color="#F59C44";}
+						if($hdparms_info<31){$hdparms_color="#D32D2D";}
+						 $pouc_hdparm_text=texttooltip("{performance}:$hdparms_info%","<strong>{performance}:$hdparms_info%</strong><hr><br>{hdparm_infos_text}",null,null,0,"font-size:9px");
+						
+							$hdparm="
+							<div style='width:100px;background-color:white;padding-left:0px;border:1px solid $hdparms_color;margin-top:3px'>
+								<div style='width:{$hdparms_info}px;text-align:center;color:white;padding-top:3px;padding-bottom:3px;background-color:$hdparms_color'>
+									
+								</div>
+							</div>
+							";						
+					}
+					
 					
 					if($users->IOSTAT_INSTALLED){
 						
@@ -738,8 +760,9 @@ function html_Memory_usage(){
 								</div>
 							</div>
 							$iostat
+							$hdparm
 						</td>
-						<td width=1% nowrap><strong>{$occ}G/{$size}G&nbsp;$pouc_disk_io_text</strong></td>
+						<td width=1% nowrap><strong>{$occ}G/{$size}G&nbsp;$pouc_disk_io_text$pouc_hdparm_text</strong></td>
 						
 					</tr>";
 				}

@@ -109,7 +109,6 @@ On the low side, the number should not be too small in order for the startup cos
  For 4000 users a value between 5 and 10 would be a good starting point.[br]
  With low memory (e.g. 256 MB) a value of 2 or 3 would probably do.
 </max_servers_text>
-<notification>SMTP Alertas y notificaciones</notification>
 <notification_text>Notificaciones comportamientos seg&uacute;n las detecciones de Amavis</notification_text>
 <postfix_afterqueue>Pstfix despues-cola de contenido filtrado</postfix_afterqueue>
 <postfix_afterqueue_text>
@@ -142,6 +141,7 @@ SaneSecurity firmas son la culminaci&oacute;n de mucho trabajo y compromiso de p
 <sa_tag2_level_deflt>A&ntilde;adir X-Spam-Flag: SI a encabezados en ese nivel para pasar el correo</sa_tag2_level_deflt>
 <sa_tag_level_deflt>A&ntilde;adir X-Spam *** si informar en las cabeceras, o por encima de ese nivel</sa_tag_level_deflt>
 <select_domain>Seleccione el dominio SMTP</select_domain>
+<smtp_notification>SMTP Alertas y notificaciones</smtp_notification>
 <spamassassin>Caracter&iacute;sticas de SpamAssassin</spamassassin>
 <spamassassin_text>Definir las pol&iacute;ticas de anti-spam</spamassassin_text>
 <spam_quarantine_spammy>Verde: Poner en cuarentena si se llegar a esta puntuaci&oacute;n[br]Rojo: lo autoriza pero lo marca como correo no deseado</spam_quarantine_spammy>

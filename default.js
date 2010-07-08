@@ -885,6 +885,9 @@ function FetchMailPostForm(edit_mode){
 	if(document.getElementById('_fetchall').checked){XHR.appendData('fetchall',1);}else{XHR.appendData('fetchall',0);}		
 	if(document.getElementById('_keep').checked){XHR.appendData('keep',1);}else{XHR.appendData('keep',0);}
 	if(document.getElementById('_nokeep').checked){XHR.appendData('nokeep',1);}else{XHR.appendData('nokeep',0);}
+	
+	if(document.getElementById('_fingerprint')){XHR.appendData('sslfingerprint',document.getElementById('_fingerprint').value);}
+	if(document.getElementById('_sslcertck').checked){XHR.appendData('sslcertck',1);}else{XHR.appendData('sslcertck',0);}
 	XHR.sendAndLoad('artica.wizard.fetchmail.php', 'GET',x_FetchMailPostForm);
        
         

@@ -6,7 +6,7 @@ unit mailarchiver;
 interface
 
 uses
-    Classes, SysUtils,variants,strutils,IniFiles, Process,logs,unix,amavisd_milter,
+    Classes, SysUtils,variants,strutils,Process,logs,unix,amavisd_milter,
     RegExpr      in '/home/dtouzeau/developpement/artica-postfix/bin/src/artica-install/RegExpr.pas',
     zsystem      in '/home/dtouzeau/developpement/artica-postfix/bin/src/artica-install/zsystem.pas';
 
@@ -201,11 +201,7 @@ end;
 function tmailarchive.STATUS():string;
 var ini:TstringList;
 begin
-ini:=TstringList.Create;
-
-
-
-
+   ini:=TstringList.Create;
    ini.Add('[MAILARCHIVER]');
    ini.Add('service_name=APP_MAILARCHIVER');
    ini.Add('service_cmd=mailarchiver');

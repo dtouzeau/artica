@@ -1,4 +1,7 @@
 <?php
+
+
+
 	include_once('ressources/class.templates.inc');
 	include_once('ressources/class.ldap.inc');
 	include_once('ressources/class.users.menus.inc');
@@ -30,6 +33,7 @@ if(isset($_GET["popup"])){popup();exit;}
 if(isset($_GET["virtual-popup-add"])){virtual_add_form();exit;}
 if(isset($_GET["cdir-ipaddr"])){virtual_cdir();exit;}
 if(isset($_GET["postfix-virtual"])){virtuals_js();exit;}
+if(isset($_GET["js-add-nic"])){echo virtuals_js_datas();exit;}
 StartPage();
 
 
@@ -379,11 +383,13 @@ function zlistnics(){
 		<table style='width:100%;margin:3px;padding:3px;border:1px solid #CCCCCC' 
 		OnMouseOver=\";this.style.cursor='pointer';this.style.background='#F5F5F5';\"
 		OnMouseOut=\";this.style.cursor='default';this.style.background='#FFFFFF';\"
-		OnClick=\"$js\"				
 		>
 		<tr>
 			<td valign='top' width=1%><img src='img/$img_on'></td>
-			<td valign='top' style='padding:4px'>$text</td>
+			<td valign='top' style='padding:4px'>
+				<div OnClick=\"$js\">$text</div>
+				<div style='text-align:right'>". imgtootltip("plus-16.png","{add_virtual_ip_addr_explain_js}","Loadjs('$page?js-add-nic=$val')")."</div>
+			</td>
 		</tr>
 		</table>
 		
@@ -420,7 +426,11 @@ function listnicinfos($nicname){
 	if(trim($tbl[5])=="yes"){
 		$wire=" (wireless)";
 	}
+	
+	$defaults_infos_array=base64_encode(serialize(array("IP"=>$tbl[0],"NETMASK"=>$tbl[2],"GW"=>$tbl[4],"NIC"=>$nicname)));
+	
 	$html="
+	<input type='hidden' id='infos_$nicname' value='$defaults_infos_array'>
 	<table style='width:100%'>
 	<tr>
 		<td class=legend nowrap>{tcp_address}:</td>
@@ -701,33 +711,40 @@ function virtuals_js(){
 	echo $html;
 	
 }
-	
-function Virtuals(){
+
+function virtuals_js_datas(){
 	$page=CurrentPageName();
 	$tpl=new templates();
 	$virtual_interfaces=$tpl->_ENGINE_parse_body('{virtual_interfaces}');
+	$default_load="VirtualIPRefresh();";
+	if(isset($_GET["js-add-nic"])){
+		$default_load="VirtualIPJSAdd('{$_GET["js-add-nic"]}');";
+	}
+	
 	$html="
-	<div style='width:100%;text-align:right'>". button("{add}","VirtualIPAdd()")."</div>
-	<div id='virtuals-list'></div>	
+		var windows_size=500;
 	
-	
-	
-		
-		
-	<script>
 		function VirtualIPAdd(){
-			YahooWin2(500,'$page?virtual-popup-add=yes','$virtual_interfaces');
+			YahooWin2(windows_size,'$page?virtual-popup-add=yes&default-datas={$_GET["default-datas"]}','$virtual_interfaces');
 		
+		}
+		
+		function VirtualIPJSAdd(nic){
+			var defaultDatas='';
+			if(document.getElementById('infos_'+nic)){
+				defaultDatas=document.getElementById('infos_'+nic).value;
+			}
+			YahooWin2(windows_size,'$page?virtual-popup-add=yes&default-datas='+defaultDatas,'$virtual_interfaces');
 		}
 		
 		function VirtualsEdit(ID){
 			YahooWin2(500,'$page?virtual-popup-add=yes&ID='+ID,'$virtual_interfaces');
 		}
 		
-var X_CalcCdirVirt= function (obj) {
+		var X_CalcCdirVirt= function (obj) {
 			var results=obj.responseText;
 			document.getElementById('cdir').value=results;
-			}		
+		}		
 		
 		function CalcCdirVirt(recheck){
 			var cdir=document.getElementById('cdir').value;
@@ -745,7 +762,9 @@ var X_CalcCdirVirt= function (obj) {
 			var results=obj.responseText;
 			if(results.length>0){alert(results);}
 			YahooWin2Hide();
+			if(document.getElementById('main_openvpn_config')){RefreshTab('main_openvpn_config');}
 			VirtualIPRefresh();
+			
 		}
 		
 		function VirtualIPAddSave(){
@@ -765,7 +784,9 @@ var X_CalcCdirVirt= function (obj) {
 		}
 		
 		function BuildVirtuals(){
-			LoadAjax('virtuals-list','$page?virtuals-list=yes&build=yes');
+			if(document.getElementById('virtuals-list')){
+				LoadAjax('virtuals-list','$page?virtuals-list=yes&build=yes');
+			}
 		}
 		
 		function VirtualsDelete(id){
@@ -775,7 +796,25 @@ var X_CalcCdirVirt= function (obj) {
 			XHR.sendAndLoad('$page', 'GET',X_VirtualIPAddSave);
 		}
 		
-		VirtualIPRefresh();";
+		$default_load	
+	";
+		
+	return $html;
+}
+
+	
+function Virtuals(){
+	$page=CurrentPageName();
+	$tpl=new templates();
+	$virtual_interfaces=$tpl->_ENGINE_parse_body('{virtual_interfaces}');
+	$html="
+	<div style='float:left'>". imgtootltip("20-refresh.png","{refresh}","VirtualIPRefresh()")."</div>
+	<div style='width:100%;text-align:right'>". button("{add}","VirtualIPAdd()")."</div>
+	
+	<div id='virtuals-list'></div>	
+	<script>
+	". virtuals_js_datas()."
+	</script>";
 	
 
 	echo $tpl->_ENGINE_parse_body($html);	
@@ -793,10 +832,23 @@ function virtual_add_form(){
 		$ligne=@mysql_fetch_array($q->QUERY_SQL($sql,"artica_backup"));
 	}
 	
+	if(isset($_GET["default-datas"])){
+			$default_array=unserialize(base64_decode($_GET["default-datas"]));
+			if(is_array($default_array)){
+				$ligne["nic"]=$default_array["NIC"];
+			if(preg_match("#(.+?)\.([0-9]+)$#",$default_array["IP"],$re)){
+				if($re[2]>254){$re[2]=1;}
+				$re[2]=$re[2]+1;
+				$ligne["ipaddr"]="{$re[1]}.{$re[2]}";
+				$ligne["gateway"]=$default_array["GW"];
+				$ligne["netmask"]=$default_array["NETMASK"];
+			}
+		}
+	}	
 	
 	$styleOfFields="width:190px;font-size:14px;padding:3px";
 	$ous=$ldap->hash_get_ou(true);
-	
+	$ous["openvpn_service"]="{APP_OPENVPN}";
 	while (list ($num, $val) = each ($nics) ){
 		$nics_array[$val]=$val;
 	}
@@ -842,7 +894,18 @@ function virtual_add_form(){
 		</tr>	
 	</table>
 	</div>
-	<div style='text-align:right'><hr>". button("{add}","VirtualIPAddSave()")."</div>";
+	<div style='text-align:right'><hr>". button("{add}","VirtualIPAddSave()")."</div>
+	<script>
+		var cdir=document.getElementById('cdir').value;
+		var netmask=document.getElementById('netmask').value;
+		if(netmask.length>0){
+			if(cdir.length==0){
+				CalcCdirVirt(0);
+				}
+			}
+	</script>
+	
+	";
 	$tpl=new templates();
 	echo $tpl->_ENGINE_parse_body($html);
 	
@@ -868,7 +931,7 @@ function virtuals_add(){
 		exit;
 	}
 	
-	
+
 	
 	
 	$sql="
@@ -884,7 +947,7 @@ function virtuals_add(){
 		cdir='{$_GET["cdir"]}',
 		gateway='{$_GET["gateway"]}' WHERE ID={$_GET["ID"]}";
 	}
-	
+	writelogs("$sql",__FUNCTION__,__FILE__,__LINE__);
 	$q=new mysql();
 	$q->QUERY_SQL($sql,"artica_backup");
 	if(!$q->ok){
@@ -896,6 +959,10 @@ function virtuals_add(){
 }
 
 function virtuals_list(){
+	header("Pragma: no-cache");	
+	header("Expires: 0");
+	header("Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT");
+	header("Cache-Control: no-cache, must-revalidate");	
 	$q=new mysql();
 	
 	$sock=new sockets();
@@ -915,7 +982,7 @@ function virtuals_list(){
 		<th>&nbsp;</th>
 		<th nowrap>{organization}</th>
 		<th nowrap>{nic}</th>
-		<th nowrap>CDIR</th>
+		<th nowrap>{tcp_address}</th>
 		<th nowrap>{netmask}</th>
 		<th>&nbsp;</th>
 		<th>&nbsp;</th>
@@ -945,7 +1012,7 @@ function virtuals_list(){
 			<td width=1%><img src='img/$img'></td>
 			<td><strong style='font-size:14px' align='right'>{$ligne["org"]}</strong></td>
 			<td><strong style='font-size:14px' align='right'>$eth</strong></td>
-			<td><strong style='font-size:14px' align='right'>{$ligne["cdir"]}</strong></td>
+			<td><strong style='font-size:14px' align='right'>{$ligne["ipaddr"]}</strong></td>
 			<td><strong style='font-size:14px' align='right'>{$ligne["netmask"]}</strong></td>
 			<td width=1%>". imgtootltip("24-administrative-tools.png","{edit}","VirtualsEdit({$ligne["ID"]})")."</td>
 			<td width=1%>". imgtootltip("ed_delete.gif","{delete}","VirtualsDelete({$ligne["ID"]})")."</td>
@@ -976,18 +1043,18 @@ function ConstructVirtsIP(){
 	$q=new mysql();
 	$results=$q->QUERY_SQL($sql,"artica_backup");	
 	while($ligne=@mysql_fetch_array($results,MYSQL_ASSOC)){	
+		if($ligne["org"]=="openvpn_service"){continue;}
 		$arr=explode(".",$ligne["ipaddr"]);
 		$arr[3]="255";
 		$brd=implode(".",$arr);
 		$eth="{$ligne["nic"]}:{$ligne["ID"]}";
-		
-		
-		
+
 		$conf[$eth]=array(
 			"NETMASK"=>$ligne["netmask"],
 			"IP_ADDR"=>$ligne["ipaddr"],
 			"BROADCAST"=>$brd,
 			"GATEWAY"=>$ligne["gateway"],
+			"org"=>$ligne["org"]
 		
 		
 		);

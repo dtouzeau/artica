@@ -20,18 +20,22 @@ $user=new usersMenus();
 	
 	if(isset($_GET["popup"])){popup();exit;}
 	if(isset($_GET["show_backuped_folders"])){FOLDERS_BACKUPED();exit;}
+	if(isset($_GET["ExecBackupTemporaryPath"])){BACKUP_OPTIONS_SAVE();exit;}
 	if(isset($_GET["BACKUP_TASKS_LISTS"])){tasks_list();exit;}
 	if(isset($_GET["show_tasks"])){show_tasks();exit;}
 	if(isset($_GET["BACKUP_TASK_RUN"])){BACKUP_TASK_RUN();exit;}
 	if(isset($_GET["backup-sources"])){BACKUP_SOURCES();exit;}
 	if(isset($_GET["DeleteBackupSource"])){BACKUP_SOURCES_DELETE();exit;}
 	if(isset($_GET["DeleteBackupTask"])){BACKUP_TASK_DELETE();exit;}
+	if(isset($_GET["adv-options"])){BACKUP_OPTIONS();exit;}
 	if(isset($_GET["backup-tests"])){BACKUP_TASK_TEST();exit;}
 	if(isset($_GET["backup_stop_imap"])){BACKUP_SOURCES_SAVE_OPTIONS();exit;}
 	if(isset($_GET["FOLDER_BACKUP"])){FOLDER_BACKUP_JS();exit;}
 	if(isset($_GET["FOLDER_BACKUP_POPUP"])){FOLDER_BACKUP_POPUP();exit;}
 	if(isset($_GET["BACKUP_FOLDER_ENABLE"])){BACKUP_FOLDER_ENABLE();exit;}
 	if(isset($_GET["FOLDER_BACKUP_DELETE"])){FOLDERS_BACKUPED_DELETE();exit;}
+	if(isset($_GET["TASK_EVENTS_DETAILS"])){TASK_EVENTS_DETAILS();exit;}
+	if(isset($_GET["TASK_EVENTS_DETAILS_INFOS"])){TASK_EVENTS_DETAILS_INFOS();exit;}
 	if(isset($_GET["events"])){BACKUP_EVENTS();exit;}
 js();
 
@@ -142,7 +146,7 @@ function FOLDERS_BACKUPED(){
 		
 		$html=$html.
 		"<tr ". CellRollOver().">
-		<td width=1% align='center'><strong style='font-size:12px'>{task}&nbsp;{$ligne["taskid"]}</strong></td>
+		<td width=1% align='center'><strong style='font-size:12px'>{$ligne["taskid"]}</strong></td>
 		<td style='font-size:12px' nowrap>". $TASK_EX[$ligne["taskid"]]."</td>
 		<td style='font-size:12px' width=98%><code>". base64_decode($ligne["path"])."</code></td>
 		<td width=1% style='font-size:12px' align='left'>{$ligne["recursive"]}</td>
@@ -252,6 +256,7 @@ function js(){
 	$tests=$tpl->javascript_parse_text("{test}");
 	$backupTaskRunAsk=$tpl->javascript_parse_text("{backupTaskRunAsk}");
 	$apply_upgrade_help=$tpl->javascript_parse_text("{apply_upgrade_help}");
+	$events=$tpl->_ENGINE_parse_body("{events}");
 	$html="
 	mem_taskid='';	
 	
@@ -266,6 +271,15 @@ function js(){
 		function BACKUP_TASKS_SOURCE(ID){
 			YahooWin3('500','$page?backup-sources=yes&ID='+ID,'$sources');
 		}
+		
+		function TASK_EVENTS_DETAILS(ID){
+			YahooWin3('700','$page?TASK_EVENTS_DETAILS='+ID,ID+'::$events');
+		}
+		
+		function TASK_EVENTS_DETAILS_INFOS(ID){
+			YahooWin4('700','$page?TASK_EVENTS_DETAILS_INFOS='+ID,ID+'::$events');
+		}
+		
 		
 var x_DeleteBackupTask= function (obj) {
 		var tempvalue=obj.responseText;
@@ -355,6 +369,7 @@ function popup(){
 	$tpl=new templates();
 	$array["show_tasks"]='{tasks}';
 	$array["show_backuped_folders"]='{backuped_folders}';
+	$array["adv-options"]='{advanced_options}';
 	$array["events"]='{events}';
 	
 	
@@ -427,6 +442,7 @@ function tasks_list(){
 	$html="<table style='width:99%'>
 	<th>{task}</th>
 	<th>&nbsp;</th>
+	<th>&nbsp;</th>
 	<th>{test}</th>
 	<th>{STORAGE_TYPE}</th>
 	<th>{resource}</th>
@@ -454,11 +470,12 @@ function tasks_list(){
 		"<tr ". CellRollOver().">
 		
 		<td width=1% align='center'><strong style='font-size:12px'>{$ligne["ID"]}</strong></td>
+		<td width=1% style='font-size:12px' align='left'>". imgtootltip("events-24.png","{events}","TASK_EVENTS_DETAILS({$ligne["ID"]})")."</td>
 		<td width=1%>$run</td>
 		<td width=1%>". imgtootltip("eclaire-24.png","{BACKUP_TASK_TEST}","BACKUP_TASK_TEST({$ligne["ID"]})")."</td>
-		<td style='font-size:12px'>{$storages[$ligne["resource_type"]]}</td>
+		<td style='font-size:12px' nowrap>{$storages[$ligne["resource_type"]]}</td>
 		<td style='font-size:12px'>". $backup->extractFirsRessource($ligne["pattern"])."</td>
-		<td style='font-size:12px'>". $cron->cron_human($ligne["schedule"])."</td>
+		<td style='font-size:12px' nowrap>". $cron->cron_human($ligne["schedule"])."</td>
 		<td style='font-size:12px'>$sources</td>
 		<td style='font-size:12px'>". imgtootltip("delete-24.png","{delete}","DeleteBackupTask({$ligne["ID"]})")."</td>
 		</tr>";
@@ -595,6 +612,8 @@ function BACKUP_TASK_DELETE(){
 	$sql="DELETE FROM backup_schedules WHERE ID='{$_GET["DeleteBackupTask"]}'";
 	$q=new mysql();
 	$q->QUERY_SQL($sql,"artica_backup");
+	$sql="DELETE FROM backup_events WHERE task_id='{$_GET["DeleteBackupTask"]}'";
+	$q->QUERY_SQL($sql,"artica_events");
 	$sock=new sockets();
 	$sock->getFrameWork("cmd.php?backup-build-cron=yes");	
 	
@@ -612,6 +631,54 @@ function BACKUP_TASK_TEST(){
 	
 	$tpl=new templates();
 	echo $tpl->_ENGINE_parse_body($html);
+}
+
+function BACKUP_OPTIONS_SAVE(){
+	$sock=new sockets();
+	$sock->SET_INFO("ExecBackupTemporaryPath",$_GET["ExecBackupTemporaryPath"]);
+	
+}
+
+
+function BACKUP_OPTIONS(){
+	$sock=new sockets();
+	$page=CurrentPageName();
+	$temporarySourceDir=$sock->GET_INFO("ExecBackupTemporaryPath");
+	if($temporarySourceDir==null){$temporarySourceDir="/home/mysqlhotcopy";}
+	
+	$html="
+	<div id='backup-adv-options'>
+	<table style='width:100%'>
+	<tr>
+		<td class=legend style='font-size:13px'>{ExecBackupTemporaryPath}:</td>
+		<td>". Field_text("ExecBackupTemporaryPath",$temporarySourceDir,"font-size:13px;width:220px")."
+	</tr>
+	<tr>
+		<td colspan=2 align='right'>". button("{apply}","SAVE_BACKUP_OPTIONS()")."</td>
+	</tr>
+	</table>
+	</div>
+	<script>
+	var x_SAVE_BACKUP_OPTIONS= function (obj) {
+		var tempvalue=obj.responseText;
+		if(tempvalue.length>0){alert(tempvalue)};
+		RefreshTab('main_config_backup_tasks');
+	 }	
+	
+		function SAVE_BACKUP_OPTIONS(){
+			var XHR = new XHRConnection();
+			XHR.appendData('ExecBackupTemporaryPath',document.getElementById('ExecBackupTemporaryPath').value);
+			document.getElementById('backup-adv-options').innerHTML='<center><img src=img/wait_verybig.gif></center>';
+			XHR.sendAndLoad('$page', 'GET',x_SAVE_BACKUP_OPTIONS);
+		
+		}
+		
+	</script>";
+	
+	
+	$tpl=new templates();
+	echo $tpl->_ENGINE_parse_body($html);	
+	
 }
 
 function BACKUP_EVENTS(){
@@ -652,6 +719,86 @@ $html=$html."
 	$tpl=new templates();
 	echo $tpl->_ENGINE_parse_body($html);	
 	
+}
+
+function TASK_EVENTS_DETAILS_INFOS(){
+	$ID=$_GET["TASK_EVENTS_DETAILS_INFOS"];
+	$sql="SELECT *  FROM backup_events WHERE ID=$ID";
+	$q=new mysql();
+	$ligne=mysql_fetch_array($q->QUERY_SQL($sql,"artica_events"));
+	$html="<H2>$ID)&nbsp;{$ligne["zdate"]}::{$ligne["backup_source"]}</H2>
+	<div style='height:300px;overflow:auto;border:1px solid #CCCCCC;padding:5px;margin:5px'>";
+	$events=@explode("\n",$ligne["event"]);
+	
+
+	while (list ($num, $line) = each ($events)){
+
+		$html=$html. "<div style='padding:2px'><code>".htmlspecialchars($line)."</code></div>";
+	}
+	
+	$html=$html."</div>";
+	
+	echo $html;
+	
+}
+
+
+function TASK_EVENTS_DETAILS(){
+	$ID=$_GET["TASK_EVENTS_DETAILS"];
+	
+$html="<div style='height:300px;overflow:auto'>
+<table style='width:99%'>
+	<th>&nbsp;</th>
+	<th>{date}</th>
+	<th>{resource}</th>
+	<th>{status}</th>
+	<th>{events}</th>
+	</tr>";	
+	
+$sql="SELECT *,DATE_FORMAT(zdate,'%W') as explainday,DATE_FORMAT(zdate,'%p') as tmorn,DATE_FORMAT(zdate,'%Hh%i') as ttime  FROM `backup_events` WHERE `task_id`='$ID' ORDER BY `backup_events`.`zdate` DESC LIMIT 0 , 200";
+$q=new mysql();
+	$results=$q->QUERY_SQL($sql,"artica_events");	
+	while($ligne=@mysql_fetch_array($results,MYSQL_ASSOC)){
+		if(strlen($ligne["event"])>60){$ligne["event"]=substr($ligne["event"],0,57)."...";}
+		
+		if(preg_match("#^([A-Z]+).*?,#",$ligne["event"],$re)){
+			$status=$re[1];
+			$ligne["event"]=str_replace($re[1].',','',$ligne["event"]);
+			
+		}
+		$ligne["explainday"]=strtolower($ligne["explainday"]);
+		$date="{{$ligne["explainday"]}} {$ligne["ttime"]}";
+		
+		$img="info-18.png";
+		switch ($status) {
+			case "INFO":$img="info-18.png";break;
+			case "ERROR":$img="status_warning.gif";break;
+			default:
+				;
+			break;
+		}
+		
+		$display="TASK_EVENTS_DETAILS_INFOS({$ligne["ID"]})";
+		
+$html=$html.
+		"
+		<tr ". CellRollOver($display,"{display}").">
+		<td width=1% valign='top'><img src='img/fw_bold.gif'></td>
+		<td width=1%  style='font-size:12px' nowrap><strong>$date</strong></td>
+		<td   style='font-size:12px' nowrap width=1%><strong>{$ligne["backup_source"]}</strong></td>
+		<td width=1%  align='center' valign='middle'><img src='img/$img'></td>
+		<td style='font-size:12px' width=99% nowrap><strong>{$ligne["event"]}</strong></td>		
+		</tr>
+		";
+		
+		
+	}
+	
+$html=$html."
+	</table>
+	</div>";
+	$tpl=new templates();
+	echo $tpl->_ENGINE_parse_body($html);		
 }
 
 

@@ -105,7 +105,6 @@ On the low side, the number should not be too small in order for the startup cos
  For 4000 users a value between 5 and 10 would be a good starting point.[br]
  With low memory (e.g. 256 MB) a value of 2 or 3 would probably do.
 </max_servers_text>
-<notification>Alertas e notifica&ccedil;&otilde;es SMTP</notification>
 <notification_text>Comportamento das notifica&ccedil;&otilde;es em acordo com a Detec&ccedil;&atilde;o Amavis</notification_text>
 <postfix_afterqueue>Filtro de Conte&uacute;dos Postfix After-Queue</postfix_afterqueue>
 <postfix_afterqueue_text>
@@ -145,6 +144,7 @@ As assinaturas SaneSecurity s&atilde;o o culminar de muito trabalho e compromiss
 <sa_tag2_level_deflt>Adicionar cabe&ccedil;alhos X-Spam-Flag: YES a esse n&iacute;vel para mail verificado.</sa_tag2_level_deflt>
 <sa_tag_level_deflt>Adicionar X-SPAM*** aos cabe&ccedil;alhos ou acima desse n&iacute;vel</sa_tag_level_deflt>
 <select_domain>Seleccione o dom&iacute;nio SMTP</select_domain>
+<smtp_notification>Alertas e notifica&ccedil;&otilde;es SMTP</smtp_notification>
 <spamassassin>Funcionalidades do SpamAssassin</spamassassin>
 <spamassassin_text>Defina as pol&iacute;ticas anti-spam</spamassassin_text>
 <spam_quarantine_spammy>Verde: Coloque em quarentena se alcan&ccedil;ar esta pontua&ccedil;&atilde;o[br]Vermelho: Permitir, mas marca com spam</spam_quarantine_spammy>

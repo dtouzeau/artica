@@ -23,7 +23,7 @@ private
      EnableVirtualDomainsInMailBoxes:integer;
      procedure CHANGE_INITD();
 
-     function PID_PATH():string;
+
 
 public
     procedure   Free;
@@ -35,7 +35,7 @@ public
     function    STATUS():string;
     function    SASLAUTHD_PATH():string;
     function    SASLAUTHD_INITD_PATH():string;
-
+    function    PID_PATH():string;
 END;
 
 implementation
@@ -179,33 +179,13 @@ end;
 //#############################################################################
 function tsaslauthd.STATUS():string;
 var
-   ini:TstringList;
-   pid:string;
+pidpath:string;
 begin
-if not FileExists(CCYRUS.SASLAUTHD_PATH()) then exit;
-   ini:=TstringList.Create;
-   pid:=SASLAUTHD_PID();
-   ini.Add('[SASLAUTHD]');
-   ini.Add('service_name=APP_SASLAUTHD');
-   ini.Add('service_cmd=saslauthd');
-   ini.Add('master_version=' + VERSION());
-
-      if SYS.MONIT_CONFIG('APP_SASLAUTHD',PID_PATH(),'saslauthd') then begin
-         ini.Add('monit=1');
-         result:=ini.Text;
-         ini.free;
-         exit;
-      end;
-
-
-   if SYS.PROCESS_EXIST(pid) then ini.Add('running=1') else  ini.Add('running=0');
-   if not FileExists(CCYRUS.SASLAUTHD_PATH()) then ini.Add('application_installed=0') else ini.Add('application_installed=1');
-   ini.Add('master_pid='+ pid);
-   ini.Add('master_memory=' + IntToStr(SYS.PROCESS_MEMORY(pid)));
-   ini.Add('status='+SYS.PROCESS_STATUS(pid));
-   result:=ini.Text;
-   ini.free;
-
+   SYS.MONIT_DELETE('APP_SASLAUTHD');
+   pidpath:=logs.FILE_TEMP();
+   fpsystem(SYS.LOCATE_PHP5_BIN()+' /usr/share/artica-postfix/exec.status.php --saslauthd >'+pidpath +' 2>&1');
+   result:=logs.ReadFromFile(pidpath);
+   logs.DeleteFile(pidpath);
 end;
 //#########################################################################################
 function tsaslauthd.PID_PATH():string;
@@ -214,7 +194,7 @@ begin
   if FileExists('/var/run/saslauthd.pid') then exit('/var/run/saslauthd.pid');
   if FileExists('/var/run/saslauthd/saslauthd.pid') then exit('/var/run/saslauthd/saslauthd.pid');
 end;
-
+//#########################################################################################
 
  function tsaslauthd.SASLAUTHD_PID():string;
 var

@@ -6,7 +6,7 @@ unit dstat;
 interface
 
 uses
-    Classes, SysUtils,variants,strutils,IniFiles, Process,logs,unix,RegExpr in 'RegExpr.pas',zsystem,postfix_class;
+    Classes, SysUtils,variants,strutils,Process,logs,unix,RegExpr in 'RegExpr.pas',zsystem,postfix_class;
 
 
   type
@@ -15,7 +15,6 @@ uses
 
 private
      LOGS:Tlogs;
-     D:boolean;
      SYS:Tsystem;
      artica_path:string;
      function GET_PID():string;
@@ -115,7 +114,6 @@ end;
 function tdstat.VERSION:string;
   var
    RegExpr:TRegExpr;
-   x:string;
    tmpstr:string;
    l:TstringList;
    i:integer;
@@ -250,7 +248,6 @@ end;
 procedure tdstat.START_TOP_MEMORY();
 var
    pid:string;
-   postfix:tpostfix;
 begin
 
      if not FileExists('/usr/bin/dstat') then begin
@@ -276,7 +273,6 @@ end;
 procedure tdstat.START_TOP_CPU();
 var
    pid:string;
-   postfix:tpostfix;
 begin
 
      if not FileExists('/usr/bin/dstat') then begin

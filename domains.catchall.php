@@ -105,7 +105,7 @@ function catchall_index(){
 			
 	";
 	
-	$form=RoundedLightWhite($form);
+	
 	
 $html="
 	
@@ -194,6 +194,8 @@ function catchall_save(){
 		
 	}	
 	
+$sock=new sockets();
+$sock->getFrameWork("cmd.php?postfix-hash-aliases=yes");	
 	
 }
 

@@ -6,7 +6,7 @@ unit rdiffbackup;
 interface
 
 uses
-    Classes, SysUtils,variants,strutils,IniFiles, Process,md5,logs,unix,RegExpr in 'RegExpr.pas',zsystem;
+    Classes, SysUtils,variants,strutils,Process,logs,unix,RegExpr in 'RegExpr.pas',zsystem;
 
   type
   trdiffbackup=class
@@ -14,10 +14,8 @@ uses
 
 private
      LOGS:Tlogs;
-     D:boolean;
      SYS:TSystem;
      artica_path:string;
-     inif:TiniFile;
 
 
 
@@ -185,8 +183,6 @@ end;
 FUNCTION trdiffbackup.DAR_STATUS():string;
 var
    ini:TstringList;
-   mailpath:string;
-   D       :boolean;
 begin
 
 ini:=TstringList.Create;
@@ -401,8 +397,6 @@ end;
 //##############################################################################
 FUNCTION trdiffbackup.PERSO_BACKUPS_LIST():TstringList;
 var
-   tmpstr:string;
-   cmd:string;
    RegExpr:tRegExpr;
    l:TstringList;
    i:integer;

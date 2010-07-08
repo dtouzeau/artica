@@ -51,7 +51,7 @@
 <postfix_smtp_reports_text>Recevoir des messages de rapports concernant l'aper&ccedil;u d'activit&eacute; postfix durant la journ&eacute;e</postfix_smtp_reports_text>
 <postmaster>Boite e-mail du Postmaster</postmaster>
 <postmaster_explain>Indiquez ici l'e-mail de l'utilisateur qui recevra les notifications :</postmaster_explain>
-<postmaster_text>Pr&eacute;ciser ici l'utilisateur qui sera l'administrateur pour la r&eacute;ception des notifications</postmaster_text>
+<postmaster_text>Pr&eacute;cisez ici l'adresse email de l'utilisateur qui sera l'administrateur pour la r&eacute;ception des notifications</postmaster_text>
 <relay>Relais</relay>
 <relay_mail>Le domaine de votre adresse locale est-il h&eacute;berg&eacute;e sur ce serveur ? Si oui laissez ce champ vide, sinon indiquez l'adresse du serveur de courrier qui h&eacute;berge la boite e-mail de l'adresse locale</relay_mail>
 <relay_server>Serveur smtp  distant</relay_server>

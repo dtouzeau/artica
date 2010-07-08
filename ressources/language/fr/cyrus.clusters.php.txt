@@ -22,7 +22,7 @@ Cyrus servers or "backend" servers in a Cyrus Murder to provide a high-availabil
 <REPLICATE_YOUR_MAILBOXES>R&eacute;plication des bo&icirc;tes aux lettres manuel</REPLICATE_YOUR_MAILBOXES>
 <REPLICATE_YOUR_MAILBOXES_TEXT>by default this operations is automatic. This will chock the replication mode</REPLICATE_YOUR_MAILBOXES_TEXT>
 <replica_ip>Nom/Adresse IP du r&eacute;pliqua</replica_ip>
-<replica_master_ip>Name/IP of this server</replica_master_ip>
+<replica_master_ip>Nom/IP du serveur</replica_master_ip>
 <SET_REPLICA_SERVER>D&eacute;finissez votre serveur r&eacute;pliqua</SET_REPLICA_SERVER>
 <SET_REPLICA_SERVER_EXPLAIN>Cette op&eacute;ration va notifier le serveur Artica distant afin qu'il devienne un r&eacute;pliqua des boites aux lettres</SET_REPLICA_SERVER_EXPLAIN>
 <SET_REPLICA_SERVER_TEXT>Le serveur r&eacute;pliqua est autoriser &agrave; &eacute;couter et accepter les ordres de synchronisation du serveur ma&icirc;tre</SET_REPLICA_SERVER_TEXT>

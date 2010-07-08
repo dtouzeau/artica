@@ -6,7 +6,7 @@ unit postfilter;
 interface
 
 uses
-    Classes, SysUtils,variants,strutils,IniFiles, Process,logs,unix,
+    Classes, SysUtils,variants,strutils,Process,logs,unix,
     RegExpr      in '/home/dtouzeau/developpement/artica-postfix/bin/src/artica-install/RegExpr.pas',
     zsystem      in '/home/dtouzeau/developpement/artica-postfix/bin/src/artica-install/zsystem.pas';
 
@@ -23,8 +23,6 @@ private
      verbose:boolean;
      EnablePostFilter:integer;
      INSTALLED:boolean;
-     AGENT_INSTALLED:boolean;
-     NotEngoughMemory:boolean;
      function  GET_PID():string;
      function  PID_PATH():string;
 
@@ -106,7 +104,6 @@ var
     RegExpr:TRegExpr;
     FileDatas:TStringList;
     i:integer;
-    BinPath:string;
     filetmp:string;
 begin
 if not INSTALLED then exit;
@@ -144,9 +141,7 @@ end;
 //##############################################################################
 procedure tpostfilter.RELOAD();
 var
-   cmd:string;
    pid:string;
-   count:integer;
 begin
 pid:=GET_PID();
 if not  SYS.PROCESS_EXIST(pid) then begin
@@ -242,7 +237,6 @@ end;
 procedure tpostfilter.STOP();
 var
    pid:string;
-   cmd:string;
    count:integer;
 begin
 

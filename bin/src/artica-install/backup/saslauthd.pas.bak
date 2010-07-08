@@ -6,7 +6,7 @@ unit saslauthd;
 interface
 
 uses
-    Classes, SysUtils,variants,strutils,IniFiles, Process,logs,unix,RegExpr in 'RegExpr.pas',zsystem,
+    Classes, SysUtils,variants,strutils,Process,logs,unix,RegExpr in 'RegExpr.pas',zsystem,
     cyrus        in '/home/dtouzeau/developpement/artica-postfix/bin/src/artica-install/cyrus.pas';
 
 
@@ -23,7 +23,7 @@ private
      EnableVirtualDomainsInMailBoxes:integer;
      procedure CHANGE_INITD();
 
-     function PID_PATH():string;
+
 
 public
     procedure   Free;
@@ -35,7 +35,7 @@ public
     function    STATUS():string;
     function    SASLAUTHD_PATH():string;
     function    SASLAUTHD_INITD_PATH():string;
-
+    function    PID_PATH():string;
 END;
 
 implementation
@@ -214,7 +214,7 @@ begin
   if FileExists('/var/run/saslauthd.pid') then exit('/var/run/saslauthd.pid');
   if FileExists('/var/run/saslauthd/saslauthd.pid') then exit('/var/run/saslauthd/saslauthd.pid');
 end;
-
+//#########################################################################################
 
  function tsaslauthd.SASLAUTHD_PID():string;
 var

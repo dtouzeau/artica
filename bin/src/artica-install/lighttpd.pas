@@ -25,7 +25,7 @@ private
      pid_root_path:string;
      mem_pid:string;
 
-    procedure   LIGHTTPD_FIX_ERRORS();
+
     procedure   LIGHTTPD_DEFAULT_CONF_SAVE();
     function    APACHE_ARTICA_ENABLED():string;
     function    Explode(const Separator, S: string; Limit: Integer = 0):TStringDynArray;
@@ -1192,6 +1192,7 @@ var
    php5DisableMagicQuotesGpc:integer;
    php5UploadMaxFileSize:integer;
    ApcEnabledInPhp:integer;
+   zarafa:tzarafa_server;
 begin
 
 if not TryStrToInt(SYS.GET_INFO('php5DisableMagicQuotesGpc'),php5DisableMagicQuotesGpc) then php5DisableMagicQuotesGpc:=0;
@@ -1218,7 +1219,7 @@ l.Add('disable_classes =');
 l.Add('expose_php = Off');
 l.Add('max_execution_time = 3600');
 l.Add('max_input_time = 3600');
-l.Add('memory_limit = 256M');
+l.Add('memory_limit = 300M');
 l.Add('error_reporting  =  E_ALL & ~E_NOTICE');
 l.Add('display_errors = Off');
 l.Add('display_startup_errors = Off');
@@ -1253,7 +1254,7 @@ l.Add('extension_dir = "'+ SYS.LOCATE_PHP5_EXTENSION_DIR()+'"');
 l.Add('cgi.force_redirect = 1');
 l.Add('cgi.fix_pathinfo = 1');
 l.Add('file_uploads = On');
-l.Add('upload_tmp_dir =');
+l.Add('upload_tmp_dir =/var/lighttpd/upload');
 
 if not tryStrToint(SYS.GET_INFO('php5UploadMaxFileSize'),php5UploadMaxFileSize) then begin
    php5UploadMaxFileSize:=256;
@@ -1436,11 +1437,13 @@ if FileExists(SYS.LOCATE_APC_SO()) then begin
    end;
 end;
 
-if FileExists(SYS.LOCATE_MAPI_SO()) then begin
+zarafa:=tzarafa_server.Create(SYS);
+if FileExists(zarafa.BIN_PATH()) then begin
+   if FileExists(SYS.LOCATE_MAPI_SO()) then begin
      logs.Debuglogs('Starting......: lighttpd: register mapi.so');
      l.Add('extension=mapi.so');
+   end;
 end;
-
 
   t:=Tstringlist.Create;
   t.add('/etc/php.ini');
@@ -1901,9 +1904,14 @@ l.Add('ssl.engine                 = "enable"');
 l.Add('ssl.pemfile                = "/opt/artica/ssl/certs/lighttpd.pem"');
 l.Add('status.status-url          = "/server-status"');
 l.Add('status.config-url          = "/server-config"');
+l.Add('server.upload-dirs         = ( "/var/lighttpd/upload" )');
+
+forceDirectories('/var/lighttpd/upload');
+fpsystem('/bin/chown -R '+name+' /var/lighttpd');
 
 if DirectoryExists(roundcube_folder) then begin
 logs.Debuglogs('Starting......: lighttpd: roundcube is installed on '+roundcube_folder);
+fpsystem(SYS.LOCATE_GENERIC_BIN('nohup')+' '+SYS.LOCATE_PHP5_BIN()+' /usr/share/artica-postfix/exec.roundcube.php --databases >/dev/null 2>&1 &');
 l.Add('alias.url += (	"/webmail" 			 => "'+roundcube_folder+'")');
 l.Add('$HTTP["url"] =~ "^/webmail/config|/webmail/temp|/webmail/logs" { url.access-deny = ( "" )}');
 end;
@@ -1955,33 +1963,6 @@ if Not FileExists('/etc/lighttpd/lighttpd.conf') then begin
 end;
 result:=l.text;
 l.free;
-end;
-//##############################################################################
-
-procedure Tlighttpd.LIGHTTPD_FIX_ERRORS();
-var
-     l:TstringList;
-     RegExpr:TRegExpr;
-     i:integer;
-begin
-
- if not FileExists('/opt/artica/conf/lighttpd.conf') then exit;
-
- l:=Tstringlist.Create;
- l.LoadFromFile('/opt/artica/conf/lighttpd.conf');
- RegExpr:=TRegExpr.Create;
- RegExpr.Expression:='^passl\.engine';
- for i:=0 to l.Count-1 do begin
-     if RegExpr.Exec(l.Strings[i]) then begin
-         l.Strings[i]:='ssl.engine                 = "enable"';
-         l.SaveToFile('/opt/artica/conf/lighttpd.conf');
-         break;
-     end;
- end;
-
-l.free;
-RegExpr.free;
-
 end;
 //##############################################################################
 function Tlighttpd.APACHE_ARTICA_ENABLED():string;

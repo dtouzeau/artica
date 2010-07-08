@@ -31,24 +31,7 @@ function GroupDelete(gpid){
 	LoadAjax('grouplist',"domains.edit.group.php"+'?LoadGroupList='+ou);;
 }
 
-function DomainEditGroupPressKey(e){
-	if(checkEnter(e)){addgroup();}
-}
 
-function addgroup(){
-	var XHR = new XHRConnection();
-	var group_name;
-	var ou;
-	
-	group_name=document.getElementById('group_add').value;
-	ou=document.getElementById('ou').value;
-
-	XHR.appendData('addgroup',document.getElementById('group_add').value);
-	XHR.appendData('ou',document.getElementById('ou').value);
-	XHR.sendAndLoad("domains.edit.group.php", 'GET',x_parseform);	
-	LoadGroups(document.getElementById('ou').value);
-	LoadAjax('GroupSettings',"domains.edit.group.php"+'?LoadGroupSettings=0&ou='+ou + '&byGroupName='+group_name);
-	}
 	
 function GroupPrivileges(gid){
 	YahooWin(650,"domains.edit.group.php"+'?GroupPriv=' + gid + '&start=yes')
@@ -123,11 +106,7 @@ function LoadMembers(groupid){
 	//LoadAjax('MembersList','domains.edit.group.php?MembersList='+groupid + '&ou='+ou)
 	}
 	
-function DeleteMembersGroup(groupid){
-	if(confirm(document.getElementById('warning_delete_all_users').value)){
-		LoadAjax('MembersList','domains.edit.group.php?DeleteMembersForGroup='+groupid)
-	}
-}	
+
 	
 function ImportMembers(groupid){
 	var ou=document.getElementById('ou').value;

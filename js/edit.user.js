@@ -14,8 +14,7 @@ var X_UserADD= function (obj) {
 	var groupid='';
 	if(document.getElementById('group_id')){groupid=document.getElementById('group_id').value;}
 	if(document.getElementById('ajax_return_group_id')){groupid=document.getElementById('ajax_return_group_id').value;}
-	
-	
+
 	
 	var reg = new RegExp( "ERROR(.+)","gi" ); 
 	if(results.match(reg)){
@@ -27,6 +26,15 @@ var X_UserADD= function (obj) {
 		return false;
 		
 	}
+	
+		if(document.getElementById('org_user_list')){
+			if(document.getElementById('searchstring')){
+				var search=document.getElementById('searchstring').value;
+				var ou=document.getElementById('org_user_list_ou').value;
+				LoadAjax('org_user_list','domains.manage.org.index.php?finduser='+search+'&ou='+ou);
+			}
+		}
+	
 	
 		if(document.getElementById('groups-section-from-members')){
 			groupid=document.getElementById('groups-section-from-members').value;
@@ -156,6 +164,10 @@ function Cyrus_mailbox_apply_settings(userid){
 
 
 var x_AddMemberGroup= function (obj) {
+	if(document.getElementById('main_group_config')){
+		RefreshTab('main_group_config');
+	}
+	
 	LoadAjax('USER_GROUP','domains.edit.user.php?USER_GROUP_LIST='+m_userid+'&userid='+m_userid+'&nodiv=yes');
 	
 	

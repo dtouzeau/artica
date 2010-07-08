@@ -35,6 +35,14 @@ class unix {
 		$this->events("Unable to stat cyrus cyrquota tool");
 	}
 	
+	public function LOCATE_CYRUS_PIDPATH(){
+		if(is_file("/var/run/cyrus-master.pid")){return "/var/run/cyrus-master.pid";}
+		if(is_file("/var/run/cyrmaster.pid")){return "/var/run/cyrmaster.pid";}
+		if(is_file("/var/run/cyrus.pid")){return "/var/run/cyrus.pid";}
+		$this->events("Unable to stat cyrus pid path");
+	}	
+
+	
 	public function DANSGUARDIAN_CATEGORIES(){
 			$path="/etc/dansguardian/lists/blacklists";
 			$unix=new unix();
@@ -119,6 +127,22 @@ class unix {
 		
 	}
 	
+	public function COUNT_LINES_OF_FILE($path){
+		$wc=$this->find_program("wc");
+		if($wc==null){
+			$array=explode("\n",@file_get_contents("$path"));
+			return count($array);
+			
+		}
+		
+		exec("$wc -l $path",$results);
+		$line=@implode(" ",$results);
+		if(preg_match("#^([0-9]+)\s+#",$line,$re)){
+			return $re[1];
+		}
+		
+	}
+	
 	
 	
 	
@@ -167,6 +191,17 @@ public function file_size($path){
 	exec($this->find_program("stat")." $path ",$results);
 	while (list ($num, $line) = each ($results)){
 		if(preg_match("#Size:\s+([0-9]+)\s+Blocks#",$line,$re)){
+			return $re[1];break;
+		}
+	}
+	return 0;
+}
+
+public function file_size_human($path){
+
+	exec($this->find_program("du")." -h $path ",$results);
+	while (list ($num, $line) = each ($results)){
+		if(preg_match("#^([0-9A-Z]+)\s+#",$line,$re)){
 			return $re[1];break;
 		}
 	}

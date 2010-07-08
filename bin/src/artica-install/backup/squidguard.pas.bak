@@ -89,7 +89,7 @@ logs.Debuglogs(BIN_PATH()+' -v >'+filetmp+' 2>&1');
 fpsystem(BIN_PATH()+' -v >'+filetmp+' 2>&1');
 
     RegExpr:=TRegExpr.Create;
-    RegExpr.Expression:='SquidGuard:\s+([0-9\.]+)\s+';
+    RegExpr.Expression:='SquidGuard:\s+([0-9\.]+)';
     FileDatas:=TStringList.Create;
     FileDatas.LoadFromFile(filetmp);
     logs.DeleteFile(filetmp);
@@ -124,23 +124,6 @@ fpsystem(BIN_PATH()+' -c /etc/monit/monitrc -p /var/run/monit/monit.pid reload')
 end;
 //#############################################################################
 
-procedure tsquidguard.STOP();
-var
-   count:integer;
-   pid:string;
-   tmp:string;
-   l:Tstringlist;
-   i:integer;
-   tt:integer;
-   path:string;
-    RegExpr:TRegExpr;
-begin
-
-
-end;
-
-
-//#############################################################################
 function tsquidguard.STATUS:string;
 var
 ini:TstringList;

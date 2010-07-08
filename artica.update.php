@@ -4,6 +4,7 @@
 	include_once('ressources/class.users.menus.inc');
 	include_once('ressources/class.artica.inc');
 	include_once('ressources/class.mysql.inc');
+	include_once('ressources/class.system.network.inc');
 	$usersmenus=new usersMenus();
 	if($usersmenus->AsArticaAdministrator==false){header('location:users.index.php');exit;}	
 	if(isset($_GET["main_artica_update"])){main_artica_update_switch();exit;}
@@ -62,6 +63,7 @@ var x_SaveArticaUpdateForm= function (obj) {
 		
 		
 		
+		XHR.appendData('WgetBindIpAddress',document.getElementById('WgetBindIpAddress').value);
     	XHR.appendData('CheckEveryMinutes',document.getElementById('CheckEveryMinutes').value);
     	XHR.appendData('uri',document.getElementById('uri').value);
     	document.getElementById('ArticaUpdateForm').innerHTML='<center><img src=\"img/wait_verybig.gif\"></center>';
@@ -183,14 +185,30 @@ $AUTOUPDATE=$ini->_params["AUTOUPDATE"];
 	</tr>";
 	}
 	
-	$form=$form."		
+	$ip=new networking();
+	
+	while (list ($eth, $cip) = each ($ip->array_TCP) ){
+		if($cip==null){continue;}
+		$arrcp[$cip]=$cip;
+	}
+	
+	$arrcp[null]="{default}";
+	
+	$WgetBindIpAddress=$sock->GET_INFO("WgetBindIpAddress");
+	$WgetBindIpAddress=Field_array_Hash($arrcp,"WgetBindIpAddress",$WgetBindIpAddress,null,null,0,"font-size:13px;padding:3px;");
+	
+	$form=$form."
+	<tr>
+	<td width=1% nowrap align='right' class=legend>{WgetBindIpAddress}:</strong></td>
+	<td align='left'>$WgetBindIpAddress</td>
+	</tr>			
 	<tr>
 	<td width=1% nowrap align='right' class=legend>{CheckEveryMinutes}:</strong></td>
-	<td align='left'>" . Field_text('CheckEveryMinutes',$AUTOUPDATE["CheckEveryMinutes"],'width:90px' )."</td>
+	<td align='left'>" . Field_text('CheckEveryMinutes',$AUTOUPDATE["CheckEveryMinutes"],'ont-size:13px;padding:3px;width:90px' )."</td>
 	</tr>
 	<tr>
 	<td width=1% nowrap align='right' class=legend>{uri}:</strong></td>
-	<td align='left'>" . Field_text('uri',$AUTOUPDATE["uri"],'width:100%' )."</td>
+	<td align='left'>" . Field_text('uri',$AUTOUPDATE["uri"],'ont-size:13px;padding:3px;width:100%' )."</td>
 	</tr>	
 	<tr>
 	<td colspan=2 align='right'>
@@ -270,6 +288,7 @@ $ini->loadString($configDisk);
 	}
 	
 	$data=$ini->toString();
+	$sock->SET_INFO("WgetBindIpAddress",$_GET["WgetBindIpAddress"]);
 	$sock->SaveConfigFile($data,"ArticaAutoUpdateConfig");
 	$sock->getFrameWork("cmd.php?ForceRefreshLeft=yes");
 	$tpl=new templates();

@@ -9,17 +9,19 @@ include_once(dirname(__FILE__).'/ressources/class.os.system.inc');
 include_once(dirname(__FILE__)."/framework/class.unix.inc");
 include_once(dirname(__FILE__)."/ressources/class.fetchmail.inc");
 include_once(dirname(__FILE__)."/framework/frame.class.inc");
+include_once(dirname(__FILE__)."/ressources/class.maincf.multi.inc");
 
-if(preg_match("#--verbose#",implode(" ",$argv))){$GLOBALS["DEBUG"]=true;}
+if(preg_match("#--verbose#",implode(" ",$argv))){$GLOBALS["DEBUG"]=true;$GLOBALS["VERBOSE"]=true;}
 if(preg_match("#--reload#",implode(" ",$argv))){$GLOBALS["RELOAD"]=true;}
-
-if($argv[1]=="--multi-start"){MultiBuildRules();die();}
+if($argv[1]=="--multi-start"){BuildRules();die();}
 
 BuildRules();
 
 
 function BuildRules(){
-
+	
+		$sock=new sockets();
+		$EnablePostfixMultiInstance=$sock->GET_INFO("EnablePostfixMultiInstance");
 		$fetch=new fetchmail();
 		$l[]="set logfile /var/log/fetchmail.log";
 		$l[]="set daemon $fetch->FetchmailPoolingTime";
@@ -43,11 +45,24 @@ function BuildRules(){
 			if($ligne["uid"]==null){continue;}
 			$user=new user($ligne["uid"]);
 			$ligne["is"]=$user->mail;
+			$smtphost=null;
+			$sslfingerprint=null;
+			$fetchall=null;
+			$timeout=null;
+			$port=null;
+			$aka=null;
+			$folder=null;
+			$tracepolls=null;
+			$interval=null;
+			$keep=null;
+			$fetchall=null;
+			$sslcertck=null;
+			
 			if($ligne["proto"]=="httpp"){$ligne["proto"]="pop3";}
 			
 			if(trim($ligne["port"])>0){$port="port {$ligne["port"]}";}
 			if(trim($ligne["aka"])<>null){$aka="\n\taka {$ligne["aka"]}";}
-			if($ligne["ssl"]==1){$ssl="\n\tssl ";}	
+			if($ligne["ssl"]==1){$ssl="\n\tssl\n\tsslproto ''";}	
 			if($ligne["timeout"]>0){$timeout="\n\ttimeout {$ligne["timeout"]}";}
 			if($ligne["folder"]<>null){$folder="\n\tfolder {$ligne["folder"]}";}				
 			if($ligne["tracepolls"]==1){$tracepolls="\n\ttracepolls";}
@@ -56,9 +71,44 @@ function BuildRules(){
 			if($ligne["nokeep"]==1){$keep="\n\tnokeep";}
 			if($ligne["multidrop"]==1){$ligne["is"]="*";}
 			if($ligne["fetchall"]==1){$fetchall="\n\tfetchall";}
-		
-		$l[]="poll {$ligne["poll"]}$tracepolls\n\tproto {$ligne["proto"]} $port\n\tuser {$ligne["user"]}\n\tpass {$ligne["pass"]}\n\tis {$ligne["is"]}$aka$folder$ssl$fetchall$interval$timeout$keep$multidrop\n\n";
+			if(strlen(trim($ligne["sslfingerprint"]))>10){$sslfingerprint="\n\tsslfingerprint '{$ligne["sslfingerprint"]}'";}
+			if($ligne["sslcertck"]==1){$sslcertck="\n\tsslcertck";}					
+			
+			
+			if($EnablePostfixMultiInstance==1){
+				if($GLOBALS["DEBUG"]){echo "multiple instances::poll={$ligne["poll"]} smtp_host={$ligne["smtp_host"]}\n";}
+				if(strlen(trim($ligne["smtp_host"]))==0){continue;}
+				$smtphost="\n\tsmtphost ".multi_get_smtp_ip($ligne["smtp_host"]);
+			}
+			
+			
+			if(trim($ssl)==null){$ssl="\n\tsslproto ssl23\n\tno ssl";}
+			$pattern="poll {$ligne["poll"]}$tracepolls\n\tproto {$ligne["proto"]} $port\n\tuser \"{$ligne["user"]}\"\n\tpass {$ligne["pass"]}\n\tis {$ligne["is"]}$aka$folder$ssl$fetchall$interval$timeout$keep$multidrop$sslfingerprint$sslcertck$smtphost\n\n";
+			if($GLOBALS["DEBUG"]){echo "$pattern\n";}
+
+			$multi_smtp[$ligne["smtp_host"]][]=$pattern;
+			$l[]=$pattern;
 		}
+		
+		if($EnablePostfixMultiInstance==1){
+			echo "Starting......: fetchmail postfix multiple instances enabled (".count($multi_smtp).") hostnames\n";
+			@unlink("/etc/artica-postfix/fetchmail.schedules");
+			
+			if(is_array($multi_smtp)){
+				while (list ($hostname, $rules) = each ($multi_smtp)){
+					echo "Starting......: fetchmail $hostname save rules...\n";
+					@file_put_contents("/etc/postfix-$hostname/fetchmail.rc",@implode("\n",$rules));
+					@chmod("/etc/postfix-$hostname/fetchmail.rc",0600);
+					$schedule[]=multi_build_schedule($hostname);
+				}
+				@file_put_contents("/etc/artica-postfix/fetchmail.schedules",@implode("\n",$schedule));
+				system("/etc/init.d/artica-postfix restart fcron");
+			}
+		return;
+		}
+		
+		
+		
 		if(is_array($l)){$conf=implode("\n",$l);}else{$conf=null;}
 		@file_put_contents("/etc/fetchmailrc",$conf);
 		@chmod("/etc/fetchmailrc",600);
@@ -66,35 +116,31 @@ function BuildRules(){
 			
 }
 
-function MultiBuildRules(){
+function multi_get_smtp_ip($hostname){
+	if($GLOBALS["SMTP_HOSTS_IP_FETCHMAIL"][$hostname]<>null){return $GLOBALS["SMTP_HOSTS_IP_FETCHMAIL"][$hostname];}
+	$main=new maincf_multi($hostname);
+	$GLOBALS["SMTP_HOSTS_IP_FETCHMAIL"][$hostname]=$main->ip_addr;
+	echo "Starting......: fetchmail $hostname ($main->ip_addr)\n";
+	return $main->ip_addr;
 	
-	
-	
-	$sql="SELECT uid FROM fetchmail_rules WHERE enabled=1";
-	$q=new mysql();
-	$results=$q->QUERY_SQL($sql,"artica_backup");
-	
-	
-	
+}
+
+function multi_build_schedule($hostname){
+	$unix=new unix();
+	$fetchmail=$unix->find_program("fetchmail");
+	if($fetchmail==null){return null;}	
+	$main=new maincf_multi($hostname);
+	$array=unserialize(base64_decode($main->GET_BIGDATA("PostfixMultiFetchMail")));	
+	if($array[$hostname]["enabled"]<>1){return null;}
+	if($array[$hostname]["schedule"]==null){return null;}
+	if($array[$hostname]["schedule"]<2){return null;}
+	echo "Starting......: fetchmail $hostname scheduling each {$array[$hostname]["schedule"]}mn\n";
+	return "{$array[$hostname]["schedule"]} $fetchmail --nodetach --fetchmailrc /etc/postfix-$hostname/fetchmail.rc --logfile /var/log/fetchmail.log";
 	
 	
 }
 
-function MultiBuildServerArray(){
-	$sock=new sockets();
-	$config=unserialize(base64_decode($sock->GET_INFO("PostfixMultiFetchMail")));
-	if(!is_array($config)){
-		echo "Starting......: fetchmail no enabled rules, aborting\n";
-		return;	
-	}
-	
-	while (list ($servername, $array) = each ($config) ){
-		if($array["enabled"]<>1){continue;}
-		$ou=$array["ou"];
-		
-	}
-	
-}
+
 
 
 ?>

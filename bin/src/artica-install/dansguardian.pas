@@ -789,7 +789,13 @@ var
   pidpath:string;
 begin
 if not FileExists(BIN_PATH()) then exit;
-SYS.MONIT_CONFIG('APP_DANSGUARDIAN','/var/run/dansguardian.pid','dansgardian');
+
+if DansGuardianEnabled=1 then begin
+   SYS.MONIT_CONFIG('APP_DANSGUARDIAN','/var/run/dansguardian.pid','dansgardian');
+end else begin
+   SYS.MONIT_DELETE('APP_DANSGUARDIAN');
+end;
+
 pidpath:=logs.FILE_TEMP();
 fpsystem(SYS.LOCATE_PHP5_BIN()+' /usr/share/artica-postfix/exec.status.php --dansguardian >'+pidpath +' 2>&1');
 result:=logs.ReadFromFile(pidpath);
@@ -984,6 +990,9 @@ end;
     ini.Add('service_cmd=dansguardian-tail');
     ini.Add('service_disabled='+ IntToStr(DansGuardianEnabled));
     ini.Add('master_version=' + SYS.ReadFileIntoString(artica_path+'/VERSION'));
+
+
+
 
      if SYS.MONIT_CONFIG('APP_ARTICA_DANSGUARDIAN_TAIL','/etc/artica-postfix/exec.dansguardian-tail.php.pid','dansguardian-tail') then begin
        ini.Add('monit=1');

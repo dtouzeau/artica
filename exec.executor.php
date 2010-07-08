@@ -235,17 +235,8 @@ function Group2(){
 	$array[]="exec.dhcpd-leases.php";
 	$array[]="exec.mailbackup.php";
 
-	if($GLOBALS["POSTFIX_INSTALLED"]){
-		$array[]="exec.watchdog.postfix.queue.php";
-		
-	}
-	
-	if($GLOBALS["DANSGUARDIAN_INSTALLED"]){
-		writelogs("DANSGUARDIAN_INSTALLED=TRUE -> exec.dansguardian.injector.php ",__FUNCTION__,__FILE__,__LINE__);
-		$array[]="exec.dansguardian.injector.php";
-	}else{
-		writelogs("DANSGUARDIAN_INSTALLED=FALSE",_FUNCTION__,__FILE__,__LINE__);
-	}
+	if($GLOBALS["POSTFIX_INSTALLED"]){$array[]="exec.watchdog.postfix.queue.php";}
+	if($GLOBALS["DANSGUARDIAN_INSTALLED"]){$array[]="exec.dansguardian.injector.php";}
 
 	if(is_array($array)){
 		while (list ($index, $file) = each ($array) ){
@@ -323,7 +314,7 @@ if(is_array($array2)){
 //2H
 function Group300(){
 	
-	
+	if(!is_file("/etc/artica-postfix/settings/Daemons/HdparmInfos")){sys_THREAD_COMMAND_SET(LOCATE_PHP5_BIN2()." /usr/share/artica-postfix/exec.hdparm.php");}
 	$array[]="exec.mysql.build.php --tables";
 	
 	

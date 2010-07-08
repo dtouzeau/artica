@@ -71,7 +71,6 @@ var
 
    s:string;
    l:TstringList;
-   D:boolean;
 begin
 s:='';
 if not FileExists('/etc/dspam/dspam.conf') then exit;
@@ -287,7 +286,7 @@ end;
 //##############################################################################
 function tdspam.VERSION():string;
 var
-   l:string;
+
    F:TstringList;
    t:string;
    i:integer;

@@ -16,16 +16,16 @@ to push/retreive local datas from this server from any computer join to this dom
 <give_computer_nameip>Donnez le nom de l'ordinateur ou l'adresse IP</give_computer_nameip>
 <give_folder_name>Donnez ici le nom du nouveau dossier que vous voulez cr&eacute;er.
 bas&eacute; sur</give_folder_name>
-<mount_name>mount name</mount_name>
+<mount_name>Nom du point de montage</mount_name>
 <net_share>Partage r&eacute;seau Windows</net_share>
 <NFS_CLIENT_ADD>Connection &agrave; un r&eacute;pertoire NFS</NFS_CLIENT_ADD>
 <NFS_CLIENT_ADD_TEXT>Ajoutez le r&eacute;pertoire distant dans le service d'auto-connexion. Ceci afin automatiquement monter la ressource r&eacute;seau lorsque le r&eacute;pertoire est  acc&egrave;d&eacute;</NFS_CLIENT_ADD_TEXT>
-<NFS_CLIENT_HOWTO>Click on the icon on the left pan in order to set NFS parameters in order to mount a local directory to the targeted server</NFS_CLIENT_HOWTO>
+<NFS_CLIENT_HOWTO>Cliquez sur l'ic&ocirc;ne sur le panneau de gauche afin de d&eacute;finir les param&egrave;tres NFS et de monter un r&eacute;pertoire local vers le serveur destinataire</NFS_CLIENT_HOWTO>
 <NTconfig>XP/2000 Policies</NTconfig>
 <NTconfig_howto>Push your Windows NT policy (*.pol) in order to make it in production mode</NTconfig_howto>
 <NTconfig_howto_title>How to create a .pol file ?</NTconfig_howto_title>
 <NTconfig_howto_title_text>Click on this icon in order to see how to create policies for your windows XP clients</NTconfig_howto_title_text>
-<NTconfig_text>Save your users policies (only if samba is set has PDC mode)</NTconfig_text>
+<NTconfig_text>Sauvegarder les strat&eacute;gies utilisateurs (seulement si le serveur est programm&eacute; en mode PDC)</NTconfig_text>
 <privileges_settings>Propri&eacute;t&eacute;s et des privil&egrave;ges du partage. Definir les privil&egrave;ges des utilisateurs et le comportement des dossiers</privileges_settings>
 <roaming_profiles>Profiles itin&eacute;rants</roaming_profiles>
 <roaming_profiles_text>Les profiles itin&eacute;rants autorise un utilisateur connect&eacute; au domaine &agrave; ouvrir une session depuis n'importe quel ordinateur afin d'acc&eacute;der &agrave; ses documents et son environnement</roaming_profiles_text>

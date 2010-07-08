@@ -659,32 +659,49 @@ function BuildBannedIPList(){
 function BuildPatterns(){
 	$unix=new unix();
 	cpulimit();
+	
 	$dirs=$unix->dirdir("/etc/dansguardian/lists/blacklists");
+	if($GLOBALS["VERBOSE"]){echo "open /etc/dansguardian/lists/blacklists array of ". count($dirs)."\n";}
+	
 	if(!is_array($dirs)){writelogs("Unable to dir /etc/dansguardian/lists/blacklists",__FUNCTION__,__FILE__,__LINE__);return;}
+	reset($dirs);
 	while (list ($num, $val) = each ($dirs) ){
 		$category=basename($num);
+		if($GLOBALS["VERBOSE"]){echo "$category:: $num -> $val\n";}
+		
 		writelogs("Checking $category",__FUNCTION__,__FILE__,__LINE__);
-		if($category=="blacklists"){continue;}
+		
+		if($category=="blacklists"){
+			if($GLOBALS["VERBOSE"]){echo "$category == blacklists, aborting\n";}
+			continue;
+		}
 		$domains=0;
 		$urls=0;
 		$expressions=0;
+		
+		
 		if(is_file("$num/domains")){
-			$rr=explode("\n",@file_get_contents("$num/domains"));
-			$domains=count($rr);
-			unset($rr);
+			$domains=$unix->COUNT_LINES_OF_FILE("$num/domains");
+			if($GLOBALS["VERBOSE"]){echo "$category:: $domains number\n";}
 			$filetime=date("Y-m-d H:i:s",filemtime("$num/domains"));
 			
+		}else{
+			if($GLOBALS["VERBOSE"]){echo "$category:: unable to stat $num/domains\n";}
 		}
+		
 		if(is_file("$num/urls")){
-			$rr=explode("\n",@file_get_contents("$num/urls"));
-			$urls=count($rr);
-			unset($rr);			
-		}
+			$urls=$unix->COUNT_LINES_OF_FILE("$num/urls");
+			
+		}else{if($GLOBALS["VERBOSE"]){echo "$category:: unable to stat $num/urls\n";}}
 	
 		
-		$array["$category"]=array($domains,$urls,$filetime);
+			if($GLOBALS["VERBOSE"]){echo "$category=$domains,$urls,$filetime\n";}
+			$array["$category"]=array($domains,$urls,$filetime);
 		
 		}
+		
+		
+		
 		$datas=base64_encode(serialize($array));
 		writelogs("writing /usr/share/artica-postfix/ressources/logs/dansguardian.patterns",__FUNCTION__,__FILE__,__LINE__);
 		@file_put_contents("/usr/share/artica-postfix/ressources/logs/dansguardian.patterns",$datas);

@@ -1350,19 +1350,16 @@ function Field_array_Hash($Hash,$FieldName,$default=null,$java=null,$class='',$m
 if(!preg_match("#font-size#",$style_of_field)){$style_of_field=$style_of_field.";font-size:12px";}
 		
 	$class="class='$class'  style='$style_of_field'";
-if($disabled){$DISABLED_TOKEN="DISABLED";}
+	if($disabled){$DISABLED_TOKEN="DISABLED";}
 	$html="
 	<!--Field_array_Hash value=\"$default\" -->
 	<select name=\"$FieldName\" id='$FieldName' $java $class $DISABLED_TOKEN>";	
 	reset ($Hash);
 	while (list($num,$val)=each($Hash)){	
 	$Default_value=$num;
-	if(is_numeric($Default_value) && is_numeric($default)){
-			if($Default_value==$default){$def="selected";}else{$def=null;}
-	}
-	if((!is_numeric($Default_value)) && (!is_numeric($default))){
-		if($Default_value==$default){$def="selected";}else{$def=null;}
-	}
+	if($Default_value==$default){$def="selected";}else{$def=null;}
+	
+	
 	if($maxlength>0){
 		if (strlen($val)>$maxlength){
 			$val=substr($val,0,$maxlength-3) . "...";
@@ -3999,26 +3996,31 @@ return $html;
 	
 }
  function is_base64_encoded($encodedString) {
-    $length = strlen($encodedString);
-   
-    // Check every character.
-    for ($i = 0; $i < $length; ++$i) {
-      $c = $encodedString[$i];
-      if (
-        ($c < '0' || $c > '9')
-        && ($c < 'a' || $c > 'z')
-        && ($c < 'A' || $c > 'Z')
-        && ($c != '+')
-        && ($c != '/')
-        && ($c != '=')
-      ) {
-        // Bad character found.
-        return false;
-      }
-    }
-    // Only good characters found.
-    return true;
+ 	$arr["150"]=true;
+ 	$arr["135"]=true;
+ 	$arr["181"]=true;
+ 	$arr["26"]=true;
+ 	$arr["182"]=true;
+ 	$arr["139"]=true;
+ 	$arr["179"]=true;
+ 	$arr["171"]=true;
+ 	
+ 	$datas=base64_decode($encodedString);
+	for($i=0;$i<strlen($datas);$i++){
+		$chr=getChr($datas[$i]);
+		if($arr[$chr]){return false;}
+		writelogs("{$datas[$i]}==".getChr($datas[$i]),__FUNCTION__,__FILE__,__LINE__);
+	}
+	return true;  
   }
+  
+  
+function getChr($car){
+	for($i=0;$i<256;$i++){
+		if($car==chr($i)){return $i;}
+	}
+	
+}
 
 
 

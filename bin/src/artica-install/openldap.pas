@@ -165,31 +165,14 @@ begin
 end;
 //##############################################################################
 function topenldap.STATUS():string;
-var ini:TstringList;
+var
+pidpath:string;
 begin
-ini:=TstringList.Create;
-
-   ini.Add('[LDAP]');
-   ini.Add('service_name=APP_LDAP');
-   ini.Add('service_cmd=ldap');
-   ini.Add('master_version=' + LDAP_VERSION());
-
-      if SYS.MONIT_CONFIG('APP_LDAP',PID_PATH(),'ldap') then begin
-         ini.Add('monit=1');
-         result:=ini.Text;
-         ini.free;
-         exit;
-      end;
-
-
-   if SYS.PROCESS_EXIST(LDAP_PID()) then ini.Add('running=1') else  ini.Add('running=0');
-   ini.Add('application_installed=1');
-   ini.Add('master_pid='+ LDAP_PID());
-   ini.Add('master_memory=' + IntToStr(SYS.PROCESS_MEMORY(LDAP_PID())));
-   ini.Add('status='+SYS.PROCESS_STATUS(LDAP_PID()));
-
-   result:=ini.Text;
-   ini.free;
+   SYS.MONIT_DELETE('APP_LDAP');
+   pidpath:=logs.FILE_TEMP();
+   fpsystem(SYS.LOCATE_PHP5_BIN()+' /usr/share/artica-postfix/exec.status.php --openldap >'+pidpath +' 2>&1');
+   result:=logs.ReadFromFile(pidpath);
+   logs.DeleteFile(pidpath);
 end;
 //#########################################################################################
 function topenldap.SLAPCAT_PATH():string;

@@ -487,7 +487,7 @@ function logon(){
 				return null;
 			}
 			
-			
+			writelogs('IT IS AN USER =>../user-backup/logon.php ',__FUNCTION__,__FILE__);
 			$tpl=new templates();
 			$array["USERNAME"]=$_POST["artica_username"];
 			$array["PASSWORD"]=md5($_POST["artica_username"]);

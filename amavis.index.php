@@ -6,7 +6,11 @@
 	include_once('ressources/class.ini.inc');
 	include_once('ressources/class.amavis.inc');
 	$user=new usersMenus();
-	if(!$user->AsPostfixAdministrator){"alert('No privileges');";exit;};
+	if($user->AsPostfixAdministrator==false){
+		$tpl=new templates();
+		echo "alert('". $tpl->javascript_parse_text("{ERROR_NO_PRIVS}")."');";
+		die();exit();
+	}
 	writelogs($_SERVER['QUERY_STRING'],null,__FILE__);
 	if(isset($_GET["status"])){page_status();exit;}
 	if(isset($_GET["section"])){main_page();exit;}
@@ -465,17 +469,25 @@ function main_events(){
 	$page=CurrentPageName();
 	$amavis=new amavis();
 	$sock=new sockets();
-	$datas=$sock->getfile("amavisevents");
-	$tbl=explode("\n",$datas);
+	$users=new usersMenus();
+	$tbl=unserialize(base64_decode($sock->getFrameWork("cmd.php?amavis-get-events&maillog=$users->maillog_path")));
 	$tbl=array_reverse ($tbl, TRUE);
-	$style="style='padding-bottom:2px;border-bottom:1px solid #CCCCCC'";
+	
 	$html="<table style='width:99%' class=table_form>";
-			
+		$count=0;
 		while (list ($num, $val) = each ($tbl) ){
-			if(trim($val)==null){continue;}
 			
+			if(trim($val)==null){continue;}
+			$count=$count+1;
+			if($count>300){break;}
+			$color="black";
 			if(preg_match('#^([A-Za-z]+)\s+([0-9:]+)\s+([0-9:]+)\s+(.+?)\s+(.+?)\[([0-9]+)\]:(.+)#',$val,$re)){
 				$re[7]=htmlentities($re[7]);
+				
+				if(preg_match("#No decoder#",$re[7])){
+					$color="red";
+				}
+				$style="style='padding-bottom:2px;border-bottom:1px solid #CCCCCC;color:$color'";
 				$html=$html . "
 			<tr " . CellRollOver().">
 			<td valign='top' nowrap $style>{$re[1]} {$re[2]} {$re[3]}</td>
@@ -536,7 +548,7 @@ function main_settings($noecho=0){
 	$trustlocal=Paragraphe("network-connection2.png",'{trust_local}','{trust_local_text}',"javascript:Loadjs('$page?script=trustlocal')",null,210,100);
 	$localNetwork=Paragraphe("64-ip-settings.png",'{local_network}','{local_network_text}',"javascript:Loadjs('$page?script=localnetwork')",null,210,100);
 	$filterbhavior=Paragraphe("64-milter-behavior.png",'{filter_behavior}','{filter_behavior_text}',"javascript:Loadjs('$page?script=filterbehavior')",null,210,100);
-	$notification=Paragraphe("mail4-64.png",'{notification}','{notification_text}',"javascript:Loadjs('$page?script=notification')",null,210,100);
+	$notification=Paragraphe("mail4-64.png",'{smtp_notification}','{notification_text}',"javascript:Loadjs('$page?script=notification')",null,210,100);
 	$spamassassin=Paragraphe("folder-64-spamassassin-grey.png",'{spamassassin}','{feature_not_installed}',null,null,210,100);
 	$whitelist=Paragraphe("folder-64-spamassassin-grey.png",'{spamassassin}','{feature_not_installed}',null,null,210,100);
 	
@@ -553,7 +565,7 @@ function main_settings($noecho=0){
 	
 	$prepost=Paragraphe("folder-equerre-64.png",'{postfix_hooking}','{postfix_hooking_text}',"javascript:Loadjs('$page?hooking-js=yes')",'postfix_hooking_text',210,100);
 	
-	
+	$spf=Paragraphe("spf-logo-64.png",'{APP_SPF}','{APP_SPF_TINY_TEXT}',"javascript:Loadjs('spamassassin.spf.php')",'APP_SPF_TINY_TEXT',210,100);
 	
 	$html="
 	<H5>{global_settings}</H5>
@@ -565,7 +577,7 @@ function main_settings($noecho=0){
 			</tr>
 			<tr>
 			<td valign='top' >$pieces_jointes</td>
-			<td valign='top'></td>
+			<td valign='top'>$spf</td>
 			<td valign='top' >$spamassassin</td>
 			</tr>			
 			<td valign='top'>$prepost</td>
@@ -891,18 +903,18 @@ $sa_tag3_level_defltl=$tpl->_ENGINE_parse_body('{sa_tag3_level_deflt}','spamassa
 
 
 if(strlen($sa_quarantine_cutoff_level)>70){
-	$sa_quarantine_cutoff_level=texttooltip(substr($sa_quarantine_cutoff_level,0,67)."...",$sa_quarantine_cutoff_level,null,null,1);
+	$sa_quarantine_cutoff_level=texttooltip(substr($sa_quarantine_cutoff_level,0,67)."..:",$sa_quarantine_cutoff_level,null,null,1);
 }
 
 if(strlen($sa_tag3_level_defltl)>70){
-	$sa_tag3_level_defltl=texttooltip(substr($sa_tag3_level_defltl,0,67)."...",$sa_tag3_level_defltl,null,null,1);
+	$sa_tag3_level_defltl=texttooltip(substr($sa_tag3_level_defltl,0,67)."..:",$sa_tag3_level_defltl,null,null,1);
 }
 
-$html="<H1>{spamassassin}</H1>
+$html="
 <div id='amavisspamassassin'>
 	<form name='FFM_filterbehavior_popup'>
 	<input type='hidden' name='INI_SAVE' value='BEHAVIORS' id='INI_SAVE'>
-	<p class=caption>{spamassassin_text}</p>
+	<p style='font-size:14px'>{spamassassin_text}</p>
 	<table style='width:100%'>	
 		<tr>
 			<td class=legend nowrap>{replicate_all_domains}:</td>
@@ -915,7 +927,7 @@ $html="<H1>{spamassassin}</H1>
 			<td>" . Field_numeric_checkbox_img('spam_quarantine_spammy',$amavis->EnableQuarantineSpammy,'{spam_quarantine_spammy}') . "</td>			
 		</tr>
 		<tr>
-			<td class=legend nowrap>$sa_tag3_level_defltl:</td>
+			<td class=legend nowrap>$sa_tag3_level_defltl</td>
 			<td width=1%>". Field_text('sa_tag3_level_deflt',$amavis->main_array["BEHAVIORS"]["sa_tag3_level_deflt"],'width:90px')."</td>
 			<td>" . Field_numeric_checkbox_img('spam_quarantine_spammy2',$amavis->EnableQuarantineSpammy2,'{spam_quarantine_spammy}') . "</td>
 		</tr>	
@@ -924,8 +936,6 @@ $html="<H1>{spamassassin}</H1>
 			<td width=1%>". Field_text('sa_kill_level_deflt',$amavis->main_array["BEHAVIORS"]["sa_kill_level_deflt"],'width:90px')."</td>
 			<td>&nbsp;</td>
 		</tr>	
-		<tr>
-		<td colspan=3 align='right'><input type='button' value='{edit}&nbsp;&raquo;' OnClick=\"javascript:ParseForm('FFM_filterbehavior_popup','$page',true);\">
 		</tr>		
 		<tr><td colspan=3><hr></td></tR>
 		<tr>
@@ -934,15 +944,10 @@ $html="<H1>{spamassassin}</H1>
 			<td>&nbsp;</td>
 		</tr>
 		<tr>
-			<td class=legend nowrap>$sa_quarantine_cutoff_level:</td>
+			<td class=legend nowrap>$sa_quarantine_cutoff_level</td>
 			<td width=1%>". Field_text('sa_quarantine_cutoff_level',$amavis->main_array["BEHAVIORS"]["sa_quarantine_cutoff_level"],'width:90px')."</td>
 			<td>&nbsp;</td>
 		</tr>
-		
-		
-	<tr>
-		<td colspan=2 align='right'><input type='button' value='{edit}&nbsp;&raquo;' OnClick=\"javascript:$form_js;\">
-	</tr>	
 	</table>
 	<hr>
 <table style='width:100%'>	
@@ -962,9 +967,12 @@ $html="<H1>{spamassassin}</H1>
 		</tr>	
 		
 	<tr>
-		<td colspan=5 align='right'><input type='button' value='{edit}&nbsp;&raquo;' OnClick=\"javascript:$form_js;\">
+		<td colspan=5 align='right'>
+		<hr>
+		". button("{apply}","$form_js")."
+		</td>
 	</tr>			
-	
+	</table>
 	</form>
 	<table style='width:100%'>
 	<tr>
@@ -983,58 +991,89 @@ $html="<H1>{spamassassin}</H1>
 function notification_popup(){
 $amavis=new amavis();
 $page=CurrentPageName();
-
+$tpl=new templates();
 if($amavis->main_array["BEHAVIORS"]["virus_admin"]=="undef"){$amavis->main_array["BEHAVIORS"]["virus_admin"]=null;}
 
-$html="<H1>{notification}</H1>
+	$mailfrom_notify_admin=$tpl->_ENGINE_parse_body("{mailfrom_notify_admin}:");
+	$mailfrom_notify_recip=$tpl->_ENGINE_parse_body("{mailfrom_notify_recip}:");
+	$mailfrom_notify_spamadmin=$tpl->_ENGINE_parse_body("{mailfrom_notify_spamadmin}:");
+	$mailfrom_notify=$tpl->_ENGINE_parse_body("{mailfrom_notify}:");
+	$virus_admin=$tpl->_ENGINE_parse_body("{virus_admin}:");
+	$warnbadhsender=$tpl->_ENGINE_parse_body("{warnbadhsender}:");
+	$warnbadhrecip=$tpl->_ENGINE_parse_body("{warnbadhrecip}:");
+	$warnvirusrecip=$tpl->_ENGINE_parse_body("{warnvirusrecip}:");
+	$warnbannedrecip=$tpl->_ENGINE_parse_body("{warnbannedrecip}:");
+	
+	
+	$sytrip_text=50;
+	$sytrip_text_=$sytrip_text-3;
+	
+	
+	if(strlen($mailfrom_notify_admin)>$sytrip_text){$mailfrom_notify_admin=texttooltip(substr($mailfrom_notify_admin,$sytrip_text_)."...:",$mailfrom_notify_admin);}
+	if(strlen($mailfrom_notify_recip)>$sytrip_text){$mailfrom_notify_recip=texttooltip(substr($mailfrom_notify_recip,0,$sytrip_text_)."...:",$mailfrom_notify_recip);}
+	if(strlen($mailfrom_notify_spamadmin)>$sytrip_text){$mailfrom_notify_spamadmin=texttooltip(substr($mailfrom_notify_spamadmin,0,$sytrip_text_)."...:",$mailfrom_notify_spamadmin);}
+	if(strlen($mailfrom_notify)>$sytrip_text){$mailfrom_notify=texttooltip(substr($mailfrom_notify,0,$sytrip_text_)."...:",$mailfrom_notify);}
+	if(strlen($virus_admin)>$sytrip_text){$virus_admin=texttooltip(substr($virus_admin,0,$sytrip_text_)."...:",$virus_admin);}
+	if(strlen($warnbadhsender)>$sytrip_text){$warnbadhsender=texttooltip(substr($warnbadhsender,0,$sytrip_text_)."...:",$warnbadhsender);}
+	if(strlen($warnbadhrecip)>$sytrip_text){$warnbadhrecip=texttooltip(substr($warnbadhrecip,0,$sytrip_text_)."...:",$warnbadhrecip);}
+	if(strlen($warnvirusrecip)>$sytrip_text){$warnvirusrecip=texttooltip(substr($warnvirusrecip,0,$sytrip_text_)."...:",$warnvirusrecip);}
+	if(strlen($warnbannedrecip)>$sytrip_text){$warnbannedrecip=texttooltip(substr($warnbannedrecip,0,$sytrip_text_)."...:",$warnbannedrecip);}
+	
+	
+
+
+$html="
 	<form name='FFM_filterbehavior_popup'>
 	<input type='hidden' name='INI_SAVE' value='BEHAVIORS' id='INI_SAVE'>
 	<p class=caption>{notification_text}</p>
 	<table style='width:100%'>	
 	<tr>
-		<td colspan=2><H3>{mailfrom_notify}:</h3></td>
+		<td colspan=2><H3>$mailfrom_notify</h3></td>
 	</tR>
 	
 	
 	
 		<tr>
-			<td class=legend nowrap>{mailfrom_notify_admin}:</td>
+			<td class=legend nowrap>$mailfrom_notify_admin</td>
 			<td width=1%>". Field_text('mailfrom_notify_admin',$amavis->main_array["BEHAVIORS"]["mailfrom_notify_admin"],'width:180px')."</td>
 		</tr>
 		<tr>
-			<td class=legend nowrap>{mailfrom_notify_recip}:</td>
+			<td class=legend nowrap>$mailfrom_notify_recip</td>
 			<td width=1%>". Field_text('mailfrom_notify_recip',$amavis->main_array["BEHAVIORS"]["mailfrom_notify_recip"],'width:180px')."</td>
 		</tr>
 		<tr>
-			<td class=legend nowrap>{mailfrom_notify_spamadmin}:</td>
+			<td class=legend nowrap>$mailfrom_notify_spamadmin</td>
 			<td width=1%>". Field_text('mailfrom_notify_spamadmin',$amavis->main_array["BEHAVIORS"]["mailfrom_notify_spamadmin"],'width:180px')."</td>
 		</tr>				
 	</tr>
 	<tr>
-		<td colspan=2><H3 style='margin-top:5px'>{notification}:</h3></td>
+		<td colspan=2><H3 style='margin-top:5px'>{smtp_notification}:</h3></td>
 	</tR>	
 		<tr>
-			<td class=legend nowrap>{virus_admin}:</td>
+			<td class=legend nowrap>$virus_admin</td>
 			<td width=1%>". Field_text('virus_admin',$amavis->main_array["BEHAVIORS"]["virus_admin"],'width:180px')."</td>
 		</tr>	
 	<tr>
-		<td class=legend nowrap>{warnbadhsender}:</td>
+		<td class=legend nowrap>$warnbadhsender</td>
 		<td width=1%>". Field_numeric_checkbox_img('warnbadhsender',$amavis->main_array["BEHAVIORS"]["warnbadhsender"],'{enable_disable}')."</td>
 	</tr>
 	<tr>
-		<td class=legend nowrap>{warnbadhrecip}:</td>
+		<td class=legend nowrap>$warnbadhrecip</td>
 		<td width=1%>". Field_numeric_checkbox_img('warnbadhrecip',$amavis->main_array["BEHAVIORS"]["warnbadhrecip"],'{enable_disable}')."</td>
 	</tr>	
 	<tr>
-		<td class=legend nowrap>{warnvirusrecip}:</td>
+		<td class=legend nowrap>$warnvirusrecip</td>
 		<td width=1%>". Field_numeric_checkbox_img('warnvirusrecip',$amavis->main_array["BEHAVIORS"]["warnvirusrecip"],'{enable_disable}')."</td>
 	</tr>		
 	<tr>
-		<td class=legend nowrap>{warnbannedrecip}:</td>
+		<td class=legend nowrap>$warnbannedrecip</td>
 		<td width=1%>". Field_numeric_checkbox_img('warnbannedrecip',$amavis->main_array["BEHAVIORS"]["warnbannedrecip"],'{enable_disable}')."</td>
 	</tr>		
 	<tr>
-		<td colspan=2 align='right'><input type='button' value='{edit}&nbsp;&raquo;' OnClick=\"javascript:ParseForm('FFM_filterbehavior_popup','$page',true);\">
+		<td colspan=2 align='right'>
+		<hr>". button("{apply}","ParseForm('FFM_filterbehavior_popup','$page',true);")."
+		
+		</td>
 	</tr>	
 	</table>
 	</form>";

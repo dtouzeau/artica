@@ -3517,17 +3517,6 @@ RegExpr.expression:='dansguardian_service:(.+)';
     end;
 
 
-RegExpr.expression:='miltergl';
-    if RegExpr.Exec(uri) then begin
-        tmpstr:=logs.FILE_TEMP();
-        logs.logs('ParseUri::  -> milter-greylist config');
-        fpsystem(GLOBAL_INI.get_ARTICA_PHP_PATH() + '/bin/artica-ldap -milter-greylist --verbose >'+tmpstr+' 2>&1');
-        FileData.Add(logs.ReadFromFile(tmpstr));
-        logs.DeleteFile(tmpstr);
-        result:=true;
-        exit;
-    end;
-
 RegExpr.expression:='MILTER_GREYLIST_STATUS';
     if RegExpr.Exec(uri) then begin
         logs.logs('ParseUri::  -> milter-greylist MILTER_GREYLIST_STATUS');

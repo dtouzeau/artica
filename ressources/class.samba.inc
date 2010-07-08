@@ -665,7 +665,8 @@ function BuildConfig(){
 				$conf=$conf ."logon drive = \"\"\n";
 			}
 			
-			$conf=$conf ."socket options = TCP_NODELAY SO_RCVBUF=8192 SO_SNDBUF=8192\n";
+
+			$conf=$conf ."socket options = TCP_NODELAY IPTOS_LOWDELAY IPTOS_THROUGHPUT SO_KEEPALIVE SO_RCVBUF=8192 SO_SNDBUF=8192\n";
 			$conf=$conf ."case sensitive = No\n";
 			$conf=$conf ."default case = lower\n";
 			$conf=$conf ."preserve case = yes\n";
@@ -972,6 +973,14 @@ function GetUsrsRights($userid){
 	
 	
 	
+}
+
+function CheckSambaRights(){
+	$user=new usersMenus();
+	if($user->AsArticaAdministrator){return true;}
+	if($user->AsSambaAdministrator){return true;}
+	if($user->AsOrgStorageAdministrator){return true;}
+	return false;
 }
 /*
  * 

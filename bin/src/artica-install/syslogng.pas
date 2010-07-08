@@ -6,7 +6,7 @@ unit syslogng;
 interface
 
 uses
-    Classes, SysUtils,variants,strutils,IniFiles, Process,md5,logs,unix,RegExpr in 'RegExpr.pas',zsystem;
+    Classes, SysUtils,variants,strutils,Process,logs,unix,RegExpr in 'RegExpr.pas',zsystem;
 
 type LDAP=record
       admin:string;
@@ -23,8 +23,6 @@ type LDAP=record
 private
      LOGS:Tlogs;
      SYS:Tsystem;
-     D:boolean;
-     GLOBAL_INI:TiniFIle;
      artica_path:string;
 SyslogNgPref:integer;
      InsufficentRessources:boolean;
@@ -159,8 +157,6 @@ end;
 
 procedure tsyslogng.START();
  var
-    count      :integer;
-    cmdline    :string;
     logs       :Tlogs;
     FileTemp   :string;
     PIDS       :string;
@@ -168,7 +164,6 @@ procedure tsyslogng.START();
     EnableMysql:string;
     
 begin
-     count:=0;
      logs:=Tlogs.Create;
      EnableMysqlFeatures:=0;
 
@@ -379,14 +374,12 @@ end;
 //##############################################################################
 procedure tsyslogng.CONFIG_MYSQL();
  var
-    count      :integer;
     mysql_bin:string;
     sql        :string;
     l,t        :TstringList;
     syslogng_log_fifo_size:string;
     syslogng_sync:string;
     log_fifo_size:integer;
-    fifo_size:integer;
     sync:integer;
     EnableMysqlFeatures:boolean;
     syslogng_max_connections:integer;
@@ -707,7 +700,6 @@ var
   RegExpr:TRegExpr;
   l:TstringList;
   i:integer;
-  FileTemp:string;
   commut1:boolean;
   commut2:boolean;
 

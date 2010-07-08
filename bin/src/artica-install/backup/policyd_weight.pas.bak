@@ -178,7 +178,7 @@ begin
    tmpstr:=logs.FILE_TEMP();
    fpsystem(path+' -v >'+tmpstr+' 2>&1');
 
-
+     if not FileExists(tmpstr) then exit;
      l:=TstringList.Create;
      RegExpr:=TRegExpr.Create;
      l.LoadFromFile(tmpstr);

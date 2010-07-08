@@ -445,6 +445,10 @@ function listOfAvailableServices(){
 		$array["ZARAFA"]="{APP_ZARAFA}";
 		$array["ZARAFA_MOBILE"]="{APP_ZARAFA_MOBILE_ACCESS}";
 	}
+	
+	if($user->DRUPAL_INSTALLED){
+		$array["DRUPAL"]="{APP_DRUPAL}";
+	}
 
 	
 	

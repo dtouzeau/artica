@@ -17,7 +17,7 @@ uses
   imapsync, dhcp_server, samba4, obm2, xapian, opengoo, dstat, rsync, tcpip,
   nfsserver, lvm, assp, pdns, gluster, kav4proxy, zabbix, hamachi, kavmilter,
   kavm4mls, postfilter, fetchmail, vmwaretools, zarafa_server, monit,
-  squidguard, wifi;
+  squidguard, wifi,fail2ban,mysql_daemon,saslauthd;
 
 var
    install:Tclass_install;
@@ -96,6 +96,9 @@ var
    zmonit:tmonit;
    zsquidguard:tsquidguard;
    zwifi:twifi;
+   zfail2ban:tfail2ban;
+   zmysql:tmysql_daemon;
+   zsaslauthd:tsaslauthd;
 
  begin
     SYS:=Tsystem.Create;
@@ -280,6 +283,81 @@ end;
               halt(0);
          end;
 
+         if ParamStr(2)='milter-greylist' then begin
+              milter_greylist:=tmilter_greylist.Create(SYS);
+              writeln(milter_greylist.VERSION());
+              halt(0);
+         end;
+
+         if ParamStr(2)='milter-greylist-pid' then begin
+              milter_greylist:=tmilter_greylist.Create(SYS);
+              writeln(milter_greylist.MILTER_GREYLIST_PID_PATH());
+              halt(0);
+         end;
+
+         if ParamStr(2)='lighttpd' then begin
+              zlighttpd:=Tlighttpd.Create(SYS);
+              writeln(zlighttpd.LIGHTTPD_VERSION());
+              halt(0);
+         end;
+
+         if ParamStr(2)='pdns' then begin
+              zpdns:=tpdns.Create(SYS);
+              writeln(zpdns.VERSION());
+              halt(0);
+         end;
+
+         if ParamStr(2)='cyrus-imap' then begin
+              ccyrus:=Tcyrus.Create(SYS);
+              writeln(ccyrus.CYRUS_VERSION());
+              halt(0);
+         end;
+
+
+         if ParamStr(2)='fail2ban' then begin
+              zfail2ban:=tfail2ban.Create(SYS);
+              writeln(zfail2ban.VERSION());
+              halt(0);
+         end;
+
+         if ParamStr(2)='mysql-pid' then begin
+              zmysql:=tmysql_daemon.Create(SYS);
+              writeln(zmysql.PID_PATH());
+              halt(0);
+         end;
+
+        if ParamStr(2)='mysql-ver' then begin
+              zmysql:=tmysql_daemon.Create(SYS);
+              writeln(zmysql.VERSION());
+              halt(0);
+         end;
+
+        if ParamStr(2)='openldap' then begin
+              zldap:=tOpenldap.Create();
+              writeln(zldap.LDAP_VERSION());
+              halt(0);
+         end;
+
+        if ParamStr(2)='openldap-pid' then begin
+              zldap:=tOpenldap.Create();
+              writeln(zldap.PID_PATH());
+              halt(0);
+         end;
+
+        if ParamStr(2)='saslauthd' then begin
+              zsaslauthd:=tsaslauthd.Create(SYS);
+              writeln(zsaslauthd.VERSION());
+              halt(0);
+         end;
+
+        if ParamStr(2)='saslauthd-pid' then begin
+              zsaslauthd:=tsaslauthd.Create(SYS);
+              writeln(zsaslauthd.PID_PATH());
+              halt(0);
+         end;
+
+
+
          writeln('help:');
          writeln('--export-version squid');
          writeln('--export-version c-icap');
@@ -288,6 +366,11 @@ end;
          writeln('--export-version wpa_suppliant');
          writeln('--export-version hostapd');
          writeln('--export-version fetchmail');
+         writeln('--export-version milter-greylist');
+         writeln('--export-version milter-greylist-pid');
+         writeln('--export-version fail2ban');
+         writeln('--export-version lighttpd');
+         writeln('--export-version pdns');
          halt(0);
     end;
 
@@ -346,7 +429,9 @@ end;
    end;
 
     if ParamStr(1)='--zarafa-remove' then begin
+      zZarafa:=tzarafa_server.Create(SYS);
       fpsystem('/usr/share/artica-postfix/bin/artica-make APP_ZARAFA --remove');
+      zZarafa.REMOVE();
       halt(0);
    end;
 

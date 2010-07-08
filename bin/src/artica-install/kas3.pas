@@ -6,7 +6,7 @@ unit kas3;
 interface
 
 uses
-    Classes, SysUtils,variants,strutils,IniFiles, Process,logs,unix,RegExpr in 'RegExpr.pas',zsystem;
+    Classes, SysUtils,variants,strutils,Process,logs,unix,RegExpr in 'RegExpr.pas',zsystem;
 
 type LDAP=record
       admin:string;
@@ -22,7 +22,7 @@ type LDAP=record
 
 private
      LOGS:Tlogs;
-     GLOBAL_INI:TiniFIle;
+
      SYS:TSystem;
      artica_path:string;
 

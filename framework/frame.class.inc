@@ -23,7 +23,10 @@ function sys_events($text){
 		
 		
 function file_time_min($path){
-	if(!is_file($path)){return 100000;}
+	if(!is_file($path)){
+		if($GLOBALS["VERBOSE"]){echo "file_time_min() -> unable to stat $path\n";}
+		return 100000;
+		}
 	 $last_modified = filemtime($path);
 	 $data1 = $last_modified;
 	 $data2 = time();

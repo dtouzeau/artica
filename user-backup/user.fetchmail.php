@@ -34,7 +34,7 @@ function js(){
 		
 	function EditRuleFetchmail(index){
 		fetchid=index;
-		YahooWin2(400,'$page?edit-rule='+index,'$title2');
+		YahooWin2(450,'$page?edit-rule='+index,'$title2');
 		}		
 		
 		
@@ -65,7 +65,10 @@ var x_DeleteFetchmail= function (obj) {
 		XHR.appendData('proto',document.getElementById('proto').value);
 		XHR.appendData('rule_number',ruleid);
 		if(document.getElementById('ssl').checked){XHR.appendData('ssl',1);}
-		
+		if(document.getElementById('smtp_host')){
+			XHR.appendData('smtp_host',document.getElementById('smtp_host').value);
+		}
+	
 		XHR.sendAndLoad('$page', 'GET',x_SaveFetchmailRule);	
 	}	
 
@@ -128,6 +131,11 @@ function form_rule(){
 	$user=new user($_SESSION["uid"]);
 	$ligne=$user->fetchmail_rules[$rule_id];
 	$f=new Fetchmail_settings();
+	$sock=new sockets();
+	$EnablePostfixMultiInstance=$sock->GET_INFO("EnablePostfixMultiInstance");
+	
+	
+	
 	
 	$array=$f->LoadRule($rule_id);
 	
@@ -144,6 +152,16 @@ function form_rule(){
 	
 	$sslcheck=Field_checkbox("ssl",1,$ssl);
 	
+	if($EnablePostfixMultiInstance==1){
+		$smtp_sender=
+		"<tr>
+			<td valign='top' class=legend nowrap>{local_smtp_host}:</td>
+			<td valign='top'>".	Field_array_Hash(fetchmail_PostFixMultipleInstanceList($user->ou),"smtp_host",$array["smtp_host"])."</td>
+		</tr>";
+	}
+	
+	
+	
 	$table="
 	<div id='mypool'>
 	<table class=table_form>
@@ -155,6 +173,7 @@ function form_rule(){
 		<td class=legend>{server_name}:</td>
 		<td>" . Field_text('poll',$array["poll"],'width:70%')."</td>
 	</tr>
+	$smtp_sender
 	<tr>
 		<td class=legend>ssl:</td>
 		<td>$sslcheck</td>
@@ -249,6 +268,19 @@ function rule_delete(){
 	$user=new user($_SESSION["uid"]);
 	$fr=new Fetchmail_settings();
 	$fr->DeleteRule($_GET["rule_delete"],$_SESSION["uid"]);
+}
+function fetchmail_PostFixMultipleInstanceList($ou){
+	$sock=new sockets();
+	$uiid=$sock->uuid=base64_decode($sock->getFrameWork("cmd.php?system-unique-id=yes"));	
+	$q=new mysql();
+	$sql="SELECT `value`,`ip_address` FROM postfix_multi WHERE `key`='myhostname' AND `ou`='$ou' AND `uuid`='$uiid'";
+	$results=$q->QUERY_SQL($sql,"artica_backup");
+	if(!$q->ok){writelogs("$q->mysql_error\n$sql",__FUNCTION__,__FILE__,__LINE__);}
+	while($ligne=@mysql_fetch_array($results,MYSQL_ASSOC)){	
+		$array[$ligne["value"]]=$ligne["value"];
+	}
+	$array[null]="{select}";
+	return $array;
 }
 
 

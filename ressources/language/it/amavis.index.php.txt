@@ -115,7 +115,6 @@ On the low side, the number should not be too small in order for the startup cos
  For 4000 users a value between 5 and 10 would be a good starting point.[br]
  With low memory (e.g. 256 MB) a value of 2 or 3 would probably do.
 </max_servers_text>
-<notification>SMTP Alerts & notifications</notification>
 <notification_text>Notifications behaviors according amavis detections</notification_text>
 <postfix_afterqueue>Postfix After-Queue Content Filter</postfix_afterqueue>
 <postfix_afterqueue_text>
@@ -159,6 +158,7 @@ SaneSecurity signatures are a culmination of hard work and commitment to providi
 <sa_tag2_level_deflt>Add X-Spam-Flag: YES headers at that level to passed mail</sa_tag2_level_deflt>
 <sa_tag_level_deflt>Add X-Spam*** info headers if at, or above that level</sa_tag_level_deflt>
 <select_domain>Select the SMTP domain</select_domain>
+<smtp_notification>SMTP Alerts & notifications</smtp_notification>
 <spamassassin>SpamAssassin Features</spamassassin>
 <spamassassin_text>Define anti-spam policies</spamassassin_text>
 <spam_quarantine_spammy>Green: Put it quarantine if reach this score[br]Red: PASS but mark has spam</spam_quarantine_spammy>

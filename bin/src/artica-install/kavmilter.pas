@@ -129,9 +129,6 @@ end;
 procedure tkavmilter.RELOAD();
 var
     pidlists:string;
-    RegExpr:TRegExpr;
-    l:TstringList;
-    i:Integer;
 begin
   pidlists:=KAV_MILTER_PID();
   if length(pidlists)=0 then begin
@@ -206,14 +203,8 @@ end;
 procedure tkavmilter.START();
 var
     pidlists:string;
-    RegExpr:TRegExpr;
-    l:TstringList;
-    i:Integer;
-    Expired:boolean;
     count:integer;
 begin
-Expired:=false;
-
 logs.Debuglogs('###################### kavmilter ######################');
 
 if not FileExists(SYS.LOCATE_GENERIC_BIN('postconf')) then begin
@@ -479,12 +470,11 @@ end;
 function tkavmilter.PERFORM_UPDATE():string;
 var
 tmp:string;
-spattern_date:string;
 pids,cmd:string;
 ini:TiniFile;
 Retranslator_g:string;
 begin
-
+result:='';
  if RetranslatorEnabled=1 then  begin
     fpsystem('/opt/kav/5.6/kavmilter/bin/kavmilter -r bases');
     exit;

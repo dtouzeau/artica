@@ -6,7 +6,8 @@
 	include_once('ressources/class.mimedefang.inc');	
 	include_once('ressources/class.apache.inc');
 	include_once('ressources/class.lvm.org.inc');
-	
+
+
 	
 	if(!VerifyRights()){
 		$tpl=new templates();
@@ -39,6 +40,7 @@ if(isset($_GET["js-pop"])){popup_tabs();exit;}
 if(isset($_GET["ORG_VHOSTS_LIST"])){echo organization_vhostslist($_GET["ORG_VHOSTS_LIST"]);exit;}
 
 if(isset($_GET["finduser-js"])){organization_users_find_member_js();exit;}
+if(isset($_GET["finduser-popup"])){organization_users_list();exit;}
 if(isset($_GET["finduser"])){organization_users_find_member();exit;}
 
 js();	
@@ -96,12 +98,20 @@ function organization_users_find_member_js(){
 	$title=$tpl->_ENGINE_parse_body("{organization}:: {$_GET["ou"]}");
 	$page=CurrentPageName();
 	$ou_encoded=base64_encode($ou);
+	$start="organization_users_find_member_js_start()";
+	if(isset($_GET["in-front-ajax"])){$start="organization_users_find_member_js_InFrontAjax()";}
+	
 	$html="
 	
+	function organization_users_find_member_js_InFrontAjax(){
+		$('#BodyContent').load('$page?finduser-popup=&ou=$ou_encoded');
+		
+	}	
+	
 	function organization_users_find_member_js_start(){
-		YahooSearchUser(770,'$page?finduser=&ou=$ou_encoded','$title');
+		YahooSearchUser(770,'$page?finduser-popup=&ou=$ou_encoded','$title');
 	}
-	organization_users_find_member_js_start();
+	$start
 	";
 	echo $html;
 	
@@ -437,6 +447,15 @@ function popup_tabs(){
 	$user=new usersMenus();
 	$array["management"]='{management}';
 	$array["users"]='{users}';
+	
+	
+	if($sock->GET_INFO("EnableInterfaceMailCampaigns")==1){
+		if($usersmenus->AseMailCampaignsAdmin){
+		$array["emailings"]="{email_campaigns}";
+		}
+	}	
+	
+	
 	if($usersmenus->AsOrgAdmin){
 		$array["groupwares"]='{groupwares}';
 		if(count($lvm_g->disklist)>0){$array["storage"]='{storage}';}
@@ -460,6 +479,12 @@ function popup_tabs(){
 			$a[]="<li><a href=\"domains.postfix.multi.php?org={$_GET["ou"]}\"><span>$ligne</span></a></li>\n";	
 			continue;
 		}
+		
+		if($num=="emailings"){
+			$a[]="<li><a href=\"domains.emailings.php?popup=yes&ou=". base64_encode("{$_GET["ou"]}")."\"><span>$ligne</span></a></li>\n";	
+			continue;
+		}		
+		
 		$a[]="<li><a href=\"$page?org_section=$num&SwitchOrgTabs={$_GET["ou"]}&ou={$_GET["ou"]}&mem=yes\"><span>$ligne</span></a></li>\n";
 			
 		}	
@@ -626,6 +651,7 @@ if($usersmenus->ZABBIX_INSTALLED){
 
 function organization_management(){
 	$ou=$_GET["ou"];
+	$ou_encoded=base64_encode($ou);
 	$sock=new sockets();
 	if(trim($ou==null)){
 		if(isset($_COOKIE["SwitchOrgTabsOu"])){$_GET["ou"]=$_COOKIE["SwitchOrgTabsOu"];}
@@ -635,7 +661,7 @@ function organization_management(){
 	
 	if(($usersmenus->AllowAddUsers) OR ($usersmenus->AsOrgAdmin) OR ($usersmenus->AsMessagingOrg)){	
 		$add_user=Paragraphe('folder-useradd-64.png','{create_user}','{create_user_text}',"javascript:Loadjs('domains.add.user.php?ou=$ou')",null,210,null,0,true);	
-		$groups=Paragraphe('folder-group-64.png','{manage_groups}','{manage_groups_text}',"javascript:Loadjs('domains.edit.group.php?ou=$ou&js=yes')",null,210,100,0,true);
+		$groups=Paragraphe('folder-group-64.png','{manage_groups}','{manage_groups_text}',"javascript:Loadjs('domains.edit.group.php?ou=$ou_encoded&js=yes')",null,210,100,0,true);
 		
 	}
 		
@@ -1101,6 +1127,7 @@ function organization_vhostslist($ou){
 			case "GROUPOFFICE":$img="groupoffice-32.png";break;
 			case "ZARAFA":$img="zarafa-logo-32.png";break;
 			case "ZARAFA_MOBILE":$img="zarafa-logo-32.png";break;
+			case "DRUPAL":$img="drupal-logo-32.png";$suffix="/install.php";break;
 			default:
 				;
 			break;
@@ -1238,25 +1265,37 @@ function organization_sections(){
 
 function organization_users_list(){
 	$page=CurrentPageName();
+	$tpl=new templates();
 	$html="
-	<div id='org_user_list'>
-	
-	
-	
-	</div>
+	<input type='hidden' id='org_user_list_ou' value='{$_GET["ou"]}'>
+	<table style='width:100%;margin:5px'>
+	<tr>
+		<td width=1% nowrap class=legend style='font-size:14px;padding:3px;font-weight:bold'>{search}:</td>
+		<td>". Field_text("searchstring",null,"font-size:14px;padding:3px;font-weight:bold",null,null,null,false,"FindUserCheckEnter(event)")."</td>
+	</tr>
+	</table>
+	<div id='org_user_list'></div>
 	<script>
+		function FindUserCheckEnter(e){
+			if(checkEnter(e)){
+				LoadAjax('org_user_list','$page?finduser='+document.getElementById('searchstring').value+'&ou={$_GET["ou"]}');
+			}
+		}
+	
+	
 		LoadAjax('org_user_list','$page?finduser=&ou={$_GET["ou"]}');
 	</script>
 	
 	
 	";
-	echo $html;
+	echo $tpl->_ENGINE_parse_body($html);
 }
 
 function organization_users_find_member(){
+	
 	$tofind=$_GET["finduser"];
 	if(is_base64_encoded($_GET["ou"])){$ou=base64_decode($_GET["ou"]);}else{$ou=$_GET["ou"];}
-	
+	writelogs("Find users $tofind in ou=$ou ({$_GET["ou"]})",__FUNCTION__,__FILE__,__LINE__);
 	
 	if($_SESSION["uid"]<>-100){$ou=$_SESSION["ou"];}
 	$ldap=new clladp();
@@ -1275,15 +1314,22 @@ function organization_users_find_member(){
 	
 	$html="
 	
-	<div style='width:100%;height:500px;overflow:auto'>
-	<table style='width:100%;>";
-		$over="OnMouseOut=\"javascript:this.style.cursor='auto'\"";
-		$out="OnMouseOver=\"javascript:this.style.cursor='pointer'\"";
+	
+	<table style='width:100%'>
+	<tr>
+		<td valign='top'>
+		<div style='width:100%;height:560px;overflow:auto'>	
+			<ul id='domains-checklist'>
+				
+	";
 		
+		$add_user=Paragraphe('folder-useradd-64.png','{create_user}','{create_user_text}',"javascript:Loadjs('domains.add.user.php?ou=$ou')",null,210,null,0,true);	
+		$groups=Paragraphe('folder-group-64.png','{manage_groups}','{manage_groups_text}',"javascript:Loadjs('domains.edit.group.php?ou=$ou_encoded&js=yes')",null,210,100,0,true);
 		
 	for($i=0;$i<$number;$i++){
 		$userARR=$hash[$i];
 		$uid=$userARR["uid"][0];
+		if($uid=="squidinternalauth"){continue;}
 		$js=MEMBER_JS($uid,1,1);
 		
 		$sn=texttooltip($userARR["sn"][0],"{display}:$uid",$js,null,0,"font-size:13px");
@@ -1292,20 +1338,28 @@ function organization_users_find_member(){
 		$mail=texttooltip($userARR["mail"][0],"{display}:$uid",$js,null,0,"font-size:13px");
 		$telephonenumber=texttooltip($userARR["telephonenumber"][0],"{display}:$uid",$js,null,0,"font-size:13px");
 		
+		$img=imgtootltip("contact-48.png","{edit}",$js);
 		
-		if($bg=="#cce0df"){$bg="#FFFFFF";}else{$bg="#cce0df";}
-		$html=$html ."<tr style='background-color:$bg' $over $out>
-			<td width=1%><img src='img/contact-32.png'></td>
-			<td style='font-size:13px;color:black;padding:8px' $over $out>$sn</td>
-			<td style='font-size:13px;color:black;padding:8px' $over $out>$givenname</td>
-			<td style='font-size:13px;color:black;padding:8px' $over $out>$title</td>
-			<td style='font-size:13px;color:black;padding:8px' $over $out>$mail</td>
-			<td style='font-size:13px;color:black;padding:8px' $over $out>$telephonenumber</td>
-		</tr>
+		$html=$html ."<li class='domainsli' style='width:345px'>
+			<table style='width:100%'>
+			<tr>
+				<td width=1% valign='top'>$img</td>
+				<td valign='top'>
+					<div style='font-size:13px;font-weight:bold;color:#005447'>{$userARR["sn"][0]} {$userARR["givenname"][0]}</div>
+					<div style='font-size:11px;text-align:right;border-top:1px solid #005477;pading-top:3px'>{$userARR["telephonenumber"][0]}&nbsp;|&nbsp;{$userARR["mail"][0]}</div>
+					<div style='font-size:11px;text-align:right;color:black;' $over $out>{$userARR["title"][0]}</div>				
+				</td>
+			</tr>
+			</table>
+			</li>
 		";
 		
 	}
-	$html=$html ."</table></div>";
+	$html=$html ."</ul></div>
+	</td>
+	<td valign='top' width=1%>$add_user<br>$groups</td>
+	</tr>
+	</table>";
 
 	$tpl=new templates();
 	echo $tpl->_ENGINE_parse_body($html);
@@ -1340,6 +1394,7 @@ function organization_users_formatUser($hash){
 }
 function VerifyRights(){
 	$usersmenus=new usersMenus();
+	if($usersmenus->AsOrgPostfixAdministrator){return true;}
 	if($usersmenus->AsMessagingOrg){return true;}
 	if(!$usersmenus->AllowChangeDomains){return false;}
 }

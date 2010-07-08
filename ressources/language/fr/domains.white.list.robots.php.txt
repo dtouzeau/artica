@@ -11,4 +11,4 @@ user@*.tld[br]
 </enable_artica_wbl_robots_explain>
 <quar_addr>Robot de rapports de quarantaine</quar_addr>
 <report_addr>Report Robot</report_addr>
-<whitelist_addr>WhiteList Robot</whitelist_addr>
+<whitelist_addr>Robot de liste blanche</whitelist_addr>

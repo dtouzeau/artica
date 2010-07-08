@@ -219,6 +219,7 @@ public
 
       function       LMB_LUNDIMATIN_VERSION():string;
       function       PHPMYADMIN_VERSION():string;
+      function       DRUPAL_VERSION():string;
       //CLAMAV
 
       function       CLAMD_GETINFO(Key:String):string;
@@ -2920,6 +2921,7 @@ begin
 
      //phpmyadmin
     ArrayList.Add('[APP_PHPMYADMIN] "' + PHPMYADMIN_VERSION() + '"');
+    ArrayList.Add('[APP_DRUPAL] "' + DRUPAL_VERSION() + '"');
 
     ArrayList.Add('[APP_CLAMAV_MILTER] "' + clamav.CLAMAV_VERSION() + '"');
     ArrayList.Add('[APP_CLAMAV] "' + clamav.CLAMAV_VERSION() + '"');
@@ -9875,7 +9877,6 @@ end;
    logs.Debuglogs('PDNS STATUS ----------------------------------');
    pdns:=tpdns.Create(SYS);
    ini:=ini+ pdns.STATUS()+CRLF;
-   ini:=ini+ pdns.STATUS_RECURSOR()+CRLF;
    pdns.Free;
 
    //openvpn
@@ -11735,34 +11736,13 @@ end;
 //#####################################################################################
 function myconf.SYSLOGER_STATUS():string;
 var
-ini:TstringList;
-pid:string;
+pidpath:string;
 begin
-
-   ini:=TstringList.Create;
-   ini.Add('[APP_SYSLOGER]');
-   ini.Add('service_name=APP_SYSLOGER');
-   ini.Add('service_cmd=sysloger');
-   ini.Add('service_disabled=1');
-   ini.Add('master_version=' + SYS.ReadFileIntoString('/usr/share/artica-postfix/VERSION'));
-
-
-
-      if SYS.MONIT_CONFIG('APP_SYSLOGER','/etc/artica-postfix/exec.syslog.php.pid','sysloger') then begin
-         ini.Add('monit=1');
-         result:=ini.Text;
-         ini.free;
-         exit;
-      end;
-
-      pid:=SYSLOGER_PID();
-      if SYS.PROCESS_EXIST(pid) then ini.Add('running=1') else  ini.Add('running=0');
-      ini.Add('application_installed=1');
-      ini.Add('master_pid='+ pid);
-      ini.Add('master_memory=' + IntToStr(SYS.PROCESS_MEMORY(pid)));
-      ini.Add('status='+SYS.PROCESS_STATUS(pid));
-      result:=ini.Text;
-      ini.free;
+   SYS.MONIT_DELETE('APP_SYSLOGER');
+   pidpath:=logs.FILE_TEMP();
+   fpsystem(SYS.LOCATE_PHP5_BIN()+' /usr/share/artica-postfix/exec.status.php --sysloger >'+pidpath +' 2>&1');
+   result:=logs.ReadFromFile(pidpath);
+   logs.DeleteFile(pidpath);
 end;
 //#####################################################################################
 procedure myconf.SYSLOGER_STOP();
@@ -11939,6 +11919,49 @@ end;
     RegExpr.free;
 end;
 //#####################################################################################
+function myconf.DRUPAL_VERSION():string;
+var
+   l:Tstringlist;
+   tmpstr:string;
+   RegExpr:TRegExpr;
+   i:integer;
+   D:boolean;
+begin
+
+     D:=false;
+     result:=SYS.GET_CACHE_VERSION('APP_DRUPAL');
+     if length(result)>2 then exit;
+     D:=SYS.COMMANDLINE_PARAMETERS('--drupal');
+     tmpstr:='/usr/share/drupal/modules/system/system.info';
+
+
+
+     if not FileExists(tmpstr) then begin
+        if D then writeln('Unable to stat '+tmpstr);
+        exit;
+     end;
+l:=Tstringlist.Create;
+l.LoadFromFile(tmpstr);
+
+if D then writeln('File:',tmpstr);
+
+RegExpr:=TRegExpr.Create;
+if D then writeln('Lines:',l.Count);
+RegExpr.Expression:='version = "([0-9\.]+)';
+for i:=0 to l.Count-1 do begin
+    if RegExpr.Exec(l.Strings[i]) then begin
+       result:=RegExpr.Match[1];
+       break;
+    end;
+end;
+     SYS.SET_CACHE_VERSION('APP_DRUPAL',result);
+    l.free;
+    RegExpr.free;
+end;
+//#####################################################################################
+
+
+
 procedure myconf.LISTDIRS_RECURSIVE(path:string);
 var
    i:integer;

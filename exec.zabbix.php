@@ -9,6 +9,7 @@ include_once(dirname(__FILE__)."/framework/frame.class.inc");
 
 if($argv[1]=="--db"){TestDatabase();die();}
 if($argv[1]=="--server-conf"){ServerConfig();die();}
+if($argv[1]=="--export"){export();die();}
 
 function TestDatabase(){
 	
@@ -267,4 +268,23 @@ function server_conf_path(){
 	return "/etc/zabbix/zabbix_server.conf";
 	
 }
+
+
+function export(){
+	$File="/home/dtouzeau/export.csv";
+	$q=new mysql();
+	$sql="SELECT NOM,PRENOM,EMAIL,TEL_DIRECT,CP,VILLE,addresse FROM contacts";
+		$results=$q->QUERY_SQL($sql,"kasperskyinfo ");
+		$fh = fopen($File, 'w') or die("can't open file");
+		
+		while($ligne=@mysql_fetch_array($results,MYSQL_ASSOC)){
+			echo "{$ligne["EMAIL"]}\n";
+			$datas="\"\",\"{$ligne["PRENOM"]}\",\"{$ligne["NOM"]}\",\"{$ligne["EMAIL"]}\",\"{$ligne["TEL_DIRECT"]}\",\"{$ligne["VILLE"]}\",\"{$ligne["CP"]}\",,\"{$ligne["addresse"]}\"\n";
+			fwrite($fh, $datas);
+		}
+			
+	fclose($fh);
+	
+}
+
 ?>

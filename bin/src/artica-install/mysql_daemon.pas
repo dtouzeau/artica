@@ -35,9 +35,6 @@ private
      procedure cluster_replicat_saveconf();
      function PID_CLUSTER():string;
      function PID_CLUSTER_REPLICAT():string;
-     FUNCTION STATUS_REPLICAT():string;
-     FUNCTION STATUS_NDB():string;
-     FUNCTION STATUS_MAIN():string;
      procedure DELETE_PARAMETERS(key:string);
 
 
@@ -257,6 +254,9 @@ begin
 end;
 //#############################################################################
 
+
+
+
 function tmysql_daemon.SERVER_PARAMETERS(key:string):string;
 var Ini:TMemIniFile;
 begin
@@ -459,115 +459,16 @@ begin
 end;
 //##############################################################################
 FUNCTION tmysql_daemon.STATUS():string;
-begin
-     result:=STATUS_MAIN()+STATUS_NDB()+ STATUS_REPLICAT();
-
-end;
-//##############################################################################
-FUNCTION tmysql_daemon.STATUS_NDB():string;
 var
-   ini:TstringList;
-   pid:string;
+pidpath:string;
 begin
-
-  if not FileExists(SYS.LOCATE_NDB_MGMD()) then exit;
-  ini:=TstringList.Create;
-ini.Add('');
-  ini.Add('[MYSQL_CLUSTER_MGMT]');
-     ini.Add('service_name=APP_MYSQL_CLUSTER_MGMT');
-     ini.Add('service_cmd=mysql-cluster');
-     ini.Add('start_logs=mysql.start.daemon');
-     ini.Add('service_disabled='+ IntToStr(EnableMysqlClusterManager));
-     ini.Add('master_version=' +VERSION());
-
-     if EnableMysqlClusterManager=0 then begin
-         result:=ini.Text;
-         ini.free;
-         SYS.MONIT_DELETE('APP_MYSQL_CLUSTER_MGMT');
-         exit;
-     end;
-
-
-     pid:=PID_CLUSTER();
-     if SYS.PROCESS_EXIST(pid) then ini.Add('running=1') else  ini.Add('running=0');
-     ini.Add('application_installed=1');
-     ini.Add('master_pid='+ pid);
-     ini.Add('master_memory=' + IntToStr(SYS.PROCESS_MEMORY(pid)));
-     ini.Add('status='+SYS.PROCESS_STATUS(pid));
-  result:=ini.Text;
-  ini.free;
-end;
-//##############################################################################
-FUNCTION tmysql_daemon.STATUS_REPLICAT():string;
-var
-   ini:TstringList;
-   pid:string;
-begin
-
-  if not FileExists(SYS.LOCATE_NDB_MGMD()) then exit;
-  ini:=TstringList.Create;
-ini.Add('');
-  ini.Add('[MYSQL_CLUSTER_REPLICA]');
-     ini.Add('service_name=APP_MYSQL_CLUSTER_REPLICA');
-     ini.Add('service_cmd=mysql-cluster');
-     ini.Add('start_logs=mysql.start.daemon');
-     ini.Add('service_disabled='+ IntToStr(EnableMysqlClusterReplicat));
-     ini.Add('master_version=' +VERSION());
-
-     if EnableMysqlClusterReplicat=0 then begin
-         result:=ini.Text;
-         ini.free;
-         SYS.MONIT_DELETE('MYSQL_CLUSTER_REPLICA');
-         exit;
-     end;
-
-
-     pid:=PID_CLUSTER_REPLICAT();
-     if SYS.PROCESS_EXIST(pid) then ini.Add('running=1') else  ini.Add('running=0');
-     ini.Add('application_installed=1');
-     ini.Add('master_pid='+ pid);
-     ini.Add('master_memory=' + IntToStr(SYS.PROCESS_MEMORY(pid)));
-     ini.Add('status='+SYS.PROCESS_STATUS(pid));
-  result:=ini.Text;
-  ini.free;
-
-end;
-//##############################################################################
-FUNCTION tmysql_daemon.STATUS_MAIN():string;
-var
-   ini:TstringList;
-   pid:string;
-begin
-
-  if not FileExists(SYS.LOCATE_mysqld_bin()) then exit;
-  ini:=TstringList.Create;
-
-  ini.Add('[ARTICA_MYSQL]');
-  ini.Add('service_name=APP_MYSQL_ARTICA');
-  ini.Add('service_cmd=mysql');
-  ini.Add('start_logs=mysql.start.daemon');
-  ini.Add('master_version=' +VERSION());
-
-
-  if SYS.MONIT_CONFIG('APP_MYSQL_ARTICA',PID_PATH(),'mysql') then begin
-         ini.Add('monit=1');
-         result:=ini.Text;
-         ini.free;
-         exit;
-      end;
-
-  pid:=PID_NUM();
-  if SYS.PROCESS_EXIST(pid) then ini.Add('running=1') else  ini.Add('running=0');
-  ini.Add('application_installed=1');
-  ini.Add('application_enabled=1');
-  ini.Add('master_pid='+ pid);
-  ini.Add('master_memory=' + IntToStr(SYS.PROCESS_MEMORY(pid)));
-  ini.Add('status='+SYS.PROCESS_STATUS(pid));
-  ini.add('');
-  result:=ini.Text;
-  ini.free;
-
-  
+   SYS.MONIT_DELETE('APP_MYSQL_ARTICA');
+   SYS.MONIT_DELETE('MYSQL_CLUSTER_REPLICA');
+   SYS.MONIT_DELETE('APP_MYSQL_CLUSTER_MGMT');
+   pidpath:=logs.FILE_TEMP();
+   fpsystem(SYS.LOCATE_PHP5_BIN()+' /usr/share/artica-postfix/exec.status.php --mysql >'+pidpath +' 2>&1');
+   result:=logs.ReadFromFile(pidpath);
+   logs.DeleteFile(pidpath);
 
 end;
 //##############################################################################
@@ -713,6 +614,7 @@ ForceDirectories('/var/log/mysql');
    logs.DebugLogs('Starting......: user................:' +mysql_user);
    logs.DebugLogs('Starting......: pid-file............:' +pid_file);
    logs.DebugLogs('Starting......: LOGS ENABLED........:' +IntTostr(EnableMysqlLog));
+   logs.DebugLogs('Starting......: Daemon..............:' +daemon_bin_path);
 
    if length(logbin)>0 then logs.OutputCmd('/bin/chown -R '+mysql_user+':'+mysql_user+' '+logbin);
    forcedirectories('/var/run/mysqld');
@@ -737,6 +639,7 @@ ForceDirectories('/var/log/mysql');
    end;
 
    DELETE_PARAMETERS('skip-innodb');
+   DELETE_PARAMETERS('skip-bdb');
    fpsystem(daemon_bin_path +logpathstring+ ' &');
    pid:=PID_NUM();
 

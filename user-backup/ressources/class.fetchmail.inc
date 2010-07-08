@@ -124,6 +124,12 @@ class Fetchmail_settings{
 				if(preg_match('#folder\s+(.+)#',$line,$re)){$arr[$i]["folder"]=$re[1];}	
 				if(preg_match('#disabled#',$line,$re)){$arr[$i]["disabled"]=true;}
 				if(preg_match('#multidrop#',$line,$re)){$arr[$i]["multidrop"]=true;}
+				if(preg_match('#sslcertck#',$line,$re)){$arr[$i]["sslcertck"]=true;}
+				
+				
+				if(preg_match('#sslfingerprint\s+\'(.+?)\'\s+#',$line,$re)){$arr[$i]["sslfingerprint"]=$re[1];}		
+				
+				
 			
 				}
 		
@@ -176,13 +182,19 @@ class Fetchmail_settings{
 		if($array["disabled"]==0){
 			$disabled="\n\tdisabled";
 		}
-		
-if($array["multidrop"]==1){
+		if($array["multidrop"]==1){
 			$multidrop="\n\tmultidrop";
+		}		
+		if($array["sslfingerprint"]<>null){
+			$sslfingerprint="\n\tsslfingerprint '{$array["sslfingerprint"]}'";
+		}
+			if($array["sslfingerprint"]<>null){
+			$sslcertck="\n\sslcertck";
 		}		
 		
 		
-		$line="poll {$array["poll"]} \n\t$tracepolls\n\tproto {$array["proto"]} $port\n\tuser {$array["user"]}\n\t pass {$array["pass"]}\n\tis {$array["is"]}$aka$folder$ssl$fetchall$interval$timeout$keep$disabled$multidrop";
+		
+		$line="poll {$array["poll"]} \n\t$tracepolls\n\tproto {$array["proto"]} $port\n\tuser {$array["user"]}\n\t pass {$array["pass"]}\n\tis {$array["is"]}$aka$folder$ssl$fetchall$interval$timeout$keep$disabled$multidrop$sslfingerprint$sslcertck";
 		return $line;
 	}
 	
@@ -220,6 +232,9 @@ if($array["multidrop"]==1){
 		if(isset($POSTED_ARRAY["fetchall"])){$sqa["`fetchall`"]=$POSTED_ARRAY["fetchall"];$sq[]=" `fetchall`='{$POSTED_ARRAY["fetchall"]}'";}
 		if(isset($POSTED_ARRAY["keep"])){$sqa["`keep`"]=$POSTED_ARRAY["keep"];$sq[]=" `keep`='{$POSTED_ARRAY["keep"]}'";}	
 		if(isset($POSTED_ARRAY["nokeep"])){$sqa["`nokeep`"]=$POSTED_ARRAY["nokeep"];$sq[]=" `nokeep`='{$POSTED_ARRAY["nokeep"]}'";}
+		if(isset($POSTED_ARRAY["smtp_host"])){$sqa["`smtp_host`"]=$POSTED_ARRAY["smtp_host"];$sq[]=" `smtp_host`='{$POSTED_ARRAY["smtp_host"]}'";}
+		if(isset($POSTED_ARRAY["sslfingerprint"])){$sqa["`sslfingerprint`"]=$POSTED_ARRAY["sslfingerprint"];$sq[]=" `sslfingerprint`='{$POSTED_ARRAY["sslfingerprint"]}'";}
+		if(isset($POSTED_ARRAY["sslcertck"])){$sqa["`sslcertck`"]=$POSTED_ARRAY["sslcertck"];$sq[]=" `sslcertck`='{$POSTED_ARRAY["sslcertck"]}'";}
 
 		
 		
@@ -252,11 +267,7 @@ if($array["multidrop"]==1){
 	function AddRule($POSTED_ARRAY){
 		
 		$md5=md5($POSTED_ARRAY["uid"].$POSTED_ARRAY["is"].$POSTED_ARRAY["user"].$POSTED_ARRAY["poll"].$POSTED_ARRAY["proto"]);
-		
-		
-		
-		
-		$sql="INSERT INTO fetchmail_rules (`uid`,`is`,`user`,`pass`,`poll`,`proto`,`keep`,`nokeep`,`enabled`,`md5`)
+		$sql="INSERT INTO fetchmail_rules (`uid`,`is`,`user`,`pass`,`poll`,`proto`,`keep`,`nokeep`,`enabled`,`md5`,`smtp_host`)
 		VALUES('{$POSTED_ARRAY["uid"]}',
 		'{$POSTED_ARRAY["is"]}',
 		'{$POSTED_ARRAY["user"]}',
@@ -265,7 +276,9 @@ if($array["multidrop"]==1){
 		'{$POSTED_ARRAY["proto"]}',
 		'{$POSTED_ARRAY["keep"]}',
 		'{$POSTED_ARRAY["nokeep"]}',
-		0,'$md5')";
+		 1,
+		 '$md5',
+		 '{$POSTED_ARRAY["smtp_host"]}')";
 		
 		$q=new mysql();
 		if(!$q->QUERY_SQL($sql,"artica_backup")){
@@ -299,7 +312,10 @@ if($array["multidrop"]==1){
 				"interval"=>$ligne["interval"],
 				"aka"=>$ligne["aka"],
 				"multidrop"=>$ligne["multidrop"],
-				"nokeep"=>$ligne["nokeep"]
+				"nokeep"=>$ligne["nokeep"],
+				"smtp_host"=>$ligne["smtp_host"],
+				"sslfingerprint"=>$ligne["sslfingerprint"],
+				"sslcertck"=>$ligne["sslcertck"]
 			);
 		}
 		
@@ -329,7 +345,10 @@ if($array["multidrop"]==1){
 				"aka"=>$ligne["aka"],
 				"uid"=>$ligne["uid"],
 				"multidrop"=>$ligne["multidrop"],
-				"nokeep"=>$ligne["nokeep"]
+				"nokeep"=>$ligne["nokeep"],
+				"smtp_host"=>$ligne["smtp_host"],
+				"sslfingerprint"=>$ligne["sslfingerprint"],
+				"sslcertck"=>$ligne["sslcertck"]
 			);
 		}
 		
@@ -357,7 +376,9 @@ if($array["multidrop"]==1){
 				"interval"=>$ligne["interval"],
 				"aka"=>$ligne["aka"],
 				"multidrop"=>$ligne["multidrop"],
-				"nokeep"=>$ligne["nokeep"]
+				"nokeep"=>$ligne["nokeep"],
+				"smtp_host"=>$ligne["smtp_host"],
+				"sslfingerprint"=>$ligne["sslfingerprint"],
 			);
 		
 		
@@ -368,10 +389,8 @@ if($array["multidrop"]==1){
 		$sql="DELETE FROM fetchmail_rules WHERE ID='$ID' and uid='$uid'";
 		$q=new mysql();
 		$q->QUERY_SQL($sql,"artica_backup");
-			$sock=new sockets();
-			$sock->getFrameWork('cmd.php?restart-fetchmail=yes');
-				
-		
+		$sock=new sockets();
+		$sock->getFrameWork('cmd.php?restart-fetchmail=yes');
 	}
 	
 }

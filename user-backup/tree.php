@@ -6,11 +6,11 @@ session_start();
 	include_once('ressources/class.sockets.inc');
 	include_once('ressources/class.samba.inc');
 	include_once('ressources/class.nfs.inc');
-	include_once('framework/class.unix.inc');
 	include_once('ressources/class.lvm.org.inc');
 	include_once('ressources/class.user.inc');	
 	include_once('ressources/class.crypt.php');	
 	include_once('ressources/class.mysql.inc');	
+	if(!class_exists("unix")){include_once(dirname(__FILE__).'framework/class.unix.inc');}
 		
 		if(!IsRights()){
 			$tpl=new templates();
@@ -29,6 +29,9 @@ session_start();
 		if(isset($_GET["delete-folder"])){delete_folder();exit;}
 		if(isset($_GET["share-folder"])){share_folder();exit;}
 		if(isset($_GET["unshare-rsync"])){rsync_unshare();exit;}
+		if(isset($_GET["upload-file"])){upload_file_popup();exit;}
+		if(isset($_GET["form-upload"])){upload_file_iframe();exit;}
+		if( isset($_POST['target_path']) ){upload_form_perform();exit();}
 		js();
 		
 		
@@ -82,6 +85,7 @@ function js(){
 	$are_you_sure_to_delete=$tpl->javascript_parse_text("{are_you_sure_to_delete} ?","fileshares.index.php");
 	$unshare_this=$tpl->javascript_parse_text("{unshare_this} ?","fileshares.index.php");
 	if(trim($_GET["mount-point"])==null){$_GET["mount-point"]=IsPriv();}
+	$upload_a_file=$tpl->_ENGINE_parse_body("{upload_a_file}");
 	
 	$page=CurrentPageName();
 	$html="
@@ -91,7 +95,7 @@ function js(){
 		var mem_parent_id;
 		var mem_parent;
 		function start(){
-			YahooWinBrowse(900,'$page?popup=yes&mount-point={$_GET["mount-point"]}','$title');
+			YahooWinBrowse(900,'$page?popup=yes&mount-point={$_GET["mount-point"]}&select-file={$_GET["select-file"]}&target-form={$_GET["target-form"]}','$title');
 			Loadjs('js/samba.js');
 		}
 		
@@ -126,6 +130,8 @@ function js(){
 			if(!expanded){
 				var XHR = new XHRConnection();
 				XHR.appendData('browse-folder',path);
+				XHR.appendData('select-file','{$_GET["select-file"]}');
+				XHR.appendData('target-form','{$_GET["target-form"]}');
 				XHR.sendAndLoad('$page', 'GET',X_TreeArticaExpand);
 			}else{
 				$('#'+mem_id).children('ul').empty();
@@ -148,8 +154,10 @@ function js(){
 
 	function FileInfo(path){
 		YahooWin2(665,'$page?file-info='+path,'$title');
-		
+	}
 	
+	function FileUpload(path){
+		YahooWin2(580,'$page?upload-file='+path+'&select-file={$_GET["select-file"]}&target-form={$_GET["target-form"]}','$upload_a_file');
 	}
 		
 		
@@ -157,6 +165,8 @@ function js(){
 			var XHR = new XHRConnection();
 			XHR.appendData('folder-infos',path);
 			XHR.appendData('id',mem_id);
+			XHR.appendData('select-file','{$_GET["select-file"]}');
+			XHR.appendData('target-form','{$_GET["target-form"]}');			
 			document.getElementById('browser-infos').innerHTML='<center style=\"margin:20px;padding:20px\"><img src=\"img/wait_verybig.gif\"></center>';
 			XHR.sendAndLoad('$page', 'GET',X_BrowserInfos);
 		}
@@ -164,6 +174,8 @@ function js(){
 		function top_bar(path){
 			var XHR = new XHRConnection();
 			XHR.appendData('top-bar',path);
+			XHR.appendData('select-file','{$_GET["select-file"]}');
+			XHR.appendData('target-form','{$_GET["target-form"]}');					
 			XHR.sendAndLoad('$page', 'GET',X_top_bar);
 		}
 		
@@ -219,6 +231,11 @@ function js(){
         		}   
 		
 		}
+		
+		function PutFileInform(filepath){
+			document.getElementById('{$_GET["target-form"]}').value=filepath;
+			YahooWinBrowseHide();
+		}
 
 		
 		var x_DeleteSubFolder=function (obj) {
@@ -272,6 +289,8 @@ function js(){
 				$('#'+mem_id).addClass('collapsed');
 				var XHR = new XHRConnection();
 				XHR.appendData('browse-folder',path);
+				XHR.appendData('select-file','{$_GET["select-file"]}');
+				XHR.appendData('target-form','{$_GET["target-form"]}');						
 				XHR.sendAndLoad('$page', 'GET',X_TreeArticaExpand);
 			}		
 		}
@@ -484,7 +503,9 @@ if($schedules_number>0){
 	$delfolder=imgtootltip('folder-delete-48.png','{del_sub_folder}',"DeleteSubFolder('$path','$parent','$parent_id')");
 	$folder_refresh=imgtootltip('folder-refresh-48.png','{refresh}',"RefreshFolder('$path','$id')");		
 	$acls=imgtootltip('folder-acls-48.png','{acls_directory}',"Loadjs('samba.acls.php?path=$path_encoded')");
-
+	$upload=imgtootltip('folder-upload-48.png','{upload_a_file}',"FileUpload('$path_encoded')");
+	
+	
 
 	
 	
@@ -500,6 +521,8 @@ if($schedules_number>0){
 			$shareit=null;
 			$nfs=null;
 			$acls=null;
+			$share_rsync=null;
+			$share_rsync_properties=null;
 			$ct=new user($_SESSION["uid"]);
 			if($ct->homeDirectory==$path){
 				$delfolder=imgtootltip('folder-delete-48-grey.png','{del_sub_folder}',"");
@@ -507,6 +530,20 @@ if($schedules_number>0){
 		}
 
 		if($backup==null){$backup=$acls;$acls="&nbsp;";}
+		
+		if($_GET["select-file"]<>null){
+			$removeShare=null;
+			$ShareProperties=null;
+			$shareit=null;
+			$nfs=null;
+			$acls=null;
+			$share_rsync=null;
+			$share_rsync_properties=null;
+			$backup=$upload;
+			$addfolder=null;
+			$delfolder=null;
+		}
+		
 		
 $html="
 $txt
@@ -532,6 +569,7 @@ $txt
 			<td width=1% valign='top'>$share_rsync_properties</td>
 		</tr>		
 	</table>";
+	
 $tpl=new templates();
 return $tpl->_ENGINE_parse_body($html,"samba.index.php");
 	
@@ -603,6 +641,9 @@ function folder_infos(){
 				if(date('Y-m-d',$array["time"]["mtime"])==date('Y-m-d')){$modified="{today} ".date('H:i:s',$array["time"]["mtime"]);}
 				$size=$array["size"]["size"];
 				$ext=Get_extension($num);
+				if($_GET["select-file"]<>null){
+					if($ext<>$_GET["select-file"]){continue;}
+				}
 				$img="img/ext/def_small.gif";
 				if($ext<>null){
 					if(isset($GLOBALS[$ext])){$img="img/ext/{$ext}_small.gif";}else{
@@ -614,8 +655,15 @@ function folder_infos(){
 				
 				$size_new=FormatBytes($size/1024);
 				if(strlen($num)>27){$text_file=substr($num,0,24)."...";}else{$text_file=$num;}
-				$text_file=texttooltip($text_file,fileTooltip($array),"FileInfo('". base64_encode("$dir/$num"). "')");
 				
+				$file_tool_tip=fileTooltip($array);
+				$file_js="FileInfo('". base64_encode("$dir/$num")."')";
+				if(trim($_GET["target-form"])<>null){
+					$file_js="PutFileInform('$dir/$num')";
+					$file_tool_tip="<span style=font-size:14px>{select_this_file}</span><hr>$file_tool_tip";
+				}				
+				$text_file=texttooltip($text_file,$file_tool_tip,$file_js);
+
 				
 				if($size_new==0){$size_new=$size." bytes";}
 				//print_r($array);
@@ -840,6 +888,96 @@ function rsync_unshare(){
 	$rsync=new rsyncd_conf();
 	unset($rsync->main_array[$_GET["unshare-rsync"]]);
 	$rsync->save();
+}
+
+function upload_file_popup(){
+	$page=CurrentPageName();
+	$html="<iframe style='width:100%;height:250px;border:1px' src='$page?form-upload={$_GET["upload-file"]}&select-file={$_GET["select-file"]}'></iframe>";
+	echo $html;
+}
+function upload_file_iframe($error=null){
+	
+	if(isset($_POST["select-file"])){$_GET["select-file"]=$_POST["select-file"];}
+	if(isset($_POST["target_path"])){$_GET["form-upload"]=$_POST["target_path"];}
+	
+	if($error<>null){
+		$error="<div style='font-size:14px;font-weight:bold;padding:3px;margin:3px;border:1px solid red;text-align:center;color:red'>$error</div>";
+	}
+	
+	if($_GET["select-file"]<>null){
+	}
+	
+	$page=CurrentPageName();
+	$tpl=new templates();
+	$html="<p>&nbsp;</p>
+	<table style='width:100%'>
+	<tr>
+	<td width=1% valign='top'>
+	<img src='img/folder-upload-90.png'>
+	</td>
+	<td valign='top'>
+		
+		<H3>{upload_a_file} ({$_GET["select-file"]})</H3>
+		$error
+		<form method=\"POST\" enctype=\"multipart/form-data\" action=\"$page\">
+		<input type='hidden' name='target_path' value='{$_GET["form-upload"]}'>
+		<input type='hidden' name='select-file' value='{$_GET["select-file"]}'>
+		
+		<table style='width:100%'>
+			<td class=legend style='font-size:13px'>{file_to_upload}:</td>
+			<td><input type=\"file\" name=\"fichier\" size=\"20\" style='font-size:13px;border:1px'></td>
+		</tr>
+		<tr>
+		<td colspan=2 align='right'><hr>
+			<input type='submit' name='upload' value='{upload}&nbsp;&raquo;' style='width:120px;padding:5px;margin:5px'>
+		</td>
+		</tr>
+		</table>
+		</form>
+	</td>
+	</tr>
+	</table>
+	";
+		$html=iframe($html,0,"500px");	
+echo $tpl->_ENGINE_parse_body($html);		
+	
+	
+}
+
+
+function upload_form_perform(){
+while (list ($num, $line) = each ($_POST) ){
+	writelogs("_POST:: receive $num=$line",__FUNCTION__,__FILE__,__LINE__);
+	}
+	
+	while (list ($num, $line) = each ($_FILES['fichier']) ){
+	writelogs("_FILES:: receive $num=$line",__FUNCTION__,__FILE__,__LINE__);
+	}	
+	
+	
+	$tmp_file = $_FILES['fichier']['tmp_name'];
+	$content_dir=dirname(__FILE__)."/ressources/conf/upload";
+	if(!is_dir($content_dir)){mkdir($content_dir);}
+	if( !is_uploaded_file($tmp_file) ){upload_file_iframe('{error_unable_to_upload_file}');exit();}
+	 
+	$type_file = $_FILES['fichier']['type'];
+	$name_file = $_FILES['fichier']['name'];
+	$ext=file_ext($name_file);	 
+	if($_POST["select-file"]<>null){
+		if( $ext<>$_POST["select-file"]){	
+			upload_file_iframe("{error_file_extension_not_match} :\"$ext\" is not \"{$_POST["select-file"]}\"");
+			return;
+		}
+	}
+	
+	if(file_exists( $content_dir . "/" .$name_file)){@unlink( $content_dir . "/" .$name_file);}
+ 	if( !move_uploaded_file($tmp_file, $content_dir . "/" .$name_file) ){upload_file_iframe("{error_unable_to_move_file} : ". $content_dir . "/" .$name_file);exit();}
+    $_GET["moved_file"]=$content_dir . "/" .$name_file;
+    include_once("ressources/class.sockets.inc");
+    $sock=new sockets();
+    $rettun=$sock->getFrameWork("cmd.php?move_uploaded_file='{$_POST["target_path"]}&src=". base64_encode("$content_dir/$name_file"));
+    
+ 	upload_file_iframe($_POST["database_name"]. "<br>{success}<br>$rettun");		
 }
 
 

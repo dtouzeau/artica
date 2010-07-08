@@ -89,7 +89,7 @@ install.INSTALL_STATUS('APP_MILTERGREYLIST',10);
   
   if FileExists('/usr/lib/libmilter/libmilter.a') then fpsystem('ln -s /usr/lib/libmilter/libmilter.a /lib/libmilter.a');
     install.INSTALL_PROGRESS('APP_MILTERGREYLIST','{compiling}');
-  fpsystem('cd ' + source_folder + ' && ./configure CFLAGS="-L/usr/lib/libmilter -L/lib -L/usr/lib -L/usr/local/lib" && make && make install');
+  fpsystem('cd ' + source_folder + ' && ./configure CFLAGS="-L/usr/lib/libmilter -L/lib -L/usr/lib -L/usr/local/lib" --enable-postfix && make && make install');
   if not FileExists('/usr/local/bin/milter-greylist') then begin
      install.INSTALL_STATUS('APP_MILTERGREYLIST',110);
     install.INSTALL_PROGRESS('APP_MILTERGREYLIST','{failed}');

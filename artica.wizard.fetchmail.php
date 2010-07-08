@@ -4,6 +4,11 @@
 $user=new usersMenus();
 $tpl=new templates();
 
+
+if(isset($_GET["ssl-fingerprint"])){ssl_fingerprint_js();exit;}
+if(isset($_GET["getsslfinger"])){ssl_fingerprint_get();exit;}
+
+
 if(isset($_GET["poll"])){SavePools();exit();}
 if(isset($_GET["AddNewFetchMailRule"])){AddNewFetchMailRule();exit();}
 if(isset($_GET["LdapRules"])){LdapRules();exit;}
@@ -16,7 +21,6 @@ if(isset($_GET["InstallFetchmail"])){echo InstallFetchmail();exit;}
 if(isset($_GET["UserRules"])){LoadUserRules();exit;}
 if(isset($_GET["LoadFetchMailRuleFromUser"])){LoadFetchMailRuleFromUser();exit;}
 if(isset($_GET["ChangeFetchMailUser"])){ChangeFetchMailUser();exit;}
-
 
 
 PAGE();
@@ -61,6 +65,65 @@ $CFG["JS"][]='js/wizard.fetchmail.js';
 $tpl=new template_users('{get_mails_isp}',$html,0,0,0,0,$CFG);
 echo $tpl->web_page;
 	
+}
+
+function ssl_fingerprint_js(){
+	$rule=$_GET["LdapRules"];
+	$uid=$_GET["uid"];
+	$page=CurrentPageName();
+	
+	$html="
+	
+	var x_ssl_finger_js_start= function (obj) {
+		var tempvalue=obj.responseText;
+		if(tempvalue.length>0){alert(tempvalue)};
+		UserFetchMailRule($rule,'$uid');
+	}		
+	
+	
+	function ssl_finger_js_start(){
+		var XHR = new XHRConnection();
+		XHR.appendData('getsslfinger','yes');
+		XHR.appendData('LdapRules','$rule');
+		document.getElementById('fetchmailadvrule').innerHTML=\"<center style='margin:10px'><img src='img/wait_verybig.gif'></center>\";
+		XHR.sendAndLoad('$page', 'GET',x_ssl_finger_js_start);
+		}
+		
+		
+		
+	ssl_finger_js_start();	
+		
+	";
+	
+	echo $html;
+	
+}
+
+function ssl_fingerprint_get(){
+	$rule_number=$_GET["LdapRules"];
+	$fr=new Fetchmail_settings();
+	$hash_rules=$fr->LoadRule($rule_number);	
+	$poll=$hash_rules["poll"];
+	$proto=$hash_rules["proto"];
+	if($proto=="pop3"){$port=995;}
+	if($proto=="imap"){$port=993;}
+	$sock=new sockets();
+	$tpl=new templates();
+	$finger_print=base64_decode($sock->getFrameWork("cmd.php?sslfingerprint=yes&ip=$poll&port=$port"));
+	if($finger_print==null){
+		echo $tpl->javascript_parse_text("{failed}\n$poll:$port");
+		return;
+	}
+	
+	$sql="UPDATE fetchmail_rules SET sslfingerprint='$finger_print' WHERE ID='$rule_number'";
+	$q=new mysql();
+	$q->QUERY_SQL($sql,"artica_backup");
+	if(!$q->ok){
+		echo $q->mysql_error;
+		return;
+	}
+	
+	$sock->getFrameWork('cmd.php?restart-fetchmail=yes');
 }
 
 
@@ -175,7 +238,7 @@ function LdapRules(){
 }
 
 function FormRules($array,$editmode=0,$rulenumber=0){
-	
+	$page=CurrentPageName();
 	$title="<h1>{$array["poll"]}</H1>";
 	
 	$proto=array(""=>"{select}",
@@ -204,6 +267,7 @@ function FormRules($array,$editmode=0,$rulenumber=0){
 	$fetchall=Field_checkbox('_fetchall',1,$array["fetchall"]);
 	$keep=Field_checkbox('_keep',1,$array["keep"]);
 	$nokeep=Field_checkbox('_nokeep',1,$array["nokeep"]);
+	$sslcertck=Field_checkbox('_sslcertck',1,$array["sslcertck"]);
 
 			
 if($array["is"]==null){
@@ -251,27 +315,46 @@ if($array["is"]==null){
 		<td align='left'>" . Field_text('_interval',$array["interval"],'width:20%',null,null,'{interval_text}')."</td>
 	</tr>
 	<tr>
+		<td align='right' class=legend>{ssl_fingerprint}</strong>:&nbsp;</td>
+		<td align='left'>" . Field_text('_fingerprint',$array["sslfingerprint"],'width:220px',null,null)."</td>
+	</tr>
+	<tr>
+		<td colspan=2 align='right'>". texttooltip("{import_fingerprint}","{import_fingerprint}","Loadjs('$page?ssl-fingerprint=yes&LdapRules=$rulenumber&uid={$_GET["uid"]}')")."</td>	
+	<tr>
 	<td colspan=2>
 	<table>
 		<tr>
 		<td align='right' class=legend>{tracepolls}</strong>:&nbsp;</td>
 		<td align='left'>$tracepolls&nbsp;</td>	
+		<td width=1%>&nbsp;</td>
 		</tr>
 		<tr>	
 		<td align='right' class=legend>{ssl}</strong>:&nbsp;</td>
 		<td align='left'>$ssl&nbsp;</td>
+		<td width=1%>&nbsp;</td>
 		</tr>
+		<tr>	
+		<td align='right' class=legend>{sslcertck}</strong>:&nbsp;</td>
+		<td align='left'>$sslcertck&nbsp;</td>
+		<td width=1%>". help_icon("{sslcertck_text}")."</td>
+		</tr>		
+		
 		<tr>
 		<td align='right' class=legend>{fetchall}</strong>:&nbsp;</td>
 		<td align='left'>$fetchall&nbsp;</td>
+		<td width=1%>&nbsp;</td>
 		</tr>
 		<tr>
 			<td align='right' class=legend>{keepmess}</strong>:&nbsp;</td>
-			<td align='left'>$keep&nbsp;</td>	
+			<td align='left'>$keep&nbsp;</td>
+			<td width=1%>&nbsp;</td>	
 		</tr>
 			<td align='right' class=legend>{nokeepmess}</strong>:&nbsp;</td>
-			<td align='left'>$nokeep&nbsp;</td>	
+			<td align='left'>$nokeep&nbsp;</td>
+			<td width=1%>&nbsp;</td>	
 		</tr>
+		
+		
 		
 		
 </table>
@@ -336,6 +419,7 @@ $form2="
 	
 	
 	$html="
+	<div id='fetchmailadvrule'>
 	$title
 	<input type='hidden' id='uid' value='{$_GET["uid"]}'>
 	<input type='hidden' id='rule_number' value='$rulenumber'>
@@ -364,7 +448,7 @@ $form2="
 	</table>			
 	</div>
 	</form>
-	
+	</div>
 	
 	
 	";

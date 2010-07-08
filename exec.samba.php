@@ -17,6 +17,11 @@ include_once(dirname(__FILE__)."/framework/frame.class.inc");
 if(preg_match("#--verbose#",implode(" ",$argv))){$GLOBALS["VERBOSE"]=true;}
 if(preg_match("#--force#",implode(" ",$argv))){$GLOBALS["FORCE"]=true;}
 
+if($argv[1]=='--users'){
+	CountDeUsers();
+	die();
+}
+
 if(!Build_pid_func(__FILE__,"MAIN")){
 	writelogs(basename(__FILE__).":Already executed.. aborting the process",basename(__FILE__),__FILE__,__LINE__);
 	die();
@@ -532,6 +537,13 @@ function LogonScripts_remove(){
 		  }
 		  continue;
 		}
+}
+
+
+function CountDeUsers(){
+	$ldap=new clladp();
+	$arr=$ldap->hash_users_ou(null);
+	@file_put_contents("/etc/artica-postfix/UsersNumber",count($arr));
 }
 
 

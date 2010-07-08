@@ -6,7 +6,7 @@ unit artica_cron;
 interface
 
 uses
-    Classes, SysUtils,variants,strutils,IniFiles, Process,md5,logs,unix,RegExpr in 'RegExpr.pas',zsystem,postfix_class,kas3,isoqlog,squid,fetchmail;
+    Classes, SysUtils,variants,strutils,IniFiles, Process,logs,unix,RegExpr in 'RegExpr.pas',zsystem,kas3,isoqlog,squid,fetchmail;
 
 
 
@@ -16,10 +16,8 @@ uses
 
 private
      LOGS:Tlogs;
-     D:boolean;
      SYS:TSystem;
      artica_path:string;
-     inif:TiniFile;
      EnableMilterSpyDaemon:integer;
      RetranslatorEnabled:integer;
      RetranslatorCronMinutes:integer;
@@ -124,7 +122,7 @@ begin
 
 
    if SYS.PROCESS_EXIST(pid) then begin
-      logs.DebugLogs('Starting......: artica-postfix daemon (fcron) is already running using PID ' + pid + '...');
+      logs.DebugLogs('Starting......: Daemon (fcron) is already running using PID ' + pid + '...');
       exit;
    end;
    
@@ -132,7 +130,7 @@ begin
   kas3.CHANGE_CRONTAB();
    
    
-  logs.DebugLogs('Starting......: artica-postfix daemon (fcron)');
+  logs.DebugLogs('Starting......: Daemon (fcron)');
   fpsystem('/bin/rm -rf /etc/artica-postfix/spool');
   forceDirectories('/etc/artica-cron/spool');
   forceDirectories('/usr/share/artica-cron');
@@ -195,8 +193,8 @@ end;
   parms:=artica_path + '/bin/artica-cron --configfile /etc/artica-cron/artica-cron.conf --background --savetime 1800 --maxserial '+intToStr(processNumber)+' --firstsleep 10';
   Save_processes();
 
-  logs.DebugLogs('Starting......: artica-postfix daemon (fcron) CPU(s):'+IntToStr(cpunum)+' Memory:'+IntTOstr(round(mem div 1024))+' Mb');
-  logs.DebugLogs('Starting......: artica-postfix daemon (fcron) ' + intToStr(processNumber)+' processe(s) number at the same time');
+  logs.DebugLogs('Starting......: Daemon (fcron) CPU(s):'+IntToStr(cpunum)+' Memory:'+IntTOstr(round(mem div 1024))+' Mb');
+  logs.DebugLogs('Starting......: Daemon (fcron) ' + intToStr(processNumber)+' processe(s) number at the same time');
   logs.OutputCmd(SYS.EXEC_NICE()+artica_path + '/bin/artica-ldap -syncmodules &');
   logs.OutputCmd(SYS.EXEC_NICE()+artica_path + '/bin/artica-iso &');
   
@@ -209,14 +207,14 @@ end;
         count:=count+1;
         logs.DebugLogs('tcron.START(): wait sequence ' + intToStr(count));
         if count>20 then begin
-            logs.DebugLogs('Starting......: artica-postfix daemon (fcron) failed...');
+            logs.DebugLogs('Starting......: Daemon (fcron) failed...');
             exit;
         end;
   end;
   logs.DebugLogs('Starting......: Installing crontab');
   logs.OutputCmd(artica_path + '/bin/fcrontab -c /etc/artica-cron/artica-cron.conf -z root');
   logs.Syslogs('Success starting artica-cron daemon...');
-  logs.DebugLogs('Starting......: artica-postfix daemon (fcron) success...');
+  logs.DebugLogs('Starting......: Daemon (fcron) success...');
 
 end;
 //##############################################################################
@@ -354,7 +352,7 @@ end;
 procedure tcron.Save_processes();
 
 var l:TstringList;
-cmd_prepend,tmp:string;
+
 Nice:integer;
 Nicet:string;
 cmdnice:string;
@@ -365,25 +363,25 @@ backup_hour:string;
 backup_min_int:Integer;
 backup_hour_int:Integer;
 backup_command:string;
-backup_command2:string;
 schedule_time:string;
 backups:Tstringlist;
+fetchmailrcs:Tstringlist;
 RegExpr:TRegExpr;
 ini:TiniFile;
-postfix:tpostfix;
-WBLReplicEachMin:string;
-SalearnSchedule:string;
+tmp:string;
 i:integer;
 systemMaxOverloaded:integer;
 squid:Tsquid;
 WifiAPEnable:integer;
 EnableFetchmail:integer;
 fetchmail:tfetchmail;
+PostfixPostmaster:string;
+php5bin:string;
 begin
       nolog:=',nolog(true)';
       l:=TstringList.Create;
       backup_command:='';
-      postfix:=tpostfix.Create(SYS);
+
        if not TryStrToInt(SYS.GET_INFO('EnableFetchmail'),EnableFetchmail) then EnableFetchmail:=0;
 
       tmp:=SYS.GET_PERFS('ProcessNice');
@@ -460,10 +458,9 @@ logs.DeleteFile('/etc/cron.d/artica-cron-executor-300');
       SYS.DirFiles('/etc/cron.d','*');
       for i:=0 to l.Count-1 do begin
           writeln('Uninstall schedule ' + l.Strings[i]);
-
-
       end;
 
+      php5bin:=SYS.LOCATE_PHP5_BIN();
 
       if not TryStrToInt(SYS.GET_INFO('systemMaxOverloaded'),systemMaxOverloaded) then begin
          SYS.isoverloadedTooMuch();
@@ -513,37 +510,60 @@ logs.DeleteFile('/etc/cron.d/artica-cron-executor-300');
            schedule_time:=ini.ReadString('SETTINGS','schedule','');
            if length(schedule_time)>0 then begin
              logs.DebugLogs('Starting......: Daemon (cron) set pflogsumm reports schedule...');
-             SYS.CRON_CREATE_SCHEDULE(schedule_time,cmdnice+SYS.LOCATE_PHP5_BIN() +' '+artica_path+'/exec.postfix.reports.php','artica-cron-pflogsumm');
+             SYS.CRON_CREATE_SCHEDULE(schedule_time,cmdnice+php5bin +' '+artica_path+'/exec.postfix.reports.php','artica-cron-pflogsumm');
            end;
       end;
 
-      l.Add('!mailto(root)');
+
+      PostfixPostmaster:=SYS.GET_INFO('PostfixPostmaster');
+      if length(PostfixPostmaster)=0 then PostfixPostmaster:='root';
+
+      l.Add('!mailto('+PostfixPostmaster+')');
       l.add('!serial(true),b(0)');
       if length(backup_command)>0 then begin
           l.Add(backup_command);
       end;
-      l.Add('@'+Nicet+nolog+',lavg1('+IntToStr(systemMaxOverloaded)+') 10s '+cmdnice+SYS.LOCATE_PHP5_BIN()+ ' ' +artica_path+'/exec.parse-orders.php');
-      l.Add('@'+Nicet+nolog+',lavg1('+IntToStr(systemMaxOverloaded)+') 12s '+cmdnice+SYS.LOCATE_PHP5_BIN()+ ' ' +artica_path+'/exec.executor.php --group10s');
-      l.Add('@'+Nicet+nolog+',lavg1('+IntToStr(systemMaxOverloaded)+') 30s '+cmdnice+SYS.LOCATE_PHP5_BIN()+ ' ' +artica_path+'/exec.executor.php --group30s');
-      l.Add('@'+Nicet+nolog+',lavg1('+IntToStr(systemMaxOverloaded)+') 10 '+cmdnice+SYS.LOCATE_PHP5_BIN()+ ' ' +artica_path+'/exec.rsync.events.php');
-
-
-
-
+      l.Add('@'+Nicet+nolog+',lavg1('+IntToStr(systemMaxOverloaded)+') 10s '+cmdnice+php5bin+ ' ' +artica_path+'/exec.parse-orders.php');
+      l.Add('@'+Nicet+nolog+',lavg1('+IntToStr(systemMaxOverloaded)+') 12s '+cmdnice+php5bin+ ' ' +artica_path+'/exec.executor.php --group10s');
+      l.Add('@'+Nicet+nolog+',lavg1('+IntToStr(systemMaxOverloaded)+') 30s '+cmdnice+php5bin+ ' ' +artica_path+'/exec.executor.php --group30s');
+      l.Add('@'+Nicet+nolog+',lavg1('+IntToStr(systemMaxOverloaded)+') 10 ' +cmdnice+php5bin+ ' ' +artica_path+'/exec.rsync.events.php');
+      l.Add('@'+Nicet+nolog+',lavg1('+IntToStr(systemMaxOverloaded)+') 20 ' +cmdnice+php5bin+ ' ' +artica_path+'/exec.cleanfiles.php');
+      l.Add('@'+Nicet+nolog+',lavg1('+IntToStr(systemMaxOverloaded)+') 1h ' +cmdnice+php5bin+ ' ' +artica_path+'/exec.hdparm.php');
 // ---------------------------------- fetchmail ---------------------------------------------------------------------------------------------------------
+
+      if FileExists('/etc/artica-postfix/fetchmail.schedules') then begin
+          fetchmailrcs:=Tstringlist.Create;
+          fetchmailrcs.LoadFromFile('/etc/artica-postfix/fetchmail.schedules');
+          logs.DebugLogs('Starting......: Daemon (fcron) set fetchmail '+IntTOStr(fetchmailrcs.Count) +' schedules');
+          for i:=0 to fetchmailrcs.Count-1 do begin
+               if length(trim(fetchmailrcs.Strings[i]))>0 then begin
+                   l.Add('@'+Nicet+nolog+',lavg1('+IntToStr(systemMaxOverloaded)+') '+fetchmailrcs.Strings[i]);
+               end;
+          end;
+      end;
+
+
       fetchmail:=tfetchmail.Create(SYS);
       if FileExists(fetchmail.FETCHMAIL_BIN_PATH()) then begin
          logs.DebugLogs('Starting......: Daemon (fcron) set fetchmail injector schedule');
-         l.Add('@'+Nicet+nolog+',lavg1('+IntToStr(systemMaxOverloaded)+') 2 '+cmdnice+SYS.LOCATE_PHP5_BIN()+ ' ' +artica_path+'/exec.fetchmail.sql.php');
+         l.Add('@'+Nicet+nolog+',lavg1('+IntToStr(systemMaxOverloaded)+') 2 '+cmdnice+php5bin+ ' ' +artica_path+'/exec.fetchmail.sql.php');
       end;
       fetchmail.free;
 // -------------------------------------------------------------------------------------------------------------------------------------------------------
+
+// ---------------------------------- drupal -----------------------------
+   if DirectoryExists('/usr/share/drupal') then begin
+        logs.DebugLogs('Starting......: Daemon (fcron) set drupal maintenance each 5 Hours');
+       l.Add('@'+Nicet+nolog+',lavg1('+IntToStr(systemMaxOverloaded)+') 5h '+cmdnice+php5bin+ ' ' +artica_path+'/exec.drupal.php --cron');
+   end;
+// -----------------------------------------------------------------------
+
 
 
       squid:=Tsquid.Create;
       if FileExists(squid.SQUID_BIN_PATH()) then begin
          logs.DebugLogs('Starting......: Daemon (fcron) set squid injector reports schedule...');
-         l.Add('@'+Nicet+nolog+',lavg1('+IntToStr(systemMaxOverloaded)+') 58s '+cmdnice+SYS.LOCATE_PHP5_BIN()+ ' ' +artica_path+'/exec.dansguardian.injector.php');
+         l.Add('@'+Nicet+nolog+',lavg1('+IntToStr(systemMaxOverloaded)+') 58s '+cmdnice+php5bin+ ' ' +artica_path+'/exec.dansguardian.injector.php');
       end else begin
          logs.DebugLogs('Starting......: Daemon (fcron) Squid is not installed');
       end;
@@ -579,15 +599,15 @@ logs.DeleteFile('/etc/cron.d/artica-cron-executor-300');
 if not TryStrToInt(SYS.GET_INFO('WifiAPEnable'),WifiAPEnable) then WifiAPEnable:=0;
 if WifiAPEnable=1 then begin
       logs.DebugLogs('Starting......: Daemon (cron) Activate WIFI Client connection watchdog');
-      l.Add('@'+Nicet+nolog+',lavg1('+IntToStr(systemMaxOverloaded)+') 5 '+cmdnice+SYS.LOCATE_PHP5_BIN()+ ' ' +artica_path+'/exec.wifi.detect.cards.php --checkap');
+      l.Add('@'+Nicet+nolog+',lavg1('+IntToStr(systemMaxOverloaded)+') 5 '+cmdnice+php5bin+ ' ' +artica_path+'/exec.wifi.detect.cards.php --checkap');
 end;
 
 
-l.add('@first(1),lavg1('+IntToStr(systemMaxOverloaded)+') 10 '+ SYS.LOCATE_GENERIC_BIN('nohup')+' /etc/init.d/artica-postfix start all >/dev/null 2>&1 &');
+l.add('@'+Nicet+nolog+',lavg1('+IntToStr(systemMaxOverloaded)+') 10 '+ SYS.LOCATE_GENERIC_BIN('nohup')+' /etc/init.d/artica-postfix start all >/dev/null 2>&1 &');
 
 
       if EnableMilterSpyDaemon=1 then begin
-           logs.DebugLogs('Starting......: artica-postfix daemon (fcron) enable mailspy statistics');
+           logs.DebugLogs('Starting......: Daemon (fcron) enable mailspy statistics');
            if FileExists('/usr/local/bin/cronspy.sh') then begin
               fpsystem('/bin/chmod 777 /usr/local/bin/cronspy.sh');
               l.Add('@'+Nicet+' 15 /usr/local/bin/cronspy.sh hourly');
@@ -600,7 +620,7 @@ l.add('@first(1),lavg1('+IntToStr(systemMaxOverloaded)+') 10 '+ SYS.LOCATE_GENER
 
 
       if RetranslatorEnabled=1 then begin
-           logs.DebugLogs('Starting......: artica-postfix daemon (fcron) enable kaspersky retranslator each '+IntToStr(RetranslatorCronMinutes)+' minutes');
+           logs.DebugLogs('Starting......: Daemon (fcron) enable kaspersky retranslator each '+IntToStr(RetranslatorCronMinutes)+' minutes');
            l.Add('@'+Nicet+' '+IntToStr(RetranslatorCronMinutes) +' '+ artica_path+'/bin/artica-update --retranslator');
       end;
 
@@ -611,12 +631,12 @@ l.add('@first(1),lavg1('+IntToStr(systemMaxOverloaded)+') 10 '+ SYS.LOCATE_GENER
       //SYS.CRON_CREATE_SCHEDULE('0 23 * * *',cmdnice+artica_path+'/bin/artica-install --dansguardian-stats','artica-cron-dansguardian');
 
       //A 2H
-      SYS.CRON_CREATE_SCHEDULE('0 2 * * *',cmdnice+SYS.LOCATE_PHP5_BIN()+ ' ' +artica_path+'/exec.smtp.events.clean.php','artica-clean-smtplogs');
+      SYS.CRON_CREATE_SCHEDULE('0 2 * * *',cmdnice+php5bin+ ' ' +artica_path+'/exec.smtp.events.clean.php','artica-clean-smtplogs');
 
       //toutes les heures
       SYS.CRON_CREATE_SCHEDULE('@hourly',cmdnice+artica_path+'/bin/artica-update','artica-cron-update');
-      SYS.CRON_CREATE_SCHEDULE('@hourly',cmdnice+SYS.LOCATE_PHP5_BIN()+ ' ' +artica_path+'/cron.mysql-databases.php','artica-cron-mysqldb');
-      SYS.CRON_CREATE_SCHEDULE('@hourly',cmdnice+SYS.LOCATE_PHP5_BIN()+ ' ' +artica_path+'/exec.vacationtime.php','artica-cron-vacation');
+      SYS.CRON_CREATE_SCHEDULE('@hourly',cmdnice+php5bin+ ' ' +artica_path+'/cron.mysql-databases.php','artica-cron-mysqldb');
+      SYS.CRON_CREATE_SCHEDULE('@hourly',cmdnice+php5bin+ ' ' +artica_path+'/exec.vacationtime.php','artica-cron-vacation');
 
       if FileExists('/usr/bin/sarg') then begin
          SYS.CRON_CREATE_SCHEDULE('@hourly',artica_path+'/bin/artica-install --sarg','artica-cron-sarg');
@@ -625,11 +645,17 @@ l.add('@first(1),lavg1('+IntToStr(systemMaxOverloaded)+') 10 '+ SYS.LOCATE_GENER
 
 
       //toutes les deux heures
-      SYS.CRON_CREATE_SCHEDULE('0 2,4,6,8,10,12,14,16,18,20,22 * * *',cmdnice+SYS.LOCATE_PHP5_BIN()+ ' ' +artica_path+'/exec.executor.php --group120','artica-cron-executor-120');
+      SYS.CRON_CREATE_SCHEDULE('0 2,4,6,8,10,12,14,16,18,20,22 * * *',cmdnice+php5bin+ ' ' +artica_path+'/exec.executor.php --group120','artica-cron-executor-120');
 
 
       //toutes les 5 Heures
-      SYS.CRON_CREATE_SCHEDULE('0 5,10,15,20 * * *',cmdnice+SYS.LOCATE_PHP5_BIN()+ ' ' +artica_path+'/exec.executor.php --group300','artica-cron-executor-300');
+      SYS.CRON_CREATE_SCHEDULE('0 5,10,15,20 * * *',cmdnice+php5bin+ ' ' +artica_path+'/exec.executor.php --group300','artica-cron-executor-300');
+
+      if length(SYS.LOCATE_GENERIC_BIN('dansguardian'))>0 then begin
+         SYS.CRON_CREATE_SCHEDULE('0 5,10,15,20 * * *','/usr/share/artica-postfix/bin/artica-update --dansguardian','artica-cron-dansguardian-update');
+      end else begin
+           if length(SYS.LOCATE_GENERIC_BIN('squidguard'))>0 then SYS.CRON_CREATE_SCHEDULE('0 5,10,15,20 * * *','/usr/share/artica-postfix/bin/artica-update --dansguardian','artica-cron-dansguardian-update');
+      end;
 
       //toutes les 30 Minutes
       SYS.CRON_CREATE_SCHEDULE('0,30 * * * *',cmdnice+artica_path+'/bin/artica-install --verify-artica-iso','artica-cron-iso'); //iso
@@ -639,19 +665,19 @@ l.add('@first(1),lavg1('+IntToStr(systemMaxOverloaded)+') 10 '+ SYS.LOCATE_GENER
       SYS.CRON_CREATE_SCHEDULE('0,20,40 * * * *',cmdnice+artica_path+'/bin/process1 --kill','artica-cron-process1k');  //watchdog kill
 
       //toutes les 10 minutes
-      SYS.CRON_CREATE_SCHEDULE('0,10,20,30,40,50 * * * *',cmdnice+SYS.LOCATE_PHP5_BIN()+ ' ' +artica_path+'/exec.executor.php --group10','artica-cron-executor-10');
+      SYS.CRON_CREATE_SCHEDULE('0,10,20,30,40,50 * * * *',cmdnice+php5bin+ ' ' +artica_path+'/exec.executor.php --group10','artica-cron-executor-10');
 
 
       //toutes les 5 minutes
-      SYS.CRON_CREATE_SCHEDULE('0,5,10,15,20,25,30,35,40,45,50,55 * * * *',cmdnice+SYS.LOCATE_PHP5_BIN()+ ' ' +artica_path+'/exec.executor.php --group5','artica-cron-executor-5');
+      SYS.CRON_CREATE_SCHEDULE('0,5,10,15,20,25,30,35,40,45,50,55 * * * *',cmdnice+php5bin+ ' ' +artica_path+'/exec.executor.php --group5','artica-cron-executor-5');
       SYS.CRON_CREATE_SCHEDULE('0,5,10,15,20,25,30,35,40,45,50,55 * * * *','/etc/init.d/artica-postfix start daemon','artica-cron-watchdog');
 
 
       //toutes les 2 minutes
-      SYS.CRON_CREATE_SCHEDULE('0,2,4,6,8,10,12,14,16,18,20,22,24,26,28,30,32,34,36,38,40,42,44,46,48,50,52,54,56,58 * * * *',cmdnice+SYS.LOCATE_PHP5_BIN()+ ' ' +artica_path+'/exec.executor.php --group2','artica-cron-executor-2');
+      SYS.CRON_CREATE_SCHEDULE('0,2,4,6,8,10,12,14,16,18,20,22,24,26,28,30,32,34,36,38,40,42,44,46,48,50,52,54,56,58 * * * *',cmdnice+php5bin+ ' ' +artica_path+'/exec.executor.php --group2','artica-cron-executor-2');
 
       //toutes les minutes
-      SYS.CRON_CREATE_SCHEDULE('* * * * *',cmdnice+SYS.LOCATE_PHP5_BIN()+ ' ' +artica_path+'/exec.executor.php --group0','artica-cron-executor-0');
+      SYS.CRON_CREATE_SCHEDULE('* * * * *',cmdnice+php5bin+ ' ' +artica_path+'/exec.executor.php --group0','artica-cron-executor-0');
 
       //specifiques
       quarantine_report_schedules();
@@ -672,7 +698,7 @@ l.add('@first(1),lavg1('+IntToStr(systemMaxOverloaded)+') 10 '+ SYS.LOCATE_GENER
 
 
       if SYS.GET_INFO('EnableFDMFetch')='1' then begin
-         logs.DebugLogs('Starting......: artica-postfix daemon (fcron) enable FDM polling every 10mn');
+         logs.DebugLogs('Starting......: Daemon (fcron) enable FDM polling every 10mn');
          l.add('@'+Nicet+' 30 '+  artica_path+'/bin/artica-ldap -fdm');
       end;
 
@@ -683,8 +709,8 @@ l.add('@first(1),lavg1('+IntToStr(systemMaxOverloaded)+') 10 '+ SYS.LOCATE_GENER
       logs.syslogs('Saving croned scripts');
 
       fpsystem('/bin/rm -f /etc/cron.d/artica-avcomp-*');
-      fpsystem(SYS.LOCATE_PHP5_BIN()+' '+ artica_path+'/exec.rsync.events.php --computers-schedule >/dev/null &');
-      fpsystem(SYS.LOCATE_PHP5_BIN()+' '+ artica_path+'/exec.computer.scan.php --schedules >/dev/null &');
+      fpsystem(php5bin+' '+ artica_path+'/exec.rsync.events.php --computers-schedule >/dev/null &');
+      fpsystem(php5bin+' '+ artica_path+'/exec.computer.scan.php --schedules >/dev/null &');
 
       except
          logs.syslogs('Saving croned scripts failed !');
@@ -734,7 +760,7 @@ end;
 //#########################################################################################
 procedure tcron.save_cyrus_backup();
 var
-   l:Tstringlist;
+
    f:Tinifile;
    i:integer;
    Sections:Tstringlist;
@@ -787,18 +813,15 @@ end;
 
 procedure tcron.Save_processes_watchdog();
 var l:TstringList;
-cmd_prepend,tmp:string;
 Nice:integer;
 Nicet:string;
 nolog:string;
-postfix:tpostfix;
-WBLReplicEachMin:string;
-SalearnSchedule:string;
 RegExpr:TRegExpr;
+tmp:string;
 begin
 
 
-postfix:=Tpostfix.Create(SYS);
+
       nolog:=',nolog(true)';
       l:=TstringList.Create;
       tmp:=SYS.GET_PERFS('ProcessNice');
@@ -883,7 +906,6 @@ end;
 //#########################################################################################
 function tcron.FCRON_VERSION():string;
 var
-   l:string;
    F:TstringList;
    t:string;
    i:integer;

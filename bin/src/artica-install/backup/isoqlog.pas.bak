@@ -6,7 +6,7 @@ unit isoqlog;
 interface
 
 uses
-    Classes, SysUtils,variants,strutils,IniFiles, Process,logs,unix,
+    Classes, SysUtils,variants,strutils,Process,logs,unix,
     RegExpr      in '/home/dtouzeau/developpement/artica-postfix/bin/src/artica-install/RegExpr.pas',
     zsystem      in '/home/dtouzeau/developpement/artica-postfix/bin/src/artica-install/zsystem.pas';
 
@@ -98,7 +98,8 @@ begin
     logs.Debuglogs('tisoqlog.performStatistics():: unable to stat isqlog binary...');
     exit;
  end;
-
+   logs.Debuglogs('tisoqlog.performStatistics():: isoqlog is not longer maintain.');
+   exit;
 
  if not FileExists('/etc/artica-postfix/LocalDomains.conf') then begin
     logs.Debuglogs('tisoqlog.performStatistics():: Unable to stat /etc/artica-postfix/LocalDomains.conf');

@@ -10,6 +10,7 @@
 	
 	CleanTempDirs();
 	CleanArticaUpdateLogs();
+	ParseMysqlEventsQueue();
 	die();
 	
 	
@@ -34,13 +35,23 @@ function CleanTempDirs(){
 
 
 function CleanArticaUpdateLogs(){
-	
-foreach (glob("/var/log/artica-postfix/artica-update-*.debug") as $filename) {
-	$file_time_min=file_time_min($filename);
-	if(file_time_min($filename)>5752){@unlink($filename);}
-	
-}
+	foreach (glob("/var/log/artica-postfix/artica-update-*.debug") as $filename) {
+		$file_time_min=file_time_min($filename);
+		if(file_time_min($filename)>5752){@unlink($filename);}
+		}
 
 }
+
+
+function ParseMysqlEventsQueue(){
+	$q=new mysql();
+	foreach (glob("/var/log/artica-postfix/sql-events-queue/*.sql") as $filename) {
+			$sql=@file_get_contents($filename);
+			$q->QUERY_SQL($sql,"artica_events");
+			if($q->ok){
+				@unlink($filename);
+			}
+		}	
+	}
 
 ?>

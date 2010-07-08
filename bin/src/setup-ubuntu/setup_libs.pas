@@ -37,7 +37,7 @@ private
        function   MYSQL_EXEC_BIN_PATH():string;
        procedure  ZARAFA_INSTALL_MENU();
        procedure  ZARAFA_INSTALL_PERFORM();
-
+       function   GET_INFO(key:string):string;
 public
       constructor Create();
       procedure Free;
@@ -49,7 +49,7 @@ public
       function PERL_INCFolders():TstringList;
       procedure InstallArtica();
       function RPM_is_application_installed(appname:string):boolean;
-      function INTRODUCTION(base:string;postfix:string;cyrus:string;samba:string;squid:string;nfs:string='';pdns:string=''):string;
+      function INTRODUCTION(base:string;postfix:string;cyrus:string;samba:string;squid:string;nfs:string='';pdns:string='';openvpn:string=''):string;
       function get_LDAP(key:string):string;
       procedure set_LDAP(key:string;val:string);
       function get_LDAP_ADMIN():string;
@@ -302,11 +302,15 @@ var
    commandline_artica:string;
    command_line_curl:string;
    command_line_wget:string;
+   WgetBindIpAddress_cmd_line_wget:string;
+   WgetBindIpAddress_cmd_line_curl:string;
    localhost:boolean;
+   WgetBindIpAddress:string;
    ssl:boolean;
  begin
    localhost:=false;
    command_line_curl:='';
+   WgetBindIpAddress:=GET_INFO('WgetBindIpAddress');
    RegExpr:=TRegExpr.Create;
    ProxyString:=GET_HTTP_PROXY();
    ProxyString:=AnsiReplaceStr(ProxyString,'"','');
@@ -357,12 +361,15 @@ var
 
    end;
 
-
-   command_line_wget:=uri + '  -q --output-document=' + file_path;
+   if length(WgetBindIpAddress)>0 then begin
+      WgetBindIpAddress_cmd_line_wget:=' --bind-address='+WgetBindIpAddress;
+      WgetBindIpAddress_cmd_line_curl:=' --interface '+WgetBindIpAddress;
+   end;
+   command_line_wget:=uri +WgetBindIpAddress_cmd_line_wget+'  -q --output-document=' + file_path;
 
 
    if FileExists(LOCATE_CURL()) then begin
-         if ssl then command_line_curl:=command_line_curl+ ' --insecure';
+         if ssl then command_line_curl:=command_line_curl+WgetBindIpAddress_cmd_line_curl+' --insecure';
          command_line_curl:=LOCATE_CURL() + command_line_curl;
          fpsystem(command_line_curl);
          result:=true;
@@ -1801,7 +1808,7 @@ begin
      writeln('');
 end;
 
-function tlibs.INTRODUCTION(base:string;postfix:string;cyrus:string;samba:string;squid:string;nfs:string;pdns:string):string;
+function tlibs.INTRODUCTION(base:string;postfix:string;cyrus:string;samba:string;squid:string;nfs:string;pdns:string;openvpn:string):string;
 var
    u:string;
    plist:TStringDynArray;
@@ -1946,6 +1953,19 @@ if length(trim(pdns))=0 then begin
          writeln('PowerDNS System :......................................Installed');
     end;
  end;
+
+if length(trim(openvpn))=0 then begin
+       writeln('**********************************************************');
+   writeln('');
+    if length(nfs)>0 then begin
+       writeln('OpenVPN System :.......................................[9]');
+       plistSquid:=explode(',', pdns);
+       writeln(IntToStr(length(pdns))+' package(s) are not installed');
+    end else begin
+         writeln('OpenVPN System :.......................................Installed');
+    end;
+ end;
+
 
 
 end;
@@ -2146,6 +2166,20 @@ begin
    if FileExists('/usr/local/bin/mysql') then exit('/usr/local/bin/mysql');
 end;
 //#############################################################################
+function tlibs.GET_INFO(key:string):string;
+var
+   str:string;
+begin
 
+
+
+str:='';
+   if FileExists('/etc/artica-postfix/settings/Daemons/'+key) then begin
+      str:=trim(ReadFileIntoString('/etc/artica-postfix/settings/Daemons/'+key));
+      result:=str;
+   end;
+
+end;
+//#############################################################################
 
 end.

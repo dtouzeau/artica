@@ -90,6 +90,7 @@ public
     //ProxyPac
     procedure   PROXY_PAC_STOP();
     procedure   PROXY_PAC_START();
+    function    PROXY_PAC_STATUS():string;
 
 
 END;
@@ -482,7 +483,7 @@ fpsystem(cmd);
 
  l:=Tstringlist.Create;
  try
-    l.LoadFromFile(FileTemp);
+    if FileExists(FileTemp) then l.LoadFromFile(FileTemp);
     for count:=0 to l.Count-1 do begin
         logs.DebugLogs('Starting......: Squid '+ L.Strings[count]);
     end;
@@ -795,10 +796,6 @@ caches.Clear;
  RegExpr2.free;
 end;
 //#############################################################################
-
-
-
-
 function tsquid.SQUID_SPOOL_DIR():string;
 begin
 result:=SQUID_GET_SINGLE_VALUE('coredump_dir');
@@ -1050,18 +1047,11 @@ var
   pidpath:string;
 begin
  if not FileExists(SQUID_BIN_PATH()) then exit;
-
+ SYS.MONIT_DELETE('APP_SQUID');
  pidpath:=logs.FILE_TEMP();
  fpsystem(SYS.LOCATE_PHP5_BIN()+' /usr/share/artica-postfix/exec.status.php --squid >'+pidpath +' 2>&1');
  result:=logs.ReadFromFile(pidpath);
  logs.DeleteFile(pidpath);
-
- if SQUIDEnable=0 then begin
-    SYS.MONIT_DELETE('APP_SQUID');
-    exit;
- end;
- SYS.MONIT_CONFIG('APP_SQUID','/var/run/squid.pid','squid');
-
 end;
 //##############################################################################
 function tsquid.SQUID_VERSION():string;
@@ -1631,12 +1621,17 @@ end;
 //#####################################################################################
 function tsquid.TAIL_STATUS():string;
 var
-ini:TstringList;
-pid:string;
-Enabled:integer;
+pidpath:string;
 begin
+   if not FileExists(SQUID_BIN_PATH()) then exit;
+   SYS.MONIT_DELETE('APP_ARTICA_SQUID_TAIL');
+   pidpath:=logs.FILE_TEMP();
+   fpsystem(SYS.LOCATE_PHP5_BIN()+' /usr/share/artica-postfix/exec.status.php --squid-tail >'+pidpath +' 2>&1');
+   result:=logs.ReadFromFile(pidpath);
+   logs.DeleteFile(pidpath);
+end;
 
-if not FileExists(SQUID_BIN_PATH()) then begin
+
  SYS.MONIT_DELETE('APP_ARTICA_SQUID_TAIL');
  exit;
 end;

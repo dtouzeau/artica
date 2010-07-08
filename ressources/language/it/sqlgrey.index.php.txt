@@ -139,7 +139,6 @@ There is no measurable perfomance loss.[br]
 <group_domain_level_text>wait for X validated adresses to add a whole domain in Auto White List</group_domain_level_text>
 <ip_white_list>IP white list</ip_white_list>
 <ip_white_list_text>Add here only IP address of server that will be exclude from SQLGrey process</ip_white_list_text>
-<main_settings>Main settings</main_settings>
 <max_connect_age>max connect age</max_connect_age>
 <max_connect_age_text>don't allow a reconnection after x hours</max_connect_age_text>
 <optmethod>Optin/Optout</optmethod>

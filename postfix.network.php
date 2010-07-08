@@ -15,6 +15,9 @@ if($_GET["section"]=="BindInterfaceForm"){echo BindInterfaceForm();exit;}
 if($_GET["section"]=="networkint"){echo NetworkInterfacesForm();exit;}
 if(isset($_GET["ReloadInterfaceTable"])){echo BindInterfaceTable();exit;}
 if(isset($_GET["ReloadNetworkTable"])){echo mynetworks_table();exit;}
+
+
+if(isset($_GET["POSTFIX_MULTI_INSTANCE_JS"])){POSTFIX_MULTI_INSTANCE_JS();exit;}
 if(isset($_GET["EnablePostfixMultiInstance"])){POSTFIX_MULTI_INSTANCE_SAVE();exit;}
 if(isset($_GET["inet_interface_add"])){inet_interface_add();exit;}
 if(isset($_GET["PostfixAddMyNetwork"])){PostfixAddMyNetwork();exit;}
@@ -691,26 +694,51 @@ $title="{postfix_bind_activated}";
 		return Paragraphe($img,$title,$text,$uri);	
 }
 
+function  POSTFIX_MULTI_INSTANCE_JS(){
+		$page=CurrentPageName();
+		$tpl=new templates();
+		$title=$tpl->_ENGINE_parse_body("{POSTFIX_MULTI_INSTANCE}");
+		$html="
+			function POSTFIX_MULTI_INSTANCE_JS_START(){
+				YahooWin5(600,'$page?main=POSTFIX_MULTI_INSTANCE','$title');
+			}
+		
+		POSTFIX_MULTI_INSTANCE_JS_START();";
+	
+	echo $html;
+}
+
+
 function POSTFIX_MULTI_INSTANCE(){
 	$sock=new sockets();
 	$page=CurrentPageName();
 	$EnablePostfixMultiInstance=$sock->GET_INFO("EnablePostfixMultiInstance");
-	$enable=Paragraphe_switch_img("{enable} {POSTFIX_MULTI_INSTANCE}","{POSTFIX_MULTI_INSTANCE_TEXT}","EnablePostfixMultiInstance",$EnablePostfixMultiInstance,null,550);
+	$enable=Paragraphe_switch_img("{ENABLE_POSTFIX_MULTI_INSTANCE}","{POSTFIX_MULTI_INSTANCE_TEXT}",
+	"EnablePostfixMultiInstance",$EnablePostfixMultiInstance,null,400);
 	$html="
 	<table style='width:100%'>
 	<tr>
-		<td valign='top'>$enable</td>
+		<td valign='top' width=1%><img src='img/postfix-multi-128.png'></td>
+		<td valign='top'>
+				<table style='width:100%'>
+			<tr>
+				<td valign='top'>$enable</td>
+			</tr>
+			</table>
+		</td>
 	</tr>
 	</table>
+	<p class=caption style='font-size:13px;margin-top:10px'>{POSTFIX_MULTI_INSTANCE_HOWTO}</p>
 		<div style='text-align:right'><hr>
 		". button("{edit}","POSTFIX_MULTI_INSTANCE()")."
 		</div>
-	<p class=caption style='font-size:13px;margin-top:10px'>{POSTFIX_MULTI_INSTANCE_HOWTO}</p>	
+		
 	<script>
 	var x_POSTFIX_MULTI_INSTANCE= function (obj) {
 			remove_cache();
-			RefreshTab('main_config_postfix_net');
+			if(document.getElementById('main_config_postfix_net')){RefreshTab('main_config_postfix_net');}
 			if(document.getElementById('main_config_postfix')){RefreshTab('main_config_postfix');}
+			YahooWin5Hide();
 			}	
 	
 	

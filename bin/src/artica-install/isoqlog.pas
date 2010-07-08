@@ -6,7 +6,7 @@ unit isoqlog;
 interface
 
 uses
-    Classes, SysUtils,variants,strutils,IniFiles, Process,logs,unix,
+    Classes, SysUtils,variants,strutils,Process,logs,unix,
     RegExpr      in '/home/dtouzeau/developpement/artica-postfix/bin/src/artica-install/RegExpr.pas',
     zsystem      in '/home/dtouzeau/developpement/artica-postfix/bin/src/artica-install/zsystem.pas';
 
@@ -65,7 +65,6 @@ var
     RegExpr:TRegExpr;
     FileDatas:TStringList;
     i:integer;
-    BinPath:string;
     filetmp:string;
 begin
 filetmp:=logs.FILE_TEMP();

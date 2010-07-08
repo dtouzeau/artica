@@ -46,6 +46,7 @@ public
       function CheckBasePHP():string;
       function CheckPDNS():string;
       function CheckZabbix():string;
+      function CheckOpenVPN():string;
       procedure DennouRuby();
       function  EPEL():boolean;
 END;
@@ -68,7 +69,7 @@ end;
 //#########################################################################################
 procedure tcentos.Show_Welcome;
 var
-   base,postfix,u,cyrus,samba,squid,selinux,pdns,zabbix:string;
+   base,postfix,u,cyrus,samba,squid,selinux,pdns,zabbix,openvpn:string;
 begin
 
    if not FileExists('/usr/bin/yum') then begin
@@ -123,9 +124,9 @@ begin
     pdns:=CheckPDNS();
     writeln('Checking.............: Zabbix System...');
     zabbix:=CheckZabbix();
-
-
-    u:=libs.INTRODUCTION(base,postfix,cyrus,samba,squid);
+    writeln('Checking.............: OpenVPN System...');
+    openvpn:=CheckOpenVPN();
+    u:=libs.INTRODUCTION(base,postfix,cyrus,samba,squid,openvpn);
 
     writeln('You have selected the option : ' + u);
 
@@ -182,6 +183,12 @@ begin
 
    if u='8' then begin
           InstallPackageLists(zabbix);
+          Show_Welcome;
+          exit;
+    end;
+
+   if u='9' then begin
+          InstallPackageLists(openvpn);
           Show_Welcome;
           exit;
     end;
@@ -421,8 +428,7 @@ l.add('fuse-sshfs');
 L.add('fuse');
 
 //openvpn
-l.add('bridge-utils');
-l.add('openvpn');
+
 
 //xapian
 l.add('catdoc');
@@ -499,6 +505,7 @@ l.add('monit');
 
 //clamav
 l.add('libtool-ltdl-devel');
+l.add('libtommath-devel');
 
 //dhcp gateway
 l.Add('dhcp');
@@ -570,12 +577,39 @@ for i:=0 to l.Count-1 do begin
      end;
 end;
 
-if not FIleExists('/usr/bin/python') then f:=f + ',python';
+
 
  result:=f;
 
 end;
 //#########################################################################################
+function tcentos.CheckOpenVPN():string;
+var
+   l:TstringList;
+   f:string;
+   i:integer;
+
+begin
+f:='';
+l:=TstringList.Create;
+l.add('bridge-utils');
+l.add('openvpn');
+fpsystem('/bin/rm -rf /tmp/packages.list');
+
+for i:=0 to l.Count-1 do begin
+     if not libs.RPM_is_application_installed(l.Strings[i]) then begin
+          f:=f + ',' + l.Strings[i];
+     end;
+end;
+result:=f;
+end;
+//#########################################################################################
+
+
+
+
+
+
 function tcentos.CheckPostfix():string;
 var
    l:TstringList;
@@ -633,7 +667,7 @@ for i:=0 to l.Count-1 do begin
      end;
 end;
 
-if not FIleExists('/usr/bin/python') then f:=f + ',python';
+
 
  result:=f;
 end;

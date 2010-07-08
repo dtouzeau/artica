@@ -11,7 +11,7 @@
 	
 
 	
-	if(!ChekGlobalRights()){die();}
+	if(!CheckSambaRights()){die();}
 	if( isset($_POST['upload']) ){main_kav4samba_LicenceUploaded();exit();}
 	if(isset($_GET["FolderDelete"])){folder_delete();exit;}
 	if(isset($_GET["mkdirp"])){mkdirp();exit;}
@@ -264,6 +264,7 @@ function main_tabs(){
 	$array["shared_folders"]='{shared_folders}';
 	$array["conf"]='{config}';
 	$array["acldisks"]="{acl_disks}";
+	$array["events"]="{events}";
 	$tpl=new templates();
 	
 	$users=new usersMenus();
@@ -278,6 +279,12 @@ function main_tabs(){
 			$html[]= $tpl->_ENGINE_parse_body("<li><a href=\"samba.shared.folders.list.php?acldisks=yes\"><span>$ligne</span></li>\n");
 			continue;
 		}
+		
+		if($num=="events"){
+			$html[]= $tpl->_ENGINE_parse_body("<li><a href=\"samba.events.php\"><span>$ligne</span></li>\n");
+			continue;
+		}		
+		
 		$html[]= $tpl->_ENGINE_parse_body("<li><a href=\"$page?main=$num\"><span>$ligne</span></li>\n");
 	}
 	

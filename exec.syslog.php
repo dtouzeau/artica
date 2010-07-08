@@ -86,6 +86,44 @@ if(preg_match("#zarafa-server.+?INNODB engine is disabled#",$buffer)){
 		}			
 }
 
+
+if(preg_match("#(.+?)\[.+?segfault at.+?error.+?in.+?\[#",$buffer,$re)){
+	$file="/etc/artica-postfix/croned.1/segfault.{$re[1]}";
+	if(IfFileTime($file,10)){
+		events("{$re[1]}: segfault");
+		email_events("{$re[1]}: segfault","Kernel claim \"$buffer\" ",'system');
+		WriteFileCache($file);
+		return;	
+	}
+}
+
+if(preg_match("#kernel:.+?Out of memory:\s+kill\s+process\s+#",$buffer,$re)){
+	$file="/etc/artica-postfix/croned.1/kernel.Out.of.memory";
+	if(IfFileTime($file,1)){
+		events("Out of memory -> REBOOT !!!");
+		email_events("Out of memory ! server will be rebooted","Kernel claim \"$buffer\" the server will be rebooted",'system');
+		WriteFileCache($file);
+		shell_exec("/etc/init.d/artica-postfix stop");
+		shell_exec("reboot");
+		return;	
+	}
+}
+
+if(preg_match("#winbindd\[.+?failed to bind to server\s+(.+?)\s+with dn.+?Error: Can.+?contact LDAP server#",$buffer,$re)){
+	$file="/etc/artica-postfix/croned.1/winbindd.ldap.failed";
+	if(IfFileTime($file,10)){
+		events("winbindd -> LDAP FAIELD");
+		email_events("LDAP server is unavailable","Samba claim \"$buffer\" artica will try to restart LDAP server ",'system');
+		WriteFileCache($file);
+		THREAD_COMMAND_SET('/etc/init.d/artica-postfix restart ldap');
+		return;	
+	}
+}
+
+
+
+
+
 if(preg_match("#zarafa-server.+?Unable to connect to database.+?MySQL server on.+?([0-9\.]+)#",$buffer)){
 	$file="/etc/artica-postfix/croned.1/zarafa.MYSQL.CONNECT";
 	if(IfFileTime($file,2)){
@@ -400,6 +438,28 @@ if(preg_match("#master.+?cannot find executable for service.+?sieve#",$buffer,$r
 			return;
 		}		
 }
+
+
+if(preg_match("#smbd\[.+?write_data: write failure in writing to client 0.0.0.0. Error Connection reset by peer#",$buffer,$re)){
+	$file="/etc/artica-postfix/croned.1/samba.Error.Connection.reset.by.peer.error";
+		if(IfFileTime($file)){
+			events("Check sieve Error Connection reset by peer");
+			$text[]="Your MS Windows computers should not have access to the server cause network generic errors";
+			$text[]="- Check these parameters:"; 
+			$text[]="- Check if Apparmor or SeLinux are disabled on the server.";
+			$text[]="- Check your hard drives by this command-line: hdparm -tT /dev/sda(0-9)";
+			$text[]="- Check that 137|138|139|445 ports is open from workstation to this server";
+			$text[]="- Check network switch or hub connection between this server and your workstations.";
+			$text[]="- Try to add this registry key [HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Disk]\n\t\"TimeOutValue\"=dword:0000003c";
+			email_events("Samba network error","Samba claim \"$buffer\"\n" .implode("\n",$text) ,'system');
+			WriteFileCache($file);
+			return;
+		}else{
+			events("Check sieve Error Connection reset by peer :$buffer, but take action after 10mn");
+			return;
+		}		
+}
+
 	
 events("Not Filtered:\"$buffer\"");		
 }

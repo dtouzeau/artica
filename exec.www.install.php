@@ -17,8 +17,14 @@ $GLOBALS["SSLKEY_PATH"]="/etc/ssl/certs/apache";
 if(posix_getuid()<>0){die("Cannot be used in web server mode\n\n");}
 
 if(is_array($argv)){
-	if(preg_match("#--verbose#",implode(" ",$argv))){$_GET["debug"]=true;}
-	if(preg_match("#--only\s+([A-Z0-9]+)#",implode(" ",$argv),$re)){$GLOBALS["ONLY"]=$re[1];}
+	while (list ($i, $cmds) = each ($argv) ){
+		echo "$cmds\n";
+		if(preg_match("#--verbose#",$cmds)){$_GET["debug"]=true;}
+		if(preg_match("#--only-([A-Z0-9]+)#",$cmds,$re)){
+			echo "Starting......: {$re[1]} sub-domains\n";
+			$GLOBALS["ONLY"]=$re[1];
+		}
+	}
 }
 
 if($argv[1]=="getou"){$f=new opengoo();echo $f->get_Organization($argv[2])."\n";die();}
@@ -61,11 +67,12 @@ for($i=0;$i<$hash["count"];$i++){
 	$root=$hash[$i]["apachedocumentroot"][0];
 	$wwwservertype=trim($hash[$i]["wwwservertype"][0]);
 	$apacheservername=trim($hash[$i]["apacheservername"][0]);
-	echo "Starting......: Apache groupware checking $apacheservername host ($wwwservertype)\n";
+	
 		$dn=$hash[$i]["dn"];
-		if(preg_match("#ou=www,ou=(.+?),dc=organizations#",$dn,$re) ){$hash[$i]["OU"][0]=$re[1];}
+		if(preg_match("#ou=www,ou=(.+?),dc=organizations#",$dn,$re) ){$hash[$i]["OU"][0]=trim($re[1]);$ouexec=trim($re[1]);}
 	
 	if($GLOBALS["ONLY"]<>null){if($wwwservertype<>$GLOBALS["ONLY"]){continue;}}
+	echo "Starting......: Apache groupware checking $apacheservername host ($wwwservertype)\n";
 	
 	if($wwwservertype=="LMB"){
 		LMB_INSTALL($apacheservername,$root,$hash[$i]);
@@ -104,6 +111,11 @@ if($wwwservertype=="ZARAFA"){
 
 if($wwwservertype=="ZARAFA_MOBILE"){
 		ZARAFA_MOBILE_INSTALL($apacheservername,$root,$hash[$i]);
+	}
+
+
+if($wwwservertype=="DRUPAL"){
+		DRUPAL_INSTALL($apacheservername,$root,$hash[$i]);
 	}		
 	
 	
@@ -111,7 +123,10 @@ if($wwwservertype=="ZARAFA_MOBILE"){
 
 if($hash["count"]>0){
 	echo "restart apache\n";
+	writelogs("restart apache...",basename(__FILE__),__FILE__,__LINE__);
 	system('/etc/init.d/artica-postfix restart apache-groupware');
+	$sock=new sockets();
+	$sock->getFrameWork("cmd.php?roundcube-sync=yes&ou=$ouexec");
 }
 
 
@@ -284,6 +299,17 @@ function SUGAR_INSTALL($servername,$root,$hash=array()){
 	events("Creating configuration file config.php");
 	@file_put_contents("$root/config.php",$conf);
 	
+	
+	events("sugar version is $sugar->sugar_supposed_version");
+	$sql="UPDATE `$server_database`.`config` SET `value` = '$sugar->sugar_supposed_version' 
+	WHERE `config`.`category` =  'info' 
+	AND `config`.`name` = 'sugar_version'  LIMIT 1 ;";
+	$q=new mysql();
+	$q->QUERY_SQL($sql,$server_database);
+	if(!$q->ok){
+		events("$q->mysql_error");
+		events("$sql");
+	}
 	shell_exec("chmod -R 755 $root/include/javascript");
 	
 	
@@ -493,8 +519,14 @@ for($i=0;$i<$hash["count"];$i++){
 	$wwwservertype=trim($hash[$i]["wwwservertype"][0]);
 	$wwwsslmode=$hash[$i]["wwwsslmode"][0];
 	$DirectoryIndex="index.php";
+	unset($rewrite);
+	unset($dirplus);
 	$magic_quotes_gpc="off";
+	$adds=null;
 	$ssl=null;
+	
+	
+	
 	if($wwwsslmode=="TRUE"){
 		$ssl="\tSSLEngine on\n";
 		$ssl=$ssl."\tSSLCertificateFile {$GLOBALS["SSLKEY_PATH"]}/$apacheservername.crt\n";
@@ -520,32 +552,65 @@ for($i=0;$i<$hash["count"];$i++){
 		$root="$root/php";
 	}
 	
+	if($wwwservertype=="DRUPAL"){
+		$DirectoryIndex="index.php";
+		$adds=null;
+		$adds=$adds."\tAddDefaultCharset ISO-8859-15\n";
+		$adds=$adds."\tAccessFileName .htaccess\n";
+		$rewrite[]="\t\t\t<IfModule mod_rewrite.c>";
+		$rewrite[]="\t\t\t\tRewriteEngine on";
+  		$rewrite[]="\t\t\t\tRewriteBase /";
+   		$rewrite[]="\t\t\t\tRewriteCond %{REQUEST_FILENAME} !-f";
+   		$rewrite[]="\t\t\t\tRewriteCond %{REQUEST_FILENAME} !-d";
+   		$rewrite[]="\t\t\t\tRewriteRule ^(.*)$ index.php?q=$1 [L,QSA]";
+   		$rewrite[]="\t\t\t</IfModule>";
+        $rewrite[]="\t\t\t<FilesMatch \"\.(engine|inc|info|install|module|profile|po|sh|.*sql|theme|tpl(\.php)?|xtmpl)$|^(code-style\.pl|Entries.*|Repository|Root|Tag|Template)$\">";
+        $rewrite[]="\t\t\t\tOrder allow,deny";
+        $rewrite[]="\t\t\t\tdeny from all";
+        $rewrite[]="\t\t\t</FilesMatch>";  	
+
+        $dirplus[]="\t\t\t<Location /cron.php>";
+        $dirplus[]="\t\t\t\tOrder deny,allow";
+        $dirplus[]="\t\t\t\tdeny from all";
+        $dirplus[]="\t\t\t\tallow from 127.0.0.1";
+        $dirplus[]="\t\t\t\tallow from IP";
+    	$dirplus[]="\t\t\t</Location>";
+        
+		$root="/usr/share/drupal";
+		@mkdir("/usr/share/drupal/sites/$apacheservername/files",0755,true);
+		@chmod("/usr/share/drupal/sites/$apacheservername/files",0777);
+	}	
+	
 	
 	if($wwwservertype=="GROUPOFFICE"){$open_basedir=null;}
 	
 	
 	
 	
-	@mkdir("$root/php_logs",0755,true);
+	@mkdir("$root/php_logs/$apacheservername",0755,true);
 	$conf=$conf."\n\n<VirtualHost *:$ApacheGroupWarePort_WRITE>\n";
+	$conf=$conf."\tServerName $apacheservername\n";
 	$conf=$conf."\tServerAdmin webmaster@$apacheservername\n";
 	$conf=$conf."\tDocumentRoot $root\n";
 	$conf=$conf.$ssl;
 	$conf=$conf.$alias;
 	$conf=$conf.$adds;
-	$conf=$conf."\tphp_value  error_log  \"$root/php_logs/php.log\"\n";  
+	$conf=$conf."\tphp_value  error_log  \"$root/php_logs/$apacheservername/php.log\"\n";  
 	if($open_basedir<>null){
 		$conf=$conf."\tphp_value open_basedir \"$root\"\n";
 	} 
 	$conf=$conf."\tphp_value magic_quotes_gpc $magic_quotes_gpc\n";	
-	$conf=$conf."\tServerName $apacheservername\n";
+	
 	$conf=$conf."\t<Directory \"$root\">\n";
+	if(is_array($rewrite)){$conf=$conf.@implode("\n",$rewrite)."\n";}	
 	$conf=$conf."\t\t\tDirectoryIndex $DirectoryIndex\n";
 	$conf=$conf."\t\t\tOptions Indexes FollowSymLinks MultiViews\n";
 	$conf=$conf."\t\t\tAllowOverride all\n";
 	$conf=$conf."\t\t\tOrder allow,deny\n";
 	$conf=$conf."\t\t\tAllow from all\n";
+
 	$conf=$conf."\t</Directory>\n";
+	if(is_array($dirplus)){$conf=$conf.@implode("\n",$dirplus)."\n";}	
 	$conf=$conf."\tCustomLog /usr/local/apache-groupware/logs/{$apacheservername}_access.log \"%h %l %u %t \\\"%r\\\" %>s %b \\\"%{Referer}i\\\" \\\"%{User-Agent}i\\\" %V\"\n";
 	$conf=$conf."\tErrorLog /usr/local/apache-groupware/logs/{$apacheservername}_err.log\n";
 	$conf=$conf."</VirtualHost>\n";
@@ -881,7 +946,9 @@ function GROUPOFFICE_INSTALL($servername,$root,$hash=array()){
 function ROUNDCUBE_INSTALL($servername,$root,$hash=array()){
 	$srcfolder=ROUNDCUBE_SRC_FOLDER();
 	
-$GLOBALS["ADDLOG"]="/var/log/artica-postfix/$servername.log";	
+	echo "Starting......: Roundcube $servername\n"; 
+	
+	$GLOBALS["ADDLOG"]="/var/log/artica-postfix/$servername.log";	
 	if($root==null){events("Starting install roundcube Unable to stat root dir");return false;}
 	if(!is_dir($srcfolder)){
 		events("Starting install roundcube Unable to stat SRC");
@@ -916,10 +983,12 @@ $GLOBALS["ADDLOG"]="/var/log/artica-postfix/$servername.log";
 	}
 	
 	events("Starting setting permissions on Database with user $user");
+	echo "Starting......: Roundcube $servername set permissions on Database with user $user\n"; 
 	AddPrivileges($user,$mysql_password,$server_database);
 	
 	
 	events("Starting install roundcube installing source code");
+	echo "Starting......: Roundcube $servername installing source code\n"; 
 	shell_exec("/bin/cp -rf $srcfolder/* $root/");
 	if($q->mysql_password<>null){
 		$password=" --password=$q->mysql_password ";
@@ -943,81 +1012,41 @@ $GLOBALS["ADDLOG"]="/var/log/artica-postfix/$servername.log";
 		
 
 	}	
+
+	$q->checkRoundCubeTables($server_database);
+	$conf[]="<?php";
+	$conf[]="\$rcmail_config = array();";
+	$conf[]="\$rcmail_config[\"db_dsnw\"] = \"mysql://$user:$mysql_password@$q->mysql_server/$server_database\";";
+	$conf[]="\$rcmail_config[\"db_dsnr\"] = \"\";";
+	$conf[]="\$rcmail_config[\"db_max_length\"] = 512000;  // 500K";
+	$conf[]="\$rcmail_config[\"db_persistent\"] = FALSE;";
+	$conf[]="\$rcmail_config[\"db_table_users\"] = \"users\";";
+	$conf[]="\$rcmail_config[\"db_table_identities\"] = \"identities\";";
+	$conf[]="\$rcmail_config[\"db_table_contacts\"] = \"contacts\";";
+	$conf[]="\$rcmail_config[\"db_table_session\"] = \"session\";";
+	$conf[]="\$rcmail_config[\"db_table_cache\"] = \"cache\";";
+	$conf[]="\$rcmail_config[\"db_table_messages\"] = \"messages\";";
+	$conf[]="\$rcmail_config[\"db_sequence_users\"] = \"user_ids\";";
+	$conf[]="\$rcmail_config[\"db_sequence_identities\"] = \"identity_ids\";";
+	$conf[]="\$rcmail_config[\"db_sequence_contacts\"] = \"contact_ids\";";
+	$conf[]="\$rcmail_config[\"db_sequence_cache\"] = \"cache_ids\";";
+	$conf[]="\$rcmail_config[\"db_sequence_messages\"] = \"message_ids\";";
+	$conf[]="?>";
+	events("Starting install roundcube saving $root/config/db.inc.php");
+	echo "Starting......: Roundcube $servername db.inc.php OK\n";
+	@file_put_contents("$root/config/db.inc.php",@implode("\n",$conf));	
 	
-		$conf[]="<?php";
-		$conf[]="\$config['enabled']=true;";
-		$conf[]="\$config['id']=\"groupoffice\";";
-		$conf[]="\$config['debug']=false;";
-		$conf[]="\$config['log']=false;";
-		$conf[]="\$config['language']=\"en\";";
-		$conf[]="\$config['default_country']=\"FR\";";
-		$conf[]="\$config['default_timezone']=\"Europe/Amsterdam\";";
-		$conf[]="\$config['default_currency']=\"€\";";
-		$conf[]="\$config['default_date_format']=\"dmY\";";
-		$conf[]="\$config['default_date_separator']=\"-\";";
-		$conf[]="\$config['default_time_format']=\"G:i\";";
-		$conf[]="\$config['default_first_weekday']=\"1\";";
-		$conf[]="\$config['default_decimal_separator']=\",\";";
-		$conf[]="\$config['default_thousands_separator']=\".\";";
-		$conf[]="\$config['theme']=\"Default\";";
-		$conf[]="\$config['allow_themes']=true;";
-		$conf[]="\$config['allow_password_change']=false;";
-		$conf[]="\$config['allow_profile_edit']=true;";
-		$conf[]="\$config['allow_registration']=false;";
-		$conf[]="\$config['registration_fields']=\"title_initials,sex,birthday,address,home_phone,fax,cellular,company,department,function,work_address,work_phone,work_fax,homepage\";";
-		$conf[]="\$config['required_registration_fields']=\"company,address\";";
-		$conf[]="\$config['allow_duplicate_email']=false;";
-		$conf[]="\$config['auto_activate_accounts']=false;";
-		$conf[]="\$config['notify_admin_of_registration']=true;";
-		$conf[]="\$config['register_modules_read']=\"summary,email,calendar,tasks,addressbook,files,notes,links,tools,comments\";";
-		$conf[]="\$config['register_modules_write']=\"\";";
-		$conf[]="\$config['allowed_modules']=\"\";";
-		$conf[]="\$config['register_user_groups']=\"\";";
-		$conf[]="\$config['register_visible_user_groups']=\",\";";
-		$conf[]="\$config['host']=\"/\";";
-		$conf[]="\$config['force_login_url']=false;";
-		$conf[]="\$config['full_url']=\"http://groupoffice.touzeau.biz:81/\";";
-		$conf[]="\$config['title']=\"Group-Office\";";
-		$conf[]="\$config['webmaster_email']=\"webmaster@example.com\";";
-		$conf[]="\$config['root_path']=\"/usr/share/artica-groupware/domains/groupoffice.touzeau.biz/\";";
-		$conf[]="\$config['tmpdir']=\"/tmp/\";";
-		$conf[]="\$config['max_users']=\"0\";";
-		$conf[]="\$config['quota']=\"0\";";
-		$conf[]="\$config['db_type']=\"mysql\";";
-		$conf[]="\$config['db_host']=\"localhost\";";
-		$conf[]="\$config['db_name']=\"groupoffice_touzeau_biz\";";
-		$conf[]="\$config['db_user']=\"groupoffice\";";
-		$conf[]="\$config['db_pass']=\"groupoffice\";";
-		$conf[]="\$config['db_port']=\"3306\";";
-		$conf[]="\$config['db_socket']=\"\";";
-		$conf[]="\$config['file_storage_path']=\"/home/groupoffice/\";";
-		$conf[]="\$config['max_file_size']=\"10000000\";";
-		$conf[]="\$config['smtp_server']=\"localhost\";";
-		$conf[]="\$config['smtp_port']=\"25\";";
-		$conf[]="\$config['smtp_username']=\"\";";
-		$conf[]="\$config['smtp_password']=\"\";";
-		$conf[]="\$config['smtp_encryption']=\"\";";
-		$conf[]="\$config['smtp_local_domain']=\"\";";
-		$conf[]="\$config['restrict_smtp_hosts']=\"\";";
-		$conf[]="\$config['max_attachment_size']=\"10000000\";";
-		$conf[]="\$config['cmd_zip']=\"/usr/bin/zip\";";
-		$conf[]="\$config['cmd_unzip']=\"/usr/bin/unzip\";";
-		$conf[]="\$config['cmd_tar']=\"/bin/tar\";";
-		$conf[]="\$config['cmd_chpasswd']=\"/usr/sbin/chpasswd\";";
-		$conf[]="\$config['cmd_sudo']=\"/usr/bin/sudo\";";
-		$conf[]="\$config['cmd_xml2wbxml']=\"/usr/bin/xml2wbxml\";";
-		$conf[]="\$config['cmd_wbxml2xml']=\"/usr/bin/wbxml2xml\";";
-		$conf[]="\$config['cmd_tnef']=\"/usr/bin/tnef\";";
-		$conf[]="\$config['cmd_php']=\"php\";";
-		$conf[]="\$config['phpMyAdminUrl']=\"\";";
-		$conf[]="\$config['allow_unsafe_scripts']=\"\";";
-		$conf[]="\$config['default_password_length']=\"6\";";
-		$conf[]="\$config['session_inactivity_timeout']=\"0\"";	
+	if(is_file("/usr/share/roundcube/config/main.inc.php")){
+		echo "Starting......: Roundcube $servername main.inc.php OK\n";
+		@copy("/usr/share/roundcube/config/main.inc.php","$root/config/main.inc.php");}
+	
+		
 }
 
 
 function events($text){
 		if($_GET["debug"]){echo "Starting......: Apache groupware $text\n";}
+		
 		writelogs($text,"main",__FILE__,__LINE__);
 		}
 		
@@ -1760,6 +1789,46 @@ function vhosts_BuildCertificate($hostname){
 	$ini->saveFile($conf);
 	$cmd="$openssl req -new -x509 -batch -config $conf -nodes -out $dir/$hostname.crt -keyout $dir/$hostname.key -days $CertificateMaxDays";
 	shell_exec($cmd);
+	
+}
+
+function DRUPAL_INSTALL($apacheservername,$root,$hash=array()){
+	$ldap=new clladp();
+	$GLOBALS["ADDLOG"]="/var/log/artica-postfix/$servername.log";	
+	$server_database=str_replace(".","_",$apacheservername);
+	$server_database=str_replace("-","_",$server_database);	
+	events("Starting install drupal table prefix={$server_database}_...");
+	$sock=new sockets();
+	$ApacheGroupWarePort=$sock->GET_INFO("ApacheGroupWarePort");
+	$prefix_web="http";
+	if($hash["wwwsslmode"][0]=='TRUE'){$prefix_web="https";}
+	$dn=$hash["dn"];
+	
+	if(preg_match("#ou=www,ou=(.+?),#",$dn,$re)){$ou=$re[1];}
+	$q=new mysql();	
+	$conf[]="<?php";
+	$conf[]="\$db_url = 'mysql://$q->mysql_admin:$q->mysql_password@$q->mysql_server:$q->mysql_port/drupal';";
+	$conf[]="\$db_prefix = '{$server_database}_';";
+	$conf[]="\$update_free_access = FALSE;";
+	$conf[]="\$base_url = '$prefix_web://$apacheservername:$ApacheGroupWarePort';  // NO trailing slash!";
+	$conf[]="ini_set('arg_separator.output',     '&amp;');";
+	$conf[]="ini_set('magic_quotes_runtime',     0);";
+	$conf[]="ini_set('magic_quotes_sybase',      0);";
+	$conf[]="ini_set('session.cache_expire',     200000);";
+	$conf[]="ini_set('session.cache_limiter',    'none');";
+	$conf[]="ini_set('session.cookie_lifetime',  2000000);";
+	$conf[]="ini_set('session.gc_maxlifetime',   200000);";
+	$conf[]="ini_set('session.save_handler',     'user');";
+	$conf[]="ini_set('session.use_cookies',      1);";
+	$conf[]="ini_set('session.use_only_cookies', 1);";
+	$conf[]="ini_set('session.use_trans_sid',    0);";
+	$conf[]="ini_set('url_rewriter.tags',        '');";
+	$conf[]="?>";	
+	
+	@mkdir("/usr/share/drupal/sites/$apacheservername/files",0755,true);
+	
+	@file_put_contents("/usr/share/drupal/sites/$apacheservername/settings.php",@implode("\n",$conf));
+	
 	
 }
 

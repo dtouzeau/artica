@@ -832,53 +832,6 @@ begin
  
 
 end;
-
-//#############################################################################
-PROCEDURE tldapconf.milter_greylist();
-var
-   Confd:string;
-   f:miltergreylist_settings;
-   l:TstringList;
-begin
-   if ldap.Logged=false then begin
-    logs.logs('milter_greylist:: Logged is false;aborting...');
-    exit;
- end;
-
-  if not FileExists(miltergreylist.MILTER_GREYLIST_BIN_PATH()) then exit;
-
-  if SYS.GET_INFO('MilterGreyListEnabled')<>'1' then begin
-     logs.Debuglogs('Milter-greylist is disabled...');
-     exit;
-  end;
-
-  f:=ldap.Load_miltergreylist();
-  if length(f.GreyListConf)=0 then exit;
-  logs.Debuglogs('Changing file configuration with ' +IntToStr(length(f.GreyListConf))+' bytes length');
-  if not FileExists('/var/lib/milter-greylist/greylist.db') then logs.OutputCmd('/bin/touch /var/lib/milter-greylist/greylist.db');
-  
-
-  l:=TstringList.Create;
-  l.Add(f.GreyListConf);
-  forceDirectories('/etc/milter-greylist');
-
-
-
-  try
-     if not FileExists(miltergreylist.MILTER_GREYLIST_CONF_PATH()) then l.SaveToFile('/etc/milter-greylist/greylist.conf');
-  except
-        logs.Syslogs('milter_greylist() FATAL ERROR WHILE SAVING /etc/milter-greylist/greylist.conf');
-
-  end;
-
-  logs.WriteToFile(l.Text,miltergreylist.MILTER_GREYLIST_CONF_PATH());
-  logs.Debuglogs('Restarting milter-greylist');
-  fpsystem('/etc/init.d/artica-postfix restart mgreylist');
-  l.free;
-end;
-
-//#############################################################################
-//#############################################################################
 //#############################################################################
 procedure tldapconf.kav4samba_save();
 var

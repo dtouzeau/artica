@@ -6,7 +6,7 @@ unit bind9;
 interface
 
 uses
-    Classes, SysUtils,variants,strutils,IniFiles, Process,md5,logs,unix,RegExpr in 'RegExpr.pas',zsystem,lighttpd;
+    Classes, SysUtils,variants,strutils,Process,logs,unix,RegExpr in 'RegExpr.pas',zsystem,lighttpd;
 
 type LDAP=record
       admin:string;
@@ -22,13 +22,9 @@ type LDAP=record
 
 private
      LOGS:Tlogs;
-     D:boolean;
-     GLOBAL_INI:TiniFIle;
      SYS:TSystem;
      artica_path:string;
      lighttp:Tlighttpd;
-     found_start:integer;
-     daemon_user:string;
      DNSServerList:TstringList;
      function PID_PATH():string;
      function FixFIles():string;
@@ -60,7 +56,7 @@ public
     function    statistics_path():string;
     procedure   Generate_binrrd();
     function    forwarders():string;
-    function    ApplyForwarders(path:string):boolean;
+    function    ApplyForwarders(path:string=''):boolean;
     procedure   ApplyLoopBack();
     function    dnssec_keygen_path():string;
     function    GenerateKey(domainname:string):string;
@@ -114,7 +110,6 @@ if FileExists('/usr/sbin/bindrrdcronjob.sh') then exit('/usr/sbin/bindrrdcronjob
 end;
 //#############################################################################
 function tbind9.GET_USER():string;
-var user:string;
 begin
  if SYS.IsUserExists('named') then exit('named');
  if SYS.IsUserExists('bind') then exit('bind');
@@ -295,7 +290,6 @@ end;
 //##############################################################################
 function tbind9.VERSION():string;
 var
-   tmp            :string;
    RegExpr        :TRegExpr;
    D              :boolean;
    F              :TstringList;
@@ -304,7 +298,7 @@ var
 begin
    result:='';
    
-
+  D:=SYS.COMMANDLINE_PARAMETERS('--verbose');
   result:=SYS.GET_CACHE_VERSION('APP_BIND9');
   if length(result)>0 then exit;
    
@@ -440,20 +434,13 @@ var
 l:TstringList;
 RegExpr        :TRegExpr;
 i:Integer;
-t:integer;
-D:boolean;
-Found:boolean;
-ff:TstringList;
-tmpstr:string;
 working_path:string;
 firstkey:string;
 ZoneDomain:string;
 ConfigFolder:string;
 FilSystem:Tsystem;
-footer:TstringList;
-
 begin
-
+result:=false;
 working_path:=WORKING_DIRECTORY();
 configFolder:='/etc/artica-postfix/settings/Daemons';
 logs.DebugLogs('Starting......: bind9 Apply forwarders and change configuration');
@@ -897,7 +884,7 @@ var
    tf:string;
 
 begin
-
+   result:='';
    if not FileExists(conf_path()) then exit;
    conffile:=TstringList.Create;
    conffile.LoadFromFile(conf_path());
@@ -957,11 +944,9 @@ end;
 //#############################################################################
 procedure tbind9.ApplyLoopBack();
 var
-   tmp            :string;
    RegExpr        :TRegExpr;
    D              :boolean;
    L              :TstringList;
-   T              :string;
    i              :integer;
 begin
    if not FileExists('/etc/resolv.conf') then exit;
@@ -1011,11 +996,8 @@ end;
 //#############################################################################
 function tbind9.statistics_path():string;
 var
-   tmp            :string;
    RegExpr        :TRegExpr;
-   D              :boolean;
    F              :TstringList;
-   T              :string;
    i              :integer;
 begin
    result:='';
@@ -1062,11 +1044,8 @@ end;
 
 procedure tbind9.bindrrd_configure();
 var
-   tmp            :string;
    RegExpr        :TRegExpr;
-   D              :boolean;
    F              :TstringList;
-   T              :string;
    i              :integer;
    stat           :string;
 begin

@@ -6,7 +6,7 @@ unit zsystem;
 interface
 
 uses
-Classes, SysUtils,Process,strutils,IniFiles,BaseUnix,unix,Logs,
+Classes, SysUtils,Process,strutils,IniFiles,BaseUnix,unix,Logs, base64,
 RegExpr  in '/home/dtouzeau/developpement/artica-postfix/bin/src/artica-install/RegExpr.pas',md5,
 users    in '/home/dtouzeau/developpement/artica-postfix/bin/src/artica-install/users.pas',
 DATEUTILS;
@@ -72,7 +72,7 @@ public
       DirListFiles:TstringList;
       constructor Create();
       function Load_DisableFollowServiceHigerThan1G():integer;
-
+      function CHECK_PERL_MODULES_VER(ModulesToCheck:string):string;
 
       procedure Free;
       function COMMANDLINE_PARAMETERS(FoundWhatPattern:string):boolean;
@@ -413,6 +413,7 @@ public
         function LIGHTTPD_LISTEN_PORT():string;
         function WIRELESS_CARD():string;
         function ArchStruct():integer;
+        function base64_encode(value:string):string;
 END;
 
 implementation
@@ -523,6 +524,24 @@ begin
      result:=logs.ReadFromFile('/usr/share/artica-postfix/VERSION');
 end;
 //##############################################################################
+function Tsystem.base64_encode(value:string):string;
+var
+  DecodedStream: TStringStream;
+  EncodedStream: TStringStream;
+  Encoder: TBase64EncodingStream;
+begin
+
+DecodedStream := TStringStream.Create('Hello World!');
+  EncodedStream := TStringStream.Create('');
+  Encoder       := TBase64EncodingStream.Create(EncodedStream);
+  Encoder.CopyFrom(DecodedStream, DecodedStream.Size);
+  result := EncodedStream.DataString;
+  DecodedStream.Free;
+  EncodedStream.Free;
+  Encoder.Free;
+end;
+
+
 function Tsystem.IsUserINGroup(groupname:string;user:string):boolean;
 var
    l:TstringList;
@@ -2772,6 +2791,7 @@ begin
    if not FileExists('/proc/'+pid+'/status') then exit;
    l:=TstringList.Create;
    try
+      if not FileExists('/proc/'+pid+'/status') then exit;
       l.LoadFromFile('/proc/'+pid+'/status');
    except
      exit;
@@ -2998,6 +3018,7 @@ begin
   if not FileExists('/proc/'+PID+'/status') then exit(false);
   l:=Tstringlist.Create;
   try
+      if not FileExists('/proc/'+pid+'/status') then exit;
      l.LoadFromFile('/proc/'+PID+'/status');
   except
     exit();
@@ -3100,7 +3121,7 @@ begin
    for i:=0 to l.Count-1 do begin
 
       if FileExists(l.Strings[i]+'/status') then begin
-           s.LoadFromFile(l.Strings[i]+'/status');
+           try s.LoadFromFile(l.Strings[i]+'/status'); except  result:=raz;  exit; end;
            for z:=0 to s.Count-1 do begin
                RegExpr.Expression:='^Pid:\s+([0-9]+)';
                if RegExpr.Exec(s.Strings[z]) then lefils:=RegExpr.Match[1];
@@ -3136,8 +3157,8 @@ if not FileExists(PidPath) then begin
        exit(0);
      end;
 
- s:=TStringList.Create;
- s.LoadFromFile(PidPath);
+ try s:=TStringList.Create; except exit; end;
+ try s.LoadFromFile(PidPath); except exit;end;
 
   RegExpr:=TRegExpr.Create;
      RegExpr.Expression:='^(PPid|PPID):\s+([0-9]+)';
@@ -3582,7 +3603,7 @@ begin
         exit(0);
      end;
      s:=TStringList.Create;
-     S.LoadFromFile('/proc/' + trim(PID) + '/status');
+     try S.LoadFromFile('/proc/' + trim(PID) + '/status'); except exit; end;
 
      RegExpr:=TRegExpr.Create;
      RegExpr.Expression:='^VmRSS:\s+([0-9]+)';
@@ -3646,7 +3667,7 @@ begin
         exit('0');
      end;
      s:=TStringList.Create;
-     S.LoadFromFile('/proc/' + trim(PID) + '/status');
+     try S.LoadFromFile('/proc/' + trim(PID) + '/status'); except exit; end;
      if D then writeln('SYSTEM_PROCESS_STATUS:: /proc/' + trim(PID) + '/status');
 
      RegExpr.Expression:='^State:\s+([A-Z])\s+\(([a-zA-Z]+)\)';
@@ -4691,11 +4712,13 @@ var
    commandline_artica:string;
    command_line_curl:string;
    command_line_wget:string;
+   WgetBindIpAddress_cmd_line_wget:string;
+   WgetBindIpAddress_cmd_line_curl:string;
    localhost:boolean;
    LOGS:Tlogs;
    ssl:boolean;
    ForceHTTPEngineToWget:integer;
-
+   WgetBindIpAddress:string;
    D:boolean;
  begin
    D:=COMMANDLINE_PARAMETERS('debug');
@@ -4711,9 +4734,16 @@ var
    if not TryStrToInt(GET_INFO('ForceHTTPEngineToWget'),ForceHTTPEngineToWget) then ForceHTTPEngineToWget:=0;
 
 
+   WgetBindIpAddress:=GET_INFO('WgetBindIpAddress');
+
+   if length(trim(WgetBindIpAddress))>0 then begin
+      WgetBindIpAddress_cmd_line_wget:=' --bind-address='+WgetBindIpAddress;
+      WgetBindIpAddress_cmd_line_curl:=' --interface '+WgetBindIpAddress;
+   end;
+
    command_line_curl:=' ';
    ssl:=false;
-   command_line_curl:= command_line_curl + ' --progress-bar --output ' + file_path + ' "' + uri+'"';
+   command_line_curl:= command_line_curl +WgetBindIpAddress_cmd_line_curl+' --progress-bar --output ' + file_path + ' "' + uri+'"';
 
    RegExpr.Expression:='^https:.+';
    if RegExpr.Exec(uri) then ssl:=True;
@@ -4754,7 +4784,7 @@ var
    end;
 
 
-   command_line_wget:=uri + '  -q --output-document=' + file_path;
+   command_line_wget:=uri +WgetBindIpAddress_cmd_line_wget+'  -q --output-document=' + file_path;
    if JustHead then ForceHTTPEngineToWget:=0;
 
 
@@ -7340,6 +7370,9 @@ logs:=Tlogs.Create;
 tmpstr:=logs.FILE_TEMP();
 RegExpr:=TRegExpr.Create;
 fpsystem('/sbin/route -n >' +tmpstr+' 2>&1');
+l:=tstringlist.Create;
+l.LoadFromFile(tmpstr);
+logs.DeleteFile(tmpstr);
 for i:=0 to l.count-1 do begin
      RegExpr.Expression:='([0-9\.]+)\s+([0-9\.]+)\s+([0-9\.]+)\s+([A-Z]+)\s+.+?'+eth;
      if RegExpr.Exec(l.Strings[i]) then begin
@@ -7789,5 +7822,38 @@ if RegExpr.Exec(data) then begin
    exit;
 end;
 end;
+//##############################################################################
+function Tsystem.CHECK_PERL_MODULES_VER(ModulesToCheck:string):string;
+var
+   cmd:string;
+   l:TstringList;
+   RegExpr:TRegExpr;
+   tmpstr:string;
+begin
+result:='';
+tmpstr:=FILE_TEMP();
+if not FileExists(LOCATE_PERL_BIN()) then exit;
+cmd:=LOCATE_PERL_BIN()+' -M'+ModulesToCheck+' -e ''print "$'+ModulesToCheck+'::VERSION\n"''';
+fpsystem(cmd + ' >'+tmpstr+' 2>&1');
+ l:=TstringList.Create;
+ RegExpr:=TRegExpr.Create;
+ if not FileExists(tmpstr) then exit;
+ l.LoadFromFile(tmpstr);
+ fpsystem('/bin/rm -f '+tmpstr);
+ RegExpr.Expression:='([0-9\.]+)';
+ if RegExpr.Exec(l.Strings[0]) then begin
+    if trim(RegExpr.Match[1])='.' then begin
+          writeln('Failed to check ' + ModulesToCheck);
+          result:='';
+          exit;
+    end;
+    result:=RegExpr.Match[1];
+ end else begin
+
+ end;
+ L.free;
+ RegExpr.Free;
+end;
+
 //##############################################################################
 end.

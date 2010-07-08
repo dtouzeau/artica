@@ -61,7 +61,7 @@ function ParseDebianNetworks($config){
 	
 	if(is_array($config)){
 		while (list ($eth, $nics) = each ($config) ){
-			echo "Starting......: Virtuals $eth {$nics["IP_ADDR"]}/{$nics["NETMASK"]} gateway {$nics["GATEWAY"]}\n";
+			echo "Starting......: Virtuals $eth {$nics["IP_ADDR"]}/{$nics["NETMASK"]} gateway {$nics["GATEWAY"]} ({$nics["org"]})\n";
 			$array[$eth][]="iface $eth inet static";
 			$array[$eth][]="\taddress {$nics["IP_ADDR"]}";
 			$array[$eth][]="\tnetmask {$nics["NETMASK"]}";
@@ -75,8 +75,11 @@ while (list ($eth, $nics2) = each ($array) ){
 	
 			$conf[]="auto $eth";
 			if($eth<>"lo"){
-				echo "Starting......: Virtuals stopping $eth\n";
-				system("ifdown $eth");
+				if(preg_match("#^.+?:[0-9]+#",$eth)){
+					$tostart[]=$eth;
+					echo "Starting......: Virtuals stopping $eth\n";
+					system("ifdown $eth");
+				}
 			}
 			
 			while (list ($index, $line) = each ($nics2) ){	
@@ -88,13 +91,20 @@ while (list ($eth, $nics2) = each ($array) ){
 }
 $conf[]="";
 @file_put_contents("/etc/network/interfaces",@implode("\n",$conf));
-echo "Starting......: Virtuals reloading interfaces\n";
-system("/etc/init.d/networking restart");
-shell_exec("ifconfig lo 127.0.0.1");
+$unix=new unix();
+$ifup=$unix->find_program("ifup");
+$nohup=$unix->find_program("nohup");
+
+system("$nohup $ifup -a >/dev/null 2>&1 &");
+system("$nohup ifconfig lo 127.0.0.1 >/dev/null 2>&1 &");
 	
 }
 
 function ParseRedHatNetworks($config){
+$unix=new unix();
+$ifup=$unix->find_program("ifup");
+$nohup=$unix->find_program("nohup");
+
 
 	foreach (glob("/etc/sysconfig/network-scripts/ifcfg-*") as $filename) {
 		$fileconf=basename($filename);
@@ -113,11 +123,13 @@ function ParseRedHatNetworks($config){
 			$array[]="ONBOOT=yes";
 			$array[]="USERCTL=yes";
 			@file_put_contents("/etc/sysconfig/network-scripts/ifcfg-$eth",@implode("\n",$array));
+			system("$nohup $ifup $eth >/dev/null 2>&1 &");
 			unset($array);
 			}
 	}		
-	shell_exec("/etc/init.d/network restart");
-	shell_exec("ifconfig lo 127.0.0.1");
+	
+system("$nohup $ifup -a >/dev/null 2>&1 &");
+system("$nohup ifconfig lo 127.0.0.1 >/dev/null 2>&1 &");
 }
 
 function ifconfig_tests(){

@@ -24,11 +24,13 @@ $_GET["server"]=$users->hostname;
 $_GET["IMAP_HACK"]=array();
 $GLOBALS["POP_HACK"]=array();
 $GLOBALS["SMTP_HACK"]=array();
+$GLOBALS["PopHackEnabled"]=$sock->GET_INFO("PopHackEnabled");
+$GLOBALS["PopHackCount"]=$sock->GET_INFO("PopHackCount");
+if($GLOBALS["PopHackEnabled"]==null){$GLOBALS["PopHackEnabled"]=1;}
+if($GLOBALS["PopHackCount"]==null){$GLOBALS["PopHackCount"]=10;}
 
-	$GLOBALS["PopHackEnabled"]=$sock->GET_INFO("PopHackEnabled");
-	$GLOBALS["PopHackCount"]=$sock->GET_INFO("PopHackCount");
-	if($GLOBALS["PopHackEnabled"]==null){$GLOBALS["PopHackEnabled"]=1;}
-	if($GLOBALS["PopHackCount"]==null){$GLOBALS["PopHackCount"]=10;}
+$unix=new unix();
+$GLOBALS["postfix_bin_path"]=$unix->find_program("postfix");
 
 @mkdir("/etc/artica-postfix/cron.1",0755,true);
 @mkdir("/etc/artica-postfix/cron.2",0755,true);
@@ -88,18 +90,83 @@ if(preg_match("#FATAL: lmtpd: unable to init duplicate delivery database#",$buff
 if(preg_match("#skiplist: checkpointed.+?annotations\.db#",$buffer)){return null;}
 if(preg_match("#duplicate_prune#",$buffer)){return null;}
 if(preg_match("#cyrus\/cyr_expire\[[0-9]+#",$buffer)){return null;}
+if(preg_match("#cyrus\/imap.+?SSL_accept#",$buffer)){return null;}
+if(preg_match("#cyrus\/pop3.+?SSL_accept#",$buffer)){return null;}
+if(preg_match("#cyrus\/imap.+?:\s+executed#",$buffer)){return null;}
+if(preg_match("#cyrus.+?executed#",$buffer)){return null;}
+if(preg_match("#postfix\/.+?refreshing the Postfix mail system#",$buffer)){return null;}
+if(preg_match("#master.+?reload -- version#",$buffer)){return null;}
+if(preg_match("#SQUAT failed#",$buffer)){return null;}
+if(preg_match("#lmtpunix.+?sieve\s+runtime\s+error\s+for#",$buffer)){return null;}
+if(preg_match("#imapd:Loading hard-coded DH parameters#",$buffer)){return null;}
+if(preg_match("#ctl_cyrusdb.+?checkpointing cyrus databases#",$buffer)){return null;}
+if(preg_match("#idle for too long, closing connection#",$buffer)){return null;}
+if(preg_match("#amavis\[.+?Found#",$buffer)){return null;}
+if(preg_match("#amavis\[.+?Module\s+#",$buffer)){return null;}
+if(preg_match("#amavis\[.+?\s+loaded$#",trim($buffer))){return null;}
 
 
+if(preg_match("#zarafa-server\[.+?: SQL Failed: Table.+?zarafa\.(.+?)'\s+doesn.+?exist#",$buffer,$re)){
+	events("Zarafa, missing table {$re[1]}");
+	zarafa_rebuild_db($table,$buffer);
+}
 
-if(preg_match("#spamd\[[0-9]+.+?Can.+?locate\s+Mail\/SpamAssassin\/CompiledRegexps\/body_0\.pm#",$buffer,$re)){
+
+if(preg_match("#.+?postfix-.+?\/master\[.+?:\s+fatal:\s+bind\s+[0-9\.]+\s+port\s+25:\s+Address already in use#",$buffer,$re)){
+	events("Address already in use, restart postfix");
+	THREAD_COMMAND_SET("{$GLOBALS["postfix_bin_path"]} stop");
+	THREAD_COMMAND_SET("{$GLOBALS["postfix_bin_path"]} postfix start");
+	return null;	
+}
+
+if(preg_match("#postfix\/.+?warning:\s+(.+?)\s+and\s+(.+?)\s+differ#",$buffer,$re)){
+	THREAD_COMMAND_SET("/bin/cp -pf {$re[2]} {$re[1]}");
+	return ;
+}
+
+if(preg_match("#smtpd\[.+?warning:\s+connect to Milter service unix:(.+?):\s+Permission denied#",$buffer,$re)){
+	events("chown postfix:postfix {$re[1]}");
+	shell_exec("/bin/chown postfix:postfix {$re[1]} &");
+	return;
+}
+
+
+if(preg_match("#amavis.+?:.+?_DIE:\s+Can.+?locate.+?.+?body_[0-9]+\.pm\s+in\s+@INC#",$buffer,$re)){
+	SpamAssassin_error_saupdate($buffer);
+	return null;	
+}
+
+if(preg_match("#spamd\[[0-9]+.+?Can.+?locate\s+Mail\/SpamAssassin\/CompiledRegexps\/body_[0-9]+\.pm#",$buffer,$re)){
 	SpamAssassin_error_saupdate($buffer);
 	return null;
 }
+
+if(preg_match("#cyrus\/lmtp\[.+?verify_user\(user\.(.+?)\)\s+failed: Mailbox does not exist#",$buffer,$re)){
+	cyrus_mailbox_not_exists($buffer,$re[1]);
+	return null;
+}
+
 
 if(preg_match("#zarafa-monitor.+?:\s+Unable to get store entry id for company\s+(.+?), error code#",$buffer,$re)){
 	zarafa_store_error($buffer);
 	return null;
 }
+
+if(preg_match("#postfix\/lmtp.+?:\s+(.+?):\s+to=<(.+?)>.+?lmtp.+?deferred.+?451.+?Mailbox has an invalid format#",$buffer,$re)){
+	event_messageid_rejected($re[1],"Mailbox corrupted",null,$re[2]);
+	mailbox_corrupted($buffer,$re[2]);
+	return null;
+	}
+	
+
+	
+if(preg_match("#postfix\/lmtp.+?(.+?):\s+to=<(.+?)>.+?lmtp.+?status=deferred.+?452.+?Over quota#",$buffer,$re)){
+	event_messageid_rejected($re[1],"Over quota",null,$re[2]);
+	mailbox_overquota($buffer,$re[2]);
+	return null;
+	}	
+
+
 
 if(preg_match("#smtp.+?status=deferred.+?connect.+?\[127\.0\.0\.1\]:10024: Connection refused#",$buffer,$re)){
 	AmavisConfigErrorInPostfix($buffer);
@@ -116,6 +183,12 @@ if(preg_match("#postfix\/.+?:(.+?):\s+to=<(.+?)>,.+?\[(.+?)\].+?status=deferred.
 	event_messageid_rejected($re[1],"antivirus failed",$re[3],$re[2]);
 	return null;
 	}
+	
+	
+if(preg_match("#master\[.+?:\s+fatal:\s+binds\+(.+?)\s+port\s+(.+?).+?Address already in use#",$buffer,$re)){
+	postfix_bind_error($re[1],$re[2],$buffer);
+	return null;
+}
 
 
 if(preg_match("#kavmilter\[.+?:\s+KAVMilter Error\(13\):\s+Active key expired.+?Exiting#",$buffer,$re)){
@@ -138,7 +211,10 @@ if(preg_match("#postfix\/qmgr.+?:\s+(.+?):\s+from=<(.*?)>,\s+status=expired, ret
 }
 
 
-
+if(preg_match("#postfix postmulti\[[0-9+]\]: fatal: No matching instances#",$buffer,$re)){
+	multi_instances_reconfigure($buffer);
+	return null;
+}
 
 
 if(preg_match("#cyrus\/.+?\[.+?IOERROR: fstating sieve script\s+(.+?):\s+No such file or directory#",$buffer,$re)){
@@ -225,6 +301,13 @@ if(preg_match("#zarafa-gateway\[.+?: Failed to login from\s+(.+?)\s+with invalid
 	hackPOP($re[1],$re[2],$buffer);
 	return;
 }
+if(preg_match("#cyrus.+?unable to get certificate from.+?(.+?)cyrus\.pem#",$buffer,$re)){
+	cyrus_vertificate_error();
+	return;
+}
+
+
+
 
 if(preg_match("#smtpd.+?:\s+warning: SASL authentication failure: no secret in database#",$buffer)){
 	$file="/etc/artica-postfix/croned.1/postfix.sasl.secret.error";
@@ -397,6 +480,30 @@ if(preg_match('#badlogin: \[(.+?)\] plaintext\s+(.+?)\s+SASL\(-1\): generic fail
 	}
 	return null;
 }
+if(preg_match('#cyrus\/lmtpunix.+?DBERROR:\s+opening.+?\.db:\s+Cannot allocate memory#',$buffer,$re)){
+	$file="/etc/artica-postfix/croned.1/cyrus.dberror.restart.error";
+	if(file_time_min($file)>10){
+		email_events("Cyrus DBERROR error","Artica will restart messaging service\n\"$buffer\"","mailbox");
+		THREAD_COMMAND_SET('/etc/init.d/artica-postfix restart imap');
+		@unlink($file);
+	}
+	return null;
+}
+if(preg_match('#cyrus\/imap.+?DBERROR.+?Open database handle:\s+(.+?)tls_sessions\.db#',$buffer,$re)){
+	$file="/etc/artica-postfix/croned.1/cyrus.dberror.tls_sessions.error";
+	if(file_time_min($file)>10){
+		email_events("Cyrus DBERROR error","Artica will delete {$re[1]}tls_sessions.db file\n\"$buffer\"","mailbox");
+		@unlink("{$re[1]}tls_sessions.db");
+		@unlink($file);
+	}
+	return null;
+}
+
+
+
+
+
+
 
 if(preg_match('#cyrus\/notify.+?DBERROR db[0-9]: PANIC: fatal region error detected; run recovery#',$buffer)){
 	$file="/etc/artica-postfix/croned.1/cyrus.db.error";
@@ -718,6 +825,12 @@ if(preg_match("#smtp\[.+?:\s+(.+?):\s+to=<(.+?)>,\s+relay=.+?\[(.+?)\].+?status=
 	event_messageid_rejected($re[1],"Your are blacklisted",$re[3],$re[2]);
 	return null;
 }
+
+if(preg_match("#postfix\/bounce\[.+?:\s+(.+?):\s+sender non-delivery notification#",$buffer,$re)){
+	events("{$re[1]} non-delivery");
+	event_messageid_rejected($re[1],"non-delivery",null,null);
+	return null;
+	}	
 
 
 if(preg_match("#smtp\[.+?\]:\s+(.+?):\s+to=<(.+?)>, relay=(.+?)\[.+?status=bounced\s+\(.+?loops back to myself#",$buffer,$re)){
@@ -1352,7 +1465,18 @@ function amavis_socket_error($line){
 function mailbox_unknown($line,$to){
 	$file="/etc/artica-postfix/cron.1/".__FUNCTION__.'.'.md5($to);
 	if(file_time_min($file)<15){return null;}
-	email_events("Warning unknown mailbox $to","Postfix claim that $to mailbox is not available you should create this alias or mailbox $line","mailbox");
+	email_events("Warning unknown mailbox $to","Postfix claim: $to mailbox is not available you should create an alias or mailbox $line","mailbox");
+	@unlink($file);
+	@file_put_contents($file,"#");	
+	
+}
+function cyrus_mailbox_not_exists($line,$user){
+	$user=str_replace('^','.',$user);
+	$file="/etc/artica-postfix/cron.1/".__FUNCTION__.'.'.md5($user);
+	if(file_time_min($file)<15){return null;}
+	email_events("Warning Mailbox does not exist $user","Mailbox server claim: $user mailbox is not available you should create an alias or mailbox $line","mailbox");
+	@unlink($file);
+	@file_put_contents($file,"#");	
 	
 }
 
@@ -1460,7 +1584,7 @@ function AmavisConfigErrorInPostfix($buffer){
 		return null;}	
 	events("amavisd-new socket error time:$timeFile Mn!!!");
 	email_events("amavisd-new socket error","Postfix claim \"$buffer\", Artica will reload Postfix and compile new Postfix settings",'postfix');
-	THREAD_COMMAND_SET(LOCATE_PHP5_BIN()." ".dirname(__FILE__)."/exec.postfix.maincf.php --reconfigure");
+	THREAD_COMMAND_SET(LOCATE_PHP5_BIN2()." ".dirname(__FILE__)."/exec.postfix.maincf.php --reconfigure");
 	THREAD_COMMAND_SET('/etc/init.d/artica-postfix restart amavis');
 	THREAD_COMMAND_SET('/usr/share/artica-postfix/bin/artica-install --postfix-reload');
 	@unlink($file);
@@ -1479,7 +1603,7 @@ $file="/etc/artica-postfix/cron.1/".__FUNCTION__;
 		return null;}	
 	events("Spamassassin error time:$timeFile Mn!!!");
 	email_events("SpamAssassin error Regex","SpamAssassin claim \"$buffer\", Artica will run /usr/bin/sa-update to fix it",'postfix');
-	THREAD_COMMAND_SET("/usr/bin/sa-update");
+	THREAD_COMMAND_SET("/usr/share/artica-postfix/bin/artica-update --spamassassin");
 	@unlink($file);
 	@file_put_contents($file,"#");	
 	if(!is_file($file)){
@@ -1630,9 +1754,9 @@ function hackPOP($ip,$logon,$buffer){
 }
 
 
-function zarafa_store_error(){
+function zarafa_store_error($buffer){
 	$file="/etc/artica-postfix/cron.1/".__FUNCTION__.".store.error";
-	if(file_time_min($file)<15){return null;}
+	if(file_time_min($file)<3600){return null;}
 	@unlink($file);
 	$cmd=LOCATE_PHP5_BIN()." ".dirname(__FILE__)."/exec.zarafa.build.stores.php";
 	events("$cmd");
@@ -1687,6 +1811,90 @@ function postfix_baddb($service,$targetedfile,$buffer){
 	THREAD_COMMAND_SET("postfix reload");
 	@file_put_contents($file,"#");	
 	return;			
+}
+
+function multi_instances_reconfigure($buffer){
+	$file="/etc/artica-postfix/cron.1/".__FUNCTION__.".postfix.file";
+	if(file_time_min($file)<15){return null;}	
+	@unlink($file);
+	$cmd=LOCATE_PHP5_BIN2() ."/usr/share/artica-postfix/exec.postfix-multi.php";
+	events(__FUNCTION__. " <$cmd>");
+	THREAD_COMMAND_SET($cmd);	
+	email_events("multi-instances not correctly set","Service postfix claim \"$buffer\" Artica will rebuild multi-instances settings",'smtp');
+	@file_put_contents($file,"#");	
+	return;		
+}
+
+function postfix_bind_error($ip,$port,$buffer){
+	$file="/etc/artica-postfix/cron.1/".__FUNCTION__.md5("$ip:$port");
+	if(file_time_min($file)<15){
+		events("Postfix bind error, time-out");
+		return null;
+	}	
+	@unlink($file);
+	$cmd=LOCATE_PHP5_BIN2() ."/usr/share/artica-postfix/exec.postfix-multi.php --restart-all";
+	events(__FUNCTION__. " <$cmd>");
+	THREAD_COMMAND_SET($cmd);	
+	email_events("Unable to bind $ip:$port","Service postfix claim \"$buffer\" Artica will restart all daemons to fix it",'smtp');
+	@file_put_contents($file,"#");	
+	return;	
+}
+
+function cyrus_vertificate_error($buffer){
+	$file="/etc/artica-postfix/cron.1/".__FUNCTION__;
+	if(file_time_min($file)<15){
+		events("Cyrus certificate error, time-out");
+		return null;
+	}	
+	@unlink($file);
+	$cmd="/usr/share/artica-postfix/bin/artica-install -cyrus ssl";
+	events(__FUNCTION__. " <$cmd>");
+	THREAD_COMMAND_SET($cmd);	
+	email_events("Cyrus certificate error","Service cyrus claim \"$buffer\" Artica will rebuild certificate for cyrus-imapd",'mailbox');
+	@file_put_contents($file,"#");	
+	return;		
+}
+
+function mailbox_corrupted($buffer,$mail){
+	$file="/etc/artica-postfix/cron.1/".__FUNCTION__.md5($mail);
+	if(file_time_min($file)<15){
+		events("mailbox_corrupted <$mail>, time-out");
+		return null;
+	}	
+	@unlink($file);
+	email_events("Corrupted mailbox $mail","Service postfix claim \"$buffer\" try to repair the mailbox or to use the command line
+	turned out to be corrupted quota files:
+	find ~cyrus -type f | grep quota\nremove the quota files for the affected mailbox(es)\nrun
+	reconstruct -r -f user/mailboxoftheuser\n\n
+	if you cannot perform this operation, you can open a ticket on artica technology company http://www.artica-technology.com' ",'mailbox');
+	@file_put_contents($file,"#");	
+	return;		
+}
+
+function mailbox_overquota($buffer,$mail){
+	$file="/etc/artica-postfix/cron.1/".__FUNCTION__.md5($mail);
+	if(file_time_min($file)<15){
+		events("mailbox_overquota <$mail>, time-out");
+		return null;
+	}	
+	@unlink($file);
+	email_events("mailbox $mail Over Quota","Service postfix claim \"$buffer\" try to increase quota for $mail' ",'mailbox');
+	@file_put_contents($file,"#");	
+	return;		
+}
+
+function zarafa_rebuild_db($table,$buffer){
+	$file="/etc/artica-postfix/cron.1/".__FUNCTION__;
+	if(file_time_min($file)<15){
+		events("Zarafa missing table <$table>, time-out");
+		return null;
+	}	
+	@unlink($file);
+	email_events("Zarafa missing Mysql table $table","Service Zarafa claim \"$buffer\" artica will destroy the zarafa database in order to let the Zarafa service create a new one' ",'mailbox');
+	THREAD_COMMAND_SET(LOCATE_PHP5_BIN2()." ".dirname(__FILE__)."/exec.mysql.build.php --rebuild-zarafa");
+	@file_put_contents($file,"#");	
+	return;		
+	
 }
 
  

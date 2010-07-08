@@ -418,7 +418,7 @@ function popup_tabs(){
 
 function popup_dansguardian_main(){
 	
-	if(GET_CACHED(__FILE__,__FUNCTION__,"dans")){return;}
+	
 	
 	$table=true;
 	$mysql=new mysql();

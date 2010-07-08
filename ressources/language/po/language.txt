@@ -1,5 +1,8 @@
 </li>
 <//li>
+<about_cyrus>Cyrus is a highly scalable enterprise mail system designed for use in
+enterprise environments of various sizes using standards based technologies.[br]
+Cyrus technologies scale from independent use in email departments to a system centrally managed in a large enterprise</about_cyrus>
 <about_organization>This section allows you to manage users and domains according your privileges</about_organization>
 <about_procmail>Procmail is a powerful and robust set of tools that enable you to automatically process mail as you receive it or after it is already in a message folder.[br]
 Procmail is a mail processing utility, which can help you filter your mail, sort incoming mail according to sender, Subject line, length of message, keywords in the message, implement an ftp-by-mail server, and much more.[br]
@@ -59,6 +62,8 @@ select your ressource[br]
 This operation will activate service and enable remote backup trough Artica Network Agent feature</ACTIVATE_BACKUP_AGENT_EXPLAIN>
 <ACTIVATE_BACKUP_AGENT_TEXT>Enable Artica Network agents to backup folders to your storages</ACTIVATE_BACKUP_AGENT_TEXT>
 <ACTIVATE_HD_ORG_DEFAULT_EXPLAIN>The selected storage will be the default storage for your user's home directory</ACTIVATE_HD_ORG_DEFAULT_EXPLAIN>
+<ACTIVATE_SPF>Activate Sender Policy Framework checking</ACTIVATE_SPF>
+<ACTIVATE_SPF_TEXT>If this feature is enabled, anti-spam scores will be modified with sender verification SPF method</ACTIVATE_SPF_TEXT>
 <ActiveDirectorySettings>ActiveDirectory Parameters</ActiveDirectorySettings>
 <ActiveDirectorySettings_text>Define credentials in order to help Artica connecting to the remote ActiveDirectory parameters</ActiveDirectorySettings_text>
 <activedirectory_admin>Active Directory Administrator</activedirectory_admin>
@@ -132,6 +137,7 @@ Specify an empty value (address_verify_sender =) or  if you want to use the null
 [i]Beware, some sites reject mail from , even though RFCs require that such addresses be accepted[/i].
 </address_verify_sender_text>
 <add_action>add new operation</add_action>
+<add_already_member>Add a member already stored in this organisation</add_already_member>
 <add_artica_tasks>Add predefined tasks</add_artica_tasks>
 <add_artica_tasks_text>Select predefined tasks in the field list bellow.[br]</add_artica_tasks_text>
 <add_attachment_blocking_text>Add a new attachment to block</add_attachment_blocking_text>
@@ -205,11 +211,14 @@ examples[br]
 [li]Level _STARS(*)_[/li]
 [li]Checker-Version SpamAssassin _VERSION_ (_SUBVERSION_) on _HOSTNAME_[/li]
 </add_spamassassin_header_txt>
+<add_task>Add a new task</add_task>
 <add_tls_smtp_server>add target SMTP TLS server</add_tls_smtp_server>
 <add_user>Add user</add_user>
 <add_users_and_groups>Add users and groups</add_users_and_groups>
 <add_user_computer>Add computer</add_user_computer>
 <add_user_computer_text>Bind a computer to this user in order to give more features</add_user_computer_text>
+<add_virtual_ip_address>Add new virtual IP address</add_virtual_ip_address>
+<add_virtual_ip_addr_explain_js>Click on this cross in order to add a new virtual IP address based on this NIC informations</add_virtual_ip_addr_explain_js>
 <ADD_WEB_SERVICE>New groupware service</ADD_WEB_SERVICE>
 <ADD_WEB_SERVICE_TEXT>Provide new features for your users by adding web/groupwares services</ADD_WEB_SERVICE_TEXT>
 <admin>Administrator</admin>
@@ -375,6 +384,9 @@ Unlike other systems for load balancing IMAP mailboxes, the aggregator allows us
 <APP_DNSMASQ>DNS forwarder caching</APP_DNSMASQ>
 <APP_DOTCLEAR>DotClear web Publish</APP_DOTCLEAR>
 <APP_DOTCLEAR_TEXT>Define your multi-Blog settings</APP_DOTCLEAR_TEXT>
+<APP_DRUPAL>Drupal</APP_DRUPAL>
+<APP_DRUPAL_TEXT>Drupal is a free software package that allows an individual, a community of users, or an enterprise to easily publish, manage and organize a wide variety of content on a website.[br]
+ Hundreds of thousands of people and organizations are using Drupal  to power an endless variety of web sites.</APP_DRUPAL_TEXT>
 <APP_DSTAT>Versatile resource statistics tool</APP_DSTAT>
 <APP_EACCELERATOR>PHP accelerator</APP_EACCELERATOR>
 <APP_EMAILRELAY>E-MailRelay</APP_EMAILRELAY>
@@ -527,7 +539,13 @@ If you enable this feature, you will be able to share folders trough the explore
 <APP_SMBMOUNT>netshare mount tool</APP_SMBMOUNT>
 <APP_SPAMASSASSIN>SpamAssassin</APP_SPAMASSASSIN>
 <APP_SPAMASS_MILTER>Spamassassin-Milter daemon</APP_SPAMASS_MILTER>
+<APP_SPF>Sender Policy Framework</APP_SPF>
 <APP_SPFMILTER>SPF mail filter module</APP_SPFMILTER>
+<APP_SPF_TEXT>Sender Policy Framework (SPF), as defined in RFC 4408, is an e-mail validation system designed to prevent e-mail spam by addressing a common vulnerability, source address spoofing.[br]
+ SPF allows administrators to specify which hosts are allowed to send e-mail 
+ from a given domain by creating a specific DNS SPF record in the public DNS.[br]
+  Mail exchangers then use the DNS to check that mail from a given domain is being sent by a host sanctioned by that domain's administrators.</APP_SPF_TEXT>
+<APP_SPF_TINY_TEXT>SPF is an e-mail validation system designed to prevent e-mail spam by addressing a common vulnerability, source address spoofing</APP_SPF_TINY_TEXT>
 <APP_SQLGREY>SqlGrey Policy server</APP_SQLGREY>
 <APP_SQUID>Squid cache proxy</APP_SQUID>
 <APP_SQUIDGUARD>squidGuard Web filter</APP_SQUIDGUARD>
@@ -768,6 +786,7 @@ Specify 0 when mail delivery should be tried only once.</bounce_queue_lifetime_t
 <BP>Post Office Box</BP>
 <br> In a parent relationship, the child cache will forward requests to its parent cache.[br]
   If the parent does not hold a requested object, it will forward the request on behalf of the child[br]</br>
+<BRIDGE_ADDR>VPN server IP address</BRIDGE_ADDR>
 <broadcast>Broadcast</broadcast>
 <broken_sasl_auth_clients>obsolete SMTP clients compatibility</broken_sasl_auth_clients>
 <broken_sasl_auth_clients_text>Enable inter-operability with SMTP clients that implement an obsolete version of the AUTH command (RFC 4954).[br]
@@ -951,6 +970,8 @@ Requests that specify a larger TTL will be stored with the maximum allowed TTL.
 [br] The purpose of this additional control is to protect the infrastructure against careless people. </connection_cache_ttl_limit_text>
 <connection_to_backup_failed>Failed connecting to remote resource storage</connection_to_backup_failed>
 <ConnectTimeout>Connect Timeout</ConnectTimeout>
+<contacts>contacts</contacts>
+<contacts_databases>Contacts databases</contacts_databases>
 <container>container</container>
 <Contains>Contains</Contains>
 <content_analyze>Content analyze</content_analyze>
@@ -1021,6 +1042,12 @@ Depends on your disk size, this section helps you put this storage to a new disk
 <cyrus_change_folder_text>Move your mailboxes storage directory to a new directory</cyrus_change_folder_text>
 <cyrus_connection_error>There is a problem while connecting to imap server...Please restart later</cyrus_connection_error>
 <cyrus_imap>Cyrus IMAP</cyrus_imap>
+<cyrus_lmtp_howto>By default, the Cyrus mailboxes service listen a local unix socket in a specific directory.[br]This behavior force the SMTP service to use this local socket in order to send mail.[br]
+ You can change it by using a network socket.[br]Using a network socket allow others remote SMTP servers to directly send messages to this server.[br]
+ It is more easy to use because Artica did not need to check file system securities settings.[br]Using a unix local socket will not load the Network card and avoid network security issues.
+ </cyrus_lmtp_howto>
+<cyrus_net_behavior>Cyrus hooking behavior</cyrus_net_behavior>
+<cyrus_net_behavior_text>Define the behavior when SMTP server send messages to the mailbox service</cyrus_net_behavior_text>
 <CYRUS_REPLICA_WIZARD_HELP>Run the wizard in order to define corrects parameters to build a imap cluster</CYRUS_REPLICA_WIZARD_HELP>
 <cyrus_status>Cyrus IMAP Status</cyrus_status>
 <CYRUS_TO_ZARAFA>Cyrus To Zarafa</CYRUS_TO_ZARAFA>
@@ -1093,6 +1120,7 @@ Setting this parameter to a value of 1 changes the meaning of the corresponding 
 </default_destination_recipient_limit_text>
 <default_directory>Default directory</default_directory>
 <DEFAULT_EMAIL_HOST>Default domain for email addresses</DEFAULT_EMAIL_HOST>
+<default_password>Default password</default_password>
 <default_process_limit>Default process limit</default_process_limit>
 <default_process_limit_text>The default maximal number of Postfix child processes that provide a given service. </default_process_limit_text>
 <deferred_queue>Deferred</deferred_queue>
@@ -1165,14 +1193,30 @@ Setting this parameter to a value of 1 changes the meaning of the corresponding 
 <display_queries_list>Display queries</display_queries_list>
 <display_statistics_of_this_user>Display statistics of this user</display_statistics_of_this_user>
 <display_statistics_of_this_website>Display statistics of this website</display_statistics_of_this_website>
+<dkim_about2>This technology is a combination between signed messages and DNS servers, all mails signed will be verified with the public DNS checking method (the TXT field).[br]For incoming mails, not-signed emails will increase the anti-spam score, in the opposite, signed mail decrease scores.[br]
+Outgoing mails can be signed with your certificates in order to be verified by others mails servers.</dkim_about2>
+<dkim_showkeys_text>You need to set up the DNS record of each domain listed above.[br]Each DNS record will should have a 'TXT' type DNS record.</dkim_showkeys_text>
+<DKIM_SPAMASS_WBL_HOWTO>Servers listed in this section will reduce the anti-spam score behavior</DKIM_SPAMASS_WBL_HOWTO>
+<dkim_testkeys_text>If TXT DNS records are successfully added, this section should display your domains and the records DKIM success validation.</dkim_testkeys_text>
 <dmidecode>DMI BIOS Informations</dmidecode>
 <dmidecode_text>Contains a description  of  the  system’s  hardware  components,  as well as other useful pieces of information such as serial numbers and BIOS revision</dmidecode_text>
+<DNSBL_EXPLAIN>A DNSBL (DNS-based Blackhole List, Block List, or Blacklist; see below) is a list of IP addresses published through the 
+Internet Domain Name Service in a particular format.[br]
+DNSBLs are most often used to publish the addresses of computers or networks linked to spamming;
+ most mail server software can be configured to reject or flag messages which have been sent from a site listed on one or more such lists.[br]
+"DNSBL" is a software mechanism, rather than a specific list or policy.[br]
+There are dozens of DNSBLs in existence,[1][2] which use a wide array of standards for listing and delisting of addresses.[br]
+These may include listing the addresses of zombie computers or other machines being used to send spam, listing the addresses of ISPs who willingly host spammers, or listing addresses which have sent spam to a honeypot system.[br]
+Since the creation of the first DNSBL in 1997, the operation and policies of these lists have been frequently controversial, both in Internet advocacy and occasionally in lawsuits. Many mail system operators and users consider DNSBLs a valuable tool to share information about spam sources, but others including prominent Internet activists have objected to them as a form of censorship. In addition, a small number of DNSBL operators have been the target of lawsuits filed by spammers seeking to have the lists shut down.
+</DNSBL_EXPLAIN>
 <dnsmasq_DNS_records>MX Records</dnsmasq_DNS_records>
 <dnsmasq_DNS_records_text>Dnsmasq can serve DNS MX records with its database</dnsmasq_DNS_records_text>
 <dnsmasq_settings>dnsmasq settings</dnsmasq_settings>
 <DNSServer>DNS Server</DNSServer>
 <dns_information>DNS information</dns_information>
 <dns_main_settings>DNS settings and tweeks</dns_main_settings>
+<DNS_RECORDS>DNS records</DNS_RECORDS>
+<DNS_RECORDS_TESTS>DNS records validations</DNS_RECORDS_TESTS>
 <dns_server>DNS server</dns_server>
 <dns_servers>DNS Servers</dns_servers>
 <documents>documents</documents>
@@ -1244,6 +1288,7 @@ supports the X-Forward extension for Postfix protocol only if [b]smtp[/b] is use
 <emails_flow_week>Send & receive per week</emails_flow_week>
 <emails_number>eMails number</emails_number>
 <emails_recieved>emails recieved</emails_recieved>
+<email_campaigns>eMail Campaigns</email_campaigns>
 <email_number>email number</email_number>
 <email_scenarios>eMail Scenarios</email_scenarios>
 <empty_list>Empty list</empty_list>
@@ -1290,10 +1335,13 @@ If devices or this server is stolen, nobody can use it except your users compute
 </ENABLE_COFFREFORT_TEXT>
 <enable_disable>Red:Option is disabled[br]Green:Option is enabled[br]Click to change</enable_disable>
 <enable_disclaimer>Enable disclaimer feature</enable_disclaimer>
+<enable_dkim_signing>Enables dkim signing for outgoing mail</enable_dkim_signing>
+<enable_dkim_verification>enable DKIM signatures verification in incoming mails</enable_dkim_verification>
 <enable_inbound>Enable inbound</enable_inbound>
 <enable_kaspersky_samba>Enable Kaspersky For Samba</enable_kaspersky_samba>
 <enable_kaspersky_samba_text>Protect your Shared folders against viruses using Kaspersky For Samba</enable_kaspersky_samba_text>
 <enable_kavmilter_text>Activate Kasprsky Antivirus For Milter that allow checking viruses in your mails</enable_kavmilter_text>
+<enable_lmtp_unix>Enable LMTP in unix socket</enable_lmtp_unix>
 <ENABLE_MAILMAN>Enable Mailman distribution list</ENABLE_MAILMAN>
 <ENABLE_MAILMAN_TEXT>If you activate this feature, your users will be allowed to create their own distribution list according their rights</ENABLE_MAILMAN_TEXT>
 <enable_mynetwork>Enable my current network</enable_mynetwork>
@@ -1306,6 +1354,7 @@ This to display graphic about size used on your disks.[br]
 This feature is an ergonomic option. Disabling this feature will not perturb main services and Artica engine.[br]
 disabling it just safe performances... </enable_philesight_text>
 <enable_plugins_text>Enable/Disable plugins</enable_plugins_text>
+<ENABLE_POSTFIX_MULTI_INSTANCE>Activate multiple instances</ENABLE_POSTFIX_MULTI_INSTANCE>
 <ENABLE_SA_BLACKLIST_UPDATE>Enable/Disable updating blacklisted domains</ENABLE_SA_BLACKLIST_UPDATE>
 <ENABLE_SA_BLACKLIST_UPDATE_TEXT>If you turn to green this feature, Artica will update each 2 hours the pattern file for improve your spamassassin detection rate by adding more than 300 000 black listed domains</ENABLE_SA_BLACKLIST_UPDATE_TEXT>
 <enable_scanned_only>Enable ScannedOnly</enable_scanned_only>
@@ -1348,6 +1397,7 @@ The static content can be cached on the reverse proxy while the web server will 
 <error_cannot_be_ip_address>Error this cannot be an ip address</error_cannot_be_ip_address>
 <error_check_dates>Error: please check your dates</error_check_dates>
 <error_choose_email_or_domain>Error: choose email or domain</error_choose_email_or_domain>
+<ERROR_COMPRESSOR>Error occurred in the compressor engine</ERROR_COMPRESSOR>
 <error_creating_mailbox>Error creating mailbox on local server</error_creating_mailbox>
 <ERROR_CURLPHP_NOT_INSTALLED>It seems that php for curl is not installed on your system, some features will not running correctly,try to get from your repository manager</ERROR_CURLPHP_NOT_INSTALLED>
 <ERROR_CURL_NOT_INSTALLED>Error unable to stat curl binary file</ERROR_CURL_NOT_INSTALLED>
@@ -1465,6 +1515,7 @@ On some operating systems, the host file content is used preferentially over oth
 <ExcludeMimeTypeKavExplain>
 Exception mask for filtering by MIME type. The plugin will not perform anti-virus scanning of objects with MIME type, which does not match the specified mask</ExcludeMimeTypeKavExplain>
 <ExcludeMimeType_text>Exclude files from the scan by set a list of mime type</ExcludeMimeType_text>
+<ExecBackupTemporaryPath>Temporary working folder path</ExecBackupTemporaryPath>
 <execute>execute</execute>
 <execute_operation>Performed operation</execute_operation>
 <ExeptionFileSiteList_user_explain>Allow downloading files from specific web sites</ExeptionFileSiteList_user_explain>
@@ -1475,6 +1526,8 @@ Exception mask for filtering by MIME type. The plugin will not perform anti-viru
 <explain 1>Give the email domain (after the @ of your mailboxes)</explain 1>
 <explorer>explorer</explorer>
 <explorer_browse_yours_files>Browse your files and your allowed storages</explorer_browse_yours_files>
+<exporting>exporting</exporting>
+<EXPORT_OPERATION_IN_BACKGROUND>The export operation will be run in background mode, check the logs to see results</EXPORT_OPERATION_IN_BACKGROUND>
 <EXPORT_ORG>Export organization</EXPORT_ORG>
 <expunges>expunges</expunges>
 <EXTERNAL_PORTS>Externals ports list</EXTERNAL_PORTS>
@@ -1528,6 +1581,8 @@ Fetchmail is licensed under the GNU General Public License</fetchmail_about>
 <files_size_disk>Files size on disk</files_size_disk>
 <files_size_tmp>Temp files size</files_size_tmp>
 <files_transfered>files transfered</files_transfered>
+<file_path>File path</file_path>
+<file_to_upload>File to upload</file_to_upload>
 <fill_form>Fill the form</fill_form>
 <filter>filter</filter>
 <Filtered>Filtered</Filtered>
@@ -1558,6 +1613,8 @@ after the message is queued, send the  entire  message through the specified ext
 <firstname>First Name</firstname>
 <first_emails>first emails</first_emails>
 <flow>flow</flow>
+<flush_queue>Flush queues</flush_queue>
+<flush_queue_text>Force SMTP service to route all messages stored in defered queues</flush_queue_text>
 <folder>folder</folder>
 <folders>folders</folders>
 <folders_monitor>Folders monitor</folders_monitor>
@@ -1580,9 +1637,12 @@ in this form you want to submit</form_error>
 <fs_type>filesystem type</fs_type>
 <gateway>Gateway</gateway>
 <GDPHP_NOT_INSTALLED>GD Library !</GDPHP_NOT_INSTALLED>
+<gender>gender</gender>
 <general_settings>general settings</general_settings>
 <generate certificate>generate certificate</generate certificate>
 <generate temporary error>generate temporary error</generate temporary error>
+<generate_a_signing_key>Generate a signing key</generate_a_signing_key>
+<generate_a_signing_key_nokey_text>You need first to generate a signing key to enable the DKIM verification.[br]Just click on the button it generate a new one for you</generate_a_signing_key_nokey_text>
 <generate_config>Rebuild config</generate_config>
 <generate_config_text>Build all yours settings to a temporary ldap field</generate_config_text>
 <GENERIC_LDAP_ERROR>OpenLDAP generic error</GENERIC_LDAP_ERROR>
@@ -1640,6 +1700,13 @@ enable or disable this feature.</group_behavior_text>
 <hardware_info>Hardware Informations</hardware_info>
 <hardware_info_text>See components of your system and disks usage</hardware_info_text>
 <hdFree_stat>Hard drive space statistics</hdFree_stat>
+<hdparm_infos_text>
+Computer performances means Hard drives performances too. Especially if your system run on a virtual machine..[br]
+Artica check speed disks every 60mn.[br]you see here the result of the latest test.[br]
+tests has been based on a disk speed to 100MB/sec has a good rate for a server.[br]
+If test speed display 75% that means your disk reach 75MB/sec.[br]
+If you speed is under 30% you need to review your computer hardware performances by increasing the disks quality.
+</hdparm_infos_text>
 <hd_stat>Hard Drive performances</hd_stat>
 <Header Field>Header Field</Header Field>
 <header_address_token_limit>address limit</header_address_token_limit>
@@ -1711,8 +1778,13 @@ This form allows you to put a csv file in order to import users in this organiza
 <import users explain 2>This is the result of the 5 lines parsed on your file.[br]Please check it if the operation will be successfull</import users explain 2>
 <importation_background_text>Importation task has been scheduled in background mode, refresh panel in order to display progress</importation_background_text>
 <importation_success_scheduled>Operation has been scheduled, display events to follow process</importation_success_scheduled>
+<importing>importing</importing>
 <import_ad_domain_only>Import only users matching this email domain</import_ad_domain_only>
 <import_artica_computers_list_text>Import computer from a text list</import_artica_computers_list_text>
+<import_contacts_db>Import contacts</import_contacts_db>
+<import_contacts_db_explain>This area will import contacts from a CSV file, the csv file must be formatted:</import_contacts_db_explain>
+<import_contacts_db_text>Import mass contacts in database from an external source</import_contacts_db_text>
+<import_fingerprint>Import SSL fingerprint</import_fingerprint>
 <import_sub_branch>Start importation from this sub-branch</import_sub_branch>
 <in>in</in>
 <INACTIVE>Inactive</INACTIVE>
@@ -2026,6 +2098,8 @@ The message delivery transport name is the first field in the entry in the maste
 [i]You don't want to run lots of those at the same time.[/i]
 </local_destination_concurrency_limit_text>
 <local_domains_table>SMTP Local domains</local_domains_table>
+<local_file>local file</local_file>
+<local_smtp_host>Local SMTP host</local_smtp_host>
 <locked>locked</locked>
 <locking_type>locking type</locking_type>
 <log>log</log>
@@ -2200,6 +2274,9 @@ The default time unit is d (days).[br]Specify 0 when mail delivery should be tri
 <messaging_servers>Messaging servers</messaging_servers>
 <messaging_service>Messaging service</messaging_service>
 <messaging_service_text>Messaging service allows you to provide a mail relay on this server, including all securities features like anti-spam, antivirus</messaging_service_text>
+<migrate_user_text>This operation will tranform all contacts from the selected database to local users in your organization.[br]If any mailbox server is installed, all users will have a new mailbox created.[br]
+ Select in this form the group that will store new users.</migrate_user_text>
+<migrate_user_tini_text>Import this database to your organization, and tranform these contacts to users</migrate_user_tini_text>
 <mime_nesting_limit>mime nesting limit</mime_nesting_limit>
 <mime_nesting_limit_text>he maximal recursion level that the MIME processor will handle.[br] Postfix refuses mail that is nested deeper than the specified limit.</mime_nesting_limit_text>
 <minimal>minimal</minimal>
@@ -2528,6 +2605,7 @@ or until further truncation is not possible.(eg:192.168.1.0/24)
 <pcfg_title2>View main.cf</pcfg_title2>
 <pcfg_title3>View master.cf</pcfg_title3>
 <percentage>percentage</percentage>
+<performance>Performance</performance>
 <performances_settings>Performances</performances_settings>
 <performances_settings_text>All settings that could accelerate postfix processes</performances_settings_text>
 <perform_operation_ask>Perform this operation ?</perform_operation_ask>
@@ -2607,12 +2685,15 @@ Each organization will be able to manage their own instance and the Interface wi
 This may be a simpler way to configure a multi-function Postfix system.[br]
 With multiple Postfix instances, each instance has its own directories for configuration, queue and data files,
 but it shares all Postfix program and documentation files with other instances</POSTFIX_MULTI_INSTANCE_TEXT>
+<POSTFIX_MULTI_INSTANCE_TINY_TEXT>Transform your server to a multi-SMTP server for your organizations</POSTFIX_MULTI_INSTANCE_TINY_TEXT>
 <postfix_network>Postfix Network settings</postfix_network>
 <postfix_network_text>Specify here your local network and what network IP addresses postfix must bind </postfix_network_text>
 <POSTFIX_PLUGINS>Postfix Plugins</POSTFIX_PLUGINS>
 <POSTFIX_PROCESS_NUMBER>Messaging processes number</POSTFIX_PROCESS_NUMBER>
 <postfix_realtime_events>Postfix realtime flow</postfix_realtime_events>
 <postfix_realtime_events_text>Display routed mails in realtime</postfix_realtime_events_text>
+<postfix_reconfigure>Reconfigure SMTP Service</postfix_reconfigure>
+<postfix_reconfigure_text>Rebuild all parameters and restart the SMTP service</postfix_reconfigure_text>
 <postfix_reload>Reload SMTP service</postfix_reload>
 <postfix_reload_text>Force the SMTP service to refresh databases, settings and current tasks</postfix_reload_text>
 <postfix_restart>Restart SMTP service</postfix_restart>
@@ -2628,6 +2709,14 @@ This is because Postfix needs to open lookup tables ahead of time, but the reade
 <postfix_status>Postfix mail system status</postfix_status>
 <postfix_status_stopped>Postfix mail system is stopped</postfix_status_stopped>
 <postmaster>postmaster</postmaster>
+<postmaster_explain>email address will receive notifications from this system,
+  this means SMTP errors (bounce errors, forward errors...), scheduled tasks notifications</postmaster_explain>
+<postmaster_identity>Postmaster identity</postmaster_identity>
+<postmaster_identity_explain>This option make sense if you using a mail relay server that perform sender email address verification.[br]
+ by default, postfix use the server hostname and MAILTER-DAEMON to send emails.</postmaster_identity_explain>
+<postmaster_identity_text>Define the sender email address of the mail notifications</postmaster_identity_text>
+<POSTMASTER_NOT_EDITED>Postmaster recipient not defined</POSTMASTER_NOT_EDITED>
+<POSTMASTER_NOT_EDITED_TEXT>You need to define recipient in order to receive notifications from the smtp service.</POSTMASTER_NOT_EDITED_TEXT>
 <prepend to the subject>Prepend to the Subject</prepend to the subject>
 <PREPEND_help>Prepend  the  specified  message header to the message.
 [br]When more than one PREPEND action  executes,[br]the  first prepended header appears before the second etc. prepended header.
@@ -3042,6 +3131,7 @@ You can enable RBL RHSBL features in order to prevent spams
 <select_group_text>Please select in the list the group you want to manage in order to see settings</select_group_text>
 <select_ip_address>Select address</select_ip_address>
 <select_this_container>Select this container</select_this_container>
+<select_this_file>Select this file</select_this_file>
 <select_user_group_text>A group is used to define privileges of features and operations permitted in the portal.[br]If you didn't select a group, the user will be a simple user with only access to it's mailbox</select_user_group_text>
 <select_user_group_title>Select the user group</select_user_group_title>
 <selfmx>Self MX</selfmx>
@@ -3418,14 +3508,38 @@ by changing 5xx reply codes into 4xx. However, this option is no cure for addres
 <spam option 5r>Trusted</spam option 5r>
 <spam option 6>If a message is recognized as 'Not Detected'</spam option 6>
 <spam option 6r>Not Detected</spam option 6r>
+<SPAMASSASSIN_DNS_BLACKLIST>DNS Blacklist</SPAMASSASSIN_DNS_BLACKLIST>
+<SPAMASSASSIN_DNS_BLACKLIST_TEXT>Enable DNS Blacklist tests in Spamassassin in order to increase detection rate</SPAMASSASSIN_DNS_BLACKLIST_TEXT>
 <SPAMASSASSIN_NEWVERSION>New SpamAssassin version</SPAMASSASSIN_NEWVERSION>
 <SPAMASSASSIN_NEWVERSION_TEXT>A new SpamAssassin version is available on the update server. It required to update it in order to increase detection rate</SPAMASSASSIN_NEWVERSION_TEXT>
 <SPAMASSASSIN_UPDATE_COMPILATION>Compiling new SpamAssassin Patterns</SPAMASSASSIN_UPDATE_COMPILATION>
 <SPAMASSASSIN_UPDATE_COMPILATION_TEXT>SpamAssassin currently compiling anti-spam databases,the system should be loaded during this time...</SPAMASSASSIN_UPDATE_COMPILATION_TEXT>
 <spamass_add_header>Add X-Spam- in the email header according scores</spamass_add_header>
 <spamass_rewrite_header>preprend the basic element of an eMail according scores has Subject, From, To fields</spamass_rewrite_header>
+<SPAMASS_SCORES_EXPLAIN>Score that pilot the Bayesian classifier can have 1 or 4 parameters.[br]If there is only one parameter (the norm) then that score is used all the time.[br]
+ Rules with a score set to 0 are not evaluated at all.[br] 
+[ul]
+[li]The first parameter applies when the Bayesian classifier and network tests are not in use.[/li]
+[li]The second parameter applies when the Bayesian classifier is not in use, but the network tests are[/li]
+[li]The third parameter applies when the Bayesian classifier is in use, but network tests are not[/li]
+[li]The fourth parameter applies when the Bayesian classifier and network tests are both in use[/li]  
+[/ul]  
+ </SPAMASS_SCORES_EXPLAIN>
 <spam_detection_families>Anti-spam detection families</spam_detection_families>
 <speed>speed</speed>
+<SPF_FAIL>Fail</SPF_FAIL>
+<SPF_FAIL_HELP>The SPF record has designated the host as NOT being allowed to send</SPF_FAIL_HELP>
+<SPF_HELO_FAIL>Fail HELO</SPF_HELO_FAIL>
+<SPF_HELO_NEUTRAL>Neutral HELO</SPF_HELO_NEUTRAL>
+<SPF_HELO_PASS>Pass HELO</SPF_HELO_PASS>
+<SPF_HELO_SOFTFAIL>Soft fail HELO</SPF_HELO_SOFTFAIL>
+<SPF_NEUTRAL_HELP>The SPF record specifies explicitly that nothing can be said about validity</SPF_NEUTRAL_HELP>
+<SPF_PASS>Pass</SPF_PASS>
+<SPF_PASS_HELP>The SPF record designates the host to be allowed to send</SPF_PASS_HELP>
+<SPF_SOFTFAIL>Soft Fail</SPF_SOFTFAIL>
+<SPF_SOFTFAIL_HELP>The SPF record has designated the host as NOT being allowed to send but is in transition</SPF_SOFTFAIL_HELP>
+<SPF_SPAMMASS_ADD_WL_TEXT>Add here sender domain or email address.
+ you can set joe@domain.tld or *@domain.tld</SPF_SPAMMASS_ADD_WL_TEXT>
 <spouseName>Spouse name</spouseName>
 <sqlgrey_main_settings>SQLGrey Main configurations</sqlgrey_main_settings>
 <sqlgrey_satus>SqlGrey status</sqlgrey_satus>
@@ -3440,6 +3554,8 @@ by changing 5xx reply codes into 4xx. However, this option is no cure for addres
 <squid_accel_websites_text>Define the web servers that will be cached and protected by your proxy server</squid_accel_websites_text>
 <squid_advanced_parameters>Squid Advanced settings</squid_advanced_parameters>
 <squid_advanced_parameters_text>Tweaks and tunings about SQUID Advanced settings</squid_advanced_parameters_text>
+<SQUID_CACHES_OVER>Proxy caches over !</SQUID_CACHES_OVER>
+<SQUID_CACHES_OVER_TEXT>It seems that your cache storage exceed the limit, in order to get better performances when surfing you need to increase your cache size or adding a new cache repository</SQUID_CACHES_OVER_TEXT>
 <squid_events>Squid Events</squid_events>
 <squid_filter_stats_text>Create filter in order to display specifics events</squid_filter_stats_text>
 <squid_main_settings>Squid-cache settings</squid_main_settings>
@@ -3476,9 +3592,18 @@ UDP packets are almost always unicast too, though they can be sent to the broadc
 <srv_postfix>Postfix service status</srv_postfix>
 <srv_postfix_infos>Postfix infos</srv_postfix_infos>
 <srv_postfix_version>Postfix major version</srv_postfix_version>
+<sslcertck>Strictly check the server certificate</sslcertck>
+<sslcertck_text>Causes fetchmail to strictly check the server certificate against a set of local trusted certificates.[br]
+ If the server certificate cannot be obtained or is not signed by one of the trusted ones (directly or indirectly), 
+ the SSL connection will fail, regardless of the SSL fingerprint option.
+[br]Note that CRL (certificate revocation lists) are only supported in OpenSSL 0.9.7 and newer!
+[br]Your system clock should also be reasonably accurate when using this option.
+[br]Note that this optional behavior may become default behavior in future fetchmail versions
+</sslcertck_text>
 <SSLStrictSNIVHostCheck>Disable SNI support</SSLStrictSNIVHostCheck>
 <SSLStrictSNIVHostCheck_text>Used for Groupwares applications with Apache.[br]This directive sets whether a non SNI client is allowed to access a name based virtual host.[br]
 prevent error No hostname was provided via SNI for a name based virtual host</SSLStrictSNIVHostCheck_text>
+<ssl_fingerprint>SSL fingerprint</ssl_fingerprint>
 <standard_classes>standard classes</standard_classes>
 <start>Start</start>
 <Start With>Start With</Start With>
@@ -3589,6 +3714,9 @@ you will be redirected to the new IP address in 15 seconds
 <tcp_address>TCP Address</tcp_address>
 <tcp_main_settings>Network cards parameters</tcp_main_settings>
 <templates>Templates</templates>
+<template_add>Add a new template</template_add>
+<template_add_emailing_text>Build your message that will be used to send the mass mailling</template_add_emailing_text>
+<template_name>Template name</template_name>
 <test>test</test>
 <text>This page show you every 10 seconds events generated by Postfix mail system.</text>
 <text1>....</text1>
@@ -3610,7 +3738,9 @@ If you want to activate share access, click on the button bellow.</this_not_a_sa
 <Timeout for receiving response from UDS server>Timeout for receiving response from UDS server (in seconds)</Timeout for receiving response from UDS server>
 <timezone>timezone</timezone>
 <timezones>timezones</timezones>
+<TIME_AM>AM</TIME_AM>
 <time_date_com_text_moscow>Click to visit the web site timeanddate.com[br]In order to see the current time in [b]moscow[/b]</time_date_com_text_moscow>
+<TIME_PM>PM</TIME_PM>
 <title>Artica-PostFix events</title>
 <TITLE_DOMAINS>Global settings</TITLE_DOMAINS>
 <title_infos>Statics informations</title_infos>
@@ -3877,6 +4007,7 @@ The rules for transferring (routing) are set in this section.[br]
 <upgrade_your_system>Upgrade your System</upgrade_your_system>
 <upload>upload</upload>
 <upload file>Upload file</upload file>
+<upload_a_file>upload a file</upload_a_file>
 <upload_max_filesize>Max uploading files size</upload_max_filesize>
 <upload_new_license>Upload a new license</upload_new_license>
 <upload_vpn_configuration>Upload VPN settings</upload_vpn_configuration>
@@ -3911,6 +4042,7 @@ The rules for transferring (routing) are set in this section.[br]
 <UseUpdateServerUrl>Use Update Server Url</UseUpdateServerUrl>
 <UseUpdateServerUrlOnly>Use Update Server Url Only</UseUpdateServerUrlOnly>
 <use_apache>Use apache only</use_apache>
+<use_compressed_zip_file>put a compressed file using ZIP compressor</use_compressed_zip_file>
 <use_local_storage>Use local storage</use_local_storage>
 <use_local_storage_text>Browse this server and select a folder on the local file system</use_local_storage_text>
 <USE_MY_IPS_EXAMPLES_TEXT>ISPs examples you should use to send eMails trough Internet</USE_MY_IPS_EXAMPLES_TEXT>
@@ -3951,6 +4083,7 @@ In the url the "%f" can be used to specify the real name of downloaded file</Vir
 <virusname>Virus name</virusname>
 <virus_by_sender_domains>Virus detections by sender domains</virus_by_sender_domains>
 <VIRUS_EVENTS>Viruses events</VIRUS_EVENTS>
+<VISIT_WEB_SITE_INFOS>Visit the website for more informations</VISIT_WEB_SITE_INFOS>
 <waiting>Please wait operation</waiting>
 <waiting_database_compilation>Waiting database compilation</waiting_database_compilation>
 <waiting_settings>waiting parameters</waiting_settings>
@@ -3983,12 +4116,14 @@ In the url the "%f" can be used to specify the real name of downloaded file</Vir
 <weekly>Weekly</weekly>
 <WELCOME>Welcome on Artica-Postfix</WELCOME>
 <welcomeb>welcome</welcomeb>
+<WgetBindIpAddress>Bind local IP address</WgetBindIpAddress>
 <when>when</when>
 <WHEN_TO_BACKUP>When to backup ?</WHEN_TO_BACKUP>
 <WHEN_TO_BACKUP_TEXT>Define the schedule of the backup execution</WHEN_TO_BACKUP_TEXT>
 <white list>White List</white list>
 <white list explain>Managing the list of trusted addresses.[br] Messages from these addresses are not checked for the presence of spam signs</white list explain>
 <whitelisted_networks>Whitelisted network</whitelisted_networks>
+<whitelist_text>Whitelist</whitelist_text>
 <width>width</width>
 <width_action>width</width_action>
 <WifiConnectAPDisabled>Wifi Access Point Client mode is not activated</WifiConnectAPDisabled>

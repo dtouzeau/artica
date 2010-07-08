@@ -71,7 +71,6 @@ end;
 procedure tsamba4.START();
 var
    pid:string;
-   parms:string;
 begin
   pid:=PID_NUM();
    if SYS.PROCESS_EXIST(pid) then begin

@@ -22,6 +22,7 @@
 	
 	function js(){
 	$ou=base64_decode($_GET["ou"]);
+	$hostname=$_GET["hostname"];
 	$page=CurrentPageName();
 	$tpl=new templates();
 	$title=$tpl->_ENGINE_parse_body('{attachment_blocking}');
@@ -31,11 +32,11 @@
 		var mem_dev='';
 		function attachment_blocking_load(){
 			mem_dev='';
-			YahooWin('650','$page?popup=yes&ou=$ou','$title')
+			YahooWin('650','$page?popup=yes&ou=$ou&hostname=$hostname','$title')
 		}
 		
 		function AddAttachmentForm(){
-			YahooWin2('450','$page?popup-add-attach=yes','$title')
+			YahooWin2('450','$page?popup-add-attach=yes&ou=$ou&hostname=$hostname','$title')
 		}
 		
 		var x_AddSMTPAttachment= function (obj) {
@@ -48,6 +49,7 @@
 		function AddSMTPAttachment(){
 			var XHR = new XHRConnection();
 				XHR.appendData('ou','$ou');
+				XHR.appendData('hostname','$hostname');
 				XHR.appendData('AddSMTPAttachment',document.getElementById('AddSMTPAttachment').value);
 				document.getElementById('popup-add-attach-div').innerHTML='<div style=\"width:100%\"><center style=\"margin:20px;padding:20px\"><img src=\"img/wait_verybig.gif\"></center></div>';
 				XHR.sendAndLoad('$page', 'GET',x_AddSMTPAttachment);
@@ -61,17 +63,19 @@
 		function IncludeByNameDelete(ID){
 				var XHR = new XHRConnection();
 				XHR.appendData('ou','$ou');
+				XHR.appendData('hostname','$hostname');
 				XHR.appendData('IncludeByNameDelete',ID);
 				XHR.sendAndLoad('$page', 'GET',x_AddSMTPAttachment);
 		}
 		
 		function RefreshAttachementsList(){
-			LoadAjax('attachmentslist','$page?attachmentslist=yes&ou=$ou');
+			LoadAjax('attachmentslist','$page?attachmentslist=yes&ou=$ou&hostname=$hostname');
 		}
 		
 		function AddPostFixDefaultRules(){
 				var XHR = new XHRConnection();
 				XHR.appendData('ou','_Global');
+				XHR.appendData('hostname','$hostname');
 				XHR.appendData('AddPostFixDefaultRules','yes');
 				document.getElementById('attachmentslist').innerHTML='<div style=\"width:100%\"><center style=\"margin:20px;padding:20px\"><img src=\"img/wait_verybig.gif\"></center></div>';
 				XHR.sendAndLoad('$page', 'GET',x_AddSMTPAttachment);
@@ -81,6 +85,7 @@
 			if(confirm('$delete_all ?')){
 				var XHR = new XHRConnection();
 				XHR.appendData('ou','$ou');
+				XHR.appendData('hostname','$hostname');
 				XHR.appendData('DeleteAllAttachments','yes');
 				document.getElementById('attachmentslist').innerHTML='<div style=\"width:100%\"><center style=\"margin:20px;padding:20px\"><img src=\"img/wait_verybig.gif\"></center></div>';
 				XHR.sendAndLoad('$page', 'GET',x_AddSMTPAttachment);
@@ -158,15 +163,23 @@ function AddSMTPAttachment(){
 		while (list ($index, $file) = each ($tbl) ){
 			$file=trim(strtolower($file));
 			$file=str_replace(".","",$file);
-			$sql="INSERT INTO smtp_attachments_blocking (IncludeByName,ou) VALUES ('$file','$ou')";
+			$sql="INSERT INTO smtp_attachments_blocking (IncludeByName,ou,hostname) VALUES ('$file','$ou','{$_GET["hostname"]}')";
 			$q->QUERY_SQL($sql,"artica_backup");
 			if(!$q->ok){
 				echo $q->mysql_error;
 				return;
 			}
 		}
-	
+		
 	$sock=new sockets();
+	
+	if($sock->GET_INFO("EnablePostfixMultiInstance")==1){
+		if($_GET["hostname"]<>null){
+			$sock->getFrameWork("cmd.php?postfix-multi-mime-header-checks={$_GET["hostname"]}");
+		}
+		return;
+	}
+	
 	$users=new usersMenus();
 	if($ou<>"_Global"){
 		if($users->KAV_MILTER_INSTALLED){$sock->getFrameWork("cmd.php?kavmilter-configure=yes");}
@@ -177,10 +190,23 @@ function AddSMTPAttachment(){
 
 function DeleteAllAttachments(){
 	$ou=$_GET["ou"];
-	$sql="DELETE FROM smtp_attachments_blocking WHERE ou='$ou'";
+	if($_GET["hostname"]<>null){
+		$hostname=" AND hostname='{$_GET["hostname"]}'";
+	}
+	$sql="DELETE FROM smtp_attachments_blocking WHERE ou='$ou'$hostname";
 	$q=new mysql();
 	$q->QUERY_SQL($sql,"artica_backup");
+	
 	$sock=new sockets();
+	
+	if($sock->GET_INFO("EnablePostfixMultiInstance")==1){
+		if($_GET["hostname"]<>null){
+			$sock->getFrameWork("cmd.php?postfix-multi-mime-header-checks={$_GET["hostname"]}");
+		}
+		return;
+	}	
+	
+	
 	$users=new usersMenus();
 	if($ou<>"_Global"){
 		if($users->KAV_MILTER_INSTALLED){$sock->getFrameWork("cmd.php?kavmilter-configure=yes");}
@@ -203,6 +229,14 @@ function AddPostFixDefaultRules(){
 		}	
 		
 	$sock=new sockets();
+	
+	if($sock->GET_INFO("EnablePostfixMultiInstance")==1){
+		if($_GET["hostname"]<>null){
+			$sock->getFrameWork("cmd.php?postfix-multi-mime-header-checks={$_GET["hostname"]}");
+		}
+		return;
+	}	
+	
 	$sock->getFrameWork("cmd.php?postfix-mime-header-checks=yes");	
 	
 }
@@ -210,8 +244,12 @@ function AddPostFixDefaultRules(){
 
 
 function attachmentslist(){
+	$sock=new sockets();
+	if($sock->GET_INFO("EnablePostfixMultiInstance")==1){
+		$hostname=" AND hostname='{$_GET["hostname"]}'";
+	}
 	GlobalAttachments();
-	$sql="SELECT * FROM smtp_attachments_blocking WHERE ou='{$_GET["ou"]}' ORDER BY IncludeByName";
+	$sql="SELECT * FROM smtp_attachments_blocking WHERE ou='{$_GET["ou"]}'$hostname ORDER BY IncludeByName";
 	$q=new mysql();
 	$results=$q->QUERY_SQL($sql,"artica_backup");
 	$style=CellRollOver();
@@ -272,6 +310,15 @@ function IncludeByNameDelete(){
 	$sock=new sockets();
 	$users=new usersMenus();
 	writelogs("OU->$ou",__FUNCTION__,__FILE__,__LINE__);
+	
+	
+	if($sock->GET_INFO("EnablePostfixMultiInstance")==1){
+		if($_GET["hostname"]<>null){
+			$sock->getFrameWork("cmd.php?postfix-multi-mime-header-checks={$_GET["hostname"]}");
+		}
+		return;
+	}	
+	
 	if($ou<>"_Global"){
 		if($users->KAV_MILTER_INSTALLED){
 			$sock->getFrameWork("cmd.php?kavmilter-configure=yes");
@@ -290,6 +337,9 @@ function IncludeByNameDelete(){
 
 
 function GlobalAttachments(){
+	$sock=new sockets();
+	if($sock->GET_INFO("EnablePostfixMultiInstance")==1){return ;}
+	
 $sql=new mysql();
 	$sql="SELECT * FROM smtp_attachments_blocking WHERE ou='_Global' ORDER BY IncludeByName";
 	$q=new mysql();

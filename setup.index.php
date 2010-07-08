@@ -673,6 +673,7 @@ $html="
 		$html=$html.BuildRows("APP_LMB",$GlobalApplicationsStatus,"lmb");
 		$html=$html.BuildRows("APP_OPENGOO",$GlobalApplicationsStatus,"opengoo");
 		$html=$html.BuildRows("APP_GROUPOFFICE",$GlobalApplicationsStatus,"groupoffice-com");
+		$html=$html.BuildRows("APP_DRUPAL",$GlobalApplicationsStatus,"drupal");
 	}
 if($users->cyrus_imapd_installed){
 	$html=$html.spacer('webmails');

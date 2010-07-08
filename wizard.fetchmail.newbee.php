@@ -125,8 +125,10 @@ var x_FetchmailSaveAccount= function (obj) {
 			alert('$username=NULL!');
 			return true;
 		}
-
+		
+		
 		var XHR = new XHRConnection();
+		if(document.getElementById('smtp_host')){XHR.appendData('smtp_host',document.getElementById('smtp_host').value);}
 		XHR.appendData('fetchmail_rule_id',document.getElementById('fetchmail_rule_id').value);
 		XHR.appendData('is',document.getElementById('is').value);
 		XHR.appendData('uid',document.getElementById('uid').value);
@@ -401,14 +403,36 @@ echo $tpl->_ENGINE_parse_body($html);
 	
 }
 
+function fetchmail_PostFixMultipleInstanceList($ou){
+	$sock=new sockets();
+	$uiid=$sock->uuid=base64_decode($sock->getFrameWork("cmd.php?system-unique-id=yes"));	
+	$q=new mysql();
+	$sql="SELECT `value`,`ip_address` FROM postfix_multi WHERE `key`='myhostname' AND `ou`='$ou' AND `uuid`='$uiid'";
+	$results=$q->QUERY_SQL($sql,"artica_backup");
+	if(!$q->ok){writelogs("$q->mysql_error\n$sql",__FUNCTION__,__FILE__,__LINE__);}
+	while($ligne=@mysql_fetch_array($results,MYSQL_ASSOC)){	
+		$array[$ligne["value"]]=$ligne["value"];
+	}
+	$array[null]="{select}";
+	return $array;
+}
+
+
 function page_modify_rule(){
 	
 	
-$user=new user($_GET["uid"]);
+	$user=new user($_GET["uid"]);
 	$fetch=new Fetchmail_settings();
 	$page=CurrentPageName();
 	$array=$fetch->LoadRule($_GET["page-modify"]);
-
+	$sock=new sockets();
+	if($sock->GET_INFO("EnablePostfixMultiInstance")==1){
+		$smtp_sender=
+		"<tr>
+			<td valign='top' class=legend nowrap>{local_smtp_host}:</td>
+			<td valign='top'>".	Field_array_Hash(fetchmail_PostFixMultipleInstanceList($user->ou),"smtp_host",$array["smtp_host"])."</td>
+		</tr>";
+	}
 	
 	$buttonadd="{edit}";
 	$advanced=button("{advanced_options}...","UserFetchMailRule({$_GET["page-modify"]},'{$_GET["uid"]}')");
@@ -465,15 +489,19 @@ $html="
 						" . Field_text('poll',$array["poll"])."
 					</td>
 					<td valign='top'>" .
-					imgtootltip('22-infos.png','<strong>{GET_RIGHT_ISP_SETTINGS}</strong><br>{GET_RIGHT_ISP_SETTINGS_TEXT}',
-					"LoadFetchmailISPList()")."&nbsp;<span id='choosen_isp' style='font-weight:bolder'></span></td>
+						imgtootltip('22-infos.png','<strong>{GET_RIGHT_ISP_SETTINGS}</strong><br>{GET_RIGHT_ISP_SETTINGS_TEXT}',
+						"LoadFetchmailISPList()")."&nbsp;<span id='choosen_isp' style='font-weight:bolder'></span>
+					</td>
 				</tr>
+				
 				</table>
 			</tr>
+			
 			<tr>
 				<td class=legend nowrap>{protocol}:</td>
 				<td>" . Field_array_Hash($arraypr,'proto',$array["proto"])."</td>
 			</tr>	
+			$smtp_sender
 			<tr>
 				<td class=legend nowrap>{not_delete_messages}:</td>
 				<td>$keep</td>

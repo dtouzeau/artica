@@ -165,6 +165,7 @@ function popup(){
 	
 	$tpl=new templates();
 	$datas=unserialize(base64_decode(@file_get_contents("ressources/logs/dansguardian.patterns")));
+
 	if(!is_array($datas)){
 		echo "<center><img src='img/database-urls-error-256.png'></center>";
 		exit;

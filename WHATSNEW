@@ -1,3 +1,113 @@
+1.4.070814:
+========================================================================================
+
+Messaging Changes:
+-------------------------------------------------
+1.4.070712: Fix artica create Draft without "s" caracters that Roundcube and Thunderbird expect.
+1.4.070712: Adding "null" in $rcmail_config['imap_root'] in RoundCube configuration file.
+1.4.070814: Adding a new feature that allow to add some DNSBL list (especially senderbase has cisco black lists) into SpamAssassin.
+
+
+System changes
+-------------------------------------------------
+1.4.070814: Adding a maillog watchdog on 0x0000000847ec10: SQL Failed: Table 'zarafa.*' doesn't exists (Artica action = delete database zarafa and restart service)
+
+
+1.4.070616: 
+========================================================================================
+
+System Changes
+-------------------------------------------------
+1.4.070217: When creating a new user user id is now forced to lowercase.
+1.4.070217: Fix unable to perform backup when servername contains (")" caracters (eg:mailserver1.(none))
+1.4.070517: Fix backup error using rsync with a non-unix rsync server.
+1.4.070614: Now the backup tasks will backup Zarafa database
+1.4.070614: Adding backup time calculation in task events.
+1.4.070614: Adding a syslog watchdog on kernel segfault (Artica action = email notifications).
+1.4.070614: Adding a syslog watchdog on kernel Out of memory (Artica action = reboot).
+1.4.070614: Adding a syslog watchdog for Error: Can't contact LDAP server on winbindd (Artica action = restart local ldap)
+
+
+Interface Changes
+-------------------------------------------------
+1.4.070217: Fix wrong informations sended when using the users & groups section.
+1.4.070219: Fix errors displaying organisation informations.
+1.4.070402: Improve the organization's domains settings area.
+
+
+Messaging Changes:
+-------------------------------------------------
+1.4.070217: Adding sslfingerprint and sslcertck options when editing fetchmail rule. (artica is able to get the fingerprint automatically). 
+1.4.070219: Fix error when creating fetchmail rule for multiple user, token from first user are remplicated in all fetchmail rules.
+1.4.070402: Adding feature in order to change postmaster recipient and from email address when sending Postfix SMTP notifications.
+1.4.070402: Adding a new feature that allow administrator to switch cyrus imap socket from unix to inet and from inet to unix.
+1.4.070517: Fix errors in aliases files.
+1.4.070517: Fix socket error permissions on any milters
+1.4.070517: Artica daemon will test spamassassin presence before running amavis, if not it install it automatically.
+1.4.070517: Fix unable to install Spamassasin trough artica-make.
+1.4.070603: Adding DKIM-AMAVIS support
+1.4.070615: Fix artica unable to detect RoundCube version when upgrading to 0.4-beta
+
+
+Proxy Changes:
+-------------------------------------------------
+1.4.070412: Add a new alert when used caches size exceed limit. 
+
+Groupwares changes 
+-------------------------------------------------
+1.4.070616: Supporting Drupal software, include zen, admin modules and multiple domains.
+
+
+1.4.063018: 
+========================================================================================
+
+System Changes
+-------------------------------------------------
+1.4.062303: Artica is now compliance using OpenVPN server on "bridge" mode.
+1.4.062901: Rebuild the backup process tasks.
+1.4.062901: Adding more logs whe doing backup.
+1.4.063018: Remove skip-bdb parameters on mysql server cause error to start on Ubuntu 9.x versions
+1.4.063018: Adding possibility to set the temporary working path for backup tasks
+1.4.063018: Adding possibility to define a local bind IP address when updating, installing applications trough artica (in artica update parameters)
+
+
+Messaging Changes:
+-------------------------------------------------
+1.4.062303: Fetchmail is now compliance with multiple postfix instances mode.
+1.4.062312: Fix mynetworks was not correctly set.
+1.4.062312: Fix catch-all was not correctly set in postfix hash databases.
+1.4.062901: Amavisd-new now write log into syslog
+1.4.062901: Fix unable to run spamassassin sa-compile cause AWL (Auto-whitelist) plugin was not enabled by default in debian systems.
+1.4.062901: amavisd-new multi postfix instances compliance.
+1.4.062912: Adding SPF configuration panel for AMAVIS+Spamassassin.
+
+File Sharing changes:
+-----------------------------------------------
+1.4.062316: Adding possibility to download samba log files trough artica interface.
+
+Proxy Changes:
+-------------------------------------------------
+1.4.062413: Fix Monit try to monitor Dansguardian even Dansguardian is disabled.
+1.4.062413: Adding a default cron schedule for databases updates in DansGuardian/SquidGuard each 5H
+1.4.062413: Remove the cache for the Web filter main page.
+1.4.062413: Fix sometimes Dansguardian status is displayed has wrong stopped status.
+1.4.062413: Fix wrong status of proxy.pac status.
+1.4.062901: Fix memory exceed limit when building Dansguardian databases status.
+
+
+Groupwares changes 
+-------------------------------------------------
+1.4.063018: Fix installation error trough Setup center on sugraCRM 5.5.4
+1.4.063018: Support upgrade to RoundCube 0.4 beta.
+1.4.063018: Adding roundcube multiple sub-domains synchronization.
+
+
+
+to see: 
+www.web-polygraph.org
+
+
+ 
 1.4.061819:
 ========================================================================================
 
@@ -17,7 +127,8 @@ Messaging Changes:
 1.4.060401: Fix demime error before backup mails. This cause illimited stored mysql error files in /var/log/artica-postfix that cause crash server.
 1.4.061220: Adding Zarafa ICal/CalDav process startup/monitor.
 1.4.061320: Fix unable to start amavis when detected server name match xxx.(none)
-1.4.062001: Rebuild totally the multiple postfix instances engine (now each organization can store multiple mail servers)
+1.4.062001: Rebuild totally the multiple postfix instances engine (now each organization can store multiple mail servers).
+
  
 
 Proxy Changes:
@@ -27,6 +138,8 @@ Proxy Changes:
 1.4.061320: Statistics minors improvements.
 1.4.061814: Reverse Proxy compliance.
 1.4.061819: Adding new feature in order to manage "proxy.pac" autoconfiguration file.
+
+
 
 1.4.053118:
 ========================================================================================

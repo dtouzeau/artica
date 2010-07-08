@@ -74,7 +74,7 @@ $head=$tpl->_ENGINE_parse_body("
 		<th><span style='color:white'>{recipient}</span></th>
 		</tr>");
 	
-	$date_hier = strftime("%y-%m-%d", mktime(0, 0, 0, date('m'), date('d')-1, date('y')));
+	$date_hier = strftime("%Y-%m-%d", mktime(0, 0, 0, date('m'), date('d')-1, date('Y')));
 	$date=date('Y-m-d');	
 	
 	while($ligne=mysql_fetch_array($results,MYSQL_ASSOC)){

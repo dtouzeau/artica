@@ -3,17 +3,7 @@ include_once(dirname(__FILE__) . '/ressources/class.ldap.inc');
 include_once(dirname(__FILE__) . '/ressources/class.user.inc');
 include_once(dirname(__FILE__).'/framework/class.unix.inc');
 include_once(dirname(__FILE__)."/framework/frame.class.inc");
-
-/*
-$conf=$conf . $this->BuildLdapSettings("VirtualAliasMailingTable",null,"(&(objectClass=MailingAliasesTable)(cn=%s))","MailingListAddress");
-$conf=$conf . $this->BuildLdapSettings("VirtualAliasMapsTable",null,"(&(objectClass=userAccount)(mailAlias=%s))","mail");
-$conf=$conf . $this->BuildLdapSettings("AliasMapsTable",null,"(&(objectClass=userAccount)(uid=%u))","mail");
-$conf=$conf . $this->BuildLdapSettings("CatchAllAliasMaps","cn=catch-all,cn=artica","(&(objectclass=AdditionalPostfixMaps)(cn=%s))","");
-$conf=$conf . $this->BuildLdapSettings("VirtualMailManMaps",null,"(&(objectClass=ArticaMailManRobots)(cn=%s))","cn");
-$conf=$conf . $this->BuildLdapSettings("RelaisDomainsTable",$ldap->suffix,"(&(objectclass=PostFixRelayDomains)(cn=%s))","cn");
-$conf=$conf . $this->BuildLdapSettings("RecipientBccMaps",null,"(&(objectClass=UserArticaClass)(mail=%s))","RecipientToAdd");
-*/
-
+if(preg_match("#--verbose#",implode(" ",$argv))){$GLOBALS["DEBUG"]=true;}
 
 $sock=new sockets();
 $unix=new unix();
@@ -24,6 +14,7 @@ $GLOBALS["postmap"]=$unix->find_program("postmap");
 $GLOBALS["newaliases"]=$unix->find_program("newaliases");
 $GLOBALS["postalias"]=$unix->find_program("postalias");
 $GLOBALS["postfix"]=$unix->find_program("postfix");
+$GLOBALS["newaliases"]=$unix->find_program("newaliases");
 
 if(!is_file($GLOBALS["postfix"])){die();}
 
@@ -42,6 +33,7 @@ if($GLOBALS["EnablePostfixMultiInstance"]==1){
 	die();
 }
 
+if($argv[1]=="--postmaster"){postmaster();die();}	
 
 
 if($argv[1]=="--bcc"){
@@ -55,10 +47,11 @@ if($argv[1]=="--bcc"){
 
 
 if($argv[1]=="--transport"){
-	transport_maps_build();
-	transport_maps();
-	relais_domains_build();
-	relay_domains();	
+	transport_maps_search();
+	relais_domains_search();
+	build_transport_maps();
+	build_relay_domains();
+	build_cyrus_lmtp_auth();	
 	shell_exec("{$GLOBALS["postfix"]} reload >/dev/null 2>&1");
 	die();}
 	
@@ -66,8 +59,10 @@ if($argv[1]=="--aliases"){
 	maillings_table();
 	aliases_users();
 	aliases();
-	virtual_alias_maps();
-	aliases_maps();
+	catch_all();
+	build_aliases_maps();
+	build_virtual_alias_maps();
+	postmaster();
 	shell_exec("{$GLOBALS["postfix"]} reload >/dev/null 2>&1");
 	die();}
 		
@@ -78,6 +73,8 @@ if($argv[1]=="--smtp-passwords"){
 	smtp_sasl_password_maps();
 	shell_exec("{$GLOBALS["postfix"]} reload >/dev/null 2>&1");
 	die();}	
+	
+	
 
 $GLOBALS["virtual_alias_maps"]=array();
 $GLOBALS["alias_maps"]=array();
@@ -89,11 +86,14 @@ $GLOBALS["transport_maps"]=array();
 maillings_table();
 aliases_users();
 aliases();
-aliases_maps();
-virtual_alias_maps();
+catch_all();
 
-relais_domains_build();
-relay_domains();
+
+build_aliases_maps();
+build_virtual_alias_maps();
+
+relais_domains_search();
+build_relay_domains();
 
 relay_recipient_maps_build();
 
@@ -113,16 +113,17 @@ recipient_bcc_maps_build();
 sender_bcc_maps();
 sender_bcc_maps_build();
 
-local_recipient_maps();
+build_local_recipient_maps();
 
-mydestination_build();
+mydestination_search();
 mydestination();
 
-transport_maps_build();
-transport_maps();
+transport_maps_search();
+build_transport_maps();
 
 relayhost();
-
+postmaster();
+build_cyrus_lmtp_auth();
 
 shell_exec("{$GLOBALS["postfix"]} reload >/dev/null 2>&1");
 
@@ -230,21 +231,25 @@ function maillings_table(){
 function catch_all(){
 	$ldap=new clladp();
 	$filter="(&(objectClass=AdditionalPostfixMaps)(cn=*))";
-	$attrs=array("cn","MailingListAddress");
+	$attrs=array("cn","CatchAllPostfixAddr");
 	$dn="cn=catch-all,cn=artica,$ldap->suffix";
 	
-	$hash=$ldap->Ldap_search($dn,$filter,$attrs);
+	if($GLOBALS["DEBUG"]){echo __FUNCTION__." -> open branch $dn $filter\n";}
 	
+	$hash=$ldap->Ldap_search($dn,$filter,$attrs);
+	if($GLOBALS["DEBUG"]){echo __FUNCTION__." -> found {$hash["count"]} entries\n";}
 	for($i=0;$i<$hash["count"];$i++){
 		$cn=$hash[$i]["cn"][0];
 		for($t=0;$t<$hash[$i][strtolower("CatchAllPostfixAddr")]["count"];$t++){
-			$GLOBALS["virtual_alias_maps"][]="@$cn\t{$hash[$i][strtolower("CatchAllPostfixAddr")][$t]}";
+			echo "Starting......: catch-all {$hash[$i][strtolower("CatchAllPostfixAddr")][$t]} for $cn\n";
+			if(substr($cn,0,1)<>"@"){$cn="@$cn";}
+			if($GLOBALS["DEBUG"]){echo __FUNCTION__." -> virtual_alias_maps=$cn\t{$hash[$i][strtolower("CatchAllPostfixAddr")][$t]}\n";}
+			$GLOBALS["virtual_alias_maps"][]="$cn\t{$hash[$i][strtolower("CatchAllPostfixAddr")][$t]}";
 		}
 	}
-
 }
 
-function relais_domains_build(){
+function relais_domains_search(){
 $ldap=new clladp();
 	$filter="(&(objectClass=PostFixRelayDomains)(cn=*))";
 	$attrs=array("cn");
@@ -258,7 +263,7 @@ $ldap=new clladp();
 	echo "Starting......: ". count($GLOBALS["relay_domains"])." relay domain(s)\n";
 }
 	
-function relay_domains(){
+function build_relay_domains(){
 	if(!is_array($GLOBALS["relay_domains"])){
 		shell_exec("{$GLOBALS["postconf"]} -e \"relay_domains = \" >/dev/null 2>&1");
 		return null;
@@ -270,7 +275,7 @@ function relay_domains(){
 		
 }
 
-function mydestination_build(){
+function mydestination_search(){
 $ldap=new clladp();
 	$filter="(&(objectClass=organizationalUnit)(associatedDomain=*))";
 	$attrs=array("associatedDomain");
@@ -312,17 +317,10 @@ function mydestination(){
 		
 		shell_exec("{$GLOBALS["postmap"]} hash:/etc/postfix/mydestination >/dev/null 2>&1");
 }	
-	
-
-
-
-
-
-
-
 
 function aliases_users(){
 	$ldap=new clladp();
+	$users=new usersMenus();
 	$filter="(&(objectClass=userAccount)(uid=*))";
 	$attrs=array("uid","mail");
 	$dn="dc=organizations,$ldap->suffix";
@@ -331,8 +329,20 @@ function aliases_users(){
 	for($i=0;$i<$hash["count"];$i++){
 		$uid=$hash[$i]["uid"][0];
 		for($t=0;$t<$hash[$i]["mail"]["count"];$t++){
-			$GLOBALS["alias_maps"][]="$uid\t{$hash[$i]["mail"][$t]}";
-			$GLOBALS["virtual_mailbox"]="{$hash[$i]["mail"][$t]}\t$uid";
+			$mail=$hash[$i]["mail"][$t];
+			if(!$GLOBALS["virtual_alias_maps_mem"][$mail]){
+				$GLOBALS["virtual_alias_maps"][]="$mail\t$mail";
+			}
+			$GLOBALS["virtual_alias_maps_mem"][$mail]=true;
+			
+			if(!$GLOBALS["alias_maps_mem"][$uid]){
+				if(!preg_match("#.+?@#",$uid)){$GLOBALS["alias_maps"][]="$uid:$mail";}
+				$GLOBALS["alias_maps_mem"][$uid]=true;	
+			}
+				
+			
+								
+			$GLOBALS["virtual_mailbox"]="$mail\t$uid";
 		}
 	}
 
@@ -342,13 +352,41 @@ function aliases_users(){
 	$hash=$ldap->Ldap_search($dn,$filter,$attrs);
 	for($i=0;$i<$hash["count"];$i++){
 		$cn=$hash[$i]["cn"][0];
-		$GLOBALS["alias_maps"][]="$cn\tx";
+		if(preg_match("#(.+?)@#",$cn,$re)){
+			$map=$re[1];
+		if(!$GLOBALS["alias_maps_mem"][$map]){
+			$GLOBALS["alias_maps"][]="$map:$cn";
+			$GLOBALS["alias_maps_mem"][$map]=true;
+			}
+		}
 	}
-
+	
+	$sock=new sockets();
+	$PostfixPostmaster=trim($sock->GET_INFO("PostfixPostmaster"));
+	if($PostfixPostmaster==null){return;}
+	
+	$myhostname=trim($sock->GET_INFO("myhostname"));
+	if($myhostname==null){$myhostname=$users->hostname;}
+	preg_match("#(.+?)@#",$PostfixPostmaster,$re);
+	$PostfixPostmaster_prefix=$re[1];	
+	
+	
+	$GLOBALS["virtual_alias_maps"][]="$PostfixPostmaster_prefix@$hostname\t$PostfixPostmaster";
+	$GLOBALS["virtual_alias_maps"][]="$PostfixPostmaster\t$PostfixPostmaster";
+	$GLOBALS["virtual_alias_maps"][]="root@$myhostname\t$PostfixPostmaster";
+	$GLOBALS["virtual_alias_maps"][]="postmaster\t$PostfixPostmaster";
+	$GLOBALS["virtual_alias_maps"][]="MAILER-DAEMON\t$PostfixPostmaster";
+	$GLOBALS["virtual_alias_maps"][]="root\t$PostfixPostmaster";
+	$GLOBALS["alias_maps"][]="postmaster:$PostfixPostmaster";
+	$GLOBALS["alias_maps"][]="MAILER-DAEMON:$PostfixPostmaster";
+	$GLOBALS["alias_maps"][]="root:$PostfixPostmaster";
+	if($PostfixPostmaster_prefix<>null){
+		if(!$GLOBALS["alias_maps_mem"][$PostfixPostmaster_prefix]){$GLOBALS["alias_maps"][]="$PostfixPostmaster_prefix:$PostfixPostmaster";}
+	}
 }
 
 
-function local_recipient_maps(){
+function build_local_recipient_maps(){
 if(!is_array($GLOBALS["local_recipient_maps"])){
 		shell_exec("{$GLOBALS["postconf"]} -e \"local_recipient_maps = \" >/dev/null 2>&1");
 		echo "Starting......: No recipients maps\n"; 
@@ -362,27 +400,32 @@ shell_exec("{$GLOBALS["postmap"]} hash:/etc/postfix/local_recipients >/dev/null 
 	
 }
 
-function virtual_alias_maps(){
-if(!is_array($GLOBALS["virtual_alias_maps"])){
+function build_virtual_alias_maps(){
+	
+if($GLOBALS["DEBUG"]){echo __FUNCTION__." -> virtual_alias_maps=". count($GLOBALS["virtual_alias_maps"]) . " entries\n";}	
+	if(!is_array($GLOBALS["virtual_alias_maps"])){
+		if($GLOBALS["DEBUG"]){echo __FUNCTION__." -> {$GLOBALS["postconf"]} -e \"virtual_alias_maps = \" >/dev/null 2>&1\n";}
 		shell_exec("{$GLOBALS["postconf"]} -e \"virtual_alias_maps = \" >/dev/null 2>&1");
 		echo "Starting......: No virtual aliases\n"; 
-		return null;
+		return;
 		}	
 
-	echo "Starting......: ". count($GLOBALS["virtual_alias_maps"])." virtual aliase(s)\n"; 		
-	shell_exec("{$GLOBALS["postconf"]} -e \"virtual_alias_maps =hash:/etc/postfix/virtual\" >/dev/null 2>&1");		
+	echo "Starting......: ". count($GLOBALS["virtual_alias_maps"])." virtual aliase(s)\n"; 	
+	if($GLOBALS["DEBUG"]){echo __FUNCTION__." -> {$GLOBALS["postconf"]} -e \"virtual_alias_maps =hash:/etc/postfix/virtual\" >/dev/null 2>&1\n";}	
+	shell_exec("{$GLOBALS["postconf"]} -e \"virtual_alias_maps =hash:/etc/postfix/virtual\" >/dev/null 2>&1");
+	if($GLOBALS["DEBUG"]){echo __FUNCTION__." -> writing /etc/postfix/virtual\n";}			
 	@file_put_contents("/etc/postfix/virtual",implode("\n",$GLOBALS["virtual_alias_maps"]));
 	echo "Starting......: compiling virtual aliase database /etc/postfix/virtual\n"; 
+	if($GLOBALS["DEBUG"]){echo __FUNCTION__." -> {$GLOBALS["postmap"]} hash:/etc/postfix/virtual >/dev/null 2>&1\n";}	
 	shell_exec("{$GLOBALS["postmap"]} hash:/etc/postfix/virtual >/dev/null 2>&1");		
 }
 
 
-function aliases_maps(){
+function build_aliases_maps(){
 if(!is_array($GLOBALS["alias_maps"])){
 		shell_exec("{$GLOBALS["postconf"]} -e \"aliases_maps = \" >/dev/null 2>&1");
 		shell_exec("{$GLOBALS["postconf"]} -e \"virtual_mailbox_maps = \" >/dev/null 2>&1");
 		echo "Starting......: No aliases\n"; 
-		virtual_alias_maps();
 		return null;
 		
 		}	
@@ -394,18 +437,13 @@ if(!is_array($GLOBALS["alias_maps"])){
 			$hash_mailman_virtual=",hash:/var/lib/mailman/data/virtual-mailman";
 		}
 	}
-	
-	
-	
-		
-	
-		
 		echo "Starting......: ". count($GLOBALS["alias_maps"])." aliase(s)\n"; 
 		shell_exec("{$GLOBALS["postconf"]} -e \"alias_maps =hash:/etc/postfix/aliases$hash_mailman\" >/dev/null 2>&1");
 		shell_exec("{$GLOBALS["postconf"]} -e \"alias_database =hash:/etc/postfix/aliases\" >/dev/null 2>&1");
 		@file_put_contents("/etc/postfix/aliases",implode("\n",$GLOBALS["alias_maps"]));
-		shell_exec("{$GLOBALS["postmap"]} hash:/etc/postfix/aliases >/dev/null 2>&1");	
-		virtual_alias_maps();
+		shell_exec("{$GLOBALS["postalias"]} -c /etc/postfix hash:/etc/postfix/aliases >/dev/null 2>&1");
+		shell_exec("{$GLOBALS["newaliases"]}");		
+		
 	
 }
 
@@ -438,6 +476,7 @@ function aliases(){
 
 	for($i=0;$i<$hash["count"];$i++){
 		$mail=$hash[$i]["mail"][0];
+		$GLOBALS["virtual_alias_maps"][]="{$hash[$i]["mailalias"][$t]}\t{$hash[$i]["mailalias"][$t]}";
 		for($t=0;$t<$hash[$i]["mailalias"]["count"];$t++){
 			$GLOBALS["virtual_alias_maps"][]="{$hash[$i]["mailalias"][$t]}\t$mail";
 		}
@@ -445,7 +484,7 @@ function aliases(){
 	
 }
 
-function transport_maps(){
+function build_transport_maps(){
 	if(!is_array($GLOBALS["transport_maps"])){
 		shell_exec("{$GLOBALS["postconf"]} -e \"transport_maps =\" >/dev/null 2>&1");
 	}
@@ -630,7 +669,7 @@ function recipient_canonical_maps(){
 
 
 
-function transport_maps_build(){
+function transport_maps_search(){
 	$ldap=new clladp();
 	$filter="(&(objectClass=transportTable)(cn=*))";
 	$attrs=array("cn","transport");
@@ -642,10 +681,12 @@ function transport_maps_build(){
 		//$transport=str_replace("relay:","smtp:",$transport);
 		
 		if(substr($domain,0,1)=="@"){$domain=substr($domain,1,strlen($domain));}
-		$GLOBALS["transport_maps"]["$domain"]="$transport";
+		if(!$GLOBALS["transport_mem"]["$domain"]){$GLOBALS["transport_maps"]["$domain"]="$transport";}
 		
 		if(strpos("  $domain","@")==0){$domain="@$domain";}
-		$GLOBALS["transport_maps_AT"]["$domain"]="$transport";
+		if(!$GLOBALS["transport_mem"]["$domain"]){$GLOBALS["transport_maps_AT"]["$domain"]="$transport";}
+		$GLOBALS["transport_mem"]["$domain"]=true;
+		
 		
 
 	}
@@ -658,8 +699,12 @@ function transport_maps_build(){
 	for($i=0;$i<$hash["count"];$i++){
 		$email=$hash[$i]["cn"][0];
 		$transport=$hash[$i][strtolower("ArticaSMTPSenderTable")][0];
-		$GLOBALS["transport_maps"]["$email"]="$transport";
-
+		$uid=$ldap->uid_from_email($email);
+		if($uid<>null){continue;}
+		if(!$GLOBALS["transport_mem"]["$email"]){
+			$GLOBALS["transport_maps"]["$email"]="$transport";
+		}
+		$GLOBALS["transport_mem"]["$email"]=true;
 	}  
 }
 
@@ -688,6 +733,90 @@ function relayhost(){
 	shell_exec("{$GLOBALS["postconf"]} -e \"relayhost =$PostfixRelayHost_pattern\" >/dev/null 2>&1");
 	
 }
+
+function postmaster(){
+	$sock=new sockets();
+	$users=new usersMenus();
+	$hostname=$sock->GET_INFO("myhostname");
+	if($hostname==null){$hostname=$users->hostname;}
+	if($GLOBALS["DEBUG"]){echo "postmaster():: Hostname=$hostname\n";}
+	$hosts=explode(".",$hostname);
+	if(count($hosts)>0){$mydomain_default="\\\$myhostname";}else{$mydomain_default="localdomain";}
+	
+		
+	$PostfixPostmaster=trim($sock->GET_INFO("PostfixPostmaster"));
+	$PostfixPostmasterSender=trim($sock->GET_INFO("PostfixPostmasterSender"));
+	if($PostfixPostmaster==null){
+		$error_notice_recipient="postmaster";
+		$delay_notice_recipient="postmaster";
+		$empty_address_recipient="MAILER-DAEMON";
+		$myorigin="\\\$myhostname";
+	}else{
+		$error_notice_recipient="$PostfixPostmaster";
+		$delay_notice_recipient="$PostfixPostmaster";
+		$empty_address_recipient="$PostfixPostmaster";
+	}
+	shell_exec("{$GLOBALS["postconf"]} -e \"error_notice_recipient =$error_notice_recipient\" >/dev/null 2>&1");
+	shell_exec("{$GLOBALS["postconf"]} -e \"delay_notice_recipient =$delay_notice_recipient\" >/dev/null 2>&1");
+	shell_exec("{$GLOBALS["postconf"]} -e \"empty_address_recipient =$empty_address_recipient\" >/dev/null 2>&1");
+	
+	$address_verify_sender="\\\$double_bounce_sender";
+	$double_bounce_sender="double-bounce";
+	$mydomain=$mydomain_default;
+	
+	if($PostfixPostmasterSender<>null){
+		if(preg_match("#(.+?)@(.+)#",$PostfixPostmasterSender,$re)){
+			$mydomain=$re[2];
+			$myorigin="\$mydomain";
+		}
+		$address_verify_sender=$PostfixPostmasterSender;
+		$double_bounce_sender=$PostfixPostmasterSender;
+	
+	}
+	
+	if($GLOBALS["DEBUG"]){echo "postmaster():: mydomain =$mydomain\n";}
+	
+	shell_exec("{$GLOBALS["postconf"]} -e \"address_verify_sender =$address_verify_sender\" >/dev/null 2>&1");
+	shell_exec("{$GLOBALS["postconf"]} -e \"double_bounce_sender =$double_bounce_sender\" >/dev/null 2>&1");
+	shell_exec("{$GLOBALS["postconf"]} -e \"mydomain =$mydomain\" >/dev/null 2>&1");	
+}
+
+function build_cyrus_lmtp_auth(){
+	$users=new usersMenus();
+	$disable=false;
+	if($users->ZABBIX_INSTALLED){$disable=true;}else{
+		if(!$users->cyrus_imapd_installed){$disable=true;}
+	}
+	
+	if($disable){
+		shell_exec("{$GLOBALS["postconf"]} -e \"lmtp_sasl_auth_enable =no\" >/dev/null 2>&1");
+		shell_exec("{$GLOBALS["postconf"]} -e \"lmtp_sasl_password_maps =\" >/dev/null 2>&1");
+		shell_exec("{$GLOBALS["postconf"]} -e \"lmtp_sasl_security_options =\" >/dev/null 2>&1");
+		return;		
+	}
+	
+	
+	$sock=new sockets();
+	$page=CurrentPageName();
+	$CyrusEnableLMTPUnix=$sock->GET_INFO("CyrusEnableLMTPUnix");	
+	if($CyrusEnableLMTPUnix==1){
+		shell_exec("{$GLOBALS["postconf"]} -e \"lmtp_sasl_auth_enable =no\" >/dev/null 2>&1");
+		shell_exec("{$GLOBALS["postconf"]} -e \"lmtp_sasl_password_maps =\" >/dev/null 2>&1");
+		shell_exec("{$GLOBALS["postconf"]} -e \"lmtp_sasl_security_options =\" >/dev/null 2>&1");	
+	}else{
+		$ldap=new clladp();
+		$CyrusLMTPListen=trim($sock->GET_INFO("CyrusLMTPListen"));
+		$cyruspass=$ldap->CyrusPassword();
+		@file_put_contents("/etc/postfix/lmtpauth","$CyrusLMTPListen\tcyrus:$cyruspass");
+		shell_exec("{$GLOBALS["postmap"]} hash:/etc/postfix/lmtpauth >/dev/null 2>&1");
+		shell_exec("{$GLOBALS["postconf"]} -e \"lmtp_sasl_auth_enable =yes\" >/dev/null 2>&1");
+		shell_exec("{$GLOBALS["postconf"]} -e \"lmtp_sasl_password_maps = hash:/etc/postfix/lmtpauth\" >/dev/null 2>&1");
+		shell_exec("{$GLOBALS["postconf"]} -e \"lmtp_sasl_mechanism_filter = plain, login\" >/dev/null 2>&1");
+		shell_exec("{$GLOBALS["postconf"]} -e \"lmtp_sasl_security_options =\" >/dev/null 2>&1");
+	}
+	
+}
+
 
 
 ?>

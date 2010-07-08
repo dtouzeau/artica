@@ -6,7 +6,7 @@ unit spamass;
 interface
 
 uses
-    Classes, SysUtils,variants,strutils,IniFiles, Process,
+    Classes, SysUtils,variants,strutils,Process,
     logs in '/home/dtouzeau/developpement/artica-postfix/bin/src/artica-install/logs.pas',unix,
     RegExpr in '/home/dtouzeau/developpement/artica-postfix/bin/src/artica-install/RegExpr.pas',
     zsystem;
@@ -25,19 +25,22 @@ type LDAP=record
 
 private
      LOGS:Tlogs;
-     GLOBAL_INI:TiniFIle;
      SYS:        TSystem;
      artica_path:string;
      SpamAssMilterEnabled:Integer;
      EnableSaBlackListUpdate:Integer;
      InsufficentRessources:boolean;
-
+     enable_dkim_verification:integer;
+     EnableSPF:integer;
      function    COMMANDLINE_PARAMETERS(FoundWhatPattern:string):boolean;
      function    ReadFileIntoString(path:string):string;
      function    TRUSTED_NETWORK():string;
      procedure   SPAMASSASSIN_REMOVE_INCLUDE_FILE(filepath:string);
+     procedure   SPAMASSASSIN_REMOVE_PLUGIN(plugin:string);
      function    BLOCK_MAIL():string;
-     procedure SPAMASSASSIN_V320();
+     procedure   SPAMASSASSIN_V320();
+     procedure   SPAMASSASSIN_init_pre();
+     function    GET_VALUE(key:string):string;
 
 public
     SpamdEnabled:integer;
@@ -92,16 +95,20 @@ begin
        SYS:=zSYS;
        SpamAssMilterEnabled:=0;
        SpamdEnabled:=1;
-
+       enable_dkim_verification:=0;
 
        if not TryStrToInt(SYS.get_INFO('SpamAssMilterEnabled'),SpamAssMilterEnabled) then SpamAssMilterEnabled:=0;
        if not TryStrToInt(SYS.GET_INFO('EnableSaBlackListUpdate'),EnableSaBlackListUpdate) then EnableSaBlackListUpdate:=0;
+       if not TryStrToInt(SYS.GET_INFO('EnableSPF'),EnableSPF) then EnableSPF:=1;
+       if not TryStrToInt(SYS.GET_INFO('enable_dkim_verification'),enable_dkim_verification) then enable_dkim_verification:=0;
+
+
+
        InsufficentRessources:=SYS.ISMemoryHiger1G();
         if not InsufficentRessources then begin
              if SpamAssMilterEnabled=1 then begin
                 SYS.set_INFO('SpamAssMilterEnabled','0');
                 SpamAssMilterEnabled:=0;
-                SYS.THREAD_COMMAND_SET(SYS.LOCATE_PHP5_BIN()+' /usr/share/artica-postfix/exec.postfix.maincf.php --maincf');
           end;
        end;
 
@@ -130,7 +137,7 @@ EnableAmavisDaemon:=0;
 if not SYS.ISMemoryHiger1G() then exit(0);
 if not TryStrToInt(SYS.GET_INFO('EnableAmavisDaemon'),EnableAmavisDaemon) then EnableAmavisDaemon:=0;
 if EnableAmavisDaemon=1 then exit(1);
-SpamAssMilterEnabled=1 then exit(1);
+if SpamAssMilterEnabled=1 then exit(1);
 end;
 //##############################################################################
 
@@ -527,7 +534,6 @@ var
     RegExpr:TRegExpr;
     FileDatas:TStringList;
     i:integer;
-    main_dbver:string;
 begin
 if not FileExists(MILTER_DAEMON_BIN_PATH()) then exit;
 
@@ -666,10 +672,9 @@ function Tspamass.RAZOR_GET_VALUE(key:string):string;
 var
    l:Tstringlist;
    RegExpr:TRegExpr;
-   f:boolean;
+
    i:integer;
 begin
-     f:=false;
      if not FileExists(RAZOR_AGENT_CONF_PATH()) then exit;
      RegExpr:=TRegExpr.Create;
      l:=Tstringlist.Create;
@@ -738,11 +743,9 @@ end;
 procedure Tspamass.SPAMASSASSIN_START();
  var
     count      :integer;
-    D          :boolean;
     cmdline    :string;
-    SYS        :TSystem;
     helper_home:string;
-    l:TstringList;
+
 begin
      if not FileExists(SPAMASSASSIN_BIN_PATH()) then begin
         logs.DebugLogs('Starting......: spamassassin is not installed');
@@ -938,7 +941,6 @@ end;
 FUNCTION Tspamass.SPAMASSASSIN_STATUS():string;
 var
    ini:TstringList;
-   SpamAssassinEnabled:integer;
    pid:string;
 begin
 if not FileExists(SPAMASSASSIN_BIN_PATH()) then exit;
@@ -981,50 +983,79 @@ procedure Tspamass.DEFAULT_SETTINGS();
 var
    l:TstringList;
    sapmcfDir:string;
+   auto_whitelist_path:string;
+   auto_whitelist_file_mode:string;
 begin
 
 if not FileExists(SPAMASSASSIN_LOCAL_CF()) then begin
-   logs.Syslogs('Starting......: Unable to stat spamassassin local.cf');
+   logs.Debuglogs('Starting......: Unable to stat spamassassin local.cf');
    exit;
 end;
 sapmcfDir:=ExtractFilePath(SPAMASSASSIN_LOCAL_CF());
 
 SPAMASSASSIN_ADD_PLUGIN('Rule2XSBody');
+
+if enable_dkim_verification=1 then begin
+    SPAMASSASSIN_ADD_PLUGIN('DKIM');
+    logs.Debuglogs('Starting......: spamassassin DKIM Engine is enabled');
+    fpsystem(SYS.LOCATE_PHP5_BIN()+' /usr/share/artica-postfix/exec.spamassassin.php --dkim');
+end else begin
+     logs.Debuglogs('Starting......: spamassassin DKIM Engine is disbaled');
+     SPAMASSASSIN_REMOVE_PLUGIN('DKIM');
+end;
+
+SPAMASSASSIN_ADD_PLUGIN('AWL');
 SPAMASSASSIN_V320();
+SPAMASSASSIN_init_pre();
 if EnableSaBlackListUpdate=1 then SPAMASSASSIN_ADD_INCLUDE_FILE(sapmcfDir+'sa-blacklist.work') else SPAMASSASSIN_REMOVE_INCLUDE_FILE(sapmcfDir+'sa-blacklist.work');
+
+auto_whitelist_path:=GET_VALUE('auto_whitelist_path');
+auto_whitelist_file_mode:=GET_VALUE('auto_whitelist_file_mode');
+
+if length(auto_whitelist_path)>0 then begin
+        logs.Debuglogs('Starting......: spamassassin auto-whitelist path '+auto_whitelist_path+' chmod '+ auto_whitelist_file_mode);
+        ForceDirectories(ExtractFilePath(auto_whitelist_path));
+        if not FileExists(auto_whitelist_path) then fpsystem('/bin/touch  '+auto_whitelist_path +' >/dev/null 2>&1');
+        fpsystem('/bin/chmod '+auto_whitelist_file_mode+' '+auto_whitelist_path);
+end;
+
+
 
 
 
 l:=TstringList.Create;
 l.LoadFromFile(SPAMASSASSIN_LOCAL_CF());
 if not IF_PATTERN_FOUND('^rewrite_header Subject') then begin
-      logs.Syslogs('Starting......: Set default rewrite_header parameter');
+      logs.Debuglogs('Starting......: spamassassin Set default rewrite_header parameter');
       l.Add('rewrite_header Subject ***** SPAM *****');
 end;
 
 if not IF_PATTERN_FOUND('^required_score') then begin
    l.Add('required_score 5.0');
-   logs.Syslogs('Starting......: Set default required_score parameter');
+   logs.Debuglogs('Starting......: spamassassin Set default required_score parameter');
 end;
 
 if not IF_PATTERN_FOUND('^report_safe') then begin
    l.Add('report_safe 0');
-   logs.Syslogs('Starting......: Set default report_safe parameter');
+   logs.Debuglogs('Starting......: spamassassin Set default report_safe parameter');
 end;
 
 if not IF_PATTERN_FOUND('^bayes_ignore_header') then begin
    l.Add('bayes_ignore_header X-Bogosity');
    l.Add('bayes_ignore_header X-Spam-Flag');
    l.Add('bayes_ignore_header X-Spam-Status');
-   logs.Syslogs('Starting......: Set default bayes_ignore_header');
+   logs.Debuglogs('Starting......: Set default bayes_ignore_header');
 end;
 
 if not IF_PATTERN_FOUND('^use_bayes') then l.Add('use_bayes 1');
 if not IF_PATTERN_FOUND('^bayes_auto_learn') then l.Add('bayes_auto_learn 1');
+
+
+
 try
-l.SaveToFile(SPAMASSASSIN_LOCAL_CF());
+logs.WriteToFile(l.Text,SPAMASSASSIN_LOCAL_CF());
 except
-logs.Syslogs('Starting......: Unable to save configuration file '+SPAMASSASSIN_LOCAL_CF());
+logs.Debuglogs('Starting......: spamassassin Unable to save configuration file '+SPAMASSASSIN_LOCAL_CF());
 end;
 l.free;
 end;
@@ -1032,7 +1063,6 @@ end;
 procedure Tspamass.SPAMASSASSIN_ADD_INCLUDE_FILE(filepath:string);
 var l:TstringList;
     RegExpr:TRegExpr;
-    FileDatas:TStringList;
     i:integer;
     F:boolean;
 begin
@@ -1042,7 +1072,7 @@ if not FileExists(SPAMASSASSIN_LOCAL_CF()) then begin
 end;
 
 if not FileExists(filepath) then begin
-      logs.Syslogs('Starting......: Unable to stat file '+filepath);
+      logs.Debuglogs('Starting......: spamassassin Unable to stat file '+filepath);
       exit;
 end;
 
@@ -1075,10 +1105,32 @@ l.free;
    
 end;
 //#########################################################################################
+function Tspamass.GET_VALUE(key:string):string;
+var
+   l:TstringList;
+   i:integer;
+   RegExpr:TRegExpr;
+begin
+
+   RegExpr:=TRegExpr.Create;
+   RegExpr.Expression:='^'+key+'\s+(.+)';
+   l:=TstringList.Create;
+   l.LoadFromFile(SPAMASSASSIN_LOCAL_CF());
+   for i:=0 to l.Count-1 do begin
+       if RegExpr.Exec(l.Strings[i]) then begin
+          result:=trim(RegExpr.Match[1]);
+          break;
+       end;
+   end;
+
+   l.free;
+   RegExpr.free;
+
+end;
+
 procedure Tspamass.SPAMASSASSIN_REMOVE_INCLUDE_FILE(filepath:string);
 var l:TstringList;
     RegExpr:TRegExpr;
-    FileDatas:TStringList;
     i:integer;
     F:boolean;
     orgfilepath:string;
@@ -1135,12 +1187,32 @@ begin
  l.Add('loadplugin Mail::SpamAssassin::Plugin::URIEval');
  l.Add('loadplugin Mail::SpamAssassin::Plugin::WLBLEval');
  l.Add('loadplugin Mail::SpamAssassin::Plugin::ImageInfo');
+ l.Add('loadplugin Mail::SpamAssassin::Plugin::AWL');
  logs.WriteToFile(l.Text,filename);
+ logs.Debuglogs('Starting......: spamassassin v320.pre success');
  l.free;
 end;
 //#########################################################################################
-
-
+procedure Tspamass.SPAMASSASSIN_init_pre();
+var filename:string;
+    l:Tstringlist;
+begin
+ filename:='/etc/spamassassin/init.pre';
+ l:=Tstringlist.Create;
+ logs.Debuglogs('Starting......: spamassassin URIDNSBL enabled');
+ l.Add('loadplugin Mail::SpamAssassin::Plugin::URIDNSBL');
+ l.Add('loadplugin Mail::SpamAssassin::Plugin::Hashcash');
+ if EnableSPF=1 then begin
+    l.Add('loadplugin Mail::SpamAssassin::Plugin::SPF');
+    logs.Debuglogs('Starting......: spamassassin SPF enabled');
+    fpsystem(SYS.LOCATE_PHP5_BIN()+' ' + artica_path+'/exec.spamassassin.php --spf');
+ end;
+  logs.WriteToFile(l.Text,filename);
+  logs.Debuglogs('Starting......: spamassassin init.pre success');
+      fpsystem(SYS.LOCATE_PHP5_BIN()+' ' + artica_path+'/exec.spamassassin.php --dnsbl');
+ l.free;
+end;
+//#########################################################################################
 procedure Tspamass.SPAMASSASSIN_ADD_PLUGIN(plugin:string);
 var
    l:Tstringlist;
@@ -1171,13 +1243,47 @@ begin
     if not found then begin
         logs.DebugLogs('Starting......: spamassassin adding new plugin ' + plugin);
         l.Add('loadplugin Mail::SpamAssassin::Plugin::'+plugin);
-        l.SaveToFile(filename);
+        logs.WriteToFile(l.Text,filename);
     end;
 
     l.free;
     RegExpr.free;
 
 end;
+//#########################################################################################
+procedure   Tspamass.SPAMASSASSIN_REMOVE_PLUGIN(plugin:string);
+var
+   l:Tstringlist;
+   RegExpr:TRegExpr;
+   found:boolean;
+   filename:string;
+   i:integer;
+begin
+ filename:='/etc/spamassassin/v310.pre';
+    if not FileExists(filename) then begin
+       ForceDirectories(ExtractFilePath(filename));
+       fpsystem('/bin/touch '+filename);
+    end;
+
+
+    RegExpr:=TRegExpr.Create;
+    RegExpr.Expression:='^loadplugin Mail.+?'+plugin;
+    l:=TstringList.Create;
+    l.LoadFromFile(filename);
+    found:=false;
+    for i:=0 to l.Count-1 do begin
+         if RegExpr.Exec(l.Strings[i]) then begin
+            l.Delete(i);
+            found:=true;
+            break;
+         end;
+    end;
+
+    if found then logs.WriteToFile(l.Text,filename);
+    l.free;
+    RegExpr.free;
+end;
+
 //#########################################################################################
 function Tspamass.SPAMASSASSIN_VERSION():string;
 var

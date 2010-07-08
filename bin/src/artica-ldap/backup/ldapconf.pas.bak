@@ -1094,35 +1094,6 @@ begin
  fpsystem('/etc/init.d/artica-postfix restart imap');
 end;
 //#############################################################################
-
-
-procedure tldapconf.SpamAssassin();
-var
-   conf:spamassassin_settings;
-   spam:Tspamass;
-   l   :Tstringlist;
-begin
-
-
- if ldap.Logged=false then begin
-   logs.logs('SpamAssassin:: Logged is false;aborting...');
-    exit;
- end;
-   conf:=ldap.Load_spamassassin();
-   if length(conf.SpamAssassinConfFile)>0 then begin
-         spam:=Tspamass.Create(SYS);
-         l:=TstringList.Create;
-         l.Add(conf.SpamAssassinConfFile);
-         if FileExists(spam.SPAMASSASSIN_LOCAL_CF()) then begin
-            l.SaveToFile(spam.SPAMASSASSIN_LOCAL_CF());
-             spam.MILTER_STOP();
-             spam.SPAMASSASSIN_STOP();
-             spam.SPAMASSASSIN_START();
-             spam.MILTER_START();
-         end;
-   end;
-end;
-//#############################################################################
 function tldapconf.KasperskyASGroupsParseFile(datas:string):string;
 var
    RegExpr                :TRegExpr;

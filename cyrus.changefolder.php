@@ -47,7 +47,7 @@ function cyrus_change_folder_schedule(){
 
 
 function cyrus_change_folder_load(){
-	YahooWin('600','$page?popup=yes','$title');
+	YahooWin('630','$page?popup=yes','$title');
 }
 	
 var x_current_directory_size=function (obj) {

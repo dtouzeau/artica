@@ -112,7 +112,11 @@ begin
         install.INSTALL_STATUS(CODE_NAME,100);
         exit;
    end;
+  writeln('Removing old installations');
   spamassassin_remove();
+
+
+  writeln('Checking Artica repository');
   if length(source_folder)=0 then source_folder:=libs.COMPILE_GENERIC_APPS('Mail-SpamAssassin');
 
 
@@ -128,6 +132,7 @@ begin
   writeln('Using ' + cmd);
   fpsystem(cmd);
   fpsystem('make && make install');
+  SetCurrentDir('/root');
 
 if(length(libs.CHECK_PERL_MODULES('Mail::SpamAssassin')))>0 then begin
         install.INSTALL_STATUS(CODE_NAME,100);
@@ -164,11 +169,12 @@ if libs.VersionToInteger(PERL_MODULES)>=libs.VersionToInteger(MAIL_DKIM_VER) the
      exit;
   end;
 
- SetCurrentDir(source_folder);
+  SetCurrentDir(source_folder);
   cmd:='perl Makefile.PL';
   writeln('Using ' + cmd);
   fpsystem(cmd);
   fpsystem('make && make install');
+  SetCurrentDir('/root');
   fpsystem('/bin/rm -rf '+source_folder);
 
 end;
@@ -313,6 +319,7 @@ begin
   cmd:='echo n|perl Makefile.PL';
   fpsystem(cmd);
   fpsystem('make && make install');
+  SetCurrentDir('/root');
   fpsystem('/bin/rm -rf '+source_folder);
 
 end;

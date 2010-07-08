@@ -18,7 +18,7 @@ function writeToFile($text,$filepath){
 }
 function writelogs($text=null,$function=null,$file_source=null,$line=null){
 if($file_source==null){$file_source= __FILE__ ;}
-if(posix_getuid()==0){$prefix="[DAEMON]";}else{$prefix="[CONSOLE]";}
+if(posix_getuid()==0){$prefix="[DAEMON]";}else{$prefix="[CONSOLE]::{$_SESSION["uid"]}";}
 if(function_exists("getmypid")){$pid=getmypid();}
 
 $p=dirname(__FILE__);
@@ -34,28 +34,23 @@ $text="[$pid] $prefix::$function:: $text in $file_source$line";
 writeOtherlogs(dirname(__FILE__)."/logs/web/interface.debug",$text2);
 if($GLOBALS["ADDLOG"]<>null){writeOtherlogs($GLOBALS["ADDLOG"],$text2);}
 error_log("$text");
-
-if(basename($file_source)=="exec.gluster.php"){
-	writeClasslogs($text,$function,"exec.gluster.php");
-}
-
+if(basename($file_source)=="exec.backup.php"){writeOtherlogs("/var/log/artica-postfix/exec.backup.".date("Y-m-d").".log",$text);}
 $arr=explode("/",$function);
 if($arr[1]<>null){$class=$arr[1];}
 writeClasslogs($text,$function,$class);
 
 }function writeOtherlogs($file,$text=null){
-			@mkdir(dirname($file));
-		    $logFile=$file;
-		    if(!is_dir(dirname($logFile))){mkdir(dirname($logFile));}
-   		if (is_file($logFile)) { 
-   			$size=filesize($logFile);
-		    	if($size>1000000){unlink($logFile);}
-   		}
-		 $logFile=str_replace("//","/",$logFile);
-		$f = @fopen($logFile, 'a');
-		
-		@fwrite($f, "$text\n");
-		@fclose($f);
+	@mkdir(dirname($file));
+	$logFile=$file;
+	if(!is_dir(dirname($logFile))){mkdir(dirname($logFile));}
+   	if (is_file($logFile)) { 
+   		$size=filesize($logFile);
+   		if($size>1000000){unlink($logFile);}
+   	}
+	$logFile=str_replace("//","/",$logFile);
+	$f = @fopen($logFile, 'a');
+	@fwrite($f, "$text\n");
+	@fclose($f);
 }function writeClasslogs($text=null,$function=null,$class=null){
 if($class==null){return null;}
 	

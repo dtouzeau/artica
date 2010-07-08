@@ -935,7 +935,8 @@ if($relayIP<>null){
 			$upd["sn"][]="cyrus";
 			$upd["uid"][]="cyrus";
 			$upd["userPassword"][]=$this->ldap_password;
-			$this->ldap_add($dn,$upd);
+			return $this->ldap_add($dn,$upd);
+			
 		}
 		
 		
@@ -1733,14 +1734,21 @@ function Hash_GetALLUsers(){
 		return $res;
 		}		
 		
-	function hash_users_ou($ou){
+	function hash_users_ou($ou=null){
 		$pos=strpos($ou,',');
 		if($pos>0){$ou=substr($ou,0,$pos);}		
 		$ld =$this->ldap_connection;
 		$bind =$this->ldapbind;
 		$suffix=$this->suffix;	
+		$dn="ou=$ou,dc=organizations,$suffix";
+		if(posix_getuid()==0){
+			if($ou==null){
+				$dn="dc=organizations,$suffix";
+			}
+		}
+		
 		$arr=array("cn","dn","uid","displayname");
-		$sr = @ldap_search($ld,"ou=$ou,dc=organizations,$suffix",'(objectclass=userAccount)',$arr);
+		$sr = @ldap_search($ld,$dn,'(objectclass=userAccount)',$arr);
 		if ($sr) {
 			$hash=ldap_get_entries($ld,$sr);
 			while (list ($num, $ligne) = each ($hash) ){
@@ -2148,7 +2156,7 @@ function HashMembersFromOU($ou){
 		$entry_id = ldap_first_entry($this->ldap_connection,$sr);
 		if(!$entry_id){
 			writelogs( 'INFOS: bad value $entry_id: (' . $entry_id . ')  find: (cn=cyrus) -> aborting function search engine doesn`t found the pattern',__CLASS__.'/'.__FUNCTION__,__FILE__);
-			return null;
+			if($this->CyrusAdminCreate()){return $this->ldap_password;}
 		}
 		$attrs = ldap_get_attributes($this->ldap_connection, $entry_id);
 		return $attrs["userPassword"][0];
@@ -2337,9 +2345,10 @@ if($res["ARRAY_KEYS"]["FTPStatus"]==null){
 		return $conf;}
 		
 	function _ParsePrivieleges($content=null){
+		$uid=posix_getuid();
 		if(preg_match_all('#\[([a-zA-Z]+)\]="([a-z0-9]+)"#is',$content,$reg)){
 				while (list ($num, $ligne) = each ($reg[1]) ){
-					writelogs("$ligne={$reg[2][$num]}",__CLASS__.'/'.__FUNCTION__,__FILE__);
+					if($uid>0){writelogs("$ligne={$reg[2][$num]}",__CLASS__.'/'.__FUNCTION__,__FILE__);}
 					$priv[$ligne]=$reg[2][$num];
 					}}
 			
@@ -2937,6 +2946,20 @@ function Hash_get_restrictions_classes_tables($class_name,$table_name){
 //-------------------------------------------------------------------------------------------------------------------------------------	
 
 	
+function load_mynetworks(){
+		
+		$dn="cn=mynetworks_maps,cn=artica,$this->suffix";
+		$sr =@ldap_read($this->ldap_connection,$dn,'objectClass=PostfixMynetworks');
+		if ($sr) {
+			$hash=ldap_get_entries($this->ldap_connection,$sr);	
+			for($i=0;$i<$hash[0]["mynetworks"]["count"];$i++){
+				if(trim($hash[0]["mynetworks"][$i])==null){continue;}
+					$array_mynetworks[]=$hash[0]["mynetworks"][$i];
+				}
+			}
+	
+	   return $array_mynetworks;
+}
 	
 
 function WhitelistsFromDomain($domain=null){

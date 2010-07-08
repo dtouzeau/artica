@@ -6,7 +6,7 @@ unit dnsmasq;
 interface
 
 uses
-    Classes, SysUtils,variants,strutils,IniFiles, Process,logs,unix,
+    Classes, SysUtils,variants,strutils, Process,logs,unix,
     RegExpr in 'RegExpr.pas',
     zsystem in '/home/dtouzeau/developpement/artica-postfix/bin/src/artica-install/zsystem.pas',
     bind9   in '/home/dtouzeau/developpement/artica-postfix/bin/src/artica-install/bind9.pas';
@@ -17,9 +17,7 @@ uses
 
 private
      LOGS:Tlogs;
-     D:boolean;
      artica_path:string;
-     inif:TiniFile;
      SYS:Tsystem;
      bind9:Tbind9;
 
@@ -96,7 +94,6 @@ var
     RegExpr:TRegExpr;
     FileDatas:TStringList;
     i:integer;
-    ValueResulted:string;
 begin
    if not FileExists('/etc/dnsmasq.resolv.conf') then  exit;
    FileDatas:=TStringList.Create;

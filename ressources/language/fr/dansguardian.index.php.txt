@@ -216,7 +216,7 @@ See the weighted phrase list section for examples.[br]
 <nudism>Nudisme</nudism>
 <peer2peer>Sites de t&eacute;l&eacute;chargement</peer2peer>
 <performances>Performances</performances>
-<performances_text>Set daemon settings according your server performances</performances_text>
+<performances_text>Changez les param&egrave;tres du d&eacute;mon en fonction des performances de votre serveur</performances_text>
 <personals>Couples, sites personnels</personals>
 <phishing>Sites de Phishing</phishing>
 <phrasefiltermode>Mode de filtre d'expression</phrasefiltermode>

@@ -18,11 +18,12 @@ class vhosts{
 	"ROUNDCUBE"=>"roundcube3logo.png",
 	"GROUPOFFICE"=>"groupoffice-128.png",
 	"ZARAFA"=>"zarafa-logo-128.png",
-	"ZARAFA_MOBILE"=>"zarafa-logo-128.png"
+	"ZARAFA_MOBILE"=>"zarafa-logo-128.png",
+	"DRUPAL"=>"drupal-logo-128.png",
 	
 	);
-	var $noneeduser=array("JOOMLA"=>true,"ROUNDCUBE"=>true,"ARTICA_USR"=>true,"ZARAFA_MOBILE"=>true,"ZARAFA"=>true);
-	var $noneeduser_mysql=array("ARTICA_USR"=>true,"ZARAFA_MOBILE"=>true,"ZARAFA"=>true);
+	var $noneeduser=array("JOOMLA"=>true,"ROUNDCUBE"=>true,"ARTICA_USR"=>true,"ZARAFA_MOBILE"=>true,"ZARAFA"=>true,"DRUPAL"=>true);
+	var $noneeduser_mysql=array("ARTICA_USR"=>true,"ZARAFA_MOBILE"=>true,"ZARAFA"=>true,"DRUPAL"=>true);
 	
 	
 	
@@ -37,6 +38,7 @@ class vhosts{
 	"GROUPOFFICE"=>array("TITLE"=>"APP_GROUPOFFICE","TEXT"=>"APP_GROUPOFFICE_TEXT"),
 	"ZARAFA"=>array("TITLE"=>"APP_ZARAFA","TEXT"=>"APP_ZARAFA_TEXT"),
 	"ZARAFA_MOBILE"=>array("TITLE"=>"APP_ZARAFA_MOBILE_ACCESS","TEXT"=>"APP_ZARAFA_TEXT"),
+	"DRUPAL"=>array("TITLE"=>"APP_DRUPAL","TEXT"=>"APP_DRUPAL_TEXT"),
 	);
 	
 	function vhost($ou){

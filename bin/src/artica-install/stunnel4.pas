@@ -142,21 +142,24 @@ var
     RegExpr:TRegExpr;
     FileDatas:TStringList;
     i:integer;
+    tmpstr:string;
 begin
 
 
 
  if not FileExists(DAEMON_BIN_PATH()) then exit;
 
+ tmpstr:=logs.FILE_TEMP();
+
 result:=SYS.GET_CACHE_VERSION('APP_STUNNEL');
    if length(result)>0 then exit;
 
 
  FileDatas:=TstringList.Create;
- fpsystem(DAEMON_BIN_PATH() + ' -version >/opt/artica/tmp/stunnel.ver 2>&1');
- if not FileExists('/opt/artica/tmp/stunnel.ver') then exit;
- FileDatas.LoadFromFile('/opt/artica/tmp/stunnel.ver');
- logs.DeleteFile('/opt/artica/tmp/stunnel.ver');
+ fpsystem(DAEMON_BIN_PATH() + ' -version >'+tmpstr+' 2>&1');
+ if not FileExists(tmpstr) then exit;
+ try FileDatas.LoadFromFile(tmpstr) except exit; end;
+ logs.DeleteFile(tmpstr);
  RegExpr:=TRegExpr.Create;
  RegExpr.Expression:='stunnel\s+([0-9\.]+)\s+';
  for i:=0 to FileDatas.Count-1 do begin

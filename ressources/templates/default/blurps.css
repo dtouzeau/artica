@@ -95,5 +95,68 @@ letter-spacing: -1px;
 	min-height:79px;
 }
 
+#domains-checklist{
+	clear:both;
+	margin-top:24px;
+	}
+#domains-checklist label{font-size:1.4em;
+	}
+
+#domains-checklist li{
+	position:relative;
+	background-position:14px 50%;
+	-moz-box-shadow:2px 2px 2px #ccc;
+	box-shadow:2px 2px 2px #ccc;
+	-webkit-box-shadow:2px 2px 2px #ccc;
+	}
+
+#domains-checklist li .step{position:absolute;
+	top:16px;
+	right:10px;
+	width:100px;
+	padding:3px 3px;
+	text-align:center;
+	text-decoration:none;
+	-moz-border-radius:4px;
+	border-radius:4px;
+	-webkit-border-radius:4px;
+	-moz-box-shadow:0 0 5px #999;
+	box-shadow:0 0 5px #999;
+	-webkit-box-shadow:0 0 5px #999;
+	}
+
+#domains-checklist li .step:hover{
+	background-color:#eee !important;
+	}
+
+
+
+#domains-checklist li.domainsli .step{
+	background-color:#fff;
+	color:#529214;
+	-moz-box-shadow:0 0 5px #529214;
+	box-shadow:0 0 5px #529214;
+	-webkit-box-shadow:0 0 5px #529214;
+	}
+
+
+.domainsli{
+	overflow:hidden;
+	padding:7px;
+	margin-bottom:1em;
+	border:0;
+	-moz-border-radius:4px;
+	border-radius:4px;
+	-webkit-border-radius:4px;
+	-moz-box-shadow:2px 2px 2px #ddd;
+	box-shadow:2px 2px 2px #ddd;
+	-webkit-box-shadow:2px 2px 2px #ddd;
+	
+}
+
+.domainsli{
+	background:#E6EFC2 center;
+	color:#529214;
+	}
 
 

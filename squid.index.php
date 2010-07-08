@@ -136,47 +136,7 @@ echo $tpl->_ENGINE_parse_body($html."<br>");
 }
 
 function main_little_status(){
-	main_status();exit;
-	switch ($_GET["status"]) {
-		case "connections":main_graph();exit;break;
-		case "saveconf":main_status_saveconf();exit;break;
-		default:
-			break;
-	}
-	
-		$sock=new sockets();
-		$datas=base64_decode($sock->getFrameWork('cmd.php?squid-ini-status=yes'));
-		$ini=new Bs_IniHandler($datas);
-	
-	
-	$array[]="SQUID";
-	$array[]="KAV4PROXY";
-	$array[]="DANSGUARDIAN";
-	$array[]="C-ICAP";
-	$array[]="APP_PROXY_PAC";
-	
-	$squid=new squidbee();
-	print_r($squid->network_array);
-	if(!is_array($squid->network_array)){
-		$net=Paragraphe("warning64.png","{no_squid_network}","{no_squid_network_text}","javascript:Loadjs('squid.popups.php?script=network')");
-	}
-	
-	
-	
-	while (list ($num, $ligne) = each ($array) ){
-		$st=DAEMON_STATUS_LINE($ligne,$ini,null,1);
-		if($st==null){continue;}
-		$status=$status .$st."\n";
-	}
-	
-	
-	
-	
-	$tabs=main_status_tab();
-	echo  $tpl->_ENGINE_parse_body($net.$tabs.$status.$refresh);	
-
-	
-		
+	main_status();
 }
 
 function main_status_tab(){

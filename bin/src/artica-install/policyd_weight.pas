@@ -255,6 +255,7 @@ end;
 
 ForceDirectories('/var/run/policyd-weight');
 fpsystem('/bin/chown postfix:postfix /var/run/policyd-weight');
+if FileExists(configpath) then fpsystem('/bin/chown postfix:postfix '+ configpath);
 fpsystem('/bin/chmod 770 /var/run/policyd-weight');
 
 

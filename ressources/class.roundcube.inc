@@ -505,7 +505,7 @@ function Build_lighthttp(){
 				$conf=$conf."\$rcmail_config['product_name'] = '{$this->roundCubeArray["product_name"]}';\n";
 				$conf=$conf."\n";
 				$conf=$conf."// only list folders within this path\n";
-				$conf=$conf."\$rcmail_config['imap_root'] = '';\n";
+				$conf=$conf."\$rcmail_config['imap_root'] = null;\n";
 				$conf=$conf."\n";
 				$conf=$conf."// store draft message is this mailbox\n";
 				$conf=$conf."// leave blank if draft messages should not be stored\n";

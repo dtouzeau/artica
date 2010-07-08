@@ -255,14 +255,14 @@ function INDEX(){
 				<table style='width:100%'>
 					<tr>
 						<td><H5>{local_domain_map}</h5>
-							".RoundedLightWhite("<div id='LocalDomainsList'></div>"). "
+							<div id='LocalDomainsList'></div>
 							<p>&nbsp;</p>
-							".RoundedLightWhite("<div id='RelayDomainsList'></div>"). "
+							<div id='RelayDomainsList'></div>
 						</td>
 					</tr>
 				</table>
 		</td>
-		<td valign='top'>".RoundedLightWhite("$add_local_domain<br>$add_remote_domain")."</td>
+		<td valign='top'>$add_local_domain<br>$add_remote_domain</td>
 	</tr>
 </table>";
 	
@@ -285,6 +285,7 @@ function js_script(){
 	
 	if(isset($_GET["in-front-ajax"])){
 		$startup="LoadOuDOmainsIndexInFront();";
+		$jsadd=remote_domain_js();
 	}
 	
 	$html="
@@ -297,9 +298,9 @@ function js_script(){
 	}
 	
 	function LoadOuDOmainsIndexInFront(){
-		$('#BodyContent').load('$page?ajax=yes&ou=$ou_encrypted');
+		$('#BodyContent').load('$page?ajax=yes&ou=$ou_encrypted&in-front-ajax=yes');
 	}	
-	
+	$jsadd
 	$startup
 	";
 	
@@ -322,14 +323,14 @@ function js_popup(){
 	$add_remote_domain=Paragraphe("64-remotedomain-add.png",'{add_relay_domain}','{add_relay_domain_text}',"javascript:AddRemoteDomain_form(\"$ou\",\"new domain\")","add_relay_domain",210);
 	$local_js="LoadAjax('LocalDomainsList','$page?organization-local-domain-list=$ou');";
 	
-	$local_part="	<H3 style='font-size:18px;font-weight:bolder;color:#005447'>{local_domain_map}:</h3>
-	".RoundedLightWhite("<div id='LocalDomainsList' style='height:200px;width:100%;overflow:auto'></div>")."
+	$local_part="<div style='font-size:14px;font-weight:bolder;color:#005447;width:100%;border-bottom:1px solid #005447;margin-bottom:5px'>{local_domain_map}:</div>
+	<div id='LocalDomainsList' style='width:100%;overflow:auto'></div>
 	<br><br>";
 	
 	
 	$remote_part="
-	<H3 style='font-size:18px;font-weight:bolder;color:#005447'>{relay_domain_map}:</h3>
-	".RoundedLightWhite("<div id='RelayDomainsList' style='height:200px;width:100%;overflow:auto'></div>")."
+	<div style='font-size:14px;font-weight:bolder;color:#005447;width:100%;border-bottom:1px solid #005447;margin-bottom:5px'>{relay_domain_map}:</h3>
+	<div id='RelayDomainsList' style='width:100%;overflow:auto'></div>
 	<br>";
 	
 	$remote_js="LoadAjax('RelayDomainsList','$page?organization-relay-domain-list=$ou');";
@@ -352,7 +353,7 @@ function js_popup(){
 	$local_part
 	$remote_part
 	</td>
-	<td valign='top' width=1%><br>".RoundedLightWhite("$add_local_domain<br>$add_remote_domain")."</td>
+	<td valign='top' width=1%><br>$add_local_domain<br>$add_remote_domain</td>
 	</tr>
 	
 </table>
@@ -518,12 +519,13 @@ function remote_domain_js(){
 	$tpl=new templates();
 	$title=$tpl->_ENGINE_parse_body('{relay_domain_map}');
 	$ou=$_GET["ou"];
+	$start="remote_domain_popup()";
+	if(isset($_GET["in-front-ajax"])){$start=null;}
+	
 	$index=base64_encode($_GET["index"]);
 	$html="
 		function remote_domain_popup(){
-			
-			YahooWin(650,'$page?remote-domain-popup=yes&add=yes&ou=$ou&index=$index','$title :: {$_GET["index"]}',true);
-			
+			YahooWin(650,'$page?remote-domain-popup=yes&add=yes&ou=$ou&index=$index','$title :: {$_GET["index"]}',true);	
 		}
 		
 		
@@ -569,7 +571,7 @@ function EditRelayDomain(domain_name){
 	XHR.sendAndLoad(\"domains.edit.domains.php\", 'GET',x_AddRelayDomain);	
 	}	
 		
-     remote_domain_popup();
+   $start;
 	";
 		
 	echo $html;
@@ -722,61 +724,80 @@ if($users->AMAVIS_INSTALLED){if($users->EnableAmavisDaemon==1){$amavis_oui=true;
 $disclaimer=IS_DISCLAIMER();
 
 $tools=new DomainsTools();
+
 	if(is_array($HashDomains)){
-		$html=$html . "
-		<table style='width:99%'>
-					<tr style='background-color:#CCCCCC'>
-					<td width=1% class=bottom>&nbsp;</td>
-					<td class=bottom align='center'><strong>{domains}</strong></td>
-					<td width=50% class=bottom align='center'><strong>{target_computer_name}</td>
-					<td width=50% class=bottom align='center'><strong>{disclaimer_tiny}</td>
-					<td width=1% class=bottom align='center'><strong>{aliases}</td>
-					<td width=1% class=bottom align='center'><strong>{Anti-spam}</td>
-					<td width=1% class=bottom nowrap align='center'><strong>{mx_look_text}</strong></td>
-					<td width=1% class=bottom >&nbsp;</td>
-					</tr>";
-		
+		$ul[]="<ul id='domains-checklist'>";
 		
 		while (list ($num, $ligne) = each ($HashDomains) ){
 			writelogs("add in row $ligne ",__FUNCTION__,__FILE__);
 			$arr=$tools->transport_maps_explode($ligne);
 			$count=$count=1;
-			$edit="Onclick=\"javascript:AddRemoteDomain_form('$ou','$num');\"
-			onMouseOver=\"this.style.cursor='pointer'\" 
-			OnMouseOut=\"this.style.cursor='default'\"
+			$js="AddRemoteDomain_form('$ou','$num')";
+			$relay="{$arr[1]}:{$arr[2]}";
 			
-			";
-			
-			if(strlen($aliases->DomainsArray[$num])>0){$autoalias="<img src='img/status_ok.gif'>";}else{$autoalias="<img src='img/status_disabled.gif'>";}
-			if($arr[3]=="yes"){$mx="<img src='img/status_ok.gif'>";}else{$mx="<img src='img/status_disabled.gif'>";}
+			if(strlen($aliases->DomainsArray[$num])>0){$autoalias="{yes}";}else{$autoalias="{no}";}
+			if($arr[3]=="yes"){$mx="{yes}";}else{$mx="{no}";}
 			if($amavis_oui){
-				$amavis="<td class=bottom align='center'>" . imgtootltip("fw-20.gif","{Anti-spam}","Loadjs('domains.amavis.php?domain=$num')")."</td>";
-			}else{
-				$amavis="<td class=bottom align='center'>-</td>";
+				$amavis="
+				<tr>
+				<td class=legend width=1% nowrap>{Anti-spam}:</td>
+				<td>". texttooltip("[{settings}]","{Anti-spam}:$num","Loadjs('domains.amavis.php?domain=$num')",null,0,"font-weight:bold;font-size:12px")."</td>
+				</tr>";
 			}
 			
-			$disclamer_row=="<td class=bottom align='center'>-</td>";
-			if($disclaimer){$disclamer_row="<td class=bottom align='center'>". imgtootltip("page.gif","{disclaimer}","Loadjs('domains.disclaimer.php?domain=$num&ou=$ou')")."</td>";}else{$html=$html."<td class=bottom align='center'>-</td>";}
+					
+			if($disclaimer){
+				$disclaimer_domain="
+				<tr>
+				<td class=legend width=1% nowrap>{disclaimer}:</td>
+				<td>". texttooltip("[{settings}]","{disclaimer}:$num","Loadjs('domains.disclaimer.php?domain=$num&ou=$ou')",null,0,"font-weight:bold;font-size:12px")."</td>
+				</tr>";		
+			}
+	
+		
+		$ul[]="<li class='domainsli' style='width:350px'><table style='width:100%'>
+			<tr>
+				<td width=1% valign='top'>". imgtootltip("domain-relay-64.png","{edit}",$js)."</td>
+				<td valign='top'>";						
+		$ul[]="
+			<table style='width:90%'>
+			<tr>
+				<td colspan=2>
+					<table style='width:100%'>
+					<tr>
+						<td><strong style='font-size:16px'>". texttooltip($num,"{parameters}",$js,null,0,"font-size:16px;color:#005447")."</strong>
+						<div style='font-size:12px;text-align:right;border-top:1px solid #005447;padding:3px;font-weight:bolder'>$relay</div>
+						</td>
+						<td valign='top' width=1% align='right'>".imgtootltip("delete-24.png",'{label_delete_transport}',"DeleteRelayDomain('$num')")."</td>
+					</tr>
+					</table>
+				</td>
+			<tr>
+				<td class=legend width=1% nowrap>{mx_look_text}:</td>
+				<td><strong>$autoalias</strong></td>
+			</tr>			
+		
+			<tr>
+				<td class=legend width=1% nowrap>{aliases}:</td>
+				<td><strong>$autoalias</strong></td>
+			</tr>
 			
-			$html=$html . "
-			
-			<tr " . CellRollOver().">
-				<td width=1% class=bottom><img src='img/globe2.gif'></td>
-				<td style='font-size:12px' class=bottom $edit><code>$num</code></td>
-				<td style='font-size:12px' class=bottom $edit>{$arr[1]}:{$arr[2]}</td>
-				$disclamer_row
-				<td style='font-size:12px' class=bottom $edit align='center'>$autoalias</td>
-				$amavis
-				<td style='font-size:12px' class=bottom align='center' $edit>$mx</td>
-				<td width=1% class=bottom>". imgtootltip('x.gif','{label_delete_transport}',"DeleteRelayDomain('$num')")."				
-			</tr>";
+			$amavis
+			$amavis_duplicate
+			$disclaimer_domain
+			</tr>
+			</table>
+			</td>
+			</tr>
+			</table>
+			";
+			$ul[]="</li>";				
 			
 		}
+	$ul[]="</ul>";}
 	
-	$html=$html . "</table>";
-	}
 	
-return $tpl->_ENGINE_parse_body($html);
+return $tpl->_ENGINE_parse_body(@implode("\n",$ul));
 }
 
 function IS_DISCLAIMER(){
@@ -816,66 +837,88 @@ if($users->AMAVIS_INSTALLED){if($users->EnableAmavisDaemon==1){$amavis_oui=true;
 
 
 $HashDomains=$ldap->Hash_associated_domains($ou);
-$aliases=new AutoAliases($ou);
+	$aliases=new AutoAliases($ou);
 	if(is_array($HashDomains)){
-		$html=$html . "
-		<center>
-		<table style='width:99%'>
-					<tr style='background-color:#CCCCCC'>
-					<td width=1% class=bottom>&nbsp;</td>
-					<td class=bottom><strong>{domains}</strong></td>
-					<td class=bottom nowrap><strong>{disclaimer_tiny}</strong></td>
-					<td class=bottom nowrap><strong>{duplicate_domain}</strong></td>
-					<td class=bottom nowrap><strong>{Anti-spam}</strong></td>
-					<td class=bottom><strong>{aliases}</strong></td>
-					<td width=1% class=bottom>&nbsp;</td>
-					</tr>";
+		
+		$ul[]="<ul id='domains-checklist'>";
+		
 		while (list ($num, $ligne) = each ($HashDomains) ){
+			$ul[]="<li class='domainsli' style='width:350px'>
+			<table style='width:100%'>
+			<tr>
+				<td width=1% valign='top'>". imgtootltip("domain-64.png","{edit}",$js)."</td>
+				<td valign='top'>";		
 			$js="EditInfosLocalDomain('$num','$ou');";
 			$jstr=CellRollOver();
-			if(strlen($aliases->DomainsArray[$num])>0){$autoalias="<img src='img/status_ok.gif'>";}else{$autoalias="<img src='img/status_disabled.gif'>";}
+			if(strlen($aliases->DomainsArray[$num])>0){$autoalias="{yes}";}else{$autoalias="{no}";}
+			
+			if($amavis_oui){
+				$amavis="
+				<tr>
+				<td class=legend width=1% nowrap>{Anti-spam}:</td>
+				<td>". texttooltip("[{settings}]","{Anti-spam}:$num","Loadjs('domains.amavis.php?domain=$num')",null,0,"font-weight:bold;font-size:12px")."</td>
+				</tr>";
+				
+			if($amavis->copy_to_domain_array[strtolower($num)]["enable"]==1){
+				$amavis_duplicate=
+				"
+				<tr>
+				<td class=legend width=1% nowrap>{duplicate_domain}:</td>
+				<td><strong style='font-size:12px'>{$amavis->copy_to_domain_array[strtolower($num)]["duplicate_host"]}:{$amavis->copy_to_domain_array[strtolower($num)]["duplicate_port"]}</td>
+				</tr>";				
+				}
+				
+			}
+			
+			if($disclaimer){
+				$disclaimer_domain="
+				<tr>
+				<td class=legend width=1% nowrap>{disclaimer}:</td>
+				<td>". texttooltip("[{settings}]","{disclaimer}:$num","Loadjs('domains.disclaimer.php?domain=$num&ou=$ou')",null,0,"font-weight:bold;font-size:12px")."</td>
+				</tr>";		
+			}
+			
+			$delete="<tr>
+				<td colspan=2 align='right'>". imgtootltip("delete-24.png",'{label_delete_transport}',"DeleteInternetDomain('$num')")."</td>
+			</tr>";
+			
+			
+			
 			
 			if(!$POSTFIX_INSTALLED){$js=null;}
 			
-			$html=$html . "
-			<tr $jstr>
-				<td width=1% class=bottom><img src='img/globe2.gif'></td>
-				<td style='font-size:12px' class=bottom width=69%><code>" .texttooltip(strtolower($num),strtolower($num),$js,null,0,'font-size:12px')."</code></td>
-				";
-				if($disclaimer){$html=$html."<td class=bottom align='center'>". imgtootltip("page.gif","{disclaimer}","Loadjs('domains.disclaimer.php?domain=$num&ou=$ou')")."</td>";}else{$html=$html."<td class=bottom align='center'>-</td>";}
-		
-			if($POSTFIX_INSTALLED){
-				if($amavis_oui){
-					
-					if($amavis->copy_to_domain_array[strtolower($num)]["enable"]==1){
-						$html=$html . "<td class=bottom>{$amavis->copy_to_domain_array[strtolower($num)]["duplicate_host"]}:{$amavis->copy_to_domain_array[strtolower($num)]["duplicate_port"]}</td>";
-						}else{
-						$html=$html."<td class=bottom align='center'>-</td>";
-						}
-				$html=$html . "<td class=bottom align='center'>" . imgtootltip("fw-20.gif","{Anti-spam}","Loadjs('domains.amavis.php?domain=$num')")."</td>";
-				}else{
-					$html=$html."<td class=bottom align='center'>-</td>";
-					$html=$html."<td class=bottom align='center'>-</td>";
-				}
-			}else{
-				$html=$html."<td class=bottom align='center'>-</td>";
-				$html=$html."<td class=bottom align='center'>-</td>";
-			}
-			
-			
-			
-			if(!$POSTFIX_INSTALLED){$autoalias="&nbsp;";}
 			
 				
-				$html=$html . "
-				<td witdh=1% class=bottom align='center'>$autoalias</td>
-				<td width=1% class=bottom>". imgtootltip('x.gif','{label_delete_transport}',"DeleteInternetDomain('$num')")."				
-			</tr>";
 			
+			$ul[]="
+			<table style='width:90%'>
+			<tr>
+				<td colspan=2>
+					<table style='width:100%'>
+					<tr>
+						<td><strong style='font-size:16px'>". texttooltip($num,"{parameters}",$js,null,0,"font-size:16px;color:#005447")."</strong></td>
+						<td>".imgtootltip("delete-24.png",'{label_delete_transport}',"DeleteInternetDomain('$num')")."</td>
+					</tr>
+					</table>
+				</td>
+			<tr>
+				<td class=legend width=1% nowrap>{aliases}:</td>
+				<td><strong>$autoalias</strong></td>
+			</tr>
+			$amavis
+			$amavis_duplicate
+			$disclaimer_domain
+			</tr>
+			</table>
+			</td>
+			</tr>
+			</table>
+			";
+			$ul[]="</li>";
 		}
-	
-	$html=$html . "</table></center>";
 	}
+	$ul[]="</ul>";
+	$html=@implode("\n",$ul);
 	
 return $tpl->_ENGINE_parse_body($html);
 }	
@@ -912,9 +955,10 @@ function AddNewInternetDomain(){
 			$sock=new sockets();
 			if($usr->cyrus_imapd_installed){
 				$sock->getFrameWork("cmd.php?cyrus-check-cyr-accounts=yes");
+				
 			}
 			
-			
+			$sock->getFrameWork("cmd.php?postfix-transport-maps=yes");
 			
 		}
 	}
@@ -1032,6 +1076,9 @@ if($relayIP<>null){
 	$ldap->ldap_add($dn,$upd);			
 	}
 	
+	
+	$sock=new sockets();
+	$sock->getFrameWork("cmd.php?postfix-transport-maps=yes");
 
 			
 }

@@ -1,6 +1,7 @@
 <?php
 include_once(dirname(__FILE__).'/class.ssl.certificate.inc');
 include_once(dirname(__FILE__) . '/class.system.network.inc');
+include_once(dirname(__FILE__) . '/class.mysql.inc');
 
 class openvpn{
 	
@@ -18,6 +19,35 @@ class openvpn{
 		$this->BuildDefault();
 		$this->LoadRoutes();
 		}
+		
+		
+	function virtual_ip_lists(){
+			$sql="SELECT * FROM nics_virtuals ORDER BY ID DESC";
+			$q=new mysql();
+			$results=$q->QUERY_SQL($sql,"artica_backup");
+			while($ligne=@mysql_fetch_array($results,MYSQL_ASSOC)){	
+				if($ligne["org"]=="openvpn_service"){
+					$eth="{$ligne["nic"]}:{$ligne["ID"]}";
+					$array[$eth]=$eth;
+				}
+			}
+			$array[null]="{select}";
+			return  $array;
+	}
+	
+	function virtual_ip_information(){
+		$eth=$this->main_array["GLOBAL"]["BRIDGE_ETH"];
+		if(!preg_match("#(.+?):([0-9]+)#",$eth,$re)){return array();}
+		$sql="SELECT * FROM nics_virtuals WHERE ID={$re[2]}";
+		$q=new mysql();
+		$ligne=mysql_fetch_array($q->QUERY_SQL($sql,"artica_backup"));	
+		$array_ip["IPADDR"]=$ligne["ipaddr"];
+		$array_ip["NETMASK"]=$ligne["netmask"];
+		$array_ip["GATEWAY"]=$ligne["gateway"];
+		
+		return $array_ip;
+		
+	}
 	
 	
 	function BuildDefault(){
@@ -33,9 +63,10 @@ class openvpn{
 		if($this->main_array["GLOBAL"]["KEY_EMAIL"]==null){$this->main_array["GLOBAL"]["KEY_EMAIL"]="yourmail@localhost.localdomain";}
 		if($this->main_array["GLOBAL"]["LISTEN_PORT"]==null){$this->main_array["GLOBAL"]["LISTEN_PORT"]="1194";}
 		if($this->main_array["GLOBAL"]["ENABLE_SERVER"]==null){$this->main_array["GLOBAL"]["ENABLE_SERVER"]="0";}
-		if($this->main_array["GLOBAL"]["BRIDGE_ETH"]==null){$this->main_array["GLOBAL"]["BRIDGE_ETH"]="eth0";}
+		if($this->main_array["GLOBAL"]["BRIDGE_ETH"]==null){$this->main_array["GLOBAL"]["BRIDGE_ETH"]="eth0:1";}
 		if($this->main_array["GLOBAL"]["LISTEN_PROTO"]==null){$this->main_array["GLOBAL"]["LISTEN_PROTO"]="udp";}
 		if($this->main_array["GLOBAL"]["DEV_TYPE"]==null){$this->main_array["GLOBAL"]["DEV_TYPE"]="tun";} //or tap0
+		if($this->main_array["GLOBAL"]["ENABLE_BRIDGE"]==null){$this->main_array["GLOBAL"]["ENABLE_BRIDGE"]="0";}
 		
 		
 		
@@ -173,7 +204,8 @@ class openvpn{
 				$conf=$conf ."# file so it has a .ovpn extension           #\r\n";
 				$conf=$conf ."##############################################\r\n";
 				$conf=$conf ."client\r\n";
-				if($ini->_params["GLOBAL"]["DEV_TYPE"]=="tap0"){
+				
+				if($this->main_array["GLOBAL"]["ENABLE_BRIDGE_MODE"]==1){
 				$conf=$conf ."dev tap\r\n";
 				}else{
 					$conf=$conf ."dev tun\r\n";	
@@ -212,10 +244,31 @@ class openvpn{
 					$conf=$conf. "#ROUTE\t". $this->DefaultRoute()."\r\n";				
 				}
 				$conf=$conf .";mute 20";
+				$conf=$conf. $this->GetRemotesSitesRoutes();
 				return $conf;
 		
 		
 	}
+	
+	private function GetRemotesSitesRoutes(){
+		
+	$sql="SELECT * FROM vpnclient WHERE connexion_type=1 ORDER BY sitename DESC";
+	$q=new mysql();
+	$results=$q->QUERY_SQL($sql,"artica_backup");
+	$routess[]="";
+	while($ligne=mysql_fetch_array($results,MYSQL_ASSOC)){
+		if($ligne["IP_START"]==null){continue;}
+		$ligne["IP_START"]=trim($ligne["IP_START"]);
+		$ligne["netmask"]=trim($ligne["netmask"]);
+		$routess[]="# REMOTE-SITE: {$ligne["IP_START"]};{$ligne["netmask"]}";   
+	}
+	if(is_array($routess)){
+		return implode("\n",$routess);
+	}
+		
+	}
+	
+	
 	
 	private function IpCalcRoute($ipsingle){
 		 if(!preg_match("#(.+?)\.([0-9]+)$#",$ipsingle,$re)){

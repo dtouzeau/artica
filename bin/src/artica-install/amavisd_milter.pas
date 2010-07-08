@@ -102,6 +102,8 @@ begin
        if not TryStrToInt(SYS.GET_INFO('EnablePostfixMultiInstance'),EnablePostfixMultiInstance) then EnablePostfixMultiInstance:=0;
 
 
+       if(EnablePostfixMultiInstance=1) then EnableAmavisDaemon:=1;
+
        if EnableAmavisDaemon=1 then begin
           if not SYS.ISMemoryHiger1G() then begin
              logs.NOTIFICATION('[ARTICA]: ('+SYS.HOSTNAME_g()+') Warning: your memory is under 1GB ['+IntToStr(mem_installee)+'], amavis is now disabled','Amavis is disabled because your computer is not "memory compliance"','system');
@@ -243,7 +245,8 @@ end;
 
 SaveConfig();
 START_MILTER();
-cmd:=AMAVISD_BIN_PATH() + ' -c /usr/local/etc/amavisd.conf -P /var/spool/postfix/var/run/amavisd-new/amavisd-new.pid reload &';
+fpsystem(SYS.LOCATE_PHP5_BIN()+' /usr/share/artica-postfix/exec.amavis.php');
+cmd:=AMAVISD_BIN_PATH() + ' -c /usr/local/etc/amavisd.conf reload &';
 logs.Syslogs('Reloading amavisd daemon');
 logs.Debuglogs(cmd);
 fpsystem(cmd);
@@ -287,7 +290,6 @@ end;
 //##############################################################################
 procedure tamavis.include_config_files();
 var
-tmpstr:string;
 FileDatas:TstringList;
 i:integer;
 RegExpr:tRegExpr;
@@ -563,6 +565,11 @@ if not FileExists(MILTER_BIN_PATH()) then begin
    exit;
 end;
 
+if EnablePostfixMultiInstance=1 then begin
+   logs.Debuglogs('Starting......: multiples postfix instances enabled, method is set in post-queue mode');
+   exit;
+end;
+
 if not fileExists(SYS.LOCATE_SU()) then begin
    logs.Syslogs('Starting......: amavisd-milter to locate su tool !!');
    exit;
@@ -595,7 +602,7 @@ fpsystem('/bin/chmod 770 /var/amavis');
 fpsystem('/bin/chmod 770 /tmp/savemail');
 
 
-fpsystem(SYS.LOCATE_PHP5_BIN()+' /usr/share/artica-postfix/exec.amavis.php');
+
 
 if FileExists('/etc/artica-postfix/settings/Daemons/AmavisGlobalConfiguration') then begin
      AmavisGlobalConfiguration:=TiniFile.Create('/etc/artica-postfix/settings/Daemons/AmavisGlobalConfiguration');
@@ -702,9 +709,6 @@ procedure tamavis.START_AMAVIS_STAT();
 var
    pid,cmd:string;
    count:integer;
-   myhostname:string;
-   EnableMysql:integer;
-   CopyToDomainSpool:string;
 begin
 
  if FileExists('/etc/cron.d/amavis-stats') then logs.DeleteFile('/etc/cron.d/amavis-stats');
@@ -792,7 +796,6 @@ procedure tamavis.START_AMAVISD();
 var
    pid,cmd:string;
    count:integer;
-   myhostname:string;
    EnableMysql:integer;
    CopyToDomainSpool:string;
    EnableAmavisInMasterCF:Integer;
@@ -872,7 +875,7 @@ forceDirectories('/var/amavis/dspam');
 forceDirectories('/var/virusmails');
 forceDirectories('/var/log/amavis');
 forceDirectories('/var/log/artica-postfix/RTM');
-
+forceDirectories('/etc/amavis/dkim');
 
 
 
@@ -893,6 +896,15 @@ end;
 
  
  
+if not FileExists('/usr/local/etc/sender_scores_sitewide') then fpsystem('/bin/touch /usr/local/etc/sender_scores_sitewide');
+fpsystem('/bin/chmod 755 /usr/local/etc/sender_scores_sitewide');
+
+include_config_files();
+
+if FileExists('/var/spool/postfix/var/run/amavisd-new/amavisd-new.pid') then logs.DeleteFile('/var/spool/postfix/var/run/amavisd-new/amavisd-new.pid');
+if fileExists('/var/spool/postfix/var/run/amavisd-new/amavisd-new.sock') then logs.DeleteFile('/var/spool/postfix/var/run/amavisd-new/amavisd-new.sock');
+fpsystem(SYS.LOCATE_PHP5_BIN()+' /usr/share/artica-postfix/exec.amavis.php');
+
 forceDirectories('/var/amavis/.spamassassin');
 fpsystem('/bin/chown -R postfix:postfix /var/amavis/.spamassassin');
 fpsystem('/bin/chmod 755 /var/amavis/.spamassassin');
@@ -901,16 +913,10 @@ fpsystem('/bin/chown -R postfix:postfix /var/amavis');
 fpsystem('/bin/chown -R postfix:postfix /var/virusmails');
 fpsystem('/bin/chown -R postfix:postfix /var/spool/postfix/var/run/amavisd-new');
 fpsystem('/bin/chown -R postfix:postfix /var/log/amavis');
+fpsystem('/bin/chown -R postfix:postfix /etc/amavis/dkim');
 fpsystem('/bin/chmod 777 /var/log/artica-postfix/RTM');
+fpsystem('/bin/chmod -R 755 /etc/amavis/dkim');
 fpsystem('/bin/chown postfix:root /var/log/artica-postfix/RTM');
-
-if not FileExists('/usr/local/etc/sender_scores_sitewide') then fpsystem('/bin/touch /usr/local/etc/sender_scores_sitewide');
-fpsystem('/bin/chmod 755 /usr/local/etc/sender_scores_sitewide');
-
-include_config_files();
-
-if FileExists('/var/spool/postfix/var/run/amavisd-new/amavisd-new.pid') then logs.DeleteFile('/var/spool/postfix/var/run/amavisd-new/amavisd-new.pid');
-if fileExists('/var/spool/postfix/var/run/amavisd-new/amavisd-new.sock') then logs.DeleteFile('/var/spool/postfix/var/run/amavisd-new/amavisd-new.sock');
 
 
     if not FileExists('/etc/artica-postfix/amavis.modules.checked') then begin
@@ -934,7 +940,7 @@ if fileExists(dspam.BIN_PATH()) then begin
          AMAVISD_SETCONFIG('dspam',SYS.LOCATE_DSPAM());
          spamassassin.DSPAM_PATCH();
          spamassassin.RAZOR_INIT();
-         spamassassin.DEFAULT_SETTINGS();
+
          dspam.SET_CONFIG();
          fpsystem('chmod u-s,a+rx ' + SYS.LOCATE_DSPAM());
       end;
@@ -946,6 +952,11 @@ if fileExists(dspam.BIN_PATH()) then begin
 end else begin
    logs.Debuglogs('Starting......: Dspam is not detected');
 
+end;
+
+spamassassin.DEFAULT_SETTINGS();
+if not FileExists( spamassassin.SPAMASSASSIN_BIN_PATH()) then begin
+   fpsystem('/usr/share/artica-postfix/bin/artica-make APP_SPAMASSASSIN');
 end;
 
 logs.OutputCmd('/bin/chmod 755 /usr/local/etc/amavisd.conf');
@@ -996,6 +1007,7 @@ count:=0;
     if not SYS.PROCESS_EXIST(AMAVISD_PID()) then begin
          writeln('');
          logs.DebugLogs('Starting......: amavisd-new (failed!!!)');
+         logs.DebugLogs(cmd);
     end else begin
          writeln('');
          logs.NOTIFICATION('[ARTICA]: ('+SYS.HOSTNAME_g()+') Amavis has been successfully started PID '+AMAVISD_PID(),'this is an information...','system');
@@ -1055,10 +1067,6 @@ l.free;
 
 end;
 //##############################################################################
-
-
-
-
 procedure tamavis.SaveConfig();
 begin
 
@@ -1072,10 +1080,11 @@ end;
      CheckMyHostname();
      CheckUnixSocketName();
      CheckLogfile();
+     spamassassin.DEFAULT_SETTINGS();
      AMAVISD_SETCONFIG('daemon_user','postfix');
      AMAVISD_SETCONFIG('daemon_group','postfix');
 end;
-
+//##############################################################################
 
 procedure tamavis.CheckUnixSocketName();
 var
@@ -1173,7 +1182,6 @@ var
 l:TstringList;
 RegExpr:tRegExpr;
 i:Integer;
-myhostname:string;
 patternfound:string;
 begin
 
@@ -1430,7 +1438,6 @@ end;
 
 
 procedure tamavis.STOP();
-var pid:string;
 begin
     STOP_MILTER();
     STOP_AMAVISD();
@@ -1446,11 +1453,7 @@ function tamavis.AMAVISD_STATUS():string;
 var
    ini:TstringList;
    pid:string;
-   milter_enabled:integer;
 begin
-
-
-milter_enabled:=0;
 if not FileExists(AMAVISD_BIN_PATH()) then exit;
    ini:=TstringList.Create;
    ini.Add('');
@@ -1567,7 +1570,6 @@ end;
 procedure tamavis.WRITE_INITD();
 var
    l:TstringList;
-   initPath:string;
 begin
 
 l:=TstringList.Create;
@@ -1633,7 +1635,6 @@ end;
 //#############################################################################
 procedure tamavis.MASTER_CF_DELETE_AMAVIS();
 var
-   d:boolean;
    l:TstringList;
    RegExpr:tRegExpr;
    t,i:integer;
@@ -1712,11 +1713,9 @@ end;
 //#############################################################################
 function tamavis.CHECK_IF_IN_MASTER():boolean;
 var
-   d:boolean;
    l:TstringList;
    RegExpr:tRegExpr;
-   t,i:integer;
-   f:boolean;
+   i:integer;
 begin
 
 if not FileExists('/etc/postfix/master.cf') then exit;

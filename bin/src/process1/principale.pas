@@ -729,6 +729,10 @@ begin
    //rsync
    if FileExists(SYS.LOCATE_GENERIC_BIN('rsync')) then list.Add('$_GLOBAL["RSYNC_INSTALLED"]=True;') else list.Add('$_GLOBAL["RSYNC_INSTALLED"]=False;');
 
+   //DRUPAL
+   if FileExists('/usr/share/drupal/install.php') then list.Add('$_GLOBAL["DRUPAL_INSTALLED"]=True;') else list.Add('$_GLOBAL["DRUPAL_INSTALLED"]=False;');
+
+
    //cpu,mem...
    list.Add('$_GLOBAL["CPU_NUMBER"]="'+ IntToStr(sys.CPU_NUMBER())+'";');
    list.Add('$_GLOBAL["LOAD_AVERAGE"]="'+ sys.LOAD_AVERAGE()+'";');
@@ -888,6 +892,8 @@ begin
 
     mysqld:=tmysql_daemon.CReate(SYS);
     list.Add('$_GLOBAL["mysqld_version"]="' +  mysqld.VERSION() + '";');
+    list.Add('$_GLOBAL["mysqld_datadir"]="' +  mysqld.SERVER_PARAMETERS('datadir') + '";');
+
      
     if EnableMysqlFeatures=1 then  list.Add('$_GLOBAL["mysql_enabled"]=True;') else list.Add('$_GLOBAL["mysql_enabled"]=false;');
 
@@ -1119,6 +1125,7 @@ if FileExists('/usr/sbin/postconf') then begin
         if FileExists(amavis.MILTER_BIN_PATH()) then begin
            if FileExists(amavis.AMAVISD_BIN_PATH()) then list.Add('$_GLOBAL["AMAVIS_INSTALLED"]=True;') else list.Add('$_GLOBAL["AMAVIS_INSTALLED"]=False;');
            if FileExists(amavis.altermime_bin_path()) then list.Add('$_GLOBAL["ALTERMIME_INSTALLED"]=True;') else list.Add('$_GLOBAL["ALTERMIME_INSTALLED"]=False;');
+           list.Add('$_GLOBAL["MAIL_DKIM_VERSION"]="'+SYS.CHECK_PERL_MODULES_VER('Mail::DKIM')+'";');
            list.Add('$_GLOBAL["AMAVISD_VERSION"]="'+amavis.AMAVISD_VERSION()+'";');
         end else begin
            list.Add('$_GLOBAL["AMAVIS_INSTALLED"]=False;');
@@ -1494,6 +1501,8 @@ logs.Debuglogs('web_settings() -> 75%');
     fpchmod(php_path + '/ressources/settings.inc',&755);
     logs.Debuglogs('thProcThread.web_settings('+ php_path + ') -> TERM');
     fpsystem(SYS.EXEC_NICE()+SYS.LOCATE_PHP5_BIN()+' /usr/share/artica-postfix/exec.admin.status.postfix.flow.php &');
+
+    if not FileExists('/etc/artica-postfix/settings/Daemons/HdparmInfos') then fpsystem(SYS.LOCATE_PHP5_BIN()+' /usr/share/artica-postfix/exec.hdparm.php &');
     list.Free;;
     CheckMaxLogs();
 
@@ -1729,8 +1738,9 @@ begin
     end;
 
 
-   pid:=SYS.PIDOF('bin/artica-update');
+   pid:=SYS.PIDOF('/usr/share/artica-postfix/bin/artica-update');
    logs.Debuglogs('CleanBadProcesses():: artica-update ('+pid+')');
+   if length(pid)>0 then begin
    if SYS.PROCESS_EXIST(pid) then begin
       min:=SYS.PROCCESS_TIME_MIN(pid);
       logs.Debuglogs('CleanBadProcesses():: artica-update ('+pid+') process time :'+ IntTOStr(min)+' minutes live');
@@ -1740,7 +1750,7 @@ begin
          logs.NOTIFICATION('[ARTICA]: ('+SYS.HOSTNAME_g()+') artica-update was killed','The proccess running since '+IntTOStr(min)+' minutes and reach 60 minutes to live','system');
       end;
    end;
-
+  end;
 
 
 

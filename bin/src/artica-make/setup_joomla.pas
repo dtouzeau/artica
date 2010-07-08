@@ -381,7 +381,7 @@ var
    i:Integer;
    files:string;
 begin
-    result:=false;
+    result:=true;
     files:='/usr/share/artica-postfix/bin/install/SugarCRM/files.txt';
      if not FileExists(files) then begin
         writeln('Unable to stat '+files);
@@ -393,15 +393,10 @@ begin
 
          if not FileExists('/usr/local/share/artica/sugarcrm_src/'+l.Strings[i]) then begin
             writeln('Unable to stat /usr/local/share/artica/sugarcrm_src/'+l.Strings[i]+' installation corrupted');
-            L.free;
             result:=false;
-            exit;
          end;
 
      end;
-
-
-    result:=true;
 end;
 //#########################################################################################
 
@@ -587,11 +582,14 @@ RegExpr:=TRegExpr.Create;
 
 
 
-  if not directoryExists('/usr/local/share/artica/sugarcrm_src') then begin
+
      install.INSTALL_PROGRESS(CODE_NAME,'{downloading}');
      if length(source_folder)=0 then source_folder:=libs.COMPILE_GENERIC_APPS('SugarCE');
+
+
      if not DirectoryExists(source_folder) then begin
         writeln('Install '+CODE_NAME+' failed...');
+        writeln('Install '+CODE_NAME+' unable to stat source_folder: '+source_folder);
         install.INSTALL_STATUS(CODE_NAME,110);
         exit;
      end;
@@ -606,17 +604,15 @@ RegExpr:=TRegExpr.Create;
      fpsystem(cmd);
      install.INSTALL_PROGRESS(CODE_NAME,'{checking}');
      if not SugarCheckCorrupt() then begin
-         writeln('Install '+CODE_NAME+' failed...');
+         writeln('Install '+CODE_NAME+' failed... SugarCheckCorrupt report corrupted installation');
         install.INSTALL_STATUS(CODE_NAME,110);
-        exit;
      end else begin
         writeln('Install '+CODE_NAME+' success...');
         install.INSTALL_STATUS(CODE_NAME,100);
         install.INSTALL_PROGRESS(CODE_NAME,'{installed}');
-        exit;
      end;
 
- end;
+
 
 end;
 //#########################################################################################

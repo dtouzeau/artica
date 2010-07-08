@@ -142,9 +142,9 @@ function downloadFile($url,$hostname)  {
    	}
    	
    	chmod($myFile,0755);
-	if(function_exists("writelogs")){
-		writelogs("Writing $myFile ". strlen($stringData)." bytes ok",__CLASS__.'/'.__FUNCTION__,__FILE__,__LINE__);
-	}
+	//if(function_exists("writelogs")){
+	//	writelogs("Writing $myFile ". strlen($stringData)." bytes ok",__CLASS__.'/'.__FUNCTION__,__FILE__,__LINE__);
+	//}
 	return true;
    	
    }
@@ -531,7 +531,7 @@ function GET_MYSQL_ROOT($key){
 			if($this->SYSTEMV5_ENABLED()){
 				if(trim($value)==null){
 	   				$shm=new semaphores($this->semaphore_key,$this->semaphore_memory,3);   				
-					if($GLOBALS["DEBUG"]){echo "APC_GET($key,$maxtime) -> semaphores($sock->semaphore_key,$sock->semaphore_memory,3) \n";}
+					if($GLOBALS["posix_getuid"]){if($GLOBALS["DEBUG"]){echo "APC_GET($key,$maxtime) -> semaphores($sock->semaphore_key,$sock->semaphore_memory,3) \n";}}
 					$value=$shm->GET($key);
 	   				$time=$shm->GET("{$key}-time");
 	   				$_SESSION["APC"][$key]=$value;

@@ -37,7 +37,7 @@ private
        function   MYSQL_EXEC_BIN_PATH():string;
        procedure  ZARAFA_INSTALL_MENU();
        procedure  ZARAFA_INSTALL_PERFORM();
-
+       function   GET_INFO(key:string):string;
 public
       constructor Create();
       procedure Free;
@@ -49,7 +49,7 @@ public
       function PERL_INCFolders():TstringList;
       procedure InstallArtica();
       function RPM_is_application_installed(appname:string):boolean;
-      function INTRODUCTION(base:string;postfix:string;cyrus:string;samba:string;squid:string;nfs:string='';pdns:string=''):string;
+      function INTRODUCTION(base:string;postfix:string;cyrus:string;samba:string;squid:string;nfs:string='';pdns:string='';openvpn:string=''):string;
       function get_LDAP(key:string):string;
       procedure set_LDAP(key:string;val:string);
       function get_LDAP_ADMIN():string;
@@ -76,12 +76,14 @@ public
       function  GET_FIRMWARE_PATH():string;
       function  ExtractLocalPackage(filepath:string):string;
       function  VersionToInteger(version:string):integer;
+      function  ArchStruct():integer;
 END;
 
 implementation
 
 constructor tlibs.Create();
 begin
+if not DirectoryExists('/opt/artica/tmp') then forceDirectories('/opt/artica/tmp');
 index_file:='http://www.artica.fr/auto.update.php';
 local_folder:='';
 end;
@@ -166,6 +168,34 @@ CACHE_KERNEL_VERSION:=kernelversion;
 
 end;
 //##############################################################################
+function tlibs.ArchStruct():integer;
+var
+   tmpstr,data:string;
+   RegExpr:TRegExpr;
+begin
+tmpstr:=FILE_TEMP();
+fpsystem('uname -m >'+tmpstr +' 2>&1');
+data:=trim(ReadFromFile(tmpstr));
+fpsystem('/bin/rm '+tmpstr+' >/dev/null 2>&1');
+RegExpr:=TRegExpr.Create;
+RegExpr.Expression:='i[0-9]86';
+if RegExpr.Exec(data) then begin
+   RegExpr.free;
+   result:=32;
+   exit;
+end;
+
+RegExpr.Expression:='x86_64';
+if RegExpr.Exec(data) then begin
+   RegExpr.free;
+   result:=64;
+   exit;
+end;
+end;
+//##############################################################################
+
+
+
 function tlibs.CheckReposKernel():string;
 var
    tmpstr:string;
@@ -272,11 +302,15 @@ var
    commandline_artica:string;
    command_line_curl:string;
    command_line_wget:string;
+   WgetBindIpAddress_cmd_line_wget:string;
+   WgetBindIpAddress_cmd_line_curl:string;
    localhost:boolean;
+   WgetBindIpAddress:string;
    ssl:boolean;
  begin
    localhost:=false;
    command_line_curl:='';
+   WgetBindIpAddress:=GET_INFO('WgetBindIpAddress');
    RegExpr:=TRegExpr.Create;
    ProxyString:=GET_HTTP_PROXY();
    ProxyString:=AnsiReplaceStr(ProxyString,'"','');
@@ -327,12 +361,17 @@ var
 
    end;
 
+   if length(WgetBindIpAddress)>0 then begin
+      WgetBindIpAddress_cmd_line_wget:=' --bind-address='+WgetBindIpAddress;
+      WgetBindIpAddress_cmd_line_curl:=' --interface '+WgetBindIpAddress;
 
-   command_line_wget:=uri + '  -q --output-document=' + file_path;
+
+   end;
+   command_line_wget:=uri +WgetBindIpAddress_cmd_line_wget+'  -q --output-document=' + file_path;
 
 
    if FileExists(LOCATE_CURL()) then begin
-         if ssl then command_line_curl:=command_line_curl+ ' --insecure';
+         if ssl then command_line_curl:=command_line_curl+WgetBindIpAddress_cmd_line_curl+' --insecure';
          command_line_curl:=LOCATE_CURL() + command_line_curl;
          fpsystem(command_line_curl);
          result:=true;
@@ -1356,10 +1395,15 @@ fpsystem('/usr/share/artica-postfix/bin/artica-install --init-from-repos');
 fpsystem('/usr/share/artica-postfix/bin/artica-install --perl-addons-repos');
 fpsystem('/usr/share/artica-postfix/bin/artica-install -awstats-reconfigure');
 fpsystem('/usr/share/artica-postfix/bin/artica-install -awstats generate');
+fpsystem('/etc/init.d/artica-postfix stop daemon');
+fpsystem('/etc/init.d/artica-postfix start daemon');
 fpsystem('/etc/init.d/artica-postfix stop');
 fpsystem('/etc/init.d/artica-postfix start');
-fpsystem('/etc/init.d/artica-postfix stop');
-fpsystem('/etc/init.d/artica-postfix start');
+fpsystem('/etc/init.d/artica-postfix start all');
+fpsystem('/etc/init.d/artica-postfix stop mysql');
+fpsystem('/etc/init.d/artica-postfix start mysql');
+
+
 fpsystem('/usr/share/artica-postfix/bin/artica-install --init-from-repos');
 end;
 //#########################################################################################
@@ -1382,6 +1426,13 @@ begin
     end;
 
     l:=TstringList.Create;
+    if not FileExists('/tmp/packages.list') then begin
+       writeln('Checking.............: something wrong export file is under 10 rows ??! restart again...');
+       fpsystem('/bin/rm -rf /tmp/packages.list');
+       result:=RPM_is_application_installed(appname);
+       exit;
+    end;
+
     l.LoadFromFile('/tmp/packages.list');
 
 
@@ -1759,7 +1810,7 @@ begin
      writeln('');
 end;
 
-function tlibs.INTRODUCTION(base:string;postfix:string;cyrus:string;samba:string;squid:string;nfs:string;pdns:string):string;
+function tlibs.INTRODUCTION(base:string;postfix:string;cyrus:string;samba:string;squid:string;nfs:string;pdns:string;openvpn:string):string;
 var
    u:string;
    plist:TStringDynArray;
@@ -1904,6 +1955,19 @@ if length(trim(pdns))=0 then begin
          writeln('PowerDNS System :......................................Installed');
     end;
  end;
+
+if length(trim(openvpn))=0 then begin
+       writeln('**********************************************************');
+   writeln('');
+    if length(nfs)>0 then begin
+       writeln('OpenVPN System :.......................................[9]');
+       plistSquid:=explode(',', pdns);
+       writeln(IntToStr(length(pdns))+' package(s) are not installed');
+    end else begin
+         writeln('OpenVPN System :.......................................Installed');
+    end;
+ end;
+
 
 
 end;
@@ -2072,7 +2136,7 @@ begin
 
 
       writeln('Install mandatories Zarafa libraries...................: Success');
-      fpsystem('/usr/share/artica-postfix/bin/artica-make APP_ZARAFA');
+      fpsystem('/usr/share/artica-postfix/bin/artica-make APP_ZARAFA --running');
       exit;
 end;
 //#############################################################################
@@ -2104,6 +2168,20 @@ begin
    if FileExists('/usr/local/bin/mysql') then exit('/usr/local/bin/mysql');
 end;
 //#############################################################################
+function tlibs.GET_INFO(key:string):string;
+var
+   str:string;
+begin
 
+
+
+str:='';
+   if FileExists('/etc/artica-postfix/settings/Daemons/'+key) then begin
+      str:=trim(ReadFileIntoString('/etc/artica-postfix/settings/Daemons/'+key));
+      result:=str;
+   end;
+
+end;
+//#############################################################################
 
 end.

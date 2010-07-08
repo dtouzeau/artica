@@ -1160,6 +1160,11 @@ function USER_ALIASES_FORM_ADD(){
     	
     	
     	
+$form_catech_all=
+
+
+    	
+    	
 $form_add="
     			<table style='width:100%;border:0px solid #005447'>
     				<tr>
@@ -1180,26 +1185,27 @@ $form_add="
    						<td nowrap colspan=2><hr></td>
    				</tr>
    				<tr>
-    					<td nowrap colspan=2><strong>{add_new_alias}:&laquo;{out_of_organization}&raquo;</strong></td>
-    				</tr>
-    				<tr>
-    					<td valign='top'>
+    				<td nowrap colspan=2><strong>{add_new_alias}:&laquo;{out_of_organization}&raquo;</strong></td>
+    			</tr>
+    			<tr>
+    				<td valign='top'>
 	    					<table>
 	    						<tr>
 	    							<td>" . Field_text('fullaliase',null,'width:220px') ."</td>
 	    						</tr>
 	    					</table>
-    					</td>
-    				</tr>    				
+    				</td>
+    			</tr>    				
     				<tr>
     					<td colspan=2 align='right'><hr>
     					". button("{submit}","AddNewAliases('$userid');"). "
     						
     						<hr>
     					</td>
-    				</tr>
+    			</tr>
+   				  			
     			</table>";
-$form_add=RoundedLightWhite($form_add);
+
 
 $html="<H1>{add_new_alias}</H1>
 <p class=caption>{aliases_text}:&nbsp;&laquo;<b>{$user->mail}&raquo;</b></p>

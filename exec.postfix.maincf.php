@@ -5,6 +5,7 @@ include_once(dirname(__FILE__).'/ressources/class.ini.inc');
 include_once(dirname(__FILE__).'/ressources/class.mysql.inc');
 include_once(dirname(__FILE__).'/ressources/class.ldap.inc');
 include_once(dirname(__FILE__).'/ressources/class.main_cf.inc');
+include_once(dirname(__FILE__).'/ressources/class.maincf.multi.inc');
 include_once(dirname(__FILE__).'/ressources/class.main_cf_filtering.inc');
 include_once(dirname(__FILE__).'/ressources/class.policyd-weight.inc');
 include_once(dirname(__FILE__).'/framework/class.unix.inc');
@@ -35,7 +36,7 @@ $GLOBALS["postconf"]=$unix->find_program("postconf");
 $GLOBALS["postmap"]=$unix->find_program("postmap");
 $GLOBALS["postfix"]=$unix->find_program("postfix");
 
-if($argv[1]=='--networks'){mynetworks();die();}
+if($argv[1]=='--networks'){mynetworks();shell_exec("{$GLOBALS["postfix"]} reload");die();}
 if($argv[1]=='--headers-check'){headers_check();die();}
 if($argv[1]=='--assp'){ASSP_LOCALDOMAINS();die();}
 if($argv[1]=='--artica-filter'){ArticaFilterInMasterCF();die();}
@@ -49,6 +50,7 @@ if($argv[1]=='--restricted'){RestrictedForInternet(true);die();}
 if($argv[1]=='--others-values'){OthersValues();CleanMyHostname();exec("{$GLOBALS["postfix"]} reload");}
 if($argv[1]=='--mime-header-checks'){mime_header_checks();exec("{$GLOBALS["postfix"]} reload");}
 if($argv[1]=='--interfaces'){inet_interfaces();exec("{$GLOBALS["postfix"]} stop");exec("{$GLOBALS["postfix"]} start");}
+if($argv[1]=='--mailbox-transport'){MailBoxTransport();exec("{$GLOBALS["postfix"]} stop");exec("{$GLOBALS["postfix"]} start");}
 
 
 
@@ -56,7 +58,7 @@ if($argv[1]=='--interfaces'){inet_interfaces();exec("{$GLOBALS["postfix"]} stop"
 
 if($argv[1]=='--reconfigure'){
 	if($GLOBALS["EnablePostfixMultiInstance"]==1){
-		shell_exec(LOCATE_PHP5_BIN2()." ".dirname(__FILE__)."/exec.postfix-multi.php");
+		shell_exec(LOCATE_PHP5_BIN2()." ".dirname(__FILE__)."/exec.postfix-multi.php --from-main-reconfigure");
 	}
 	
 
@@ -70,6 +72,7 @@ if($argv[1]=='--reconfigure'){
 }
 
 function _DefaultSettings(){
+if($GLOBALS["EnablePostfixMultiInstance"]==1){shell_exec(LOCATE_PHP5_BIN2()." ".dirname(__FILE__)."/exec.postfix-multi.php --from-main-null");return;}
 	SetTLS();
 	inet_interfaces();
 	headers_check(1);
@@ -85,6 +88,7 @@ function _DefaultSettings(){
 	CleanMyHostname();
 	OthersValues();
 	MailBoxTransport();
+	mynetworks();
 	ReloadPostfix();	
 	
 }
@@ -92,10 +96,9 @@ function _DefaultSettings(){
 
 
 if($argv[1]=='--write-maincf'){
-	if($GLOBALS["EnablePostfixMultiInstance"]==1){
-		shell_exec(LOCATE_PHP5_BIN2()." ".dirname(__FILE__)."/exec.postfix-multi.php");
+	if($GLOBALS["EnablePostfixMultiInstance"]==1){shell_exec(LOCATE_PHP5_BIN2()." ".dirname(__FILE__)."/exec.postfix-multi.php --from-main-write-maincf");return;}
+
 	
-	}	
 	$main=new main_cf();
 	$main->save_conf_to_server(1);
 	file_put_contents('/etc/postfix/main.cf',$main->main_cf_datas);
@@ -109,6 +112,7 @@ if($argv[1]=='--write-maincf'){
 }
 
 if($argv[1]=='--maincf'){
+	if($GLOBALS["EnablePostfixMultiInstance"]==1){shell_exec(LOCATE_PHP5_BIN2()." ".dirname(__FILE__)."/exec.postfix-multi.php --from-main-maincf");return;}	
 	$main=new main_cf();
 	$main->save_conf_to_server(1);
 	file_put_contents('/etc/postfix/main.cf',$main->main_cf_datas);
@@ -116,6 +120,7 @@ if($argv[1]=='--maincf'){
 	headers_check(1);
 	ArticaFilterInMasterCF();
 	ArticaFilterInMasterCFPipe();
+	mynetworks();
 	if($GLOBALS["DEBUG"]){echo @file_get_contents("/etc/postfix/main.cf");}
 	die();
 }
@@ -164,15 +169,25 @@ if($sock->GET_INFO('smtp_sender_dependent_authentication')==1){
 
 function mynetworks(){
 	
-	$main=new main_cf();
-	if(!is_array($main->array_mynetworks)){
-	if($GLOBALS["DEBUG"]){echo "No networks sets\n";}
+	if($GLOBALS["EnablePostfixMultiInstance"]==1){
+		echo "Starting......: Building mynetworks multiple-instances, enabled\n";
+		shell_exec("{$GLOBALS["postconf"]} -e \"mynetworks =127.0.0.0/8\" >/dev/null 2>&1");
+		return;
 	}
-	$conf=implode("\n",$main->array_mynetworks);
 	
-	
+	$ldap=new clladp();
+	$nets=$ldap->load_mynetworks();
+	if(!is_array($nets)){
+		if($GLOBALS["DEBUG"]){echo "No networks sets\n";}
+		shell_exec("{$GLOBALS["postconf"]} -e \"mynetworks =127.0.0.0/8\" >/dev/null 2>&1");
+		return;}
+	$conf=@implode("\n",$nets);
 	if($GLOBALS["DEBUG"]){echo "CONF:$conf\n";}
+	$inline=@implode(", ",$nets);
+	echo "Starting......: Building mynetworks ". count($nets)." Networks\n";
 	@file_put_contents("/etc/artica-postfix/mynetworks",$conf);
+	shell_exec("{$GLOBALS["postconf"]} -e \"mynetworks = $inline\" >/dev/null 2>&1");
+	
 }
 
 function headers_check($noreload=0){
@@ -492,11 +507,6 @@ function mime_header_checks(){
 	$strings=implode("|",$f);
 	echo "Starting......: ". count($f)." extensions blocked\n";
 	$pattern[]="/^\s*Content-(Disposition|Type).*name\s*=\s*\"?(.+\.($strings))\"?\s*$/\tREJECT file attachment types is not allowed. File \"$2\" has the unacceptable extension \"$3\"";
-	
-	
-	
-	//$pattern[]="/^Content-(Disposition|Type):\s+.+?(?:file)?name=\"?.+?\.($strings)\b/       REJECT  \".$2\" file attachment types is not allowed";
-	
 	$pattern[]="";
 	@file_put_contents("/etc/postfix/mime_header_checks",implode("\n",$pattern));
 	shell_exec("{$GLOBALS["postconf"]} -e \"mime_header_checks = regexp:/etc/postfix/mime_header_checks\" >/dev/null 2>&1");
@@ -749,8 +759,10 @@ function CleanMyHostname(){
 	$myhostname=trim(implode("",$results));
 	$myhostname=str_replace("header_checks =","",$myhostname);
 	exec("{$GLOBALS["postconf"]} -h relayhost",$results);
-	unset($results);
-	$relayhost=trim(implode("",$results));
+	
+	if(is_array($results)){
+		$relayhost=trim(@implode("",$results));
+	}
 	
 	if($myhostname=="Array.local"){
 		$users=new usersMenus();
@@ -869,18 +881,11 @@ function inet_interfaces(){
 }
 
 function MailBoxTransport(){
-	$users=new usersMenus();
-	if($users->cyrus_imapd_installed){
-		if(!$users->ZARAFA_INSTALLED){
-			echo "Starting......: Mailbox server: Cyrus-imap\n";
-			$default="lmtp:unix:/var/spool/postfix/var/run/cyrus/socket/lmtp";
-		}
-	}
-	if($users->ZARAFA_INSTALLED){
-		echo "Starting......: Mailbox server: Zarafa\n";
-		system("{$GLOBALS["postconf"]} -e \"zarafa_destination_recipient_limit = 1\" >/dev/null 2>&1");
-		$default="lmtp:127.0.0.1:2003";
-	}
+	
+	$main=new maincf_multi();
+	$default=$main->getMailBoxTransport();
+	
+	system("{$GLOBALS["postconf"]} -e \"zarafa_destination_recipient_limit = 1\" >/dev/null 2>&1");
 	system("{$GLOBALS["postconf"]} -e \"mailbox_transport = $default\" >/dev/null 2>&1");
 	}
 

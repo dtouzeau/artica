@@ -1,6 +1,4 @@
-<about>Cyrus is a highly scalable enterprise mail system designed for use in
-enterprise environments of various sizes using standards based technologies.[br]
-Cyrus technologies scale from independent use in email departments to a system centrally managed in a large enterprise</about>
+
 <allowallsubscribe>Allow All Subscribe</allowallsubscribe>
 <allowallsubscribe_text>Allow subscription to nonexistent mailboxes.[br]
 This option is typically used on backend servers in a Murder so that users  can  subscribe  to  mailboxes  that  don’t  reside on their "home" server.[br]

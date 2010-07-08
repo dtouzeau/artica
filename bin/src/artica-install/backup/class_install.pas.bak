@@ -661,6 +661,13 @@ begin
                exit();
             end;
 
+           if ParamStr(2)='fcron' then begin
+               cron:=tcron.Create(GLOBAL_INI.SYS);
+               cron.STOP();
+               cron.free;
+               exit();
+            end;
+
               if ParamStr(2)='ldap' then begin
                  zldap.LDAP_STOP();
                  exit();
@@ -1472,6 +1479,13 @@ begin
                exit();
             end;
 
+              if ParamStr(2)='fcron' then begin
+               cron:=tcron.Create(GLOBAL_INI.SYS);
+               cron.START();
+               cron.free;
+               exit();
+            end;
+
               if ParamStr(2)='mgreylist' then begin
                  if not NetWorkAvailable then exit();
                  zmiltergreylist.MILTER_GREYLIST_START();
@@ -1946,7 +1960,7 @@ begin
                writeln('|daemon|clammilter|dnsmasq|stunnel|postfix|mailgraph|mimedefang|roundcube|kav4samba|bind9|obm|yorel|p3scan|syslogng|mailarchive|bogom');
                writeln('|collectd|mysql|fetchmail|mailspy|amavis|retranslator|spfmilter|dotclear|jcheckmail|mailman|kas3|dhcp|cicap[openvpn|postfix-logger');
                writeln('|dansguardian-tail|apache-groupware|cups|dstat|dstat-top-mem|dstat-top-cpu|rsync|policydw|autofs|mysql-cluster|assp|pdns|gluster|gluster-cli');
-               writeln('|syslogger|zabbix|kav4proxy|postfilter|vmtools|zarafa|zarafa-web|monit|wifi');
+               writeln('|syslogger|zabbix|kav4proxy|postfilter|vmtools|zarafa|zarafa-web|monit|wifi|proxy-pac');
                exit();
             end;
 

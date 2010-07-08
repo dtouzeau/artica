@@ -1221,6 +1221,8 @@ if length(value)=0 then begin
        exit;
     end;
   end;
+
+
     
     if key='admin' then begin
       value:=get_LDAP_ADMIN();

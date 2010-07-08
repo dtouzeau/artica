@@ -3,7 +3,7 @@
 <ARTICA_AS_GATEWAY>Artica est une passerelle</ARTICA_AS_GATEWAY>
 <ARTICA_AS_GATEWAY_EXPLAIN>Si vous param&egrave;trez au vert, Artica sera serveur DHCP , DNS, proxy, les connexions ont une passerelle r&eacute;elle</ARTICA_AS_GATEWAY_EXPLAIN>
 <ARTICA_AS_GATEWAY_TEXT>D&eacute;finit si artica est votre passerelle ou non</ARTICA_AS_GATEWAY_TEXT>
-<conf>Fichier de configuration Main</conf>
+<conf>Fichier de configuration</conf>
 <ddns_domainname>Domaine Interne</ddns_domainname>
 <EnableArticaAsDNSFirst>Artica comme serveur DNS principal</EnableArticaAsDNSFirst>
 <EnableArticaAsDNSFirst_explain>If you turn to green, Artica will serve hostname resolution with the DHCP server.[br]It is usefull to resolve easly hostnames serves by the DHCP server</EnableArticaAsDNSFirst_explain>

@@ -108,7 +108,7 @@ logs.Debuglogs('###################### FRAMEWORK #####################');
        exit;
    end;
 
-
+    if FileExists('/var/log/artica-postfix/framework.log') then logs.DeleteFile('/var/log/artica-postfix/framework.log');
 
    pid:=LIGHTTPD_PID();
 
@@ -178,32 +178,13 @@ end;
 //##############################################################################
 FUNCTION tframework.STATUS():string;
 var
-   ini:TstringList;
+pidpath:string;
 begin
-
-ini:=TstringList.Create;
-  ini.Add('[FRAMEWORK]');
-      ini.Add('service_name=APP_FRAMEWORK');
-      ini.Add('service_cmd=apache');
-      ini.Add('service_disabled=1');
-      ini.Add('master_version=' + LIGHTTPD_VERSION());
-
-
-      if SYS.MONIT_CONFIG('APP_FRAMEWORK','/var/run/lighttpd/framework.pid','apache') then begin
-         ini.Add('monit=1');
-         result:=ini.Text;
-         ini.free;
-         exit;
-      end;
-
-
-   if SYS.PROCESS_EXIST(LIGHTTPD_PID()) then ini.Add('running=1') else  ini.Add('running=0');
-      ini.Add('application_installed=1');
-      ini.Add('master_pid='+LIGHTTPD_PID());
-      ini.Add('master_memory=' + IntToStr(SYS.PROCESS_MEMORY(LIGHTTPD_PID())));
-      ini.Add('status='+SYS.PROCESS_STATUS(LIGHTTPD_PID()));
-      result:=ini.Text;
-      ini.free
+SYS.MONIT_DELETE('APP_FRAMEWORK');
+pidpath:=logs.FILE_TEMP();
+fpsystem(SYS.LOCATE_PHP5_BIN()+' /usr/share/artica-postfix/exec.status.php --framework >'+pidpath +' 2>&1');
+result:=logs.ReadFromFile(pidpath);
+logs.DeleteFile(pidpath);
 end;
 //#########################################################################################
 function tframework.LIGHTTPD_VERSION():string;

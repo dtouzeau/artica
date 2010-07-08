@@ -299,6 +299,12 @@ $tpl=new templates();
 $title=$tpl->_ENGINE_parse_body('{APP_CYRUS}');
 $addons=file_get_contents("js/edit.user.js");	
 
+$startjs="{$prefix}Loadpage();";
+
+if(isset($_GET["in-front-ajax"])){
+	$startjs="{$prefix}LoadpageInFront()";
+}
+
 $html="
 var {$prefix}timerID  = null;
 var {$prefix}tant=0;
@@ -311,9 +317,12 @@ function {$prefix}ChargeLogs(){
 	}
 
 function {$prefix}Loadpage(){
-	YahooWinS('802','$page?popup-index=yes','$title');
-	
+	YahooWinS('812','$page?popup-index=yes','$title');
 	}
+	
+function {$prefix}LoadpageInFront(){	
+	$('#BodyContent').load('$page?popup-index=yes');
+}
 	
 
 
@@ -322,7 +331,7 @@ LoadAjax('main_config','$page?main=cyrusconf&reload=yes');
 }
 	
 	
- {$prefix}Loadpage();
+$startjs
  
 $addons 
  
@@ -344,10 +353,10 @@ function popup_status(){
 	
 	
 	
-	".RoundedLightWhite("<center><img src='img/mailbox-256.png'></center>")."</td>
+	<center><img src='img/mailbox-256.png'></center></td>
 	<td valign='top'><div id='services_status_mbx_cyrus' style='height:150px'>". main_status() . "</div><br>
-	".RoundedLightWhite("<img src='img/bg-cyrus.jpg' align=left style='margin:5px'>
-	<p style='font-size:14px;color:black'>{about}</p>")."</td>
+	<img src='img/bg-cyrus.jpg' align=left style='margin:5px'>
+	<p style='font-size:14px;color:black'>{about_cyrus}</p></td>
 	</tr>
 	</table>
 	
@@ -368,7 +377,7 @@ function main_tabs(){
 	$array["options"]="{options}";
 	$array["tools"]='{tools}';
 	$array["logs"]='{events}';	
-	$array["conf"]='{config}';
+	//$array["conf"]='{config}';
 	$array["cyrquota"]='{cyrquota}';
 	$array["mailboxes"]='{mailboxes}';
 	
@@ -448,12 +457,17 @@ if(!$users->cyrus_ipurge_exists){
 	
 	$sieve=Paragraphe("filter-sieve-64.png","{sieve_service}","{sieve_service_options_text}","javascript:Loadjs('cyrus.sieve.php')");
 	
-	$tr[]=$squatter;
-	$tr[]=$ipurge;
-	$tr[]=$sieve;
+	$lmtp=Paragraphe("database-connect-settings-64.png","{cyrus_net_behavior}","{cyrus_net_behavior_text}","javascript:Loadjs('cyrus.lmtp.php')");
+	
+	$tr[]=$lmtp;	
 	$tr[]=$Hacks;
 	$tr[]=$password;
 	$tr[]=$changefolder;
+	$tr[]=$squatter;
+	$tr[]=$ipurge;
+	$tr[]=$sieve;
+
+	
 
 
 	

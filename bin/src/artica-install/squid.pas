@@ -483,7 +483,7 @@ fpsystem(cmd);
 
  l:=Tstringlist.Create;
  try
-    l.LoadFromFile(FileTemp);
+    if FileExists(FileTemp) then l.LoadFromFile(FileTemp);
     for count:=0 to l.Count-1 do begin
         logs.DebugLogs('Starting......: Squid '+ L.Strings[count]);
     end;
@@ -796,10 +796,6 @@ caches.Clear;
  RegExpr2.free;
 end;
 //#############################################################################
-
-
-
-
 function tsquid.SQUID_SPOOL_DIR():string;
 begin
 result:=SQUID_GET_SINGLE_VALUE('coredump_dir');
@@ -1051,18 +1047,11 @@ var
   pidpath:string;
 begin
  if not FileExists(SQUID_BIN_PATH()) then exit;
-
+ SYS.MONIT_DELETE('APP_SQUID');
  pidpath:=logs.FILE_TEMP();
  fpsystem(SYS.LOCATE_PHP5_BIN()+' /usr/share/artica-postfix/exec.status.php --squid >'+pidpath +' 2>&1');
  result:=logs.ReadFromFile(pidpath);
  logs.DeleteFile(pidpath);
-
- if SQUIDEnable=0 then begin
-    SYS.MONIT_DELETE('APP_SQUID');
-    exit;
- end;
- SYS.MONIT_CONFIG('APP_SQUID','/var/run/squid.pid','squid');
-
 end;
 //##############################################################################
 function tsquid.SQUID_VERSION():string;
@@ -1632,47 +1621,14 @@ end;
 //#####################################################################################
 function tsquid.TAIL_STATUS():string;
 var
-ini:TstringList;
-pid:string;
-Enabled:integer;
+pidpath:string;
 begin
-
-if not FileExists(SQUID_BIN_PATH()) then begin
- SYS.MONIT_DELETE('APP_ARTICA_SQUID_TAIL');
- exit;
-end;
-
-
-   if DansGuardianEnabled=1 then begin
-      SYS.MONIT_DELETE('APP_ARTICA_SQUID_TAIL');
-      exit;
-   end;
-
-    ini:=TstringList.Create;
-    ini.Add('[APP_ARTICA_SQUID_TAIL]');
-    ini.Add('service_name=APP_ARTICA_SQUID_TAIL');
-    ini.Add('service_cmd=squid-tail');
-    ini.Add('service_disabled=1');
-    ini.Add('master_version=' + SYS.ReadFileIntoString(artica_path+'/VERSION'));
-
-     if SYS.MONIT_CONFIG('APP_ARTICA_SQUID_TAIL','/etc/artica-postfix/exec.squid-tail.php.pid','squid-tail') then begin
-       ini.Add('monit=1');
-       result:=ini.Text;
-       ini.free;
-       exit;
-     end;
-
-   pid:=TAIL_PID();
-
-      if SYS.PROCESS_EXIST(pid) then ini.Add('running=1') else  ini.Add('running=0');
-      ini.Add('application_installed=1');
-      ini.Add('master_pid='+ pid);
-      ini.Add('master_memory=' + IntToStr(SYS.PROCESS_MEMORY(pid)));
-      ini.Add('status='+SYS.PROCESS_STATUS(pid));
-
-
-   result:=ini.Text;
-   ini.free;
+   if not FileExists(SQUID_BIN_PATH()) then exit;
+   SYS.MONIT_DELETE('APP_ARTICA_SQUID_TAIL');
+   pidpath:=logs.FILE_TEMP();
+   fpsystem(SYS.LOCATE_PHP5_BIN()+' /usr/share/artica-postfix/exec.status.php --squid-tail >'+pidpath +' 2>&1');
+   result:=logs.ReadFromFile(pidpath);
+   logs.DeleteFile(pidpath);
 end;
 //#####################################################################################
 procedure tsquid.TAIL_STOP();

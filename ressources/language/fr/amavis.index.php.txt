@@ -91,9 +91,9 @@ Par exemple, si votre r&eacute;seau est 192.168.1.x indiquez [b]192.168.1.255[/b
 <local_network_text>Ajoutez votre r&eacute;seau local pour ne pas filtrer vos utilisateurs</local_network_text>
 <log_level>Niveau de Log</log_level>
 <mailfrom_notify>L'adresse d'enveloppe exp&eacute;diteur, dont les rapports de notification sont envoy&eacute;s de</mailfrom_notify>
-<mailfrom_notify_admin>L'enveloppe de l'adresse exp&eacute;diteur  pour des notifications d'administrations</mailfrom_notify_admin>
-<mailfrom_notify_recip>L'enveloppe de l'adresse exp&eacute;diteur  pour des notifications de destinataires</mailfrom_notify_recip>
-<mailfrom_notify_spamadmin>L'enveloppe de l'adresse exp&eacute;diteur pour des notifications d'administration de Spam</mailfrom_notify_spamadmin>
+<mailfrom_notify_admin>emetteur pour les notifications d'administrations</mailfrom_notify_admin>
+<mailfrom_notify_recip>emetteur des notifications pour les  destinataires</mailfrom_notify_recip>
+<mailfrom_notify_spamadmin>&eacute;metteur pour des notifications de Spam administrateur</mailfrom_notify_spamadmin>
 <max_requests>Max Requests</max_requests>
 <max_requests_text>
 Max Requests controls the approximate number of tasks each child process is willing to handle.[br]
@@ -109,7 +109,6 @@ On the low side, the number should not be too small in order for the startup cos
  For 4000 users a value between 5 and 10 would be a good starting point.[br]
  With low memory (e.g. 256 MB) a value of 2 or 3 would probably do.
 </max_servers_text>
-<notification>Notifications &amp; alertes SMTP</notification>
 <notification_text>Comportement des notifications des d&eacute;tections d'amavis</notification_text>
 <postfix_afterqueue>Filtre de Contenu d'Apr&egrave;s-queue-file-d'attente de Postfix</postfix_afterqueue>
 <postfix_afterqueue_text>[b]Utiliser le Filtre de contenu d'Apr&egrave;s 
@@ -141,13 +140,14 @@ Les signatures additionnelles Sanesecurity fournissent une s&eacute;curit&eacute
 <sa_tag2_level_deflt>Ajouter l'en-t&ecirc;te X-Spam-Flag : YES &agrave; ce niveau aux e-mails</sa_tag2_level_deflt>
 <sa_tag_level_deflt>Ajoutez l'en-t&ecirc;te X-Spam*** info si &eacute;gal ou sup&eacute;rieur &agrave; ce niveau</sa_tag_level_deflt>
 <select_domain>S&eacute;lectionnez le domaine SMTP</select_domain>
+<smtp_notification>Notifications &amp; alertes SMTP</smtp_notification>
 <spamassassin>Fonctionnalit&eacute;s de SpamAssassin</spamassassin>
 <spamassassin_text>D&eacute;finition de la politique anti-spam</spamassassin_text>
 <spam_quarantine_spammy>Vert: Mettre en quarantaine si ce score est atteint[br] Rouge: PASSER mais marqu&eacute; comme spam</spam_quarantine_spammy>
 <spam_rules>R&egrave;gles Anti-spam</spam_rules>
 <spam_subject_tag2_maps>TAG des sujets spam</spam_subject_tag2_maps>
 <spam_subject_tag_maps>TAG des sujets probable</spam_subject_tag_maps>
-<start_amavis>START amavis</start_amavis>
+<start_amavis>D&eacute;marrer amavis</start_amavis>
 <stop_amavis>Arr&ecirc;ter Amavis</stop_amavis>
 <trust_local>Autoriser le localhost</trust_local>
 <trust_local_explain>Ce param&egrave;tre active/d&eacute;sactive le contr&ocirc;le d'Amavis lorsqu'une connexion en provenance de 127.0.0.1 ou localhost.[br]

@@ -555,8 +555,9 @@ function SERVICES_STATUS(){
 		<th width=1%>&nbsp;</td>
 		</tr>";
 
+	$inifile=dirname(__FILE__)."/ressources/logs/global.status.ini";
+	$ini->loadFile($inifile);
 	
-	$ini->loadString($sock->getfile('daemons_status'));
 	
 	if($_GET["section"]=="artica_services"){
 			$html="
@@ -732,10 +733,7 @@ function SERVICES_STATUS(){
 
 function BuildRow($users,$array,$application_name){
 	include_once("ressources/class.status.inc");
-	if(!isset($GLOBALS["MONIT_ARRAY"])){
-		$sock=new sockets();
-		$GLOBALS["MONIT_ARRAY"]=unserialize(base64_decode($sock->getFrameWork("cmd.php?monit-status=yes")));
-	}
+//print_r($array);
 	
 	$page=CurrentPageName();
 	$sat=new status(1);
@@ -765,8 +763,18 @@ function BuildRow($users,$array,$application_name){
 	$status=$array["status"];
 	$cpu_percent_total="&nbsp;";
 	$memory_percent_total="&nbsp;";
-	$uptime="&nbsp;";
+	$uptime=$array["uptime"];
+	if($pid>0){$application_installed=1;}
+	
+	//writelogs("$application_name installed:$application_installed ,pid=$pid memory=$master_memory",__FUNCTION__,__FILE__,__LINE__);
+	
 	if($monit==1){
+		
+		if(!isset($GLOBALS["MONIT_ARRAY"])){
+			$sock=new sockets();
+			$GLOBALS["MONIT_ARRAY"]=unserialize(base64_decode($sock->getFrameWork("cmd.php?monit-status=yes")));
+		}
+		
 		$monit_status=$GLOBALS["MONIT_ARRAY"][$app]["status"];
 		$monit_uptime=$GLOBALS["MONIT_ARRAY"][$app]["uptime"];
 		$memory_kilobytes_total=FormatBytes($GLOBALS["MONIT_ARRAY"][$app]["memory kilobytes total"]);
@@ -807,13 +815,16 @@ function BuildRow($users,$array,$application_name){
 		
 	}else{
 		if($array["running"]==1){
+			writelogs("$app running",__FUNCTION__,__FILE__,__LINE__);
 			$img="ok24.png";
 			if(strlen($service_cmd)>0){
 				$js_service="Loadjs('StartStopServices.php?APP=$app&cmd=$service_cmd&action=stop')";
 				$tooltip="{stop_this_service} $application_name";
 				
 			}
-			if($filter_running==0){return null;}
+			if($filter_running==0){
+				writelogs("$app running but remove cause filter_running=$filter_running",__FUNCTION__,__FILE__,__LINE__);
+				return null;}
 			
 			
 		}else{

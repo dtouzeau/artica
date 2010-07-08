@@ -6,7 +6,7 @@ unit obm;
 interface
 
 uses
-    Classes, SysUtils,variants,strutils,IniFiles, Process,md5,logs,unix,RegExpr in 'RegExpr.pas',zsystem,lighttpd;
+    Classes, SysUtils,variants,strutils,IniFiles, Process,logs,unix,RegExpr in 'RegExpr.pas',zsystem,lighttpd;
 
 type LDAP=record
       admin:string;
@@ -23,7 +23,6 @@ type LDAP=record
 private
      LOGS:Tlogs;
      D:boolean;
-     GLOBAL_INI:TiniFIle;
      SYS:TSystem;
      artica_path:string;
     OBMEnabled:integer;
@@ -200,8 +199,6 @@ end;
 function tobm.VERSION():string;
 var
    RegExpr:TRegExpr;
-   x:string;
-   tmpstr:string;
    l:TstringList;
    i:integer;
 begin

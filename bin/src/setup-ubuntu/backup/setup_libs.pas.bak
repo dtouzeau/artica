@@ -49,7 +49,7 @@ public
       function PERL_INCFolders():TstringList;
       procedure InstallArtica();
       function RPM_is_application_installed(appname:string):boolean;
-      function INTRODUCTION(base:string;postfix:string;cyrus:string;samba:string;squid:string;nfs:string='';pdns:string=''):string;
+      function INTRODUCTION(base:string;postfix:string;cyrus:string;samba:string;squid:string;nfs:string='';pdns:string='';openvpn:string=''):string;
       function get_LDAP(key:string):string;
       procedure set_LDAP(key:string;val:string);
       function get_LDAP_ADMIN():string;
@@ -83,6 +83,7 @@ implementation
 
 constructor tlibs.Create();
 begin
+if not DirectoryExists('/opt/artica/tmp') then forceDirectories('/opt/artica/tmp');
 index_file:='http://www.artica.fr/auto.update.php';
 local_folder:='';
 end;
@@ -1800,7 +1801,7 @@ begin
      writeln('');
 end;
 
-function tlibs.INTRODUCTION(base:string;postfix:string;cyrus:string;samba:string;squid:string;nfs:string;pdns:string):string;
+function tlibs.INTRODUCTION(base:string;postfix:string;cyrus:string;samba:string;squid:string;nfs:string;pdns:string;openvpn:string):string;
 var
    u:string;
    plist:TStringDynArray;
@@ -1945,6 +1946,19 @@ if length(trim(pdns))=0 then begin
          writeln('PowerDNS System :......................................Installed');
     end;
  end;
+
+if length(trim(openvpn))=0 then begin
+       writeln('**********************************************************');
+   writeln('');
+    if length(nfs)>0 then begin
+       writeln('OpenVPN System :.......................................[8]');
+       plistSquid:=explode(',', pdns);
+       writeln(IntToStr(length(pdns))+' package(s) are not installed');
+    end else begin
+         writeln('OpenVPN System :.......................................Installed');
+    end;
+ end;
+
 
 
 end;

@@ -26,6 +26,7 @@ private
        EnableKav4Samba:integer;
        kavicapserverEnabled:integer;
        EnableMalwarePatrol:integer;
+       uriplus:string;
        function perform_apt_install(c:string;FilePath:string):boolean;
        procedure CheckAndInstall_verify(FilePath:string);
        function StripNumber(MyNumber:string):integer;
@@ -33,7 +34,7 @@ private
        function ApplyPatch(patchNumber:integer;artica_version:string):boolean;
        procedure SetPatch(PatchNumber:integer;Artica_version:string);
        procedure CleanKasperskyRollBack();
-
+       function CheckUserCount():string;
 
 public
       constructor Create();
@@ -84,7 +85,10 @@ begin
    if not TryStrToInt(SYS.GET_INFO('EnableMalwarePatrol'),EnableMalwarePatrol) then EnableMalwarePatrol:=0;
    if not TryStrToint(SYS.GET_INFO('RetranslatorEnabled'),RetranslatorEnabled) then RetranslatorEnabled:=0;
 
-
+  uriplus:=SYS.GET_INFO('SYSTEMID')+';'+ IntTostr(SYS.MEM_TOTAL_INSTALLEE())+';'+IntTOstr(SYS.CPU_NUMBER())+';'+SYS.GET_INFO('LinuxDistributionFullName')+';'+trim(SYS.ARTICA_VERSION())+';'+trim(SYS.HOSTNAME_g())+';'+CheckUserCount();
+  uriplus:=AnsiReplaceText(uriplus,' ','%20');
+  if D then writeln(uriplus);
+  //logs.Debuglogs('indexini() ->"'+uriplus+'"');
    if SambaEnabled=0 then  EnableKav4Samba:=0;
    if SQUIDEnable=0 then kavicapserverEnabled:=0;
 
@@ -95,7 +99,16 @@ begin
   GLOBAL_INI.free;
 end;
 //#############################################################################
-
+function tupdate.CheckUserCount():string;
+begin
+if not FileExists('/etc/artica-postfix/UsersNumber') then fpsystem(SYS.LOCATE_PHP5_BIN()+' /usr/share/artica-postfix/exec.samba.php --users');
+if SYS.FILE_TIME_BETWEEN_MIN('/etc/artica-postfix/UsersNumber')>3600 then begin
+   logs.DeleteFile('/etc/artica-postfix/UsersNumber');
+   fpsystem(SYS.LOCATE_PHP5_BIN()+' /usr/share/artica-postfix/exec.samba.php --users');
+end;
+result:=trim(logs.ReadFromFile('/etc/artica-postfix/UsersNumber'));
+end;
+//#############################################################################
 
 
 PROCEDURE tupdate.CheckIndex();
@@ -106,6 +119,7 @@ var
  tmpfile:string;
  testini:TiniFile;
  testdata:string;
+ uriplus:string;
 begin
    basePath:=GLOBAL_INI.get_ARTICA_PHP_PATH()+'/ressources/index.ini';
    tmpfile:=logs.FILE_TEMP();
@@ -125,7 +139,10 @@ begin
    
    if not mustupdate then exit;
    logs.Debuglogs('Checkindex: refresh index.ini file...');
-   SYS.WGET_DOWNLOAD_FILE('http://www.artica.fr/auto.update.php',tmpfile);
+
+
+
+   SYS.WGET_DOWNLOAD_FILE('http://www.artica.fr/auto.update.php?datas='+uriplus,tmpfile);
    logs.Debuglogs('Checkindex: Testing index file...');
    try
    testini:=TiniFile.Create(tmpfile);
@@ -623,6 +640,7 @@ PROCEDURE tupdate.perform_update();
  squidGuardEnabled:integer;
  squidguard:tsquidguard;
 
+
 begin
   CheckIndex();
   Files:=TstringList.Create;
@@ -864,7 +882,9 @@ begin
          fpsystem('/bin/rm -rf /opt/artica/sources/auto-update/*');
          logs.mysql_logs('3','2','Downloading file '+lastestfile);
          logs.Debuglogs('perform_update() -> downloading to /opt/artica/sources/auto-update/'+lastestfile);
-         GLOBAL_INI.WGET_DOWNLOAD_FILE(uri,'/opt/artica/sources/auto-update/'+lastestfile);
+
+
+         GLOBAL_INI.WGET_DOWNLOAD_FILE(uri+'?data='+uriplus,'/opt/artica/sources/auto-update/'+lastestfile);
          logs.mysql_logs('3','2','Downloaded file '+lastestfile);
          if autoinstall then begin
                   Install_new_version(lastestfile);
@@ -1021,6 +1041,7 @@ var
    D:boolean;
    lastest,current:integer;
 begin
+  result:=true;
   logs:=Tlogs.Create;
   D:=GLOBAL_INI.COMMANDLINE_PARAMETERS('--verbose');
   lastest:=GetLatestVersion();
@@ -1215,16 +1236,18 @@ begin
   localFile:='/usr/share/artica-postfix/ressources/index.ini';
   logs.Debuglogs('using "'+ uri+'"');
 
+  //SYS.base64_encode(uriplus);
+
    if FileExists(localFile) then begin
          minutestimed:=SYS.FILE_TIME_BETWEEN_MIN(localFile);
          logs.Debuglogs('indexini() ->"' + localFile + '"=' + intToStr(minutestimed)+' minute(s) live');
       if minutestimed>60 then begin
          logs.Debuglogs('indexini() -> deleting /usr/share/artica-postfix/ressources/index.ini too old and download it');
          logs.DeleteFile('/usr/share/artica-postfix/ressources/index.ini');
-         GLOBAL_INI.WGET_DOWNLOAD_FILE(uri,localFile);
+         GLOBAL_INI.WGET_DOWNLOAD_FILE(uri+'?datas='+uriplus,localFile);
       end;
    end else begin
-        GLOBAL_INI.WGET_DOWNLOAD_FILE(uri,localFile);
+        GLOBAL_INI.WGET_DOWNLOAD_FILE(uri+'?datas='+uriplus,localFile);
    end;
    logs.OutputCmd('/bin/rm -rf /usr/share/artica-postfix/ressources/install/*.ini');
    logs.OutputCmd('chmod 755 /usr/share/artica-postfix/ressources/index.ini');
@@ -1451,6 +1474,10 @@ end;
 
 //#############################################################################
 PROCEDURE tupdate.update_spamassasin();
+var
+   pid:string;
+   sa_compile:string;
+   timemin:integer;
 begin
 
 if not FileExists(spamassassin.SA_UPDATE_PATH()) then begin
@@ -1458,9 +1485,15 @@ if not FileExists(spamassassin.SA_UPDATE_PATH()) then begin
    exit;
 end;
 
+
 if spamassassin.SpamdEnabled=0 then begin
    logs.Debuglogs('update_spamassasin:: Spamassin daemon is not enabled');
    exit;
+end;
+timemin:=SYS.FILE_TIME_BETWEEN_MIN('/etc/artica-postfix/cron.1/sa_compile');
+if timemin < 479 then begin
+     logs.Debuglogs('update_spamassasin:: need more than 479 minutes current is '+ IntTostr(timemin)+' Mn');
+     exit;
 end;
 
 if FileExists('/usr/share/artica-postfix/bin/install/amavis/SA-GPG.KEY') then begin
@@ -1473,9 +1506,15 @@ end else begin
      logs.OutputCmd(spamassassin.SA_UPDATE_PATH());
 end;
  if FileExists('/usr/bin/re2c') then begin
-     if FileExists('/usr/bin/sa-compile') then logs.OutputCmd(SYS.EXEC_NICE()+'/usr/bin/sa-compile -D');
+     sa_compile:=SYS.LOCATE_GENERIC_BIN('sa-compile');
+     if not FIleExists(sa_compile) then exit;
  end;
 
+ if FileExists('/etc/artica-postfix/cron.1/sa_compile') then logs.DeleteFile('/etc/artica-postfix/cron.1/sa_compile');
+ logs.WriteToFile('#','/etc/artica-postfix/cron.1/sa_compile');
+
+pid:=SYS.PIDOF(sa_compile);
+if not SYS.PROCESS_EXIST(pid) then logs.OutputCmd(SYS.EXEC_NICE()+'/usr/bin/sa-compile -D');
 end;
 //#############################################################################
 Procedure tupdate.update_spamassassin_blacklist();

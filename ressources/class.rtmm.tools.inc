@@ -82,7 +82,7 @@ function format_line($line){
 	$today=date('Y-m-d');
 	$time=str_replace($today,"",$time);
 	$flag_infos=trim("$Country ($Region) $smtp_sender");
-	$flag_infos=str_replace("()","");
+	$flag_infos=str_replace("()","",$flag_infos);
 	if($flag_infos==null){
 		$flag_infos="{RTMM_NO_GEOIP_OR_LOOPBACK}";
 	}

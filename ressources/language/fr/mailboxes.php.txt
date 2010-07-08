@@ -20,7 +20,7 @@ Les alias produits pour ce domaine seront enlev&eacute;s &eacute;galement</ERROR
 <js_edit_mailbox_storage>Ajouter/&Eacute;diter le stockage de la bo&icirc;te aux lettres</js_edit_mailbox_storage>
 <js_edit_transport>&Eacute;ditez la cible de transport pour ce domaine</js_edit_transport>
 <js_expand_domain>&Eacute;tendez ce domaine pour voir les param&egrave;tres</js_expand_domain>
-<PAGE_TEXT>Ce secteur est con&ccedil;u pour g&eacute;rer les domaines locaux de votre r&eacute;seau. Ces domaines stockent vos bo&icirc;tes aux lettres ou des courriers &eacute;lectroniques locaux</PAGE_TEXT>
+<PAGE_TEXT>Cette section est con&ccedil;ue pour g&eacute;rer les domaines internet de votre r&eacute;seau. Ces domaines servent principalement &agrave; la messagerie.</PAGE_TEXT>
 <title>G&eacute;rer les bo&icirc;tes aux lettres et les domaines</title>
 <xdelete_alias_text>&Ecirc;tes-vous s&ucirc;rs de vouloir enlever cette r&egrave;gle d'alias?
 La bo&icirc;te aux lettres ne sera pas supprim&eacute;e mais le syst&egrave;me de courrier Postfix ne sera pas capable de transf&eacute;rer les courriers &eacute;lectroniques  pour cet alias</xdelete_alias_text>

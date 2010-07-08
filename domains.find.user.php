@@ -65,18 +65,19 @@ var x_FIndMember= function (obj) {
 }
 
 function popup(){
-	$_GET["ou"]=base64_decode($_GET["ou"]);
+	if(is_base64_encoded($_GET["ou"])){$_GET["ou"]=base64_decode($_GET["ou"]);}
+	
 	$form="<table style='width:100%;margin:0px;padding:0px'>
 	<tr>
 		<td style='margin:0px;padding:0px'>". Field_text("find-member",null,'width:100%;font-size:12px;padding:5px;margin:5px',null,null,null,false,"FindMemberPress(event)")."</td>
 	</tr>
 	</table>";
-	$form=RoundedLightWhite($form);
 	
-	$html="<H1>{find_members}</H1>
+	
+	$html="<H2>{find_members}</H2>
 	$form
 	<hr>
-	". RoundedLightWhite("<div id='search-results' style='width:100%;height:350px;overflow:auto'>". find_member()."</div>");
+	<div id='search-results' style='width:100%;height:350px;overflow:auto'>". find_member()."</div>";
 	
 
 $tpl=new templates();	
@@ -87,7 +88,11 @@ function find_member(){
 	$tofind=$_GET["find-member"];
 	if($_SESSION["uid"]==-100){$ou=$_GET["ou"];}else{$ou=$_SESSION["ou"];}
 	$ldap=new clladp();
+	if(is_base64_encoded($ou)){$ou=base64_decode($ou);}
 	if($tofind==null){$tofind='*';}else{$tofind="*$tofind*";}
+	$tofind=str_replace('***','*',$tofind);
+	writelogs("FIND $tofind IN OU \"$ou\"",__FUNCTION__,__FILE__,__LINE__);
+	
 	$filter="(&(objectClass=userAccount)(|(cn=$tofind)(mail=$tofind)(displayName=$tofind)(uid=$tofind) (givenname=$tofind) ))";
 	$attrs=array("displayName","uid","mail","givenname","telephoneNumber","title","sn","mozillaSecondEmail","employeeNumber");
 	$dn="ou=$ou,dc=organizations,$ldap->suffix";
@@ -102,14 +107,7 @@ function find_member(){
 		$html=$html .formatUser($user);
 		
 	}
-	
 	return $html;
-	
-	//print_r($hash);
-	
-	
-	
-	
 }
 
 

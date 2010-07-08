@@ -15,7 +15,7 @@ uses
   setup_eaccelerator, setup_bacula, setup_roundcube, setup_acxdrv,
   setup_hostapd, zsystem, setup_mysql, setup_winexe, setup_assp, setup_ocs,
   setup_lmb, setup_glusterfs, setup_postfilter, setup_vmtools,
-  setup_phpldapadmin, setup_zarafa, setup_cpulimit;
+  setup_phpldapadmin, setup_zarafa, setup_cpulimit, setup_drupal;
 
 var
    collectd:tsetup_collectd;
@@ -76,6 +76,7 @@ var
    phpldapadmin:tsetup_phpldapadmin;
    zarafa:tzarafa;
    cpulimit:tsetup_cpulimit;
+   drupal:tsetup_drupal;
 
 begin
 
@@ -115,6 +116,16 @@ begin
          cpulimit.xinstall();
          halt(0);
    end;
+
+
+   if ParamStr(1)='APP_DRUPAL' then begin
+         drupal:=tsetup_drupal.Create;
+         drupal.xinstall();
+         halt(0);
+   end;
+
+
+
 
    if ParamStr(1)='APP_MONIT' then begin
          cpulimit:=tsetup_cpulimit.Create;

@@ -43,6 +43,7 @@ public
        function checkSQuid():string;
        function CheckPDNS():string;
        function CheckZabbix():string;
+       function CheckOpenVPN():string;
 
 END;
 
@@ -61,7 +62,7 @@ end;
 //#########################################################################################
 procedure tmandrake.Show_Welcome;
 var
-   base,postfix,u,cyrus,samba,squid,selinux,release,pdns,zabbix:string;
+   base,postfix,u,cyrus,samba,squid,selinux,release,pdns,zabbix,openvpn:string;
 begin
 
    if not FileExists('/usr/sbin/urpmi') then begin
@@ -108,8 +109,8 @@ begin
     pdns:=CheckPDNS();
     writeln('Checking.............: Zabbix System...');
     zabbix:=CheckPDNS();
-
-    u:=libs.INTRODUCTION(base,postfix,cyrus,samba,squid);
+    openvpn:=CheckOpenVPN();
+    u:=libs.INTRODUCTION(base,postfix,cyrus,samba,squid,openvpn);
 
     writeln('You have selected the option : ' + u);
 
@@ -172,6 +173,12 @@ begin
     end;
 
    if u='8' then begin
+          InstallPackageLists(zabbix);
+          Show_Welcome;
+          exit;
+    end;
+
+   if u='9' then begin
           InstallPackageLists(zabbix);
           Show_Welcome;
           exit;
@@ -483,6 +490,8 @@ l.Add('libcdio');
 l.Add('curl');
 l.add('cryptsetup');
 
+l.add('udisks');
+
 
 
 
@@ -558,6 +567,31 @@ if not FIleExists('/usr/bin/python') then f:=f + ',python';
  result:=f;
 end;
 //#########################################################################################
+function tmandrake.CheckOpenVPN():string;
+var
+   l:TstringList;
+   f:string;
+   i:integer;
+
+begin
+f:='';
+l:=TstringList.Create;
+l.Add('pptp-linux');
+l.Add('openvpn');
+l.Add('bridge-utils');
+
+for i:=0 to l.Count-1 do begin
+     if not libs.RPM_is_application_installed(l.Strings[i]) then begin
+          f:=f + ',' + l.Strings[i];
+     end;
+end;
+ result:=f;
+ l.free;
+end;
+//#########################################################################################
+
+
+
 function tmandrake.CheckCyrus():string;
 var
    l:TstringList;
@@ -640,6 +674,7 @@ var
    f:string;
    i:integer;
 begin
+f:='';
 l:=Tstringlist.Create;
 l.add('pdns');
 l.add('pdns-backend-ldap');

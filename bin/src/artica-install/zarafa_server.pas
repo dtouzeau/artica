@@ -1396,8 +1396,10 @@ procedure tzarafa_server.REMOVE();
 var
    l:Tstringlist;
    i:integer;
+   path:string;
 begin
 l:=Tstringlist.Create;
+STOP();
 l.add('/usr/local/lib/libical.a');
 l.add('/usr/local/lib/libical.la');
 l.add('/usr/local/lib/libicalmapi.la');
@@ -1445,6 +1447,8 @@ l.add('/usr/local/bin/zarafa-spooler');
 l.add('/usr/local/bin/zarafa-stats');
 
 
+
+
 if DirectoryExists('/usr/local/lib/zarafa') then begin
    writeln('Remove directory /usr/local/lib/zarafa');
    fpsystem('/bin/rm -rf /usr/local/lib/zarafa');
@@ -1455,8 +1459,41 @@ for i:=0 TO l.Count-1 do begin
     if FileExists(l.Strings[i]) then begin
        writeln('Remove file '+l.Strings[i]);
        fpsystem('/bin/rm '+ l.Strings[i]);
+    end else begin
+       writeln('file '+l.Strings[i]+' Already removed');
     end;
 end;
+
+l.free;
+l:=Tstringlist.Create;
+l.add('zarafa-admin');
+L.add('zarafa-cfgchecker');
+L.add('zarafa-dagent');
+L.add('zarafa-fsck');
+L.add('zarafa-gateway');
+L.add('zarafa-ical');
+L.add('zarafa-indexer');
+L.add('zarafa-monitor');
+L.add('zarafa-passwd');
+L.add('zarafa-server');
+L.add('zarafa-spooler');
+L.add('zarafa-stats');
+
+for i:=0 TO l.Count-1 do begin
+    path:=SYS.LOCATE_GENERIC_BIN(l.Strings[i]);
+    if FileExists(path) then begin
+       writeln('Remove file '+path);
+       fpsystem('/bin/rm '+ path);
+    end else begin
+       writeln('file '+l.Strings[i]+' Already removed');
+    end;
+end;
+
+l.free;
+fpsystem('/usr/share/artica-postfix/bin/process1 --force');
+fpsystem('/usr/share/artica-postfix/bin/artica-install --reconfigure-cyrus --without-zarafa');
+fpsystem('/etc/init.d/artica-postfix restart postfix');
+fpsystem('/etc/init.d/artica-postfix restart apache');
 
 writeln('done.');
 end;

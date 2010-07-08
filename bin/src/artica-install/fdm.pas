@@ -6,7 +6,7 @@ unit fdm;
 interface
 
 uses
-    Classes, SysUtils,variants,strutils,IniFiles, Process,md5,logs,unix,RegExpr in 'RegExpr.pas',zsystem,lighttpd;
+    Classes, SysUtils,variants,strutils, Process,logs,unix,RegExpr in 'RegExpr.pas',zsystem;
 
 type LDAP=record
       admin:string;
@@ -22,8 +22,6 @@ type LDAP=record
 
 private
      LOGS:Tlogs;
-     D:boolean;
-     GLOBAL_INI:TiniFIle;
      SYS:TSystem;
      artica_path:string;
 
@@ -67,26 +65,18 @@ begin
 end;
 //##############################################################################
 procedure tfdm.START();
-var
-   import:boolean;
 begin
 
-   import:=false;
    if not FileExists(bin_path()) then begin
       logs.Debuglogs('tfdm.START():: unable to stat fdm, (not installed) abort..;' );
       exit;
    end;
-
-
-
-
 end;
 
 //##############################################################################
 function tfdm.STATUS:string;
 var
 ini:TstringList;
-pid:string;
 begin
    ini:=TstringList.Create;
    ini.Add('[FDM]');

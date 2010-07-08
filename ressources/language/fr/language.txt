@@ -1,5 +1,7 @@
 </li>
 <//li>
+<about_cyrus>Cyrus est un syst&egrave;me de courrier d'entreprise fortement &eacute;volutif  con&ccedil;u pour l'utilisation dans les environnements d'entreprise de tailles diverses utilisant des standards de technologies. [Br] 
+Les technologies de Cyrus p&egrave;sent de l'utilisation ind&eacute;pendante dans des d&eacute;partements de courrier &eacute;lectronique &agrave; un syst&egrave;me au centre g&eacute;r&eacute; dans une grande entreprise</about_cyrus>
 <about_organization>Cette section vous permet de g&eacute;rer vos utilisateurs et vos domaines en fonction de vos privil&egrave;ges dans l'interface.</about_organization>
 <about_procmail>Procmail est un puissant et solide ensemble d'outils qui vous permettent de traiter automatiquement les mails que vous recevez ou apr&egrave;s, s'ils sont d&eacute;j&agrave; dans un dossier de messages. [Br]
 Procmail est un utilitaire de traitement du courrier, qui peut vous aider &agrave; filtrer votre courrier, trier le courrier selon l'exp&eacute;diteur, la ligne Objet, de la longueur du message, les mots-cl&eacute;s dans le message, mettre en place un serveur ftp par serveur de messagerie, et bien plus encore. [Br]
@@ -47,6 +49,8 @@ S&eacute;lectionnez cette ressource[br]
 Cette op&eacute;ration va activer le service et la sauvegarde &agrave; distance &agrave; travers l'agent r&eacute;seau Artica</ACTIVATE_BACKUP_AGENT_EXPLAIN>
 <ACTIVATE_BACKUP_AGENT_TEXT>Autorisez les agents Artica &agrave; sauvegarder les dossiers utilisateurs sur votre stockage</ACTIVATE_BACKUP_AGENT_TEXT>
 <ACTIVATE_HD_ORG_DEFAULT_EXPLAIN>Le stockage choisi sera aussi le chemin par d&eacute;faut des r&eacute;pertoires utilisateurs (home).</ACTIVATE_HD_ORG_DEFAULT_EXPLAIN>
+<ACTIVATE_SPF>Activation de la v&eacute;rification SPF</ACTIVATE_SPF>
+<ACTIVATE_SPF_TEXT>Si cette fonctionnalit&eacute; est activ&eacute;e, les scores de l'anti-spam seront modifi&eacute;s avec la validation des h&ocirc;tes &eacute;metteurs.</ACTIVATE_SPF_TEXT>
 <ActiveDirectorySettings>Param&egrave;tres Active Directory</ActiveDirectorySettings>
 <ActiveDirectorySettings_text>Indiquez le compte utilisateur et les coordonn&eacute;es du serveur afin de connecter Artica a votre serveur Active Directory</ActiveDirectorySettings_text>
 <activedirectory_admin>Administrateur Active Directory</activedirectory_admin>
@@ -108,6 +112,7 @@ The address verification status is not updated when the probe fails (optimistic 
 <address_verify_sender>Courrier &eacute;lectronique pour notifications d'exp&eacute;diteur</address_verify_sender>
 <address_verify_sender_text>L'adresse d'exp&eacute;dition &agrave; uiliser pour les sondages de v&eacute;rification d'adresse.[br] Pour &eacute;viter les probl&egrave;mes avec les sondages qui sont envoy&eacute;s en r&eacute;ponse &agrave; un sondage d'adresse, le serveur SMTP de Postfix exclut de la v&eacute;rification l'adresse d'exp&eacute;dition des sondages.</address_verify_sender_text>
 <add_action>Ajouter une op&eacute;ration</add_action>
+<add_already_member>Ajouter un membre d&eacute;j&agrave; existant dans l'organisation</add_already_member>
 <add_artica_tasks>Ajoutez des t&acirc;ches pr&eacute;d&eacute;termin&eacute;es</add_artica_tasks>
 <add_artica_tasks_text>S&eacute;lectionnez les t&acirc;ches pr&eacute;d&eacute;finies dans la liste des champs ci-dessous.[br]</add_artica_tasks_text>
 <add_attachment_blocking_text>Ajouter une nouvelle extension interdite</add_attachment_blocking_text>
@@ -181,11 +186,14 @@ exemples[br]
 [li]Status _YESNO_, score=_SCORE_ required=_REQD_ tests=_TESTS_ autolearn=_AUTOLEARN_ version=_VERSION_[/li]
 [li]Level _STARS(*)_[/li]
 [li]Checker-Version SpamAssassin _VERSION_ (_SUBVERSION_) on _HOSTNAME_[/li]</add_spamassassin_header_txt>
+<add_task>Ajouter une nouvelle t&acirc;che</add_task>
 <add_tls_smtp_server>Ajoutez le serveur SMTP TLS cible</add_tls_smtp_server>
 <add_user>Ajouter un utilisateur</add_user>
 <add_users_and_groups>Ajouter des membres et groupes</add_users_and_groups>
 <add_user_computer>Lier un ordinateur utilisateur</add_user_computer>
 <add_user_computer_text>Lier un ordinateur &agrave; cet utilisateur afin de disposer de plus de fonctionnalit&eacute;s</add_user_computer_text>
+<add_virtual_ip_address>Ajouter une nouvelle adresse</add_virtual_ip_address>
+<add_virtual_ip_addr_explain_js>Cliquez sur la croix afin d'ajouter une adresse IP bas&eacute;e sur les informations de cette carte r&eacute;seau</add_virtual_ip_addr_explain_js>
 <ADD_WEB_SERVICE>nouveau service groupware</ADD_WEB_SERVICE>
 <ADD_WEB_SERVICE_TEXT>Fournissez de nouvelles fonctionnalit&eacute;s &agrave; vos utilisateurs par l'ajout de nouveaux composants web</ADD_WEB_SERVICE_TEXT>
 <admin>Administrateur</admin>
@@ -351,6 +359,8 @@ Contrairement aux autres syt&egrave;mes de r&eacute;partition de charge, l'agg&e
 <APP_DNSMASQ>Mise en cache du DNS transitaire</APP_DNSMASQ>
 <APP_DOTCLEAR>Publication web Dotclear</APP_DOTCLEAR>
 <APP_DOTCLEAR_TEXT>D&eacute;finissez vos param&egrave;tres multi-Blog</APP_DOTCLEAR_TEXT>
+<APP_DRUPAL>Drupal</APP_DRUPAL>
+<APP_DRUPAL_TEXT>Drupal est un logiciel qui permet aux individus comme aux communaut&eacute;s d'utilisateurs de publier facilement, de g&eacute;rer et d'organiser un vaste &eacute;ventail de contenus sur un site web.[br] Des dizaines de milliers de personnes et d'organisations utilisent Drupal pour propulser des sites de toutes tailles et fonctions.</APP_DRUPAL_TEXT>
 <APP_DSTAT>Outil de statistiques &quot;VRS&quot;</APP_DSTAT>
 <APP_EACCELERATOR>Acc&eacute;l&eacute;rateur PHP</APP_EACCELERATOR>
 <APP_EMAILRELAY>Relai E-Mail</APP_EMAILRELAY>
@@ -500,7 +510,10 @@ Si vous activez cette fonctionnalit&eacute;, vous serez en mesure de partager vo
 <APP_SMBMOUNT>Outil de montage de partage r&eacute;seau</APP_SMBMOUNT>
 <APP_SPAMASSASSIN>SpamAssassin</APP_SPAMASSASSIN>
 <APP_SPAMASS_MILTER>D&eacute;mon Spamassassin-Milter</APP_SPAMASS_MILTER>
+<APP_SPF>Sender Policy Framework</APP_SPF>
 <APP_SPFMILTER>module de filtrage de courrier SPF</APP_SPFMILTER>
+<APP_SPF_TEXT>SPF permet aux propri&eacute;taires de noms de domaines d'indiquer dans leurs registres DNS quelles adresses IP ont le droit d'envoyer des courriers provenant de leurs domaines. Cela emp&ecirc;che les spammeurs de manipuler le Return-Path.</APP_SPF_TEXT>
+<APP_SPF_TINY_TEXT>SPF est un syst&egrave;me de validation des messages pr&eacute;venant des spams par usurpation d'identit&eacute;s</APP_SPF_TINY_TEXT>
 <APP_SQLGREY>Politique de serveur SaqlGrey</APP_SQLGREY>
 <APP_SQUID>Cache proxy Squid</APP_SQUID>
 <APP_SQUIDGUARD>filtrage web squidGuard</APP_SQUIDGUARD>
@@ -602,7 +615,7 @@ Squid optimise donc de fa&ccedil;on cons&eacute;quente le flux de donn&eacute;es
 <AsMailManAdministrator>Peut administrer des listes de distribution</AsMailManAdministrator>
 <AsMessagingOrg>G&egrave;re la messagerie de l'organisation</AsMessagingOrg>
 <AsOrgAdmin>Peut administrer cette organisation</AsOrgAdmin>
-<AsOrgPostfixAdministrator>Peu administrer le relais de messagerie (si les instances multiples sont activ&eacute;es).</AsOrgPostfixAdministrator>
+<AsOrgPostfixAdministrator>Peut administrer le relais de messagerie (si les instances multiples sont activ&eacute;es).</AsOrgPostfixAdministrator>
 <AsOrgStorageAdministrator>Peut administrer les ressources de stockage/backup de l'organisation</AsOrgStorageAdministrator>
 <AsPostfixAdministrator>Param&egrave;tres de gestion Postfix</AsPostfixAdministrator>
 <assistantName>Sous le nom</assistantName>
@@ -736,6 +749,7 @@ Specify 0 when mail delivery should be tried only once.</bounce_queue_lifetime_t
 <BP>Boite Postale</BP>
 <br> In a parent relationship, the child cache will forward requests to its parent cache.[br]
   If the parent does not hold a requested object, it will forward the request on behalf of the child[br]</br>
+<BRIDGE_ADDR>Adresse IP locale du serveur VPN</BRIDGE_ADDR>
 <broadcast>Broadcast</broadcast>
 <broken_sasl_auth_clients>interoperabilit&eacute; avec les clients SMTP obsol&egrave;tent</broken_sasl_auth_clients>
 <broken_sasl_auth_clients_text>Active l'interoperabilit&eacute; avec les clients SMTP qui impl&eacute;mentent une version obsolete de la commande AUTH (RFC 2554). [br]MicroSoft Outlook Express version 4 et MicroSoft Exchange version 5.0 sont des exemples de tels clients.</broken_sasl_auth_clients_text>
@@ -758,7 +772,7 @@ Specify 0 when mail delivery should be tried only once.</bounce_queue_lifetime_t
 <bt_set_quota>D&eacute;finissez le quota</bt_set_quota>
 <build kas config>Pr&eacute;paration de configurations Anti-spam Kaspersky</build kas config>
 <build kav config>Reconstruire les configurations antivirales Kaspersky</build kav config>
-<build postfix config>Reconstruire les param&egrave;tres postfix main</build postfix config>
+<build postfix config>Reconstruire les param&egrave;tres postfix</build postfix config>
 <buildSambaSettings>Construire les param&egrave;tres profile</buildSambaSettings>
 <build_certificate>Construire le certificat.</build_certificate>
 <businessRole>R&ocirc;le d'affaires</businessRole>
@@ -914,6 +928,8 @@ Copiez/collez une liste d'ordinateurs avec chaque nom d'ordinateur s&eacute;par&
 <connection_cache_ttl_limit_text>La taille maximale de dur&eacute;e de vie (TTL) que le processus &quot;scache&quot; va conserver .[br]Les requ&ecirc;tes qui sp&eacute;cifient une valeur TTL plus grande vont &ecirc;tre r&eacute;duite &agrave; cette valeur.[br]Le but de ce contr&ocirc;le additionnel est de prot&eacute;ger l'infrastructure contre des personnes imprudentes.</connection_cache_ttl_limit_text>
 <connection_to_backup_failed>&Eacute;chec de connexion &agrave; la ressource distante</connection_to_backup_failed>
 <ConnectTimeout>Connect Timeout</ConnectTimeout>
+<contacts>Contacts</contacts>
+<contacts_databases>Bases de contacts</contacts_databases>
 <container>conteneur</container>
 <Contains>contient</Contains>
 <content_analyze>Analyse de contenu</content_analyze>
@@ -981,6 +997,11 @@ Vous avez besoin de tester cette fonctionnalit&eacute;.[br]Parfois cpulimit effe
 <cyrus_change_folder_text>D&eacute;placer vos bo&icirc;tes aux lettres vers un nouveau r&eacute;pertoire sur le serveur</cyrus_change_folder_text>
 <cyrus_connection_error>Il y a un probl&egrave;me lors de la connexion au serveur imap ... Svp red&eacute;marrer plus tard</cyrus_connection_error>
 <cyrus_imap>Cyrus IMAP</cyrus_imap>
+<cyrus_lmtp_howto>Par d&eacute;faut, le serveur de bo&icirc;tes aux lettres Cyrus &eacute;coute sur une adresse r&eacute;seau Unix situ&eacute; dans un r&eacute;pertoire sp&eacute;cifique.[br]Ce comportement force le service SMTP &agrave; utiliser cette adresse pour envoyer les messages.[br]
+Vous pouvez modifier ce comportement en utilisant une adresse r&eacute;seau traditionnelle.[br]L'utilisation d'une adresse r&eacute;seau traditionnelle permet &agrave; d'autres services SMTP d'envoyer les messages sur ce serveur.[br]
+C'est plus facile &agrave; utiliser puisque Artica ne se souciera pas des s&eacute;curit&eacute;s &agrave; appliquer sur l'adresse Unix.[br]Toutefois, utiliser une adresse Unix permet aussi de ne pas surcharger la carte r&eacute;seau du serveur et assure la s&eacute;curit&eacute; &quot;externe&quot; puisqu'une connexion externe n'existe pas.</cyrus_lmtp_howto>
+<cyrus_net_behavior>Connexion au serveur IMAP/POP3</cyrus_net_behavior>
+<cyrus_net_behavior_text>Indiquez comment le service SMTP va envoyer les messages au service de bo&icirc;tes aux lettres</cyrus_net_behavior_text>
 <CYRUS_REPLICA_WIZARD_HELP>Lancez l'assistant afin de d&eacute;finir les bons param&egrave;tres pour construire un cluster IMAP</CYRUS_REPLICA_WIZARD_HELP>
 <cyrus_status>Status Cyrus IMAP</cyrus_status>
 <CYRUS_TO_ZARAFA>Cyrus vers Zarafa</CYRUS_TO_ZARAFA>
@@ -1049,6 +1070,7 @@ Vous pouvez ajouter des privil&egrave;ges de groupe afin d'autoriser certains ut
 <default_destination_recipient_limit_text>Nombre maximum par d&eacute;faut de destinataires par livraison de message. C'est la limite par d&eacute;faut pour la livraison via les agents de livraison</default_destination_recipient_limit_text>
 <default_directory>R&eacute;pertoire par d&eacute;faut</default_directory>
 <DEFAULT_EMAIL_HOST>domaine par d&eacute;faut pour les adresses email</DEFAULT_EMAIL_HOST>
+<default_password>mot de passe par d&eacute;faut</default_password>
 <default_process_limit>Limite de processus par d&eacute;faut</default_process_limit>
 <default_process_limit_text>Nombre maximum par d&eacute;faut de processus fils de Postfix qui fournissent le m&ecirc;me service.</default_process_limit_text>
 <deferred_queue>En reports</deferred_queue>
@@ -1121,14 +1143,25 @@ Vous pouvez ajouter des privil&egrave;ges de groupe afin d'autoriser certains ut
 <display_queries_list>Afficher les requ&ecirc;tes</display_queries_list>
 <display_statistics_of_this_user>Afficher les statistiques de cet utilisateur/IP</display_statistics_of_this_user>
 <display_statistics_of_this_website>Afficher les statistiques de ce site web</display_statistics_of_this_website>
+<dkim_about2>Cette technologie combine des messages sign&eacute;s et les serveurs DNS.[br]Tous les messages sign&eacute;s seront v&eacute;rifi&eacute;s avec les DNS externes (le champs TXT).Pour les messages entrants les messages sign&eacute;s vont influencer n&eacute;gativement le score de l'anti-spam.[br] A l'inverse l'anti-spam sera plus g&eacute;n&eacute;reux si les messages sont sign&eacute;s.[br]Vos messages sortants devront &ecirc;tre sign&eacute;s afin d'aider les serveurs destinataires de vos messages &agrave; v&eacute;rifier vos domaines de messagerie.</dkim_about2>
+<dkim_showkeys_text>Vous avez besoin de param&eacute;trer vos enregistrements dans les DNS pour chaque domaine list&eacute; ci-dessous.[br]Chaque enregistrement DNS devra disposer d'un  champ TXT avec les informations ci-dessous</dkim_showkeys_text>
+<DKIM_SPAMASS_WBL_HOWTO>Les serveurs ou domaines, emails, de cette section vont influencer positivement les scores de l'anti-spam malgr&eacute; un &eacute;chec de v&eacute;rification DKIM</DKIM_SPAMASS_WBL_HOWTO>
+<dkim_testkeys_text>Si le champs TXT &agrave; &eacute;t&eacute; correctement ajout&eacute;, la section ci-dessous devrait afficher un &eacute;tat correct pour la v&eacute;rification DKIM.[br]Ainsi, les serveurs destinataires de vos messages seront capable d'identifier correctement vos signatures.</dkim_testkeys_text>
 <dmidecode>Information BIOS DMI</dmidecode>
 <dmidecode_text>Contains a description  of  the  system’s  hardware  components,  as well as other useful pieces of information such as serial numbers and BIOS revision</dmidecode_text>
+<DNSBL_EXPLAIN>Le DNS Black Listing (DNSBL) est une m&eacute;thode permettant de consulter une liste noire d'&eacute;metteurs de courrier &eacute;lectronique en utilisant le protocole DNS.[br] Le nom DNS Black Listing vient de l'expression anglaise black list qui signifie liste noire.[br]
+Le DNS Black Listing est utilis&eacute; en s&eacute;curit&eacute; informatique pour identifier et filtrer le pourriel (spam) ou l'hame&ccedil;onnage (phishing).
+[br]
+Le DNS Black Listing est un effort coop&eacute;ratif des fournisseurs de noms de domaine pour interdire le service DNS aux spammeurs connus.[br]
+Les spammeurs connus sont ainsi bloqu&eacute;s lorsqu'ils tentent d'obtenir l'adresse IP d'un fournisseur de courrier &eacute;lectronique, ce qui les emp&ecirc;che d'envoyer des courriers &eacute;lectroniques. En effet, pour envoyer un courrier &eacute;lectronique &agrave; l'utilisateur ayant l'adresse utilisateur@fournisseur.fr, le spammeur doit pr&eacute;alablement demander l'adresse IP du domaine fournisseur.fr, c'est cette demande qui est bloqu&eacute;e gr&acirc;ce au DNS Black Listing.</DNSBL_EXPLAIN>
 <dnsmasq_DNS_records>Enregistrements MX</dnsmasq_DNS_records>
 <dnsmasq_DNS_records_text>DnsMasq peut r&eacute;pondre aux requ&egrave;tes DNS avec sa propre base de donn&eacute;es</dnsmasq_DNS_records_text>
 <dnsmasq_settings>param&egrave;tres dnsmasq</dnsmasq_settings>
 <DNSServer>Serveur DNS</DNSServer>
 <dns_information>Information DNS</dns_information>
 <dns_main_settings>Param&egrave;tres DNS et affinages</dns_main_settings>
+<DNS_RECORDS>Enregistrements DNS</DNS_RECORDS>
+<DNS_RECORDS_TESTS>Validation DNS</DNS_RECORDS_TESTS>
 <dns_server>Serveur DNS</dns_server>
 <dns_servers>Serveurs DNS</dns_servers>
 <documents>documents</documents>
@@ -1200,6 +1233,7 @@ supports the X-Forward extension for Postfix protocol only if [b]smtp[/b] is use
 <emails_flow_week>Envoy&eacute; et re&ccedil;us par semaine</emails_flow_week>
 <emails_number>Nombre de messages</emails_number>
 <emails_recieved>emails re&ccedil;us</emails_recieved>
+<email_campaigns>Campagne marketing</email_campaigns>
 <email_number>nombre d'emails</email_number>
 <email_scenarios>Sc&eacute;narios eMail</email_scenarios>
 <empty_list>Vider la liste</empty_list>
@@ -1244,10 +1278,13 @@ Cette m&eacute;thode est peu s&eacute;curis&eacute; du fait que le serveur conna
 La deuxi&egrave;me m&eacute;thode utilise l'agent r&eacute;seau Artica.[br]Celui-ci fournir le mot de passe ponctuellement pour ouvrir automatiquement le coffre-fort.[br]Cette m&eacute;thode est la plus sur car le serveur ne conserve pas les mots de passe.Ils sont uniquement stock&eacute;s sur les postes de travail.</ENABLE_COFFREFORT_TEXT>
 <enable_disable>Rouge:Option d&eacute;sactiv&eacute;e[br]Vert:Option Activ&eacute;e[br]Clickez pour changer</enable_disable>
 <enable_disclaimer>Activer la fonctionnalit&eacute; d'Avis de Non Responsabilit&eacute;</enable_disclaimer>
+<enable_dkim_signing>Signer vos messages sortants</enable_dkim_signing>
+<enable_dkim_verification>Activer la v&eacute;rification DKIM sur les messages entrants</enable_dkim_verification>
 <enable_inbound>Activer le flux entrant</enable_inbound>
 <enable_kaspersky_samba>Activation de Kaspersky For Samba</enable_kaspersky_samba>
 <enable_kaspersky_samba_text>Prot&eacute;gez vos r&eacute;pertoires partag&eacute;s contre les virus en utilisant Kaspersky For Samba</enable_kaspersky_samba_text>
 <enable_kavmilter_text>Activez Kaspersky Antivirus Milter afin de v&eacute;rifier la pr&eacute;sence de virus dans vos messages</enable_kavmilter_text>
+<enable_lmtp_unix>Activer LMTP en [b]socket Unix[/b]</enable_lmtp_unix>
 <ENABLE_MAILMAN>Activez le service de listes de distribution</ENABLE_MAILMAN>
 <ENABLE_MAILMAN_TEXT>Si vous activez cette fonctionnalit&eacute;s certains utilisateurs (avec les privil&egrave;ges associ&eacute;s) seront capable de cr&eacute;er des listes de distribution email.</ENABLE_MAILMAN_TEXT>
 <enable_mynetwork>Activer les r&eacute;seaux locaux actuels</enable_mynetwork>
@@ -1258,6 +1295,7 @@ La deuxi&egrave;me m&eacute;thode utilise l'agent r&eacute;seau Artica.[br]Celui
 <enable_philesight_text>Si vert, le scanner va traverser enti&egrave;rement votre disque dur afin de remplir une base de donn&eacute;e de la taille de vos r&eacute;pertoires.[br]Ceci afin d'afficher un graphique sur le taille disque de votre syst&egrave;me.[br
 Cette fonctionnalit&eacute; est &quot;ergonomique&quot;. [br]Si vous la rendez inop&eacute;rante, elle ne perturbera pas les services actuels.[br]Cela sera simplement un gain de performances...</enable_philesight_text>
 <enable_plugins_text>Activez/d&eacute;sactivez les plugins</enable_plugins_text>
+<ENABLE_POSTFIX_MULTI_INSTANCE>Activer le syst&egrave;me de multiple instances</ENABLE_POSTFIX_MULTI_INSTANCE>
 <ENABLE_SA_BLACKLIST_UPDATE>Activer/D&eacute;sactiver la mise &agrave; jour des domaines en liste noire</ENABLE_SA_BLACKLIST_UPDATE>
 <ENABLE_SA_BLACKLIST_UPDATE_TEXT>Si vous changer le bouton en vert, Artica sera en mesure de mettre &agrave; jour toutes les 2 heures le fichier de signature afin d'am&eacute;liorer la d&eacute;tection de SpamAssassin avec plus de 300.000 domaines en liste noire</ENABLE_SA_BLACKLIST_UPDATE_TEXT>
 <enable_scanned_only>Activation de ScannedOnly</enable_scanned_only>
@@ -1299,6 +1337,7 @@ e-mail, il ne s'agit pas d'une adresse SMTP valide</error_bad_mail_formated>
 <error_cannot_be_ip_address>Erreur cela ne peut &ecirc;tre une adresse ip</error_cannot_be_ip_address>
 <error_check_dates>Erreur: svp v&eacute;rifier vos dates</error_check_dates>
 <error_choose_email_or_domain>Erreur: choisir email ou domaine</error_choose_email_or_domain>
+<ERROR_COMPRESSOR>Erreur survenue dans le moteur de compression</ERROR_COMPRESSOR>
 <error_creating_mailbox>Erreur de cr&eacute;ation de la bo&icirc;tes aux lettres locale</error_creating_mailbox>
 <ERROR_CURLPHP_NOT_INSTALLED>Il semble que php pour curl ne soit pas install&eacute; dans votre syst&egrave;me. Certaines fonctionnalit&eacute;s ne pourront &ecirc;tres ex&eacute;cut&eacute;es correctement. Essayez de l'installer par votre syst&egrave;me d'installation ou contactez le support Artica Technology</ERROR_CURLPHP_NOT_INSTALLED>
 <ERROR_CURL_NOT_INSTALLED>Erreur, impossible de trouver le binaire curl</ERROR_CURL_NOT_INSTALLED>
@@ -1413,6 +1452,7 @@ L'op&eacute;ration d'affichage est annul&eacute;e.</error_no_datas>
 <exclude>Exclure</exclude>
 <ExcludeMimeTypeKavExplain>Masque d'exception du filtre par type MIME. Le logiciel d'analyse ne fera pas d'analyse antivirus sur cette liste d'objets.</ExcludeMimeTypeKavExplain>
 <ExcludeMimeType_text>Exclure les fichiers de l'analyse gr&agrave;ce &agrave; leur ent&ecirc;tes MIME</ExcludeMimeType_text>
+<ExecBackupTemporaryPath>R&eacute;pertoire temporaire de travail</ExecBackupTemporaryPath>
 <execute>Executer</execute>
 <execute_operation>Executer l'op&eacute;ration</execute_operation>
 <ExeptionFileSiteList_user_explain>Autoriser le t&eacute;l&eacute;chargement de fichiers via des sites web sp&eacute;cifiques.</ExeptionFileSiteList_user_explain>
@@ -1423,6 +1463,8 @@ L'op&eacute;ration d'affichage est annul&eacute;e.</error_no_datas>
 <explain 1>Donner le domaine de messagerie (apr&egrave;s @ de vos boites aux lettres)</explain 1>
 <explorer>explorateur</explorer>
 <explorer_browse_yours_files>Parcourez vos fichiers et vos ressources autoris&eacute;es</explorer_browse_yours_files>
+<exporting>exportation</exporting>
+<EXPORT_OPERATION_IN_BACKGROUND>L'op&eacute;ration d'exportation va tourner en t&acirc;che de fond, v&eacute;rifiez les &eacute;v&egrave;nements pour visualiser les r&eacute;sultats.</EXPORT_OPERATION_IN_BACKGROUND>
 <EXPORT_ORG>Exporter l'organisation</EXPORT_ORG>
 <expunges>purges</expunges>
 <EXTERNAL_PORTS>Liste des ports externes</EXTERNAL_PORTS>
@@ -1472,6 +1514,8 @@ Il retransfert les messages sur un autre serveur sur le port 25.[br]Fetchmail n'
 <files_size_disk>Taile des fichiers sur disque</files_size_disk>
 <files_size_tmp>Taille des fichiers temporaires sur disque</files_size_tmp>
 <files_transfered>Fichiers transf&eacute;r&eacute;s</files_transfered>
+<file_path>Chemin du fichier</file_path>
+<file_to_upload>fichier &agrave; charger</file_to_upload>
 <fill_form>Remplissez le formulaire</fill_form>
 <filter>filtre</filter>
 <Filtered>Filtr&eacute;</Filtered>
@@ -1501,6 +1545,8 @@ Il retransfert les messages sur un autre serveur sur le port 25.[br]Fetchmail n'
 <firstname>Pr&eacute;nom</firstname>
 <first_emails>premiers emails</first_emails>
 <flow>flux</flow>
+<flush_queue>Choquer les files d'attente</flush_queue>
+<flush_queue_text>Forcer le service SMTP &agrave; relancer l'acheminement des messages retard&eacute;s.</flush_queue_text>
 <folder>dossier</folder>
 <folders>r&eacute;pertoires</folders>
 <folders_monitor>Moniteur de dossiers</folders_monitor>
@@ -1523,9 +1569,12 @@ sous cette forme que vous souhaitez pr&eacute;senter</form_error>
 <fs_type>Type de syst&egrave;me de fichiers</fs_type>
 <gateway>Passerelle</gateway>
 <GDPHP_NOT_INSTALLED>Librairie GD !</GDPHP_NOT_INSTALLED>
+<gender>genre</gender>
 <general_settings>param&egrave;tres g&eacute;n&eacute;rales</general_settings>
 <generate certificate>cr&eacute;er un certificat</generate certificate>
 <generate temporary error>g&eacute;n&eacute;rer des erreurs temporaires</generate temporary error>
+<generate_a_signing_key>G&eacute;n&eacute;rer une clef</generate_a_signing_key>
+<generate_a_signing_key_nokey_text>Vous avez besoin de g&eacute;n&eacute;rer une clef de signature afin d'activer l'&eacute;mission des emails sign&eacute;s pour le DKIM.[br]Cliquez simplement sur le bouton Artica le g&eacute;n&egrave;rera pour vous.</generate_a_signing_key_nokey_text>
 <generate_config>Reconstruire la configuration</generate_config>
 <generate_config_text>Reconstruire tous vos param&egrave;tres vers un champ temporaire ldap</generate_config_text>
 <GENERIC_LDAP_ERROR>Erreur g&eacute;n&eacute;rique du serveur LDAP</GENERIC_LDAP_ERROR>
@@ -1581,6 +1630,8 @@ activer ou d&eacute;sactiver cette fonctionnalit&eacute;.</group_behavior_text>
 <hardware_info>Informations Hardware</hardware_info>
 <hardware_info_text>Voir les composants  de votre syst&egrave;me et l'usage disque</hardware_info_text>
 <hdFree_stat>Statistiques d'espace disque</hdFree_stat>
+<hdparm_infos_text>La performance de votre serveur est &eacute;troitement li&eacute;e &agrave; la performance des disques durs.[br]De surcro&icirc;t si vous avez install&eacute; ce syst&egrave;me dans une machine virtuelle.[br]
+Artica effectue des tests r&eacute;guliers de performances (toutes les 60mn).[br]Ces tests sont bas&eacute;s sur un taux de 100MB/seconde, taux tout &agrave; fait acceptable pour un serveur.[br]le pourcentage correspond alors au taux de transfert. 75% veut dire 75MB/s.[br]En dessous de 30% consid&eacute;rez que la performance de vos disques est m&eacute;diocre et que vous devez revoir votre mat&eacute;riel.</hdparm_infos_text>
 <hd_stat>Performances Disque</hd_stat>
 <Header Field>Champ d'en-t&ecirc;te</Header Field>
 <header_address_token_limit>Nombre Max d'adresses autoris&eacute;es</header_address_token_limit>
@@ -1605,7 +1656,7 @@ Log the optional text if  specified,[br]otherwise log a generic message.
 </HOLD_help>
 <home>Accueil</home>
 <HomeBinding>Home Binding</HomeBinding>
-<HomeBinding_text>Liez les autres r&eacute;pertoire locaux vers le r&eacute;pertoire Home.</HomeBinding_text>
+<HomeBinding_text>Liez les autres r&eacute;pertoires locaux vers le r&eacute;pertoire Home.</HomeBinding_text>
 <homePhone>T&eacute;l&eacute;phone personnel</homePhone>
 <homePostalAddress>Adresse personnelle</homePostalAddress>
 <host>H&ocirc;te</host>
@@ -1648,8 +1699,13 @@ It send notifications to recipients in order to allow them to "download" attache
 <import users explain 2>Ceci est le r&eacute;sultat des 5 lignes de votre fichier analys&eacute;. [Fr] S'il vous pla&icirc;t v&eacute;rifier que l'op&eacute;ration soit couronn&eacute;e de succ&egrave;s</import users explain 2>
 <importation_background_text>L'op&eacute;ration d'importation &agrave; &eacute;t&eacute; programm&eacute;e en t&acirc;che de fond, rafra&icirc;chissez le panel pour visualiser la progression.</importation_background_text>
 <importation_success_scheduled>L'op&eacute;ration &agrave; &eacute;t&eacute; programm&eacute;e en t&acirc;che de fond, affichez les &eacute;v&egrave;nements relatif afin de surveiller le d&eacute;roulement de la t&acirc;che</importation_success_scheduled>
+<importing>importation</importing>
 <import_ad_domain_only>Importer seulement les utilisateurs qui correspondent au domaine email</import_ad_domain_only>
 <import_artica_computers_list_text>Importer une liste d'ordinateur depuis une liste texte</import_artica_computers_list_text>
+<import_contacts_db>importer des contacts</import_contacts_db>
+<import_contacts_db_explain>Cette section va importer des contacts depuis un fichier CSV, le fichier CSV doit &ecirc;tre format&eacute; comme suit:</import_contacts_db_explain>
+<import_contacts_db_text>Importer des contacts en masse dans la base de donn&eacute;es depuis une source externe</import_contacts_db_text>
+<import_fingerprint>Importer l'empreinte SSL</import_fingerprint>
 <import_sub_branch>D&eacute;marrer l'importation &agrave; partir de la sous-branche</import_sub_branch>
 <in>dans</in>
 <INACTIVE>Inactif</INACTIVE>
@@ -1962,6 +2018,8 @@ The message delivery transport name is the first field in the entry in the maste
 [i]You don't want to run lots of those at the same time.[/i]
 </local_destination_concurrency_limit_text>
 <local_domains_table>Domaines Locaux</local_domains_table>
+<local_file>fichier local</local_file>
+<local_smtp_host>Serveur SMTP local</local_smtp_host>
 <locked>v&eacute;rouill&eacute;</locked>
 <locking_type>Type de verrouillages</locking_type>
 <log>&eacute;v&egrave;nements</log>
@@ -2021,8 +2079,8 @@ The message delivery transport name is the first field in the entry in the maste
 <mail_from>De</mail_from>
 <MAIL_MODULES>Modules de Messagerie</MAIL_MODULES>
 <mail_to>Vers</mail_to>
-<main>Main</main>
-<main.cf>Fichier de configuration Main</main.cf>
+<main>principal</main>
+<main.cf>Fichier de configuration</main.cf>
 <main.cf_explain>Lire le  fichier principal de configuration g&eacute;n&eacute;r&eacute; et ex&eacute;cut&eacute; par Postfix</main.cf_explain>
 <maintenance>maintenance</maintenance>
 <main_interfaces>Interfaces principales</main_interfaces>
@@ -2137,6 +2195,8 @@ La valeur par d&eacute;faut est d.[br]Sp&eacute;cifiez 0 si vous d&eacute;sirez 
 <messaging_servers>Serveurs de messagerie</messaging_servers>
 <messaging_service>Service de messagerie</messaging_service>
 <messaging_service_text>Le service de messagerie vous autorise &agrave; fournir un relais de messagerie fournissant toutes les s&eacute;curit&eacute;s comme l'anti-spam, l'antivirus...</messaging_service_text>
+<migrate_user_text>Cette op&eacute;ration va transformer tous les contacts de cette base de donn&eacute;es en utilisateurs locaux dans votre organisation.[br]Si un serveur de bo&icirc;te aux lettres est pr&eacute;sent, les utilisateurs import&eacute;s disposeront d'une bo&icirc;te aux lettres.[br]S&eacute;lectionnez dans ce formulaire, le groupe d'utilisateur qui va h&eacute;berger les nouveaux arrivants.</migrate_user_text>
+<migrate_user_tini_text>Importer cette base de donn&eacute;es dans votre organisation et transformez les contacts en utilisateurs</migrate_user_tini_text>
 <mime_nesting_limit>Niveau Max d'embo&icirc;tement de messages</mime_nesting_limit>
 <mime_nesting_limit_text>Le niveau maximal d'embo&icirc;tement de messages multi-parties que le processeur MIME manipulera. Postfix refuse le courrier plus imbriqu&eacute;.</mime_nesting_limit_text>
 <minimal>minimum</minimal>
@@ -2172,7 +2232,7 @@ This parameter also limits the time an unreachable destination is kept in the sh
 <move>d&eacute;placer</move>
 <move_member>Membres des groupes</move_member>
 <move_member_text>Ajouter/d&eacute;placer ce membre dans un groupe</move_member_text>
-<movies>Sites offering cinema programs</movies>
+<movies>Sites offrant des programmes de cin&eacute;ma</movies>
 <MTA Clients Settings>Param&egrave;tres de Clients MTA</MTA Clients Settings>
 <multidomains_icon_text>chaque utilisateur disposera d'une compte de type &quot;user@domain.tld&quot; au lieu de &quot;user&quot;</multidomains_icon_text>
 <music>Site offrant le t&eacute;l&eacute;chargement de musiques</music>
@@ -2462,6 +2522,7 @@ or until further truncation is not possible.(eg:192.168.1.0/24)
 <pcfg_title2>Voir main.cf</pcfg_title2>
 <pcfg_title3>Voir master.cf</pcfg_title3>
 <percentage>Pourcentage</percentage>
+<performance>Performance</performance>
 <performances_settings>Performances</performances_settings>
 <performances_settings_text>Tous les param&egrave;tres qui pourrait acc&eacute;l&eacute;rer les processus postfix</performances_settings_text>
 <perform_operation_ask>Ex&eacute;cuter cette op&eacute;ration ?</perform_operation_ask>
@@ -2536,12 +2597,15 @@ or when the address is an authorized destination (see "permit auth destination" 
 <POSTFIX_MULTI_INSTANCE_HOWTO>Lors de l'activation d'instances multiples Postfix, le processus principal sera d&eacute;sactiv&eacute; et n'&eacute;coutera que l'interface r&eacute;seau locale (127.0.0.1) afin de servir uniquement les services web.[br]
 Chaque organisation sera en mesure d'administrer leur propre instance serveur et la console web sera modifi&eacute;e afin de fournir cette fonctionnalit&eacute;</POSTFIX_MULTI_INSTANCE_HOWTO>
 <POSTFIX_MULTI_INSTANCE_TEXT>Les multiples instances de Postfix fournissent un vrai relais de messagerie PAR organisation ajout&eacute;e sur le serveur.[br]Cette fonction permet simplement de configurer un syst&egrave;me &agrave; multiple fonctions.[br]Chaque instance disposera de ses propres r&eacute;pertoires de travail.</POSTFIX_MULTI_INSTANCE_TEXT>
+<POSTFIX_MULTI_INSTANCE_TINY_TEXT>Transformez votre serveur en un serveur &agrave; multiple services SMTP pour vos organisations</POSTFIX_MULTI_INSTANCE_TINY_TEXT>
 <postfix_network>Param&egrave;tres r&eacute;seaux postfix</postfix_network>
 <postfix_network_text>Indiquez ici votre r&eacute;seau local et qu'elles adresses IP du r&eacute;seau postfix doit lier</postfix_network_text>
 <POSTFIX_PLUGINS>Plugins postfix</POSTFIX_PLUGINS>
 <POSTFIX_PROCESS_NUMBER>Nombre de processus de messagerie</POSTFIX_PROCESS_NUMBER>
 <postfix_realtime_events>Flux en temps r&eacute;el Postfix</postfix_realtime_events>
 <postfix_realtime_events_text>Afficher les mails rout&eacute;s en temps r&eacute;el</postfix_realtime_events_text>
+<postfix_reconfigure>reconfigurer le service SMTP</postfix_reconfigure>
+<postfix_reconfigure_text>Reconstruit tous les param&egrave;tres et red&eacute;marre le service SMTP</postfix_reconfigure_text>
 <postfix_reload>Recharger le service SMTP</postfix_reload>
 <postfix_reload_text>Forcer le service SMTP &agrave; rafra&icirc;chir ses bases, ses param&egrave;tres et ses t&acirc;ches courantes</postfix_reload_text>
 <postfix_restart>Red&eacute;marrer le service SMTP</postfix_restart>
@@ -2557,6 +2621,12 @@ This is because Postfix needs to open lookup tables ahead of time, but the reade
 <postfix_status>Statut du syst&egrave;me de messagerie Postfix</postfix_status>
 <postfix_status_stopped>Le syst&egrave;me de messagerie Postfix est arr&ecirc;t&eacute;</postfix_status_stopped>
 <postmaster>postmaster</postmaster>
+<postmaster_explain>L'adresse email qui recevra les notifications de ce syst&egrave;me. Cela veut dire les erreurs SMTP (mails retard&eacute;s ou en erreur), les t&acirc;che syst&egrave;mes programm&eacute;es.</postmaster_explain>
+<postmaster_identity>Identit&eacute; du Postmaster</postmaster_identity>
+<postmaster_identity_explain>Cette option prend tout son sens si vous utilisez un serveur relais qui effectue la v&eacute;rification de l'adresse email d'&eacute;mission.[br]Par d&eacute;faut, postfix utilise le nom su serveur comme domaine &agrave; rajouter derri&egrave;re &quot;MAILER-DAEMON&quot;</postmaster_identity_explain>
+<postmaster_identity_text>Indiquez l'adresse eMail &eacute;mettrice des messages de notifications</postmaster_identity_text>
+<POSTMASTER_NOT_EDITED>Le Postmaster n'a pas &eacute;t&eacute; configur&eacute;</POSTMASTER_NOT_EDITED>
+<POSTMASTER_NOT_EDITED_TEXT>Vous devez d&eacute;finir l'adresse eMail qui sera destinatrice des messages de notification SMTP</POSTMASTER_NOT_EDITED_TEXT>
 <prepend to the subject>Pr&eacute;fixer au sujet</prepend to the subject>
 <PREPEND_help>Prepend  the  specified  message header to the message.
 [br]When more than one PREPEND action  executes,[br]the  first prepended header appears before the second etc. prepended header.
@@ -2954,6 +3024,7 @@ You can enable RBL RHSBL features in order to prevent spams
 <select_group_text>S'il vous pla&icirc;t s&eacute;lectionner dans la liste le groupe que vous souhaitez g&eacute;rer, afin de voir les r&eacute;glages</select_group_text>
 <select_ip_address>S&eacute;lectionner l'adresse</select_ip_address>
 <select_this_container>S&eacute;lectionnez ce conteneur</select_this_container>
+<select_this_file>S&eacute;lectionner ce fichier</select_this_file>
 <select_user_group_text>A group is used to define privileges of features and operations permitted in the portal.[br]If you didn't select a group, the user will be a simple user with only access to it's mailbox</select_user_group_text>
 <select_user_group_title>S&eacute;lectionner le groupe d'utilisateur</select_user_group_title>
 <selfmx>Self MX</selfmx>
@@ -3325,14 +3396,36 @@ by changing 5xx reply codes into 4xx. However, this option is no cure for addres
 <spam option 5r>De confiance</spam option 5r>
 <spam option 6>Si un message est consid&eacute;r&eacute; comme &laquo;non d&eacute;tect&eacute;&raquo;</spam option 6>
 <spam option 6r>Non D&eacute;tect&eacute;</spam option 6r>
+<SPAMASSASSIN_DNS_BLACKLIST>Listes noires DNS</SPAMASSASSIN_DNS_BLACKLIST>
+<SPAMASSASSIN_DNS_BLACKLIST_TEXT>Activez les listes noires DNS dans Spamassassin afin d'augmenter le niveau de d&eacute;tection.</SPAMASSASSIN_DNS_BLACKLIST_TEXT>
 <SPAMASSASSIN_NEWVERSION>Nouvelle version de SpamAssassin</SPAMASSASSIN_NEWVERSION>
 <SPAMASSASSIN_NEWVERSION_TEXT>Une nouvelle version de SpamAssassin est disponible sur les serveurs de mise &agrave; jour. Il est conseill&eacute; de mettre &agrave; jour afin d'augmenter le niveau de d&eacute;tection de SPAM</SPAMASSASSIN_NEWVERSION_TEXT>
 <SPAMASSASSIN_UPDATE_COMPILATION>Compilation des bases de SpamAssassin</SPAMASSASSIN_UPDATE_COMPILATION>
 <SPAMASSASSIN_UPDATE_COMPILATION_TEXT>Les bases de SpamAssassin sont en cours de compilation.Le syst&egrave;me peut &ecirc;tre charg&eacute; pendant cette op&eacute;ration.</SPAMASSASSIN_UPDATE_COMPILATION_TEXT>
 <spamass_add_header>Ajouter X-Spam- dans l'ent&ecirc;te des messages en fonction des scores</spamass_add_header>
 <spamass_rewrite_header>Insertion de mots dans les &eacute;l&eacute;ments basiques des messages en fonction des scores comme le sujet, l'&eacute;metteur ou le destinataire.</spamass_rewrite_header>
+<SPAMASS_SCORES_EXPLAIN>les scores pilotent le classifieur Bayesian, ils peut &ecirc;tre au nombre de 1 &agrave; 4.[br]Si seulement un param&egrave;tre est indiqu&eacute; (le premier), celui-ci est utilis&eacute; dans toutes circonstances.[br]Les scores &agrave; 0 ne sont pas &eacute;valu&eacute;s.[br]
+[ul]
+[li]Le premier score est utilis&eacute; lorsque  le classifieur Bayesian et le test r&eacute;seaux n'est pas utilis&eacute;.[/li]
+[li]le second, lorsque le classifieur Bayesian n'est pas utilis&eacute; mais le test r&eacute;seaux est utilis&eacute;[/li]
+[li]le troisi&egrave;me, lorsque le classifieur Bayesian est utilis&eacute; mais pas le test r&eacute;seaux[/li]
+[li]le quatri&egrave;me, lorsque le classifieur Bayesian et le test r&eacute;seaux sont utilis&eacute;s[/li]
+[/ul]</SPAMASS_SCORES_EXPLAIN>
 <spam_detection_families>Familles de d&eacute;tection Anti-Spam</spam_detection_families>
 <speed>vitesse</speed>
+<SPF_FAIL>Echec</SPF_FAIL>
+<SPF_FAIL_HELP>L'enregistrement SPF indique que le l'%u0125ote n'est pas autoris&eacute; &agrave; &eacute;mettre des messages</SPF_FAIL_HELP>
+<SPF_HELO_FAIL>Echec (mode HELO)</SPF_HELO_FAIL>
+<SPF_HELO_NEUTRAL>Neutral HELO</SPF_HELO_NEUTRAL>
+<SPF_HELO_PASS>Passe (mode HELO)</SPF_HELO_PASS>
+<SPF_HELO_SOFTFAIL>Echec transitoire (mode HELO)</SPF_HELO_SOFTFAIL>
+<SPF_NEUTRAL_HELP>L'enregistrement SPF indique explicitement que rien ne peut &ecirc;tre fait sur la validation.</SPF_NEUTRAL_HELP>
+<SPF_PASS>Passe</SPF_PASS>
+<SPF_PASS_HELP>L'enregistrement SPF indique que le h&ocirc;te est autoriser &agrave; &eacute;mettre des messages</SPF_PASS_HELP>
+<SPF_SOFTFAIL>Echec transitoire</SPF_SOFTFAIL>
+<SPF_SOFTFAIL_HELP>L'enregistrement SPF indique que l'h&ocirc;te n'est pas autoris&eacute; &agrave; &eacute;mettre des message mais se trouve en transition</SPF_SOFTFAIL_HELP>
+<SPF_SPAMMASS_ADD_WL_TEXT>Ajoutez ici l'adresse de l'&eacute;metteur.
+Vous pouvez d&eacute;finir par exemple joe@domain.tld ou bien  *@domain.tld, le caractere * est autoris&eacute;.</SPF_SPAMMASS_ADD_WL_TEXT>
 <spouseName>Nom d'&eacute;pouse</spouseName>
 <sqlgrey_main_settings>Configurations principales SQLGrey</sqlgrey_main_settings>
 <sqlgrey_satus>Statut SqlGrey</sqlgrey_satus>
@@ -3347,6 +3440,8 @@ by changing 5xx reply codes into 4xx. However, this option is no cure for addres
 <squid_accel_websites_text>Indiquez ici les serveurs web qui seront mise en cache et prot&eacute;g&eacute;s par votre proxy.</squid_accel_websites_text>
 <squid_advanced_parameters>Param&egrave;tres avanc&eacute;s</squid_advanced_parameters>
 <squid_advanced_parameters_text>Personnalisation et param&egrave;tres avanc&eacute;s du proxy SQUID</squid_advanced_parameters_text>
+<SQUID_CACHES_OVER>Caches proxy en surcapacit&eacute;</SQUID_CACHES_OVER>
+<SQUID_CACHES_OVER_TEXT>Il semble que votre syst&egrave;me de cache soit en surcapacit&eacute;, afin d'am&eacute;liorer les performances, veuillez &eacute;tendre vos caches sur le disque dur</SQUID_CACHES_OVER_TEXT>
 <squid_events>&Eacute;v&egrave;nements de Squid</squid_events>
 <squid_filter_stats_text>Cr&eacute;ez un filtre afin de pr&eacute;ciser l'affichage des &eacute;v&egrave;nements</squid_filter_stats_text>
 <squid_main_settings>Param&egrave;tres de cache Squid</squid_main_settings>
@@ -3376,8 +3471,16 @@ Trois valeurs possible :[ul]
 <srv_postfix>Statut des services Postfix</srv_postfix>
 <srv_postfix_infos>Informations sur Postfix</srv_postfix_infos>
 <srv_postfix_version>Version majeure Postfix</srv_postfix_version>
+<sslcertck>Strictly check the server certificate</sslcertck>
+<sslcertck_text>fetchmail essaye v&eacute;rifier strictement le certificat du serveur avec un ensemble de  certificats [b]locaux de confiance[/b]. [br]
+Si le certificat du serveur ne peut pas &ecirc;tre obtenu ou n'est pas sign&eacute; par l'un des plus dignes de confiance (directement ou indirectement),
+la connexion SSL &eacute;chouera, malgr&eacute; l'option  d'empreinte digitale SSL.
+[br] Notez que le CRL (listes de r&eacute;vocation de certificats) sont pris en charge uniquement dans la version de OpenSSL 0.9.7 , voir plus r&eacute;centes!
+[br] Votre horloge syst&egrave;me devrait &ecirc;tre &eacute;galement suffisamment pr&eacute;cise pour l'utilisation de cette option.
+[br] Notez que ce comportement peut devenir facultatif car cette option sera par d&eacute;faut dans les  futures versions de fetchmail</sslcertck_text>
 <SSLStrictSNIVHostCheck>D&eacute;sactiver le support SNI</SSLStrictSNIVHostCheck>
 <SSLStrictSNIVHostCheck_text>Utilis&eacute; pour les application groupware avec Apache.[br]Cette option d&eacute;fini si un client NON SNI est autoris&eacute; &agrave; acc&eacute;der au service web.[br]Elle pr&eacute;vient une erreur &quot;No hostname was provided via SNI for a name based virtual host&quot;</SSLStrictSNIVHostCheck_text>
+<ssl_fingerprint>Empreinte digitale SSL</ssl_fingerprint>
 <standard_classes>Classes standart</standard_classes>
 <start>D&eacute;marrer</start>
 <Start With>D&eacute;marrer avec</Start With>
@@ -3489,6 +3592,9 @@ Si vous d&eacute;sactivez cette option, Artica utilisera uniquement un cache de 
 <tcp_address>Adresse TCP</tcp_address>
 <tcp_main_settings>Param&egrave;tres cartes r&eacute;seau</tcp_main_settings>
 <templates>Mod&egrave;les</templates>
+<template_add>Add a new template</template_add>
+<template_add_emailing_text>Construire le message qui sera utilis&eacute; lors de l'&eacute;mission en masse des messages</template_add_emailing_text>
+<template_name>Nom du mod&egrave;le</template_name>
 <test>test</test>
 <text>Cette page vous montre toutes les 10 secondes les &eacute;v&eacute;nements g&eacute;n&eacute;r&eacute;s par le syst&egrave;me de messagerie Postfix.</text>
 <text1>....</text1>
@@ -3508,7 +3614,9 @@ Exemple: user.name@domain.tlb -&gt; domain.tlb</text_add_domain_entity>
 <Timeout for receiving response from UDS server>Limite de temps lors de la r&eacute;ception de la r&eacute;ponse des serveurs UDS (en secondes)</Timeout for receiving response from UDS server>
 <timezone>Zone de temps</timezone>
 <timezones>Zones de temps</timezones>
+<TIME_AM>Matin</TIME_AM>
 <time_date_com_text_moscow>Click to visit the web site timeanddate.com[br]In order to see the current time in [b]moscow[/b]</time_date_com_text_moscow>
+<TIME_PM>APM</TIME_PM>
 <title>Ev&eacute;nements Artica-Postfix</title>
 <TITLE_DOMAINS>Param&egrave;tres principaux</TITLE_DOMAINS>
 <title_infos>Informations de statistiques</title_infos>
@@ -3776,6 +3884,7 @@ Si il est en rouge, vous allez devoir maintenir la base des utilisateurs.[br]Cet
 <upgrade_your_system>Mettez &agrave; jour votre syst&egrave;me</upgrade_your_system>
 <upload>t&eacute;l&eacute;charger</upload>
 <upload file>Fichier de t&eacute;l&eacute;chargement</upload file>
+<upload_a_file>charger un fichier</upload_a_file>
 <upload_max_filesize>Taille Max du fichier de t&eacute;l&eacute;chargement</upload_max_filesize>
 <upload_new_license>T&eacute;l&eacute;charger une nouvel licence</upload_new_license>
 <upload_vpn_configuration>Charger les param&egrave;tres VPN</upload_vpn_configuration>
@@ -3811,6 +3920,7 @@ Si il est en rouge, vous allez devoir maintenir la base des utilisateurs.[br]Cet
 <UseUpdateServerUrl>Utiliser l'url du serveur de mise &agrave; jours</UseUpdateServerUrl>
 <UseUpdateServerUrlOnly>Utiliser seulement l'url de ce serveur pour les mises &agrave; jours</UseUpdateServerUrlOnly>
 <use_apache>Utiliser uniquement Apache</use_apache>
+<use_compressed_zip_file>Mettez un fichier compress&eacute; utilisant la compression [b]ZIP[/b]</use_compressed_zip_file>
 <use_local_storage>Utiliser le stockage local</use_local_storage>
 <use_local_storage_text>Parcourez ce serveur et s&eacute;lectionnez un dossier sur le syst&egrave;me de fichier local</use_local_storage_text>
 <USE_MY_IPS_EXAMPLES_TEXT>Diff&eacute;rents fournisseurs d'acc&egrave;s sont disponibles dans cette section afin d'&eacute;mettre des messages sur Internet</USE_MY_IPS_EXAMPLES_TEXT>
@@ -3851,6 +3961,7 @@ In the url the "%f" can be used to specify the real name of downloaded file</Vir
 <virusname>Nom du virus</virusname>
 <virus_by_sender_domains>D&eacute;tection des virus par les domaines &eacute;metteurs</virus_by_sender_domains>
 <VIRUS_EVENTS>&Eacute;v&egrave;nements viraux</VIRUS_EVENTS>
+<VISIT_WEB_SITE_INFOS>Afficher le site web pour plus d'informations</VISIT_WEB_SITE_INFOS>
 <waiting>Veuillez patienter pendant l'op&eacute;ration</waiting>
 <waiting_database_compilation>En attente de la compilation des bases</waiting_database_compilation>
 <waiting_settings>param&egrave;tres d'attente</waiting_settings>
@@ -3884,12 +3995,14 @@ Il offre aussi le filtrage de contenu avec un antivirus et le filtrage des pages
 <weekly>hebdomadaire</weekly>
 <WELCOME>Bienvenue sur Artica-Postfix</WELCOME>
 <welcomeb>bienvenue</welcomeb>
+<WgetBindIpAddress>Utiliser l'IP locale</WgetBindIpAddress>
 <when>Quand</when>
 <WHEN_TO_BACKUP>Quand sauvegarder ?</WHEN_TO_BACKUP>
 <WHEN_TO_BACKUP_TEXT>D&eacute;finissez l'ordonnancement de l'ex&eacute;cution de la sauvegarde</WHEN_TO_BACKUP_TEXT>
 <white list>Liste Blanche</white list>
 <white list explain>Gestion de la liste des adresses.[br] Les messages de ces adresses ne sont pas v&eacute;rifi&eacute;es pour la pr&eacute;sence de spam</white list explain>
 <whitelisted_networks>R&eacute;seaux en liste blanche</whitelisted_networks>
+<whitelist_text>Liste blanche</whitelist_text>
 <width>largeur</width>
 <width_action>largeur</width_action>
 <WifiConnectAPDisabled>Le mode client Wifi est d&eacute;sactiv&eacute;, aucune op&eacute;ration cliente n'est permise</WifiConnectAPDisabled>

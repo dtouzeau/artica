@@ -101,6 +101,15 @@ function loadmem(){
 }
 
 function loadavg(){
+	@mkdir("/etc/artica-postfix/croned.1",0666,true);
+	$unix=new unix();
+	$pidfile="/etc/artica-postfix/".basename(__FILE__).".".__FUNCTION__.".pid";
+	$pid=trim(@file_get_contents($pidfile));
+	if($unix->process_exists($pid)){die();}
+
+	$pid=getmypid();
+	@file_put_contents($pidfile,$pid);
+	
 	$timefile="/etc/artica-postfix/croned.1/".basename(__FILE__).__FUNCTION__;
 	if(file_time_min($timefile)<5){return null;}
 	@unlink($timefile);

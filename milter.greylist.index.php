@@ -8,6 +8,7 @@
 	$user=new usersMenus();
 	if($user->AsPostfixAdministrator==false){header('location:users.index.php');exit();}
 	if(isset($_GET["main"])){main_switch();exit;}
+	if(isset($_GET["index"])){popup();exit;}
 	if(isset($_GET["SaveGeneralSettings"])){SaveConf();exit;}
 	if(isset($_GET["add_acl"])){main_acladd();exit;}
 	if(isset($_GET["explainThisacl"])){explainThisacl();exit;}
@@ -28,12 +29,12 @@
 	if(isset($_GET["js"])){js();exit;}
 	if(isset($_GET["dumpfile-js"])){dumpfile_js();exit;}
 	if(isset($_GET["dumpfile-popup"])){dumpfile_popup();exit;}
-	if(isset($_GET["popup-page"])){popup();exit;}
+	if(isset($_GET["popup-page"])){main_tabs();exit;}
 	if(isset($_GET["popup-settings"])){popup_settings();exit;}
 	if(isset($_GET["popup-acl"])){popup_acl();exit;}
 	if(isset($_GET["popup-save"])){popup_save();exit;}
 	if(isset($_GET["popup-logs"])){popup_logs();exit;}
-	main_page();
+	
 	
 function js(){
 	$content=file_get_contents("js/sqlgrey.js");
@@ -42,8 +43,15 @@ function js(){
 	$main_settings=$tpl->_ENGINE_parse_body('{main_settings}');
 	$acl=$tpl->_ENGINE_parse_body('{acl}');
 	$page=CurrentPageName();
+	$start="StartMilterGreylistPage();";
+	if(isset($_GET["in-front-ajax"])){$start="StartMilterGreyListInFront();";}
+	
 	$html="
 	$content
+	
+	function StartMilterGreyListInFront(){
+		$('#BodyContent').load('$page?popup-page=yes');
+	}
 	
 	function StartMilterGreylistPage(){
 		YahooWin('820','$page?popup-page=yes','$title');
@@ -61,13 +69,71 @@ function js(){
 	
 	function main_events_greylist(){
 		YahooWin2(\"600\",\"$page?popup-logs=yes\",\"$title\")
+	}
 	
-	}		
 	
+	function LoadMilterGreyListAcl(index){
+		YahooWin3(450,'$page?add_acl=true&num='+index,'$acl::N.'+index);	
+	}
 
+	function miltergreylist_status(){
+		LoadAjax('mgreylist-status','$page?status=yes');
 	
+	}	
 	
-	StartMilterGreylistPage();
+	var x_MilterGreyListPrincipalSave= function (obj) {
+			var tempvalue=obj.responseText;
+			if(tempvalue.length>0){alert(tempvalue)};
+			YahooWin2Hide();
+			miltergreylist_status();
+	}	
+	
+	function MilterGreyListPrincipalSave(){
+		 var XHR = new XHRConnection();
+		 XHR.appendData('SaveGeneralSettings','yes');
+		 if(document.getElementById('MilterGreyListEnabled').checked){
+		  XHR.appendData('MilterGreyListEnabled',1);
+		 }else{
+		  XHR.appendData('MilterGreyListEnabled',0);
+		}
+		 
+		 XHR.appendData('timeout',document.getElementById('timeout').value);
+		 XHR.appendData('timeout_TIME',document.getElementById('timeout_TIME').value);
+		 XHR.appendData('greylist',document.getElementById('greylist').value);
+		 XHR.appendData('greylist_TIME',document.getElementById('greylist_TIME').value);
+		 XHR.appendData('autowhite',document.getElementById('autowhite').value);
+		 XHR.appendData('autowhite_TIME',document.getElementById('autowhite_TIME').value);
+		 document.getElementById('MilterGreyListConfigGeneSaveID0').innerHTML='<center style=\"margin:20px;padding:20px\"><img src=\"img/wait_verybig.gif\"></center>';
+		 XHR.sendAndLoad('$page', 'GET',x_MilterGreyListPrincipalSave);
+	}
+	
+	var x_SaveMilterGreyListAclID= function (obj) {
+			var tempvalue=obj.responseText;
+			if(tempvalue.length>0){alert(tempvalue)};
+			YahooWin3Hide();
+			LoadAjax('acllist','$page?acllist=true');
+		}		
+
+	function SaveMilterGreyListAclID(){
+		var XHR = new XHRConnection();
+		XHR.appendData('SaveAclID',document.getElementById('SaveAclID').value);
+		XHR.appendData('type',document.getElementById('type').value);
+		if(document.getElementById('pattern')){
+			XHR.appendData('pattern',document.getElementById('pattern').value);
+		}
+		XHR.appendData('infos',document.getElementById('infos').value);
+		XHR.appendData('mode',document.getElementById('mode').value);
+		if(document.getElementById('dnsrbl_class')){
+			XHR.appendData('dnsrbl_class',document.getElementById('dnsrbl_class').value);
+			XHR.appendData('delay',document.getElementById('delay').value);
+		}
+		 
+		
+		document.getElementById('ffm11245').innerHTML='<center style=\"margin:20px;padding:20px\"><img src=\"img/wait_verybig.gif\"></center>';
+     	XHR.sendAndLoad('$page', 'GET',x_SaveMilterGreyListAclID);
+	}
+	
+	$start
 	";
 	
 	echo $html;
@@ -140,22 +206,64 @@ function popup_save(){
 		}
 		
 	$html="<H1>{APP_MILTERGREYLIST}</H1>
-	" . RoundedLightWhite("
+
 	<div style=width:100%;height:300px;overflow:auto;'>
 	$t
-	</div>");
+	</div>";
 	
 	$tpl=new templates();
 	echo $tpl->_ENGINE_parse_body($html);
 	
 }
 
+function main_tabs(){
+	
+	$page=CurrentPageName();
+	$tpl=new templates();
+	$array["index"]='{index}';
+	$array["popup-acl"]='{acls}';
+	
+
+	
+	
+	while (list ($num, $ligne) = each ($array) ){
+		$html[]=$tpl->_ENGINE_parse_body("<li><a href=\"$page?$num=yes\"><span>$ligne</span></li>\n");
+	}
+	
+	
+	echo "
+	<div id=main_config_mgreylist style='width:100%;height:550px;overflow:auto'>
+		<ul>". implode("\n",$html)."</ul>
+	</div>
+		<script>
+				$(document).ready(function(){
+					$('#main_config_mgreylist').tabs({
+				    load: function(event, ui) {
+				        $('a', ui.panel).click(function() {
+				            $(ui.panel).load(this.href);
+				            return false;
+				        });
+				    }
+				});
+			
+			
+			});
+		</script>";		
+	
+}
+
+
 
 function popup(){
-	$img=RoundedLightWhite("<img src='img/bg_sqlgrey-300.jpg'>");
+	
+	
+	
+	
+	
+	$img="<img src='img/bg_sqlgrey-240.jpg'>";
 	$page=CurrentPageName();
 	$mg=Paragraphe('folder-mailbox-64.png','{main_settings}','{main_settings_text}',"javascript:main_settings_greylist()",null,210,100,0,true);
-	$mg1=Paragraphe('folder-rules2-64.png','{acl}','{acl_text}',"javascript:main_accesslist_greylist()",null,210,100,0,true);
+	//$mg1=Paragraphe('folder-rules2-64.png','{acl}','{acl_text}',"javascript:main_accesslist_greylist()",null,210,100,0,true);
 	$mg2=Paragraphe('folder-logs-643.png','{events}','{events_text}',"javascript:main_events_greylist()",null,210,100,0,true);
 	$mg3=Buildicon64("DEF_ICO_EVENTS_MGREYLITS_DUMP");
 	
@@ -165,40 +273,35 @@ function popup(){
 	<table style='width:100'>
 	<tr>
 		<td valign='top'>$mg</td>
-		<td valign='top'>$mg1</td>
-	</tr>
-	<tr>
 		<td valign='top'>" . applysettings_miltergreylist()."</td>
-		<td valign='top'>$mg2</td>
 	</tr>
 	<tr>
+		<td valign='top'>$mg2</td>
 		<td valign='top'>$mg3</td>
-		<td valign='top'>&nbsp;</td>
-	</tr>	
-	
-	
+	</tr>
 	</table>
 	";
-	$content=RoundedLightWhite($content);
+	
 	
 	$html="
-	<H1>{APP_MILTERGREYLIST}</H1>
 	<table style='width:100%'>
 	<tr>
 		<td valign='top'>
 			$img
 			<br>
-			" . main_status()."
+			<div id='mgreylist-status'></div>
 		</td>
 		<td valign='top'>
-			
 			$content
 		</td>
 	</tr>
-	<tr>
-		<td colspan=2 style='padding-top:5px'>" .RoundedLightWhite("<p class=caption>{about}</p>")."</td>
-	</tR>
+	
 	</table>
+	
+	<script>
+		miltergreylist_status();
+	</script>
+	
 	";
 	
 	$tpl=new templates();
@@ -210,87 +313,19 @@ function popup(){
 function popup_settings(){
 	
 	$content="<div id='greylist_config'>".greylist_config(1)."</div>";
-	$html="<H1>{main_settings}</H1>".RoundedLightWhite($content);
+	$html=$content;
 	$tpl=new templates();
 	echo $tpl->_ENGINE_parse_body($html);	
 	
 }
 function popup_acl(){
 	
-	$content="<div id='greylist_config'>".main_acl(1)."</div>";
-	$html="<H1>{acl}</H1>".RoundedLightWhite($content);
+	$html="<div id='greylist_config'>".main_acl(1)."</div>";
 	$tpl=new templates();
 	echo $tpl->_ENGINE_parse_body($html);	
 	
 }
 	
-function main_page(){
-	
-
-	
-	$html=
-	"
-<script language=\"JavaScript\">       
-var timerID  = null;
-var timerID1  = null;
-var tant=0;
-var reste=0;
-
-function demarre(){
-   tant = tant+1;
-   reste=10-tant;
-	if (tant < 10 ) {                           
-      timerID = setTimeout(\"demarre()\",5000);
-      } else {
-               tant = 0;
-               //document.getElementById('wait').innerHTML='<img src=img/wait.gif>';
-               ChargeLogs();
-               demarre();                                //la boucle demarre !
-   }
-}
-
-
-function ChargeLogs(){
-	LoadAjax('services_status','$page?status=yes&hostname={$_GET["hostname"]}');
-	}
-</script>	
-	
-	<table style='width:100%'>
-	<tr>
-	<td width=1% valign='top'><img src='img/bg_sqlgrey.jpg'>	<p class=caption>{about}</p></td>
-	<td valign='top'><div id='services_status'>". main_status() . "</div></td>
-	</tr>
-	<tr>
-		<td colspan=2 valign='top'><br>
-			<div id='greylist_config'></div>
-		</td>
-	</tr>
-	</table>
-	<script>demarre();LoadAjax('greylist_config','$page?main=yes');</script>
-	
-	";
-	
-	$cfg["JS"][]='js/sqlgrey.js';
-	$tpl=new template_users('{APP_MILTERGREYLIST}',$html,0,0,0,0,$cfg);
-	echo $tpl->web_page;
-	}	
-
-function main_tabs(){
-	if(!isset($_GET["main"])){$_GET["main"]="yes";};
-	if($_GET["hostname"]==null){$hostname=$users->hostname;$_GET["hostname"]=$hostname;}else{$hostname=$_GET["hostname"];}
-	$page=CurrentPageName();
-	$array["yes"]='{main_settings}';
-	$array["acl"]='{acl}';
-	//$array["dnsrbl"]='{dnsrbl}';
-	$array["logs"]='{events}';	
-	$array["conf"]='{config}';
-	while (list ($num, $ligne) = each ($array) ){
-		if($_GET["main"]==$num){$class="id=tab_current";}else{$class=null;}
-		$html=$html . "<li><a href=\"javascript:LoadAjax('greylist_config','$page?main=$num&hostname=$hostname')\" $class>$ligne</a></li>\n";
-			
-		}
-	return "<div id=tablist>$html</div>";		
-}
 
 
 function main_switch(){
@@ -309,66 +344,13 @@ function main_switch(){
 }	
 
 function main_status(){
-
-$users=new usersMenus();
-	if($_GET["hostname"]==null){$hostname=$users->hostname;$_GET["hostname"]=$hostname;}else{$hostname=$_GET["hostname"];}		
-	$ini=new Bs_IniHandler();
 	$sock=new sockets();
-	$ini->loadString($sock->getfile('MILTER_GREYLIST_STATUS',$_GET["hostname"]));	
-	if($ini->_params["MILTER_GREYLIST"]["running"]==0){
-		$img="okdanger32.png";
-		$rouage='rouage_on.png';
-		$rouage_title='{start_service}';
-		$rouage_text='{start_service_text}';
-		$error= "";
-		$js="SQlgreyActionService(\"{$_GET["hostname"]}\",\"start\")";
-		$status="{stopped}";
-	}else{
-		$img="ok32.png";
-		$status="running";
-		$rouage='rouage_off.png';
-		$rouage_title='{stop_service}';
-		$rouage_text='{stop_service_text}';		
-		$js="SQlgreyActionService(\"{$_GET["hostname"]}\",\"stop\")";
-	}
-	
-	$status="<table style='width:100%'>
-	<tr>
-	<td valign='top'>
-		<img src='img/$img'>
-	</td>
-	<td valign='top'>
-		<table style='width:100%'>
-		<tr>
-		<td align='right' nowrap><strong>{APP_MILTERGREYLIST}:</strong></td>
-		<td><strong>$status</strong></td>
-		</tr>		
-		<tr>
-		<td align='right'><strong>{pid}:</strong></td>
-		<td><strong>{$ini->_params["MILTER_GREYLIST"]["master_pid"]}</strong></td>
-		</tr>
-		<tr>
-		<td align='right'><strong>{memory}:</strong></td>
-		<td nowrap><strong>{$ini->_params["MILTER_GREYLIST"]["master_memory"]}&nbsp; mb</strong></td>
-		</tr>
-		<tr>
-		<td align='right'><strong>{version}:</strong></td>
-		<td><strong>{$ini->_params["MILTER_GREYLIST"]["master_version"]}</strong></td>
-		</tr>				
-		<tr><td colspan=2>$error</td></tr>	
-		<tr><td colspan=2>&nbsp;</td></tr>	
-		
-		</table>		
-	</td>
-	</tr>
-	</table>";
-	
-	$status=RoundedLightGreen($status);
-	$status_serv=RoundedLightGrey(Paragraphe($rouage ,$rouage_title. " (squid)",$rouage_text,"javascript:$js"));
+	$ini=new Bs_IniHandler();
 	$tpl=new templates();
-	return $tpl->_ENGINE_parse_body($status);
-	
-}
+	$ini->loadString(base64_decode($sock->getFrameWork('cmd.php?milter-greylist-ini-status=yes')));
+	$status=DAEMON_STATUS_ROUND("MILTER_GREYLIST",$ini);
+	echo $tpl->_ENGINE_parse_body($status);
+	}
 
 
 function greylist_config($noecho=0){
@@ -381,18 +363,17 @@ function greylist_config($noecho=0){
 	$arraytime=array(
 		"m"=>"{minutes}","h"=>"{hour}","d"=>"{day}"
 	);
-	$tabs=main_tabs()."<br>
-	<h5>{main_settings}</H5>";
-	$html="
 
-	<form name='FFM_DANS2'>
+	$html="
+	<div id='MilterGreyListConfigGeneSaveID0'>
+	
 	<input type='hidden' name='hostname' value='$hostname'>
 	<input type='hidden' name='SaveGeneralSettings' value='yes'>
 	<table style='width:100%' class=table_form>
 	
 <tr>
 	<td $style align='right' nowrap valign='top' class=legend>{enable_milter}:</strong></td>
-	<td $style valign='top'>" . Field_numeric_checkbox_img('MilterGreyListEnabled',$pure->MilterGreyListEnabled)."</td>
+	<td $style valign='top'>" . Field_checkbox('MilterGreyListEnabled',1,$pure->MilterGreyListEnabled)."</td>
 	<td $style valign='top'>{enable_milter_text}</td>
 	</tr>		
 	
@@ -422,11 +403,15 @@ function greylist_config($noecho=0){
 	<tr><td colspan=3 style='border-top:1px solid #005447'>&nbsp;</td></tr>
 	<tr>
 	<td $style colspan=3 align='right' valign='top'>
+	<hr>
+	". button("{apply}","MilterGreyListPrincipalSave()")."
 	
-	<input type='button' value='{save}&nbsp;&raquo;' OnClick=\"javascript:ParseForm('FFM_DANS2','$page',true,false,false,'greylist_config','$page?main=yes&notab=$noecho');\"></td>
 	</tr>
+	
+	
 
-	</table></FORM><br>$table";
+
+	</table></div>";
 	if(isset($_GET["notab"])){$tabs=null;}
 	$tpl=new templates();
 	if($noecho==1){return $tpl->_ENGINE_parse_body($html);}
@@ -457,20 +442,21 @@ function main_acladd(){
 		$ar=$mil->ParseAcl($datas);
 	}
 
-	$arrayd=Field_array_Hash(array(""=>"{select}","blacklist"=>"{blacklist}",'whitelist'=>"{whitelist}","greylist"=>"{greylist}"),'mode',$ar[1],null,null,0,'width:110px');
+	$arrayd=Field_array_Hash(array(""=>"{select}","blacklist"=>"{blacklist}",
+	'whitelist'=>"{whitelist}","greylist"=>"{greylist}"),'mode',$ar[1],null,null,0,'width:110px;font-size:13px;padding:5px');
 	
-	$arrayf=Field_array_Hash($action,'type',$ar[2],"explainThisacl();",null,0,'width:150px');
+	$arrayf=Field_array_Hash($action,'type',$ar[2],"explainThisacl();",null,0,'width:150px;font-size:13px;padding:5px');
 	
 	$html="
-	<FORM NAME='ffm11245'>
+	<div id='ffm11245'>
 	<input type='hidden' name='SaveAclID' id='SaveAclID' value='{$_GET["num"]}'>
 	<table style='width:100%'>
 	<tr>
-	<td align='right' width=1% nowrap><strong>{method}:</strong></td>
+	<td align='right' width=1% nowrap style='font-size:13px'><strong>{method}:</strong></td>
 	<td><strong>$arrayd</strong></td>
 	</tr>
 	<tr>
-	<td align='right' width=1% nowrap><strong>{type}:</strong></td>
+	<td align='right' width=1% nowrap style='font-size:13px'><strong>{type}:</strong></td>
 	<td><strong>$arrayf</strong></td>
 	</tr>	
 	<tr>
@@ -481,21 +467,23 @@ function main_acladd(){
 	<div id='addform'>
 		<table style='width:100%'>
 			<tr>
-				<td align='right' width=1% nowrap><strong>{pattern}:</strong></td>
-				<td><textarea name='pattern' rows=3 style='width:100%'>{$ar[3]}</textarea>
+				<td align='right' width=1% nowrap valign='top'><strong style='font-size:13px'>{pattern}:</strong></td>
+				<td><textarea name='pattern' id='pattern' rows=3 style='width:100%;font-size:15px;font-weight:bold'>{$ar[3]}</textarea>
 			</tr>
 		</table>
 	</div>
-	
+	<hr>
 	<table style='width:100%'>
 		<tr>
-		<td align='right' width=1% nowrap><strong>{infos}:</strong></td>
-		<td><textarea name='infos' rows=1 style='width:100%'>{$ar[4]}</textarea>
+		<td align='right' width=1% nowrap><strong style='font-size:13px'>{infos}:</strong></td>
+		<td><textarea name='infos' id='infos' rows=1 style='width:100%;font-size:15px;font-weight:bold'>{$ar[4]}</textarea>
 		</tr>	
 	</table>
 	<table style='width:100%'>
 <tr>
-<td colspan=2 align='right'><input type='button' OnClick=\"javascript:ParseYahooForm('ffm11245','$page',true);LoadAjax('acllist','$page?acllist=true');\" value='{edit}&nbsp;&raquo;'></td>
+<td colspan=2 align='right'>
+<hr>". button("{apply}","SaveMilterGreyListAclID()")."
+</td>
 </tr>
 </table>
 </FORM>
@@ -508,21 +496,23 @@ function main_acladd(){
 
 
 function main_acl($noecho=0){
-	
-$pure=new milter_greylist();
+
+	$pure=new milter_greylist();
 	$page=CurrentPageName();
-	$tabs=main_tabs()."<br>
-	<h5>{acl}</H5>";
 	$html="
 	<table style='width:100%'>
 	<tr>
-		<td><div class=caption>{acl_text}</div></td>
-		<td valign='top'>" . imgtootltip('add-64.png',"{add_acl}","YahooWin3(450,'$page?add_acl=true&num=-1','{add_acl}');")."</tD>
+		<td><div style='font-size:14px'>{acl_text}</div></td>
+		<td valign='top'>" . imgtootltip('add-64.png',"{add_acl}","LoadMilterGreyListAcl(-1)")."</tD>
 	</tr>
 	</table>
-	<div id='acllist' style='width:100%;height:300px;overflow:auto'>".main_acl_list()."</div>
+	<hr>
+	<div id='acllist' style='width:100%;height:400px;overflow:auto'></div>
 
 	
+	<script>
+		LoadAjax('acllist','$page?acllist=true');
+	</script>
 	";
 	
 	$tpl=new templates();
@@ -547,7 +537,7 @@ function main_acl_list(){
 			
 		$a=$pure->ParseAcl($val);
 		if(is_array($a)){
-			$link="YahooWin(450,'$page?add_acl=true&num=$num','{edit_acl} Num $num');";
+			$link="LoadMilterGreyListAcl($num);";
 			
 			$html=$html . "<tr " . CellRollOver().">
 			<td width=1%><img src='img/fw_bold.gif'></td>
@@ -564,7 +554,7 @@ function main_acl_list(){
 		
 	}}
 	$html=$html."</table>";
-	$html=RoundedLightGrey($html);
+	
 	$tpl=new templates();
 	return  $tpl->_ENGINE_parse_body($html);		
 	
@@ -590,6 +580,7 @@ $line=$pure->ParseAcl($pure->acl[$id]);
 				$re[1]=15;
 				$re[2]="m";
 			}
+			$line[3]=trim($line[3]);
 			$form=
 			"<table style='width:100%'>
 				<tr>
@@ -607,8 +598,8 @@ $line=$pure->ParseAcl($pure->acl[$id]);
 	
 		default:$form="<table style='width:100%'>
 			<tr>
-				<td align='right' width=1% nowrap><strong>{pattern}:</strong></td>
-				<td><textarea name='pattern' rows=3 style='width:100%'>{$line[3]}</textarea>
+				<td align='right' width=1% nowrap valign='top'><strong style='font-size:13px'> {pattern}:</strong></td>
+				<td><textarea name='pattern' id='pattern' rows=2 style='width:100%;font-size:14px;font-weight:bold'>{$line[3]}</textarea>
 			</tr>
 		</table>";
 			break;
@@ -658,7 +649,7 @@ function SaveAclID(){
 		$pure->acl[$id]=$line;
 	}else{$pure->acl[]=$line;}
 	$pure->SaveToLdap();
-	echo $tpl->_ENGINE_parse_body('{success}');
+	
 	
 }
 
@@ -682,8 +673,7 @@ $pure=new milter_greylist();
 	$g=$pure->global_conf;
 	$g=nl2br($g);
 	
-	$html=main_tabs()."<br>
-	<h5>{config}</H5>
+	$html="
 	<div style='padding:10px'>
 	<code>$g</code>
 	</div>";
@@ -697,7 +687,7 @@ function main_dnsrbl(){
 	$pure=new milter_greylist();
 $page=CurrentPageName();
 	$link="YahooWin(450,'$page?edit_dnsrbl=&subline=0','{add_dnsrbl}');";
-	$html=main_tabs()."<br>
+	$html="
 	<h5>{dnsrbl}</H5>
 	<p class=caption><div style='float:right'>
 	
@@ -870,7 +860,7 @@ echo main_dnsrbl_list();
 function main_logs(){
 	$page=CurrentPageName();
 	$tpl=new templates();
-	$html=main_tabs() . "
+	$html="
 	<H5>{events}</H5>
 	<iframe src='miltergreylist.events.php' style='width:100%;height:500px;border:0px'></iframe>";
 	echo $tpl->_ENGINE_parse_body($html);

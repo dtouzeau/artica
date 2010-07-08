@@ -103,7 +103,6 @@ begin
    if length(result)>0 then exit;
    
    RegExpr:=TRegExpr.Create;
-   RegExpr.Expression:='V([0-9\.]+)';
    tmpstr:=LOGS.FILE_TEMP();
    fpsystem(BIN_PATH() + ' -h >'+tmpstr+' 2>&1');
    if not FileExists(tmpstr) then exit;
@@ -111,10 +110,20 @@ begin
    l.LoadFromFile(tmpstr);
    logs.DeleteFile(tmpstr);
    for i:=0 to l.Count-1 do begin
+       RegExpr.Expression:='V([0-9\.]+)';
        if RegExpr.Exec(l.Strings[i]) then begin
           result:=RegExpr.Match[1];
           break;
        end;
+
+       RegExpr.Expression:='Internet Systems Consortium DHCP Server\s+([0-9\.a-z]+)';
+       if RegExpr.Exec(l.Strings[i]) then begin
+          result:=RegExpr.Match[1];
+          break;
+       end;
+
+
+
    end;
    
    l.Free;

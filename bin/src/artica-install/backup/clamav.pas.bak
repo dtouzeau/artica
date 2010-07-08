@@ -388,7 +388,6 @@ procedure TClamav.CLAMD_START();
 
     cmdline    :string;
     Socket     :string;
-    PidPath    :string;
     PidFile    :string;
     Pids       :string;
     LogFile    :string;
@@ -397,7 +396,7 @@ procedure TClamav.CLAMD_START();
     pid        :string;
     user_daemon:string;
 begin
-
+     Socket:='';
      logs.Debuglogs('###################### CLAMAV ######################');
 
      if not FileExists(CLAMD_BIN_PATH()) then begin
@@ -599,8 +598,6 @@ end;
 FUNCTION TClamav.CLAMAV_STATUS():string;
 var
    ini:TstringList;
-   Binpath:string;
-
 begin
 
    if not FileExists(CLAMD_BIN_PATH()) then begin
@@ -665,18 +662,12 @@ end;
 
 procedure TClamav.CLAMD_STOP();
 var
-count:integer;
-D:boolean;
 procs:string;
-html:boolean;
 begin
   if not FileExists(CLAMD_BIN_PATH()) then begin
      writeln('Stopping clamav daemon.......: Not installed');
      exit;
   end;
-
-  d:=COMMANDLINE_PARAMETERS('debug');
-  count:=0;
   if not SYS.PROCESS_EXIST(CLAMD_PID()) then begin
        writeln('Stopping clamav daemon.......: Already stopped');
        FRESHCLAM_STOP();
@@ -809,8 +800,7 @@ logs.Debuglogs('Starting......: Cleaning freshclam done...');
 end;
 //##############################################################################
 procedure TClamav.FRESHCLAM_START();
-var SYS:Tsystem;
-   D:Boolean;
+var
    cmdline,DatabaseDirectory:string;
    count:integer;
    user:string;
@@ -1010,10 +1000,7 @@ end;
 //#############################################################################
 procedure TClamav.MILTER_START();
 var
-   socket_path:string;
    daemon_path:string;
-   pidfile:string;
-   daemon_option:string;
    cmd:string;
    ClamavMilterEnabled:integer;
    pid:string;
@@ -1022,9 +1009,6 @@ var
    DatabaseDirectory:string;
    UpdateLogFile:string;
 begin
-   socket_path:='/var/spool/postfix/var/run/clamav/clamav-milter.ctl';
-   pidfile:='/var/spool/postfix/var/run/clamav/clamav-milter.pid';
-   daemon_option:='-q -f '+socket_path;
    daemon_path:=MILTER_DAEMON_PATH();
    pid:='';
    count:=0;
@@ -1478,7 +1462,7 @@ if D then writeln('^ClamAV (.+)/([0-9]+) --> ' + logs.ReadFromFile(tmpstr));
 
     RegExpr:=TRegExpr.Create;
     FileDatas:=TStringList.Create;
-    FileDatas.LoadFromFile(tmpstr);
+    try FileDatas.LoadFromFile(tmpstr) except exit; end;
     logs.DeleteFile(tmpstr);
     for i:=0 to FileDatas.Count-1 do begin
         RegExpr.Expression:='^ClamAV (.+)/([0-9]+)';

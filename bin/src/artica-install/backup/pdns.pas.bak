@@ -6,7 +6,7 @@ unit pdns;
 interface
 
 uses
-    Classes, SysUtils,variants,strutils,IniFiles, Process,logs,unix,RegExpr,zsystem,openldap,tcpip,bind9;
+    Classes, SysUtils,variants,strutils,Process,logs,unix,RegExpr,zsystem,openldap,tcpip,bind9;
 
 
 
@@ -38,6 +38,7 @@ public
     procedure   RECURSOR_STOP();
     procedure   RECURSOR_START();
     function    STATUS:string;
+    function    STATUS_RECURSOR:string;
 END;
 
 implementation
@@ -102,7 +103,6 @@ var
     RegExpr:TRegExpr;
     FileDatas:TStringList;
     i:integer;
-    BinPath:string;
     filetmp:string;
 begin
 
@@ -142,7 +142,7 @@ var
    l:TstringList;
    initPath:string;
 begin
-
+initPath:='';
 l:=TstringList.Create;
 if length(initPath)=0 then initPath:='/etc/init.d/pdns';
 
@@ -236,7 +236,7 @@ begin
     bind9.STOP();
     if loglevel>9 then straces:=' --log-dns-details --log-failed-updates ';
     fpsystem(BIN_PATH()+' --daemon --guardian=yes --recursor=127.0.0.1:1553 --config-dir=/etc/powerdns --lazy-recursion=yes'+straces);
-
+    count:=0;
 
  while not SYS.PROCESS_EXIST(PID_NUM()) do begin
 
@@ -282,7 +282,7 @@ begin
     forcedirectories('/var/run/pdns');
     if loglevel>9 then trace:=' --trace';
     fpsystem(RECURSOR_BIN_PATH()+' --daemon --export-etc-hosts --quiet=no --config-dir=/etc/powerdns'+trace);
-
+    count:=0;
  while not SYS.PROCESS_EXIST(RECURSOR_PID_NUM()) do begin
 
         sleep(100);
@@ -309,12 +309,6 @@ procedure tpdns.STOP();
 var
    count:integer;
    pid:string;
-   tmp:string;
-   l:Tstringlist;
-   i:integer;
-   tt:integer;
-   path:string;
-    RegExpr:TRegExpr;
 begin
     if FileExists('/etc/init.d/pdns') then begin
        if not FileExists('/etc/init.d/pdns.bak') then fpsystem('/bin/mv /etc/init.d/pdns /etc/init.d/pdns.bak');
@@ -387,12 +381,6 @@ procedure tpdns.RECURSOR_STOP();
 var
    count:integer;
    pid:string;
-   tmp:string;
-   l:Tstringlist;
-   i:integer;
-   tt:integer;
-   path:string;
-    RegExpr:TRegExpr;
 begin
 
 
@@ -435,83 +423,17 @@ end;
 //#############################################################################
 function tpdns.STATUS:string;
 var
-ini:TstringList;
-pid:string;
+pidpath:string;
 begin
-   ini:=TstringList.Create;
-   ini.Add('[APP_PDNS]');
-   if not fileExists(BIN_PATH()) then begin
-      ini.Add('application_installed=0');
-      ini.Add('service_disabled=0');
-      result:=ini.Text;
-      ini.free;
-      exit;
-   end;
-
-      ini.Add('master_version='+VERSION());
-      ini.Add('service_name=APP_PDNS');
-      ini.Add('service_cmd=pdns');
-      ini.Add('service_disabled=1');
-
-      if SYS.MONIT_CONFIG('APP_PDNS','/var/run/pdns/pdns.pid','pdns') then begin
-       ini.Add('monit=1');
-       result:=ini.Text;
-       exit;
-      end;
-
-
-
-
-
-      pid:=PID_NUM();
-      if SYS.PROCESS_EXIST(pid) then ini.Add('running=1') else  ini.Add('running=0');
-      ini.Add('application_installed=1');
-      ini.Add('application_enabled=1');
-      ini.Add('master_pid='+ pid);
-      ini.Add('master_memory=' + IntToStr(SYS.PROCESS_MEMORY(pid)));
-      ini.Add('status='+SYS.PROCESS_STATUS(pid));
-      ini.Add('pid_path=/var/run/pdns/pdns.pid');
-
-
-
-
-   result:=ini.Text;
-   ini.free;
+   SYS.MONIT_DELETE('APP_PDNS');
+   SYS.MONIT_DELETE('APP_PDNS_RECURSOR');
+pidpath:=logs.FILE_TEMP();
+fpsystem(SYS.LOCATE_PHP5_BIN()+' /usr/share/artica-postfix/exec.status.php --pdns >'+pidpath +' 2>&1');
+result:=logs.ReadFromFile(pidpath);
+logs.DeleteFile(pidpath);
 
 end;
 //#############################################################################
-function tpdns.STATUS_RECURSOR:string;
-var
-ini:TstringList;
-pid:string;
-begin
-   if not fileExists(RECURSOR_BIN_PATH()) then exit;
-   ini:=TstringList.Create;
-
-  ini.Add('[PDNS_RECURSOR]');
-  ini.Add('master_version='+VERSION());
-  ini.Add('service_cmd=pdns');
-  ini.Add('service_disabled=1');
-  ini.Add('service_name=APP_PDNS_RECURSOR');
-
-  if SYS.MONIT_CONFIG('APP_PDNS_RECURSOR','/var/run/pdns/pdns_recursor.pid','pdns') then begin
-     ini.Add('monit=1');
-     result:=ini.Text;
-     exit;
-  end;
-
-
-  pid:=RECURSOR_PID_NUM();
-  ini.Add('application_installed=1');
-  ini.Add('master_pid='+ pid);
-  ini.Add('master_memory=' + IntToStr(SYS.PROCESS_MEMORY(pid)));
-  ini.Add('status='+SYS.PROCESS_STATUS(pid));
-  ini.Add('pid_path=/var/run/pdns/pdns_recursor.pid');
-  result:=ini.Text;
-   ini.free;
-
-end;
-//##############################################################################
 procedure tpdns.CONFIG_DEFAULT();
 var
    l:Tstringlist;
@@ -525,6 +447,7 @@ var
    ldapserver:string;
    localldap:boolean;
 begin
+iplist:='';
 ForceDirectories('/etc/powerdns/pdns.d');
 if not TryStrToInt(SYS.GET_INFO('PowerDNSLogLevel'),loglevel) then loglevel:=1;
 tcp:=ttcpip.Create;

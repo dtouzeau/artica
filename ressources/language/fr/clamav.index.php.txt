@@ -15,7 +15,7 @@ If you want to install it, click on the icon below to perform installation troug
 <INSTALL_CLAMAV_TEXT>Cette op&eacute;ration va compiler et installer la derni&egrave;re version de Clam Antivirus sur votre serveur</INSTALL_CLAMAV_TEXT>
 <junk_ndb>Phishing, malware, ecards, spam, 419s, loterie, travail, stocks</junk_ndb>
 <lott_ndb>Simple escroqueries de loterie (type 7 signatures)</lott_ndb>
-<main_cld>Base de donn&eacute;es antivirus Main</main_cld>
+<main_cld>Base de donn&eacute;es antivirus</main_cld>
 <MaxAttempts>Tentatives Maximum</MaxAttempts>
 <MaxAttempts_text>Combien de tentatives (par miroir) &agrave; faire avant d'abandonner</MaxAttempts_text>
 <mirrors>mirroirs</mirrors>

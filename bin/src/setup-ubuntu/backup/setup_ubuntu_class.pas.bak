@@ -6,7 +6,7 @@ unit setup_ubuntu_class;
 interface
 
 uses
-  Classes, SysUtils,strutils,RegExpr in 'RegExpr.pas',unix,IniFiles,setup_libs,distridetect;
+  Classes, SysUtils,RegExpr in 'RegExpr.pas',unix,setup_libs,distridetect;
 type
   TStringDynArray = array of string;
   type
@@ -40,6 +40,7 @@ public
       function CheckBasePHP():string;
       function CheckPDNS():string;
       function CheckZabbix():string;
+      function CheckOpenVPN():string;
 END;
 
 implementation
@@ -77,7 +78,7 @@ end;
 //#########################################################################################
 procedure tubuntu.Show_Welcome;
 var
-   base,postfix,u,cyrus,samba,squid,nfs,pdns,zabbix:string;
+   base,postfix,u,cyrus,samba,squid,nfs,pdns,zabbix,openvpn:string;
 begin
     if not FileExists('/usr/bin/apt-get') then begin
       writeln('Your system does not store apt-get utils, this program must be closed...');
@@ -107,8 +108,11 @@ begin
     nfs:=CheckNFS();
     writeln('Checking.............: PowerDNS System...');
     pdns:=CheckPDNS();
+    writeln('Checking.............: OpenVPN System...');
+    openvpn:=CheckOpenVPN();
 
-    u:=libs.INTRODUCTION(base,postfix,cyrus,samba,squid,nfs,pdns);
+
+    u:=libs.INTRODUCTION(base,postfix,cyrus,samba,squid,nfs,pdns,openvpn);
 
     writeln('You have selected the option : ' + u);
 
@@ -215,7 +219,25 @@ begin
           exit;
     end;
 
+    if u='8' then begin
+          fpsystem('DEBIAN_FRONTEND=noninteractive /usr/bin/apt-get -o Dpkg::Options::="--force-confnew" update --fix-missing');
+          fpsystem('DEBIAN_FRONTEND=noninteractive /usr/bin/apt-get -o Dpkg::Options::="--force-confnew" install -f');
+          fpsystem('DEBIAN_FRONTEND=noninteractive /usr/bin/apt-get -o Dpkg::Options::="--force-confnew" autoremove');
+          fpsystem('DEBIAN_FRONTEND=noninteractive /usr/bin/apt-get -o Dpkg::Options::="--force-confnew" remove bind9 bind9-utils');
+          InstallPackageLists(zabbix);
+          fpsystem('/etc/init.d/artica-postfix restart zabbix');
+          Show_Welcome;
+          exit;
+    end;
 
+    if u='9' then begin
+          fpsystem('DEBIAN_FRONTEND=noninteractive /usr/bin/apt-get -o Dpkg::Options::="--force-confnew" update --fix-missing');
+          fpsystem('DEBIAN_FRONTEND=noninteractive /usr/bin/apt-get -o Dpkg::Options::="--force-confnew" install -f');
+          fpsystem('DEBIAN_FRONTEND=noninteractive /usr/bin/apt-get -o Dpkg::Options::="--force-confnew" autoremove');
+          InstallPackageLists(openvpn);
+          Show_Welcome;
+          exit;
+    end;
 
 
 
@@ -355,17 +377,15 @@ var
    l:TstringList;
    f:string;
    i:integer;
-   distri:tdistriDetect;
    UbuntuIntVer:integer;
-   libs:tlibs;
+
 
 begin
 
 f:='';
 UbuntuIntVer:=9;
 l:=TstringList.Create;
-distri:=tdistriDetect.Create();
-libs:=tlibs.Create;
+
    l.add('portmap');
    l.add('nfs-common');
    l.add('nfs-kernel-server');
@@ -389,14 +409,14 @@ var
    distri:tdistriDetect;
    UbuntuIntVer:integer;
    libmysqlclient:boolean;
-   libs:tlibs;
+
 
 begin
 f:='';
 UbuntuIntVer:=9;
 l:=TstringList.Create;
 distri:=tdistriDetect.Create();
-libs:=tlibs.Create;
+
 if not TryStrToInt(distri.DISTRINAME_VERSION,UbuntuIntVer) then UbuntuIntVer:=9;
 
 if(UbuntuIntVer=0) then begin
@@ -452,6 +472,7 @@ l.add('freetds-dev');
 
 if distri.DISTRINAME_CODE='DEBIAN' then begin
 
+      writeln('Checking Code DEBIAN ('+distri.DISTRINAME_VERSION+')');
 
    if distri.DISTRINAME_VERSION='4' then begin
       l.add('libc-client2002-dev');
@@ -472,6 +493,7 @@ if distri.DISTRINAME_CODE='DEBIAN' then begin
 end;
 
 if distri.DISTRINAME_CODE='UBUNTU' then begin
+   writeln('Checking Code UBUNTU ('+distri.DISTRINAME_VERSION+')');
    l.add('libc-client2007b-dev');
    l.add('libcurl4-openssl-dev');
    l.add('libsnmp-dev');
@@ -540,8 +562,6 @@ l.Add('openssh-server');
 l.Add('strace');
 l.add('mtools');
 l.add('re2c');
-l.add('bridge-utils');
-l.add('cfengine2');
 l.add('cron');
 l.add('debconf-utils');
 l.add('discover');
@@ -631,13 +651,6 @@ l.Add('lighttpd');
 //process limitations
 L.add('cpulimit');
 
-l.add('catdoc'); //xapian
-l.add('antiword'); //xapian
-l.add('uuid-dev'); //zarafa
-
-
-
-
 l.Add('mysql-server');
 l.Add('rrdtool');
 l.add('libmodule-build-perl');
@@ -655,7 +668,6 @@ l.Add('libgeo-ipfree-perl');
 l.Add('libnet-xwhois-perl');
 l.Add('libgssapi-perl');
 l.Add('libwww-perl');
-l.Add('mhonarc');
 l.Add('libcrypt-openssl-rsa-perl');
 l.Add('libcrypt-openssl-bignum-perl');
 l.Add('libcrypt-openssl-random-perl');
@@ -704,11 +716,6 @@ l.add('libnet-server-perl');
 l.add('libtext-template-perl');
 l.add('libnet-dns-perl');
 l.add('libstring-random-perl');
-
-
-//openvpn
-L.add('openvpn');
-l.add('bridge-utils');
 
 l.add('mailsync');
 l.Add('sasl2-bin');
@@ -765,16 +772,17 @@ l.add('dar');
 l.add('libgeoip-dev');
 l.add('libgeoip1');
 l.add('libwrap0-dev');
-l.add('libclamav-dev');
 l.add('gettext');
 l.add('ruby');
 l.add('libdb4.2-ruby1.8');
 l.add('libcairo-ruby1.8');
-l.add('cryptsetup');
 l.add('monit');
-l.add('libtommath-devel'); //clamav
+
+l.add('libtommath-dev'); //clamav
+l.add('libclamav-dev'); //clamav
 
 
+;
 l.add('rsync');
 l.add('stunnel4');
 l.add('smbfs');
@@ -802,6 +810,7 @@ if distri.DISTRINAME_CODE='DEBIAN' then begin
       l.add('apache');
       l.add('apache-common');
       l.add('libversion-perl');
+      l.add('libmysqlclient15-dev');
    end;
 
    if distri.DISTRINAME_VERSION='5' then begin
@@ -814,6 +823,7 @@ if distri.DISTRINAME_CODE='DEBIAN' then begin
       l.add('libtommath-dev');
       l.add('libsnmp-dev');
       l.add('perl-modules');
+      l.add('libmysqlclient15-dev');
 
    end;
 
@@ -841,14 +851,22 @@ if distri.DISTRINAME_CODE='UBUNTU' then begin
 
    if UbuntuIntVer=8 then begin
       l.add('libversion-perl');
+      l.add('libmysqlclient15-dev');
    end;
 
    if UbuntuIntVer>8 then begin
       l.add('php5-geoip');
       l.add('libtommath-dev');
       l.add('perl-modules');
-
+      l.add('libmysqlclient15-dev');
    end;
+
+
+   if UbuntuIntVer>9 then begin
+       l.add('udisks');
+       l.add('libmysqlclient-dev');
+    end;
+
 
 end;
 
@@ -901,6 +919,36 @@ end;
  result:=f;
 end;
 //#########################################################################################
+
+
+function tubuntu.CheckOpenVPN():string;
+var
+   l:TstringList;
+   f:string;
+   i:integer;
+   distri:tdistriDetect;
+   UbuntuIntVer:integer;
+begin
+
+f:='';
+l:=TstringList.Create;
+distri:=tdistriDetect.Create();
+UbuntuIntVer:=9;
+libs:=tlibs.Create;
+if not TryStrToInt(distri.DISTRINAME_VERSION,UbuntuIntVer) then UbuntuIntVer:=9;
+L.add('openvpn');
+l.add('bridge-utils');
+l.add('pptp-linux');
+
+fpsystem('/bin/rm -rf /tmp/packages.list');
+
+for i:=0 to l.Count-1 do begin
+     if not is_application_installed(l.Strings[i]) then begin
+          f:=f + ',' + l.Strings[i];
+     end;
+end;
+ result:=f;
+end;
 
 function tubuntu.CheckZabbix():string;
 var
@@ -964,6 +1012,7 @@ l.Add('libconvert-tnef-perl');
 l.Add('libhtml-parser-perl ');
 l.Add('libfile-scan-perl ');
 l.Add('libarchive-zip-perl ');
+l.add('libmail-spf-query-perl');
 l.Add('sanitizer ');
 l.Add('wv');
 l.Add('ttf-dustin ');
@@ -979,9 +1028,20 @@ l.add('wv');
 l.add('libmilter-dev');
 l.add('pflogsumm');
 l.add('dkim-filter');
+l.Add('mhonarc');
+l.Add('p7zip'); // 7zr
+l.Add('p7zip-full'); //7za
+l.Add('arc'); // arc
+l.Add('zoo');
+l.Add('lha');
+l.Add('cabextract');
+l.Add('tnef');
+l.Add('rpm');
+
 
 
 //Zarafa
+l.add('uuid-dev'); //zarafa
 l.add('libgsasl7-dev'); //gsasl.h
 
 //ASSP
@@ -1029,8 +1089,6 @@ var
    l:TstringList;
    f:string;
    i:integer;
-   distri:tdistriDetect;
-
 begin
 f:='';
 l:=TstringList.Create;
@@ -1051,17 +1109,16 @@ end;
  l.free;
 
 end;
-
+//#########################################################################################
 function tubuntu.CheckAmavisPerl():string;
 var
    l:TstringList;
    f:string;
    i:integer;
-   distri:tdistriDetect;
+
 
 begin
 f:='';
-distri:=tdistriDetect.Create();
 l:=TstringList.Create;
 l.Add('libcrypt-openssl-rsa-perl');
 l.Add('libmail-dkim-perl');
@@ -1131,6 +1188,8 @@ l.Add('nmap');
 l.add('libcupsimage2-dev');
 l.add('attr');
 l.add('acl');
+l.add('catdoc'); //xapian
+l.add('antiword'); //xapian
 fpsystem('touch /etc/artica-postfix/samba.check.time');
 if distri.DISTRINAME_CODE='UBUNTU' then begin
       if UbuntuIntVer>8 then begin
@@ -1153,6 +1212,7 @@ l.add('libjpeg62-dev');
 l.add('libpam0g-dev');
 l.add('uuid-dev');
 l.add('krb5-user');
+l.add('cryptsetup');
 
 for i:=0 to l.Count-1 do begin
      if not is_application_installed(l.Strings[i]) then begin
@@ -1211,9 +1271,6 @@ l:=TstringList.Create;
 l.Add('squid3');
 l.Add('squidclient');
 l.Add('dansguardian');
-l.Add('awstats');
-l.add('sarg');
-l.add('libclamav-dev');
 for i:=0 to l.Count-1 do begin
      if not is_application_installed(l.Strings[i]) then begin
           f:=f + ',' + l.Strings[i];

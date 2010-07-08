@@ -23,7 +23,6 @@ private
      DEV_TYPE:string;
      function PID_NUM():string;
      function BuildCommandLIneTUN():string;
-     function BuildCommandLIneTAP():string;
      function INVESTIGATE():boolean;
 public
     procedure   Free;
@@ -151,7 +150,6 @@ end;
    logs.DebugLogs('Starting......: OpenVPN tunnel type...: "' + DEV_TYPE + '"...');
    logs.DebugLogs('Starting......: OpenVPN ressources....: ' + DirRessources() + '...');
    logs.DebugLogs('Starting......: OpenVPN version.......: ' + VERSION() + '...');
-   logs.DebugLogs('Starting......: OpenVPN server config.: /etc/openvpn/server.conf');
 
    if not SYS.ip_forward_enabled() then begin
          logs.Syslogs('Starting......:  OpenVPN Enable IP Forwarding');
@@ -187,18 +185,8 @@ end;
    forceDirectories('/var/log/openvpn');
    logs.DeleteFile('/var/log/openvpn/openvpn.log');
 
-
-    if DEV_TYPE<>'tap0' then begin
-
-       logs.Debuglogs('Starting......: OpenVPN Bridged is not set, change to tun');
-       cmd:=BIN_PATH()+' '+BuildCommandLIneTUN();
-    end else begin
-        logs.OutputCmd(BIN_PATH()+' --mktun --dev tap0');
-        CREATE_BRIDGE();
-        cmd:=BIN_PATH()+' '+BuildCommandLIneTAP();
-    end;
-
-   logs.OutputCmd(cmd);
+    cmd:=BIN_PATH()+' '+BuildCommandLIneTUN();
+    logs.OutputCmd(cmd);
 
   while not SYS.PROCESS_EXIST(PID_NUM()) do begin
         sleep(500);
@@ -244,7 +232,7 @@ begin
     l.LoadFromFile('/var/log/openvpn/openvpn.log');
     RegExpr:=TRegExpr.Create;
     for i:=0 to l.Count-1 do begin
-        RegExpr.Expression:='Cannot load certificate file.+?fopen:No such file or directory');
+        RegExpr.Expression:='Cannot load certificate file.+?fopen:No such file or directory';
         if RegExpr.Exec(l.Strings[i]) then begin
            logs.DebugLogs('Starting......: OpenVPN Certificate missing, try to build a new one');
            fpsystem('/bin/rm /etc/artica-postfix/openvpn/keys/*');
@@ -266,12 +254,6 @@ result:=trim(logs.ReadFromFile('/etc/openvpn/cmdline.conf'));
 if Copy(result,length(result),1)='?' then result:=Copy(result,1,length(result)-1);
 end;
 //############################### TAP ###############################################
-
-function topenvpn.BuildCommandLIneTAP():string;
-begin
-fpsystem(SYS.LOCATE_PHP5_BIN()+' /usr/share/artica-postfix/exec.openvpn.php --server-conf');
-result:=logs.ReadFromFile('/etc/openvpn/cmdline.conf');
-end;
 procedure topenvpn.VerifConfig();
 begin
         ForceDirectories('/etc/artica-postfix/openvpn');
@@ -604,14 +586,9 @@ end;
 
 if not SYS.PROCESS_EXIST(PID_NUM()) then begin
    logs.Syslogs('Stopping OpenVPN......................: Success');
-   if DEV_TYPE='tap0' then begin
-      fpsystem('ifconfig br0 down');
-      fpsystem('brctl delbr br0');
-      fpsystem('openvpn --rmtun --dev tap0');
-      fpsystem('ifdown ' + eth);
-      fpsystem('ifup ' + eth);
-      fpsystem(SYS.LOCATE_PHP5_BIN()+' /usr/share/artica-postfix/exec.openvpn.php --iptables-delete');
-   end;
+   fpsystem(SYS.LOCATE_PHP5_BIN()+' /usr/share/artica-postfix/exec.openvpn.php --server-stop');
+end;
+   fpsystem(SYS.LOCATE_PHP5_BIN()+' /usr/share/artica-postfix/exec.openvpn.php --iptables-delete');
    fpsystem(SYS.LOCATE_PHP5_BIN()+' /usr/share/artica-postfix/exec.openvpn.php --client-stop');
 end;
 

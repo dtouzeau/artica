@@ -137,6 +137,7 @@ class user{
 	var $zarafaQuotaSoft=0;
 	var $zarafaQuotaHard=0;
 	var $zarafaQuotaOverride=0;
+	
 
 			
 	function user($uid=null){
@@ -150,7 +151,7 @@ class user{
 		$this->samba_groups=$group->samba_group_list();
 
 		if($uid<>null){
-			$this->uid=$uid;
+			$this->uid=trim(strtolower($uid));
 			$this->LoadUserDatas();
 			$this->GetDefaults();
 			$this->GetGroups($this->uid);
@@ -311,6 +312,7 @@ class user{
 			
 			
 	private function LoadUserDatas(){
+		$daemon_uid=posix_getuid();
 		$ldap=new clladp();
 		
 		$privilegesDatas=$ldap->_Get_privileges_userid($this->uid);
@@ -569,8 +571,7 @@ class user{
 		
 		$this->JoomlaGroup=$attrs["JoomlaGroup"][0];
 		
-		
-		writelogs("CryptedHome=\"$this->CryptedHome\",Vacation Enable=\"$this->vacationEnabled\"; vacationActive=\"$this->vacationActive\"",__CLASS__.'/'.__FUNCTION__,__FILE__,__LINE__);
+		if($daemon_uid>0){writelogs("($this->uid):: CryptedHome=\"$this->CryptedHome\",Vacation Enable=\"$this->vacationEnabled\"; vacationActive=\"$this->vacationActive\"",__CLASS__.'/'.__FUNCTION__,__FILE__,__LINE__);}
 		
 		//uidNumber
 		$newnumber=$this->uidNumberCheck(1);
@@ -625,6 +626,7 @@ class user{
 			$pattern_cn=str_replace('?','\?',$pattern_cn);
 			$pattern_cn=str_replace('(','\(',$pattern_cn);
 			$pattern_cn=str_replace(')','\)',$pattern_cn);
+			$pattern_cn=trim($pattern_cn);
 			
 			writelogs("Search organization in $this->dn = \"cn=$pattern_cn,ou=users,ou=(.+?),dc=organizations\"",__CLASS__.'/'.__FUNCTION__,__FILE__,__LINE__);
 			if(@preg_match("#cn=$pattern_cn,ou=users,ou=(.+?),dc=organizations#",$this->dn,$re)){
@@ -1960,7 +1962,7 @@ function joomla(){
 			
 			if($this->mail==null){
 				writelogs("No email specified, change to $this->uid@localhost.localdomain",__CLASS__.'/'.__FUNCTION__,__FILE__,__LINE__);
-				$this->mail=$this->uid."@localhost.localdomain";
+				$this->mail=trim(strtolower($this->uid))."@localhost.localdomain";
 			}
 			
 			if(trim($this->DisplayName)==null){$this->DisplayName=$this->uid;}
@@ -1984,8 +1986,8 @@ function joomla(){
 				writelogs("Verify if $this->uid has email address",__CLASS__.'/'.__FUNCTION__,__FILE__,__LINE__);
 				if(strpos($this->uid,'@')==0){
 					writelogs("change $this->uid to $this->mail",__CLASS__.'/'.__FUNCTION__,__FILE__,__LINE__);
-					$this->uid=$this->mail;
-					$this->cn=$this->mail;
+					$this->uid=trim(strtolower($this->mail));
+					$this->cn=trim(strtolower($this->mail));
 				}
 				
 			}
@@ -2039,7 +2041,7 @@ function joomla(){
 			
 			if(strlen($this->jpegPhoto_datas)>0){$upd["jpegPhoto"][0]=$this->jpegPhoto_datas;}
 					$upd["cn"][0]=$this->cn;	
-					$upd["userid"][0]=$this->uid;
+					$upd["userid"][0]=trim(strtolower($this->uid));
 					$upd["accountActive"][0]="TRUE";
 					$upd["accountGroup"][0]=$this->group_id;
 					
@@ -2388,8 +2390,9 @@ function UsersInterfaceDatasDelete(){
 		writelogs("Check rsync",__CLASS__.'/'.__FUNCTION__,__FILE__,__LINE__);
 		$sock=new sockets();
 		$sock->getFrameWork("cmd.php?rsync-reconfigure=yes");
-		$sock->getFrameWork("cmd.php?roundcube-sync=yes");
+		$sock->getFrameWork("cmd.php?roundcube-sync=yes&ou=$this->ou");
 		$sock->getFrameWork("cmd.php?postfix-hash-aliases=yes");
+		
 		if(posix_getuid()<>0){
 			$sock->getFrameWork("cmd.php?home-single-user=". base64_encode($this->uid));
 		}

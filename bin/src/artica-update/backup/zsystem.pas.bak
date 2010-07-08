@@ -6,7 +6,7 @@ unit zsystem;
 interface
 
 uses
-Classes, SysUtils,Process,strutils,IniFiles,unix,BaseUnix,Logs,
+Classes, SysUtils,Process,strutils,IniFiles,BaseUnix,unix,Logs, base64,
 RegExpr  in '/home/dtouzeau/developpement/artica-postfix/bin/src/artica-install/RegExpr.pas',md5,
 users    in '/home/dtouzeau/developpement/artica-postfix/bin/src/artica-install/users.pas',
 DATEUTILS;
@@ -19,12 +19,28 @@ type
   Tsystem=class
 
 private
-
+     mem_mysql_password:string;
+     MEM_PHP5_EXTENSION_DIR:string;
+     mem_mysql_user:string;
+     mem_mysql_server:string;
+     mem_mysql_port:string;
+     mem_pgrep:string;
+     mem_ps_path:string;
+     mem_cpulimit_value:string;
+     mem_monit_bin_path:string;
+     MONIT_CHECK_LIST:Tstringlist;
+     MONIT_DEBUG:boolean;
         ArticaDirectory:string;
         ArticaBuildPath:string;
         version:string;
         ConFile:string;
         pidof_path:string;
+        verbosed:boolean;
+        MEM_ADMIN_MAIL:string;
+        WildCard:string;
+       DisableFollowServiceHigerThan1G:integer;
+       function LOCATE_PHP5_EXTENSION_INMEM():string;
+       function IS_ZOMBIE(PID:string):boolean;
        function LOCATE_PHP5_EXTENSION_DIR_OLD():string;
        function LOCATE_PHP5_EXTENSION_DIR_GW():string;
        function PROCESS_MEMORY_SINGLE(PID:string):integer;
@@ -38,20 +54,28 @@ private
        function TransFormBinaryString(const Value: string): string;
        function GET_PPID(PID:integer):integer;
        function Explode(const Separator, S: string; Limit: Integer = 0):TStringDynArray;
-       function GET_MYSQL(key:string):string;
+
        procedure CLEAN_PHP_INI(path:string);
        function  MAILLOG_FROM_SYSLOGNG():string;
        function usbType(dev:string):string;
+       function DirectorySize(const dir: string): longint;
+       function FileMaskSize(const mask: string): longint;
+       function LOAD_CURRENT():string;
+       function MAILLOG_REGEX_PATH(logconfig:string=''):string;
 
 
 
 public
-      constructor Create();
       ProcessIDList:TstringList;
       SearchSize:integer;
+      PLISTPID:TstringList;
+      DirListFiles:TstringList;
+      constructor Create();
+      function Load_DisableFollowServiceHigerThan1G():integer;
+
+
       procedure Free;
       function COMMANDLINE_PARAMETERS(FoundWhatPattern:string):boolean;
-      PLISTPID:TstringList;
       function DU_PATH():string;
        procedure BuildArticaFiles();
        procedure AddShell(username:string);
@@ -62,7 +86,7 @@ public
        procedure FILE_DELETE(TargetPath:string);
        function  IsGroupExists(groupname:string):boolean;
        function  IsUserINGroup(groupname:string;user:string):boolean;
-
+       procedure cpulimit(pid:string='');
 
        function  SystemUserID(username:string):string;
        function  SystemGroupID(group_name:string):string;
@@ -78,11 +102,13 @@ public
        function  ScanINIArticaFiles(key:string):string;
        function  ScanINIArticaFilesSave(key:string;Value:string):string;
        function  DirFiles(FilePath: string;pattern:string):TstringList;
-       DirListFiles:TstringList;
+
        function DirDir(FilePath: string):TstringList;
        function DomainName():string;
 
        function DISKS_STATUS_DEV():string;
+       function DISK_FORMAT_UNIX(dev:string):string;
+       procedure FSTAB_ADD(dev:string;mount_point:string);
        function DISK_USB_EXISTS(uuid:string):boolean;
        function DISK_USB_DEV_SOURCE(uuid:string):string;
        function DISK_USB_TYPE(uuid:string):string;
@@ -104,6 +130,7 @@ public
        function  NetBiosName():string;
        function  FILE_TIME_BETWEEN_MIN(filepath:string):LongInt;
        function  GET_PID_FROM_PATH(pidPath:string):string;
+       function  GetRemoteComputerRessources(computername:string;username:string;password:string):string;
 
        function  PROCESS_EXIST(pid:string):boolean;
        function  PROCESS_MEMORY(PID:string):integer;
@@ -117,10 +144,12 @@ public
        function  PIDOF_PATTERN(pattern:string):string;
        function  PIDOF_PATTERN_PROCESS_NUMBER(pattern:string):integer;
        function  PIDOF_PATTERN_PROCESS_LIST(pattern:string):TstringList;
+       function  ETC_SERVICES_PORT(servicename:string):integer;
 
        function  OPENSSL_TOOL_PATH():string;
        function  OPENSSL_CONFIGURATION_PATH():string;
        procedure OPENSSL_CERTIFCATE_CONFIG();
+       function  OPENSSL_CERTIFCATE_HOSTS():string;
        function FILE_CHOWN(username:string;groupname:string;path:string):boolean;
        function FILE_TEMP():string;
        function PROCESS_LIST_PID(processname:string):string;
@@ -141,15 +170,19 @@ public
        procedure set_INFOS(key:string;val:string);
        procedure set_INFO(key:string;val:string);
        procedure SET_PHP_INI(KEY:string;VALUE_NAME:string;VALUE:string);
+       procedure set_CLUSTER(key:string;val:string);
+       function  GET_CLUSTER(key:string):string;
 
        function  MYSQL_INFOS(key:string):string;
        function  MYSQL_STATUS():boolean;
        procedure set_MYSQL(key:string;val:string);
 
        function  GET_PERFS(key:string):string;
+       procedure  SET_PERFS(key:string;value:string);
        function  GET_ENGINE(key:string):string;
        procedure SET_ENGINE(valuename:string;valuedata:string);
        function  ip_forward_enabled():boolean;
+       function GET_MYSQL(key:string):string;
 
        //mount, usb
        function  isMountedTargetPath(path:string):boolean;
@@ -158,6 +191,11 @@ public
        function  usb_mount_point(path:string):string;
        procedure usb_change_label(uuid:string;newname:string);
        function  disk_change_fstab(dev:string;ext:string;target:string):string;
+       function  isMounteddev(dev:string):boolean;
+       function  GetMountedDev(dev:string):Tstringlist;
+
+
+       function WHO_LISTEN_PORT(port:string):string;
 
        //processes
        function ExecPipe(commandline:string):string;
@@ -200,6 +238,7 @@ public
        function LOCATE_XAPIAN_SO():string;
        function LOCATE_GEOIP_SO():string;
        function LOCATE_MYSQL_SO():string;
+       function LOCATE_MAPI_SO():string;
        function LOCATE_GD_SO():string;
        function LOCATE_EACCELERATOR_SO():string;
        function LOCATE_STUNNEL():string;
@@ -217,16 +256,18 @@ public
        function LOCATE_SU():string;
        function LOCATE_cyrreconstruct():string;
        function LOCATE_ctl_mboxlist():string;
+       function LOCATE_ctl_cyrusdb():string;
        function LOCATE_DF():string;
        function LOCATE_PRELOAD():string;
        function LOCATE_POSTFIX_MAILDROP():string;
-       function LOCATE_cyrquota():string;
        function LOCATE_SYSLOG():string;
        function LOCATE_SMBMOUNT():string;
        function LOCATE_INETD():string;
+       function LOCATE_NOHUP():string;
        function LOCATE_UPDATE_INETD():string;
        function LOCATE_INETD_INITD():string;
        function LOCATE_MAKE():string;
+       function LOCATE_AUTH_LOG():string;
        function LOCATE_GCC():string;
        function LOCATE_SLAPD():string;
        function LOCATE_TAR():string;
@@ -243,7 +284,47 @@ public
        function LOCATE_EACCELERATOR_SO_GW():string;
        function LOCATE_MKFIFO():string;
        function LOCATE_SYSLOG_NG_CONF():string;
+       function LOCATE_SMBCLIENT():string;
+       function LOCATE_LSHW():string;
+       function LOCATE_APACHECTL():string;
+       function LOCATE_CYRQUOTA():string;
+       function LOCATE_SHOWMOUNT():string;
+       function LOCATE_PVCREATE():string;
+       function LOCATE_CYRUS_SQUATTER():string;
+       function LOCATE_CYRUS_IPURGE():string;
+       function LOCATE_LVS():string;
+       function LOCATE_PVS():string;
+       function LOCATE_VGCREATE():string;
+       function LOCATE_LVDISPLAY():string;
+       function LOCATE_LVREMOVE():string;
+       function LOCATE_LVRCREATE():string;
+       function LOCATE_LVMDISKSCAN():string;
+       function LOCATE_MPSTAT():string;
+       function LOCATE_NDB():string;
+       function LOCATE_CUT():string;
+       function LOCATE_UPTIME():string;
+       function LOCATE_NDB_MGMD():string;
+       function LOCATE_ROTATELOGS():string;
+       function LOCATE_FREE():string;
+       function LOCATE_PDNS_BIN():string;
+       function LOCATE_CRYPTSETUP():string;
+       function LOCATE_GENERIC_BIN(StrProgram:string):string;
+       function LOCATE_ZABBIX_SERVER():string;
+       function LOCATE_ZABBIX_AGENT():string;
+       function ISMemoryHiger1G():boolean;
+       function LOCATE_APC_SO():string;
+       function MEM_FREE():integer;
+       function locate_roundcube_main_folder():string;
+       function isoverloadedTooMuch():boolean;
 
+       procedure SecureWeb(path: string);
+
+       function LOCATE_APACHE_STANDARD_CONF():string;
+       function APACHE_STANDARD_PORT():string;
+       function LOCATE_APACHE_INITD():string;
+       procedure APACHE_STANDARD_PORT_CHANGE(portnumber:string);
+        function CPU_NUMBER():integer;
+       function LOAD_AVERAGE():string;
        procedure StripDiezes(filepath:string);
 
        procedure SYSTEM_ADD_MODULE(module_name:string);
@@ -310,8 +391,29 @@ public
         function AllPidsByPatternInPath(pattern:string):string;
         function EXEC_NICE():string;
         function ARTICA_VERSION():string;
+        function CHANGE_SERVICES_IP(servicename:string;port:string):string;
+        function ADMIN_MAIL():string;
+        function chmod_757(path:string):string;
+        function isoverloaded():boolean;
+        function MEM_TOTAL_INSTALLEE():integer;
+        function ArrayAlreadyUsed(arrayS:Tstringlist;pattern:string):boolean;
+        function IS_GLFS_MOUNTED(mounted:string):boolean;
+        procedure JGrowl(subject:string;text:string);
+        function TEST_IONICE():boolean;
+        function VMWARE_HOST():boolean;
+        procedure etc_ld_so_conf(path:string);
+        function GET_CPU_POURCENT(PID:integer):integer;
+        function MONIT_CONFIG(internal_name:string;pidfile:string;commandToStart:string):boolean;
+        procedure MONIT_DELETE(internal_name:string);
+        procedure MONIT_CHECK(internal_name:string);
+        procedure MONIT_CHECK_ALL();
 
-
+        function LIGHTTPD_GET_USER():string;
+        function LIGHTTPD_CONF_PATH:string;
+        function LIGHTTPD_LISTEN_PORT():string;
+        function WIRELESS_CARD():string;
+        function ArchStruct():integer;
+        function base64_encode(value:string):string;
 END;
 
 implementation
@@ -319,13 +421,20 @@ implementation
 constructor Tsystem.Create();
 begin
    ConFile:='';
+   WildCard:='*';
+   MONIT_DEBUG:=false;
    ForceDirectories('/opt/artica/tmp');
    DirListFiles:=TstringList.Create();
+   verbosed:=false;
+   verbosed:=COMMANDLINE_PARAMETERS('--verbose');
+   DisableFollowServiceHigerThan1G:=Load_DisableFollowServiceHigerThan1G();
+   MONIT_CHECK_LIST:=Tstringlist.Create;
 end;
 PROCEDURE Tsystem.Free();
 begin
 DirListFiles.Clear;
 DirListFiles.Free;
+MONIT_CHECK_LIST.free;
 end;
 //##############################################################################
 function Tsystem.IsGroupExists(groupname:string):boolean;
@@ -338,6 +447,13 @@ begin
      end;
 end;
 //##############################################################################
+function Tsystem.Load_DisableFollowServiceHigerThan1G():integer;
+begin
+if not FileExists('/etc/artica-postfix/performances.conf') then exit(0);
+if not TryStrToInt(GET_PERFS('DisableFollowServiceHigerThan1G'),result) then result:=0;
+end;
+//##############################################################################
+
 function Tsystem.SystemUserID(username:string):string;
 begin
  result:='';
@@ -408,6 +524,24 @@ begin
      result:=logs.ReadFromFile('/usr/share/artica-postfix/VERSION');
 end;
 //##############################################################################
+function Tsystem.base64_encode(value:string):string;
+var
+  DecodedStream: TStringStream;
+  EncodedStream: TStringStream;
+  Encoder: TBase64EncodingStream;
+begin
+
+DecodedStream := TStringStream.Create('Hello World!');
+  EncodedStream := TStringStream.Create('');
+  Encoder       := TBase64EncodingStream.Create(EncodedStream);
+  Encoder.CopyFrom(DecodedStream, DecodedStream.Size);
+  result := EncodedStream.DataString;
+  DecodedStream.Free;
+  EncodedStream.Free;
+  Encoder.Free;
+end;
+
+
 function Tsystem.IsUserINGroup(groupname:string;user:string):boolean;
 var
    l:TstringList;
@@ -435,7 +569,19 @@ end;
 l.free;
 end;
 //##############################################################################
+//##############################################################################
 
+function Tsystem.chmod_757(path:string):string;
+var
+mode:mode_t;
+begin
+try
+
+ // fpchmod(path,&757);
+except
+end;
+end;
+//##############################################################################
 function Tsystem.NetBiosName():string;
 var
    txt:string;
@@ -479,6 +625,116 @@ begin
 
 end;
 //#########################################################################################
+function Tsystem.LOCATE_FREE():string;
+begin
+    if fileExists('/usr/bin/free') then exit('/usr/bin/free');
+    if fileExists('/bin/free') then exit('/bin/free');
+    if fileExists('/sbin/free') then exit('/sbin/free');
+    if fileExists('/usr/local/bin/free') then exit('/usr/local/bin/free');
+    if fileExists('/usr/local/sbin/free') then exit('/usr/local/sbin/free');
+end;
+//#########################################################################################
+function Tsystem.LOCATE_CRYPTSETUP():string;
+begin
+    if fileExists('/usr/bin/cryptsetup') then exit('/usr/bin/cryptsetup');
+    if fileExists('/bin/cryptsetup') then exit('/bin/cryptsetup');
+    if fileExists('/sbin/cryptsetup') then exit('/sbin/cryptsetup');
+    if fileExists('/usr/local/bin/cryptsetup') then exit('/usr/local/bin/cryptsetup');
+    if fileExists('/usr/local/sbin/cryptsetup') then exit('/usr/local/sbin/cryptsetup');
+end;
+//#########################################################################################
+function Tsystem.ISMemoryHiger1G():boolean;
+var
+   mem:integer;
+   DisableFollowServiceHigerThan1G:integer;
+begin
+
+if not TryStrToInt(GET_PERFS('DisableFollowServiceHigerThan1G'),DisableFollowServiceHigerThan1G) then DisableFollowServiceHigerThan1G:=0;
+if DisableFollowServiceHigerThan1G=1 then exit(true);
+
+mem:=MEM_TOTAL_INSTALLEE();
+
+  if mem=0 then exit(true);
+  if mem>1012024 then exit(true);
+  exit(false);
+end;
+//#########################################################################################
+function Tsystem.MEM_TOTAL_INSTALLEE():integer;
+var
+   l:TstringList;
+   RegExpr:TRegExpr;
+   uioLogs:Tlogs;
+   filetmp:string;
+   i:integer;
+   mem:integer;
+begin
+result:=0;
+    if not FileExists('/proc/meminfo') then exit();
+    l:=Tstringlist.Create;
+    try
+       l.LoadFromFile('/proc/meminfo');
+    except
+          exit();
+    end;
+
+
+    RegExpr:=TRegExpr.Create;
+    RegExpr.Expression:='MemTotal:\s+([0-9]+)';
+    for i:=0 to l.Count-1 do begin
+        if RegExpr.Exec(l.Strings[i]) then begin
+              if not TryStrToInt(RegExpr.Match[1],mem) then begin
+                  result:=0;
+                  l.free;
+                  RegExpr.free;
+                  exit;
+              end;
+              result:=mem;
+              break;
+        end;
+    end;
+
+    l.free;
+    RegExpr.free;
+
+end;
+//#########################################################################################
+function Tsystem.MEM_FREE():integer;
+var
+   l:TstringList;
+   RegExpr:TRegExpr;
+   uioLogs:Tlogs;
+   filetmp:string;
+   i:integer;
+   mem:integer;
+begin
+result:=0;
+    if not FileExists('/proc/meminfo') then exit();
+    l:=Tstringlist.Create;
+    try
+       l.LoadFromFile('/proc/meminfo');
+    except
+      exit();
+    end;
+    RegExpr:=TRegExpr.Create;
+    RegExpr.Expression:='MemFree:\s+([0-9]+)';
+    for i:=0 to l.Count-1 do begin
+        if RegExpr.Exec(l.Strings[i]) then begin
+              if not TryStrToInt(RegExpr.Match[1],mem) then begin
+                  result:=0;
+                  l.free;
+                  RegExpr.free;
+                  exit;
+              end;
+              result:=mem;
+              break;
+        end;
+    end;
+
+    l.free;
+    RegExpr.free;
+
+end;
+//#########################################################################################
 function Tsystem.FOLDER_SIZE(path:string):integer;
 var
    tempfile:string;
@@ -514,6 +770,7 @@ if FileExists(tempfile) then begin
     For i:=0 to l.Count-1 do begin
         if RegExpr.Exec(l.Strings[i]) then begin
            result:=StrToInt(RegExpr.Match[1]);
+
            RegExpr.free;
            L.free;
            break;
@@ -558,6 +815,109 @@ if FileExists(tempfile) then begin
 end;
 end;
 //#########################################################################################
+function Tsystem.LOCATE_CUT():string;
+begin
+if FIleExists('/usr/bin/cut') then exit('/usr/bin/cut');
+if FIleExists('/bin/cut') then exit('/bin/cut');
+if FIleExists('/usr/local/bin/cut') then exit('/usr/local/bin/cut');
+end;
+//#########################################################################################
+function Tsystem.LOCATE_UPTIME():string;
+begin
+if FIleExists('/usr/bin/uptime') then exit('/usr/bin/uptime');
+if FIleExists('/usr/local/bin/uptime') then exit('/usr/local/bin/uptime');
+end;
+//#########################################################################################
+function Tsystem.CPU_NUMBER():integer;
+var
+   cpunum:integer;
+   ziulogs:Tlogs;
+   fileconf:string;
+begin
+    result:=0;
+    cpunum:=0;
+    fileconf:='/etc/artica-postfix/settings/Daemons/SystemCpuNumber';
+    if FileExists(fileconf) then begin
+       if FILE_TIME_BETWEEN_MIN(fileconf)>500 then fpsystem('/bin/rm -f '+ fileconf);
+    end;
+
+    if not TryStrToInt(GET_INFO('SystemCpuNumber'),cpunum) then begin
+         fpsystem('/bin/cat /proc/cpuinfo |/bin/grep "model name" | '+LOCATE_CUT()+' -d: -f2|/usr/bin/wc -l >'+fileconf+' 2>&1');
+         if not TryStrToInt(GET_INFO('SystemCpuNumber'),cpunum) then begin
+              ziulogs:=Tlogs.Create;
+              ziulogs.Syslogs('Tsystem.CPU_NUMBER():: unable to determine cpu number on this system');
+              ziulogs.free;
+              exit(0);
+         end;
+    end;
+
+    result:=cpunum;
+
+end;
+//#########################################################################################
+function Tsystem.IS_GLFS_MOUNTED(mounted:string):boolean;
+var
+   i:integer;
+   tmpstr:Tstringlist;
+   d:Boolean;
+begin
+   d:=false;
+   d:=COMMANDLINE_PARAMETERS('--verbose');
+   result:=false;
+   tmpstr:=TstringList.Create;
+   tmpstr.LoadFromFile('/proc/mounts');
+   for i:=0 to tmpstr.Count-1 do begin
+       if pos(mounted,tmpstr.Strings[i])>0 then begin
+          result:=true;
+          break;
+       end else begin
+          if d then writeln('NOT found ',mounted,' in ',tmpstr.Strings[i]);
+       end;
+   end;
+
+  tmpstr.free;
+
+end;
+
+//#############################################################################
+function Tsystem.LOAD_AVERAGE():string;
+var
+   cpunum:integer;
+   ziulogs:Tlogs;
+   fileconf:string;
+   RegExpr:TRegExpr;
+begin
+    result:='0.0';
+    ziulogs:=Tlogs.Create;
+    fileconf:=ziulogs.FILE_TEMP();
+    fpsystem(LOCATE_UPTIME()+' >'+fileconf+' 2>&1');
+    RegExpr:=TRegExpr.Create;
+    RegExpr.Expression:='load average:\s+([0-9\.]+),\s+([0-9\.]+),\s+([0-9\.]+)';
+    if RegExpr.Exec(ziulogs.ReadFromFile(fileconf)) then result:=RegExpr.Match[2];
+    ziulogs.DeleteFile(fileconf);
+    RegExpr.free;
+    ziulogs.free;
+end;
+//#########################################################################################
+function Tsystem.LOAD_CURRENT():string;
+var
+   cpunum:integer;
+   ziulogs:Tlogs;
+   fileconf:string;
+   RegExpr:TRegExpr;
+begin
+    result:='0.0';
+    ziulogs:=Tlogs.Create;
+    fileconf:=ziulogs.FILE_TEMP();
+    fpsystem(LOCATE_UPTIME()+' >'+fileconf+' 2>&1');
+    RegExpr:=TRegExpr.Create;
+    RegExpr.Expression:='load average:\s+([0-9\.]+),';
+    if RegExpr.Exec(ziulogs.ReadFromFile(fileconf)) then result:=RegExpr.Match[1];
+    ziulogs.DeleteFile(fileconf);
+    RegExpr.free;
+    ziulogs.free;
+end;
+//#########################################################################################
 function Tsystem.FREE_PORT():integer;
 var
    tempfile:string;
@@ -600,8 +960,127 @@ if FileExists('/usr/sbin/apache2') then exit('/usr/sbin/apache2');
 if FileExists('/usr/sbin/apache') then exit('/usr/sbin/apache');
 if FileExists('/usr/sbin/httpd') then exit('/usr/sbin/httpd');
 if FileExists('/usr/sbin/httpd2') then exit('/usr/sbin/httpd2');
+if FIleExists('/usr/local/obm-apache/bin/obm-apache') then exit('/usr/local/obm-apache/bin/obm-apache');
+if FileExists('/usr/local/apache-groupware/bin/apache-groupware') then exit('/usr/local/apache-groupware/bin/apache-groupware');
 end;
 //#########################################################################################
+function Tsystem.LOCATE_APACHE_INITD():string;
+begin
+if FileExists('/etc/init.d/apache2') then exit('/etc/init.d/apache2');
+if FileExists('/etc/init.d/httpd') then exit('/etc/init.d/httpd');
+
+end;
+//#########################################################################################
+function Tsystem.LOCATE_CYRQUOTA():string;
+begin
+if FIleExists('/usr/sbin/cyrquota') then exit('/usr/sbin/cyrquota');
+if FileExists('/usr/lib/cyrus/bin/quota') then exit('/usr/lib/cyrus/bin/quota');
+if FileExists('/usr/lib/cyrus-imapd/quota') then exit('/usr/lib/cyrus-imapd/quota');
+end;
+//#########################################################################################
+function Tsystem.LOCATE_CYRUS_SQUATTER():string;
+begin
+if FIleExists('/usr/sbin/squatter') then exit('/usr/sbin/squatter');
+if FileExists('/usr/lib/cyrus/bin/squatter') then exit('/usr/lib/cyrus/bin/squatter');
+if FileExists('/usr/lib/cyrus-imapd/squatter') then exit('/usr/lib/cyrus-imapd/squatter');
+end;
+//#########################################################################################
+function Tsystem.LOCATE_CYRUS_IPURGE():string;
+begin
+if FIleExists('/usr/sbin/ipurge') then exit('/usr/sbin/ipurge');
+if FileExists('/usr/lib/cyrus/bin/ipurge') then exit('/usr/lib/cyrus/bin/ipurge');
+if FileExists('/usr/lib/cyrus-imapd/ipurge') then exit('/usr/lib/cyrus-imapd/ipurge');
+end;
+//#########################################################################################
+function Tsystem.LOCATE_SHOWMOUNT():string;
+begin
+if FIleExists('/sbin/showmount') then exit('/sbin/showmount');
+if FileExists('/usr/sbin/showmount') then exit('/usr/sbin/showmount');
+end;
+//#########################################################################################
+function Tsystem.LOCATE_ROTATELOGS():string;
+begin
+if FIleExists('/usr/sbin/rotatelogs') then exit('/usr/sbin/rotatelogs');
+if FIleExists('/usr/local/sbin/rotatelogs') then exit('/usr/local/sbin/rotatelogs');
+if FIleExists('/usr/local/bin/rotatelogs') then exit('/usr/local/bin/rotatelogs');
+if FileExists('/usr/sbin/rotatelogs2') then exit('/usr/sbin/rotatelogs2');
+
+end;
+//#########################################################################################
+
+
+function Tsystem.LOCATE_PVCREATE():string;
+begin
+if FIleExists('/sbin/pvcreate') then exit('/sbin/pvcreate');
+if FileExists('/usr/sbin/pvcreate') then exit('/usr/sbin/pvcreate');
+end;
+//#########################################################################################
+function Tsystem.LOCATE_LVS():string;
+begin
+if FIleExists('/usr/sbin/lvs') then exit('/usr/sbin/lvs');
+if FileExists('/sbin/lvs') then exit('/sbin/lvs');
+end;
+//#########################################################################################
+function Tsystem.LOCATE_PVS():string;
+begin
+if FIleExists('/usr/sbin/pvs') then exit('/usr/sbin/pvs');
+if FileExists('/sbin/pvs') then exit('/sbin/pvs');
+end;
+//########################################################################################
+function Tsystem.LOCATE_VGCREATE():string;
+begin
+if FIleExists('/usr/sbin/vgcreate') then exit('/usr/sbin/vgcreate');
+if FileExists('/sbin/vgcreate') then exit('/sbin/vgcreate');
+end;
+//########################################################################################
+function Tsystem.LOCATE_LVDISPLAY():string;
+begin
+if FIleExists('/usr/sbin/lvdisplay') then exit('/usr/sbin/lvdisplay');
+if FileExists('/sbin/lvdisplay') then exit('/sbin/lvdisplay');
+end;
+//########################################################################################
+function Tsystem.LOCATE_LVREMOVE():string;
+begin
+if FIleExists('/usr/sbin/lvremove') then exit('/usr/sbin/lvremove');
+if FileExists('/sbin/lvremove') then exit('/sbin/lvremove');
+end;
+//########################################################################################
+function Tsystem.LOCATE_LVRCREATE():string;
+begin
+if FIleExists('/usr/sbin/lvcreate') then exit('/usr/sbin/lvcreate');
+if FileExists('/sbin/lvcreate') then exit('/sbin/lvcreate');
+end;
+//########################################################################################
+function Tsystem.LOCATE_LVMDISKSCAN():string;
+begin
+if FIleExists('/usr/sbin/lvmdiskscan') then exit('/usr/sbin/lvmdiskscan');
+if FileExists('/sbin/lvmdiskscan') then exit('/sbin/lvmdiskscan');
+end;
+//########################################################################################
+function Tsystem.LOCATE_MPSTAT():string;
+begin
+if FIleExists('/usr/bin/mpstat') then exit('/usr/bin/mpstat');
+end;
+//########################################################################################
+
+
+function Tsystem.DISK_FORMAT_UNIX(dev:string):string;
+var
+   fstype:string;
+   zlogs:Tlogs;
+   tmpstr:string;
+   cmd:string;
+begin
+    if fileExists('/sbin/mkfs.ext4') then fstype:='ext4';
+    if length(fstype)=0 then fstype:='ext3';
+    zlogs:=Tlogs.Create;
+    tmpstr:=zlogs.FILE_TEMP();
+    cmd:='/sbin/mkfs -t '+fstype+' '+dev;
+    zlogs.Debuglogs(cmd);
+    fpsystem(cmd);
+    zlogs.free;
+end;
+//########################################################################################
 
 function Tsystem.FILE_TIME_BETWEEN_MIN(filepath:string):LongInt;
 var
@@ -609,11 +1088,15 @@ var
    S    : TDateTime;
    maint:TDateTime;
 begin
+result:=0;
 if not FileExists(filepath) then exit(0);
-    fa:=FileAge(filepath);
-    maint:=Now;
-    S:=FileDateTodateTime(fa);
-    result:=MinutesBetween(maint,S);
+    try
+       fa:=FileAge(filepath);
+       maint:=Now;
+       S:=FileDateTodateTime(fa);
+       result:=MinutesBetween(maint,S);
+    finally
+    end;
 end;
 //##############################################################################
 function Tsystem.FILE_TIME_BETWEEN_SEC(filepath:string):LongInt;
@@ -644,6 +1127,7 @@ end;
 function Tsystem.LOCATE_APACHE_LIBPHP5():string;
 begin
 if FileExists(LOCATE_APACHE_MODULES_PATH()+'/libphp5.so') then exit(LOCATE_APACHE_MODULES_PATH()+'/libphp5.so');
+if FileExists('/usr/lib/apache-extramodules/mod_php5.so') then exit('/usr/lib/apache-extramodules/mod_php5.so');
 end;
 //##############################################################################
 function Tsystem.LOCATE_APACHE_MODSSLSO():string;
@@ -655,9 +1139,140 @@ function Tsystem.LOCATE_APACHE_MODULES_PATH():string;
 begin
 if FileExists('/usr/lib/apache2/modules/mod_cgi.so') then exit('/usr/lib/apache2/modules');
 if FileExists('/usr/lib/apache2/mod_cgi.so') then exit('/usr/lib/apache2');
+if FIleExists('/usr/lib/apache2/mod_perl.so') then exit('/usr/lib/apache2');
+if FileExists('/usr/lib/apache/mod_alias.so') then exit('/usr/lib/apache');
 if FileExists('/usr/lib/httpd/modules/mod_cgi.so') then exit('/usr/lib/httpd/modules');
+if FileExists('/usr/local/apache-groupware/modules/mod_cgi.so') then exit('/usr/local/apache-groupware/modules');
 end;
 //##############################################################################
+function Tsystem.LOCATE_APACHE_STANDARD_CONF():string;
+begin
+    if FIleExists('/etc/apache2/apache2.conf') then exit('/etc/apache2/apache2.conf');
+    if FIleExists('/etc/httpd/conf/httpd.conf') then exit('/etc/httpd/conf/httpd.conf');
+end;
+//##############################################################################
+function Tsystem.LOCATE_GENERIC_BIN(StrProgram:string):string;
+var
+   l:Tstringlist;
+   i:integer;
+begin
+
+   if StrProgram='ps' then if length(mem_ps_path)>0 then exit(mem_ps_path);
+   if StrProgram='monit' then if length(mem_monit_bin_path)>0 then exit(mem_monit_bin_path);
+
+    l:=Tstringlist.Create;
+    l.Add('/sbin');
+    l.Add('/usr/sbin');
+    l.Add('/bin');
+    l.Add('/usr/bin');
+    l.Add('/usr/local/bin');
+    l.Add('/usr/local/sbin');
+
+    for i:=0 to l.Count-1 do begin
+       if FIleExists(l.Strings[i]+'/'+StrProgram)  then begin
+          result:=l.Strings[i]+'/'+StrProgram;
+       end;
+    end;
+
+   if StrProgram='ps' then mem_ps_path:=result;
+    l.free;
+
+end;
+//##############################################################################
+function Tsystem.LOCATE_ZABBIX_SERVER():string;
+begin
+result:=LOCATE_GENERIC_BIN('zabbix_server');
+end;
+//##############################################################################
+function Tsystem.LOCATE_ZABBIX_AGENT():string;
+begin
+result:=LOCATE_GENERIC_BIN('zabbix_agentd');
+end;
+//##############################################################################
+
+function Tsystem.APACHE_STANDARD_PORT():string;
+var
+   l:TstringList;
+   httpdconf:string;
+   RegExpr:TRegExpr;
+   i:integer;
+begin
+     httpdconf:=LOCATE_APACHE_STANDARD_CONF();
+    if not FIleExists(httpdconf) then exit;
+    l:=Tstringlist.Create;
+    l.LoadFromFile(httpdconf);
+    RegExpr:=TRegExpr.Create;
+
+    for i:=0 to l.Count-1 do begin
+       RegExpr.Expression:='^Listen\s+(.+?):([0-9]+)';
+       if RegExpr.Exec(l.Strings[i]) then begin
+          result:=RegExpr.Match[2];
+          Break;
+       end;
+
+       RegExpr.Expression:='^Listen\s+([0-9]+)$';
+       if RegExpr.Exec(l.Strings[i]) then begin
+          result:=RegExpr.Match[1];
+          Break;
+       end;
+
+    end;
+RegExpr.free;
+l.free;
+if length(result)=0 then result:='80';
+end;
+//##############################################################################
+procedure Tsystem.APACHE_STANDARD_PORT_CHANGE(portnumber:string);
+var
+   l:TstringList;
+   httpdconf:string;
+   RegExpr:TRegExpr;
+   as_edit:boolean;
+   i:integer;
+begin
+     httpdconf:=LOCATE_APACHE_STANDARD_CONF();
+    if not FIleExists(httpdconf) then exit;
+    l:=Tstringlist.Create;
+    l.LoadFromFile(httpdconf);
+    RegExpr:=TRegExpr.Create;
+    as_edit:=false;
+
+
+    for i:=0 to l.Count-1 do begin
+       RegExpr.Expression:='^Listen\s+(.+?):([0-9]+)';
+       if RegExpr.Exec(l.Strings[i]) then begin
+          as_edit:=true;
+          l.Strings[i]:='Listen '+RegExpr.Match[1]+':'+portnumber;
+          Break;
+       end;
+
+       RegExpr.Expression:='^Listen\s+([0-9]+)$';
+       if RegExpr.Exec(l.Strings[i]) then begin
+          as_edit:=true;
+          l.Strings[i]:='Listen '+portnumber;
+          Break;
+       end;
+
+    end;
+
+
+    if as_edit then begin
+       l.SaveToFile(httpdconf);
+    end else begin
+       l.Add('Listen '+portnumber);
+       l.SaveToFile(httpdconf);
+    end;
+
+    fpsystem('/usr/share/artica-postfix/bin/process1 --force --fghjkl');
+    fpsystem(LOCATE_APACHE_INITD() +' restart');
+
+RegExpr.free;
+l.free;
+
+end;
+//##############################################################################
+
+
 procedure Tsystem.DeleteService(servicename:string);
 begin
  if FileExists('/usr/sbin/update-rc.d') then begin
@@ -675,8 +1290,298 @@ if FileExists('/etc/mime.types') then exit('/etc/mime.types');
 if FileExists('/etc/httpd/conf/mime.types') then exit('/etc/httpd/conf/mime.types');
 end;
 //##############################################################################
+function Tsystem.LOCATE_LSHW():string;
+begin
+if FileExists('/usr/bin/lshw') then exit('/usr/bin/lshw');
+end;
+//##############################################################################
+function Tsystem.MONIT_CONFIG(internal_name:string;pidfile:string;commandToStart:string):boolean;
+
+var
+   l:Tstringlist;
+   MONIT_CONFIG_LOG:Tlogs;
+   conf:TiniFile;
+   md5_a:string;
+   md5_b:string;
+   tmpstr:string;
+begin
+   pidfile:=trim(pidfile);
+   pidfile:=AnsiReplaceText(pidfile,'"','');
+   if length(pidfile)=0 then exit;
+   forceDirectories('/etc/monit/conf.d');
+   l:=Tstringlist.Create;
 
 
+
+   if length(mem_monit_bin_path)=0 then begin
+      mem_monit_bin_path:=LOCATE_GENERIC_BIN('monit');
+      if length(mem_monit_bin_path)=0 then mem_monit_bin_path:='/usr/share/artica-postfix/bin/artica-monit';
+   end;
+
+   if not FileExists('/etc/artica-postfix/settings/Daemons/MonitServicesSettings') then fpsystem(LOCATE_PHP5_BIN()+' /usr/share/artica-postfix/exec.first.settings.php --monit >/dev/null 2>&1');
+   try
+      conf:=TiniFile.Create('/etc/artica-postfix/settings/Daemons/MonitServicesSettings');
+   Except
+   exit;
+   end;
+   if not FileExists('/usr/sbin/'+internal_name+'-start.sh') then begin
+      l.Add('#!/bin/sh');
+      l.Add('PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/X11R6/bin');
+      l.add('/etc/init.d/artica-postfix start '+commandToStart);
+      l.add('exit 0');
+      l.SaveToFile('/usr/sbin/'+internal_name+'-start.sh');
+      l.clear;
+      fpsystem('/bin/chmod 777 /usr/sbin/'+internal_name+'-start.sh');
+   end;
+
+   if not FileExists('/usr/sbin/'+internal_name+'-stop.sh') then begin
+      l.Add('#!/bin/sh');
+      l.Add('PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/X11R6/bin');
+      l.add('/etc/init.d/artica-postfix stop '+commandToStart);
+      l.add('exit 0');
+      l.SaveToFile('/usr/sbin/'+internal_name+'-stop.sh');
+      l.clear;
+      fpsystem('/bin/chmod 777 /usr/sbin/'+internal_name+'-stop.sh');
+   end;
+
+   if not FileExists('/usr/sbin/'+internal_name+'-restart.sh') then begin
+      l.Add('#!/bin/sh');
+      l.Add('PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/X11R6/bin');
+      l.add('/etc/init.d/artica-postfix stop '+commandToStart);
+      l.add('/etc/init.d/artica-postfix start '+commandToStart);
+      l.add('exit 0');
+      l.SaveToFile('/usr/sbin/'+internal_name+'-restart.sh');
+      l.clear;
+      fpsystem('/bin/chmod 777 /usr/sbin/'+internal_name+'-stop.sh');
+   end;
+
+
+   l.Add('check process '+internal_name);
+   l.Add(chr(9)+'with pidfile "'+pidfile+'"');
+   l.Add(chr(9)+'start program = "/usr/sbin/'+internal_name+'-start.sh"');
+   l.Add(chr(9)+'stop program = "/usr/sbin/'+internal_name+'-stop.sh"');
+   l.Add(chr(9)+'if totalmem > '+IntToStr(conf.ReadInteger(internal_name,'totalmem',200))+' Mb then alert');
+   l.Add(chr(9)+'if children > '+IntToStr(conf.ReadInteger(internal_name,'children',200))+' for '+IntToStr(conf.ReadInteger(internal_name,'children_cycles',5))+' cycles then alert');
+   l.Add(chr(9)+'if cpu usage > '+IntToStr(conf.ReadInteger(internal_name,'totalcpu',95))+'% for '+IntToStr(conf.ReadInteger(internal_name,'totalcpu_cycles',5))+' cycles then alert');
+
+   if internal_name='APP_MILTERGREYLIST' then begin
+      l.Add(chr(9)+'if failed unixsocket /var/run/milter-greylist/milter-greylist.sock then restart');
+   end;
+
+   if internal_name='APP_AMAVISD_MILTER' then begin
+      l.Add(chr(9)+'if failed unixsocket /var/spool/postfix/var/run/amavisd-milter/amavisd-milter.sock then restart');
+   end;
+
+   MONIT_CONFIG_LOG:=Tlogs.Create;
+   if FileExists('/etc/monit/conf.d/' +internal_name+'.monitrc') then md5_a:=MONIT_CONFIG_LOG.MD5FromString(MONIT_CONFIG_LOG.ReadFromFile('/etc/monit/conf.d/' +internal_name+'.monitrc'));
+   tmpstr:=MONIT_CONFIG_LOG.FILE_TEMP();
+   MONIT_CONFIG_LOG.WriteToFile(l.Text,tmpstr);
+   md5_b:=MONIT_CONFIG_LOG.MD5FromString(MONIT_CONFIG_LOG.ReadFromFile(tmpstr));
+
+   if md5_a<>md5_b then begin
+      MONIT_CONFIG_LOG.Debuglogs('MONIT_CONFIG:: replicate /etc/monit/conf.d/' +internal_name+'.monitrc');
+      MONIT_CONFIG_LOG.WriteToFile(l.Text,'/etc/monit/conf.d/' +internal_name+'.monitrc');
+   end;
+
+   MONIT_CONFIG_LOG.DeleteFile(tmpstr);
+   l.free;
+   conf.free;
+
+   result:=true;
+   MONIT_CHECK(internal_name);
+   MONIT_CONFIG_LOG.free;
+   //if failed port 80 protocol http then restart
+end;
+//##############################################################################
+procedure Tsystem.MONIT_DELETE(internal_name:string);
+begin
+
+if not FIleExists('/etc/monit/conf.d/' +internal_name+'.monitrc') then exit;
+
+if FIleExists('/etc/monit/conf.d/' +internal_name+'.monitrc') then fpsystem('/bin/rm -f /etc/monit/conf.d/' +internal_name+'.monitrc');
+if FileExists('/usr/sbin/'+internal_name+'-start.sh') then fpsystem('/bin/rm -f /usr/sbin/'+internal_name+'-start.sh');
+if FileExists('/usr/sbin/'+internal_name+'-stop.sh') then fpsystem('/bin/rm -f /usr/sbin/'+internal_name+'-stop.sh');
+if FileExists('/usr/sbin/'+internal_name+'-restart.sh') then fpsystem('/bin/rm -f /usr/sbin/'+internal_name+'-restart.sh');
+   if length(mem_monit_bin_path)=0 then begin
+      mem_monit_bin_path:=LOCATE_GENERIC_BIN('monit');
+      if length(mem_monit_bin_path)=0 then mem_monit_bin_path:='/usr/share/artica-postfix/bin/artica-monit';
+   end;
+fpsystem(mem_monit_bin_path+' -c /etc/monit/monitrc -p /var/run/monit/monit.pid reload');
+end;
+//##############################################################################
+procedure Tsystem.MONIT_CHECK_ALL();
+Var
+    l:TstringList;
+    i:integer;
+    RegExpr:TRegExpr;
+    F:boolean;
+    monit_logs:Tlogs;
+    tmpstr:string;
+Begin
+    MONIT_DEBUG:=COMMANDLINE_PARAMETERS('debug');
+
+    DirFiles('/etc/monit/conf.d','*.monitrc');
+    RegExpr:=TRegExpr.Create;
+    RegExpr.Expression:='(.+?)\.monitrc';
+
+    for i:=0 to DirListFiles.Count-1 do begin;
+        if RegExpr.Exec(DirListFiles.Strings[i]) then MONIT_CHECK(RegExpr.Match[1]);
+    end;
+   RegExpr.free;
+
+end;
+//##############################################################################
+
+procedure Tsystem.MONIT_CHECK(internal_name:string);
+Var
+    l:TstringList;
+    i:integer;
+    RegExpr:TRegExpr;
+    F:boolean;
+    monit_logs:Tlogs;
+    tmpstr:string;
+    monitTime:integer;
+    mypid:string;
+Begin
+  F:=false;
+  mypid:=IntToStr(fpgetpid);
+  MONIT_CHECK_LIST:=Tstringlist.Create;
+  monit_logs:=Tlogs.Create;
+  if length(trim(mem_monit_bin_path))=0 then begin
+     mem_monit_bin_path:=LOCATE_GENERIC_BIN('monit');
+     if length(trim(mem_monit_bin_path))=0 then mem_monit_bin_path:='/usr/share/artica-postfix/bin/artica-monit';
+  end;
+
+  tmpstr:='/tmp/artica-install-monit.status.'+mypid+'.tmp';
+  if FileExists('/tmp/artica-monit.status.'+mypid) then begin
+        MONIT_CHECK_LIST.LoadFromFile('/tmp/artica-monit.status.'+mypid);
+  end;
+
+  if MONIT_CHECK_LIST.Count=0 then begin
+     fpsystem(mem_monit_bin_path+' -c /etc/monit/monitrc -p /var/run/monit/monit.pid summary >'+tmpstr +' 2>&1');
+     if not FileExists(tmpstr) then exit;
+     MONIT_CHECK_LIST.LoadFromFile(tmpstr);
+  end;
+
+  RegExpr:=TRegExpr.Create;
+  RegExpr.Expression:='Process.+?'+internal_name;
+  for i:=0 to MONIT_CHECK_LIST.Count-1 do begin
+     if RegExpr.Exec(MONIT_CHECK_LIST.Strings[i]) then begin
+        f:=true;
+        break;
+     end;
+     if MONIT_DEBUG then writeln('MONIT_CHECK: "',MONIT_CHECK_LIST.Strings[i],'" -> ',RegExpr.Expression,' false');
+  end;
+
+  RegExpr.free;
+
+  if not F then begin
+      if FIleExists('/etc/artica-postfix/cron.2/monit.reloaded') then monitTime:=FILE_TIME_BETWEEN_MIN('/etc/artica-postfix/cron.2/monit.reloaded') else monitTime:=600;
+      monit_logs.Debuglogs('MONIT_CHECK:: ' + internal_name+' FALSE' + ' timestamp='+ IntTOStr(monitTime)+'mn');
+      if  monitTime>2 then begin
+          monit_logs.Debuglogs('***************** RELOAD MONIT ********************');
+          monit_logs.Debuglogs('MONIT_CHECK:: Reload monit for '+internal_name);
+          fpsystem(mem_monit_bin_path+' -c /etc/monit/monitrc -p /var/run/monit/monit.pid reload >/dev/null 2>&1');
+          monit_logs.DeleteFile('/etc/artica-postfix/cron.2/monit.reloaded');
+          monit_logs.WriteToFile(monit_logs.DateTimeNowSQL(),'/etc/artica-postfix/cron.2/monit.reloaded');
+      end;
+  end else begin
+     monit_logs.Debuglogs('MONIT_CHECK:: DO NOTHING ' +internal_name);
+
+  end;
+  monit_logs.Free;
+end;
+//##############################################################################
+
+
+
+function Tsystem.CHANGE_SERVICES_IP(servicename:string;port:string):string;
+Var
+    l:TstringList;
+    i:integer;
+    RegExpr:TRegExpr;
+    F:boolean;
+    vblogs:Tlogs;
+Begin
+if length(port)=0 then exit('no port specified');
+if length(servicename)=0 then exit('no service name specified');
+if not FileExists('/etc/services') then exit('unable to stat /etc/services');
+l:=Tstringlist.Create;
+l.LoadFromFile('/etc/services');
+RegExpr:=TRegExpr.Create;
+RegExpr.Expression:='^'+servicename+'\s+([0-9]+)';
+for i:=0 to l.Count-1 do begin
+    if RegExpr.Exec(l.Strings[i]) then begin
+       if RegExpr.Match[1]=port then begin
+          l.free;
+          RegExpr.free;
+          exit('No changes...');
+       end else begin
+           vblogs:=TLogs.Create;
+           l.Strings[i]:=servicename+chr(9)+port+'/tcp #Cyrus replication cluster';
+           vblogs.WriteToFile(l.Text,'/etc/services');
+           vblogs.free;
+           l.free;
+           RegExpr.free;
+           exit('Change '+ servicename +' to '+port+' in /etc/services');
+       end;
+    end;
+end;
+
+l.Add(servicename+chr(9)+port+'/tcp #Cyrus replication cluster');
+ vblogs:=TLogs.Create;
+ vblogs.WriteToFile(l.Text,'/etc/services');
+ vblogs.free;
+ l.free;
+ RegExpr.free;
+exit('Add '+ servicename +' to '+port+' in /etc/services');
+
+
+end;
+//##############################################################################
+procedure Tsystem.cpulimit(pid:string);
+var
+   cpulimit_bin:string;
+   mypid:string;
+   cpu:string;
+   azerty:Tlogs;
+begin
+   if length(pid)=0 then mypid:=IntToStr(fpgetpid) else mypid:=pid;
+   cpu:=GET_INFO('cpulimit');
+   if length(cpu)=0 then cpu:='0';
+   if cpu='0' then exit;
+   cpulimit_bin:=LOCATE_GENERIC_BIN('cpulimit');
+   if length(cpulimit_bin)=0 then exit;
+
+   azerty:=Tlogs.Create;
+   azerty.Debuglogs('cpulimit():: cpu limitation to '+cpu+'% for PID '+mypid);
+   fpsystem(cpulimit_bin +' -p ' + mypid +' -l '+cpu+' -z >/dev/null 2>&1 &');
+   azerty.free;
+end;
+//##############################################################################
+procedure Tsystem.JGrowl(subject:string;text:string);
+var
+   l:tstringlist;
+   filetmp:string;
+   JGrowll:Tlogs;
+begin
+     JGrowll:=tlogs.Create;
+     filetmp:='/usr/share/artica-postfix/ressources/logs/jGrowl/'+JGrowll.MD5FromString(subject+text);
+     ForceDirectories(ExtractFilePath(filetmp));
+     if FIleExists(filetmp) then exit;
+
+     l:=Tstringlist.Create;
+     l.Add('[LOG]');
+     l.Add('date='+JGrowll.DateTimeNowSQL());
+     l.Add('subject='+subject);
+     l.Add('');
+     l.add('<text>'+text+'</text>');
+     l.add('');
+     JGrowll.WriteToFile(l.Text,filetmp);
+     fpsystem('/bin/chmod -R 775 /usr/share/artica-postfix/ressources/logs/jGrowl');
+     l.free;
+     JGrowll.free;
+end;
 function Tsystem.MembersList(groupname:string):TstringList;
 var
    l:Tstringlist;
@@ -745,7 +1650,7 @@ begin
        cmd:='/usr/sbin/usermod -a -G '+ groupname + ' '+ username;
        fpsystem(cmd + ' &');
        logs.Debuglogs(cmd);
-       cmd:='/usr/sbin/usermod -A '+ groupname + ' '+ username;
+       cmd:='/usr/sbin/usermod --append '+ groupname + ' '+ username;
        fpsystem(cmd + ' &');
        logs.Debuglogs(cmd);
     end;
@@ -807,6 +1712,13 @@ result:=datas_file;
 
 end;
 //#########################################################################################
+
+
+function Tsystem.LOCATE_PDNS_BIN():string;
+begin
+if FileExists('/usr/sbin/pdns_server') then exit('/usr/sbin/pdns_server');
+end;
+
 function Tsystem.ReadFileIntoString2(path:string):string;
 Var Fin : File;
     NumRead : Word;
@@ -972,7 +1884,11 @@ begin
         exit;
      end;
   end;
-  ini:=TiniFile.Create('/etc/artica-postfix/versions.cache');
+  try
+     ini:=TiniFile.Create('/etc/artica-postfix/versions.cache');
+  except
+     exit;
+  end;
   result:=ini.ReadString(APP_NAME,'VERSION','');
   ini.Free;
 end;
@@ -996,7 +1912,7 @@ Begin
     Repeat
       if Info.Name<>'..' then begin
          if Info.Name <>'.' then begin
-           if info.Attr=48 then begin
+           if (info.Attr=48) OR (info.Attr=49) then begin
               if D then ShowScreen('DirDir:: Found ' + Info.Name  + ' ' + IntToStr(info.Attr));
               DirListFiles.Add(Info.Name);
            end;
@@ -1019,7 +1935,7 @@ Begin
 
   D:=COMMANDLINE_PARAMETERS('debug');
   if D then ShowScreen('DirDir:: ' + FilePath + ' *' );
-
+  DirListFiles:=Tstringlist.Create;
 
   If FindFirst (FilePath+'/*',faAnyFile,Info)=0 then begin
     Repeat
@@ -1055,6 +1971,66 @@ Begin
   exit();
 end;
 //#########################################################################################
+procedure Tsystem.SecureWeb(path: string);
+var
+   folders:tstringlist;
+   i:integer;
+   RegExpr:TRegExpr;
+   ext:string;
+   chmodable:boolean;
+   fhlogs:tlogs;
+Begin
+   if not DirectoryExists(path) then exit;
+   folders:=Tstringlist.Create;
+
+   folders.AddStrings(DirDirRecursive(path));
+   RegExpr:=TRegExpr.Create;
+   fhlogs:=tlogs.Create;
+
+   for i:=0 to folders.Count-1 do begin
+        if FileSymbolicExists(folders.Strings[i]) then begin
+              RegExpr.Expression:='artica_ldap_addr';
+              if RegExpr.Exec(folders.Strings[i]) then continue;
+              fhlogs.Debuglogs('Warning symbolic link "'+folders.Strings[i]+'" is not acceptable in this directory ');
+              try
+                 fpunlink(folders.Strings[i]);
+              except
+               fhlogs.Debuglogs('Warning unable to remove symbolic link "'+folders.Strings[i]+'"');
+              end;
+        end;
+
+
+
+        RegExpr.Expression:='\.(.+)$';
+        if RegExpr.Exec(folders.Strings[i]) then begin
+           chmodable:=false;
+           ext:=LowerCase(RegExpr.Match[1]);
+           if ext='inc.php' then chmodable:=true;
+           if ext='php' then chmodable:=true;
+           if ext='inc' then chmodable:=true;
+           if ext='js' then chmodable:=true;
+           if ext='html' then chmodable:=true;
+           if ext='js.src' then chmodable:=true;
+           if ext='htm' then chmodable:=true;
+           if ext='png' then chmodable:=true;
+           if ext='gif' then chmodable:=true;
+           if ext='jpeg' then chmodable:=true;
+           if ext='css' then chmodable:=true;
+           if chmodable then begin
+              try
+                 FpChmod(folders.Strings[i],400);
+              except
+                fhlogs.Debuglogs('Fatal error while chmod '+folders.Strings[i]);
+              end;
+           end;
+        END;
+   end;
+
+
+
+
+end;
+
 function Tsystem.SearchFilesInPath(path: string;filter:string):TstringList;
 Var Info : TSearchRec;
     D:boolean;
@@ -1134,6 +2110,7 @@ end;
 //#############################################################################
 function Tsystem.OPENSSL_CONFIGURATION_PATH():string;
 begin
+If FileExists('/etc/artica-postfix/settings/Daemons/PostfixSSLCert') then exit('/etc/artica-postfix/settings/Daemons/PostfixSSLCert');
 If FileExists('/etc/artica-postfix/ssl.certificate.conf') then exit('/etc/artica-postfix/ssl.certificate.conf');
 if fileExists('/usr/share/artica-postfix/bin/install/DEFAULT-CERTIFICATE-DB.txt') then exit('/usr/share/artica-postfix/bin/install/DEFAULT-CERTIFICATE-DB.txt');
 if FileExists('/etc/ssl/openssl.cnf') then exit('/etc/ssl/openssl.cnf');
@@ -1143,7 +2120,11 @@ if FileExists('/usr/share/ssl/openssl.cnf') then exit('/usr/share/ssl/openssl.cn
 end;
 
 //#############################################################################
-
+function Tsystem.LOCATE_SMBCLIENT():string;
+begin
+if FileExists('/usr/bin/smbclient') then exit('/usr/bin/smbclient');
+end;
+//#############################################################################
 
 
 
@@ -1747,6 +2728,16 @@ Begin
   result:=trim(result);
 end;
 //#########################################################################################
+function Tsystem.LOCATE_APACHECTL():string;
+begin
+if FIleExists('/usr/sbin/apache2ctl') then exit('/usr/sbin/apache2ctl');
+if FIleExists('/usr/sbin/apachectl') then exit('/usr/sbin/apachectl');
+end;
+//#########################################################################################
+
+
+
+
 function Tsystem.IsBinaryString(const Value: string): Boolean;
 var
   n: integer;
@@ -1799,7 +2790,12 @@ var
 begin
    if not FileExists('/proc/'+pid+'/status') then exit;
    l:=TstringList.Create;
-   l.LoadFromFile('/proc/'+pid+'/status');
+   try
+      if not FileExists('/proc/'+pid+'/status') then exit;
+      l.LoadFromFile('/proc/'+pid+'/status');
+   except
+     exit;
+   end;
    RegExpr:=TRegExpr.Create;
    RegExpr.Expression:='^PPid:\s+([0-9]+)';
    For i:=0 to l.Count-1 do begin
@@ -1867,13 +2863,15 @@ var
 begin
  s:='';
  result:=false;
- if ParamCount>1 then begin
-     for i:=2 to ParamCount do begin
+ if ParamCount>0 then begin
+     for i:=1 to ParamCount do begin
         s:=s  + ' ' +ParamStr(i);
      end;
  end;
+   FoundWhatPattern:=AnsiReplaceText(FoundWhatPattern,'-','\-');
    RegExpr:=TRegExpr.Create;
    RegExpr.Expression:=FoundWhatPattern;
+   //writeln(RegExpr.Expression,' -> ', s,' ParamCount:',ParamCount);
    if RegExpr.Exec(s) then begin
       RegExpr.Free;
       result:=True;
@@ -2003,6 +3001,7 @@ begin
      if not FileExists('/proc/'+pid+'/cmdline') then begin
             exit(false);
      end else begin
+         if IS_ZOMBIE(pid) then exit(false);
          exit(true);
      end;
   end else begin
@@ -2010,6 +3009,36 @@ begin
   end;
 end;
 //#############################################################################
+function Tsystem.IS_ZOMBIE(PID:string):boolean;
+var
+RegExpr:TRegExpr;
+l:Tstringlist;
+i:integer;
+begin
+  if not FileExists('/proc/'+PID+'/status') then exit(false);
+  l:=Tstringlist.Create;
+  try
+      if not FileExists('/proc/'+pid+'/status') then exit;
+     l.LoadFromFile('/proc/'+PID+'/status');
+  except
+    exit();
+  end;
+  RegExpr:=TRegExpr.Create;
+  RegExpr.Expression:='State:\s+([A-Z])';
+  result:=false;
+//  State:	Z (zombie)
+  for i:=0 to l.Count-1 do begin
+        if RegExpr.Exec(l.Strings[i]) then begin
+           if trim(RegExpr.Match[1])='Z' then result:=true;
+           break;
+        end;
+  end;
+
+  l.free;
+  RegExpr.free;
+
+end;
+
 function Tsystem.PROCESS_MEMORY(PID:string):integer;
 var
    RegExpr:TRegExpr;
@@ -2092,7 +3121,7 @@ begin
    for i:=0 to l.Count-1 do begin
 
       if FileExists(l.Strings[i]+'/status') then begin
-           s.LoadFromFile(l.Strings[i]+'/status');
+           try s.LoadFromFile(l.Strings[i]+'/status'); except  result:=raz;  exit; end;
            for z:=0 to s.Count-1 do begin
                RegExpr.Expression:='^Pid:\s+([0-9]+)';
                if RegExpr.Exec(s.Strings[z]) then lefils:=RegExpr.Match[1];
@@ -2128,8 +3157,8 @@ if not FileExists(PidPath) then begin
        exit(0);
      end;
 
- s:=TStringList.Create;
- s.LoadFromFile(PidPath);
+ try s:=TStringList.Create; except exit; end;
+ try s.LoadFromFile(PidPath); except exit;end;
 
   RegExpr:=TRegExpr.Create;
      RegExpr.Expression:='^(PPid|PPID):\s+([0-9]+)';
@@ -2144,11 +3173,54 @@ s.free;
 RegExpr.free;
 end;
 //##############################################################################
+function Tsystem.GET_CPU_POURCENT(PID:integer):integer;
+var
+RegExpr:TRegExpr;
+begin
+   result:=0;
+   RegExpr:=TRegExpr.Create;
+   RegExpr.Expression:='([0-9]+)';
+   if RegExpr.Exec(ExecPipe(LOCATE_GENERIC_BIN('ps')+' -p '+ IntToStr(PID)+' -o pcpu --no-heading')) then result:=StrToInt(RegExpr.Match[1]);
+   RegExpr.free;
+end;
+//##############################################################################
 function Tsystem.LOCATE_PIDOF():string;
 begin
 if FileExists('/bin/pidof') then exit('/bin/pidof');
 if FileExists('/sbin/pidof') then exit('/sbin/pidof');
 exit(GET_INFO('pidof'));
+end;
+//##############################################################################
+function Tsystem.WHO_LISTEN_PORT(port:string):string;
+var
+   xjklogs:tLogs;
+   tmpstr:string;
+   l:Tstringlist;
+   RegExpr:TRegExpr;
+   i:Integer;
+   mypid:string;
+   org_cmdline:string;
+begin
+    xjklogs:=Tlogs.Create;
+    tmpstr:=xjklogs.FILE_TEMP();
+    fpsystem('netstat -p -l >'+tmpstr+' 2>&1');
+    if not FileExists(tmpstr) then exit;
+    l:=Tstringlist.Create;
+    l.LoadFromFile(tmpstr);
+    xjklogs.DeleteFile(tmpstr);
+    RegExpr:=TRegExpr.Create;
+    RegExpr.Expression:='^[A-Za-z0-9]+\s+[0-9]+\s+[0-9]+\s+.+?:'+port+'\s+.+?LISTEN\s+([0-9]+)\/(.+?)$';
+    for i:=0 to l.Count-1 do begin
+        if RegExpr.Exec(l.Strings[i]) then begin
+           result:='Pid:'+RegExpr.Match[1]+';Process:'+RegExpr.Match[2];
+           break;
+        end;
+    end;
+
+    l.free;
+    RegExpr.free;
+    xjklogs.free;
+
 end;
 //##############################################################################
 function Tsystem.PIDOF_PATTERN(pattern:string):string;
@@ -2160,26 +3232,47 @@ var
    i:Integer;
    mypid:string;
    org_cmdline:string;
+   pgrep:string;
 begin
     xjklogs:=Tlogs.Create;
     tmpstr:=xjklogs.FILE_TEMP();
-    pattern:=AnsiReplaceText(pattern,'-','\-');
-    pattern:=AnsiReplaceText(pattern,'.','\.');
+    if length(mem_pgrep)=0 then begin
+       pgrep:=LOCATE_GENERIC_BIN('pgrep');
+       mem_pgrep:=pgrep;
+    end else begin
+     pgrep:=mem_pgrep;
+    end;
 
-    xjklogs.Syslogs('PIDOF_PATTERN():: Search "'+ pattern+'"');
-    fpsystem('/usr/bin/pgrep -f "'+pattern+'" >'+tmpstr+' 2>&1');
+
+    if not FileExists(pgrep) then begin
+       xjklogs.Syslogs(' Tsystem.PIDOF_PATTERN():: unable to stat pgrep !!');
+       exit;
+    end;
+
+
+    if pos('.+',pattern)=0 then begin
+       pattern:=AnsiReplaceText(pattern,'-','\-');
+       pattern:=AnsiReplaceText(pattern,'.','\.');
+    end;
+    if verbosed then xjklogs.Syslogs('PIDOF_PATTERN():: Search "'+ pattern+'"');
+    fpsystem(pgrep+' -f "'+pattern+'" >'+tmpstr+' 2>&1');
     ll:=Tstringlist.CReate;
+    if not FileExists(tmpstr) then begin
+        xjklogs.debuglogs('PIDOF_PATTERN():: FATAL ERROR while reading file '+ tmpstr);
+        exit;
+    end;
+
+
      mypid:=IntToStr(fpgetpid);
     try
        ll.LOadFromFile(tmpstr);
     except
-      xjklogs.Syslogs('PIDOF_PATTERN():: FATAL ERROR while reading file '+ tmpstr);
+       xjklogs.debuglogs('PIDOF_PATTERN():: FATAL ERROR while reading file '+ tmpstr);
       exit;
     end;
 
 
     xjklogs.DeleteFile(tmpstr);
-    xjklogs.free;
     RegExpr:=TRegExpr.Create;
     RegExpr2:=TRegExpr.Create;
     RegExpr.Expression:='([0-9]+)';
@@ -2193,21 +3286,28 @@ begin
               if FileExists('/proc/'+RegExpr.Match[1]+'/cmdline') then begin
                  org_cmdline:=trim(ReadFileIntoString('/proc'+'/'+RegExpr.Match[1]+'/cmdline'));
                  if IsBinaryString(org_cmdline)  then org_cmdline:=TransFormBinaryString(org_cmdline);
-                 RegExpr2.Expression:='/bin/sh\s+';
+                 RegExpr2.Expression:='^/bin/sh\s+';
                  if RegExpr2.Exec(org_cmdline) then continue;
               end;
 
-              xjklogs.Debuglogs('PIDOF_PATTERN('+pattern+'):: '+RegExpr.Match[1]+' my pid is '+mypid+' ->' + fpReadlink('/proc/'+RegExpr.Match[1]+'/exec'));
-              xjklogs.Debuglogs('PIDOF_PATTERN('+pattern+'):: Executed '+org_cmdline);
+              if verbosed then xjklogs.Debuglogs('PIDOF_PATTERN('+pattern+'):: '+RegExpr.Match[1]+' my pid is '+mypid+' ->' + fpReadlink('/proc/'+RegExpr.Match[1]+'/exec'));
+              if verbosed then xjklogs.Debuglogs('PIDOF_PATTERN('+pattern+'):: Executed '+org_cmdline);
               result:=RegExpr.Match[1];
               break;
             end;
         end;
     end;
 
+    i:=0;
+
+
+    TryStrToInt(result,i);
+    if I<2 then result:='';
     ll.free;
     RegExpr.free;
     RegExpr2.free;
+    xjklogs.FRee;
+
 end;
 //##############################################################################
 function Tsystem.PIDOF_PATTERN_PROCESS_NUMBER(pattern:string):integer;
@@ -2469,6 +3569,21 @@ logs.Syslogs('LOCATE_PERL_BIN():: Unable to locate perl (usually in /usr/bin/per
 logs.Free;
 end;
 //##############################################################################
+function Tsystem.LOCATE_NOHUP():string;
+var
+logs:Tlogs;
+begin
+if FileExists('/usr/bin/nohup') then exit('/usr/bin/nohup');
+if FileExists('/usr/sbin/nohup') then exit('/usr/sbin/nohup');
+if FileExists('/sbin/nohup') then exit('/sbin/nohup');
+if FileExists('/bin/nohup') then exit('/bin/nohup');
+if FileExists('/usr/local/bin/nohup') then exit('/usr/local/bin/nohup');
+if FileExists('/usr/local/sbin/nohup') then exit('/usr/local/sbin/nohup');
+logs:=Tlogs.Create;
+logs.Syslogs('LOCATE_NOHUP():: Unable to locate perl (usually in /usr/bin/nohup)');
+logs.Free;
+end;
+//##############################################################################
 function Tsystem.PROCESS_MEMORY_SINGLE(PID:string):integer;
 var
    S:Tstringlist;
@@ -2488,7 +3603,7 @@ begin
         exit(0);
      end;
      s:=TStringList.Create;
-     S.LoadFromFile('/proc/' + trim(PID) + '/status');
+     try S.LoadFromFile('/proc/' + trim(PID) + '/status'); except exit; end;
 
      RegExpr:=TRegExpr.Create;
      RegExpr.Expression:='^VmRSS:\s+([0-9]+)';
@@ -2552,7 +3667,7 @@ begin
         exit('0');
      end;
      s:=TStringList.Create;
-     S.LoadFromFile('/proc/' + trim(PID) + '/status');
+     try S.LoadFromFile('/proc/' + trim(PID) + '/status'); except exit; end;
      if D then writeln('SYSTEM_PROCESS_STATUS:: /proc/' + trim(PID) + '/status');
 
      RegExpr.Expression:='^State:\s+([A-Z])\s+\(([a-zA-Z]+)\)';
@@ -2590,6 +3705,33 @@ begin
 result:=trim(ExecPipe(LOCATE_PIDOF()+' "'+processname+'"'));
 end;
 //##############################################################################
+function Tsystem.OPENSSL_CERTIFCATE_HOSTS():string;
+var
+   l:Tstringlist;
+   conf_path:string;
+   i:integer;
+   subjectAltName:string;
+   final:Tstringlist;
+   D:boolean;
+begin
+   conf_path:='/etc/artica-postfix/settings/Daemons/CertificateHostsList';
+   d:=COMMANDLINE_PARAMETERS('--verbose');
+   if not FileExists(conf_path) then exit;
+   l:=Tstringlist.Create;
+   l.LoadFromFile(conf_path);
+   for i:=0 to l.Count-1 do begin
+      if length(trim(l.Strings[i]))=0 then continue;
+      if D then writeln('OPENSSL_CERTIFCATE_HOSTS:: '+l.Strings[i]);
+      subjectAltName:=subjectAltName+'DNS:'+l.Strings[i]+',';
+   end;
+
+   if length(trim(subjectAltName))=0 then exit;
+   if subjectAltName[length(subjectAltName)]=',' then subjectAltName:=copy(subjectAltName,0,length(subjectAltName)-1);
+   result:=subjectAltName;
+end;
+
+
+
 procedure Tsystem.OPENSSL_CERTIFCATE_CONFIG();
 var
    default_conf:string;
@@ -2600,6 +3742,7 @@ var
    CertificateMaxDays:string;
    conf:TiniFile;
    policy_match:boolean;
+   HOSTS_ADDONS:string;
 begin
 
     default_conf:=OPENSSL_CONFIGURATION_PATH();
@@ -2608,12 +3751,62 @@ begin
        exit;
     end;
 
-    HostName:=getHostname();
+    conf:=TiniFile.Create(default_conf);
+    conf.EraseSection('HOSTS_ADDONS');
+
+
+    if Paramstr(2)='hostname' then begin
+       HostName:=Paramstr(3);
+       conf.WriteString('default_ca','commonName_value',HostName);
+    end;
+    if length(HostName)=0 then HostName:=conf.ReadString('default_ca','commonName_value',getHostname());
+    if HostName='Tomcat Demo Root CA.local' then HostName:=getHostname();
+
+    HOSTS_ADDONS:=OPENSSL_CERTIFCATE_HOSTS();
+    if length(trim(HOSTS_ADDONS))>0 then begin
+        writeln('starting certificate.........: multiple hosts detected');
+        conf.WriteString('HOSTS_ADDONS','basicConstraints','critical,CA:false');
+        conf.WriteString('HOSTS_ADDONS','subjectKeyIdentifier','hash');
+        conf.WriteString('HOSTS_ADDONS','keyUsage','digitalSignature, keyEncipherment');
+        conf.WriteString('HOSTS_ADDONS','extendedKeyUsage','serverAuth, clientAuth');
+        conf.WriteString('HOSTS_ADDONS','nsCertType','server');
+        conf.WriteString('HOSTS_ADDONS','nsComment','Certificate '+HostName);
+        conf.WriteString('HOSTS_ADDONS','subjectAltName',HOSTS_ADDONS);
+        conf.WriteString('v3_req','basicConstraints','critical,CA:false');
+        conf.WriteString('v3_req','keyUsage','nonRepudiation, digitalSignature, keyEncipherment');
+        conf.WriteString('v3_req','subjectAltName','@HOSTS_ADDONS');
+    end;
+
     writeln('starting certificate.........: Hostname is "'+HostName+'"');
+          conf.WriteString('CA_default','policy','policy_match');
+          conf.WriteString('ca','unique_subject','no');
+          conf.WriteString('default_ca','unique_subject','no');
+          conf.WriteString('default_db','policy','policy_match');
+          conf.WriteString('policy_match','countryName','match');
+          conf.WriteString('policy_match','stateOrProvinceName','match');
+          conf.WriteString('policy_match','organizationName','match');
+          conf.WriteString('policy_match','organizationalUnitName','optional');
+          conf.WriteString('policy_match','commonName','supplied');
+          conf.WriteString('policy_match','emailAddress','optional');
+          conf.WriteString('policy_anything','countryName','optional');
+          conf.WriteString('policy_anything','stateOrProvinceName','optional');
+          conf.WriteString('policy_anything','localityName','optional');
+          conf.WriteString('policy_anything','organizationName','optional');
+          conf.WriteString('policy_anything','organizationalUnitName','optional');
+          conf.WriteString('policy_anything','commonName','supplied');
+          conf.WriteString('policy_anything','emailAddress','optional');
+          conf.WriteString('v3_ca','subjectKeyIdentifier','hash');
+          conf.WriteString('v3_ca','authorityKeyIdentifier','keyid:always,issuer:always');
+          conf.WriteString('v3_ca','basicConstraints','critical,CA:false');
+          conf.UpdateFile;
+          conf.Free;
+
 
     RegExpr:=TRegExpr.create;
     RegExpr.Expression:='(.+?)\.(.+)';
-    if not RegExpr.Exec(HostName) then  HostName:=HostName+'.local';
+    if Paramstr(4)<>'strict' then begin
+        if not RegExpr.Exec(HostName) then  HostName:=HostName+'.local';
+    end;
 
     CertificateMaxDays:=GET_INFO('CertificateMaxDays');
     if length(CertificateMaxDays)=0 then CertificateMaxDays:='730';
@@ -2627,14 +3820,14 @@ begin
 
         if RegExpr.Exec(FILI.Strings[i]) then begin
            FILI.Strings[i]:='  commonName                      = ' + HostName;
-           writeln('starting certificate.........: commonName=' + HostName);
+           writeln('starting certificate.........: commonName=' + HostName+' line:'+IntToStr(i));
         end;
 
         RegExpr.Expression:='commonName_value[\s=]+';
         if RegExpr.Exec(FILI.Strings[i]) then FILI.Strings[i]:='  commonName_value                = '+HostName;
 
         RegExpr.Expression:='basicConstraints[\s=]+';
-        if RegExpr.Exec(FILI.Strings[i]) then FILI.Strings[i]:='  basicConstraints                = CA:true';
+        if RegExpr.Exec(FILI.Strings[i]) then FILI.Strings[i]:='  basicConstraints                = critical,CA:false';
 
         RegExpr.Expression:='default_days[\s=]+';
         if RegExpr.Exec(FILI.Strings[i]) then FILI.Strings[i]:='  default_days                = '+CertificateMaxDays;
@@ -2653,46 +3846,19 @@ begin
 
     end;
 
+
         FILI.SaveToFile('/etc/artica-postfix/ssl.certificate.conf');
 
+        conf:=TiniFile.Create('/etc/artica-postfix/ssl.certificate.conf');
+        conf.WriteString('policy','commonName','supplied');
+        conf.UpdateFile;
+        conf.free;
 
-
-          conf:=TiniFile.Create(default_conf);
-
-          conf.WriteString('CA_default','policy','policy_match');
-
-
-          conf.WriteString('ca','unique_subject','no');
-          conf.WriteString('default_ca','unique_subject','no');
-
-          conf.WriteString('default_db','policy','policy_match');
-
-
-
-          conf.WriteString('policy_match','countryName','match');
-          conf.WriteString('policy_match','stateOrProvinceName','match');
-          conf.WriteString('policy_match','organizationName','match');
-          conf.WriteString('policy_match','organizationalUnitName','optional');
-          conf.WriteString('policy_match','commonName','supplied');
-          conf.WriteString('policy_match','emailAddress','optional');
-          conf.WriteString('policy_anything','countryName','optional');
-          conf.WriteString('policy_anything','stateOrProvinceName','optional');
-          conf.WriteString('policy_anything','localityName','optional');
-          conf.WriteString('policy_anything','organizationName','optional');
-          conf.WriteString('policy_anything','organizationalUnitName','optional');
-          conf.WriteString('policy_anything','commonName','supplied');
-          conf.WriteString('policy_anything','emailAddress','optional');
-          conf.WriteString('v3_ca','subjectKeyIdentifier','hash');
-          conf.WriteString('v3_ca','authorityKeyIdentifier','keyid:always,issuer:always');
-          conf.WriteString('v3_ca','basicConstraints','CA:true');
-          conf.UpdateFile;
-          conf.free;
-
-          forceDirectories('/etc/ssl/certs/new');
-
-          FILI.Clear;
-          FILI.Add('unique_subject=no');
-          FILI.SaveToFile('/etc/ssl/certs/new/ca.index.attr');
+        FILI.SaveToFile(default_conf);
+        forceDirectories('/etc/ssl/certs/new');
+        FILI.Clear;
+        FILI.Add('unique_subject=no');
+        FILI.SaveToFile('/etc/ssl/certs/new/ca.index.attr');
 
 
 
@@ -2772,9 +3938,25 @@ var
    str:string;
 begin
 
+if key='cpulimit' then if length(mem_cpulimit_value)>0 then exit(mem_cpulimit_value);
+
 str:='';
    if FileExists('/etc/artica-postfix/settings/Daemons/'+key) then begin
       str:=trim(ReadFileIntoString('/etc/artica-postfix/settings/Daemons/'+key));
+      if key='cpulimit' then  mem_cpulimit_value:=result;
+      result:=str;
+   end;
+
+end;
+//#############################################################################
+function Tsystem.GET_CLUSTER(key:string):string;
+var
+   str:string;
+begin
+
+str:='';
+   if FileExists('/etc/artica-cluster/'+key) then begin
+      str:=trim(ReadFileIntoString('/etc/artica-cluster/'+key));
       result:=str;
    end;
 
@@ -2782,7 +3964,11 @@ end;
 //#############################################################################
 procedure Tsystem.set_INFO(key:string;val:string);
 begin
-set_INFOS(key,val);
+try
+   set_INFOS(key,val);
+except
+ writeln('Tsystem.set_INFO() Unable to set "'+key+'" "'+val+'"');
+end;
 end;
 //#############################################################################
 procedure Tsystem.set_INFOS(key:string;val:string);
@@ -2790,7 +3976,7 @@ var
    F:TEXT;
    ini:TIniFile;
 begin
-ForceDirectories('/etc/artica-postfix/settings/Daemons');
+  ForceDirectories('/etc/artica-postfix/settings/Daemons');
   AssignFile(F,'/etc/artica-postfix/settings/Daemons/'+key);
   Rewrite(F);
   Writeln (F,val);
@@ -2799,6 +3985,18 @@ ForceDirectories('/etc/artica-postfix/settings/Daemons');
 
 
 
+end;
+//#############################################################################
+procedure Tsystem.set_CLUSTER(key:string;val:string);
+var
+   F:TEXT;
+   ini:TIniFile;
+begin
+  ForceDirectories('/etc/artica-cluster');
+  AssignFile(F,'/etc/artica-cluster/'+key);
+  Rewrite(F);
+  Writeln (F,val);
+  CloseFile(F);
 end;
 //#############################################################################
 procedure Tsystem.set_MYSQL(key:string;val:string);
@@ -2874,31 +4072,79 @@ begin
 if not FileExists('/etc/artica-postfix/performances.conf') then begin
   fpsystem('/bin/touch /etc/artica-postfix/performances.conf');
 end;
-Ini:=TMemIniFile.Create('/etc/artica-postfix/performances.conf');
-result:=trim(Ini.ReadString('PERFORMANCES',key,''));
+try
+   Ini:=TMemIniFile.Create('/etc/artica-postfix/performances.conf');
+
+except
+  exit;
+end;
+   result:=trim(Ini.ReadString('PERFORMANCES',key,''));
+   Ini.Free;
+end;
+//#############################################################################
+procedure Tsystem.SET_PERFS(key:string;value:string);
+var
+  Ini:TinIFile;
+begin
+
+if not FileExists('/etc/artica-postfix/performances.conf') then begin
+  fpsystem('/bin/touch /etc/artica-postfix/performances.conf');
+end;
+
+Ini:=TinIFile.Create('/etc/artica-postfix/performances.conf');
+try
+   ini.WriteString('PERFORMANCES',key,value);
+   ini.UpdateFile;
+
+except
+ writeln('Tsystem.SET_PERFS() Fatal error while writing ',key,'->',value,' in ','/etc/artica-postfix/performances.conf');
+end;
 Ini.Free;
 end;
 //#############################################################################
 function Tsystem.MYSQL_INFOS(key:string):string;
 begin
+
 if key='server' then key:='mysql_server';
 if key='root' then key:='database_admin';
 if key='password' then key:='database_password';
 
 
+ if key='mysql_server' then begin
+    if length(mem_mysql_server)>0 then exit(mem_mysql_server);
+end;
+
+ if key='port' then begin
+    if length(mem_mysql_port)>0 then exit(mem_mysql_port);
+end;
+
+ if key='database_admin' then begin
+    if length(mem_mysql_user)>0 then exit(mem_mysql_user);
+end;
+
+ if key='database_password' then begin
+    if length(mem_mysql_password)>0 then exit(mem_mysql_password);
+end;
+
 result:=trim(GET_MYSQL(key));
 
 if key='mysql_server' then begin
    if result='' then result:='127.0.0.1';
+   mem_mysql_server:=result;
 end;
 
 if key='port' then begin
    if result='' then result:='3306';
+   mem_mysql_port:=result;
 end;
 
-//database_password
 if key='database_admin' then begin
    if result='' then result:='root';
+   mem_mysql_user:=result;
+end;
+
+if key='database_password' then begin
+    mem_mysql_password:=result;
 end;
 
 end;
@@ -3113,11 +4359,20 @@ begin
     if FileExists('/usr/sbin/accept') then exit('/usr/sbin/accept');
 end;
  //#############################################################################
+ function Tsystem.LOCATE_ctl_cyrusdb():string;
+begin
+ if FileExists('/usr/sbin/ctl_cyrusdb') then exit('/usr/sbin/ctl_cyrusdb');
+ if FileExists('/usr/lib/cyrus/bin/ctl_cyrusdb') then exit('/usr/lib/cyrus/bin/ctl_cyrusdb');
+ if FileExists('/usr/lib/cyrus-imapd/ctl_cyrusdb') then exit('/usr/lib/cyrus-imapd/ctl_cyrusdb');
+end;
 
- function Tsystem.LOCATE_ctl_mboxlist():string;
+ //#############################################################################
+  function Tsystem.LOCATE_ctl_mboxlist():string;
 begin
 
  if FileExists('/usr/sbin/ctl_mboxlist') then exit('/usr/sbin/ctl_mboxlist');
+ if FileExists('/usr/lib/cyrus/bin/ctl_mboxlist') then exit('/usr/lib/cyrus/bin/ctl_mboxlist');
+ if FileExists('/usr/lib/cyrus-imapd/ctl_mboxlist') then exit('/usr/lib/cyrus-imapd/ctl_mboxlist');
 end;
 
  //#############################################################################
@@ -3347,6 +4602,96 @@ end;
   end;
 end;
  //#############################################################################
+   function Tsystem.isoverloaded():boolean;
+ var
+    cpunum:integer;
+    currentload:string;
+    loadint:Single;
+    cpunum_max:single;
+    rtlogs:Tlogs;
+    load:integer;
+    s:string;
+    i:integer;
+ begin
+    result:=false;
+    s:='';
+
+         for i:=1 to ParamCount do begin
+             s:=s  + ' ' +ParamStr(i);
+         end;
+    cpunum:=CPU_NUMBER();
+    currentload:=LOAD_CURRENT();
+    rtlogs:=Tlogs.Create;
+    if not TryStrToFloat(currentload,loadint) then begin
+       loadint:=0;
+       rtlogs.Debuglogs('WARNING: Tsystem.isoverloaded() fatal error while int of '+ currentload );
+       rtlogs.free;
+       exit(false);
+    end;
+    cpunum_max:=(cpunum+1);
+
+    //rtlogs.Debuglogs('"'+s+'" system load '+ FloatToStr(loadint)+'/'+FloatToStr(cpunum_max) );
+    if(loadint>cpunum_max) then begin
+       rtlogs.Debuglogs('WARNING: "'+s+'" system overloaded !!: '+ FloatToStr(loadint)+'/'+FloatToStr(cpunum_max) );
+       result:=true;
+       exit;
+    end;
+   // rtlogs.Debuglogs('"'+s+'" system GOOD');
+    rtlogs.free;
+end;
+ //#############################################################################
+ function Tsystem.isoverloadedTooMuch():boolean;
+ var
+    cpunum:integer;
+    currentload:string;
+    loadint:Single;
+    cpunum_max:single;
+    rtlogs:Tlogs;
+    load:integer;
+    systemMaxOverloaded:single;
+    s:string;
+    i:integer;
+ begin
+    result:=false;
+    systemMaxOverloaded:=0;
+    s:='';
+
+         for i:=1 to ParamCount do begin
+             s:=s  + ' ' +ParamStr(i);
+         end;
+    cpunum:=CPU_NUMBER();
+    currentload:=LOAD_CURRENT();
+    rtlogs:=Tlogs.Create;
+    if not TryStrToFloat(currentload,loadint) then begin
+       loadint:=0;
+       rtlogs.Debuglogs('WARNING: Tsystem.isoverloadedTooMuch() fatal error while int of '+ currentload );
+       rtlogs.free;
+       exit(false);
+    end;
+    cpunum_max:=(cpunum+1);
+    cpunum_max:=cpunum_max*2;
+
+
+
+    //rtlogs.Debuglogs('"'+s+'" system load '+ FloatToStr(loadint)+'/'+FloatToStr(cpunum_max) );
+
+    if not TryStrToFloat(GET_INFO('systemMaxOverloaded'),systemMaxOverloaded) then begin
+          systemMaxOverloaded:=cpunum_max;
+          set_INFO('systemMaxOverloaded',FloatToStr(systemMaxOverloaded));
+    end;
+
+    if systemMaxOverloaded=0 then systemMaxOverloaded:=cpunum_max;
+
+    if(loadint>cpunum_max) then begin
+       rtlogs.DebugLogs('Starting......: '+'"'+s+'" system is very overloaded !!: '+ FloatToStr(loadint)+'/'+FloatToStr(cpunum_max));
+       rtlogs.Debuglogs('WARNING: "'+s+'" system is very overloaded !!: '+ FloatToStr(loadint)+'/'+FloatToStr(cpunum_max) );
+       result:=true;
+       exit;
+    end;
+   // rtlogs.Debuglogs('"'+s+'" system GOOD');
+    rtlogs.free;
+end;
+ //#############################################################################
 function Tsystem.LOCATE_CURL():string;
 begin
    if FileExists('/usr/local/bin/curl') then exit('/usr/local/bin/curl');
@@ -3367,11 +4712,13 @@ var
    commandline_artica:string;
    command_line_curl:string;
    command_line_wget:string;
+   WgetBindIpAddress_cmd_line_wget:string;
+   WgetBindIpAddress_cmd_line_curl:string;
    localhost:boolean;
    LOGS:Tlogs;
    ssl:boolean;
    ForceHTTPEngineToWget:integer;
-
+   WgetBindIpAddress:string;
    D:boolean;
  begin
    D:=COMMANDLINE_PARAMETERS('debug');
@@ -3387,9 +4734,16 @@ var
    if not TryStrToInt(GET_INFO('ForceHTTPEngineToWget'),ForceHTTPEngineToWget) then ForceHTTPEngineToWget:=0;
 
 
+   WgetBindIpAddress:=GET_INFO('WgetBindIpAddress');
+
+   if length(trim(WgetBindIpAddress))>0 then begin
+      WgetBindIpAddress_cmd_line_wget:=' --bind-address='+WgetBindIpAddress;
+      WgetBindIpAddress_cmd_line_curl:=' --interface '+WgetBindIpAddress;
+   end;
+
    command_line_curl:=' ';
    ssl:=false;
-   command_line_curl:= command_line_curl + ' --progress-bar --output ' + file_path + ' "' + uri+'"';
+   command_line_curl:= command_line_curl +WgetBindIpAddress_cmd_line_curl+' --progress-bar --output ' + file_path + ' "' + uri+'"';
 
    RegExpr.Expression:='^https:.+';
    if RegExpr.Exec(uri) then ssl:=True;
@@ -3430,7 +4784,7 @@ var
    end;
 
 
-   command_line_wget:=uri + '  -q --output-document=' + file_path;
+   command_line_wget:=uri +WgetBindIpAddress_cmd_line_wget+'  -q --output-document=' + file_path;
    if JustHead then ForceHTTPEngineToWget:=0;
 
 
@@ -3678,6 +5032,7 @@ end;
 function Tsystem.LOCATE_mysqld_safe():string;
 begin
 if FileExists('/usr/bin/mysqld_safe') then exit('/usr/bin/mysqld_safe');
+if FileExists('/usr/bin/mysqld_safe') then exit('/usr/bin/mysqld_safe');
 end;
 //##############################################################################
 function Tsystem.LOCATE_mysql_bin():string;
@@ -3695,10 +5050,16 @@ if FileExists('/usr/libexec/mysqld') then exit('/usr/libexec/mysqld');
 end;
 //##############################################################################
 function Tsystem.CRON_CREATE_SCHEDULE(ProgrammedTime:string;Croncommand:string;name:string):boolean;
- var FileDatas:TstringList;
+ var
+    FileDatas:TstringList;
+    mailadmin:string;
+
 begin
+  mailadmin:=ADMIN_MAIL();
   result:=true;
   FileDatas:=TstringList.Create;
+  FileDatas.Add('PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/X11R6/bin:/usr/share/artica-postfix/bin');
+  FileDatas.Add('MAILTO="'+mailadmin+'"');
   FileDatas.Add(ProgrammedTime + ' ' + ' root ' + Croncommand + ' >/dev/null 2>&1');
   FileDatas.SaveToFile('/etc/cron.d/'+name);
   fpsystem('/bin/chmod 0640 /etc/cron.d/'+name);
@@ -3706,26 +5067,59 @@ begin
   FileDatas.free;
 end;
 //#############################################################################
-function Tsystem.MAILLOG_PATH():string;
-var filedatas,logconfig,ExpressionGrep:string;
-RegExpr:TRegExpr;
-logs:Tlogs;
+function Tsystem.ADMIN_MAIL():string;
+ var Mailini:TiniFIle;
 begin
-logs:=tlogs.Create;
+if length(MEM_ADMIN_MAIL)>0 then exit(MEM_ADMIN_MAIL);
+if not FileExists('/etc/artica-postfix/smtpnotif.conf') then exit();
+Mailini:=TiniFIle.Create('/etc/artica-postfix/smtpnotif.conf');
+result:=Mailini.ReadString('SMTP','smtp_dest','');
+MEM_ADMIN_MAIL:=result;
+Mailini.free;
+end;
+//#############################################################################
+function Tsystem.MAILLOG_PATH():string;
+var
+   l:string;
+begin
+
+ l:=GET_INFO('SysMailLogPath');
+ if FIleExists(l) then exit(l);
+
+
 if FileExists(LOCATE_SYSLOG_NG_CONF()) then begin
-   exit(MAILLOG_FROM_SYSLOGNG());
+   l:=MAILLOG_FROM_SYSLOGNG();
+   if FIleExists(l) then exit(l);
+end;
+
+ l:=MAILLOG_REGEX_PATH();
+ if FIleExists(l) then exit(l);
+ if FileExists('/etc/rsyslog.conf') then l:=MAILLOG_REGEX_PATH('/etc/rsyslog.conf');
+ if FIleExists(l) then exit(l);
 end;
 
 
-if FileExists('/etc/syslog.conf') then logconfig:='/etc/syslog.conf';
-if FileExists('/etc/rsyslog.conf') then logconfig:='/etc/rsyslog.conf';
+function Tsystem.MAILLOG_REGEX_PATH(logconfig:string):string;
+var filedatas,ExpressionGrep:string;
+RegExpr:TRegExpr;
+logs:Tlogs;
+D:Boolean;
+begin
+logs:=tlogs.Create;
 
+
+ D:=COMMANDLINE_PARAMETERS('--verbose');
+if length(logconfig)=0 then logconfig:=LOCATE_SYSLOG_CONF();
+
+
+if D then writeln('logconfig: '+logconfig);
 filedatas:=ReadFileIntoString(logconfig);
    ExpressionGrep:='mail\.=info.+?-([\/a-zA-Z_0-9\.]+)?';
    RegExpr:=TRegExpr.create;
    RegExpr.ModifierI:=True;
    RegExpr.expression:=ExpressionGrep;
    if RegExpr.Exec(filedatas) then  begin
+     if D then writeln('ExpressionGrep:='+ExpressionGrep +'(' +RegExpr.Match[1]+')' );
      result:=RegExpr.Match[1];
      RegExpr.Free;
      exit;
@@ -3736,6 +5130,7 @@ filedatas:=ReadFileIntoString(logconfig);
    RegExpr.expression:=ExpressionGrep;
    if RegExpr.Exec(filedatas) then   begin
      result:=RegExpr.Match[1];
+     if D then writeln('ExpressionGrep:='+ExpressionGrep +'(' +RegExpr.Match[1]+')' );
      RegExpr.Free;
      exit;
    end;
@@ -3743,6 +5138,7 @@ filedatas:=ReadFileIntoString(logconfig);
    ExpressionGrep:='destination mailinfo[\s\{a-z]+\("(.+?)"';
    RegExpr.expression:=ExpressionGrep;
    if RegExpr.Exec(filedatas) then   begin
+        if D then writeln('ExpressionGrep:='+ExpressionGrep +'(' +RegExpr.Match[1]+')' );
      result:=RegExpr.Match[1];
      RegExpr.Free;
      exit;
@@ -3782,12 +5178,44 @@ path:=LOCATE_SYSLOG_NG_CONF();
    l.free;
 end;
 //##############################################################################
+function Tsystem.LOCATE_AUTH_LOG():string;
+var
+RegExpr:TRegExpr;
+l:TstringList;
+i:integer;
+path:string;
+begin
+path:=LOCATE_SYSLOG_CONF();
+   if not FileExists(path) then begin
+      writeln('fail');
+      exit;
+   end;
+RegExpr:=TRegExpr.Create;
+   RegExpr.Expression:='auth.+?\s+(.+)';
+   l:=Tstringlist.Create;
+   l.LoadFromFile(path);
+ for i:=0 to l.Count-1 do begin
+       if RegExpr.Exec(l.Strings[i]) then begin
+          result:=RegExpr.Match[1];
+          result:=AnsireplaceText(result,'"','');
+          result:=AnsireplaceText(result,'''','');
+          break;
+       end;
+   end;
+
+   RegExpr.free;
+   l.free;
+
+end;
+//##############################################################################
+
 
 
 function Tsystem.LOCATE_SYSLOG_CONF():string;
 begin
 if FileExists('/etc/syslog.conf') then exit('/etc/syslog.conf');
 if FileExists('/etc/syslog-ng/syslog-ng.conf') then exit('/etc/syslog-ng/syslog-ng.conf');
+if FIleExists('/etc/rsyslog.d/50-default.conf') then exit('/etc/rsyslog.d/50-default.conf');
 if FileExists('/etc/rsyslog.conf') then exit('/etc/rsyslog.conf');
 end;
 //##############################################################################
@@ -3848,22 +5276,55 @@ function Tsystem.LOCATE_SYSLOG_PATH():string;
 var i:integer;
 l:TstringList;
 RegExpr:TRegExpr;
+D:boolean;
 begin
+D:=false;
+if ParamStr(1)='--whereis-syslog' then D:=True;
+
+
+
    if not FileExists(LOCATE_SYSLOG_CONF()) then begin
       result:=LOCATE_SYSLOG_NG_PATH();
       exit;
    end;
 
+   if D then writeln('LOCATE_SYSLOG_PATH:',LOCATE_SYSLOG_CONF());
+
    l:=TstringList.Create;
    l.LoadFromFile(LOCATE_SYSLOG_CONF());
    RegExpr:=TRegExpr.create;
-   RegExpr.expression:='^\*\.\*.+?-([\/a-zA-Z_0-9\.]+)?';
+
    for i:=0 to l.Count-1 do begin
+       RegExpr.expression:='^\*\.\*.+?-([\/a-zA-Z_0-9\.]+)?';
         if RegExpr.Exec(l.Strings[i]) then begin
            result:=trim(RegExpr.Match[1]);
+           if D then writeln('LOCATE_SYSLOG_PATH: (1)',result);
            break;
+
         end;
+
+        RegExpr.expression:='destination df_syslog.+?file\("(.+?)"';
+        if RegExpr.Exec(l.Strings[i]) then begin
+           result:=trim(RegExpr.Match[1]);
+           if D then writeln('LOCATE_SYSLOG_PATH: (2)',result);
+          break
+        end;
+
+
+        RegExpr.expression:='\*\.info.+?\s+(.+)$';
+        if RegExpr.Exec(l.Strings[i]) then begin
+             if D then writeln('LOCATE_SYSLOG_PATH: (3)',result);
+             result:=trim(RegExpr.Match[1]);
+             break;
+        end;
+
+
+
+
    end;
+
+   RegExpr.expression:='^-(.+)';
+   if RegExpr.Exec(result) then result:=RegExpr.Match[1];
 
    l.free;
    RegExpr.free;
@@ -3904,10 +5365,40 @@ begin
   if FileExists('/etc/syslog-ng.conf') then exit('/etc/syslog-ng.conf');
 end;
 //##############################################################################
+function Tsystem.VMWARE_HOST():boolean;
+var
+   dmidecode:string;
+   VMWARE_HOST_LOGS:Tlogs;
+   tmpstr:string;
+   RegExpr:TRegExpr;
+   i:integer;
+   l:tstringlist;
+begin
+   result:=false;
+   if FileExists('/etc/artica-postfix/VMWARE_HOST') then exit(true);
+   dmidecode:=LOCATE_GENERIC_BIN('dmidecode');
+   if not FileExists( dmidecode) then exit;
+   VMWARE_HOST_LOGS:=Tlogs.Create;
+   tmpstr:='/etc/artica-postfix/dmidecode_type_1';
+   if not FileExists(tmpstr) then fpsystem(dmidecode+' --type 1 >'+ tmpstr+' 2>&1');
+   RegExpr:=TRegExpr.Create;
+   RegExpr.Expression:='VMware Virtual Platform';
+   l:=Tstringlist.Create;
+   l.LoadFromFile(tmpstr);
+   for i:=0 to l.Count-1 do begin
+       if  RegExpr.Exec(l.Strings[i]) then begin
+            VMWARE_HOST_LOGS.WriteToFile('yes' ,'/etc/artica-postfix/VMWARE_HOST');
+            exit(true);
+       end;
 
+   end;
 
+   l.free;
+   RegExpr.free;
+   VMWARE_HOST_LOGS.free;
 
-
+end;
+//##############################################################################
 function Tsystem.RotationSeconds(SecondsNumber:integer):boolean;
 var
    s:string;
@@ -4000,7 +5491,6 @@ begin
 
 
  if not PROCESS_EXIST(pid) then begin
-    logs.Debuglogs('BuildPids(): Create a new instance of '+MD +'('+cmdline+') for pid ' + mypid);
     l.Add(mypid);
     l.SaveToFile(FileS);
     result:=true;
@@ -4076,6 +5566,8 @@ function Tsystem.LOCATE_PHP5_BIN():string;
 begin
   if FileExists('/usr/bin/php5') then exit('/usr/bin/php5');
   if FIleExists('/usr/bin/php') then exit('/usr/bin/php');
+  if FIleExists('/usr/local/apache-groupware/php5/bin/php') then exit('/usr/local/apache-groupware/php5/bin/php');
+
 end;
 //##############################################################################
 function Tsystem.LOCATE_PHP5_CONFIG_BIN():string;
@@ -4179,10 +5671,24 @@ tmp:=LOCATE_PHP5_EXTENSION_DIR()+'/eaccelerator.so';
 if FileExists(tmp) then exit(tmp);
 end;
 //##############################################################################
+function Tsystem.LOCATE_MAPI_SO():string;
+var tmp:string;
+begin
+tmp:=LOCATE_PHP5_EXTENSION_DIR()+'/mapi.so';
+if FileExists(tmp) then exit(tmp);
+end;
+//##############################################################################
+function Tsystem.LOCATE_APC_SO():string;
+var tmp:string;
+begin
+tmp:=LOCATE_PHP5_EXTENSION_DIR()+'/apc.so';
+if FileExists(tmp) then exit(tmp);
+end;
+//##############################################################################
 function Tsystem.LOCATE_EACCELERATOR_SO_GW():string;
 var tmp:string;
 begin
-tmp:=LOCATE_PHP5_EXTENSION_DIR_GW()+'/eaccelerator.so';
+tmp:=LOCATE_PHP5_EXTENSION_DIR()+'/eaccelerator.so';
 if FileExists(tmp) then exit(tmp);
 end;
 //##############################################################################
@@ -4194,57 +5700,27 @@ tmpstr:string;
 l:Tstringlist;
 i:integer;
 RegExpr:TRegExpr;
-hour:integer;
-min:integer;
-hour2:integer;
-
+sec:integer;
 begin
  result:=0;
 logs:=Tlogs.Create;
 tmpstr:=logs.FILE_TEMP();
-if length(pid)=0 then exit;
-logs.Debuglogs('/bin/ps -p '+pid+' -o etime >'+tmpstr+' 2>&1');
-fpsystem('/bin/ps -p '+pid+' -o etime >'+tmpstr+' 2>&1');
-if not FileExists(tmpstr) then exit;
-l:=tstringList.Create;
+fpsystem('/usr/share/artica-postfix/bin/procstat '+ pid +' >'+ tmpstr);
+l:=Tstringlist.Create;
 l.LoadFromFile(tmpstr);
 logs.DeleteFile(tmpstr);
 RegExpr:=TRegExpr.Create;
-min:=0;
+sec:=0;
+RegExpr.Expression:='start_time:.+?\(([0-9]+)';
 for i:=0 to l.Count-1 do begin
-
-    RegExpr.Expression:='\s+([0-9]+):([0-9]+):([0-9]+)';
     if RegExpr.Exec(l.Strings[i]) then begin
-        TryStrToInt(RegExpr.Match[1],hour);
-        TryStrToInt(RegExpr.Match[2],min);
-        min:=(hour*60);
-        break;
+         TryStrToint(RegExpr.Match[1],sec);
     end;
-
-RegExpr.Expression:='^([0-9]+)-([0-9]+):([0-9]+):([0-9]+)';
-    if RegExpr.Exec(l.Strings[i]) then begin
-        TryStrToInt(RegExpr.Match[1],hour);
-        TryStrToInt(RegExpr.Match[2],hour2);
-        hour:=hour+hour2;
-        min:=(hour*60);
-        break;
-    end;
-
-
-    RegExpr.Expression:='\s+([0-9]+):([0-9]+)';
-    if RegExpr.Exec(l.Strings[i]) then begin
-           TryStrToInt(RegExpr.Match[1],min);
-           break;
-    end;
-
-
 end;
 
-logs.Debuglogs('PROCCESS_TIME_MIN:'+intTostr(min)+' minutes');
+if sec=0 then exit(0);
+result:=sec div 60;
 
-result:=min;
-
-logs.Debuglogs('PROCCESS_TIME_MIN:'+intTostr(result)+' minutes');
 
 end;
 //##############################################################################
@@ -4254,6 +5730,7 @@ var
   res:string;
   logs:Tlogs;
 begin
+
 
   result:=GET_CACHE_VERSION('LOCATE_PHP5_CONFIG_BIN_GW');
   if length(result)>0 then exit;
@@ -4277,11 +5754,12 @@ var
   logs:Tlogs;
 begin
 
-  result:=GET_CACHE_VERSION('LOCATE_PHP5_CONFIG_BIN');
-  if length(result)>0 then exit;
+result:=LOCATE_PHP5_EXTENSION_INMEM();
+if length(result)>5 then exit(result);
 
 if not FileExists(LOCATE_PHP5_CONFIG_BIN()) then begin
    result:=LOCATE_PHP5_EXTENSION_DIR_OLD();
+   MEM_PHP5_EXTENSION_DIR:=result;
    SET_CACHE_VERSION('LOCATE_PHP5_CONFIG_BIN',result);
    exit;
 end;
@@ -4292,15 +5770,29 @@ res:=trim(logs.ReadFromFile(php5_extension_dir));
 logs.DeleteFile(php5_extension_dir);
 if length(res)=0 then begin
    result:=LOCATE_PHP5_EXTENSION_DIR_OLD();
+   MEM_PHP5_EXTENSION_DIR:=result;
    SET_CACHE_VERSION('LOCATE_PHP5_CONFIG_BIN',result);
    exit;
 end;
 
 result:=res;
+MEM_PHP5_EXTENSION_DIR:=result;
 SET_CACHE_VERSION('LOCATE_PHP5_CONFIG_BIN',result);
 end;
 //##############################################################################
+function tSystem.LOCATE_PHP5_EXTENSION_INMEM():string;
+begin
+   if length(trim(MEM_PHP5_EXTENSION_DIR))>0 then begin
+         If DirectoryExists(MEM_PHP5_EXTENSION_DIR) then exit(MEM_PHP5_EXTENSION_DIR);
+   end;
 
+  MEM_PHP5_EXTENSION_DIR:=GET_CACHE_VERSION('LOCATE_PHP5_CONFIG_BIN');
+  if length(MEM_PHP5_EXTENSION_DIR)>0 then begin
+     If DirectoryExists(MEM_PHP5_EXTENSION_DIR) then exit(MEM_PHP5_EXTENSION_DIR);
+  end;
+
+end;
+//##############################################################################
 function tSystem.LOCATE_PHP5_EXTENSION_DIR_OLD():string;
 var
   l:TstringList;
@@ -4349,6 +5841,7 @@ if not FileExists(LOCATE_PHP5_BIN()) then begin
    exit;
 end;
 php5_extension_dir:=GET_INFO('php5_extconf_dir');
+if not DirectoryExists(php5_extension_dir) then php5_extension_dir:='';
 if length(php5_extension_dir)<3 then begin
      fpsystem(LOCATE_PHP5_BIN() + ' -i >/tmp/php.temp 2>&1');
      if not FileExists('/tmp/php.temp') then exit;
@@ -4762,12 +6255,52 @@ l.free;
 RegExpr.free;
 end;
 //##############################################################################
+function Tsystem.TEST_IONICE():boolean;
+var
+   l:TstringList;
+   i:integer;
+   RegExpr:TRegExpr;
+   tmpfile:string;
+   info:string;
+   D:boolean;
+   TEST_IONICE_LOGS:Tlogs;
+begin
+   result:=true;
+   TEST_IONICE_LOGS:=Tlogs.Create;
+   tmpfile:=TEST_IONICE_LOGS.FILE_TEMP();
+   if FIleExists('/usr/bin/ionice') then begin
+      fpsystem('/usr/bin/ionice -c2 -n7 echo 1 >'+tmpfile+' 2>&1');
+     l:=TstringList.Create;
+     if not FileExists(tmpfile) then exit;
+     l.LoadFromFile(tmpfile);
+     DeleteFile(tmpfile);
+     RegExpr:=TRegExpr.Create;
+
+
+     for i:=0 to l.Count-1 do begin
+         RegExpr.Expression:='ioprio_set.+?Operation not permitted';
+         if RegExpr.Exec(l.Strings[i]) then begin
+            result:=false;
+            break;
+         end;
+     end;
+     l.free;
+     RegExpr.free;
+     end else begin
+         result:=false;
+     end;
+     TEST_IONICE_LOGS.Free;
+
+end;
+//##############################################################################
+
 function Tsystem.EXEC_NICE():string;
 var
 tmp:string;
 ionice:string;
 cmd_nice:string;
 Nice:integer;
+useIonice:integer;
 begin
 Nice:=0;
 tmp:=GET_PERFS('ProcessNice');
@@ -4775,13 +6308,23 @@ if length(trim(tmp))=0 then begin
    set_INFO('ProcessNice','19');
    tmp:='19';
 end;
-
-
 if not TryStrToInt(tmp,Nice) then Nice:=19;
+
+tmp:=GET_PERFS('useIonice');
+if length(trim(tmp))=0 then begin
+   useIonice:=1;
+   set_INFO('useIonice','1');
+end;
+if not TryStrToInt(tmp,useIonice) then useIonice:=1;
+
+
+
 if FIleExists('/usr/bin/ionice') then begin
-   if Nice<9 then ionice:='';
-   if Nice>9 then ionice:='/usr/bin/ionice -c3 -n5 ';
-   if Nice>12 then ionice:='/usr/bin/ionice -c3 -n7 ';
+   if useIonice=1 then begin
+      if Nice<9 then ionice:='';
+      if Nice>9 then ionice:='/usr/bin/ionice -c2 -n5 ';
+      if Nice>12 then ionice:='/usr/bin/ionice -c2 -n7 ';
+   end;
 end;
 
 if FileExists('/usr/bin/nice') then cmd_nice:='/usr/bin/nice -n ' + IntToStr(Nice)+' ';
@@ -4836,16 +6379,12 @@ end;
 function Tsystem.LOCATE_cyrreconstruct():string;
 begin
   if FileExists('/usr/sbin/cyrreconstruct') then exit('/usr/sbin/cyrreconstruct');
+  if FileExists('/usr/lib/cyrus/bin/reconstruct') then exit('/usr/lib/cyrus/bin/reconstruct');
 end;
  //##############################################################################
 function Tsystem.LOCATE_SU():string;
 begin
   if FileExists('/bin/su') then exit('/bin/su');
-end;
- //##############################################################################
-function Tsystem.LOCATE_cyrquota():string;
-begin
-  if FileExists('/usr/sbin/cyrquota') then exit('/usr/sbin/cyrquota');
 end;
  //##############################################################################
 function Tsystem.LOCATE_SYSLOG():string;
@@ -5024,7 +6563,18 @@ if FileExists('/usr/local/bin/dspam') then exit('/usr/local/bin/dspam');
 if FileExists('/usr/bin/dspam') then exit('/usr/bin/dspam');
 end;
 //##############################################################################
-
+function Tsystem.LOCATE_NDB_MGMD():string;
+begin
+if FileExists('/usr/sbin/ndb_mgmd') then exit('/usr/sbin/ndb_mgmd');
+if FileExists('/usr/local/bin/ndb_mgmd') then exit('/usr/local/bin/ndb_mgmd');
+end;
+//##############################################################################
+function Tsystem.LOCATE_NDB():string;
+begin
+if FileExists('/usr/sbin/ndbd') then exit('/usr/sbin/ndbd');
+if FileExists('/usr/local/bin/ndbd') then exit('/usr/local/bin/ndbd');
+end;
+//##############################################################################
 function Tsystem.LOCATE_MEMCACHED_VERSION():string;
 var
 l      :TstringList;
@@ -5241,6 +6791,84 @@ begin
      end;
   end;
 
+  RegExpr.free;
+  l.free;
+
+end;
+//##############################################################################
+function Tsystem.isMounteddev(dev:string):boolean;
+var
+   tmpfile:string;
+   l:TstringList;
+   i:integer;
+   RegExpr:TRegExpr;
+   D:boolean;
+   Logs:Tlogs;
+begin
+  Logs:=Tlogs.Create;
+  tmpfile:=logs.FILE_TEMP();
+  fpsystem('/bin/mount -l >'+tmpfile + ' 2>&1');
+  D:=false;
+  D:=COMMANDLINE_PARAMETERS('debug');
+  if not FileExists(tmpfile) then begin
+     if D then logs.Debuglogs('SYS.isMounteddev():: tmpfile "'+tmpfile+'" IS NULL');
+     exit;
+  end;
+  result:=false;
+  l:=TstringList.Create;
+  l.LoadFromFile(tmpfile);
+  logs.DeleteFile(tmpfile);
+  RegExpr:=TRegExpr.Create;
+  RegExpr.Expression:='^'+dev+'.+?on\s+(.+?)\s+type';
+  for i:=0 to l.Count-1 do begin
+     if RegExpr.Exec(l.Strings[i]) then begin
+        if D then logs.Debuglogs('SYS.isMounteddev():: Found "'+RegExpr.Match[1]+'"');
+        result:=true;
+        break;
+     end;
+  end;
+
+  RegExpr.free;
+  l.free;
+
+end;
+//##############################################################################
+function Tsystem.GetMountedDev(dev:string):Tstringlist;
+var
+   tmpfile:string;
+   l:TstringList;
+   i:integer;
+   RegExpr:TRegExpr;
+   D:boolean;
+   Logs:Tlogs;
+   z:Tstringlist;
+begin
+
+  Logs:=Tlogs.Create;
+  tmpfile:=logs.FILE_TEMP();
+  fpsystem('/bin/mount -l >'+tmpfile + ' 2>&1');
+  D:=false;
+  D:=COMMANDLINE_PARAMETERS('debug');
+  z:=Tstringlist.Create;
+  result:=z;
+  if not FileExists(tmpfile) then begin
+     if D then logs.Debuglogs('SYS.GetMountedDev():: tmpfile "'+tmpfile+'" IS NULL');
+     exit;
+  end;
+
+  l:=TstringList.Create;
+  l.LoadFromFile(tmpfile);
+  logs.DeleteFile(tmpfile);
+  RegExpr:=TRegExpr.Create;
+  RegExpr.Expression:='^'+dev+'.+?on\s+(.+?)type';
+  for i:=0 to l.Count-1 do begin
+     if RegExpr.Exec(l.Strings[i]) then begin
+        if D then logs.Debuglogs('SYS.GetMountedDev():: Found "'+RegExpr.Match[1]+'"');
+        z.Add(trim(RegExpr.Match[1]));
+     end;
+  end;
+
+  result:=z;
   RegExpr.free;
   l.free;
 
@@ -5502,6 +7130,7 @@ var
    devtest:string;
    cmd_format:string;
    ext:string;
+
 begin
 
   disk_label:=AnsiReplaceText(disk_label,' ','_');
@@ -5564,7 +7193,7 @@ begin
    found:=false;
    if not FileExists('/etc/fstab') then exit;
 
-   line:=dev+'    '+target+'                 '+ext+'    rw,nosuid,errors=remount-ro  0    1';
+   line:=dev+'    '+target+'                 '+ext+'    rw,relatime,errors=remount-ro,user_xattr,acl  0    1';
    l:=Tstringlist.Create;
    l.LoadFromFile('/etc/fstab');
    devExp:=AnsiReplaceText(dev,'/','\/');
@@ -5741,6 +7370,9 @@ logs:=Tlogs.Create;
 tmpstr:=logs.FILE_TEMP();
 RegExpr:=TRegExpr.Create;
 fpsystem('/sbin/route -n >' +tmpstr+' 2>&1');
+l:=tstringlist.Create;
+l.LoadFromFile(tmpstr);
+logs.DeleteFile(tmpstr);
 for i:=0 to l.count-1 do begin
      RegExpr.Expression:='([0-9\.]+)\s+([0-9\.]+)\s+([0-9\.]+)\s+([A-Z]+)\s+.+?'+eth;
      if RegExpr.Exec(l.Strings[i]) then begin
@@ -5844,9 +7476,351 @@ RegExpr.free;
 SET_CACHE_VERSION('APP_UNZIP',result);
 
 end;
+
+
+
+//#############################################################################
+function Tsystem.FileMaskSize(const mask: string): longint;
+var
+  sr: tsearchrec;
+  rc: integer;
+begin
+  result:= 0;
+  rc:=SysUtils.FindFirst(mask,faAnyFile,sr);
+  while rc=0 do begin
+    inc(result,sr.size);
+    rc:= SysUtils.FindNext(sr);
+  end;
+  SysUtils.FindClose(sr);
+end;
+
+function Tsystem.DirectorySize(const dir: string): longint;
+begin
+  result:= FileMaskSize(dir+'/'+WildCard);
+end;
+//#############################################################################
+function Tsystem.ETC_SERVICES_PORT(servicename:string):integer;
+var
+ l:Tstringlist;
+ tmpstr:string;
+ zlogs:Tlogs;
+ RegExpr:TRegExpr;
+ r:Tstringlist;
+ i:integer;
+ cmd:string;
+begin
+    result:=0;
+    if not FileExists('/etc/services') then exit;
+    l:=Tstringlist.Create;
+    l.LoadFromFile('/etc/services');
+    RegExpr:=TRegExpr.Create;
+    RegExpr.Expression:='^'+servicename+'\s+([0-9]+)\/tcp';
+    for i:=0 to l.Count-1 do begin
+         if RegExpr.Exec(l.Strings[i]) then begin
+            TryStrToInt(RegExpr.Match[1],result);
+            break;
+         end;
+    end;
+
+end;
 //#############################################################################
 
 
+function Tsystem.GetRemoteCOmputerRessources(computername:string;username:string;password:string):string;
+var
+ l:Tstringlist;
+ tmpstr:string;
+ zlogs:Tlogs;
+ RegExpr:TRegExpr;
+ r:Tstringlist;
+ i:integer;
+ cmd:string;
+begin
+  zlogs:=Tlogs.Create;
+
+  if username='nil' then username:='';
+  if password='nil' then password:='';
+
+  zlogs.Debuglogs('Find ressources for "'+computername+'"');
+  tmpstr:=zlogs.FILE_TEMP();
+  l:=Tstringlist.Create;
+  r:=Tstringlist.Create;
+  RegExpr:=TRegExpr.Create;
+  if FileExists(LOCATE_SHOWMOUNT()) then begin
+
+     cmd:=LOCATE_SHOWMOUNT()+' -e '+computername+' --no-headers >'+tmpstr+' 2>&1';
+     zlogs.Debuglogs(cmd);
+     fpsystem(cmd);
+     l.LoadFromFile(tmpstr);
+     for i:=0 to l.Count-1 do begin
+         RegExpr.Expression:='can''t get address for';
+         if RegExpr.Exec(l.Strings[i]) then break;
+
+         RegExpr.Expression:='Timed out';
+         if RegExpr.Exec(l.Strings[i]) then break;
+
+         RegExpr.Expression:='^(.+?)\s+';
+         if RegExpr.Exec(l.Strings[i]) then begin
+             zlogs.Debuglogs('GetRemoteCOmputerRessources:: About "'+l.Strings[i]+'" -> '+RegExpr.Match[1]);
+             r.Add('NFS;'+RegExpr.Match[1]);
+         end;
+     end;
+  end;
 
 
+
+
+  cmd:='';
+  if FileExists(LOCATE_SMBCLIENT()) then begin
+     l.Clear;
+     if length(username)>0 then begin
+        if length(password)>0 then begin
+          cmd:=LOCATE_SMBCLIENT()+' -L '+computername+' -U '+username+'%'+password+' -g --timeout=1 >'+tmpstr+' 2>&1';
+        end;
+     end;
+     if length(cmd)=0 then cmd:=LOCATE_SMBCLIENT()+' -L '+computername+' -N -g --timeout=1 >'+tmpstr+' 2>&1';
+     zlogs.Debuglogs(cmd);
+     fpsystem(cmd);
+     l.LoadFromFile(tmpstr);
+     RegExpr.Expression:='^Disk\|(.+?)\|';
+     for i:=0 to l.Count-1 do begin
+         zlogs.Debuglogs('GetRemoteCOmputerRessources:: About "'+l.Strings[i]+'"');
+         if RegExpr.Exec(l.Strings[i]) then begin
+            r.Add('SMB;'+RegExpr.Match[1]);
+         end;
+     end;
+  end else begin
+
+
+  end;
+
+zlogs.DeleteFile(tmpstr);
+result:=r.Text;
+l.free;
+r.free;
+RegExpr.free;
+ zlogs.Debuglogs('Find ressources for "'+computername+'" done...');
+ zlogs.free;
+end;
+//#############################################################################
+
+procedure Tsystem.FSTAB_ADD(dev:string;mount_point:string);
+var
+   l:Tstringlist;
+   RegExpr:TRegExpr;
+   devstring:string;
+   mountstring:string;
+   i:integer;
+   zlogs:Tlogs;
+   f:boolean;
+   cmd:string;
+begin
+   if not FileExists('/etc/fstab') then exit;
+   devstring:=AnsiReplaceText(dev,'/','\/');
+   devstring:=AnsiReplaceText(dev,'.','\.');
+   mountstring:=AnsiReplaceText(mount_point,'/','\/');
+   mountstring:=AnsiReplaceText(mount_point,'.','\.');
+   l:=Tstringlist.Create;
+   zlogs:=Tlogs.Create;
+   l.LoadFromFile('/etc/fstab');
+   zlogs.Debuglogs('Tsystem.FSTAB_ADD found "'+devstring+'" AND "'+mountstring+'" in '+IntToStr(l.Count)+' lines');
+
+   f:=false;
+   for i:=0 to l.Count-1 do begin
+       RegExpr.Expression:=devstring;
+       if RegExpr.Exec(l.Strings[i]) then begin
+           zlogs.Debuglogs('Tsystem.FSTAB_ADD found "'+dev+'" line '+ IntToStr(i));
+           RegExpr.Expression:=mountstring;
+           if RegExpr.Exec(l.Strings[i]) then begin
+              zlogs.Debuglogs('Tsystem.FSTAB_ADD found "'+mount_point+'" line '+ IntToStr(i));
+              f:=true;
+              break;
+           end;
+       end;
+   end;
+
+
+  if not f then begin
+     cmd:=dev+chr(9)+mount_point+chr(9)+'auto'+chr(9)+'defaults'+chr(9)+'0'+chr(9)+'0';
+     l.Add(cmd);
+     zlogs.Debuglogs('Tsystem.FSTAB_ADD Add "'+cmd+'"');
+     zlogs.WriteToFile(l.Text, '/etc/fstab');
+  end;
+
+   zlogs.Debuglogs('Tsystem.FSTAB_ADD END...');
+end;
+//#############################################################################
+function Tsystem.ArrayAlreadyUsed(arrayS:Tstringlist;pattern:string):boolean;
+var
+   i:integer;
+begin
+     result:=false;
+     for i:=0 to arrayS.Count-1 do begin
+          if  arrayS.Strings[i]=pattern then exit(true);
+     end;
+end;
+//#############################################################################
+procedure Tsystem.etc_ld_so_conf(path:string);
+var
+   l:Tstringlist;
+   RegExpr:TRegExpr;
+   devstring:string;
+   mountstring:string;
+   i:integer;
+   etc_ld_so_conf_logs:Tlogs;
+   f:boolean;
+   cmd:string;
+begin
+   f:=false;
+   devstring:=path;
+   devstring:=AnsiReplaceText(path,'/','\/');
+   devstring:=AnsiReplaceText(devstring,'.','\.');
+   if not FileExists('/etc/ld.so.conf') then exit;
+   l:=Tstringlist.Create;
+   l.LoadFromFile('/etc/ld.so.conf');
+   RegExpr:=TRegExpr.Create;
+   RegExpr.Expression:=devstring;
+   etc_ld_so_conf_logs:=tlogs.Create;
+   for i:=0 to l.Count-1 do begin
+       if RegExpr.Exec(l.Strings[i]) then begin
+          etc_ld_so_conf_logs.Debuglogs('Find '+devstring+ ' line '+IntTostr(i) );
+          f:=true;
+          break;
+       end;
+   end;
+
+   if not f then begin
+      l.Add(path);
+      etc_ld_so_conf_logs.Debuglogs('writing file /etc/ld.so.conf for path '+path);
+      etc_ld_so_conf_logs.WriteToFile(l.Text,'/etc/ld.so.conf');
+   end;
+   etc_ld_so_conf_logs.free;
+   RegExpr.free;
+   l.free;
+
+
+end;
+
+//#############################################################################
+function Tsystem.locate_roundcube_main_folder():string;
+begin
+if FileExists('/usr/share/roundcubemail/index.php') then exit('/usr/share/roundcubemail');
+if FileExists('/usr/share/roundcube/index.php') then exit('/usr/share/roundcube');
+if FileExists('/var/lib/roundcube/index.php') then exit('/var/lib/roundcube');
+end;
+//##############################################################################
+function Tsystem.LIGHTTPD_GET_USER():string;
+var
+     l:TstringList;
+     RegExpr:TRegExpr;
+     i:integer;
+     user,group:string;
+begin
+
+  user:=GET_INFO('LighttpdUserAndGroup');
+  if length(user)>0 then begin
+     result:=user;
+     exit(user);
+  end;
+
+  if not FileExists(LIGHTTPD_CONF_PATH()) then exit;
+  l:=TstringList.Create;
+  RegExpr:=TRegExpr.Create;
+  l.LoadFromFile(LIGHTTPD_CONF_PATH());
+  for i:=0 to l.Count-1 do begin
+    RegExpr.Expression:='^server\.username.+?"(.+?)"';
+    if RegExpr.Exec(l.Strings[i]) then user:=RegExpr.Match[1];
+    RegExpr.Expression:='^server\.groupname.+?"(.+?)"';
+    if RegExpr.Exec(l.Strings[i]) then group:=RegExpr.Match[1];
+  end;
+  if length(user)>0 then result:=user+':'+group;
+  set_INFO('LighttpdUserAndGroup',result);
+  RegExpr.free;
+  l.free;
+end;
+//##############################################################################
+function Tsystem.LIGHTTPD_CONF_PATH:string;
+begin
+  if FileExists('/etc/lighttpd/lighttpd.conf') then exit('/etc/lighttpd/lighttpd.conf');
+  if FileExists('/etc/lighttpd/lighttpd.conf') then exit('/etc/lighttpd/lighttpd.conf');
+  if FileExists('/opt/artica/conf/lighttpd.conf') then exit('/opt/artica/conf/lighttpd.conf');
+  if FileExists('/usr/local/etc/lighttpd.conf') then exit('/usr/local/etc/lighttpd.conf');
+end;
+//##############################################################################
+function Tsystem.LIGHTTPD_LISTEN_PORT():string;
+var
+RegExpr:TRegExpr;
+l:TStringList;
+i:integer;
+begin
+if not FileExists(LIGHTTPD_CONF_PATH()) then exit;
+l:=TstringList.Create;
+l.LoadFromFile(LIGHTTPD_CONF_PATH());
+RegExpr:=TRegExpr.Create;
+RegExpr.Expression:='^server\.port.+?=.+?([0-9]+)';
+for i:=0 to l.Count-1 do begin
+
+   if RegExpr.Exec(l.Strings[i]) then begin
+   result:=RegExpr.Match[1];
+   break;
+   end;
+end;
+
+   RegExpr.Free;
+   l.free;
+
+end;
+//##############################################################################
+function Tsystem.WIRELESS_CARD():string;
+var
+RegExpr:TRegExpr;
+l:TStringList;
+i:integer;
+begin
+if not FileExists('/proc/net/wireless') then exit;
+l:=TstringList.Create;
+l.LoadFromFile('/proc/net/wireless');
+RegExpr:=TRegExpr.Create;
+RegExpr.Expression:='(.+?):\s+([0-9]+)';
+for i:=0 to l.Count-1 do begin
+
+   if RegExpr.Exec(l.Strings[i]) then begin
+   result:=trim(RegExpr.Match[1]);
+   break;
+   end;
+end;
+
+   RegExpr.Free;
+   l.free;
+
+end;
+//##############################################################################
+function Tsystem.ArchStruct():integer;
+var
+   tmpstr,data:string;
+   RegExpr:TRegExpr;
+   ArchStructLogs:Tlogs;
+begin
+tmpstr:=FILE_TEMP();
+ArchStructLogs:=Tlogs.Create;
+fpsystem(LOCATE_GENERIC_BIN('uname')+ ' -m >'+tmpstr +' 2>&1');
+data:=trim(ArchStructLogs.ReadFromFile(tmpstr));
+ArchStructLogs.free;
+fpsystem('/bin/rm '+tmpstr+' >/dev/null 2>&1');
+RegExpr:=TRegExpr.Create;
+RegExpr.Expression:='i[0-9]86';
+if RegExpr.Exec(data) then begin
+   RegExpr.free;
+   result:=32;
+   exit;
+end;
+
+RegExpr.Expression:='x86_64';
+if RegExpr.Exec(data) then begin
+   RegExpr.free;
+   result:=64;
+   exit;
+end;
+end;
+//##############################################################################
 end.

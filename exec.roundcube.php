@@ -12,6 +12,7 @@ $GLOBALS["MYSQL_DB"]=$bd;
 
 if($argv[1]=="--sieverules"){plugin_sieverules();die();}
 if($argv[1]=="--calendar"){plugin_calendar();die();}
+if($argv[1]=="--database"){check_databases($bd);die();}
 
 if(!$_GLOBAL["roundcube_installed"]){die("Roundcube is not installed, aborting");}
 
@@ -90,8 +91,6 @@ function CreateRoundCubeIdentity($bd,$user_id,$num,$val){
 	$sql="INSERT INTO `identities` (`user_id`, `del`, `standard`, `name`, `organization`, `email`, `reply-to`) VALUES ('$user_id','0','1','$num','','$val','$val');";
 	$q=new mysql();
 	$q->QUERY_SQL($sql,$bd);
-	
-	
 }
 
 
@@ -187,6 +186,12 @@ function plugin_calendar(){
 	
 	///usr/share/roundcube/plugins
 	
+	
+}
+
+function check_databases($bd){
+	$q=new mysql();
+	$q->checkRoundCubeTables($bd);
 	
 }
 	

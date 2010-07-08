@@ -132,6 +132,7 @@ begin
    if not DirectoryExists(web_folder()) then exit;
    if not FileExists(roundcube_db_inc_php()) then  exit;
    ini:=TstringList.Create;
+   pid:=SYS.GET_PID_FROM_PATH('/var/run/lighttpd/lighttpd-roundcube.pid');
    ini.Add('[ROUNDCUBE]');
       ini.Add('master_version='+VERSION());
       ini.Add('status='+SYS.PROCESS_STATUS(pid));
@@ -203,6 +204,7 @@ begin
    if length(version_str)=0 then exit(0);
    vers:=version_str;
    vers:=AnsiReplaceText(vers,'-stable','');
+   vers:=AnsiReplaceText(vers,'-beta','');
    RegExpr:=TRegExpr.Create;
    RegExpr.Expression:='^([0-9]+)\.([0-9]+)\.([0-9]+)$';
    if RegExpr.Exec(vers) then begin
@@ -224,6 +226,7 @@ begin
       exit;
    end;
 
+
    if not TryStrToInt(vers,result) then result:=0;
 end;
 //##############################################################################
@@ -233,6 +236,7 @@ var
    str:string;
 
 begin
+   str:='';
    if not DirectoryExists(web_folder()+'/plugins') then exit;
    SYS.DirDir(web_folder()+'/plugins');
    for i:=0 to SYS.DirListFiles.Count-1 do begin
@@ -313,6 +317,7 @@ var
    l:TStringList;
    i:integer;
 begin
+     exit;
      php5UploadMaxFileSize:=SYS.GET_INFO('php5UploadMaxFileSize');
 
      logs.Debuglogs('Starting......: Roundcube writing php.ini file');
@@ -497,8 +502,6 @@ var
    lighttpd:Tlighttpd;
    pid:string;
    user:string;
-   confFile:string;
-   errorlog:string;
 begin
      lighttpd:=Tlighttpd.Create(SYS);
      conf_path:='/etc/artica-postfix/lighttpd-roundcube.conf';
@@ -519,7 +522,7 @@ begin
      
      pid:=ROUNDCUBE_PID();
      if SYS.GET_INFO('RoundCubeHTTPEngineEnabled')<>'1' then begin
-         logs.Debuglogs('Starting......: Roundcube Configuration file "'+confFile+'"');
+         logs.Debuglogs('Starting......: Roundcube Configuration file "/etc/artica-postfix/lighttpd-roundcube.conf"');
          logs.Debuglogs('Starting......: lighttpd For RoundCube is disabled');
          logs.Debuglogs('Starting......: Create symbolic link from '+web_folder+' to '+ artica_path + '/webmail');
          logs.OutputCmd('/bin/ln -s --force ' + web_folder + ' ' +artica_path + '/webmail');

@@ -1,7 +1,10 @@
 <?php
 include_once(dirname(__FILE__)."/class.ldap.inc");
+include_once(dirname(__FILE__)."/class.maincf.multi.inc");
 
 class milter_greylist{
+	var $hostname;
+	var $ou;
 	var $dn;
 	var $global_conf;
 	var $main_array;
@@ -11,6 +14,7 @@ class milter_greylist{
 	var $dnsrbl_class;
 	var $MilterGreyListEnabled;
 	var $__noparse;
+	var $mynetworks=array();
 	var $actionlist=array(
 							null=>"{select}",
 							"addr"=>"{addr}",
@@ -23,8 +27,10 @@ class milter_greylist{
 							"dnsrbl"=>"{dnsrbl}");
 	
 	
-function milter_greylist($noparse=false){
+function milter_greylist($noparse=false,$hostname=null,$ou=null){
 	$this->__noparse=$noparse;
+	$this->hostname=$hostname;
+	$this->ou=$ou;
 	if($noparse){
 		$this->verifyBranch();
 		$this->loadConfig();
@@ -38,6 +44,7 @@ function milter_greylist($noparse=false){
 }
 
 function verifyBranch(){
+	if(($this->hostname<>null) && ($this->ou<>null)){return;}
 	$ldap=new clladp();
 	if($ldap->ldapFailed){return false;}
 	$this->dn="cn=milter-greyist,cn=artica,$ldap->suffix";
@@ -49,7 +56,6 @@ function verifyBranch(){
 		
 		$sock=new sockets();
 		$sock->SET_INFO('MilterGreyListEnabled',1);
-		
 		$ldap->ldap_add($this->dn,$upd);
 	}
 	
@@ -57,8 +63,21 @@ function verifyBranch(){
 
 
 function LoadConfig(){
+	
+	if(($this->hostname<>null) && ($this->ou<>null)){
+		WriteLogs("Multi-postfix instance: $this->hostname, $this->ou",__CLASS__.'/'.__FUNCTION__,__FILE__,__LINE__);
+		$main=new maincf_multi($this->hostname,$this->ou);
+		$this->global_conf=base64_decode($main->GET_BIGDATA("milter-greylist-config"));
+		$this->mynetworks=unserialize($main->GET_BIGDATA("mynetworks"));
+		return ;
+	}
+	
+	
 	$ldap=new clladp();
 	if($ldap->ldapFailed){return false;}
+	
+	$this->mynetworks=$ldap->load_mynetworks();
+	
 	$res=@ldap_read($ldap->ldap_connection,$this->dn,"(objectClass=MilterGreyList)",array());
 		if($res){
 			$hash=ldap_get_entries($ldap->ldap_connection,$res);
@@ -73,19 +92,30 @@ function LoadConfig(){
 }
 
 function SaveToLdap(){
+	
+	if(($this->hostname<>null) && ($this->ou<>null)){
+		WriteLogs("Multi-postfix instance: $this->hostname, $this->ou",__CLASS__.'/'.__FUNCTION__,__FILE__,__LINE__);
+		$main=new maincf_multi($this->hostname,$this->ou);
+		$main->SET_BIGDATA("milter-greylist-config",base64_encode($this->BuildConfig()));
+		$sock=new sockets();
+		$sock->getFrameWork("cmd.php?milter-greylist-reconfigure=yes");		
+		return ;
+	}	
+	
+	WriteLogs("Single instance: $this->hostname, $this->ou",__CLASS__.'/'.__FUNCTION__,__FILE__,__LINE__);
 	$ldap=new clladp();
 	if($ldap->ldapFailed){return false;}
 	$upd["GreyListConf"][]=$this->BuildConfig();
 	$ldap->Ldap_modify($this->dn,$upd);
 	$sock=new sockets();
-	$datas=$sock->getfile('miltergl');
-	return $datas;
+	$sock->getFrameWork("cmd.php?milter-greylist-reconfigure=yes&hostname=$this->hostname&ou=".base64_encode($this->ou));
+	
 	
 }
 
 
 function ParseConfig(){
-	WriteLogs("Parsing start",__CLASS__.'/'.__FUNCTION__,__FILE__);
+	WriteLogs("Parsing start",__CLASS__.'/'.__FUNCTION__,__FILE__,__LINE__);
 	if(trim($this->global_conf)==null){$this->global_conf=$this->BuildConfig();}
 	
 	$greylist=$this->regconf("greylist");
@@ -166,6 +196,13 @@ function BuildConfig(){
 				$this->DefaultAcls();
 			}
 			
+			if(is_array($this->mynetworks)){
+				while (list ($num, $net) = each ($this->mynetworks) ){
+					if(trim($net)==null){continue;}
+					$this->acl[]="acl whitelist addr $net # postfix local network";
+				}
+			}
+			
 			if(is_array($this->acl)){
 				while (list ($num, $ligne) = each ($this->acl) ){
 					$array_acl[$ligne]=$ligne;
@@ -181,9 +218,7 @@ function BuildConfig(){
 			if(!is_array($this->dnsrbl)){
 				$this->defaultDnsrbl();
 			}
-			if(!is_array($array_acl2)){
-				$this->DefaultAcls();
-			}
+
 	
 			$conf=$conf ."# Greylisting config file with a lot of options explained\n";
 			$conf=$conf ."#\n";
@@ -388,9 +423,9 @@ function BuildConfig(){
 			}*/
 			$conf=$conf ."\n";
 			$conf=$conf ."\n";
-			$conf=$conf ."#ACLS Rules\n";
+			$conf=$conf ."#ACLS Rules\n\n";
 			$conf=$conf . implode("\n",$array_acl2);
-			
+			$conf=$conf ."\n";
 	      	
 		    
 			return $conf;

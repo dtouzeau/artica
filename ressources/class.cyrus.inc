@@ -231,7 +231,7 @@ class cyrus{
 	private function CreateSubBox($uid,$acls){
 		$subboxes[]="Sent";
 		$subboxes[]="Trash";
-		$subboxes[]="Draft";
+		$subboxes[]="Drafts";
 		$subboxes[]="Junk";
 		$this->CreateCyrParamsAsuser($uid);
 		$cyradm=new CyrusAdmin($this->cyr_params);

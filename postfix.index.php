@@ -243,7 +243,7 @@ function {$prefix}demarre(){
 	{$prefix}tant = {$prefix}tant+1;
 	{$prefix}reste=20-{$prefix}tant;
 	if(!document.getElementById('main_config_postfix')){return;}
-	if ({$prefix}tant < 30 ) {                           
+	if ({$prefix}tant < 60 ) {                           
 	{$prefix}timerID =setTimeout(\"{$prefix}demarre()\",2000);
       } else {
 		{$prefix}tant = 0;
@@ -330,7 +330,6 @@ function main_tabs(){
 	if($EnablePostfixMultiInstance==1){
 		unset($array["security_settings"]);
 		unset($array["tweaks"]);
-		unset($array["filters-connect"]);
 	}
 
 	
@@ -630,8 +629,8 @@ function multidomains_script(){
 	$html="YahooWin2(550,'$page?multidomains=yes','$mul',''); 
 	
 var X_ApplyMultidomains= function (obj) {
-	var results=obj.responseText;
-	alert(results);
+	var results=trim(obj.responseText);
+	if(results.length>0){alert(results);}
 	YahooWin2(550,'$page?multidomains=yes','$mul',''); 
 	}
 		
@@ -1360,11 +1359,27 @@ function filters_connect_section(){
 	
 	$sock=new sockets();
 	$EnablePostfixMultiInstance=$sock->GET_INFO("EnablePostfixMultiInstance");
+	$AmavisFilterEnabled=$sock->GET_INFO('EnableAmavisDaemon');
 	$users=new usersMenus();
 	$users->LoadModulesEnabled();		
+	$hostname=$_GET["hostname"];
+	if($hostname==null){$hostname=$sock->GET_INFO("myhostname");}
+	if($hostname==null){$hostname=$users->hostname;}
 	
 	if($users->DkimFilterEnabled==1){
 		$dkim=Paragraphe('folder-64-certified.png','{APP_DKIM_FILTER}','{dkim_filter}','dkim.index.php',null,210,null,0,true);
+	}
+	
+	if($users->AMAVIS_INSTALLED){
+		if($AmavisFilterEnabled==1){
+			if($users->MAIL_DKIM_VERSION<>null){
+				$dkim=Paragraphe('folder-64-certified.png','{APP_DKIM_FILTER}','{dkim_filter}',"javascript:Loadjs('amavis.dkim.php?ou=". base64_encode("postfix-master")."&hostname=". $sock->GET_INFO("myhostname")."')",null,210,null,0,true);
+			}
+			
+			$senderbase=Paragraphe('hearth-blocked-64.png','{SPAMASSASSIN_DNS_BLACKLIST}','{SPAMASSASSIN_DNS_BLACKLIST_TEST}',
+			"javascript:Loadjs('spamassassin.dnsbl.php?ou=". base64_encode("postfix-master")."&hostname=". $sock->GET_INFO("myhostname")."')",null,210,null,0,true);
+			
+		}
 	}
 	
 	$miltergreylist=Buildicon64("DEF_ICO_MAIL_MGLIST");
@@ -1372,7 +1387,13 @@ function filters_connect_section(){
 	$block_domain=Buildicon64('DEF_ICO_MAIL_BLOCKDOM');	
 	$whitelist=Buildicon64("DEF_ICO_POSTFIX_WHITELIST");
 	
+	if($EnablePostfixMultiInstance==1){
+		$miltergreylist=null;
+		$policydweight=null;
+	}
+	
 		$tr[]=$miltergreylist;
+		$tr[]=$senderbase;
 		$tr[]=$policydweight;
 		$tr[]=$dkim;
 		$tr[]=$block_domain;
@@ -1781,9 +1802,9 @@ return $datas;
 
 
 function tweaks(){
-	$datas=GET_CACHED(__FILE__,__FUNCTION__,null,TRUE);
-	if($datas<>null){return $datas;}
-	
+
+	$sock=new sockets();
+	$EnablePostfixMultiInstance=$sock->GET_INFO("EnablePostfixMultiInstance");
 	$users=new usersMenus();
 	$page=CurrentPageName();
 	$tpl=new templates();
@@ -1804,9 +1825,13 @@ function tweaks(){
 				$winzip=Paragraphe('64-winzip.png','{auto-compress}','{auto-compress_text}',"javascript:Loadjs('auto-compress.php?script=winzip')",null,210,100,0,true);	
 			}
 		}
-	}	
+	}
+
 	
-	
+	if($users->POSTFIX_MULTI){
+		$multi=Paragraphe('postfix-multi-64.png','{POSTFIX_MULTI_INSTANCE}','{POSTFIX_MULTI_INSTANCE_TINY_TEXT}',"javascript:Loadjs('postfix.network.php?POSTFIX_MULTI_INSTANCE_JS=yes')");
+		}
+
 	
 	
 	
@@ -1821,6 +1846,12 @@ function tweaks(){
 	$mastercf=Paragraphe('folder-script-64-master.png','{master.cf}','{mastercf_explain}',"javascript:Loadjs('postfix.master.cf.php?script=yes')") ;
 	$other=Paragraphe('folder-tools2-64.png','{other_settings}','{other_settings_text}',"javascript:Loadjs('postfix.other.php')");
 	$main_src=Paragraphe('folder-script-database-64.png','{main_ldap}','{main_ldap_explain}',"javascript:s_PopUp(\"postfix.report.php\",500,500,true)");
+	$postmaster=Paragraphe('postmaster-64.png','{postmaster}','{postmaster_text}',"javascript:Loadjs('postfix.postmaster.php')");
+	$postmaster_identity=Paragraphe('postmaster-identity.png','{postmaster_identity}','{postmaster_identity_text}',"javascript:Loadjs('postfix.postmaster-ident.php')");
+	
+		$tr[]=$multi;
+		$tr[]=$postmaster;
+		$tr[]=$postmaster_identity;
 		$tr[]=$altermime;
 		$tr[]=$pommo;
 		$tr[]=$events;
@@ -1963,7 +1994,7 @@ return $tpl->_ENGINE_parse_body($html);
 
 function main_switch(){
 cookies_main();
-	if(GET_CACHED(__FILE__,__FUNCTION__,$_GET["main"])){return;}
+	//if(GET_CACHED(__FILE__,__FUNCTION__,$_GET["main"])){return;}
 	
 	$array["transport_settings"]='{transport_settings}';
 	$array["security_settings"]='{security_settings}';

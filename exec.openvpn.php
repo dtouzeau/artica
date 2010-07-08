@@ -5,6 +5,7 @@ include_once(dirname(__FILE__) . '/ressources/class.mysql.inc');
 include_once(dirname(__FILE__) . '/ressources/class.user.inc');
 include_once(dirname(__FILE__) . '/ressources/class.ini.inc');
 include_once(dirname(__FILE__) . '/ressources/class.openvpn.inc');
+include_once(dirname(__FILE__) . '/ressources/class.mysql.inc');
 include_once(dirname(__FILE__) . '/framework/class.unix.inc');
 include_once(dirname(__FILE__) . '/ressources/class.system.network.inc');
 
@@ -25,7 +26,13 @@ if($argv[1]=="--iptables-delete"){iptables_delete_rules();die();}
 if($argv[1]=="--client-conf"){BuildOpenVpnClients();die();}
 if($argv[1]=="--client-start"){StartOPenVPNCLients();die();}
 if($argv[1]=="--client-stop"){StopOpenVPNCLients();die();}
+if($argv[1]=="--server-stop"){StopServer();die();}
 if($argv[1]=="--default-eth"){OpenVpnClientGetDefaultethLink();die();}
+if($argv[1]=="--ipof"){echo GetIpaddrOf($argv[2])."\n";die();}
+if($argv[1]=="--bridges"){print_r(GetBridgeExists($argv[2]))."\n";die();}
+if($argv[1]=="--fix-routes"){BuildClientRoute($argv[2])."\n";die();}
+
+
 
 
 
@@ -60,6 +67,55 @@ function BuildIpTablesServer(){
 	echo "Starting......: OpenVPN prerouting success from tun0 -> $IPTABLES_ETH...\n";
 	
 }
+
+
+function StopServer(){
+	$unix=new unix();
+    $openvpn=$unix->find_program("openvpn");
+    $brctl=$unix->find_program("brctl");
+    $ifconfig=$unix->find_program("ifconfig");
+    $ip_tools=$unix->find_program("ip");	
+    
+	$ini=new Bs_IniHandler();
+    $sock=new sockets();
+    $ini->loadString($sock->GET_INFO("ArticaOpenVPNSettings"));
+    $BRIDGE_ETH=$ini->_params["GLOBAL"]["BRIDGE_ETH"]; 
+    echo "Stopping OpenVPN......................: stopping server bridged on=$BRIDGE_ETH\n";   
+	if(preg_match("#(.+?):([0-9]+)#",$BRIDGE_ETH,$re)){$original_eth=$re[1];}
+	if($original_eth<>null){
+		$array_ip=BuildBridgeServer_eth_infos($BRIDGE_ETH);
+		echo "Stopping OpenVPN......................: checking bridges and $original_eth\n";
+		$array=GetBridgeExists("br0");
+	
+		if(is_array($array)){
+			echo "Stopping OpenVPN......................: Bridge br0 exists\n";
+			system("$ifconfig br0 down");
+			while (list ($num, $ligne) = each ($array) ){
+				echo "Stopping OpenVPN......................: remove $ligne from br0\n";
+				system("brctl delif br0 $ligne");
+			}
+			
+			echo "Stopping OpenVPN......................: remove br0\n";
+			system("brctl delbr br0");
+			system("$ifconfig $original_eth down");
+			}
+			
+			echo "Stopping OpenVPN......................: rebuild $original_eth settings\n";
+			system("$ifconfig $original_eth up");
+			if(GetIpaddrOf($original_eth)==null){
+				if(preg_match("#^(.+?)\.([0-9]+)$#",$array_ip["IPADDR"],$re)){$eth_broadcast="broadcast {$re[1]}.255";}
+				system("$ifconfig $original_eth {$array_ip["IPADDR"]} netmask {$array_ip["NETMASK"]} $eth_broadcast");
+			}
+			system("$ip_tools route add default via {$array_ip["GATEWAY"]} dev $original_eth  proto static");
+	}
+	
+	iptables_delete_rules();
+
+}
+
+
+
+
 
 function iptables_delete_rules(){
 shell_exec("/sbin/iptables-save > /etc/artica-postfix/iptables.conf");
@@ -96,6 +152,198 @@ shell_exec("/sbin/iptables-restore < /etc/artica-postfix/iptables.new.conf");
 echo "Starting......: OpenVPN cleaning iptables $count rules\n";	
 }
 
+function BuildBridgeServer(){
+	$unix=new unix();
+    $sock=new sockets();
+    $openvpn=$unix->find_program("openvpn");
+    $brctl=$unix->find_program("brctl");
+    $ifconfig=$unix->find_program("ifconfig");
+    $ip_tools=$unix->find_program("ip");
+    if($openvpn==null){
+    	echo "Starting......: OpenVPN bridge unable to stat openvpn binary\n";
+    	@unlink("/etc/openvpn/cmdline.conf");
+    	exit;
+    }
+    
+    if($brctl==null){
+    	echo "Starting......: OpenVPN bridge unable to stat brctl binary\n";
+    	@unlink("/etc/openvpn/cmdline.conf");
+    	exit;
+    }  
+
+    if($ifconfig==null){
+    	echo "Starting......: OpenVPN bridge unable to stat ifconfig binary\n";
+    	@unlink("/etc/openvpn/cmdline.conf");
+    	exit;
+    }
+
+    if($ip_tools==null){
+    	echo "Starting......: OpenVPN bridge unable to stat ip binary\n";
+    	@unlink("/etc/openvpn/cmdline.conf");
+    	exit;
+    }      
+    
+    $servername=$unix->hostname_g();	
+  	if(preg_match("#^(.+?)\.#",$servername,$re)){$servername=$re[1];}
+    $servername=strtoupper($servername);    	
+    $ini=new Bs_IniHandler();
+    $sock=new sockets();
+    $ini->loadString($sock->GET_INFO("ArticaOpenVPNSettings"));
+    $BRIDGE_ETH=$ini->_params["GLOBAL"]["BRIDGE_ETH"];
+    $BRIDGE_ADDR=$ini->_params["GLOBAL"]["BRIDGE_ADDR"];
+    $array_ip=BuildBridgeServer_eth_infos($BRIDGE_ETH);
+    
+    
+   $ca='/etc/artica-postfix/openvpn/keys/allca.crt';
+   $dh='/etc/artica-postfix/openvpn/keys/dh1024.pem';
+   $key="/etc/artica-postfix/openvpn/keys/vpn-server.key";
+   $crt="/etc/artica-postfix/openvpn/keys/vpn-server.crt";    
+    
+    if(preg_match("#(.+?):([0-9]+)#",$BRIDGE_ETH,$re)){$original_eth=$re[1];}
+    
+    if($array_ip["IPADDR"]==null){
+    	echo "Starting......: OpenVPN bridge for $BRIDGE_ETH (failed to get IP informations)...\n";	
+    	return;
+    }
+    
+if(preg_match("#^(.+?)\.([0-9]+)$#",$array_ip["IPADDR"],$re)){$eth_broadcast=$re[1].".255";}
+    echo "Starting......: OpenVPN bridge for tap0 -> $original_eth {$array_ip["IPADDR"]}/$eth_broadcast...\n";
+    $br0_ip=GetIpaddrOf("br0");
+    echo "Starting......: OpenVPN bridge for br0=$br0_ip\n";
+    
+    if($br0_ip==null){
+    	echo "Starting......: OpenVPN bridge creating tap0\n";
+    	system("$openvpn --mktun --dev tap0");
+    	system("$brctl addbr br0");
+    	system("$brctl addif br0 tap0");
+    	system("$brctl addif br0 $original_eth");
+    	system("$ifconfig $original_eth 0.0.0.0 promisc up");
+    	system("$ifconfig tap0 0.0.0.0 promisc up");
+    	system("$ifconfig br0 {$array_ip["IPADDR"]} netmask {$array_ip["NETMASK"]} broadcast $eth_broadcast");
+		$br0_ip=GetIpaddrOf("br0");  
+		if($br0_ip==null){
+			   echo "Starting......: OpenVPN failed to create bridge rolling back\n";
+			   StopServer();
+			   return; 
+		}
+		system("$ip_tools route add default via {$array_ip["GATEWAY"]} dev br0 proto static");
+		
+    }
+		
+		
+    $OpenVpnPasswordCert=$sock->GET_INFO("OpenVpnPasswordCert");
+	if($OpenVpnPasswordCert==null){$OpenVpnPasswordCert="MyKey";}
+   
+   	if(is_file("/etc/artica-postfix/openvpn/keys/password")){
+   		$askpass=" --askpass /etc/artica-postfix/openvpn/keys/password ";
+   	}		
+	
+   	$routess=GetRoutes();
+   	if(is_array($routess)){$routes=implode(" ",$routess);}
+		
+   $port=$ini->_params["GLOBAL"]["LISTEN_PORT"];
+   $server_bridge="--server-bridge $BRIDGE_ADDR {$array_ip["NETMASK"]} {$ini->_params["GLOBAL"]["VPN_DHCP_FROM"]} {$ini->_params["GLOBAL"]["VPN_DHCP_TO"]}";
+   $cmd=" --port $port --dev tap0 $server_bridge --comp-lzo $local --ca $ca --dh $dh --key $key --cert $crt";
+   $cmd=$cmd. " --ifconfig-pool-persist /etc/artica-postfix/openvpn/ipp.txt $routes";
+   $cmd=$cmd. " $askpass--client-to-client -persist-tun -verb 5 --daemon --writepid /var/run/openvpn/openvpn-server.pid --log \"/var/log/openvpn/openvpn.log\"";
+   $cmd=$cmd. " --status /var/log/openvpn/openvpn-status.log 10";
+   @file_put_contents("/etc/openvpn/cmdline.conf",$cmd);
+
+   
+   
+    
+	
+}
+
+
+
+function GetBridgeExists($br){
+	$unix=new unix();
+    $sock=new sockets();
+    $brctl=$unix->find_program("brctl");	
+	exec("$brctl showstp $br 2>&1",$results);	
+	if($GLOBALS["VERBOSE"]){echo count($results)." lines for $brctl showstp $br\n";}
+	
+	while (list ($index, $line) = each ($results) ){
+		if(preg_match("#^([a-zA-Z]+)([0-9]+)#",$line,$re)){
+			
+			if($re[1]=="br"){continue;}
+			$array[]="{$re[1]}{$re[2]}";
+		}else{
+		
+		}
+	}
+
+	return $array;
+}
+
+
+function GetIpaddrOf($eth){
+	$unix=new unix();
+    $sock=new sockets();
+    $ip_tools=$unix->find_program("ip");	
+	exec("$ip_tools -f inet  address show $eth 2>&1",$results);
+	
+	while (list ($index, $line) = each ($results) ){
+		if(preg_match("#inet\s+([0-9\.]+)\/#",$line,$re)){
+			return $re[1];
+		}
+	}
+}
+
+function BuildBridgeServer_eth_infos($BRIDGE_ETH){
+		$eth=$BRIDGE_ETH;
+		if(!preg_match("#(.+?):([0-9]+)#",$eth,$re)){return array();}
+		$sql="SELECT * FROM nics_virtuals WHERE ID={$re[2]}";
+		$q=new mysql();
+		$ligne=mysql_fetch_array($q->QUERY_SQL($sql,"artica_backup"));	
+		if(!$q->ok){
+			echo "Starting......: OpenVPN mysql error $q->mysql_error (". __FUNCTION__.")\n";	
+		}
+		if($ligne["ipaddr"]==null){
+			echo "Starting......: OpenVPN $BRIDGE_ETH (has $eth ID={$re[2]}) has no information\n";
+		}
+		$array_ip["IPADDR"]=$ligne["ipaddr"];
+		$array_ip["NETMASK"]=$ligne["netmask"];
+		$array_ip["GATEWAY"]=$ligne["gateway"];	
+		return $array_ip;
+}
+
+
+function GetRoutes(){
+	
+   $ini=new Bs_IniHandler();
+   $sock=new sockets();
+   $ini->loadString($sock->GET_INFO("ArticaOpenVPNSettings"));
+   if($ini->_params["GLOBAL"]["ENABLE_BRIDGE_MODE"]==1){
+   		$BRIDGE_ETH=$ini->_params["GLOBAL"]["BRIDGE_ETH"];
+   		$array_ip=BuildBridgeServer_eth_infos($BRIDGE_ETH);
+   		echo "Starting......: OpenVPN binding $BRIDGE_ETH to \"{$array_ip["IPADDR"]}/{$array_ip["NETMASK"]}\"\n";
+   		if(preg_match("#(.+?)\.[0-9]+$#",trim($array_ip["IPADDR"]),$re)){
+   			$LOCAL_ROUTE="{$re[1]}.0 {$array_ip["NETMASK"]}";
+   		    echo "Starting......: OpenVPN default Local route \"$LOCAL_ROUTE\"\n";
+   			if(trim($LOCAL_ROUTE<>null)){$routess[]="--push \"route $LOCAL_ROUTE\"";}
+   		}
+   }
+
+if (is_file('/etc/artica-postfix/settings/Daemons/OpenVPNRoutes')){
+   $routes=(explode("\n",@file_get_contents("/etc/artica-postfix/settings/Daemons/OpenVPNRoutes")));
+   while (list ($num, $ligne) = each ($routes) ){
+   	if(!preg_match("#(.+?)\s+(.+)#",$ligne,$re)){continue;}
+   	$re[1]=trim($re[1]);
+   	$re[2]=trim($re[2]);
+   	$routess[]="--push \"route {$re[1]} {$re[2]}\"";
+   }
+}
+if(is_array($routess)){while (list ($index, $route) = each ($routess) ){$cleaned_routes[$route]=$route;}}
+if(is_array($cleaned_routes)){ while (list ($a, $b) = each ($cleaned_routes) ){$c[]=$a;}}
+
+
+return $c;
+
+	
+}
+
 function BuildTunServer(){
 	
    $unix=new unix();
@@ -103,15 +351,22 @@ function BuildTunServer(){
    $servername=$unix->hostname_g();	
    
  
-  if(preg_match("#^(.+?)\.#",$servername,$re)){
-  	$servername=$re[1];
-  }
-  
+  if(preg_match("#^(.+?)\.#",$servername,$re)){$servername=$re[1];}
    $servername=strtoupper($servername);       
-	
    echo "Starting......: OpenVPN building settings for $servername...\n";
+   
+   
+   
    $ini=new Bs_IniHandler();
-   $ini->loadFile('/etc/artica-postfix/settings/Daemons/ArticaOpenVPNSettings');
+   $sock=new sockets();
+   $ini->loadString($sock->GET_INFO("ArticaOpenVPNSettings"));
+   if($ini->_params["GLOBAL"]["ENABLE_BRIDGE_MODE"]==1){
+   		echo "Starting......: OpenVPN building settings mode bridge enabled...\n";
+   		BuildBridgeServer();
+   		return;
+   }
+   
+   
    $IPTABLES_ETH=$GLOBALS["IPTABLES_ETH"];
    $DEV_TYPE=$ini->_params["GLOBAL"]["DEV_TYPE"];
    $port=$ini->_params["GLOBAL"]["LISTEN_PORT"];
@@ -154,6 +409,7 @@ if (is_file('/etc/artica-postfix/settings/Daemons/OpenVPNRoutes')){
    }
 }
 
+$routess[]=GetRoutes();
 
 if(count($routess)==0){
 	if($IPTABLES_ETH_ROUTE<>null){
@@ -203,7 +459,7 @@ if(count($routess)==0){
  
    $cmd=" --port $port --dev tun --server $IP_START $NETMASK --comp-lzo $local --ca $ca --dh $dh --key $key --cert $crt";
    $cmd=$cmd. " --ifconfig-pool-persist /etc/artica-postfix/openvpn/ipp.txt " . implode(" ",$routess);
-   $cmd=$cmd. " $askpass--client-to-client --verb 5 --daemon --writepid /var/run/openvpn/openvpn-server.pid --log \"/var/log/openvpn/openvpn.log\"";
+   $cmd=$cmd. " $askpass--client-to-client --persist-tun --verb 5 --daemon --writepid /var/run/openvpn/openvpn-server.pid --log \"/var/log/openvpn/openvpn.log\"";
    $cmd=$cmd. " --status /var/log/openvpn/openvpn-status.log 10";
    @file_put_contents("/etc/openvpn/cmdline.conf",$cmd);
   
@@ -474,8 +730,26 @@ function OpenVPNCLientStartGetDev($id){
 			return "tun{$re[1]}";
 		}
 	}		
+}
+function OpenVPNCLientStartGetTAPDev($id){
+	$main_path="/etc/artica-postfix/openvpn/clients";
+	$datas=explode("\n",@file_get_contents("$main_path/$id/settings.ovpn"));
+	while (list ($num, $line) = each ($datas) ){
+		if(preg_match("#^dev\s+tap([0-9]+)#",$line,$re)){
+			return "tap{$re[1]}";
+		}
+	}		
+}
 
-	
+function OpenVPNCLientIsOnTap($id){
+$main_path="/etc/artica-postfix/openvpn/clients";
+	$datas=explode("\n",@file_get_contents("$main_path/$id/settings.ovpn"));
+	while (list ($num, $line) = each ($datas) ){
+		if(preg_match("#^dev.+?tap#",$line,$re)){
+			return true;
+		}
+	}		
+	return false;
 }
 
 
@@ -497,16 +771,26 @@ function OpenVPNCLientStart($id){
 		echo "Starting......: OpenVPN client $id, Already running PID $pid\n";
 		return;
 	}
+	$bridge=OpenVPNCLientIsOnTap($id);
+	if(!$bridge){
+		$tun=OpenVPNCLientStartGetDev($id);	
+		if($tun<>null){
+			if(!is_file("/dev/net/$tun")){
+			echo "Starting......: OpenVPN client TUN $id,creating dev \"$tun\"\n";
+			system($unix->find_program("mknod") ." /dev/net/$tun c 10 200 >/dev/null 2>&1");
+			system($unix->find_program("chmod"). " 600 /dev/net/$tun >/dev/null 2>&1");
+			}}
+	}else{
+		$tap=OpenVPNCLientStartGetTAPDev($id);
+		echo "Starting......: OpenVPN client TAP $id,creating dev \"$tap\"\n";
+		system("$openvpn --mktun --dev $tap");
+		
+		
+		
+	}
 	
-	$tun=OpenVPNCLientStartGetDev($id);	
-	if($tun<>null){
-	if(!is_file("/dev/net/$tun")){
-		echo "Starting......: OpenVPN client $id,creating dev \"$tun\"\n";
-		system($unix->find_program("mknod") ." /dev/net/$tun c 10 200 >/dev/null 2>&1");
-		system($unix->find_program("chmod"). " 600 /dev/net/$tun >/dev/null 2>&1");
-	}}
+	echo "Starting......: OpenVPN client [$id] log file will be $main_path/$id/openvpn-status.log\n";
 	
-
 	shell_exec("/bin/chmod -R 600 $main_path/$id");
 	$cmd="openvpn --askpass $main_path/$id/keypassword --config $main_path/$id/settings.ovpn --writepid $main_path/$id/pid --daemon --log $main_path/$id/log";
 	$cmd=$cmd. " --status $main_path/$id/openvpn-status.log 10";
@@ -542,22 +826,103 @@ function OpenVPNCLientStart($id){
 	}
 	
 	echo "Starting......: OpenVPN client $id, success running pid number $pid\n";
-	
-	$ethlink=trim(@file_get_contents("$main_path/$id/ethlink"));
-	
-	if(trim($ethlink)==null){
-		$ethlink=OpenVpnClientGetDefaultethLink();
-		echo "Starting......: OpenVPN client $id, no ethlink...create a default one for $ethlink\n";
-		@file_put_contents("$main_path/$id/ethlink",$ethlink);
+	if(!$bridge){
+		$ethlink=trim(@file_get_contents("$main_path/$id/ethlink"));
+		
+		if(trim($ethlink)==null){
+			$ethlink=OpenVpnClientGetDefaultethLink();
+			echo "Starting......: OpenVPN client $id, no ethlink...create a default one for $ethlink\n";
+			@file_put_contents("$main_path/$id/ethlink",$ethlink);
+		}
+		
+		if($ethlink<>null){
+			BuildIpTablesClient($ethlink,$id);
+		}else{
+			echo "Starting......: OpenVPN client $id, no ethlink...in $main_path/$id/ethlink\n";
+		}
 	}
 	
-	if($ethlink<>null){
-		BuildIpTablesClient($ethlink,$id);
-	}else{
-		echo "Starting......: OpenVPN client $id, no ethlink...in $main_path/$id/ethlink\n";
-	}
+	BuildClientRoute($id);
+	
 	
 }
+
+
+function BuildClientRoute($id){
+	sleep(5);
+	$unix=new unix();
+	$main_path="/etc/artica-postfix/openvpn/clients";
+	$ip_tool=$unix->find_program("ip");
+	$bridge=OpenVPNCLientIsOnTap($id);
+	if(!$bridge){
+		$dev=OpenVPNCLientStartGetDev($id);
+	}else{
+		$dev=OpenVPNCLientStartGetTAPDev($id);		
+	}
+	
+echo "Starting......: OpenVPN client $id, $dev\n";
+exec("$ip_tool route",$results);
+if($bridge){
+	echo "Starting......: OpenVPN Tap $dev, cleaning bad route\n";
+	
+	while (list ($num, $ligne) = each ($results) ){
+		if(preg_match("#^([0-9\.]+)\/([0-9]+)\s+via\s+[0-9\.]+\s+dev\s+$dev#",$ligne,$re)){
+			echo "Starting......: OpenVPN Tap {$re[0]} must be cleaned\n";
+			system("$ip_tool route del {$re[0]}");
+		}
+	}
+}
+
+	echo "Starting......: OpenVPN $dev, finding correct route\n";
+	reset($results);
+	while (list ($num, $ligne) = each ($results) ){
+		if(preg_match("#^([0-9\.]+)\/([0-9]+)\s+dev\s+$dev\s+proto\s+kernel\s+scope\s+link\s+src\s+([0-9\.]+)#",$ligne,$re)){
+			$IP_TO_ROUTE=$re[3];
+			echo "Starting......: OpenVPN others routes match $dev $IP_TO_ROUTE\n";
+			break;
+		}
+	
+	}
+
+	$routes=OpenVpnClientGetRoutes("$main_path/$id");
+	$localnets=getLocalNets();
+	//print_r($routes);
+	//print_r($localnets);
+	if(count($routes)==0){echo "Starting......: OpenVPN no routes to add\n";return;}
+	while (list ($ip_start, $netmask) = each ($routes) ){
+		if($localnets[$ip_start]<>null){
+			echo "Starting......: OpenVPN skipping route $ip_start\n";
+			continue;
+		}
+		echo "Starting......: OpenVPN adding route $ip_start/$netmask\n";
+		$cmd="$ip_tool route add $ip_start/$netmask dev $dev proto kernel scope link src $IP_TO_ROUTE >/dev/null 2>&1";
+		if($GLOBALS["VERBOSE"]){echo __FUNCTION__." $cmd\n";}
+		system($cmd);
+	}
+	
+	
+}
+
+function getLocalNets(){
+	$unix=new unix();
+	$main_path="/etc/artica-postfix/openvpn/clients";
+	$ip_tool=$unix->find_program("ip");
+
+	exec("$ip_tool addr show 2>&1",$results);
+	while (list ($num, $ligne) = each ($results) ){
+		if(preg_match("#^[0-9]+:\s+(.+?):#",$ligne,$re)){
+			$eth=$re[1];
+			if(preg_match("#(.+?)\.[0-9]+$#",GetIpaddrOf($eth),$ri)){
+				$ipof="{$ri[1]}.0";
+			}
+			$array[$ipof]=$eth;
+		}else{
+		
+		}
+	}
+	return $array;
+}
+
 
 
 function OpenVpnClientGetDefaultethLink(){
@@ -575,15 +940,37 @@ while (list ($num, $ligne) = each ($nic->array_TCP) ){
 	
 }
 
-
+function OpenVpnClientGetRoutes($mainpath){
+	$datas=file_get_contents("$mainpath/settings.ovpn");
+	$f=explode("\n",$datas);
+	if($GLOBALS["VERBOSE"]){echo __FUNCTION__." open $mainpath/settings.ovpn ". count($f)." lines\n";}
+	while (list ($num, $ligne) = each ($f) ){
+		if(preg_match("#REMOTE-SITE:\s+([0-9\.]+);([0-9\.]+)#",$ligne,$re)){
+			$routes[$re[1]]=$re[2];
+		}else{
+			//if($GLOBALS["VERBOSE"]){echo __FUNCTION__." $ligne NO MATCH\n";}
+		}
+	}
+	
+	return $routes;
+}
 
 function BuildOpenVpnClients_changeConfig($mainpath,$ethid){
+	echo "Starting......: OpenVPN client $mainpath/settings.ovpn\n";
+	
+	
 	$datas=file_get_contents("$mainpath/settings.ovpn");
 	$f=explode("\n",$datas);
 	while (list ($num, $ligne) = each ($f) ){
-		if(preg_match("#^dev\s+#",$ligne)){
+		if(preg_match("#^dev\s+tun(.*)#",$ligne)){
+			echo "Starting......: OpenVPN client tun dev=". trim($re[1])." change to tun$ethid\n";
 			$f[$num]="dev tun$ethid";
 		}
+		
+		if(preg_match("#^dev\s+tap(.*)#",$ligne)){
+			echo "Starting......: OpenVPN client tap dev=". trim($re[1])." change to tap$ethid\n";
+			$f[$num]="dev tap$ethid";
+		}		
 		
 		if(preg_match("#^ca\s+#",$ligne)){
 			$f[$num]="ca $mainpath/ca.crt";
