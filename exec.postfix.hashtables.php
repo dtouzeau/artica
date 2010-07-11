@@ -565,12 +565,14 @@ function smtp_sasl_password_maps(){
 	if(!is_array($GLOBALS["smtp_sasl_password_maps"])){
 		echo "Starting......: 0 smtp password rule(s)\n"; 
 		shell_exec("{$GLOBALS["postconf"]} -e \"smtp_sasl_password_maps =\" >/dev/null 2>&1");
+		shell_exec("{$GLOBALS["postconf"]} -e \"smtp_sasl_auth_enable =no\" >/dev/null 2>&1");
 	}
 
 	echo "Starting......: ". count($GLOBALS["smtp_sasl_password_maps"])." smtp password rule(s)\n"; 
 	@file_put_contents("/etc/postfix/smtp_sasl_password",implode("\n",$GLOBALS["smtp_sasl_password_maps"]));
 	shell_exec("{$GLOBALS["postmap"]} hash:/etc/postfix/smtp_sasl_password >/dev/null 2>&1");
 	shell_exec("{$GLOBALS["postconf"]} -e \"smtp_sasl_password_maps = hash:/etc/postfix/smtp_sasl_password\" >/dev/null 2>&1");
+	shell_exec("{$GLOBALS["postconf"]} -e \"smtp_sasl_auth_enable = yes\" >/dev/null 2>&1");
 }
 
 function sender_dependent_relayhost_maps_build(){

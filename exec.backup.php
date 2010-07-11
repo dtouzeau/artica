@@ -25,6 +25,8 @@ if(preg_match("#--mysql-db#",implode(" ",$argv))){backup_mysql_databases_list(0)
 
 
 $GLOBALS["USE_RSYNC"]=false;
+$GLOBALS["INTRO_CMDLINES"]=@implode(" ",$argv);
+
 
 if($argv[1]=="--restore-mbx"){
 	restorembx($argv[2]);
@@ -61,7 +63,7 @@ if($argv[1]=="--mount"){
 
 $ID=$argv[1];
 if($ID<1){
-	writelogs(date('m-d H:i:s')." "."unable to get task ID",__FUNCTION__,__FILE__,__LINE__);
+	writelogs(date('m-d H:i:s')." "."unable to get task ID \"{$GLOBALS["INTRO_CMDLINES"]}\" process die()",__FUNCTION__,__FILE__,__LINE__);
 	die();
 }
 

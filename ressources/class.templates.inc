@@ -2345,7 +2345,9 @@ if(strlen($title)>30){$tips="<b>$title</b><br>$tips";}
 	
 
 		
-		if($img<>null){$img_p="<img src='img/$img'>";}
+		if($img<>null){
+			if(preg_match("#\/#",$img)){$img_p="<img src='$img'>";}else{$img_p="<img src='img/$img'>";}
+		}
 		if($link==null){$hrf=null;$h3style=null;}
 
 	
@@ -4002,6 +4004,9 @@ return $html;
  	$arr["26"]=true;
  	$arr["182"]=true;
  	$arr["139"]=true;
+ 	$arr["166"]=true;
+ 	$arr["169"]=true;
+ 	$arr["186"]=true;
  	$arr["179"]=true;
  	$arr["171"]=true;
  	

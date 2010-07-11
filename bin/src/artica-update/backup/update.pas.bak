@@ -35,7 +35,7 @@ private
        procedure SetPatch(PatchNumber:integer;Artica_version:string);
        procedure CleanKasperskyRollBack();
        function CheckUserCount():string;
-
+       Procedure test_sa_update(tmpstr:string);
 public
       constructor Create();
       procedure Free;
@@ -1478,6 +1478,7 @@ var
    pid:string;
    sa_compile:string;
    timemin:integer;
+   tmpstr:string;
 begin
 
 if not FileExists(spamassassin.SA_UPDATE_PATH()) then begin
@@ -1485,25 +1486,34 @@ if not FileExists(spamassassin.SA_UPDATE_PATH()) then begin
    exit;
 end;
 
+tmpstr:=logs.FILE_TEMP();
 
 if spamassassin.SpamdEnabled=0 then begin
    logs.Debuglogs('update_spamassasin:: Spamassin daemon is not enabled');
    exit;
 end;
-timemin:=SYS.FILE_TIME_BETWEEN_MIN('/etc/artica-postfix/cron.1/sa_compile');
-if timemin < 479 then begin
+if not SYS.COMMANDLINE_PARAMETERS('--force') then begin
+   timemin:=SYS.FILE_TIME_BETWEEN_MIN('/etc/artica-postfix/cron.1/sa_compile');
+   if timemin < 479 then begin
      logs.Debuglogs('update_spamassasin:: need more than 479 minutes current is '+ IntTostr(timemin)+' Mn');
-
+     exit;
+   end;
+end;
 
 if FileExists('/usr/share/artica-postfix/bin/install/amavis/SA-GPG.KEY') then begin
   logs.OutputCmd(spamassassin.SA_UPDATE_PATH()+' --import /usr/share/artica-postfix/bin/install/amavis/SA-GPG.KEY');
 end;
 
 if FileExists('/usr/share/artica-postfix/bin/install/amavis/sa-channels.conf') then begin
-   logs.OutputCmd(spamassassin.SA_UPDATE_PATH()+' --channelfile /usr/share/artica-postfix/bin/install/amavis/sa-channels.conf --gpgkey 856AA88A');
+   logs.OutputCmd(spamassassin.SA_UPDATE_PATH()+' --channelfile /usr/share/artica-postfix/bin/install/amavis/sa-channels.conf --gpgkey 856AA88A -D -v --channel updates.spamassassin.org >'+tmpstr +' 2>&1');
 end else begin
-     logs.OutputCmd(spamassassin.SA_UPDATE_PATH());
+     logs.OutputCmd(spamassassin.SA_UPDATE_PATH()+' -D -v --channel updates.spamassassin.org >'+tmpstr +' 2>&1');
 end;
+
+
+test_sa_update(tmpstr);
+logs.DeleteFile(tmpstr);
+
  if FileExists('/usr/bin/re2c') then begin
      sa_compile:=SYS.LOCATE_GENERIC_BIN('sa-compile');
      if not FIleExists(sa_compile) then exit;
@@ -1516,6 +1526,29 @@ pid:=SYS.PIDOF(sa_compile);
 if not SYS.PROCESS_EXIST(pid) then logs.OutputCmd(SYS.EXEC_NICE()+'/usr/bin/sa-compile -D');
 end;
 //#############################################################################
+Procedure tupdate.test_sa_update(tmpstr:string);
+var
+   RegExpr:TRegExpr;
+   l:TstringList;
+   i:integer;
+begin
+
+if not FileExists(tmpstr) then exit;
+
+l:=Tstringlist.Create;
+try l.LoadFromFile(tmpstr) except exit; end;
+RegExpr:=TRegExpr.CReate;
+for i:=0 to l.Count-1 do begin
+   RegExpr.Expression:='dns:\s+query failed:\s+(.+?)\s+.+?SERVFAIL';
+   if RegExpr.Exec(l.Strings[i]) then begin
+      logs.NOTIFICATION('spamassassin failed updating from '+RegExpr.Match[1],l.Strings[i],'update');
+   end;
+end;
+
+RegExpr.Free;
+l.free;
+end;
+
 Procedure tupdate.update_spamassassin_blacklist();
 var
    RegExpr:TRegExpr;

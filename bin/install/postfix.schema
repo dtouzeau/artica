@@ -142,7 +142,7 @@ attributetype (1.1.2.1.1.10.1.261 NAME 'TemplateNotifyInfectedAdmin'
     EQUALITY caseIgnoreIA5Match
     SYNTAX 1.3.6.1.4.1.1466.115.121.1.26 )
 
-#-----------------------------------------------------------------#-------------------------------------------------------------------------------------
+#-----------------------------------------------------------------
 attributetype (1.1.2.1.1.10.1.26 NAME 'TemplateNotifyCorruptedRecipient'
     DESC 'Antivirus notify corrupted recipient template' 
     EQUALITY caseIgnoreIA5Match
@@ -1097,6 +1097,8 @@ attributetype (1.1.2.1.1.10.1.210 NAME 'AmavisFilterEnabled'
     EQUALITY caseIgnoreIA5Match
     SYNTAX 1.3.6.1.4.1.1466.115.121.1.26 SINGLE-VALUE)
 #--------------------------------------------------------------------
+
+# 1.1.2.1.1.10.1.211 KasxFilterEnabled (removed)
 attributetype (1.1.2.1.1.10.1.211 NAME 'KasxFilterEnabled'
     DESC 'Kaspersky Anti-spam Enable/disable'
     EQUALITY caseIgnoreIA5Match
@@ -1981,11 +1983,18 @@ attributetype ( 1.1.2.1.1.10.1.389 NAME 'SenderBccMaps'
   EQUALITY caseIgnoreIA5Match
   SYNTAX 1.3.6.1.4.1.1466.115.121.1.26 SINGLE-VALUE)
 #------------------------------------------------------------------
+attributetype ( 1.1.2.1.1.10.1.390 NAME 'jpegLogo'
+	DESC 'RFC2798: a JPEG logo'
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.28 )
+#------------------------------------------------------------------
+attributetype ( 1.1.2.1.1.10.1.391 NAME 'WWWMultiSMTPSender'
+  DESC 'WWWMultiSMTPSender'
+  EQUALITY caseIgnoreIA5Match
+  SYNTAX 1.3.6.1.4.1.1466.115.121.1.26 SINGLE-VALUE)
+  )
+#-------------------------------------------------------------------
 
-
-
-
-#deleted old attribute : ProcMailRcConfig ArticaPolicyEnabled
+#deleted old attribute : ProcMailRcConfig ArticaPolicyEnabled kasxFilterEnabled
 
 
 
@@ -1994,7 +2003,7 @@ objectclass ( 1.3.6.1.4.1.15347.2.3.1.2
     	DESC 'special artica attributes'
 	SUP top
 	AUXILIARY
-	MAY(ArticaGroupPrivileges $ KasperkyAVScanningDatas $ KasperkyASDatas $ KasperskyASGroupNumber $ KasperkyASDatasRules $ MailboxActive $ KasperkyASDatasAllow $ KasperkyASDatasDeny $ CronDatas $ PostfixMaincf $ FetchMailsRules $ FetchMailsGlobalSettings $ PostfixHeadersRegex $ PostfixSSLCert $ MailBoxMaxSize $ PostfixHashSmtpSaslAuth $ SmtpdClientRestrictionsRules $ SmtpdRecipientRestrictionsRules $ SmtpdSenderRestrictionsRules $ PostFixBounceTemplate $ SieveScriptsUser $ ArticaGlobalSettings $ VirtualDomainsMapsMTA $ TemplateNotifyInfectedRecipient $ TemplateNotifyInfectedSender $  TemplateNotifyInfectedAdmin $ TemplateNotifyCorruptedRecipient $ TemplateNotifyCorruptedSender $ TemplateNotifyCorruptedAdmin $ TemplateNotifySuspiciousRecipient $ TemplateNotifySuspiciousSender $ TemplateNotifySuspiciousAdmin $ TemplateNotifyCuredRecipient $ TemplateNotifyCuredSender $ TemplateNotifyCuredAdmin $ TemplateNotifyWarningRecipient $ TemplateNotifyWarningSender $ TemplateNotifyWarningAdmin $ TemplateNotifyProtectedRecipient $ TemplateNotifyProtectedSender $ TemplateNotifyProtectedAdmin $ TemplateNotifyFilteredRecipient $ TemplateNotifyFilteredSender $ TemplateNotifyFilteredAdmin $ TemplateNotifyErrorRecipient $ TemplateNotifyErrorSender $ TemplateNotifyErrorAdmin $ CheckRecipientAccess $ checkrecipientmxaccess $ SmtpdHeloRestrictionsRules $ checkheloaccess $ checkhelomxaccess $ checkhelonsaccess $ checksenderaccess $ checksendermxaccess $ checksendernsaccess $ ArticaUserFilterRule $ ArticaMaxDayQuarantine $ ArticaFakedMailFrom $ ArticaDenyNoMXRecords $ FiltersExtensionsGroupName $ CountryDeny $ RblServers $ RblServersAction $ SURBLServers $ SURBLServersAction $ ArticaWebRootURI $ BogoFilterAction $ OuTrustMyUSers $ ArticaDansGuardianGroupRuleEnabled $ ArticaMailAddonsLevel $ ArticaMaxTempLogFilesDay $ ArticaFoldersSizeConfig $ ArticaAutoUpdateConfig $ ArticaFilterEnabled $ AmavisFilterEnabled $ KasxFilterEnabled $ OBMEnabled $ NTPDEnabled $ DefaultGroupPassword $ AutoDomainAliases))
+	MAY(ArticaGroupPrivileges $ KasperkyAVScanningDatas $ KasperkyASDatas $ KasperskyASGroupNumber $ KasperkyASDatasRules $ MailboxActive $ KasperkyASDatasAllow $ KasperkyASDatasDeny $ CronDatas $ PostfixMaincf $ FetchMailsRules $ FetchMailsGlobalSettings $ PostfixHeadersRegex $ PostfixSSLCert $ MailBoxMaxSize $ PostfixHashSmtpSaslAuth $ SmtpdClientRestrictionsRules $ SmtpdRecipientRestrictionsRules $ SmtpdSenderRestrictionsRules $ PostFixBounceTemplate $ SieveScriptsUser $ ArticaGlobalSettings $ VirtualDomainsMapsMTA $ TemplateNotifyInfectedRecipient $ TemplateNotifyInfectedSender $  TemplateNotifyInfectedAdmin $ TemplateNotifyCorruptedRecipient $ TemplateNotifyCorruptedSender $ TemplateNotifyCorruptedAdmin $ TemplateNotifySuspiciousRecipient $ TemplateNotifySuspiciousSender $ TemplateNotifySuspiciousAdmin $ TemplateNotifyCuredRecipient $ TemplateNotifyCuredSender $ TemplateNotifyCuredAdmin $ TemplateNotifyWarningRecipient $ TemplateNotifyWarningSender $ TemplateNotifyWarningAdmin $ TemplateNotifyProtectedRecipient $ TemplateNotifyProtectedSender $ TemplateNotifyProtectedAdmin $ TemplateNotifyFilteredRecipient $ TemplateNotifyFilteredSender $ TemplateNotifyFilteredAdmin $ TemplateNotifyErrorRecipient $ TemplateNotifyErrorSender $ TemplateNotifyErrorAdmin $ CheckRecipientAccess $ checkrecipientmxaccess $ SmtpdHeloRestrictionsRules $ checkheloaccess $ checkhelomxaccess $ checkhelonsaccess $ checksenderaccess $ checksendermxaccess $ checksendernsaccess $ ArticaUserFilterRule $ ArticaMaxDayQuarantine $ ArticaFakedMailFrom $ ArticaDenyNoMXRecords $ FiltersExtensionsGroupName $ CountryDeny $ RblServers $ RblServersAction $ SURBLServers $ SURBLServersAction $ ArticaWebRootURI $ BogoFilterAction $ OuTrustMyUSers $ ArticaDansGuardianGroupRuleEnabled $ ArticaMailAddonsLevel $ ArticaMaxTempLogFilesDay $ ArticaFoldersSizeConfig $ ArticaAutoUpdateConfig $ ArticaFilterEnabled $ AmavisFilterEnabled $ jpegLogo $ OBMEnabled $ NTPDEnabled $ DefaultGroupPassword $ AutoDomainAliases))
 
 #---------------------------------------------------------------------------
 
@@ -2695,7 +2704,7 @@ objectclass (1.3.6.1.4.1.15347.2.178
     	DESC 'Used to set additional configurations on VHOST'
 	SUP apacheConfig
 	STRUCTURAL
-	MAY(WWWServerType $ WWWMysqlUser $ WWWMysqlPassword $ WWWAppliUser $ WWWAppliPassword $ WWWSSLMode)
+	MAY(WWWServerType $ WWWMysqlUser $ WWWMysqlPassword $ WWWAppliUser $ WWWAppliPassword $ WWWSSLMode $ WWWMultiSMTPSender)
 	)
 #===========================================================
 objectclass ( 1.3.6.1.4.1.15347.2.179

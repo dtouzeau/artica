@@ -1630,6 +1630,7 @@ activer ou d&eacute;sactiver cette fonctionnalit&eacute;.</group_behavior_text>
 <hardware_info>Informations Hardware</hardware_info>
 <hardware_info_text>Voir les composants  de votre syst&egrave;me et l'usage disque</hardware_info_text>
 <hdFree_stat>Statistiques d'espace disque</hdFree_stat>
+<hdparm>D&eacute;tails techniques</hdparm>
 <hdparm_infos_text>La performance de votre serveur est &eacute;troitement li&eacute;e &agrave; la performance des disques durs.[br]De surcro&icirc;t si vous avez install&eacute; ce syst&egrave;me dans une machine virtuelle.[br]
 Artica effectue des tests r&eacute;guliers de performances (toutes les 60mn).[br]Ces tests sont bas&eacute;s sur un taux de 100MB/seconde, taux tout &agrave; fait acceptable pour un serveur.[br]le pourcentage correspond alors au taux de transfert. 75% veut dire 75MB/s.[br]En dessous de 30% consid&eacute;rez que la performance de vos disques est m&eacute;diocre et que vous devez revoir votre mat&eacute;riel.</hdparm_infos_text>
 <hd_stat>Performances Disque</hd_stat>

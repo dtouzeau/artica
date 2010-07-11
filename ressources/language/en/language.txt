@@ -4087,6 +4087,11 @@ There are dozens of DNSBLs in existence,[1][2] which use a wide array of standar
 These may include listing the addresses of zombie computers or other machines being used to send spam, listing the addresses of ISPs who willingly host spammers, or listing addresses which have sent spam to a honeypot system.[br]
 Since the creation of the first DNSBL in 1997, the operation and policies of these lists have been frequently controversial, both in Internet advocacy and occasionally in lawsuits. Many mail system operators and users consider DNSBLs a valuable tool to share information about spam sources, but others including prominent Internet activists have objected to them as a form of censorship. In addition, a small number of DNSBL operators have been the target of lawsuits filed by spammers seeking to have the lists shut down.
 </DNSBL_EXPLAIN>
-
+<hdparm>Hard drive informations</hdparm>
+<global_director_report>Global director report</global_director_report>
+<global_director_report_text>Send organisation's mail flow report periodically</global_director_report_text>
+<edit_photo_title_org>Edit organization's LOGO</edit_photo_title_org>
+<edit_photo_title_org_text>Upload/Change the icon picture that represent your organization</edit_photo_title_org_text>
+<WWWMultiSMTPSender>SMTP server</WWWMultiSMTPSender>
 
  

@@ -32,7 +32,7 @@
 	if(isset($_GET["VGUnlinkDisk"])){lvm_unlink_disk();exit;}
 	if(isset($_GET["VGlinkDisk"])){lvm_link_disk();exit;}
 	if(isset($_GET["vgextend"])){lvm_vgextend_popup();exit;}
-	
+	if(isset($_GET["hdparm-infos"])){hdparm_infos();exit;}	
 js();
 
 
@@ -390,10 +390,14 @@ function hd_partinfos(){
 	$page=CurrentPageName();
 	$array["status"]='{status}';
 	
-	
+	$users=new usersMenus();
 	$sock=new sockets();
 	$a=unserialize(base64_decode($sock->getFrameWork('cmd.php?lvmdiskscan=yes')));
 	if($a[$dev]<>null){$array["lvm"]='{virtual_disks}';}
+	
+	if($users->HDPARM_INSTALLED){
+		$array["hdparm"]='{hdparm}';
+	}
 	
 	while (list ($num, $ligne) = each ($array) ){
 		if($_GET["main"]==$num){$class="id=tab_current";}else{$class=null;}
@@ -407,7 +411,7 @@ function hd_partinfos(){
 	
 	
 	echo $tpl->_parse_body("
-	<div id=partinfosdiv style='width:100%;height:430px;overflow:auto'>
+	<div id=partinfosdiv style='width:100%;height:530px;overflow:auto'>
 		<ul>". implode("\n",$html)."</ul>
 	</div>
 		<script>
@@ -432,6 +436,53 @@ function hd_partinfos_switch(){
 	
 	if($_GET["switchtab"]=="status"){hd_partinfos_status();exit;}
 	if($_GET["switchtab"]=="lvm"){echo "<div id='lvm_status'>";lvm_status();echo "</div>";exit;}
+	if($_GET["switchtab"]=="hdparm"){echo hdparm();exit;}
+	
+	
+	
+}
+
+function hdparm(){
+	$page=CurrentPageName();
+	$html="<div id='hdparm'></div>
+	<script>
+		LoadAjax('hdparm','$page?hdparm-infos={$_GET["dev"]}');
+	</script>
+	
+	";
+	
+	echo $html;
+	
+	
+}
+
+function hdparm_infos(){
+	$sock=new sockets();
+	$tpl=new templates();
+	$datas=unserialize(base64_decode($sock->getFrameWork("cmd.php?hdparm-infos={$_GET["hdparm-infos"]}")));
+	if(!is_array($datas)){
+		echo $tpl->_ENGINE_parse_body("<H2>{error_no_datas}</H2>");
+		return;
+	}
+	
+	$tr[]="<ul id='domains-checklist'>";
+	while (list ($num, $line) = each ($datas)){
+		if(preg_match("#^[A-Za-z]+#",$line)){
+			$tr[]="</li><li class='domainsli' style='width:650px'><H3>$line</H3>";
+			continue;
+		}
+		
+		if(preg_match("#^\s+#",$line)){
+			
+			$line=str_replace(" ","&nbsp;",$line);
+			$tr[]="<div><code>$line</code></div>";
+		}
+		
+	}
+	
+	$tr[]="</ul>";
+	
+	echo @implode("\n",$tr);
 	
 	
 }

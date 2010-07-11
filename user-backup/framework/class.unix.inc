@@ -41,6 +41,10 @@ class unix {
 		if(is_file("/var/run/cyrus.pid")){return "/var/run/cyrus.pid";}
 		$this->events("Unable to stat cyrus pid path");
 	}	
+	
+	public function LOCATE_MILTER_GREYLIST_PID(){
+		if(is_file("/var/run/milter-greylist/milter-greylist.pid")){return "/var/run/milter-greylist/milter-greylist.pid";}
+	}
 
 	
 	public function DANSGUARDIAN_CATEGORIES(){

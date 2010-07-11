@@ -11,6 +11,10 @@ if(isset($_GET["servername"])){Upload();exit;}
 if(isset($_GET["OUlanguage"])){OUSettings();exit;}
 if(isset($_GET["export"])){EXPORT_ORG();exit;}
 
+if(isset($_GET["picture"])){popup_picture();exit;}
+if(isset($_GET["picture-iframe"])){popup_picture_iframe();exit;}
+if(isset($_FILES["ou-photo"])){popup_picture_save();exit;}
+
 js();
 
 
@@ -46,11 +50,15 @@ $html="
 var {$prefix}timeout=0;
 
 	function {$prefix}Loadpage(){
-		RTMMail('550','$page?popup=yes&ou=$ou_encrypted','$title');
+		RTMMail('600','$page?popup=yes&ou=$ou_encrypted','$title::$ou');
 	}
 	
 	function {$prefix}export(){
-		RTMMail('550','$page?export=yes&ou=$ou_encrypted','$title');
+		RTMMail('550','$page?export=yes&ou=$ou_encrypted','$title::$ou');
+	}
+	
+	function OrgPictureChange(){
+		YahooWin5('550','$page?picture=yes&ou=$ou_encrypted','LOGO::$ou');
 	}
 	
 	var x_RenameOrganization=function (obj) {
@@ -139,15 +147,12 @@ function popup(){
 	
 	//ArticaGroupPrivileges
 	
-	$form="<table style='width:100%'>
+	$form="
+	<table style='width:100%'>
 	<tr>
 	<td valign='top' class=legend nowrap style='font-size:13px'>{rename_org}:</td>
 	<td valign='top'>". Field_text('organization_name',$ou,"font-size:13px;padding:3px")."</td>
-	</tr>
-	<tr>
-		<td colspan=2 align='right'>
-		<hr>". button("{rename}","RenameOrganization()")."
-		
+	<td valign='top'><input type='button' OnClick=\"javascript:RenameOrganization();\" value='{rename}&nbsp;&raquo;'></td>
 	</tr>
 	</table>
 	
@@ -157,26 +162,35 @@ function popup(){
 	<tr>
 	<td valign='top' class=legend nowrap style='font-size:13px'>{default_language}:</td>
 	<td valign='top'>$language</td>
-	</tr>
-	<tr>
-		<td colspan=2 align='right'>
-		<hr>". button("{apply}","SaveOUDefSettings()")."
-		</td>
+	<td valign='top'><input type='button' OnClick=\"javascript:SaveOUDefSettings();\" value='{apply}&nbsp;&raquo;'></td>
 	</tr>
 	</table>";
 	
 	
-	
+	$ldap=new clladp();
+	$img=$ldap->get_organization_picture(base64_decode($_GET["ou"]),128);
 
 	
 	
-	$html="<H1>$ou</H1>
-	<p class=caption>{ORG_SETTINGS_TEXT}</p>
-	<div id='{$ou}_div'>
-		$form3
-		<br>
-		$form
-	</div>
+	$html="
+	<p class=caption style='font-size:13px'>{ORG_SETTINGS_TEXT}</p>
+	<table style='width:100%'>
+	<tr>
+	<td valign='top'>
+		<H3>LOGO</H3>
+		<div style='width:135px;height:135px;margin:3px;border:1px solid #CCCCCC;padding:5px;margin:5px'>
+			<img src='$img'>
+		</div>
+		<center><input type='button' OnClick=\"javascript:OrgPictureChange();\" value='{change}&nbsp;&raquo;'></center>
+		</td>
+	<td valign='top'>
+		<div id='{$ou}_div'>
+			<div style='border:1px solid #CCCCCC;padding:5px;margin:5px'>$form3</div>
+			<br>
+			<div style='border:1px solid #CCCCCC;padding:5px;margin:5px'>$form</div>
+		</div>
+	</td>
+	</table>
 	
 	";
 	
@@ -285,6 +299,81 @@ function Upload(){
 		
 	}
 }
+
+function popup_picture(){
+	
+	$html="<iframe style='width:100%;height:400px' src='domains.organization-settings.php?picture-iframe=yes&ou={$_GET["ou"]}'></iframe>";
+	echo $html;
+	
+}
+
+function popup_picture_iframe($error=null){
+	$page=CurrentPageName();
+	if(isset($_POST["ou"])){$_GET["ou"]=$_POST["ou"];}
+	$ou=$_GET["ou"];
+	
+	$ldap=new clladp();
+	$img=$ldap->get_organization_picture(base64_decode($ou),64);
+	
+$html="<p>&nbsp;</p>
+<div id='content' style='width:400px'>
+<table style='width:100%'>
+<tr>
+<td valign='top'>
+<h3>{edit_photo_title_org}</h3>
+<p>{edit_photo_title_org_text}</p>
+<div style='color:red'>$error</div>
+<div style='font-size:11px'><code>$error</code></div>
+<form method=\"post\" enctype=\"multipart/form-data\" action=\"$page\">
+<input type='hidden' name='ou' value='$ou'>
+<p>
+<input type=\"file\" name=\"ou-photo\" size=\"30\">
+<div style='width:100%;text-align:right'>
+	<input type='submit' name='upload' value='{upload_a_file}&nbsp;&raquo;' style='width:190px'>
+</div>
+</p>
+</form>
+</td>
+<td valign='top'><img src='$img'></td>
+</div>
+
+";	
+$tpl=new templates();
+$html= $tpl->_ENGINE_parse_body($html,"domains.manage.org.index.php");
+echo iframe($html,0,400);
+	
+}
+
+function popup_picture_save(){
+	$tmp_file = $_FILES['ou-photo']['tmp_name'];
+	$content_dir=dirname(__FILE__)."/ressources/conf/upload";
+	if(!is_dir($content_dir)){@mkdir($content_dir);}
+	if( !@is_uploaded_file($tmp_file) ){
+		echo popup_picture_iframe('{error_unable_to_upload_file} '.$tmp_file);
+		exit;
+	}
+	$name_file = $_FILES['ou-photo']['name'];
+
+if(file_exists( $content_dir . "/" .$name_file)){@unlink( $content_dir . "/" .$name_file);}
+ if( !move_uploaded_file($tmp_file, $content_dir . "/" .$name_file) ){
+ 	echo popup_picture_iframe("{error_unable_to_move_file} : ". $content_dir . "/" .$name_file);exit();}
+    $file=$content_dir . "/" .$name_file;
+    
+    
+    if(isset($_POST["ou"])){
+		$_GET["ou"]=$_POST["ou"];
+		$ldap=new clladp();
+		if(!$ldap->set_organization_picture(base64_decode($_GET["ou"]),@file_get_contents("$file"))){
+			echo popup_picture_iframe($ldap->ldap_last_error);
+			return null;	
+		}
+    	
+    }
+    
+    echo popup_picture_iframe();
+    
+}
+
 
 function OUSettings(){
 $ldap=new clladp();

@@ -877,7 +877,8 @@ forceDirectories('/var/log/amavis');
 forceDirectories('/var/log/artica-postfix/RTM');
 forceDirectories('/etc/amavis/dkim');
 
-
+forceDirectories('/tmp/savemail');
+fpsystem('/bin/chmod 777 /tmp/savemail');
 
 
 if not FileExists('/var/log/amavis/amavis.log') then begin

@@ -10,6 +10,7 @@
 	include_once(dirname(__FILE__).'/framework/frame.class.inc');
 	include_once(dirname(__FILE__).'/ressources/class.joomla.php');
 	include_once(dirname(__FILE__).'/ressources/class.opengoo.inc');
+
 	
 	
 $GLOBALS["SSLKEY_PATH"]="/etc/ssl/certs/apache";
@@ -1036,11 +1037,33 @@ function ROUNDCUBE_INSTALL($servername,$root,$hash=array()){
 	echo "Starting......: Roundcube $servername db.inc.php OK\n";
 	@file_put_contents("$root/config/db.inc.php",@implode("\n",$conf));	
 	
+	
+	
+	
+	
+	
 	if(is_file("/usr/share/roundcube/config/main.inc.php")){
 		echo "Starting......: Roundcube $servername main.inc.php OK\n";
-		@copy("/usr/share/roundcube/config/main.inc.php","$root/config/main.inc.php");}
+		@copy("/usr/share/roundcube/config/main.inc.php","$root/config/main.inc.php");
 	
-		
+	
+	}
+	
+	$sock=new sockets();
+	$EnablePostfixMultiInstance=$sock->GET_INFO("EnablePostfixMultiInstance");
+	
+	if($EnablePostfixMultiInstance==1){
+		echo "Starting......: Roundcube $servername Postfix Multi Instance Enabled \n";
+		$smtp=$hash[strtolower("WWWMultiSMTPSender")][0];
+		$tbl=@explode("\n",@file_get_contents("$root/config/main.inc.php"));
+		while (list ($i, $line) = each ($tbl) ){
+			if(preg_match("#rcmail_config.+?smtp_server#",$line)){
+				echo "Starting......: Roundcube $servername Postfix change line $i to $smtp\n";
+				$tbl[$i]="\$rcmail_config['smtp_server'] = '$smtp';";
+			}
+		}
+		@file_put_contents("$root/config/main.inc.php",@implode("\n",$tbl));
+	}
 }
 
 

@@ -629,12 +629,13 @@ begin
   end;
   
    logs.Syslogs('Starting......: milter-greylist');
+
+   if not sys.COMMANDLINE_PARAMETERS('--noconfig') then fpsystem(SYS.LOCATE_PHP5_BIN()+' /usr/share/artica-postfix/exec.milter-greylist.php --norestart');
+
    FIX_RACL();
 
-   MILTER_GREYLIST_SET_VALUE('pidfile','/var/run/milter-greylist/milter-greylist.pid');
-   MILTER_GREYLIST_SET_VALUE('socket','/var/run/milter-greylist/milter-greylist.sock');
-   MILTER_GREYLIST_SET_VALUE('user','postfix');
-   pid_path:=MILTER_GREYLIST_PID_PATH();
+
+   pid_path:='/var/run/milter-greylist/milter-greylist.pid';
    user:='postfix';
    socketPath:=CheckSocket();
    FullSocketPath:=socketPath;

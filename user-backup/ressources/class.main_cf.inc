@@ -232,7 +232,10 @@ class smtp_sasl_password_maps{
 				$upd["SmtpSaslPasswordString"][]="$username:$password";
 				$return=$ldap->Ldap_modify($dn,$upd);
 				$this->ldap_infos=$ldap->ldap_last_error;
-				if($return){$this->testsSaslClientParameters();}
+				if($return){
+					$sock=new sockets();
+					$sock->getFrameWork("cmd.php?postfix-hash-senderdependent=yes");	
+				}
 				return $return;
 			}
 			
@@ -243,28 +246,12 @@ class smtp_sasl_password_maps{
 			$upd["SmtpSaslPasswordString"][]="$username:$password";
 			$res=$ldap->ldap_add($dn,$upd);
 			$this->ldap_infos=$ldap->ldap_last_error;
-			if($res){
-				$this->testsSaslClientParameters();
-				}
+			$sock=new sockets();
+			$sock->getFrameWork("cmd.php?postfix-hash-senderdependent=yes");
 			return $res;
 		}
 		
 		
-		private function testsSaslClientParameters(){
-			$main=new main_cf();
-			if($main->main_array["smtp_sasl_auth_enable"]<>"yes"){
-				$main->main_array["smtp_sasl_auth_enable"]="yes";
-				$main->save_conf();
-				$main->save_conf_to_server();
-				return true;
-			}
-			if($main->main_array["smtp_sasl_security_options"]<>"noanonymous"){
-				$main->save_conf();
-				$main->save_conf_to_server();
-				return true;				
-			}
-			
-		}
 		
 		function delete($server){
 			$xldap=new clladp();
@@ -275,6 +262,9 @@ class smtp_sasl_password_maps{
 					$this->ldap_infos=$ldap->ldap_last_error;
 					return false;
 			}
+			$sock=new sockets();
+			$sock->getFrameWork("cmd.php?postfix-hash-senderdependent=yes");
+			
 			return true;
 			
 		}		

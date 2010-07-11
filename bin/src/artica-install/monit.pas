@@ -442,6 +442,7 @@ var
    recipients:Tstringlist;
    bcc:Tstringlist;
    myversion:integer;
+   monit_not_on:string;
 begin
 ForceDirectories('/var/monit');
 ForceDirectories('/var/run/monit');
@@ -476,10 +477,10 @@ if length(smtp_server)=0 then  EnableNotifs:=0;
 if length(smtp_sender)=0 then  EnableNotifs:=0;
 if recipients.Count=0 then EnableNotifs:=0;
 if length(trim(smtp_server_port))=0 then smtp_server_port:='25';
-
+monit_not_on:='instance,action';
 if myversion<5000 then begin
   l.add('set daemon 60');
-
+  monit_not_on:='instance';
 end else begin
   l.add('set daemon 60 with start delay 20');
   l.add('set idfile /var/run/monit/monit.id');
@@ -510,7 +511,7 @@ if EnableNotifs=1 then begin
    l.add('}');
    l.add('');
    for i:=0 to recipients.Count-1 do begin
-       l.add('set alert '+recipients.Strings[i]+' but not on { instance,action}');
+       l.add('set alert '+recipients.Strings[i]+' but not on {'+monit_not_on+'}');
    end;
    l.add('');
 end;

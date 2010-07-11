@@ -54,7 +54,22 @@ if(preg_match("#smbd_audit:\s+(.+?)\|(.+?)\|(.+?)\|(.+?)\|(.+?)\|(.+?)\|(.+?)\|(
 	events("{$re[5]}/{$re[8]} in xapian queue");
 	WriteXapian("{$re[5]}/{$re[8]}"); 
 	return true;
-}	
+}
+
+
+if(preg_match("#squid\[.+?comm_old_accept:\s+FD\s+15:.+?Invalid argument#",$buffer,$re)){
+	$file="/etc/artica-postfix/croned.1/comm_old_accept.FD15";
+	if(IfFileTime($file)){
+			events("comm_old_accept FD15 SQUID");
+			email_events("Squid File System error","SQUID claim \"$buffer\" the squid service will be restarted",'system');
+			THREAD_COMMAND_SET('/etc/init.d/artica-postfix restart squid-cache');
+			WriteFileCache($file);
+			return;
+		}else{
+			events("comm_old_accept FD15 SQUID");
+			return;
+		}	
+}
 
 if(preg_match("#dansguardian.+?:\s+Error connecting to proxy#",$buffer,$re)){
 		$file="/etc/artica-postfix/croned.1/squid.tostart.error";

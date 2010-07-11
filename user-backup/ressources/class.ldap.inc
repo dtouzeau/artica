@@ -386,6 +386,62 @@ function ErrorConnection(){
 		$hash=ldap_get_entries($this->ldap_connection,$sr);
 		if($hash["count"]>0){return $hash[0]["uid"][0];}
 	}
+	
+	function set_organization_picture($ou,$picture_data){
+		$dn="ou=$ou,dc=organizations,$this->suffix";
+		$update_array["jpegLogo"][0]=$picture_data;
+		if(!$this->Ldap_modify($dn,$update_array)){return false;}
+		$base=md5($ou);
+		shell_exec("/bin/rm ".dirname(__FILE__)."/profiles/icons/$base*");
+		return true;
+	}
+	
+	function get_organization_picture($ou,$size){
+		include_once(dirname(__FILE__)."/class.images.inc");
+		$base=md5($ou).".$size";
+		$jpeg_filename=dirname(__FILE__)."/profiles/icons/$base";
+		@mkdir(dirname($jpeg_filename),0665,true);
+		writelogs("want to find $jpeg_filename",__CLASS__.'/'.__FUNCTION__,__FILE__,__LINE__);
+		
+		if(!is_file($jpeg_filename)){
+			writelogs("$jpeg_filename did not exists, create it",__CLASS__.'/'.__FUNCTION__,__FILE__,__LINE__);
+			$dn="ou=$ou,dc=organizations,$this->suffix";
+			$search =@ldap_read($this->ldap_connection,"ou=$ou,dc=organizations,$this->suffix",'(objectClass=*)');
+			if ($search){
+				$entry_id =ldap_first_entry($this->ldap_connection,$search);
+				$attrs = ldap_get_attributes($this->ldap_connection,$entry_id);	
+				$jpeg_filedata=$attrs["jpegLogo"][0];
+				writelogs("jpegLogo=".strlen($jpeg_filedata)." bytes",__CLASS__.'/'.__FUNCTION__,__FILE__,__LINE__);
+			}else{
+				writelogs("LDAP FAILED ou=$ou,dc=organizations,$this->suffix",__CLASS__.'/'.__FUNCTION__,__FILE__,__LINE__);
+			}
+		
+			if($jpeg_filedata==null){$jpeg_filedata=@file_get_contents("/usr/share/artica-postfix/img/folder-org-64.png");}
+			@file_put_contents($jpeg_filename,$jpeg_filedata);
+		}
+		
+		$jpeg_dimensions=@getimagesize($jpeg_filename);
+		$img_type=array(1=>"gif",2=>'jpg',3=>'png',4=>'swf',5=>'psd',6=>'bmp',7=>'tiff',8=>'tiff',9=>'jpc',10=>'jp2',11=>'jpx');
+		$ext=$img_type[$jpeg_dimensions[2]];
+		if($ext<>null){$ext=".$ext";}
+		$thumbnail_path="$jpeg_filename$ext";
+		
+		writelogs("$thumbnail_path",__CLASS__.'/'.__FUNCTION__,__FILE__,__LINE__);
+		
+		if(!is_file($thumbnail_path)){
+			$image=new images($jpeg_filename);
+			if($image->thumbnail($size,$size,$thumbnail_path)){
+				writelogs("thumbnail=SUCCESS return ressources/profiles/icons/".basename($thumbnail_path),__CLASS__.'/'.__FUNCTION__,__FILE__,__LINE__);
+				return "ressources/profiles/icons/".basename($thumbnail_path);
+			}
+		}else{
+			writelogs("thumbnail=FAILED return ressources/profiles/icons/".basename($thumbnail_path),__CLASS__.'/'.__FUNCTION__,__FILE__,__LINE__);
+			return "ressources/profiles/icons/".basename($thumbnail_path);
+		}
+		writelogs("return img/folder-org-64.png",__CLASS__.'/'.__FUNCTION__,__FILE__,__LINE__);
+		return "img/folder-org-64.png";
+		
+	}
 
 	function organization_name_from_transporttable($domain){
 		$pattern="(&(objectClass=transportTable)(cn=$domain))";
@@ -836,13 +892,7 @@ if($relayIP<>null){
 			}else{$array["ArticaFilterEnabled"]=$hash[0][strtolower("ArticaFilterEnabled")][0];}			
 			
 			
-			if($hash[0][strtolower("KasxFilterEnabled")][0]==null){
-				$updatearray["KasxFilterEnabled"]=0;
-				writelogs("Adding KasxFilterEnabled as artica data settings",__CLASS__.'/'.__FUNCTION__,__FILE__);
-				$this->Ldap_add_mod("cn=artica,$this->suffix",$updatearray);
-				unset($updatearray);
-				$array["KasxFilterEnabled"]=0;
-			}else{$array["KasxFilterEnabled"]=$hash[0][strtolower("KasxFilterEnabled")][0];}				
+			
 			
 			if($hash[0][strtolower("OBMEnabled")][0]==null){
 				$updatearray["OBMEnabled"]=0;

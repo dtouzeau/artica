@@ -1884,6 +1884,7 @@ begin
         exit;
      end;
   end;
+
   try
      ini:=TiniFile.Create('/etc/artica-postfix/versions.cache');
   except

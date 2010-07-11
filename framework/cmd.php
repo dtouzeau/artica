@@ -427,6 +427,7 @@ if(isset($_GET["fstab-add"])){fstab_add();exit;}
 if(isset($_GET["fstablist"])){fstab_list();exit;}
 if(isset($_GET["path-acls"])){acls_infos();exit;}
 if(isset($_GET["IsDir"])){IsDir();exit;}
+if(isset($_GET["hdparm-infos"])){hdparm_infos();exit;}
 
 
 // cmd.php?fstab-acl=yes&acl=$acl&dev=$dev
@@ -3859,5 +3860,10 @@ function dkim_amavis_tests_keys(){
 	echo "<articadatascgi>". base64_encode(serialize($results))."</articadatascgi>";	
 }
 
-
+function hdparm_infos(){
+$unix=new unix();
+$hdparm=$unix->find_program("hdparm");
+exec("$hdparm -I {$_GET["hdparm-infos"]} 2>&1",$results);
+echo "<articadatascgi>". base64_encode(serialize($results))."</articadatascgi>";
+}
 ?>

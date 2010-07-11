@@ -10,6 +10,7 @@ class vhosts{
 	var $WWWMysqlPassword;
 	var $WWWAppliUser;
 	var $WWWAppliPassword;
+	var $WWWMultiSMTPSender;
 	var $WWWSSLMode="FALSE";
 	var $IMG_ARRAY_128=array("LMB"=>"logo_lmb-200.png",
 	"JOOMLA"=>"128.joomla.png","SUGAR"=>"98-sugarcrm.png","ARTICA_USR"=>"bg_user-120.png",
@@ -65,6 +66,9 @@ class vhosts{
 				$LoadVhosts["wwwappliuser"]=$hash[$i]["wwwappliuser"][0];
 				$LoadVhosts["wwwapplipassword"]=$hash[$i]["wwwapplipassword"][0];
 				$LoadVhosts["wwwsslmode"]=$hash[$i]["wwwsslmode"][0];
+				$LoadVhosts["WWWMultiSMTPSender"]=$hash[$i][strtolower("WWWMultiSMTPSender")][0];
+				
+				
 				}
 		}
 		
@@ -87,6 +91,7 @@ class vhosts{
 				$LoadVhosts["wwwappliuser"]=$hash[$i]["wwwappliuser"][0];
 				$LoadVhosts["wwwapplipassword"]=$hash[$i]["wwwapplipassword"][0];
 				$LoadVhosts["wwwsslmode"]=$hash[$i]["wwwsslmode"][0];
+				$LoadVhosts["WWWMultiSMTPSender"]=$hash[$i][strtolower("WWWMultiSMTPSender")][0];
 				$LoadVhosts["dn"]=$hash[$i]["dn"];
 				$LoadVhosts["apacheDocumentRoot"]=$hash[$i][strtolower("apacheDocumentRoot")][0];
 				if(preg_match("#ou=www,ou=(.+?),dc=organizations#",$dn,$re) ){$LoadVhosts["OU"]=$re[1];}
@@ -133,7 +138,7 @@ class vhosts{
 	function Addhost($servername,$servertype){
 		$ldap=new clladp();
 		$dn="apacheServerName=$servername,ou=www,ou=$this->ou,dc=organizations,$ldap->suffix";
-		writelogs("Building dn $dn",__CLASS__.'/'.__FUNCTION__,__FILE__);
+		writelogs("Building dn $dn WWWMultiSMTPSender=$this->WWWMultiSMTPSender",__CLASS__.'/'.__FUNCTION__,__FILE__);
 		if(!$ldap->ExistsDN($dn)){
 			$upd["objectClass"][]="top";
 			$upd["objectClass"][]="apacheConfig";
@@ -146,6 +151,7 @@ class vhosts{
 			if($this->WWWMysqlPassword<>null){$upd["WWWMysqlPassword"][]=$this->WWWMysqlPassword;}
 			if($this->WWWAppliUser<>null){$upd["WWWAppliUser"][]=$this->WWWAppliUser;}
 			if($this->WWWAppliPassword<>null){$upd["WWWAppliPassword"][]=$this->WWWAppliPassword;}
+			if($this->WWWMultiSMTPSender<>null){$upd["WWWMultiSMTPSender"][]=$this->WWWMultiSMTPSender;}
 			$ldap->ldap_add($dn,$upd);
 		}else{
 			$upd["WWWServerType"][]=$servertype;
@@ -154,6 +160,9 @@ class vhosts{
 			if($this->WWWMysqlPassword<>null){$upd["WWWMysqlPassword"][]=$this->WWWMysqlPassword;}
 			if($this->WWWAppliUser<>null){$upd["WWWAppliUser"][]=$this->WWWAppliUser;}
 			if($this->WWWAppliPassword<>null){$upd["WWWAppliPassword"][]=$this->WWWAppliPassword;}
+			if($this->WWWMultiSMTPSender<>null){$upd["WWWMultiSMTPSender"][]=$this->WWWMultiSMTPSender;}
+			
+			
 			
 			$ldap->Ldap_modify($dn,$upd);
 		}

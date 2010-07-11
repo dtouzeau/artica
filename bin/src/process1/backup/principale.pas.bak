@@ -839,6 +839,8 @@ begin
     list.Add('$_GLOBAL["maillog_path"]="' +  SYS.MAILLOG_PATH() + '";');
     list.Add('$_GLOBAL["PHP_BIN_PATH"]="' +  SYS.LOCATE_PHP5_BIN() + '";');
     list.Add('$_GLOBAL["EXEC_NICE"]="' +  SYS.EXEC_NICE()+ '";');
+
+    if length(SYS.LOCATE_GENERIC_BIN('hdparm'))>0 then then list.Add('$_GLOBAL["HDPARM_INSTALLED"]=True;') else list.Add('$_GLOBAL["HDPARM_INSTALLED"]=False;');
     
     //------------ openldap
     if FileExists(SYS.LOCATE_SLAPD()) then  begin
@@ -1502,9 +1504,7 @@ logs.Debuglogs('web_settings() -> 75%');
     logs.Debuglogs('thProcThread.web_settings('+ php_path + ') -> TERM');
     fpsystem(SYS.EXEC_NICE()+SYS.LOCATE_PHP5_BIN()+' /usr/share/artica-postfix/exec.admin.status.postfix.flow.php &');
 
-    if not FileExists('/etc/artica-postfix/settings/Daemons/HdparmInfos') then begin
-      fpsystem(SYS.LOCATE_PHP5_BIN()+' /usr/share/artica-postfix/exec.hdparm.php &');
-    end;
+    if not FileExists('/etc/artica-postfix/settings/Daemons/HdparmInfos') then fpsystem(SYS.LOCATE_PHP5_BIN()+' /usr/share/artica-postfix/exec.hdparm.php &');
     list.Free;;
     CheckMaxLogs();
 

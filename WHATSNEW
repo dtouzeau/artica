@@ -1,16 +1,34 @@
-1.4.070814:
+1.4.071110:
 ========================================================================================
 
 Messaging Changes:
 -------------------------------------------------
 1.4.070712: Fix artica create Draft without "s" caracters that Roundcube and Thunderbird expect.
-1.4.070712: Adding "null" in $rcmail_config['imap_root'] in RoundCube configuration file.
-1.4.070814: Adding a new feature that allow to add some DNSBL list (especially senderbase has cisco black lists) into SpamAssassin.
+1.4.070712: Add "null" in $rcmail_config['imap_root'] in RoundCube configuration file.
+1.4.070814: Add a new feature that allow to add some DNSBL list (especially senderbase has cisco black lists) into SpamAssassin.
+1.4.070900: Force mandatory 127.0.0.0/8 network in postfix mynetwork parameter
+1.4.070900: Add a syslog watchdog on fatal: valid hostname or network address required in server description (Artica action = notify)
+1.4.070917: Adding a syslog watchdog on zarafa-server  Cannot instantiate user plugin: ldap_bind_s: Invalid credentials (Artica action = restart zarafa)
+1.4.070917: Add a syslog watchdog on postfix fatal: specify a password table via the `smtp_sasl_password_maps' configuration parameter (Artica action = disable SMTP SASL)
+1.4.071110: Add a syslog watchdog on amavis : TROUBLE in child_init_hook: BDB can't connect db env. at /var/amavis/db (Artica action=restart amavis)
+1.4.071110: Fix unable to start milter-greylist in multiple postfix instance mode.
+1.4.071110: Add possibility to set the ip address of the local smtp server in the roundcube subdomain when using the postfix multiple instance mode.
 
 
 System changes
 -------------------------------------------------
-1.4.070814: Adding a maillog watchdog on 0x0000000847ec10: SQL Failed: Table 'zarafa.*' doesn't exists (Artica action = delete database zarafa and restart service)
+1.4.070814: Add a maillog watchdog on 0x0000000847ec10: SQL Failed: Table 'zarafa.*' doesn't exists (Artica action = delete database zarafa and restart service)
+1.4.070900: Add more hard drives informations.
+1.4.070900: Fix monit error configuration when monit is under 4.x version.
+
+Interface Changes
+-------------------------------------------------
+1.4.071110: Add possibility to add a picture logo in the organization settings.
+
+
+Proxy Changes
+-------------------------------------------------
+1.4.070900: Add a syslog watchdog httpAccept: FD 15: accept failure: (22) Invalid argument (Artica action = restart squid).
 
 
 1.4.070616: 

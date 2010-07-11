@@ -347,6 +347,7 @@ class usersMenus {
 	var $mysqld_datadir;
 	var $DRUPAL_INSTALLED=false;
 	var $MAIL_DKIM_VERSION=null;
+	var $HDPARM_INSTALLED=false;
 	
 	function usersMenus($priv=null,$nobuild=0,$hostname=null){
 
@@ -617,6 +618,7 @@ class usersMenus {
 			$this->mysqld_datadir=$_GLOBAL["mysqld_datadir"];
 			$this->DRUPAL_INSTALLED=$_GLOBAL["DRUPAL_INSTALLED"];
 			$this->MAIL_DKIM_VERSION=trim($_GLOBAL["MAIL_DKIM_VERSION"]);
+			$this->HDPARM_INSTALLED=trim($_GLOBAL["HDPARM_INSTALLED"]);
 			
 			$this->hostname=str_replace('.(none)','',$this->hostname);
 			$this->fqdn=str_replace('.(none)','',$this->fqdn);

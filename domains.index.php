@@ -128,7 +128,7 @@ function ORGANISATIONS_LIST(){
 		$error="<div style='float:left'>".Paragraphe("danger64.png","{GENERIC_LDAP_ERROR}",$ldap->ldap_last_error)."</div>";
 	}
 
-	$ldap->ldap_close();
+	
 $page=CurrentPageName();
 		
 
@@ -154,10 +154,10 @@ if(isset($_GET["ajaxmenu"])){$header="
 			$uri="javascript:Loadjs('$page?LoadOrgPopup=$ligne');";
 		}
 		
-		
+		$img=$ldap->get_organization_picture($ligne,64);
 		
 
-		$html=$html . "<div style='float:left'>" . Paragraphe('folder-org-64.png',"{manage} $ligne","
+		$html=$html . "<div style='float:left'>" . Paragraphe($img,"{manage} $ligne","
 		<strong>$ligne:<br></strong>{manage_organisations_text}",$uri,null,220,100) . "</div>
 		";
 		
@@ -175,7 +175,7 @@ if(isset($_GET["ajaxmenu"])){$header="
 		
 	}
 	
-	
+	$ldap->ldap_close();
 	return $html."$sendmail</div>";
 }
 

@@ -623,6 +623,13 @@ if($usersmenus->ZABBIX_INSTALLED){
 		"javascript:Loadjs('domains.migr.zarafa.php?ou=$ou_encoded')",null,210,100,0,true);
 	}
 }
+
+if($usersmenus->AllowEditOuSecurity){
+	$director_report=Paragraphe("postmaster-identity.png","{global_director_report}","{global_director_report_text}",
+		"javascript:Loadjs('domains.director.report.php?ou=$ou_encoded')",null,210,100,0,true);
+}
+
+
 	
 	
 	
@@ -634,7 +641,7 @@ if($usersmenus->ZABBIX_INSTALLED){
 	
 	
 	$html="<div style='width:700px'>
-	$transport$network$zarafa$zarafa_migration$buildAllmailboxes$restrictions$whitelists$dnsbl
+	$transport$network$zarafa$zarafa_migration$buildAllmailboxes$restrictions$whitelists$dnsbl$director_report
 	$assp$kavmilter$extensions_block$kas3x$whitelistrobots$quarantine_robot$rttm$quarantine$quarantine_admin$quarantine_report$quarantine_query$stats
 	$ArticaHtml$icon_backuphtml
 	</div>
@@ -673,8 +680,10 @@ function organization_management(){
 	
 	
 if($usersmenus->AsOrgAdmin){
+	$ldap=new clladp();
+	$img=$ldap->get_organization_picture($ou,64);
 	$ad_import=Paragraphe('folder-import-ad-64.png','{ad_import}','{ad_import_text}',"javascript:Loadjs('domains.ad.import.php?ou=$ou')",null,210,0,0,true);
-	$orgsettings=Paragraphe('64-org-settings.png','{ORG_SETTINGS}','{ORG_SETTINGS_TEXT}',"javascript:Loadjs('domains.organization-settings.php?ou=$ou')",null,210,0,0,true);
+	$orgsettings=Paragraphe($img,'{ORG_SETTINGS}','{ORG_SETTINGS_TEXT}',"javascript:Loadjs('domains.organization-settings.php?ou=$ou')",null,210,0,0,true);
 	$orgsduplicate=Paragraphe('org-duplicate-64.png','{EXPORT_ORG}','{duplicate_to_remote_server}',"javascript:Loadjs('domains.organization-settings.php?ou=$ou&js-export=yes')",null,210,0,0,true);
 	
 	
@@ -1213,7 +1222,7 @@ if($usersmenus->SMTP_LEVEL>0){
 function organization_sections(){
 	
 	
-	if(GET_CACHED(__FILE__,__FUNCTION__,"sec:{$_GET["ou"]}:{$_GET["org_section"]}")){return null;}
+	
 	
 	$tpl=new templates();
 	
@@ -1224,21 +1233,23 @@ function organization_sections(){
 	switch ($_GET["org_section"]) {
 		case "management":
 			$html=$tpl->_ENGINE_parse_body(organization_management());
-			SET_CACHED(__FILE__,__FUNCTION__,"sec:{$_GET["ou"]}:{$_GET["org_section"]}",$html);
 			echo $html;
 			break;
 		
 		case "groupwares":
+			if(GET_CACHED(__FILE__,__FUNCTION__,"sec:{$_GET["ou"]}:{$_GET["org_section"]}")){return null;}
 			$html=$tpl->_ENGINE_parse_body(organization_groupwares());
 			//SET_CACHED(__FILE__,__FUNCTION__,"sec:{$_GET["ou"]}:{$_GET["ajaxmenu"]}",$html);
 			echo $html;			
 			break;
 			
 		case "storage":
+			if(GET_CACHED(__FILE__,__FUNCTION__,"sec:{$_GET["ou"]}:{$_GET["org_section"]}")){return null;}
 			echo $tpl->_ENGINE_parse_body(organization_storage());
 			break;	
 			
 		case "users":
+	
 			echo $tpl->_ENGINE_parse_body(organization_users_list());
 			break;
 			

@@ -211,6 +211,11 @@ begin
 count:=0;
   if not FileExists(MILTER_GREYLIST_BIN_PATH()) then exit;
 
+    if EnablePostfixMultiInstance=1 then begin
+       fpsystem(SYS.LOCATE_PHP5_BIN() +'/usr/share/artica-postfix/exec.milter-greylist.php --stop');
+       exit;
+    end;
+
   if not SYS.PROCESS_EXIST(SYS.PIDOF(MILTER_GREYLIST_BIN_PATH())) then begin
       writeln('Stopping milter-greylist.....: Already stopped');             
       exit;
@@ -624,12 +629,13 @@ begin
   end;
   
    logs.Syslogs('Starting......: milter-greylist');
+
+
+
    FIX_RACL();
 
-   MILTER_GREYLIST_SET_VALUE('pidfile','/var/run/milter-greylist/milter-greylist.pid');
-   MILTER_GREYLIST_SET_VALUE('socket','/var/run/milter-greylist/milter-greylist.sock');
-   MILTER_GREYLIST_SET_VALUE('user','postfix');
-   pid_path:=MILTER_GREYLIST_PID_PATH();
+
+   pid_path:='/var/run/milter-greylist/milter-greylist.pid');
    user:='postfix';
    socketPath:=CheckSocket();
    FullSocketPath:=socketPath;

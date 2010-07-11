@@ -12,7 +12,7 @@
       <MainUnit Value="0"/>
       <TargetFileExt Value=""/>
       <Title Value="process1"/>
-      <ActiveEditorIndexAtStart Value="5"/>
+      <ActiveEditorIndexAtStart Value="4"/>
     </General>
     <VersionInfo>
       <ProjectVersion Value=""/>
@@ -66,12 +66,12 @@
         <Filename Value="principale.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="principale"/>
-        <CursorPos X="83" Y="1485"/>
-        <TopLine Value="1451"/>
+        <CursorPos X="162" Y="843"/>
+        <TopLine Value="815"/>
         <EditorIndex Value="4"/>
         <UsageCount Value="206"/>
         <Bookmarks Count="1">
-          <Item0 X="6" Y="1062" ID="0"/>
+          <Item0 X="6" Y="1064" ID="0"/>
         </Bookmarks>
         <Loaded Value="True"/>
       </Unit4>

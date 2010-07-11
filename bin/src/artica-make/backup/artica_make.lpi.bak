@@ -791,8 +791,8 @@
         <Filename Value="setup_drupal.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="setup_drupal"/>
-        <CursorPos X="87" Y="134"/>
-        <TopLine Value="96"/>
+        <CursorPos X="20" Y="155"/>
+        <TopLine Value="113"/>
         <EditorIndex Value="9"/>
         <UsageCount Value="23"/>
         <Loaded Value="True"/>

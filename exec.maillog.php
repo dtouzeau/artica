@@ -93,6 +93,7 @@ if(preg_match("#cyrus\/cyr_expire\[[0-9]+#",$buffer)){return null;}
 if(preg_match("#cyrus\/imap.+?SSL_accept#",$buffer)){return null;}
 if(preg_match("#cyrus\/pop3.+?SSL_accept#",$buffer)){return null;}
 if(preg_match("#cyrus\/imap.+?:\s+executed#",$buffer)){return null;}
+if(preg_match("#cyrus\/ctl_cyrusdb.+?recovering cyrus databases#",$buffer)){return null;}
 if(preg_match("#cyrus.+?executed#",$buffer)){return null;}
 if(preg_match("#postfix\/.+?refreshing the Postfix mail system#",$buffer)){return null;}
 if(preg_match("#master.+?reload -- version#",$buffer)){return null;}
@@ -104,11 +105,59 @@ if(preg_match("#idle for too long, closing connection#",$buffer)){return null;}
 if(preg_match("#amavis\[.+?Found#",$buffer)){return null;}
 if(preg_match("#amavis\[.+?Module\s+#",$buffer)){return null;}
 if(preg_match("#amavis\[.+?\s+loaded$#",trim($buffer))){return null;}
-
+if(preg_match("#amavis\[.+?\s+Internal decoder#",trim($buffer))){return null;}
+if(preg_match("#amavis\[.+?\s+Creating db#",trim($buffer))){return null;}
 
 if(preg_match("#zarafa-server\[.+?: SQL Failed: Table.+?zarafa\.(.+?)'\s+doesn.+?exist#",$buffer,$re)){
 	events("Zarafa, missing table {$re[1]}");
 	zarafa_rebuild_db($table,$buffer);
+}
+
+if(preg_match("#zarafa-server\[.+?:\s+Cannot instantiate user plugin: ldap_bind_s: Invalid credentials#",$buffer,$re)){
+	$file="/etc/artica-postfix/croned.1/zarafa.ldap_bind_s.error";
+	events("zarafa-server -> ldap_bind_s: Invalid credentials");
+	if(file_time_min($file)>5){
+		email_events("Zarafa server cannot connect to ldap server","Zarafa-server claim\n$buffer\nArtica will restart and reconfigure zarafa","mailbox");
+		THREAD_COMMAND_SET("/etc/init.d/artica-postfix restart zarafa");
+		@unlink($file);
+		file_put_contents($file,"#");
+	}
+	
+	return;
+}
+
+if(preg_match("#smtp\[.+? fatal: specify a password table via the.+?smtp_sasl_password_maps.+?configuration parameter#",$re)){
+	$file="/etc/artica-postfix/croned.1/postfix.smtp_sasl_password_maps.error";
+	events("postfix -> smtp_sasl_password_maps");
+	if(file_time_min($file)>5){
+		email_events("Postfix configuration problem","Postfix claim\n$buffer\nArtica will disable SMTP Sasl feature","postfix");
+		THREAD_COMMAND_SET(LOCATE_PHP5_BIN2()." /usr/share/artica-postfix/exec.postfix.maincf.php --disable-smtp-sasl");
+		@unlink($file);
+		file_put_contents($file,"#");
+	}
+	return;	
+}
+
+if(preg_match("#amavis\[.+?TROUBLE.+?in child_init_hook: BDB can't connect db env.+?No such file or directory#",$re)){
+	$file="/etc/artica-postfix/croned.1/amavis.BDB.error";
+	events("amavis BDB ERROR");
+	if(file_time_min($file)>5){
+		email_events("avais BDB Error","amavis claim\n$buffer\nArtica will restart amavis service","postfix");
+		THREAD_COMMAND_SET("/etc/init.d/artica-postfix restart amavis");
+		@unlink($file);
+		file_put_contents($file,"#");
+	}
+	return;	
+}
+
+
+
+
+
+
+if(preg_match("#smtp\[.+?:\s+fatal: valid hostname or network address required in server description:(.+?)#",$buffer,$re)){
+	mail_events("{$re[1]} Bad configuration parameters","Postfix claim\n$buffer\nPlease come back to the interface and check your configuration!","postfix");
+	return;
 }
 
 
@@ -135,6 +184,9 @@ if(preg_match("#amavis.+?:.+?_DIE:\s+Can.+?locate.+?.+?body_[0-9]+\.pm\s+in\s+@I
 	SpamAssassin_error_saupdate($buffer);
 	return null;	
 }
+
+
+
 
 if(preg_match("#spamd\[[0-9]+.+?Can.+?locate\s+Mail\/SpamAssassin\/CompiledRegexps\/body_[0-9]+\.pm#",$buffer,$re)){
 	SpamAssassin_error_saupdate($buffer);
@@ -367,6 +419,12 @@ if(preg_match("#warning: connect to Milter service unix:(.+?)spamass.sock: No su
 
 if(preg_match("#warning: connect to Milter service unix:(.+?)greylist.sock: No such file or directory#",$buffer,$re)){
 	miltergreylist_error($buffer,"{$re[1]}/greylist.sock");
+	return null;
+}
+
+if(preg_match("#postfix\/smtpd\[.+?warning: connect to Milter service unix:(.+?)milter-greylist.sock: No such file or directory#",$buffer,$re)){
+	miltergreylist_error($buffer,"{$re[1]}/milter-greylist.sock");
+	return null;
 }
 
 if(preg_match("#warning: connect to Milter service unix:/var/spool/postfix/var/run/amavisd-milter/amavisd-milter.sock: Connection refused#",$buffer)){
@@ -1603,7 +1661,7 @@ $file="/etc/artica-postfix/cron.1/".__FUNCTION__;
 		return null;}	
 	events("Spamassassin error time:$timeFile Mn!!!");
 	email_events("SpamAssassin error Regex","SpamAssassin claim \"$buffer\", Artica will run /usr/bin/sa-update to fix it",'postfix');
-	THREAD_COMMAND_SET("/usr/share/artica-postfix/bin/artica-update --spamassassin");
+	THREAD_COMMAND_SET("/usr/share/artica-postfix/bin/artica-update --spamassassin --force");
 	@unlink($file);
 	@file_put_contents($file,"#");	
 	if(!is_file($file)){

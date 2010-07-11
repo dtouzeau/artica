@@ -102,6 +102,11 @@ function sender_canonical_add(){
 	$userid=$_GET["uid"];
 	$user=new user($userid);
 	
+	if(!preg_match("#.+?@.+#",$_GET["SaveSenderCanonical"])){
+		echo "Malformed address !\n";
+		return;
+	}
+	
 	if(trim($_GET["SaveSenderCanonical"])==null){
 		$user->DeleteCanonical();
 		return;

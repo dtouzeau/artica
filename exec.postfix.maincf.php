@@ -51,6 +51,7 @@ if($argv[1]=='--others-values'){OthersValues();CleanMyHostname();exec("{$GLOBALS
 if($argv[1]=='--mime-header-checks'){mime_header_checks();exec("{$GLOBALS["postfix"]} reload");}
 if($argv[1]=='--interfaces'){inet_interfaces();exec("{$GLOBALS["postfix"]} stop");exec("{$GLOBALS["postfix"]} start");}
 if($argv[1]=='--mailbox-transport'){MailBoxTransport();exec("{$GLOBALS["postfix"]} stop");exec("{$GLOBALS["postfix"]} start");}
+if($argv[1]=='--disable-smtp-sasl'){disable_smtp_sasl();exec("{$GLOBALS["postfix"]} reload");}
 
 
 
@@ -180,8 +181,16 @@ function mynetworks(){
 	if(!is_array($nets)){
 		if($GLOBALS["DEBUG"]){echo "No networks sets\n";}
 		shell_exec("{$GLOBALS["postconf"]} -e \"mynetworks =127.0.0.0/8\" >/dev/null 2>&1");
-		return;}
+		return;
+	}
+	
 	$conf=@implode("\n",$nets);
+	$conf[]="127.0.0.0/8";
+	while (list ($num, $network) = each ($nets) ){$cleaned[$network]=$network;}
+	unset($nets);
+	while (list ($network, $network2) = each ($cleaned) ){$nets[]=$network;}
+	
+	
 	if($GLOBALS["DEBUG"]){echo "CONF:$conf\n";}
 	$inline=@implode(", ",$nets);
 	echo "Starting......: Building mynetworks ". count($nets)." Networks\n";
@@ -888,6 +897,12 @@ function MailBoxTransport(){
 	system("{$GLOBALS["postconf"]} -e \"zarafa_destination_recipient_limit = 1\" >/dev/null 2>&1");
 	system("{$GLOBALS["postconf"]} -e \"mailbox_transport = $default\" >/dev/null 2>&1");
 	}
+	
+function disable_smtp_sasl(){
+	shell_exec("{$GLOBALS["postconf"]} -e \"smtp_sasl_password_maps =\" >/dev/null 2>&1");
+	shell_exec("{$GLOBALS["postconf"]} -e \"smtp_sasl_auth_enable =no\" >/dev/null 2>&1");	
+	
+}
 
 
 

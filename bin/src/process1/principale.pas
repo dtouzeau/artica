@@ -839,6 +839,8 @@ begin
     list.Add('$_GLOBAL["maillog_path"]="' +  SYS.MAILLOG_PATH() + '";');
     list.Add('$_GLOBAL["PHP_BIN_PATH"]="' +  SYS.LOCATE_PHP5_BIN() + '";');
     list.Add('$_GLOBAL["EXEC_NICE"]="' +  SYS.EXEC_NICE()+ '";');
+
+    if length(SYS.LOCATE_GENERIC_BIN('hdparm'))>0 then list.Add('$_GLOBAL["HDPARM_INSTALLED"]=True;') else list.Add('$_GLOBAL["HDPARM_INSTALLED"]=False;');
     
     //------------ openldap
     if FileExists(SYS.LOCATE_SLAPD()) then  begin

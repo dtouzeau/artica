@@ -29,6 +29,9 @@ $q->check_storage_table();
 $sock=new sockets();
 if($sock->GET_INFO("KeepArticaMysqlError")<>1){DeleteMysqlError();}
 $quarantine_dir="/tmp/savemail";
+@mkdir("$quarantine_dir");
+@chmod("$quarantine_dir",0777);
+
 $files=DirList($quarantine_dir);
 $count=0;
 $pid=getmypid();
@@ -70,6 +73,8 @@ ASSP_QUAR("/usr/share/assp/okmail");
 ASSP_QUAR("/usr/share/assp/notspam");		
 		
 system(LOCATE_PHP5_BIN2()." ". dirname(__FILE__)."/exec.clean.logs.php &");		
+@mkdir("$quarantine_dir");
+@chmod("$quarantine_dir",0777);
 die();
 
 function ASSP_QUAR($baseDir){

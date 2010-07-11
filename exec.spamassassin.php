@@ -317,7 +317,12 @@ echo "Starting......: spamassassin writing dkim.pre done ($count whitelisted sen
 function dnsbl(){
 	$sock=new sockets();
 	$datas=unserialize(base64_decode($sock->GET_INFO("SpamassassinDNSBL")));
-	$count=0;	
+	$count=0;
+	if(!is_array($datas)){
+		@file_put_contents("/etc/spamassassin/dnsbl.pre","#");
+		return ;	
+	}
+	
 	while (list ($key, $vlue) = each ($datas)){
 		if($vlue==null){continue;}
 		if($vlue==0){continue;}	

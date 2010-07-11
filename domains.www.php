@@ -96,6 +96,10 @@ var x_AddWebService= function (obj) {
 		XHR.appendData('WWWMysqlUser',document.getElementById('WWWMysqlUser').value);
 		XHR.appendData('WWWMysqlPassword',document.getElementById('WWWMysqlPassword').value);
 		if(document.getElementById('WWWAppliUser')){XHR.appendData('WWWAppliUser',document.getElementById('WWWAppliUser').value);}
+		if(document.getElementById('WWWMultiSMTPSender')){XHR.appendData('WWWMultiSMTPSender',document.getElementById('WWWMultiSMTPSender').value);}
+		
+		
+		
 		XHR.appendData('WWWAppliPassword',document.getElementById('WWWAppliPassword').value);
 		document.getElementById('wwwInfos').innerHTML='<center><img src=\"img/wait_verybig.gif\"></center>';
     	XHR.sendAndLoad('$page', 'GET',x_AddWebService);		
@@ -124,6 +128,7 @@ function popup_add(){
 	
 	$list=listOfAvailableServices();
 	$ldap=new clladp();
+	$sock=new sockets();
 	$domns=$ldap->hash_get_domains_ou($_GET["ou"]);
 	$domns[null]="{select}";
 	$domains=Field_array_Hash($domns,"domain",null);
@@ -182,6 +187,30 @@ if($_GET["host"]<>null){
 	
 	if($LoadVhosts["wwwsslmode"]=="TRUE"){$LoadVhosts["wwwsslmode"]=1;}else{$LoadVhosts["wwwsslmode"]=0;}
 	
+	$EnablePostfixMultiInstance=$sock->GET_INFO("EnablePostfixMultiInstance");
+	
+	if($EnablePostfixMultiInstance==1){
+		$q=new mysql();
+		$sql="SELECT ipaddr FROM nics_virtuals WHERE org='{$_GET["ou"]}'";
+		$results=$q->QUERY_SQL($sql,"artica_backup");
+		$ipssmtp[null]="{select}";
+		
+		while($ligne=@mysql_fetch_array($results,MYSQL_ASSOC)){
+			$ipssmtp[trim($ligne["ipaddr"])]=trim($ligne["ipaddr"]);
+			}		
+		$ipssmtp["127.0.0.1"]="127.0.0.1";
+		
+		$WWWMultiSMTPSender="
+				<tr>
+					<td class=legend>{WWWMultiSMTPSender}:</td>
+					<td>". Field_array_Hash($ipssmtp,"WWWMultiSMTPSender",$LoadVhosts["WWWMultiSMTPSender"])."</td>
+				</tr>	";	
+		
+		
+		
+	}
+	
+	
 	$html="<H1>$title</H1>
 	<table style='width:100%'>
 	<tr>
@@ -197,7 +226,8 @@ if($_GET["host"]<>null){
 				<tr>
 					<td class=legend>{https_mode} ({port}:443):</td>
 					<td>". Field_checkbox("WWWSSLMode",1,$LoadVhosts["wwwsslmode"])."</td>
-				</tr>				
+				</tr>
+				$WWWMultiSMTPSender				
 				<tr>
 					<td class=legend>{WWWMysqlUser}:</td>
 					<td>". Field_text("WWWMysqlUser",$LoadVhosts["wwwmysqluser"],'width:120px')."</td>
@@ -400,6 +430,10 @@ function add_web_service(){
 	$vhosts->WWWMysqlUser=$_GET["WWWMysqlUser"];
 	$vhosts->WWWMysqlPassword=$_GET["WWWMysqlPassword"];
 	$vhosts->WWWSSLMode=$_GET["WWWSSLMode"];
+	
+	writelogs("WWWMultiSMTPSender={$_GET["WWWMultiSMTPSender"]}",__FUNCTION__,__FILE__,__LINE__);
+	
+	$vhosts->WWWMultiSMTPSender=$_GET["WWWMultiSMTPSender"];
 	$vhosts->Addhost($hostname,$ServerWWWType);
 	
 	$sock=new sockets();

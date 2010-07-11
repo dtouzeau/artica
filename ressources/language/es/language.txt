@@ -1700,6 +1700,7 @@ enable or disable this feature.</group_behavior_text>
 <hardware_info>Hardware Informations</hardware_info>
 <hardware_info_text>See components of your system and disks usage</hardware_info_text>
 <hdFree_stat>Hard drive space statistics</hdFree_stat>
+<hdparm>Hard drive informations</hdparm>
 <hdparm_infos_text>
 Computer performances means Hard drives performances too. Especially if your system run on a virtual machine..[br]
 Artica check speed disks every 60mn.[br]you see here the result of the latest test.[br]

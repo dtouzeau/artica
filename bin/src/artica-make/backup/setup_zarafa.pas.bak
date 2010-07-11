@@ -258,6 +258,7 @@ var
    REMOTE_INTEGER:integer;
    t:tstringlist;
    l:Tstringlist;
+   i:integer;
 
 begin
 LOCAL_INTEGER:=0;
