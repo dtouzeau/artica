@@ -17,10 +17,21 @@ if(preg_match("#--verbose#",implode(" ",$argv))){$GLOBALS["DEBUG"]=true;}
 if(preg_match("#--reload#",implode(" ",$argv))){$GLOBALS["RELOAD"]=true;}
 
 if(posix_getuid()<>0){die("Cannot be used in web server mode\n\n");}
-if(!Build_pid_func(__FILE__,"MAIN")){
-	echo(basename(__FILE__)." Already executed.. aborting the process\n");
+$sock=new sockets();
+$unix=new unix();
+
+
+
+$pidfile="/etc/artica-postfix/".basename(__FILE__).".pid";
+if($unix->process_exists(@file_get_contents($pidefile))){
+	echo "Starting......: Postfix configurator already executed PID ". @file_get_contents($pidefile)."\n";
 	die();
 }
+
+
+$pid=getmypid();
+echo "Starting......: Postfix configurator running $pid\n";
+file_put_contents($pidfile,$pid);
 
 $users=new usersMenus();
 if(!$users->POSTFIX_INSTALLED){
@@ -28,8 +39,17 @@ if(!$users->POSTFIX_INSTALLED){
 	die();
 }
 
-$sock=new sockets();
-$unix=new unix();
+
+if(!$unix->IS_OPENLDAP_RUNNING()){
+	echo "Starting......: Postfix openldap is not running, start it\n";
+	system("/etc/init.d/artica-postfix start ldap");
+}
+if(!$unix->IS_OPENLDAP_RUNNING()){
+	echo "Starting......: Postfix openldap is not running, aborting\n";
+	die();
+}
+
+
 $GLOBALS["EnablePostfixMultiInstance"]=$sock->GET_INFO("EnablePostfixMultiInstance");
 $GLOBALS["EnableBlockUsersTroughInternet"]=$sock->GET_INFO("EnableBlockUsersTroughInternet");
 $GLOBALS["postconf"]=$unix->find_program("postconf");
@@ -47,11 +67,13 @@ if($argv[1]=='--ssl-off'){MasterCFSSL_disable(1);die();}
 if($argv[1]=='--imap-sockets'){imap_sockets();die();}
 if($argv[1]=='--policyd-reconfigure'){policyd_weight_reconfigure();die();}
 if($argv[1]=='--restricted'){RestrictedForInternet(true);die();}
-if($argv[1]=='--others-values'){OthersValues();CleanMyHostname();exec("{$GLOBALS["postfix"]} reload");}
-if($argv[1]=='--mime-header-checks'){mime_header_checks();exec("{$GLOBALS["postfix"]} reload");}
-if($argv[1]=='--interfaces'){inet_interfaces();exec("{$GLOBALS["postfix"]} stop");exec("{$GLOBALS["postfix"]} start");}
-if($argv[1]=='--mailbox-transport'){MailBoxTransport();exec("{$GLOBALS["postfix"]} stop");exec("{$GLOBALS["postfix"]} start");}
-if($argv[1]=='--disable-smtp-sasl'){disable_smtp_sasl();exec("{$GLOBALS["postfix"]} reload");}
+if($argv[1]=='--others-values'){OthersValues();CleanMyHostname();exec("{$GLOBALS["postfix"]} reload");die();}
+if($argv[1]=='--mime-header-checks'){mime_header_checks();exec("{$GLOBALS["postfix"]} reload");die();}
+if($argv[1]=='--interfaces'){inet_interfaces();exec("{$GLOBALS["postfix"]} stop");exec("{$GLOBALS["postfix"]} start");die();}
+if($argv[1]=='--mailbox-transport'){MailBoxTransport();exec("{$GLOBALS["postfix"]} stop");exec("{$GLOBALS["postfix"]} start");die();}
+if($argv[1]=='--disable-smtp-sasl'){disable_smtp_sasl();exec("{$GLOBALS["postfix"]} reload");die();}
+if($argv[1]=='--perso-settings'){perso_settings();die();}
+if($argv[1]=='--luser-relay'){luser_relay();die();}
 
 
 
@@ -68,6 +90,7 @@ if($argv[1]=='--reconfigure'){
 	$main->save_conf_to_server(1);
 	if(!is_file("/etc/postfix/hash_files/header_checks.cf")){@file_put_contents("/etc/postfix/hash_files/header_checks.cf","#");}
 	file_put_contents('/etc/postfix/main.cf',$main->main_cf_datas);
+	echo "Starting......: Postfix Building main.cf ". strlen($main->main_cf_datas). " bytes done line ". __LINE__."\n";
 	_DefaultSettings();
 	die();
 }
@@ -90,6 +113,8 @@ if($GLOBALS["EnablePostfixMultiInstance"]==1){shell_exec(LOCATE_PHP5_BIN2()." ".
 	OthersValues();
 	MailBoxTransport();
 	mynetworks();
+	luser_relay();
+	perso_settings();
 	ReloadPostfix();	
 	
 }
@@ -98,14 +123,13 @@ if($GLOBALS["EnablePostfixMultiInstance"]==1){shell_exec(LOCATE_PHP5_BIN2()." ".
 
 if($argv[1]=='--write-maincf'){
 	if($GLOBALS["EnablePostfixMultiInstance"]==1){shell_exec(LOCATE_PHP5_BIN2()." ".dirname(__FILE__)."/exec.postfix-multi.php --from-main-write-maincf");return;}
-
-	
+	echo "Starting......: Postfix Postfix Multi Instance disabled, single instance mode\n";
 	$main=new main_cf();
 	$main->save_conf_to_server(1);
 	file_put_contents('/etc/postfix/main.cf',$main->main_cf_datas);
+	echo "Starting......: Postfix Building main.cf ". strlen($main->main_cf_datas). "line ". __LINE__." bytes done\n";
 	if(!is_file("/etc/postfix/hash_files/header_checks.cf")){@file_put_contents("/etc/postfix/hash_files/header_checks.cf","#");}
 	_DefaultSettings();
-	echo "Starting......: Building main.cf ". strlen($main->main_cf_datas). " bytes done\n";
 	if($argv[2]=='no-restart'){appliSecu();die();}
 	echo "Starting......: restarting postfix\n";
 	shell_exec("/etc/init.d/artica-postfix restart postfix");
@@ -117,11 +141,7 @@ if($argv[1]=='--maincf'){
 	$main=new main_cf();
 	$main->save_conf_to_server(1);
 	file_put_contents('/etc/postfix/main.cf',$main->main_cf_datas);
-	SetTLS();
-	headers_check(1);
-	ArticaFilterInMasterCF();
-	ArticaFilterInMasterCFPipe();
-	mynetworks();
+	_DefaultSettings();
 	if($GLOBALS["DEBUG"]){echo @file_get_contents("/etc/postfix/main.cf");}
 	die();
 }
@@ -183,18 +203,18 @@ function mynetworks(){
 		shell_exec("{$GLOBALS["postconf"]} -e \"mynetworks =127.0.0.0/8\" >/dev/null 2>&1");
 		return;
 	}
-	
-	$conf=@implode("\n",$nets);
-	$conf[]="127.0.0.0/8";
+	$nets[]="127.0.0.0/8";
+
 	while (list ($num, $network) = each ($nets) ){$cleaned[$network]=$network;}
 	unset($nets);
 	while (list ($network, $network2) = each ($cleaned) ){$nets[]=$network;}
 	
 	
-	if($GLOBALS["DEBUG"]){echo "CONF:$conf\n";}
+	
 	$inline=@implode(", ",$nets);
-	echo "Starting......: Building mynetworks ". count($nets)." Networks\n";
-	@file_put_contents("/etc/artica-postfix/mynetworks",$conf);
+	$config_net=@implode("\n",$nets);
+	echo "Starting......: Building mynetworks ". count($nets)." Networks ($inline)\n";
+	@file_put_contents("/etc/artica-postfix/mynetworks",$config_net);
 	shell_exec("{$GLOBALS["postconf"]} -e \"mynetworks = $inline\" >/dev/null 2>&1");
 	
 }
@@ -226,26 +246,24 @@ function headers_check($noreload=0){
 
 
 function ReloadPostfix(){
-	echo "Starting......: Apply securities issues\n"; 
-	appliSecu();
-	echo "Starting......: Compiling tables\n";
+	echo "Starting......: Postfix Compiling tables...\n";
 	system(LOCATE_PHP5_BIN2()." /usr/share/artica-postfix/exec.postfix.hashtables.php");
+	echo "Starting......: Postfix Apply securities issues\n"; 
+	appliSecu();
+	echo "Starting......: Postfix Reloading ASSP\n"; 
 	system("/usr/share/artica-postfix/bin/artica-install --reload-assp");
-	
-	
-	
-	echo "Starting......: reloading postfix\n";
+	echo "Starting......: Postfix reloading postfix master\n";
 	if(is_file("/usr/sbin/postfix")){
 		shell_exec("/usr/sbin/postfix reload");
 		return;
 	}
 	
-	if(is_file("/var/lib/postfix/smtpd_tls_session_cache.db")){shell_exec("/bin/chown postfix:postfix /var/lib/postfix/smtpd_tls_session_cache.db");}
-	shell_exec("/etc/init.d/artica-postfix restart postfix >/dev/null 2>&1 &");
+	
+	
 }
 
 function appliSecu(){
-
+	if(is_file("/var/lib/postfix/smtpd_tls_session_cache.db")){shell_exec("/bin/chown postfix:postfix /var/lib/postfix/smtpd_tls_session_cache.db");}
 	if(is_file("/var/lib/postfix/master.lock")){@chown("/var/lib/postfix/master.lock","postfix");}
 }
 
@@ -324,6 +342,8 @@ function ArticaFilterInMasterCF(){
 	$data[]="    -o smtp_send_xforward_command=yes";
 	$data[]="    -o disable_dns_lookups=yes";
 	$data[]="    -o local_header_rewrite_clients=";
+	$data[]=" 	 -o smtp_generic_maps=";
+	$data[]=" 	 -o sender_canonical_maps=";
 	$data[]="    -o smtpd_milters="; 	
 	@file_put_contents("/etc/postfix/master.cf",implode("\n",$data));	
 	
@@ -869,7 +889,7 @@ function OthersValues(){
 	system("{$GLOBALS["postconf"]} -e \"mime_nesting_limit = {$main->main_array["mime_nesting_limit"]}\" >/dev/null 2>&1");
 	system("{$GLOBALS["postconf"]} -e \"header_address_token_limit = {$main->main_array["header_address_token_limit"]}\" >/dev/null 2>&1");
 	system("{$GLOBALS["postconf"]} -e \"virtual_mailbox_limit = {$main->main_array["virtual_mailbox_limit"]}\" >/dev/null 2>&1");
-
+	perso_settings();
 }
 
 function inet_interfaces(){
@@ -885,12 +905,11 @@ function inet_interfaces(){
 	
 	if(!is_array($newarray)){$newarray[]="all";}
 	$finale=implode(",",$newarray);
-	echo "Starting......: Listen interface(s) \"$finale\"\n";
+	echo "Starting......: Postfix Listen interface(s) \"$finale\"\n";
 	system("{$GLOBALS["postconf"]} -e \"inet_interfaces = $finale\" >/dev/null 2>&1");
 }
 
 function MailBoxTransport(){
-	
 	$main=new maincf_multi();
 	$default=$main->getMailBoxTransport();
 	
@@ -901,6 +920,36 @@ function MailBoxTransport(){
 function disable_smtp_sasl(){
 	shell_exec("{$GLOBALS["postconf"]} -e \"smtp_sasl_password_maps =\" >/dev/null 2>&1");
 	shell_exec("{$GLOBALS["postconf"]} -e \"smtp_sasl_auth_enable =no\" >/dev/null 2>&1");	
+	
+}
+
+function perso_settings(){
+	$main=new main_perso();
+	if(!is_array($main->main_array)){
+		echo "Starting......: Postfix no main.cf tokens defined by admin\n";
+		return;
+	}
+	while (list ($key, $array) = each ($main->main_array) ){
+		echo "Starting......: Postfix Added by administrator: $key = {$array["VALUE"]}\n";
+		system("{$GLOBALS["postconf"]} -e \"$key = {$array["VALUE"]}\" >/dev/null 2>&1");
+	}
+	
+	if($GLOBALS["RELOAD"]){exec("{$GLOBALS["postfix"]} reload");}
+	
+}
+
+function luser_relay(){
+	$sock=new sockets();
+	$luser_relay=trim($sock->GET_INFO("luser_relay"));
+	if($luser_relay==null){
+		echo "Starting......: Postfix no Unknown user recipient set\n";
+		system("{$GLOBALS["postconf"]} -e \"luser_relay = \" >/dev/null 2>&1");
+		return;
+	}
+	echo "Starting......: Postfix Unknown user set to $luser_relay\n";
+	system("{$GLOBALS["postconf"]} -e \"luser_relay = $luser_relay\" >/dev/null 2>&1");
+	system("{$GLOBALS["postconf"]} -e \"local_recipient_maps =\" >/dev/null 2>&1");
+	if($GLOBALS["RELOAD"]){shell_exec("{$GLOBALS["postfix"]} reload");}
 	
 }
 

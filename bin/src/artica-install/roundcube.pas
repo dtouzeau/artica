@@ -126,44 +126,16 @@ end;
 //##############################################################################
 function troundcube.STATUS:string;
 var
-ini:TstringList;
-pid:string;
+pidpath:string;
 begin
+
    if not DirectoryExists(web_folder()) then exit;
+   SYS.MONIT_DELETE('APP_ROUNDCUBE');
    if not FileExists(roundcube_db_inc_php()) then  exit;
-   ini:=TstringList.Create;
-   pid:=SYS.GET_PID_FROM_PATH('/var/run/lighttpd/lighttpd-roundcube.pid');
-   ini.Add('[ROUNDCUBE]');
-      ini.Add('master_version='+VERSION());
-      ini.Add('status='+SYS.PROCESS_STATUS(pid));
-      ini.Add('service_name=APP_ROUNDCUBE');
-      ini.Add('service_cmd=roundcube');
-      ini.Add('service_disabled='+ IntToStr(RoundCubeHTTPEngineEnabled));
-
-
-     if RoundCubeHTTPEngineEnabled=0 then begin
-         result:=ini.Text;
-         ini.free;
-         SYS.MONIT_DELETE('APP_ROUNDCUBE');
-         exit;
-     end;
-
-      if SYS.MONIT_CONFIG('APP_ROUNDCUBE','/var/run/lighttpd/lighttpd-roundcube.pid','roundcube') then begin
-         ini.Add('monit=1');
-         result:=ini.Text;
-         ini.free;
-         exit;
-      end;
-
-
-      pid:=ROUNDCUBE_PID();
-      if SYS.PROCESS_EXIST(pid) then ini.Add('running=1') else  ini.Add('running=0');
-      ini.Add('application_installed=1');
-      ini.Add('application_enabled='+SYS.GET_INFO('RoundCubeHTTPEngineEnabled'));
-      ini.Add('master_pid='+ pid);
-      ini.Add('master_memory=' + IntToStr(SYS.PROCESS_MEMORY(pid)));
-      result:=ini.Text;
-      ini.free;
+   pidpath:=logs.FILE_TEMP();
+   fpsystem(SYS.LOCATE_PHP5_BIN()+' /usr/share/artica-postfix/exec.status.php --roundcube >'+pidpath +' 2>&1');
+   result:=logs.ReadFromFile(pidpath);
+   logs.DeleteFile(pidpath);
 
 end;
 //##############################################################################

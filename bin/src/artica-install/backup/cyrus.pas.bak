@@ -215,7 +215,7 @@ end;
 //##############################################################################
 function Tcyrus.POSTFIX_QUEUE_DIRECTORY():string;
 var
-    path,ver:string;
+    ver:string;
     tmp:string;
 begin
    if not FileExists('/usr/sbin/postconf') then exit;
@@ -432,8 +432,6 @@ begin
 end;
 //##############################################################################
 procedure Tcyrus.RECOVER_CYRUS_DB_SINGLE();
-var
-   configdirectory:string;
 begin
 
 
@@ -487,8 +485,6 @@ end;
 
 function TCyrus.CREATE_USER(uid:string):string;
 var
-   DomainName:string;
-   cyrusname:string;
    tmpstr:string;
    cmd:string;
 begin
@@ -515,8 +511,6 @@ end;
 //##############################################################################
 function TCyrus.MAILBOX_EXISTS_CGI(uid:string):string;
 var
-   DomainName:string;
-   cyrusname:string;
    tmpstr:string;
    cmd:string;
    openldap:topenldap;
@@ -556,7 +550,7 @@ procedure TCyrus.ANTIVIRUS_SCAN();
 var
    inif:TiniFile;
    nice:string;
-   clamscan,time:string;
+   time:string;
    config_directory:string;
    cmd:string;
 begin
@@ -567,11 +561,11 @@ begin
 
    inif:=TiniFile.Create('/etc/artica-postfix/settings/Daemons/CyrusAVConfig');
    nice:=inif.ReadString('SCAN','ProcessNice','-15');
-   clamscan:='/usr/bin/clamscan';
+
    inif.free;
 
-   if not FIleExists('/usr/bin/clamscan') then begin
-       logs.Debuglogs('ANTIVIRUS_SCAN:: unable to stat /usr/bin/clamscan');
+   if not FIleExists(SYS.LOCATE_GENERIC_BIN('clamscan')) then begin
+       logs.Debuglogs('ANTIVIRUS_SCAN:: unable to stat clamscan');
        exit;
    end;
 
@@ -885,7 +879,6 @@ end;
 function Tcyrus.MURDER_CHANGE_LDAP():string;
 var
 sini:TiniFile;
-cmd:string;
 servername,username,password,suffix:string;
 begin
   if not FileExists('/etc/artica-postfix/settings/Daemons/CyrusMurderBackendServer') then begin
@@ -1619,7 +1612,6 @@ var
    CyrPassword:string;
    cmd:string;
    tmp:string;
-   l            :string;
    RegExpr      :TRegExpr;
    usermbx      :string;
    s:TstringList;
@@ -1685,11 +1677,8 @@ var
    CyrPassword:string;
    cmd:string;
    tmp:string;
-   l            :string;
    RegExpr      :TRegExpr;
    usermbx      :string;
-   s:TstringList;
-   i:Integer;
 begin
     cyradm:='cyrus';
     CyrPassword:=myldap.ldap_settings.cyrus_password;

@@ -6,7 +6,7 @@ unit mysql_daemon;
 interface
 
 uses
-    Classes, SysUtils,variants,strutils,IniFiles, Process,md5,logs,unix,RegExpr in 'RegExpr.pas',zsystem,openldap;
+    Classes, SysUtils,variants,strutils,IniFiles, Process,logs,unix,RegExpr in 'RegExpr.pas',zsystem,openldap;
 
 type LDAP=record
       admin:string;
@@ -23,7 +23,6 @@ type LDAP=record
 private
      LOGS:Tlogs;
      D:boolean;
-     GLOBAL_INI:TiniFIle;
      SYS:Tsystem;
      artica_path:string;
      EnableMysqlClusterManager:integer;
@@ -206,7 +205,6 @@ procedure tmysql_daemon.DELETE_PARAMETERS(key:string);
 var
  RegExpr:TRegExpr;
  l:tstringlist;
- start:boolean;
  found:boolean;
  i:integer;
 begin
@@ -333,7 +331,6 @@ end;
 
 procedure tmysql_daemon.SERVICE_STOP();
 var
-   conf_path:string;
    pid:string;
    mysqladmin:string;
    mysqladmin_pid:string;
@@ -464,6 +461,7 @@ pidpath:string;
 begin
    SYS.MONIT_DELETE('APP_MYSQL_ARTICA');
    SYS.MONIT_DELETE('MYSQL_CLUSTER_REPLICA');
+   SYS.MONIT_DELETE('APP_MYSQL_CLUSTER_MGMT');
    pidpath:=logs.FILE_TEMP();
    fpsystem(SYS.LOCATE_PHP5_BIN()+' /usr/share/artica-postfix/exec.status.php --mysql >'+pidpath +' 2>&1');
    result:=logs.ReadFromFile(pidpath);
@@ -474,7 +472,6 @@ end;
 FUNCTION tmysql_daemon.CHECK_ERRORS_INFILE(path:string):boolean;
 var
    i     :integer;
-   D:boolean;
    l:TstringList;
    RegExpr:TRegExpr;
 begin
@@ -504,11 +501,8 @@ end;
 
 procedure tmysql_daemon.SERVICE_START();
 var
-   cmd,pid   :string;
-   i     :integer;
-   D:boolean;
-   l:TstringList;
-   datadir,logbin,FileTemp,syslog,EnableMysqlFeatures:string;
+   pid   :string;
+   Datadir,logbin,FileTemp,syslog,EnableMysqlFeatures:string;
    artica_backup_pid:string;
    processname:string;
    pid_file:string;
@@ -518,7 +512,7 @@ var
    ldap:topenldap;
    mysql_install_db:string;
 begin
-i:=0;
+
 logpathstring:='';
  FileTemp:=artica_path+'/ressources/logs/mysql.start.daemon';
  mysql_install_db:=SYS.LOCATE_GENERIC_BIN('mysql_install_db');
@@ -598,7 +592,7 @@ ForceDirectories('/var/log/mysql');
    if length(logbin)=0 then logbin:=SERVER_PARAMETERS('log');
 
 
-
+   datadir:=SERVER_PARAMETERS('datadir');
    logbin:=ExtractFileDir(logbin);
    syslog:=SYS.LOCATE_SYSLOG_PATH();
    logs.DebugLogs('Starting......: tuning '+ CNF_PATH() );
@@ -847,6 +841,7 @@ if not SYS.PROCESS_EXIST(pid) then begin
       exit;
 end;
 
+count:=0;
 while SYS.PROCESS_EXIST(pid) do begin
         sleep(100);
         inc(count);
@@ -887,6 +882,7 @@ if not SYS.PROCESS_EXIST(pid) then begin
       exit;
 end;
 
+        count:=0;
 while SYS.PROCESS_EXIST(pid) do begin
         sleep(100);
         inc(count);
@@ -912,10 +908,10 @@ end;
 procedure tmysql_daemon.CLUSTER_REPLICA_START();
 var
    cmd,pid,processname,artica_backup_pid:string;
-   i,count    :integer;
+   count    :integer;
    MysqlClusterReplicatID:integer;
 begin
-i:=0;
+
 
 if not FileExists(SYS.LOCATE_NDB()) then begin
    logs.DebugLogs('Starting......: Mysql-cluster replica is not installed, abort');
@@ -982,10 +978,10 @@ end;
 procedure tmysql_daemon.CLUSTER_MANAGEMENT_START();
 var
    cmd,pid,processname,artica_backup_pid:string;
-   i,count     :integer;
+   count     :integer;
    MysqlClusterManagerID:integer;
 begin
-i:=0;
+
 
 if not FileExists(SYS.LOCATE_NDB_MGMD) then begin
    logs.DebugLogs('Starting......: Mysql-cluster is not installed, abort');
@@ -1071,12 +1067,13 @@ if not FileExists('/usr/bin/mysqld_safe') then begin
    exit;
 end;
 
-mysqld_bin:=SYS.LOCATE_mysqld_bin();
-writeln('Stopping mysql daemon...');
-SERVICE_STOP();
-writeln('running in --skip-grant-tables mode');
-fpsystem('/usr/bin/mysqld_safe --skip-grant-tables &');
+  mysqld_bin:=SYS.LOCATE_mysqld_bin();
+  writeln('Stopping mysql daemon...');
+  SERVICE_STOP();
+  writeln('running in --skip-grant-tables mode');
+  fpsystem('/usr/bin/mysqld_safe --skip-grant-tables &');
   count:=0;
+  pid:=SYS.PIDOF(mysqld_bin);
   while not SYS.PROCESS_EXIST(pid) do begin
         sleep(500);
         count:=count+1;

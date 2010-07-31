@@ -600,8 +600,8 @@ return $html;
 function Postfix_multi_status($hostname){
 	
 	$sock=new sockets();
-	$array=unserialize(base64_decode($sock->getFrameWork("cmd.php?postfix-multi-queues=$hostname")));
-	$tot=$array["incoming"]+$array["active"]+$array["deferred"]+$array["corrupt"];
+	$tot=base64_decode($sock->getFrameWork("cmd.php?postfix-multi-postqueue=$hostname"));
+	
 	
 	
 	
@@ -611,22 +611,7 @@ $status_queues="
 			<tr>
 				<td colspan=2><span style='font-size:13px'>{smtp_queues}</span></td>
 			</tr>
-				<tr>
-					<td align='right' $link style='font-size:12px'>{incoming_queue}:</a>&nbsp;</td>
-					<td $link><strong style='font-size:12px'>{$array["incoming"]} </strong>emails</td>
-				</tr>
-				<tr>
-					<td align='right' $link style='font-size:12px'>{active_queue}:</a>&nbsp;</td>
-					<td $link><strong style='font-size:12px'>{$array["active"]} </strong>emails</td>
-				</tr>
-				<tr>
-					<td align='right' $link style='font-size:12px'>{deferred_queue}:</a>&nbsp;</td>
-					<td $link><strong style='font-size:12px'>{$array["deferred"]} </strong>emails</td>
-				</tr>
-				<tr $link_corrupt>
-					<td align='right' style='font-size:12px'>{corrupt_queue}:</a>&nbsp;</td>
-					<td><strong style='font-size:12px'>{$array["corrupt"]} </strong>emails</td>
-				</tr>				
+				
 	
 				<tr $link>
 					<td align='right' style='color:#C53110;border-top:1px dotted #CCCCCC'>Total:&nbsp;</td>

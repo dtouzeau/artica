@@ -323,9 +323,13 @@ function js_popup(){
 	$add_remote_domain=Paragraphe("64-remotedomain-add.png",'{add_relay_domain}','{add_relay_domain_text}',"javascript:AddRemoteDomain_form(\"$ou\",\"new domain\")","add_relay_domain",210);
 	$local_js="LoadAjax('LocalDomainsList','$page?organization-local-domain-list=$ou');";
 	
-	$local_part="<div style='font-size:14px;font-weight:bolder;color:#005447;width:100%;border-bottom:1px solid #005447;margin-bottom:5px'>{local_domain_map}:</div>
+	$local_part=
+	"<div style='font-size:14px;font-weight:bolder;color:#005447;width:100%;border-bottom:1px solid #005447;margin-bottom:5px'>
+		{local_domain_map}:
+	</div>
 	<div id='LocalDomainsList' style='width:100%;overflow:auto'></div>
-	<br><br>";
+	<br>
+	<br>";
 	
 	
 	$remote_part="
@@ -343,7 +347,6 @@ function js_popup(){
 	
 	
 	$html="
-	<H1 style='margin:-1px;width:99.5%'>$ou</h1>
 	<input type='hidden' id='inputbox delete' value=\"{are_you_sure_to_delete}\">
 	<input type='hidden' id='add_local_domain_form' value=\"{add_local_domain_form}\">
 	<input type='hidden' id='ou' value='$ou'>		
@@ -853,7 +856,7 @@ $HashDomains=$ldap->Hash_associated_domains($ou);
 			if(strlen($aliases->DomainsArray[$num])>0){$autoalias="{yes}";}else{$autoalias="{no}";}
 			
 			if($amavis_oui){
-				$amavis="
+				$amavis_infos="
 				<tr>
 				<td class=legend width=1% nowrap>{Anti-spam}:</td>
 				<td>". texttooltip("[{settings}]","{Anti-spam}:$num","Loadjs('domains.amavis.php?domain=$num')",null,0,"font-weight:bold;font-size:12px")."</td>
@@ -905,7 +908,7 @@ $HashDomains=$ldap->Hash_associated_domains($ou);
 				<td class=legend width=1% nowrap>{aliases}:</td>
 				<td><strong>$autoalias</strong></td>
 			</tr>
-			$amavis
+			$amavis_infos
 			$amavis_duplicate
 			$disclaimer_domain
 			</tr>

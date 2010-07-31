@@ -130,12 +130,16 @@ function downloadFile($url,$hostname)  {
    function WriteConfigToFile($myFile,$stringData){
    	if(!function_exists("writelogs")){include(dirname(__FILE__)."/logs.inc");}
    	if(!is_dir(dirname(__FILE__).'/conf')){mkdir(dirname(__FILE__).'/conf');}
-   	
+   	if(!is_dir(dirname(__FILE__).'/conf')){
+   		echo "Unable to create dir ".dirname(__FILE__).'/conf'."\n";
+   		return false;
+   	}
    	
    	$myFile=dirname(__FILE__).'/conf/'.$myFile;
-   	@file_put_contents($myFile,$stringData);
+   	file_put_contents($myFile,$stringData);
    	if(!is_file($myFile)){
    	if(function_exists("writelogs")){
+   		echo "Writing $myFile ". strlen($stringData)." bytes failed\n";
 		writelogs("Writing $myFile ". strlen($stringData)." bytes failed",__CLASS__.'/'.__FUNCTION__,__FILE__,__LINE__);
 		}
    		return false;

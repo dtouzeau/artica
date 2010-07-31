@@ -12,7 +12,7 @@
       <MainUnit Value="0"/>
       <TargetFileExt Value=""/>
       <Title Value="Artica make"/>
-      <ActiveEditorIndexAtStart Value="5"/>
+      <ActiveEditorIndexAtStart Value="1"/>
     </General>
     <VersionInfo>
       <ProjectVersion Value=""/>
@@ -491,8 +491,8 @@
         <Filename Value="setup_spamassassin.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="setup_spamassassin"/>
-        <CursorPos X="60" Y="111"/>
-        <TopLine Value="56"/>
+        <CursorPos X="34" Y="142"/>
+        <TopLine Value="90"/>
         <EditorIndex Value="1"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
@@ -792,7 +792,7 @@
         <IsPartOfProject Value="True"/>
         <UnitName Value="setup_drupal"/>
         <CursorPos X="20" Y="155"/>
-        <TopLine Value="1"/>
+        <TopLine Value="85"/>
         <EditorIndex Value="9"/>
         <UsageCount Value="23"/>
         <Loaded Value="True"/>

@@ -95,14 +95,22 @@ function BuildRules(){
 			@unlink("/etc/artica-postfix/fetchmail.schedules");
 			
 			if(is_array($multi_smtp)){
+				if($GLOBALS["DEBUG"]){print_r($multi_smtp);}
 				while (list ($hostname, $rules) = each ($multi_smtp)){
 					echo "Starting......: fetchmail $hostname save rules...\n";
 					@file_put_contents("/etc/postfix-$hostname/fetchmail.rc",@implode("\n",$rules));
 					@chmod("/etc/postfix-$hostname/fetchmail.rc",0600);
 					$schedule[]=multi_build_schedule($hostname);
+					if(!is_fetchmailset($hostname)){
+						$restart=true;
+					}else{
+						echo "Starting......: fetchmail $hostname already scheduled...\n";
+					}
 				}
-				@file_put_contents("/etc/artica-postfix/fetchmail.schedules",@implode("\n",$schedule));
-				system("/etc/init.d/artica-postfix restart fcron");
+				if($restart){
+					@file_put_contents("/etc/artica-postfix/fetchmail.schedules",@implode("\n",$schedule));
+					system("/etc/init.d/artica-postfix restart fcron");
+				}
 			}
 		return;
 		}
@@ -115,6 +123,27 @@ function BuildRules(){
 		echo "Starting......: fetchmail saving configuration file done\n";
 			
 }
+
+function is_fetchmailset($hostname){
+	
+	if(!is_array($GLOBALS["crontab"])){
+		exec("/usr/share/artica-postfix/bin/fcrontab -c /etc/artica-cron/artica-cron.conf  -l -u root 2>&1",$results);
+		$GLOBALS["crontab"]=$results;
+	}
+	if($GLOBALS["DEBUG"]){echo __FUNCTION__.":: $hostname ". count($GLOBALS["crontab"])." lines\n";}
+	$hostname=str_replace(".","\.",$hostname);
+	while (list ($i, $line) = each ($GLOBALS["crontab"])){
+		if(preg_match("#bin\/fetchmail.+?fetchmailrc\s+\/etc\/postfix-$hostname#",$line)){
+			return true;
+		}else{
+		if($GLOBALS["DEBUG"]){echo __FUNCTION__.":: $line NO MATCH #bin\/fetchmail.+?fetchmailrc \/etc\/$hostname#\n";}
+		}
+		
+	}
+	return false;
+	
+}
+
 
 function multi_get_smtp_ip($hostname){
 	if($GLOBALS["SMTP_HOSTS_IP_FETCHMAIL"][$hostname]<>null){return $GLOBALS["SMTP_HOSTS_IP_FETCHMAIL"][$hostname];}
@@ -135,7 +164,7 @@ function multi_build_schedule($hostname){
 	if($array[$hostname]["schedule"]==null){return null;}
 	if($array[$hostname]["schedule"]<2){return null;}
 	echo "Starting......: fetchmail $hostname scheduling each {$array[$hostname]["schedule"]}mn\n";
-	return "{$array[$hostname]["schedule"]} $fetchmail --nodetach --fetchmailrc /etc/postfix-$hostname/fetchmail.rc --logfile /var/log/fetchmail.log";
+	return "{$array[$hostname]["schedule"]} $fetchmail --nodetach --fetchmailrc /etc/postfix-$hostname/fetchmail.rc >>/var/log/fetchmail.log";
 	
 	
 }

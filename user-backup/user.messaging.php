@@ -29,13 +29,21 @@ function page(){
 	$page=CurrentPageName();
 	$allmails=table_allmails();
 	$block1=iconTable("canonical-64.png","{sender_canonical}",'{sender_canonical_text}',"Loadjs('sender.settings.php')");
-	$block2=iconTable("fetchmail-rule-64.png","{APP_FETCHMAIL}",'{user_fetchmail_explain}',"Loadjs('user.fetchmail.php')");
+	
 	if(IS_DISCLAIMER()){
 		$block4=iconTable("64-templates.png","{disclaimer_tiny}",'{user_disclaimer_explain}',"s_PopUp('$page?disclaimer=yes',800,800)");
 	}
 	
 	if(IS_ARTICA_FILTER()){
 		$block5=iconTable("64-templates.png","{vacation_message}",'{menu_OUT_OF_OFFICE_text}',"s_PopUp('vacation.php',800,600)");
+	}
+	
+	if($users->AllowFetchMails){
+		$block2=iconTable("fetchmail-rule-64.png","{APP_FETCHMAIL}",'{user_fetchmail_explain}',"Loadjs('user.fetchmail.php')");
+		if($users->imapsync_installed){
+			$block6=Paragraphe("sync-64.png","{import_mailbox}","{export_mailbox_text}","javascript:Loadjs('mailsync.php?uid={$_SESSION["uid"]}')");
+		}
+		
 	}
 	
 	
@@ -69,6 +77,7 @@ function page(){
 		<td valign='top' style=''>
 		$block4
 		$block5
+		$block6
 		</td>
 	</tr>
 	</table>

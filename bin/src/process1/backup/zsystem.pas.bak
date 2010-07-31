@@ -72,7 +72,7 @@ public
       DirListFiles:TstringList;
       constructor Create();
       function Load_DisableFollowServiceHigerThan1G():integer;
-      function CHECK_PERL_MODULES(ModulesToCheck:string):string;
+      function CHECK_PERL_MODULES_VER(ModulesToCheck:string):string;
 
       procedure Free;
       function COMMANDLINE_PARAMETERS(FoundWhatPattern:string):boolean;
@@ -1884,6 +1884,7 @@ begin
         exit;
      end;
   end;
+
   try
      ini:=TiniFile.Create('/etc/artica-postfix/versions.cache');
   except
@@ -7503,11 +7504,8 @@ function Tsystem.ETC_SERVICES_PORT(servicename:string):integer;
 var
  l:Tstringlist;
  tmpstr:string;
- zlogs:Tlogs;
  RegExpr:TRegExpr;
- r:Tstringlist;
  i:integer;
- cmd:string;
 begin
     result:=0;
     if not FileExists('/etc/services') then exit;
@@ -7626,6 +7624,7 @@ begin
    zlogs.Debuglogs('Tsystem.FSTAB_ADD found "'+devstring+'" AND "'+mountstring+'" in '+IntToStr(l.Count)+' lines');
 
    f:=false;
+   RegExpr:=TRegExpr.Create;
    for i:=0 to l.Count-1 do begin
        RegExpr.Expression:=devstring;
        if RegExpr.Exec(l.Strings[i]) then begin
@@ -7665,11 +7664,9 @@ var
    l:Tstringlist;
    RegExpr:TRegExpr;
    devstring:string;
-   mountstring:string;
    i:integer;
    etc_ld_so_conf_logs:Tlogs;
    f:boolean;
-   cmd:string;
 begin
    f:=false;
    devstring:=path;

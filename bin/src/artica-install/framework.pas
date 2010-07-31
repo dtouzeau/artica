@@ -6,7 +6,7 @@ unit framework;
 interface
 
 uses
-    Classes, SysUtils,variants,strutils,IniFiles, Process,md5,logs,unix,RegExpr in 'RegExpr.pas',zsystem,awstats,mailmanctl,tcpip,openldap,Baseunix;
+    Classes, SysUtils,variants,strutils, Process,logs,unix,RegExpr in 'RegExpr.pas',zsystem,awstats;
 
 type
   TStringDynArray = array of string;
@@ -17,12 +17,9 @@ type
 
 private
      LOGS:Tlogs;
-     D:boolean;
-     GLOBAL_INI:TiniFIle;
      SYS:TSystem;
      artica_path:string;
      awstats:tawstats;
-     pid_root_path:string;
      mem_pid:string;
     function    Explode(const Separator, S: string; Limit: Integer = 0):TStringDynArray;
 
@@ -34,7 +31,7 @@ EnableLighttpd:integer;
     InsufficentRessources:Boolean;
     procedure   Free;
     constructor Create(const zSYS:Tsystem);
-    procedure   START(notroubleshoot:boolean=false);
+    procedure   START();
     function    LIGHTTPD_BIN_PATH():string;
     function    LIGHTTPD_PID():string;
     procedure   STOP();
@@ -88,21 +85,14 @@ begin
    if FileExists('/usr/local/bin/php-cgi') then exit('/usr/local/bin/php-cgi');
 end;
 //##############################################################################
-procedure tframework.START(notroubleshoot:boolean);
+procedure tframework.START();
 var
-   cmdline:string;
-   count:integer;
-   pid:string;
-   user:string;
-   group:string;
-   logs_path:string;
-   daemon:boolean;
-   RegExpr:TRegExpr;
+  pid:string;
 begin
-   daemon:=LOGS.COMMANDLINE_PARAMETERS('--daemon');
+
 
 logs.Debuglogs('###################### FRAMEWORK #####################');
-   count:=0;
+
    if not FileExists(LIGHTTPD_BIN_PATH()) then begin
        logs.Debuglogs('LIGHTTPD_START():: it seems that lighttpd is not installed... Aborting');
        exit;
@@ -231,14 +221,11 @@ end;
 function tframework.DEFAULT_CONF():string;
 var
 l:TstringList;
-mailman:tmailman;
-user:string;
-RegExpr:TRegExpr;
-group,name:string;
 PHP_FCGI_CHILDREN:Integer;
 PHP_FCGI_MAX_REQUESTS:integer;
 max_procs:integer;
 begin
+result:='';
 l:=TstringList.Create;
 
 forceDirectories('/usr/share/artica-postfix/framework');

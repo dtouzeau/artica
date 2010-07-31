@@ -398,7 +398,7 @@ function ajax_popup(){
 function page_status($noecho=0){
 			$ini=new Bs_IniHandler();
 			$sock=new sockets();
-			$ini->loadString($sock->getfile('amavisstatus'));
+			$ini->loadString(base64_decode($sock->getFrameWork('cmd.php?amavis-get-status=yes')));
 			$status_amavis=DAEMON_STATUS_ROUND("AMAVISD",$ini,null);
 			$status_amavismilter=DAEMON_STATUS_ROUND("AMAVISD_MILTER",$ini,null);
 			$status_spamassassin=DAEMON_STATUS_ROUND("SPAMASSASSIN",$ini,null);
@@ -440,9 +440,9 @@ function main_page(){
 }
 
 function main_config_amavisfile(){
-	
-	$amavis=new amavis();
-	$tbl=explode("\n",$amavis->amavis_conf);
+	$sock=new sockets();
+	$conf=base64_decode($sock->getFrameWork("cmd.php?amavis-configuration-file=yes"));
+	$tbl=explode("\n",$conf);
 	$html="<div style='background-color:white;width:100%;height:600px;overflow:auto;font-size:11px;'>
 	<table style='width:100%'>
 	
@@ -560,12 +560,17 @@ function main_settings($noecho=0){
 	
 	//$apply=Paragraphe('system-64.png','{apply config}','{APPLY_SETTINGS_AMAVIS}',"javascript:Loadjs('$page?script=apply')",'APPLY_SETTINGS_AMAVIS',210,100);
 	$apply=Buildicon64("DEF_ICO_AMAVIS_RESTART",210,100);
-	$sanesecurity=Paragraphe('folder-64-denywebistes.png','SaneSecurity signatures','{sanesecurity_text}',"javascript:Loadjs('$page?sanesecurity-js=yes')",'sanesecurity_text',210,100);
+	
 	
 	
 	$prepost=Paragraphe("folder-equerre-64.png",'{postfix_hooking}','{postfix_hooking_text}',"javascript:Loadjs('$page?hooking-js=yes')",'postfix_hooking_text',210,100);
 	
 	$spf=Paragraphe("spf-logo-64.png",'{APP_SPF}','{APP_SPF_TINY_TEXT}',"javascript:Loadjs('spamassassin.spf.php')",'APP_SPF_TINY_TEXT',210,100);
+	
+	$users=new usersMenus();
+	if($users->CLAMD_INSTALLED){
+		$sanesecurity=Paragraphe('folder-64-denywebistes.png','SaneSecurity signatures','{sanesecurity_text}',"javascript:Loadjs('$page?sanesecurity-js=yes')",'sanesecurity_text',210,100);	
+	}
 	
 	$html="
 	<H5>{global_settings}</H5>

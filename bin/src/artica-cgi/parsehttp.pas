@@ -358,15 +358,7 @@ RegExpr.expression:='^ClusterDisableSlave';
        exit(true);
   end;
 
-RegExpr.expression:='^ChangeCyrusPassword:(.+)';
-  if RegExpr.Exec(uri) then begin
-       ldap:=topenldap.Create;
-       ldap.set_LDAP('cyrus_password',RegExpr.Match[1]);
-       fpsystem('/usr/share/artica-postfix/bin/process1 --force verbose password-cyrus');
-       GLOBAL_INI.THREAD_COMMAND_SET(GLOBAL_INI.get_ARTICA_PHP_PATH()+'/bin/artica-install --cyrus-checkconfig');
-       GLOBAL_INI.THREAD_COMMAND_SET('/etc/init.d/artica-postfix restart imap');
-       exit(true);
-  end;
+
 
 RegExpr.expression:='^LaunchRemoteInstall';
   if RegExpr.Exec(uri) then begin
@@ -3124,13 +3116,6 @@ if RegExpr.Exec(uri) then begin
    exit(true);
 end;
 
-RegExpr.expression:='ChangeDiskLabel:(.+?);(.+)';
-if RegExpr.Exec(uri) then begin
-   SYS:=Tsystem.Create();
-   logs.Debuglogs('ParseUri:: usb_change_label('+RegExpr.Match[1]+','+RegExpr.Match[2]+')');
-   SYS.usb_change_disk_label(RegExpr.Match[1],RegExpr.Match[2]);
-   exit(true);
-end;
 
 RegExpr.expression:='BuildUniquePartition:(.+?);(.+)';
 if RegExpr.Exec(uri) then begin

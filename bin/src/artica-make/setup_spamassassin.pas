@@ -139,6 +139,7 @@ if(length(libs.CHECK_PERL_MODULES('Mail::SpamAssassin')))>0 then begin
         writeln('installed');
         install.INSTALL_PROGRESS(CODE_NAME,'{installed}');
         install.INSTALL_STATUS(CODE_NAME,100);
+        fpsystem('sa-compile &');
         exit;
    end;
 

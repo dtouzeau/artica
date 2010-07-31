@@ -416,7 +416,7 @@ function SERVICE_OPTIONS_POPUP(){
 function memory(){
 	
 	$os=new os_system();
-	return  RoundedLightWhite($os->html_Memory_usage());
+	return  $os->html_Memory_usage();
 	
 	
 }
@@ -543,16 +543,13 @@ function SERVICES_STATUS(){
 	//echo($sock->getfile('daemons_status'));
 	
 	$table_header="<tr>
-		<th width=1% style='$style1$style2'>{status}</td>
+		<th width=1% style='$style1$style2'>&nbsp;</td>
 		<th  nowrap>{daemon}</td>
 		<th nowrap>&nbsp;</td>
-		<th nowrap>%CPU</td>
 		<th width=1% nowrap>{memory}</td>
-		<th width=1% nowrap>%{memory}</td>
-		<th width=1% nowrap>{pid}</td>
+		<th width=1% nowrap>{virtual_memory}</td>
 		<th width=1%>{version}</td>
 		<th nowrap >{uptime}</td>
-		<th width=1%>&nbsp;</td>
 		</tr>";
 
 	$inifile=dirname(__FILE__)."/ressources/logs/global.status.ini";
@@ -576,10 +573,11 @@ function SERVICES_STATUS(){
 			$html=$html . BuildRow($users,$ini->_params["APP_SYSLOGER"],"{APP_SYSLOGER}");
 			$html=$html . BuildRow($users,$ini->_params["SASLAUTHD"],"{APP_SASLAUTHD}");
 			$html=$html . BuildRow($users,$ini->_params["BOA"],"{APP_BOA}");
-			$html=$html . BuildRow($users,$ini->_params["FRAMEWORK"],"{APP_FRAMEWORK}");	
+			$html=$html . BuildRow($users,$ini->_params["FRAMEWORK"],"{APP_FRAMEWORK}");
+			$html=$html . BuildRow($users,$ini->_params["APP_GROUPWARE_APACHE"],"{APP_GROUPWARE_APACHE}");
 			$html=$html . BuildRow($users,$ini->_params["LDAP"],"{APP_LDAP}");
 			$html=$html . BuildRow($users,$ini->_params["ARTICA_MYSQL"],"{APP_MYSQL_ARTICA}");
-			$html=$html . BuildRow($users,$ini->_params["PDNS"],"{APP_PDNS}");
+			$html=$html . BuildRow($users,$ini->_params["APP_PDNS"],"{APP_PDNS}");
 			$html=$html . BuildRow($users,$ini->_params["PDNS_RECURSOR"],"{APP_PDNS_RECURSOR}");							
 			$html=$html . BuildRow($users,$ini->_params["BIND9"],"{APP_BIND9}");
 			$html=$html . BuildRow($users,$ini->_params["DHCPD"],"{APP_DHCP}");			
@@ -666,6 +664,7 @@ function SERVICES_STATUS(){
 		<div style='heigth:550px;overflow:auto'>
 		<table style='width:98%;margin:0px;padding:5px;'>$table_header";
 		$html=$html . BuildRow($users,$ini->_params["CYRUSIMAP"],"{APP_CYRUS}");
+		$html=$html . BuildRow($users,$ini->_params["ROUNDCUBE"],"{APP_ROUNDCUBE}");
 		$html=$html . BuildRow($users,$ini->_params["APP_ZARAFA_SERVER"],"{APP_ZARAFA_SERVER}");
 		$html=$html . BuildRow($users,$ini->_params["APP_ZARAFA_SPOOLER"],"{APP_ZARAFA_SPOOLER}");
 		$html=$html . BuildRow($users,$ini->_params["APP_ZARAFA_GATEWAY"],"{APP_ZARAFA_GATEWAY}");
@@ -764,7 +763,10 @@ function BuildRow($users,$array,$application_name){
 	$cpu_percent_total="&nbsp;";
 	$memory_percent_total="&nbsp;";
 	$uptime=$array["uptime"];
+	$master_cached_memory=$array["master_cached_memory"];
+	$processes_number=$array["processes_number"];
 	if($pid>0){$application_installed=1;}
+	if(strlen($master_version)>0){$application_installed=1;}
 	
 	//writelogs("$application_name installed:$application_installed ,pid=$pid memory=$master_memory",__FUNCTION__,__FILE__,__LINE__);
 	
@@ -797,12 +799,14 @@ function BuildRow($users,$array,$application_name){
 
 	}
 	
+	$info=imgtootltip("icon_info.gif","{processes}:<strong>$processes_number</strong><br>{pid}:<strong>$pid</strong>");
 	
 	if($service_disabled==null){$service_disabled=-1;}
 	
 	
-
+	writelogs("$application_name service_disabled=$service_disabled application_installed=$application_installed",__FUNCTION__,__FILE__,__LINE__);
 	if($master_memory>0){$master_memory=FormatBytes($master_memory);}
+	if($master_cached_memory>0){$master_cached_memory=FormatBytes($master_cached_memory);}
 	$style1='padding:3px;border-bottom:1px dotted #CCCCCC;font-size:11px;';
 	
 	if($application_installed<>1){
@@ -829,7 +833,7 @@ function BuildRow($users,$array,$application_name){
 			
 		}else{
 			
-			if($service_disabled==1){
+			if($service_disabled==0){
 				$img='warning24.png';
 				$status="{disabled}";
 				$tooltip="{service_disabled}";
@@ -845,7 +849,7 @@ function BuildRow($users,$array,$application_name){
 		}
 	}
 	
-	if($service_disabled=="0"){
+	if($service_disabled==0){
 		$img="warning24.png";
 		$js_service=null;
 		$tooltip="{service_disabled}";
@@ -871,15 +875,12 @@ function BuildRow($users,$array,$application_name){
 		<td width=1% style='$style1$style2'>
 			$image
 		</td>
-		<td style='$style1$style2' nowrap>&nbsp;$application_name</td>
-		<td style='$style1$style2' nowrap>$monit_settings</td>
-		<td style='$style1$style2' nowrap>&nbsp;$cpu_percent_total</td>
+		<td style='$style1$style2' nowrap>$application_name</td>
+		<td style='$style1$style2' nowrap valign='middle' align='center'>$info</td>
 		<td style='$style1$style2' width=1% nowrap>&nbsp;$master_memory</td>
-		<td style='$style1$style2' width=1% nowrap>&nbsp;$memory_percent_total</td>
-		<td style='$style1$style2' width=1%>&nbsp;$pid</td>
-		<td style='$style1$style2' width=1%>&nbsp;$master_version</td>
-		<td style='$style1$style2' >&nbsp;$uptime</td>
-		<td style='$style1$style2' width=1%>&nbsp;$status</td>
+		<td style='$style1$style2' width=1% nowrap>&nbsp;$master_cached_memory</td>
+		<td style='$style1$style2' width=1% nowrap>&nbsp;$master_version</td>
+		<td style='$style1$style2' nowrap width=1% nowrap>$uptime</td>
 		</tr>
 		";
 		

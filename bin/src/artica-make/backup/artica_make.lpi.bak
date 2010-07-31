@@ -12,7 +12,7 @@
       <MainUnit Value="0"/>
       <TargetFileExt Value=""/>
       <Title Value="Artica make"/>
-      <ActiveEditorIndexAtStart Value="9"/>
+      <ActiveEditorIndexAtStart Value="5"/>
     </General>
     <VersionInfo>
       <ProjectVersion Value=""/>
@@ -743,8 +743,8 @@
         <Filename Value="setup_zarafa.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="setup_zarafa"/>
-        <CursorPos X="14" Y="261"/>
-        <TopLine Value="234"/>
+        <CursorPos X="111" Y="424"/>
+        <TopLine Value="387"/>
         <EditorIndex Value="5"/>
         <UsageCount Value="53"/>
         <Loaded Value="True"/>
@@ -792,7 +792,7 @@
         <IsPartOfProject Value="True"/>
         <UnitName Value="setup_drupal"/>
         <CursorPos X="20" Y="155"/>
-        <TopLine Value="113"/>
+        <TopLine Value="1"/>
         <EditorIndex Value="9"/>
         <UsageCount Value="23"/>
         <Loaded Value="True"/>

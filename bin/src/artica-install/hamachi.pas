@@ -6,7 +6,7 @@ unit hamachi;
 interface
 
 uses
-    Classes, SysUtils,variants,strutils,IniFiles, Process,md5,logs,unix,RegExpr in 'RegExpr.pas',zsystem;
+    Classes, SysUtils,variants,strutils,IniFiles, Process,logs,unix,RegExpr in 'RegExpr.pas',zsystem;
 
   type
   thamachi=class
@@ -14,13 +14,9 @@ uses
 
 private
      LOGS:Tlogs;
-     D:boolean;
-     GLOBAL_INI:TiniFIle;
      SYS:TSystem;
      artica_path:string;
-     EnablePolicydWeight:integer;
      CONFIG_ARRAY:Tinifile;
-     EnablePostfixMultiInstance:integer;
      EnableHamachi:integer;
 public
     NETLIST:Tstringlist;
@@ -127,11 +123,6 @@ procedure thamachi.START();
 var
    pid:string;
    count:integer;
-   pid_path:string;
-   type_server:string;
-   LOGIN:string;
-   PASSWORD:string;
-   NETWORK:string;
    l:Tstringlist;
 
 
@@ -230,7 +221,6 @@ end;
 procedure thamachi.STOP();
 var
    count:integer;
-   l:TstringList;
    pid:string;
 begin
 
@@ -247,7 +237,7 @@ end;
 writeln('Stopping amachi..............: ' + pid + ' PID..');
 fpsystem('/bin/kill '+ pid);
 pid:=SYS.PIDOF(BIN_PATH());
-
+  count:=0;
   while SYS.PROCESS_EXIST(pid) do begin
         sleep(500);
         count:=count+1;
@@ -306,35 +296,15 @@ fpsystem('/etc/hamachi/list.sh');
 
 end;
 //#############################################################################
-
-
-
-
 function thamachi.STATUS();
 var
-   ini:TstringList;
-   pid,type_server:string;
-   disbaled:integer;
+   pidpath:string;
 begin
 if not FileExists(BIN_PATH()) then exit;
-pid:=SYS.PIDOF(BIN_PATH());
-disbaled:=1;
-type_server:=trim(GET_VALUE('TYPE'));
-if length(type_server)=0 then disbaled:=0;
-
-      ini:=TstringList.Create;
-      ini.Add('[APP_AMACHI]');
-      if SYS.PROCESS_EXIST(pid) then ini.Add('running=1') else  ini.Add('running=0');
-      ini.Add('application_installed=1');
-      ini.Add('master_pid='+ pid);
-      ini.Add('master_memory=' + IntToStr(SYS.PROCESS_MEMORY(pid)));
-      ini.Add('master_version=' + VERSION());
-      ini.Add('status='+SYS.PROCESS_STATUS(pid));
-      ini.Add('service_name=APP_AMACHI');
-      ini.Add('service_cmd=amachi');
-      ini.Add('service_disabled='+IntToStr(EnableHamachi));
-      result:=ini.Text;
-      ini.free;
+pidpath:=logs.FILE_TEMP();
+fpsystem(SYS.LOCATE_PHP5_BIN()+' /usr/share/artica-postfix/exec.status.php --hamachi >'+pidpath +' 2>&1');
+result:=logs.ReadFromFile(pidpath);
+logs.DeleteFile(pidpath);
 end;
 //##############################################################################
 end.

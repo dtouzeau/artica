@@ -822,17 +822,19 @@ pid:=AMAVISD_PID();
     if SYS.PROCESS_EXIST(pid) then begin
        logs.DebugLogs('Starting......: amavisd-new already exists using pid ' + pid+ '...');
        logs.DebugLogs('Starting......: Server memory: '+IntToStr(mem_installee)+' K');
-       if EnableAmavisInMasterCF=0 then begin
-          if FileExists('/var/spool/postfix/var/run/amavisd-new/amavisd-new.sock') then begin
-             logs.OutputCmd('/bin/chown postfix:postfix /var/spool/postfix/var/run/amavisd-new/amavisd-new.sock');
-          end else begin
-            CheckUnixSocketName();
-            STOP_AMAVISD();
-            exit;
-          end;
+       if EnablePostfixMultiInstance=0 then begin
+          if EnableAmavisInMasterCF=0 then begin
+             if FileExists('/var/spool/postfix/var/run/amavisd-new/amavisd-new.sock') then begin
+               logs.OutputCmd('/bin/chown postfix:postfix /var/spool/postfix/var/run/amavisd-new/amavisd-new.sock');
+             end else begin
+                CheckUnixSocketName();
+                STOP_AMAVISD();
+                exit;
+             end;
+           end;
+         end;
+         exit;
        end;
-       exit;
-    end;
 if FileExists('/etc/init.d/amavis') then SYS.DeleteService('amavis');
 if FileExists('/etc/init.d/amavisd-new-milter') then SYS.DeleteService('amavisd-new-milter');
 
@@ -878,6 +880,7 @@ forceDirectories('/var/log/artica-postfix/RTM');
 forceDirectories('/etc/amavis/dkim');
 
 forceDirectories('/tmp/savemail');
+fpsystem('/bin/chmod 777 /tmp/savemail');
 
 
 if not FileExists('/var/log/amavis/amavis.log') then begin
@@ -906,6 +909,8 @@ if fileExists('/var/spool/postfix/var/run/amavisd-new/amavisd-new.sock') then lo
 fpsystem(SYS.LOCATE_PHP5_BIN()+' /usr/share/artica-postfix/exec.amavis.php');
 
 forceDirectories('/var/amavis/.spamassassin');
+forceDirectories('/etc/amavis/dkim');
+
 fpsystem('/bin/chown -R postfix:postfix /var/amavis/.spamassassin');
 fpsystem('/bin/chmod 755 /var/amavis/.spamassassin');
 forceDirectories('/var/spool/postfix/var/run/amavisd-new');
@@ -915,6 +920,7 @@ fpsystem('/bin/chown -R postfix:postfix /var/spool/postfix/var/run/amavisd-new')
 fpsystem('/bin/chown -R postfix:postfix /var/log/amavis');
 fpsystem('/bin/chown -R postfix:postfix /etc/amavis/dkim');
 fpsystem('/bin/chmod 777 /var/log/artica-postfix/RTM');
+fpsystem('/bin/chmod 755 /etc/amavis/dkim');
 fpsystem('/bin/chmod -R 755 /etc/amavis/dkim');
 fpsystem('/bin/chown postfix:root /var/log/artica-postfix/RTM');
 
@@ -974,13 +980,14 @@ cmd:=cmd + '-S /var/amavis/var ';
 cmd:=cmd + '-L /var/amavis/run/amavis.lock ';
 cmd:=cmd + '-P /var/spool/postfix/var/run/amavisd-new/amavisd-new.pid ';
 cmd:=cmd + '-c /usr/local/etc/amavisd.conf ';
-if EnableAmavisInMasterCF=0 then begin
-   cmd:=cmd + '-p /var/spool/postfix/var/run/amavisd-new/amavisd-new.sock';
-end else begin
+if EnablePostfixMultiInstance=0 then begin
+   if EnableAmavisInMasterCF=0 then begin
+      cmd:=cmd + '-p /var/spool/postfix/var/run/amavisd-new/amavisd-new.sock';
+   end else begin
     logs.Debuglogs('Starting......: amavisd-new using port 10024');
     cmd:=cmd + '-p 10024';
+   end;
 end;
-
 cmd:=cmd+' start &';
 
 
@@ -1092,7 +1099,7 @@ l:TstringList;
 RegExpr:tRegExpr;
 i:Integer;
 begin
-
+    if EnablePostfixMultiInstance=1 then exit;
     if not FileExists('/usr/local/etc/amavisd.conf') then exit;
     l:=TstringList.Create;
     l.LoadFromFile('/usr/local/etc/amavisd.conf');
@@ -1450,95 +1457,25 @@ result:=AMAVISD_STATUS()+AMAVISD_MILTER_STATUS();
 end;
 //#########################################################################################
 function tamavis.AMAVISD_STATUS():string;
-var
-   ini:TstringList;
-   pid:string;
+var pidpath:string;
 begin
-if not FileExists(AMAVISD_BIN_PATH()) then exit;
-   ini:=TstringList.Create;
-   ini.Add('');
-   ini.Add('[AMAVISD]');
-   ini.Add('master_version='+AMAVISD_VERSION());
-   ini.Add('service_name=APP_AMAVISD_NEW');
-   ini.Add('service_cmd=amavis');
-   ini.Add('service_disabled='+IntToStr(EnableAmavisDaemon));
-
-   if EnableAmavisDaemon=0 then begin
-      SYS.MONIT_DELETE('APP_AMAVISD_NEW');
-      result:=ini.Text;
-      ini.free;
-      exit;
-   end;
-
-   if SYS.MONIT_CONFIG('APP_AMAVISD_NEW','/var/spool/postfix/var/run/amavisd-new/amavisd-new.pid','amavis') then begin
-      ini.add('monit=1');
-      result:=ini.Text;
-      ini.free;
-      exit;
-   end;
-
-
-   pid:=AMAVISD_PID();
-   if SYS.PROCESS_EXIST(pid) then ini.Add('running=1') else  ini.Add('running=0');
-   ini.Add('application_installed=1');
-   ini.Add('master_pid='+ pid);
-   ini.Add('master_memory=' + IntToStr(SYS.PROCESS_MEMORY(pid)));
-   ini.Add('status='+SYS.PROCESS_STATUS(pid));
-
-   result:=ini.Text;
-   ini.free;
-
+   SYS.MONIT_DELETE('APP_AMAVISD_NEW');
+   pidpath:=logs.FILE_TEMP();
+   fpsystem(SYS.LOCATE_PHP5_BIN()+' /usr/share/artica-postfix/exec.status.php --amavis >'+pidpath +' 2>&1');
+   result:=logs.ReadFromFile(pidpath);
+   logs.DeleteFile(pidpath);
 end;
 //#########################################################################################
 function tamavis.AMAVISD_MILTER_STATUS():string;
-var
-   ini:TstringList;
-   pid:string;
-   milter_enabled:integer;
+var pidpath:string;
 begin
-
-      if EnableAmavisDaemon=1 then begin
-         if EnableAmavisInMasterCF=1 then milter_enabled:=0 else milter_enabled:=1;
-      end;
-
-   if not FileExists(MILTER_BIN_PATH()) then exit;
-ini:=TstringList.Create;
-ini.add('');
-ini.Add('[AMAVISD_MILTER]');
-      ini.Add('service_name=APP_AMAVISD_MILTER');
-      ini.Add('service_cmd=amavis');
-      ini.Add('service_disabled='+IntToStr(milter_enabled));
-      ini.Add('service_cmd=amavis');
-
-  if milter_enabled=0 then begin
-      SYS.MONIT_DELETE('APP_AMAVISD_MILTER');
-      result:=ini.Text;
-      ini.free;
-      exit;
-   end;
-
-   if SYS.MONIT_CONFIG('APP_AMAVISD_MILTER','/var/spool/postfix/var/run/amavisd-milter/amavisd-milter.pid','amavis') then begin
-      ini.add('monit=1');
-      result:=ini.Text;
-      ini.free;
-      exit;
-   end;
-   pid:=MILTER_PID();
-
-      if SYS.PROCESS_EXIST(pid) then ini.Add('running=1') else  ini.Add('running=0');
-      ini.Add('application_installed=1');
-      ini.Add('master_pid='+ pid);
-      ini.Add('master_memory=' + IntToStr(SYS.PROCESS_MEMORY(pid)));
-      ini.Add('master_version='+MILTER_VERSION());
-      ini.Add('status='+SYS.PROCESS_STATUS(pid));
-
-   result:=ini.Text;
-   ini.free;
-
+   SYS.MONIT_DELETE('APP_AMAVISD_MILTER');
+   pidpath:=logs.FILE_TEMP();
+   fpsystem(SYS.LOCATE_PHP5_BIN()+' /usr/share/artica-postfix/exec.status.php --amavis-milter >'+pidpath +' 2>&1');
+   result:=logs.ReadFromFile(pidpath);
+   logs.DeleteFile(pidpath);
 end;
-
-
-
+//#########################################################################################
 procedure tamavis.AMAVIS_STAT_WRITE_CONF();
 var
 l:TstringList;
@@ -1750,13 +1687,12 @@ l.add('');
 l.add('amavis'+chr(9)+'unix'+chr(9)+'-'+chr(9)+'-'+chr(9)+'-'+chr(9)+'-'+chr(9)+'2'+chr(9)+'smtp');
 l.add('    -o smtp_data_done_timeout=1200');
 l.add('    -o smtp_send_xforward_command=yes');
+l.add('    -o smtp_generic_maps=');
+l.add('    -o sender_canonical_maps=');
 l.add('');
 l.add('');
 l.add('127.0.0.1:10025'+chr(9)+'inet'+chr(9)+'n'+chr(9)+'-'+chr(9)+'n'+chr(9)+'-'+chr(9)+'-'+chr(9)+'smtpd');
 if not TryStrToint(SYS.GET_INFO('EnableArticaSMTPFilter'),EnableArticaSMTPFilter) then EnableArticaSMTPFilter:=0;
-
-
-
 l.add('    -o notify_clases=protocol,resource,software');
 l.add('    -o header_checks=');
 if EnableArticaSMTPFilter=1 then begin
@@ -1786,6 +1722,8 @@ l.add('    -o smtp_send_xforward_command=yes');
 l.add('    -o disable_dns_lookups=yes');
 l.add('    -o local_header_rewrite_clients=');
 l.add('    -o smtpd_milters=');
+l.add('    -o smtp_generic_maps=');
+l.add('    -o sender_canonical_maps=');
 l.add('');
 
 try

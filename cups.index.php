@@ -48,6 +48,8 @@ function js(){
 	$error_no_ipaddr=$tpl->_ENGINE_parse_body("{error_no_ipaddr}");
 	$error_no_localization=$tpl->_ENGINE_parse_body("{error_no_localization}");
 	$page=CurrentPageName();
+	$start="CupsLoad();";
+	if(isset($_GET["in-front-ajax"])){$start="CupsLoad2();";}
 	$html="
 	
 var cups_timerID  = null;
@@ -79,6 +81,11 @@ function StartDrvLogs(){
    function CupsLoad(){
 		YahooWin2(750,'$page?cups-index=yes','$title');
 	}
+	
+   function CupsLoad2(){
+   		$('#BodyContent').load('$page?cups-index=yes');
+		
+	}	
 		
 	function CupsConnected(){
 		YahooWin3(450,'$page?cups-scan=yes','$title');
@@ -277,7 +284,7 @@ function StartDrvLogs(){
 	}
 		
 	
-	CupsLoad();	
+	$start
 	";
 	
 	echo $html;

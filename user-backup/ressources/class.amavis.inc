@@ -342,6 +342,9 @@ function buildconf(){
 		$myhostname=$users->fqdn;
 	}
 	
+	if(posix_getuid()==0){echo "Starting......: amavisd-new buildconf() EnablePostfixMultiInstance=$EnablePostfixMultiInstance\n";} 
+	
+	
 	if(!preg_match("#\..+?$#",$myhostname)){
 		$myhostname="$myhostname.local";
 	}
@@ -450,30 +453,50 @@ function buildconf(){
 		$conf=$conf."@local_domains_maps = ( [" . $this->GetLocalDomains()."] );  # list of all local domains\n";
 		$conf=$conf."@mynetworks = qw(".$this->BuildNetworks().");\n";
 		$conf=$conf."\n";
-		$conf=$conf."\$unix_socketname = \"/var/spool/postfix/var/run/amavisd-new/amavisd-new.sock\";  # amavisd-release or amavis-milter\n";
-		$conf=$conf."\$inet_socket_port = 10024;   # listen on this local TCP port(s)\n";
-		$conf=$conf."\$myhostname = \"$myhostname\";  # must be a fully-qualified domain name!\n";
+		if($EnablePostfixMultiInstance<>1){
+			$conf=$conf."\$unix_socketname = \"/var/spool/postfix/var/run/amavisd-new/amavisd-new.sock\";  # amavisd-release or amavis-milter\n";
+		}
+		
+		if($EnablePostfixMultiInstance==1){$multiple_policies=$this->LoadMultiPolicies();}
+		
+		if(!is_array($GLOBALS["inet_socket_port"])){
+			$conf=$conf."\$inet_socket_port = 10024;   # listen on this local TCP port(s)\n";
+		}else{
+			$GLOBALS["inet_socket_port"][]="10024";
+			$conf=$conf."\$inet_socket_port =  [". @implode(",",$GLOBALS["inet_socket_port"]). "]; # listen on this local TCP port(s)\n";
+		}
 
+		$conf=$conf."\$myhostname = \"$myhostname\";  # must be a fully-qualified domain name!\n";
+		
+		
+		
+		
+		
+		
 		$currentip=$this->getInternalIPs();
 		$conf=$conf."#adding net acl $currentip of all interfaces prevent DENIED ACCESS from IP 172.16.X.YYY\n";
+		$conf=$conf ."@inet_acl = qw($currentip);\n";
+		
 		if($EnablePostfixMultiInstance<>1){
 			if($EnableAmavisInMasterCF){
 				$conf=$conf ."\$inet_socket_bind ='127.0.0.1';\n";
 				$conf=$conf ."\$forward_method = 'smtp:[127.0.0.1]:10025';\n";
 				$conf=$conf ."\$notify_method = 'smtp:[127.0.0.1]:10025';\n";
-				$conf=$conf ."@inet_acl = qw($currentip);\n";
+				
 			}else{
 				$conf=$conf."\$forward_method ='pipe:flags=q argv=/usr/sbin/sendmail -Ac -i -f \${sender} -- \${recipient}';\n";
 				$conf=$conf."\$notify_method = \$forward_method;\n";	
 			}
 		}
 		
+		
+		
 		if($EnablePostfixMultiInstance==1){
 			echo "Starting......: amavisd-new multiple instances is enabled\n";
-			$conf=$conf .$this->LoadMultiPolicies();
-			
+			$conf=$conf .$multiple_policies;
 		}
 		
+
 		
 		
 		$conf=$conf."\n";
@@ -791,6 +814,8 @@ private function LoadMultiPolicies(){
 		$hostname=$main->myhostname;
 		echo "Starting......: amavisd-new $ip_address:$port for $hostname\n";
 		$interfaces[]="\$interface_policy{'$port'} = '$hostname';";
+		if(posix_getuid()==0){echo "Starting......: amavisd-new bin port:$port\n";} 
+		$GLOBALS["inet_socket_port"][]=$port;
 		$policy[]=$this->LoadMultiplePoliciesConfig($hostname);
 		$already[md5("$ip_address:$port")]=true;
 	}

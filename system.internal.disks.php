@@ -49,6 +49,12 @@ function js(){
 	$ADD_VG=$tpl->_ENGINE_parse_body('{ADD_VG}');
 	$unlink_hard_drive_confirm=$tpl->javascript_parse_text('{unlink_hard_drive_confirm}');
 	$link_hard_drive=$tpl->_ENGINE_parse_body('{link_hard_drive}');
+	$start="hdload()";
+	if(isset($_GET["in-front-ajax"])){
+		$start="hdload2()";
+	}
+	
+	
 	$html="
 	var mem_dev='';
 	var mem_vggroup='';
@@ -57,6 +63,10 @@ function js(){
 			YahooWin3('745','$page?display=yes','$title');
 		
 		}
+		
+		function hdload2(){
+			$('#BodyContent').load('$page?display=yes');	
+		}		
 		
 		function vgmanage(dev){
 			Loadjs('lvm.vg.php?dev='+dev);
@@ -266,7 +276,7 @@ function js(){
 		}
 	
 	
-		hdload();
+		$start;
 	";
 		
 		echo $html;
@@ -598,6 +608,7 @@ if(is_array($array)){
 	
 	while (list ($num, $line) = each ($array)){
 		if($num==null){continue;}
+		$label=null;
 		$perc=pourcentage($line["POURC"]);
 		
 		$MOUNTED=$line["MOUNTED"];
@@ -645,13 +656,16 @@ if(is_array($array)){
 		}
 		
 		
-		
+		if($line["CHANGE_LABEL"]){
+			if($line["ID_FS_LABEL"]==null){$line["ID_FS_LABEL"]="{unknown}";}
+			$label=texttooltip("{label}:{$line["ID_FS_LABEL"]}","{edit}: {label}",$line["CHANGE_LABEL_JS"]);
+		}
 		
 		$partitions=$partitions . "
 		
 		<tr>
 		<td width=1%>$icon</td>
-		<td><strong style='font-size:12px'>". basename($num)."</td>
+		<td><strong style='font-size:12px'>". basename($num)."&nbsp;$label</td>
 		<td valign='middle'><strong style='font-size:12px' >$perc</td>
 		<td width=1%  nowrap align='right'><strong style='font-size:12px' >{$line["USED"]}</td>
 		<td width=1% nowrap align='right'><strong style='font-size:12px' >{$line["SIZE"]}</td>
@@ -750,6 +764,9 @@ if(!is_file('ressources/usb.scan.inc')){
 		$PART_ARRAY["$dev_path"]["SIZE"]=$TOTSIZE;
 		$PART_ARRAY["$dev_path"]["TYPE"]=$line["TYPE"];
 		$PART_ARRAY["$dev_path"]["USED"]=$used;
+		$PART_ARRAY["$dev_path"]["ID_FS_LABEL"]=$line["ID_FS_LABEL"];
+		$PART_ARRAY["$dev_path"]["CHANGE_LABEL"]=false;
+		$PART_ARRAY["$dev_path"]["PVCREATE"]=false;
 		
 		if(($line["TYPE"]<>5) AND ($line["TYPE"]<>82)){
 			$PART_ARRAY["$dev_path"]["CHANGE_LABEL"]=true;
@@ -1156,8 +1173,15 @@ function ChangeLabel(){
 	$label=substr($label,0,16);
 	$label=trim($label);
 	$label=replace_accents($label);
+	
+	if($label==null){
+		echo "LABEL: NULL VALUE";
+		return;
+	}
+	
 	$sock=new sockets();
-	$sock->getfile("ChangeDiskLabel:{$_GET["ChangeLabel"]};$label");
+	$datas=unserialize(base64_decode($sock->getFrameWork("cmd.php?disk-change-label={$_GET["ChangeLabel"]}&name=$label")));
+	echo trim(@implode("\n",$datas));
 	}
 	
 function BuildBigPartition(){

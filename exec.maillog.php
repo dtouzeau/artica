@@ -15,6 +15,7 @@ if(!Build_pid_func(__FILE__,"MAIN")){
 $pid=getmypid();
 $pidfile="/etc/artica-postfix/".basename(__FILE__).".pid";
 $sock=new sockets();
+$unix=new unix();
 events("running $pid ");
 file_put_contents($pidfile,$pid);
 include_once(dirname(__FILE__).'/ressources/class.ini.inc');
@@ -29,7 +30,8 @@ $GLOBALS["PopHackCount"]=$sock->GET_INFO("PopHackCount");
 if($GLOBALS["PopHackEnabled"]==null){$GLOBALS["PopHackEnabled"]=1;}
 if($GLOBALS["PopHackCount"]==null){$GLOBALS["PopHackCount"]=10;}
 
-$unix=new unix();
+
+
 $GLOBALS["postfix_bin_path"]=$unix->find_program("postfix");
 
 @mkdir("/etc/artica-postfix/cron.1",0755,true);
@@ -108,10 +110,48 @@ if(preg_match("#amavis\[.+?\s+loaded$#",trim($buffer))){return null;}
 if(preg_match("#amavis\[.+?\s+Internal decoder#",trim($buffer))){return null;}
 if(preg_match("#amavis\[.+?\s+Creating db#",trim($buffer))){return null;}
 
+
+
+if(preg_match("#KASERROR.+?keepup2date\s+failed.+?no valid license info found#",$buffer,$re)){
+	events("Kas3, license error, uninstall kas3");
+	$file="/etc/artica-postfix/croned.1/kas3.license.error";
+	if(file_time_min($file)>5){
+		email_events("Kaspersky Antispam: license error","Kaspersku Updater claim\n$buffer\nArtica will uninstall Kaspersky Anti-spam","postfix");
+		THREAD_COMMAND_SET("/usr/share/artica-postfix/bin/artica-install --kas3-remove");
+		@unlink($file);
+		file_put_contents($file,"#");
+	}
+	
+	return;
+}
+
+
+if(preg_match("#postfix\/postfix-script\[.+?\]: fatal: the Postfix mail system is not running#",$buffer,$re)){
+	THREAD_COMMAND_SET("{$GLOBALS["postfix_bin_path"]} start");
+	return;
+}
+
+
 if(preg_match("#zarafa-server\[.+?: SQL Failed: Table.+?zarafa\.(.+?)'\s+doesn.+?exist#",$buffer,$re)){
 	events("Zarafa, missing table {$re[1]}");
 	zarafa_rebuild_db($table,$buffer);
 }
+
+if(preg_match("#zarafa-server\[.+?INNODB engine is not support.+?Please enable the INNODB engine#",$buffer,$re)){
+	events("Zarafa, INNODB not enabled, restart mysql {$re[1]}");
+	$file="/etc/artica-postfix/croned.1/zarafa.INNODB.error";
+	if(file_time_min($file)>5){
+		email_events("Zarafa server: innodb is not enabled","Zarafa-server claim\n$buffer\nArtica will restart mysql","mailbox");
+		THREAD_COMMAND_SET("/etc/init.d/artica-postfix restart mysql");
+		@unlink($file);
+		file_put_contents($file,"#");
+	}
+	
+	return;
+}
+
+
+
 
 if(preg_match("#zarafa-server\[.+?:\s+Cannot instantiate user plugin: ldap_bind_s: Invalid credentials#",$buffer,$re)){
 	$file="/etc/artica-postfix/croned.1/zarafa.ldap_bind_s.error";
@@ -126,7 +166,7 @@ if(preg_match("#zarafa-server\[.+?:\s+Cannot instantiate user plugin: ldap_bind_
 	return;
 }
 
-if(preg_match("#smtp\[.+? fatal: specify a password table via the.+?smtp_sasl_password_maps.+?configuration parameter#",$re)){
+if(preg_match("#smtp\[.+? fatal: specify a password table via the.+?smtp_sasl_password_maps.+?configuration parameter#",$buffer,$re)){
 	$file="/etc/artica-postfix/croned.1/postfix.smtp_sasl_password_maps.error";
 	events("postfix -> smtp_sasl_password_maps");
 	if(file_time_min($file)>5){
@@ -138,7 +178,7 @@ if(preg_match("#smtp\[.+? fatal: specify a password table via the.+?smtp_sasl_pa
 	return;	
 }
 
-if(preg_match("#amavis\[.+?TROUBLE.+?in child_init_hook: BDB can't connect db env.+?No such file or directory#",$re)){
+if(preg_match("#amavis\[.+?TROUBLE.+?in child_init_hook: BDB can't connect db env.+?No such file or directory#",$buffer,$re)){
 	$file="/etc/artica-postfix/croned.1/amavis.BDB.error";
 	events("amavis BDB ERROR");
 	if(file_time_min($file)>5){
@@ -235,6 +275,19 @@ if(preg_match("#postfix\/.+?:(.+?):\s+to=<(.+?)>,.+?\[(.+?)\].+?status=deferred.
 	event_messageid_rejected($re[1],"antivirus failed",$re[3],$re[2]);
 	return null;
 	}
+	
+if(preg_match("#smtp\[[0-9]+\]:\s+(.+?):\s+to=<(.+?)>,\s+relay=127\.0\.0.+:[0-9]+,.+?deferred.+?451.+?during fwd-connect\s+\(Negative greeting#",$buffer,$re)){
+	event_messageid_rejected($re[1],"Internal timed-out","127.0.0.1",$re[2]);
+	$file="/etc/artica-postfix/croned.1/timedout-amavis";
+	events("fwd-connect ERROR");
+	if(file_time_min($file)>5){
+		THREAD_COMMAND_SET("{$GLOBALS["postfix_bin_path"]} stop");
+		THREAD_COMMAND_SET("{$GLOBALS["postfix_bin_path"]} start");
+		@unlink($file);
+		file_put_contents($file,"#");
+	}
+	return;		
+}
 	
 	
 if(preg_match("#master\[.+?:\s+fatal:\s+binds\+(.+?)\s+port\s+(.+?).+?Address already in use#",$buffer,$re)){
@@ -1426,6 +1479,31 @@ if(preg_match("#host.+?\[(.+?)\]\s+said:.+?<(.+?)>: Recipient address rejected: 
 			}
 			
 			
+if(preg_match("#said:.+?Authentication required#",$bounce_error)){
+			$status="Error";
+			$delivery_success="no";
+			$bounce_error="Authentication required";	
+}
+
+if(preg_match("#temporary failure.+?[0-9]+\s+[0-9\.]+\s+Bad sender address syntax.+?could not send mail#",$bounce_error)){
+			$status="Error";
+			$delivery_success="no";
+			$bounce_error="Bad sender address syntax";	
+}
+
+if(preg_match("#connect.+?Permission denied#",$bounce_error)){
+			$status="Error";
+			$delivery_success="no";
+			$bounce_error="service permissions error";	
+}
+
+if(preg_match("#Command died with status 255:.+?exec\.artica-filter\.php#",$bounce_error)){
+			$status="Error";
+			$delivery_success="no";
+			$bounce_error="artica-filter error";
+}
+
+
 			
 
 if($delivery_success=="no"){

@@ -55,6 +55,7 @@ var x_AddWebService= function (obj) {
 			}
 			document.getElementById('wwwInfos').innerHTML='';
 			YahooWinHide();
+			RefreshTab('org_main');
 			if(document.getElementById('ORG_VHOSTS_LIST')){
 				LoadAjax('ORG_VHOSTS_LIST','domains.manage.org.index.php?ORG_VHOSTS_LIST=$ou');
 			}
@@ -70,6 +71,7 @@ var x_AddWebService= function (obj) {
 				}
 			document.getElementById('wwwInfos').innerHTML='';
 			YahooWinHide();
+			RefreshTab('org_main');
 			if(document.getElementById('ORG_VHOSTS_LIST')){
 				LoadAjax('ORG_VHOSTS_LIST','domains.manage.org.index.php?ORG_VHOSTS_LIST=$ou');
 			}

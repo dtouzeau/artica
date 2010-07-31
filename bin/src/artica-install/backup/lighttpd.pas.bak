@@ -6,7 +6,7 @@ unit lighttpd;
 interface
                                                               
 uses
-    Classes, SysUtils,variants,strutils,IniFiles, Process,md5,logs,unix,RegExpr in 'RegExpr.pas',zsystem,awstats,mailmanctl,tcpip,openldap,Baseunix,mysql_daemon,zarafa_server;
+    Classes, SysUtils,variants,strutils,IniFiles, Process,logs,unix,RegExpr in 'RegExpr.pas',zsystem,awstats,mailmanctl,tcpip,mysql_daemon,zarafa_server;
 
 type
   TStringDynArray = array of string;
@@ -17,8 +17,6 @@ type
 
 private
      LOGS:Tlogs;
-     D:boolean;
-     GLOBAL_INI:TiniFIle;
      SYS:TSystem;
      artica_path:string;
      awstats:tawstats;
@@ -60,7 +58,7 @@ public
     procedure   TROUBLESHOTLIGHTTPD();
     function    lighttpd_server_key(key:string):string;
 
-    function    POMMO_ALIASES():string;
+    procedure    POMMO_ALIASES();
     function    POMMO_VERSION():string;
 
     procedure   PHPMYADMIN();
@@ -226,7 +224,6 @@ var
 RegExpr:TRegExpr;
 l:TStringList;
 i:integer;
-D:Boolean;
 begin
 
 if length(pid_root_path)>0 then exit(pid_root_path);
@@ -326,7 +323,6 @@ var
    user:string;
    group:string;
    logs_path:string;
-   daemon:boolean;
    RegExpr:TRegExpr;
 begin
 
@@ -378,19 +374,16 @@ end;
 //##############################################################################
 procedure Tlighttpd.LIGHTTPD_START(notroubleshoot:boolean);
 var
-   cmdline:string;
-   count:integer;
    pid:string;
    user:string;
    group:string;
-   logs_path:string;
    daemon:boolean;
    RegExpr:TRegExpr;
 begin
    daemon:=LOGS.COMMANDLINE_PARAMETERS('--daemon');
 
 logs.Debuglogs('###################### LIGHTTPD #####################');
-   count:=0;
+
    if not FileExists(LIGHTTPD_BIN_PATH()) then begin
        logs.Debuglogs('LIGHTTPD_START():: it seems that lighttpd is not installed... Aborting');
        exit;
@@ -413,7 +406,7 @@ logs.Debuglogs('###################### LIGHTTPD #####################');
    logs.DeleteFile('/var/log/lighttpd/error.log');
 
 
-   logs_path:=LIGHTTPD_LOG_PATH();
+
    user:=LIGHTTPD_GET_USER();
    RegExpr:=TRegExpr.Create;
    RegExpr.Expression:='(.+?):(.+)';
@@ -550,7 +543,7 @@ end;
 
 procedure Tlighttpd.IS_CGI_SPAWNED();
 var
-   cmd:string;
+
    tmpstr:string;
    l:Tstringlist;
    RegExpr:TRegExpr;
@@ -810,42 +803,14 @@ end;
 //##############################################################################
 FUNCTION Tlighttpd.STATUS():string;
 var
-   ini:TstringList;
-   ApacheArticaEnabled:integer;
+   pidpath:string;
 begin
-  if not FileExists(LIGHTTPD_BIN_PATH()) then exit;
-  ini:=TstringList.Create;
-  ini.Add('[LIGHTTPD]');
-  ini.Add('service_disabled='+IntToStr(EnableLighttpd));
-  ini.Add('service_name=APP_LIGHTTPD');
-  ini.Add('service_cmd=apache');
-  ini.Add('master_version=' + LIGHTTPD_VERSION());
-  if not TryStrToInt(SYS.GET_INFO('ApacheArticaEnabled'),ApacheArticaEnabled) then ApacheArticaEnabled:=0;
-  if ApacheArticaEnabled=1 then EnableLighttpd:=0;
-
-
-     if EnableLighttpd=0 then begin
-         result:=ini.Text;
-         ini.free;
-         SYS.MONIT_DELETE('APP_LIGHTTPD');
-         exit;
-     end;
-
-      if SYS.MONIT_CONFIG('APP_LIGHTTPD',LIGHTTPD_PID_PATH(),'apache') then begin
-         ini.Add('monit=1');
-         result:=ini.Text;
-         ini.free;
-         exit;
-      end;
-
-   if SYS.PROCESS_EXIST(LIGHTTPD_PID()) then ini.Add('running=1') else  ini.Add('running=0');
-   ini.Add('master_pid='+LIGHTTPD_PID());
-   ini.Add('master_memory=' + IntToStr(SYS.PROCESS_MEMORY(LIGHTTPD_PID())));
-   ini.Add('status='+SYS.PROCESS_STATUS(LIGHTTPD_PID()));
-
-
-result:=ini.Text;
-ini.free
+SYS.MONIT_DELETE('APP_LIGHTTPD');
+if not FileExists(LIGHTTPD_BIN_PATH()) then exit;
+pidpath:=logs.FILE_TEMP();
+fpsystem(SYS.LOCATE_PHP5_BIN()+' /usr/share/artica-postfix/exec.status.php --lighttpd >'+pidpath +' 2>&1');
+result:=logs.ReadFromFile(pidpath);
+logs.DeleteFile(pidpath);
 end;
 //#########################################################################################
 procedure Tlighttpd.LIGHTTPD_CERTIFICATE();
@@ -886,25 +851,37 @@ var
      RegExpr:TRegExpr;
      i:integer;
      tmpstr:string;
+     D:boolean;
+     cmd:string;
 begin
     if not FileExists(LIGHTTPD_BIN_PATH()) then exit;
-
+    D:=SYS.COMMANDLINE_PARAMETERS('--verbose');
     result:=SYS.GET_CACHE_VERSION('APP_LIGHTTPD');
-    if length(result)>0 then exit;
+    if length(result)>2 then exit;
     tmpstr:=logs.FILE_TEMP();
+    cmd:=LIGHTTPD_BIN_PATH()+' -v >'+tmpstr+' 2>&1';
+    if D then writeln(cmd);
 
-    fpsystem(LIGHTTPD_BIN_PATH()+' -v >'+tmpstr+' 2>&1');
+    fpsystem(cmd);
     if not FileExists(tmpstr) then exit;
     l:=TStringList.Create;
     l.LoadFromFile(tmpstr);
     logs.DeleteFile(tmpstr);
     RegExpr:=TRegExpr.Create;
-    RegExpr.Expression:='lighttpd-([0-9\.]+)';
+
     For i:=0 to l.Count-1 do begin
+        RegExpr.Expression:='lighttpd-([0-9\.]+)';
         if RegExpr.Exec(l.Strings[i]) then begin
             result:=RegExpr.Match[1];
             logs.Debuglogs('LIGHTTPD_VERSION:: ' + result);
         end;
+
+        RegExpr.Expression:='lighttpd\/([0-9\.]+)';
+        if RegExpr.Exec(l.Strings[i]) then begin
+            result:=RegExpr.Match[1];
+            logs.Debuglogs('LIGHTTPD_VERSION:: ' + result);
+        end;
+
     end;
 
     SYS.SET_CACHE_VERSION('APP_LIGHTTPD',result);
@@ -1030,14 +1007,12 @@ end;
 
 end;
 //##############################################################################
-function Tlighttpd.POMMO_ALIASES():string;
+procedure Tlighttpd.POMMO_ALIASES();
 var
 RegExpr:TRegExpr;
 l:TStringList;
 f:boolean;
-user:string;
 i:integer;
-version:string;
 begin
 
 if not DirectoryExists('/usr/share/pommo') then begin
@@ -1175,16 +1150,9 @@ end;
 //##############################################################################
 procedure Tlighttpd.LIGHTTPD_ADD_INCLUDE_PATH();
 var
-   php:TiniFile;
    l  :TstringList;
    t  :Tstringlist;
-   obm_share:string;
-   original_include:string;
-   new_include:string;
-   i,a:integer;
-   open_basedir:string;
-   dirs:TStringDynArray;
-   open_basedirt:boolean;
+   i:integer;
    timezone:string;
    mysql:tmysql_daemon;
    mysql_socket:string;
@@ -1437,13 +1405,13 @@ if FileExists(SYS.LOCATE_APC_SO()) then begin
    end;
 end;
 
-
-
-if FileExists(SYS.LOCATE_MAPI_SO()) then begin
+zarafa:=tzarafa_server.Create(SYS);
+if FileExists(zarafa.BIN_PATH()) then begin
+   if FileExists(SYS.LOCATE_MAPI_SO()) then begin
      logs.Debuglogs('Starting......: lighttpd: register mapi.so');
      l.Add('extension=mapi.so');
+   end;
 end;
-
 
   t:=Tstringlist.Create;
   t.add('/etc/php.ini');
@@ -1766,14 +1734,18 @@ PHP_FCGI_MAX_REQUESTS:integer;
 max_procs:integer;
 roundcube_folder:string;
 zarafa:tzarafa_server;
+ArticaHttpsPort:integer;
 begin
-
+ArticaHttpsPort:=9000;
 user:=LIGHTTPD_GET_USER();
 if length(user)=0 then user:=SYS.GET_INFO('LighttpdUserAndGroup');
 if length(user)=0 then begin
    user:='www-data:www-data';
    SYS.set_INFO('LighttpdUserAndGroup',user);
 end;
+
+if not TrYStrToInt(SYS.GET_INFO('ArticaHttpsPort'),ArticaHttpsPort) then ArticaHttpsPort:=9000;
+logs.Debuglogs('Starting......: lighttpd: runnin on port '+IntToStr(ArticaHttpsPort));
 
 RegExpr:=TRegExpr.Create;
 RegExpr.Expression:='(.+?):(.+)';
@@ -1875,7 +1847,7 @@ l.Add('accesslog.filename          = "/var/log/lighttpd/access.log"');
 l.Add('url.access-deny             = ( "~", ".inc" )');
 l.Add('');
 l.Add('static-file.exclude-extensions = ( ".php", ".pl", ".fcgi" )');
-l.Add('server.port                 = 9000');
+l.Add('server.port                 = '+IntToStr(ArticaHttpsPort));
 l.Add('#server.bind                = "127.0.0.1"');
 l.Add('#server.error-handler-404   = "/error-handler.html"');
 l.Add('#server.error-handler-404   = "/error-handler.php"');

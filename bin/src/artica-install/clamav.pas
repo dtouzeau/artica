@@ -52,7 +52,6 @@ public
     procedure MILTER_STOP();
     function  MILTER_SOCK_PATH():string;
     function  MILTER_GET_SOCK_PATH():string;
-    FUNCTION  MILTER_STATUS():string;
     procedure MILTER_CHANGE_INITD();
 
     
@@ -73,7 +72,6 @@ public
     function  CLAMAV_INITD():string;
     FUNCTION  CLAMAV_STATUS():string;
     function  CLAMSCAN_BIN_PATH():string;
-    FUNCTION  CLAMSCAN_STATUS():string;
     function  CLAMAV_CONFIG_BIN_PATH():string;
     function  StartStopDaemonPath():string;
     
@@ -83,7 +81,6 @@ public
     function  FRESHCLAM_CONF_PATH():string;
     function  FRESHCLAM_GETINFO(Key:String):string;
     procedure FRESHCLAM_SETINFO(Key:String;value:string);
-    FUNCTION  FRESHCLAM_STATUS():string;
     function  FRESHCLAM_PID() :string;
     procedure FRESHCLAM_START();
     procedure FRESHCLAM_CLEAN();
@@ -151,9 +148,7 @@ end;
 //##############################################################################
 function TClamav.MILTER_DAEMON_PATH():string;
 begin
-    if FileExists('/usr/local/sbin/clamav-milter') then exit('/usr/local/sbin/clamav-milter');
-    if FileExists('/usr/sbin/clamav-milter') then exit('/usr/sbin/clamav-milter');
-
+    result:=SYS.LOCATE_GENERIC_BIN('clamav-milter');
 end;
 //#############################################################################
 function TClamav.StartStopDaemonPath():string;
@@ -288,43 +283,6 @@ if length(pid)=0 then pid:=SYS.PIDOF(FRESHCLAM_PATH());
 result:=pid;
 end;
 //##############################################################################
-FUNCTION TClamav.FRESHCLAM_STATUS():string;
-var
-   ini:TstringList;
-begin
-if not FileExists(FRESHCLAM_PATH()) then exit;
-
-   ini:=TstringList.Create;
-   ini.Add('[FRESHCLAM]');
-      ini.Add('service_name=APP_FRESHCLAM');
-      ini.Add('service_cmd=freshclam');
-      ini.Add('service_disabled='+IntToStr(EnableFreshClam));
-      ini.Add('master_version=' + CLAMAV_VERSION());
-
-     if EnableFreshClam=0 then begin
-         result:=ini.Text;
-         ini.free;
-         SYS.MONIT_DELETE('APP_FRESHCLAM');
-         exit;
-     end;
-
-      if SYS.MONIT_CONFIG('APP_FRESHCLAM',FRESHCLAM_GETINFO('PidFile'),'freshclam') then begin
-         ini.Add('monit=1');
-         result:=ini.Text;
-         ini.free;
-         exit;
-      end;
-
-
-      if SYS.PROCESS_EXIST(FRESHCLAM_PID()) then ini.Add('running=1') else  ini.Add('running=0');
-      ini.Add('application_installed=1');
-      ini.Add('master_pid='+ FRESHCLAM_PID());
-      ini.Add('master_memory=' + IntToStr(SYS.PROCESS_MEMORY(FRESHCLAM_PID())));
-      ini.Add('status='+SYS.PROCESS_STATUS(FRESHCLAM_PID()));
-      result:=ini.Text;
-      ini.free;
-end;
-//#########################################################################################
 function Tclamav.PATTERNS_VERSIONS():string;
 var
  DatabaseDirectory:string;
@@ -597,69 +555,20 @@ end;
 
 FUNCTION TClamav.CLAMAV_STATUS():string;
 var
-   ini:TstringList;
+   pidpath:string;
 begin
+if FileExists('/etc/artica-postfix/KASPER_MAIL_APP') then exit;
+SYS.MONIT_DELETE('APP_CLAMAV');
+SYS.MONIT_DELETE('APP_CLAMAV_MILTER');
+SYS.MONIT_DELETE('APP_FRESHCLAM');
+pidpath:=logs.FILE_TEMP();
+fpsystem(SYS.LOCATE_PHP5_BIN()+' /usr/share/artica-postfix/exec.status.php --clamav >'+pidpath +' 2>&1');
+result:=logs.ReadFromFile(pidpath);
+logs.DeleteFile(pidpath);
 
-   if not FileExists(CLAMD_BIN_PATH()) then begin
-       SYS.MONIT_DELETE('APP_CLAMAV');
-       exit;
-   end;
-
-   ini:=TstringList.Create;
-   ini.Add('[CLAMAV]');
-      ini.Add('pattern_version=' + CLAMAV_PATTERN_VERSION());
-      ini.Add('service_name=APP_CLAMAV');
-      ini.Add('service_cmd=clamd');
-      ini.Add('service_disabled='+ IntToStr(EnableClamavDaemon));
-      ini.Add('master_version=' + CLAMAV_VERSION());
-
-     if EnableClamavDaemon=0 then begin
-         result:=ini.Text;
-         ini.free;
-         SYS.MONIT_DELETE('APP_CLAMAV');
-         exit;
-     end;
-
-      if SYS.MONIT_CONFIG('APP_CLAMAV',CLAMD_GETINFO('PidFile'),'mgreylist') then begin
-         ini.Add('monit=1');
-         result:=ini.Text;
-         ini.free;
-         exit;
-      end;
-
-       if SYS.PROCESS_EXIST(CLAMD_PID()) then ini.Add('running=1') else  ini.Add('running=0');
-      ini.Add('application_installed=1');
-      ini.Add('master_pid='+ CLAMD_PID());
-      ini.Add('master_memory=' + IntToStr(SYS.PROCESS_MEMORY(CLAMD_PID())));
-      ini.Add('status='+SYS.PROCESS_STATUS(CLAMD_PID()));
-result:=ini.Text;
-ini.free
 end;
 
 //#########################################################################################
-FUNCTION TClamav.CLAMSCAN_STATUS():string;
-var
-   ini:TstringList;
-
-begin
-  if not FileExists(CLAMSCAN_BIN_PATH())then exit;
-  ini:=TstringList.Create;
-ini.Add('[CLAMSCAN]');
-ini.Add('application_installed=1');
-      ini.Add('master_pid=0');
-      ini.Add('master_memory=0');
-      ini.Add('master_version=' + CLAMAV_VERSION());
-      ini.Add('status=command line');
-      ini.Add('pattern_version=' + CLAMAV_PATTERN_VERSION());
-      ini.Add('service_name=APP_CLAMSCAN');
-      ini.Add('service_cmd=');
-result:=ini.Text;
-ini.free
-
-end;
-//#########################################################################################
-
-
 procedure TClamav.CLAMD_STOP();
 var
 procs:string;
@@ -1303,48 +1212,6 @@ begin
 
 end;
 //##############################################################################
-FUNCTION TClamav.MILTER_STATUS():string;
-var
-   ini:TstringList;
-   pid:string;
-begin
-if not FileExists(MILTER_DAEMON_PATH()) then exit;
-      ini:=TstringList.Create;
-      pid:=MILTER_PID();
-
-      ini.Add('[CLAMAV_MILTER]');
-      ini.Add('master_version=' + CLAMAV_VERSION());
-      ini.Add('pattern_version=' + CLAMAV_PATTERN_VERSION());
-      ini.Add('service_disabled='+ IntToStr(ClamavMilterEnabled));
-      ini.Add('service_name=APP_CLAMAV_MILTER');
-      ini.Add('service_cmd=clammilter');
-
-
-      if ClamavMilterEnabled=0 then begin
-            result:=ini.Text;
-            SYS.MONIT_DELETE('APP_CLAMAV_MILTER');
-            ini.free;
-            exit;
-      end;
-
-
-      if SYS.MONIT_CONFIG('APP_CLAMAV_MILTER','/var/spool/postfix/var/run/clamav/clamav-milter.pid','clammilter') then begin
-         ini.Add('monit=1');
-         result:=ini.Text;
-         ini.free;
-         exit;
-      end;
-
-      if SYS.PROCESS_EXIST(pid) then ini.Add('running=1') else  ini.Add('running=0');
-      ini.Add('application_installed=1');
-      ini.Add('master_pid='+ pid);
-      ini.Add('master_memory=' + IntToStr(SYS.PROCESS_MEMORY(pid)));
-      ini.Add('status='+SYS.PROCESS_STATUS(pid));
-      result:=ini.Text;
-      ini.free
-end;
-
-//#########################################################################################
 function TClamav.CLAMAV_VERSION():string;
 var
     RegExpr:TRegExpr;

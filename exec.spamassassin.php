@@ -21,6 +21,8 @@ if(preg_match("#--force#",implode(" ",$argv))){$GLOBALS["FORCE"]=true;}
 		write_syslog("want to change spamassassin settings but could not stat main configuration file",__FILE__);
 	}
 	
+	x_headers();
+	x_bounce();
 	
 	if($argv[1]=='--spf'){spf();die();}
 	if($argv[1]=='--dkim'){dkim();die();}
@@ -111,7 +113,7 @@ function CleanConf($confPath){
 }
 
 function spf(){
-	
+
 	$sock=new sockets();
 	$EnableSPF=$sock->GET_INFO("EnableSPF");
 	if($EnableSPF==null){$EnableSPF=1;}
@@ -220,7 +222,7 @@ function dkim(){
 		echo "Starting......: spamassassin writing dkim.pre inbound verification disabled\n";
 		return ;
 	}
-	
+$r[]="loadplugin Mail::SpamAssassin::Plugin::DKIM";	
 $r[]="  score DKIM_VERIFIED -0.1";
 $r[]="  score DKIM_SIGNED    0";
 $r[]="";
@@ -248,7 +250,6 @@ $r[]="";
 		
 	}
 $r[]="";
-$r[]="loadplugin Mail::SpamAssassin::Plugin::DKIM";
 $r[]="  # DKIM-based whitelisting of domains with less then perfect";
 $r[]="  # reputation can be given fewer negative score points:";
 $r[]="  score USER_IN_DEF_DKIM_WL -1.5";
@@ -625,6 +626,350 @@ $conf[]="";
 @file_put_contents("/etc/spamassassin/dnsbl.pre",@implode("\n",$conf));
 	
 }
+
+
+function x_headers(){
+	//X-Wum-Spamlevel
+$conf[]="header INFOMANIAK_SPAM X-Infomaniak-Spam =~ /spam/";
+$conf[]="score INFOMANIAK_SPAM       1";
+$conf[]="header SPAMASS_SPAM X-Spam-Status =~ /Yes/";
+$conf[]="score SPAMASS_SPAM       1";
+$conf[]="header XASF_SPAM X-ASF-Spam-Status =~ /Yes/";
+$conf[]="score XASF_SPAM       1";	
+$conf[]="header XTMAS_SPAM X-TM-AS-Result =~ /Yes/";
+$conf[]="score XTMAS_SPAM       1";		
+@file_put_contents("/etc/spamassassin/x-headers.pre",@implode("\n",$conf));
+	
+}
+
+
+function x_bounce(){
+	$sock=new sockets();
+	if($sock->GET_INFO("SpamAssassinVirusBounceEnabled")<>1){
+		echo "Starting......: spamassassin Virus Bounce Ruleset is disabled\n";
+		@file_put_contents('/etc/spamassassin/20_vbounce.cf',"#");
+		return;
+	}
+	
+echo "Starting......: spamassassin Virus Bounce Ruleset is enabled\n";
+x_bound_pm();	
+$f[]="# very frequent, using unrelated From lines; either spam or C/R, not yet";
+$f[]="# sure which";
+$f[]="header __CRBOUNCE_GETRESP Return-Path =~ /<bounce\S+\@\S+\.getresponse\.com>/";
+$f[]="";
+$f[]="header __CRBOUNCE_TMDA  Message-Id =~ /\@\S+\-tmda\-confirm>$/";
+$f[]="header __CRBOUNCE_ASK   X-AskVersion =~ /\d/";
+$f[]="header __CRBOUNCE_SZ    X-Spamazoid-MD =~ /\d/";
+$f[]="header __CRBOUNCE_SPAMLION Spamlion =~ /\S/";
+$f[]="";
+$f[]="# something called /cgi-bin/notaspammer does this!";
+$f[]="header __CRBOUNCE_PREC_SPAM  Precedence =~ /spam/";
+$f[]="";
+$f[]="header __AUTO_GEN_XBT   exists:X-Boxtrapper";
+$f[]="header __AUTO_GEN_BBTL  exists:X-Bluebottle-Request";
+$f[]="meta __CRBOUNCE_HEADER    (__AUTO_GEN_XBT || __AUTO_GEN_BBTL)";
+$f[]="";
+$f[]="header __CRBOUNCE_EXI   X-ExiSpam =~ /ExiSpam/";
+$f[]="";
+$f[]="header __CRBOUNCE_UNVERIF   Subject =~ /^Unverified email to /";
+$f[]="";
+$f[]="meta CRBOUNCE_MESSAGE       !MY_SERVERS_FOUND && (__CRBOUNCE_UOL || __CRBOUNCE_VERIF || __CRBOUNCE_RP || __CRBOUNCE_VANQ || __CRBOUNCE_HEADER || __CRBOUNCE_QURB || __CRBOUNCE_0SPAM || __CRBOUNCE_GETRESP || __CRBOUNCE_TMDA || __CRBOUNCE_ASK || __CRBOUNCE_EXI || __CRBOUNCE_PREC_SPAM || __CRBOUNCE_SZ || __CRBOUNCE_SPAMLION || __CRBOUNCE_MIB || __CRBOUNCE_SI || __CRBOUNCE_UNVERIF || __CRBOUNCE_RP_2)";
+$f[]="";
+$f[]="describe CRBOUNCE_MESSAGE   Challenge-response bounce message";
+$f[]="score    CRBOUNCE_MESSAGE   0.1";
+$f[]="";
+$f[]="# ---------------------------------------------------------------------------";
+$f[]="# \"Virus found in your mail\" bounces";
+$f[]="";
+$f[]="# source: VirusBounceRules from the exit0 SA wiki";
+$f[]="";
+$f[]="body __VBOUNCE_EXIM      /a potentially executable attachment /";
+$f[]="body __VBOUNCE_GUIN      /message contains file attachments that are not permitted/";
+$f[]="body __VBOUNCE_CISCO     /^Found virus \S+ in file \S+/m";
+$f[]="body __VBOUNCE_SMTP      /host \S+ said: 5\d\d\s+Error: Message content rejected/";
+$f[]="body __VBOUNCE_AOL       /TRANSACTION FAILED - Unrepairable Virus Detected. /";
+$f[]="body __VBOUNCE_DUTCH     /bevatte bijlage besmet welke besmet was met een virus/";
+$f[]="body __VBOUNCE_MAILMARSHAL       /Mail.?Marshal Rule: Inbound Messages : Block Dangerous Attachments/";
+$f[]="header __VBOUNCE_MAILMARSHAL2    Subject =~ /^MailMarshal has detected possible spam in your message/";
+$f[]="header __VBOUNCE_NAVFAIL   Subject =~ /^Norton Anti.?Virus failed to scan an attachment in a message you sent/";
+$f[]="header __VBOUNCE_REJECTED   Subject =~ /^EMAIL REJECTED$/";
+$f[]="header __VBOUNCE_NAV   Subject =~ /^Norton Anti.?Virus detected and quarantined/";
+$f[]="header __VBOUNCE_MELDING   Subject =~ /^Virusmelding$/";
+$f[]="body __VBOUNCE_VALERT      /The mail message \S+ \S+ you sent to \S+ contains the virus/";
+$f[]="body __VBOUNCE_REJ_FILT    /Reason: Rejected by filter/";
+$f[]="header __VBOUNCE_YOUSENT   Subject =~ /^Warning - You sent a Virus Infected Email to /";
+$f[]="body __VBOUNCE_MAILSWEEP   /MAILsweeper has found that a \S+ \S+ \S+ \S+ one or more virus/";
+$f[]="header   __VBOUNCE_SCREENSAVER Subject =~ /(Re: ?)+Wicked screensaver\b/i";
+$f[]="header   __VBOUNCE_DISALLOWED Subject =~ /^Disallowed attachment type found/";
+$f[]="header   __VBOUNCE_FROMPT From =~ /Security.?Scan Anti.?Virus/";
+$f[]="header   __VBOUNCE_WARNING Subject =~ /^Warning:\s*E-?mail virus(es)? detected/i";
+$f[]="header   __VBOUNCE_DETECTED Subject =~ /^Virus detected /i";
+$f[]="header   __VBOUNCE_AUTOMATIC Subject =~ /\b(automatic reply|AutoReply)\b/";
+$f[]="header   __VBOUNCE_INTERSCAN Subject =~ /^Failed to clean virus\b/i";
+$f[]="header   __VBOUNCE_VIOLATION Subject =~ /^Content violation/i";
+$f[]="header   __VBOUNCE_ALERT Subject =~ /^Virus Alert\b/i";
+$f[]="header   __VBOUNCE_NAV2 Subject =~ /^NAV detected a virus in a document /";
+$f[]="body      __VBOUNCE_NAV3 /^Reporting-MTA: Norton Anti.?Virus Gateway/";
+$f[]="header   __VBOUNCE_INTERSCAN2 Subject =~ /^InterScan MSS for SMTP has delivered a message/";
+$f[]="header   __VBOUNCE_INTERSCAN3 Subject =~ /^InterScan NT Alert/";
+$f[]="header   __VBOUNCE_ANTIGEN Subject =~ /^Antigen found\b/i";
+$f[]="header   __VBOUNCE_LUTHER From =~ /\blutherh\@stratcom.com\b/";
+$f[]="header   __VBOUNCE_AMAVISD Subject =~ /^VIRUS IN YOUR MAIL /i";
+$f[]="body     __VBOUNCE_AMAVISD2 /\bV I R U S\b/";
+$f[]="header __VBOUNCE_GSHIELD Subject =~ /^McAfee GroupShield Alert/";
+$f[]="";
+$f[]="# off: got an FP in a simple forward";
+$f[]="# rawbody  __VBOUNCE_SUBJ_IN_MAIL /^\s*Subject:\s*(Re: )*((my|your) )?(application|details)/i";
+$f[]="# rawbody  __VBOUNCE_SUBJ_IN_MAIL2 /^\s*Subject:\s*(Re: )*(Thank you!?|That movie|Wicked screensaver|Approved)/i";
+$f[]="";
+$f[]="header __VBOUNCE_SCANMAIL Subject =~ /^Scan.?Mail Message: .{0,30} virus found /i";
+$f[]="header __VBOUNCE_DOMINO1 Subject =~ /^Report to Sender/";
+$f[]="body __VBOUNCE_DOMINO2 /^Incident Information:/";
+$f[]="header __VBOUNCE_RAV Subject =~ /^RAV Anti.?Virus scan results/";
+$f[]="";
+$f[]="body __VBOUNCE_ATTACHMENT0     /(?:Attachment.{0,40}was Deleted|Virus.{1,40}was found|the infected attachment)/i";
+$f[]="# Bart says: it appears that _ATTACHMENT0 is an alternate for _NAV -- both match the same messages.";
+$f[]="";
+$f[]="body __VBOUNCE_AVREPORT0       /(antivirus system report|the antivirus module has|illegal attachment|Unrepairable Virus Detected)/i";
+$f[]="header __VBOUNCE_SENDER       Subject =~ /^Virus to sender/";
+$f[]="body __VBOUNCE_MAILSWEEP2     /\bblocked by Mailsweeper\b/i";
+$f[]="";
+$f[]="header __VBOUNCE_MAILSWEEP3   From =~ /\bmailsweeper\b/i";
+$f[]="# Bart says: This one could replace both MAILSWEEP2 and MAILSWEEP as far as I can tell.";
+$f[]="#            Perhaps it's too general?";
+$f[]="";
+$f[]="body __VBOUNCE_CLICKBANK      /\bvirus scanner deleted your message\b/i";
+$f[]="header __VBOUNCE_FORBIDDEN    Subject =~ /\bFile type Forbidden\b/";
+$f[]="header   __VBOUNCE_MMS        Subject =~ /^MMS Notification/";
+$f[]="# added by JoeyKelly";
+$f[]="";
+$f[]="header __VBOUNCE_JMAIL Subject =~ /^Message Undeliverable: Possible Junk\/Spam Mail Identified$/";
+$f[]="";
+$f[]="body __VBOUNCE_QUOTED_EXE     /> TVqQAAMAAAAEAAAA/";
+$f[]="";
+$f[]="# majordomo is really stupid about this stuff";
+$f[]="header __MAJORDOMO_SUBJ     Subject =~ /^Majordomo results: /";
+$f[]="rawbody __MAJORDOMO_HELP_BODY  /\*\*\*\* Help for [mM]ajordomo\@/";
+$f[]="rawbody __MAJORDOMO_HELP_BODY2 /\*\*\*\* Command \'.{0,80}\' not recognized\b/";
+$f[]="meta __VBOUNCE_MAJORDOMO_HELP (__MAJORDOMO_SUBJ && __MAJORDOMO_HELP_BODY && __MAJORDOMO_HELP_BODY2)";
+$f[]="";
+$f[]="header __VBOUNCE_AV_RESULTS   Subject =~ /AntiVirus scan results/";
+$f[]="header __VBOUNCE_EMVD         Subject =~ /^Warning: E-mail viruses detected/";
+$f[]="header __VBOUNCE_UNDELIV      Subject =~ /^Undeliverable mail, invalid characters in header/";
+$f[]="header __VBOUNCE_BANNED_MAT   Subject =~ /^Banned or potentially offensive material/";
+$f[]="header __VBOUNCE_NAV_DETECT   Subject =~ /^Norton AntiVirus detected and quarantined/";
+$f[]="header __VBOUNCE_DEL_WARN     Subject =~ /^Delivery warning report id=/";
+$f[]="header __VBOUNCE_MIME_INFO    Subject =~ /^The MIME information you requested/";
+$f[]="header __VBOUNCE_EMAIL_REJ    Subject =~ /^EMAIL REJECTED/";
+$f[]="header __VBOUNCE_CONT_VIOL    Subject =~ /^Content violation/";
+$f[]="header __VBOUNCE_SYM_AVF      Subject =~ /^Symantec AVF detected /";
+$f[]="header __VBOUNCE_SYM_EMP      Subject =~ /^Symantec E-Mail-Proxy /";
+$f[]="header __VBOUNCE_VIR_FOUND    Subject =~ /^Virus Found in message/";
+$f[]="header __VBOUNCE_INFLEX       Subject =~ /^Inflex scan report \[/";
+$f[]="";
+$f[]="header __VBOUNCE_RAPPORT      Subject =~ /^Spam rapport \/ Spam report \S+ -\s+\(\S+\)$/";
+$f[]="header __VBOUNCE_GWAVA        Subject =~ /^GWAVA Sender Notification .RBL block.$/";
+$f[]="";
+$f[]="header __VBOUNCE_EMANAGER     Subject =~ /^\[MailServer Notification\]/";
+$f[]="header __VBOUNCE_MSGLABS      Return-Path =~ /alert\@notification\.messagelabs\.com/i";
+$f[]="body __VBOUNCE_ATT_QUAR       /\bThe attachment was quarantined\b/";
+$f[]="body __VBOUNCE_SECURIQ        /\bGROUP securiQ.Wall\b/";
+$f[]="";
+$f[]="header __VBOUNCE_PT_BLOCKED   Subject =~ /^\*\*\*\s*Mensagem Bloqueada/i";
+$f[]="";
+$f[]="meta VBOUNCE_MESSAGE        !MY_SERVERS_FOUND && (__VBOUNCE_MSGLABS || __VBOUNCE_EXIM || __VBOUNCE_GUIN || __VBOUNCE_CISCO || __VBOUNCE_SMTP || __VBOUNCE_AOL || __VBOUNCE_DUTCH || __VBOUNCE_MAILMARSHAL || __VBOUNCE_MAILMARSHAL2 || __VBOUNCE_NAVFAIL || __VBOUNCE_REJECTED || __VBOUNCE_NAV || __VBOUNCE_MELDING || __VBOUNCE_VALERT || __VBOUNCE_REJ_FILT || __VBOUNCE_YOUSENT || __VBOUNCE_MAILSWEEP || __VBOUNCE_SCREENSAVER || __VBOUNCE_DISALLOWED || __VBOUNCE_FROMPT || __VBOUNCE_WARNING || __VBOUNCE_DETECTED || __VBOUNCE_AUTOMATIC || __VBOUNCE_INTERSCAN || __VBOUNCE_VIOLATION || __VBOUNCE_ALERT || __VBOUNCE_NAV2 || __VBOUNCE_NAV3 || __VBOUNCE_INTERSCAN2 || __VBOUNCE_INTERSCAN3 || __VBOUNCE_ANTIGEN || __VBOUNCE_LUTHER || __VBOUNCE_AMAVISD || __VBOUNCE_AMAVISD2 || __VBOUNCE_SCANMAIL || __VBOUNCE_DOMINO1 || __VBOUNCE_DOMINO2 || __VBOUNCE_RAV || __VBOUNCE_GSHIELD || __VBOUNCE_ATTACHMENT0 || __VBOUNCE_AVREPORT0 || __VBOUNCE_SENDER || __VBOUNCE_MAILSWEEP2 || __VBOUNCE_MAILSWEEP3 || __VBOUNCE_CLICKBANK || __VBOUNCE_FORBIDDEN || __VBOUNCE_MMS || __VBOUNCE_QUOTED_EXE || __VBOUNCE_MAJORDOMO_HELP || __VBOUNCE_AV_RESULTS || __VBOUNCE_EMVD || __VBOUNCE_UNDELIV || __VBOUNCE_BANNED_MAT || __VBOUNCE_NAV_DETECT || __VBOUNCE_DEL_WARN || __VBOUNCE_MIME_INFO || __VBOUNCE_EMAIL_REJ || __VBOUNCE_CONT_VIOL || __VBOUNCE_SYM_AVF || __VBOUNCE_SYM_EMP || __VBOUNCE_ATT_QUAR || __VBOUNCE_SECURIQ || __VBOUNCE_VIR_FOUND || __VBOUNCE_EMANAGER || __VBOUNCE_JMAIL || __VBOUNCE_GWAVA || __VBOUNCE_PT_BLOCKED || __VBOUNCE_INFLEX)";
+$f[]="";
+$f[]="describe VBOUNCE_MESSAGE    Virus-scanner bounce message";
+$f[]="score    VBOUNCE_MESSAGE    0.1";
+$f[]="";
+$f[]="# ---------------------------------------------------------------------------";
+$f[]="";
+$f[]="# a catch-all type for all the above";
+$f[]="";
+$f[]="meta     ANY_BOUNCE_MESSAGE (CRBOUNCE_MESSAGE||BOUNCE_MESSAGE||VBOUNCE_MESSAGE)";
+$f[]="describe ANY_BOUNCE_MESSAGE Message is some kind of bounce message";
+$f[]="score    ANY_BOUNCE_MESSAGE 0.1";
+$f[]="";
+$f[]="# ---------------------------------------------------------------------------";
+$f[]="";
+$f[]="# ensure these aren't published in rule-updates as general antispam rules;";
+$f[]="# this is required, since it appears we're now at the stage where they";
+$f[]="# *do* appear to correlate strongly :(";
+$f[]="# http://ruleqa.spamassassin.org/20060405-r391250-n/BOUNCE_MESSAGE";
+$f[]="#";
+$f[]="tflags   CRBOUNCE_MESSAGE   nopublish";
+$f[]="tflags   BOUNCE_MESSAGE     nopublish";
+$f[]="tflags   VBOUNCE_MESSAGE    nopublish";
+$f[]="tflags   ANY_BOUNCE_MESSAGE nopublish";
+$f[]="";
+
+@file_put_contents('/etc/spamassassin/20_vbounce.cf',@implode("\n",$f));
+
+}
+
+function x_bound_pm(){
+	if(file_exists("/etc/spamassassin/VBounce.pm")){return;}
+$f[]="# <@LICENSE>";
+$f[]="# Licensed to the Apache Software Foundation (ASF) under one or more";
+$f[]="# contributor license agreements.  See the NOTICE file distributed with";
+$f[]="# this work for additional information regarding copyright ownership.";
+$f[]="# The ASF licenses this file to you under the Apache License, Version 2.0";
+$f[]="# (the \"License\"); you may not use this file except in compliance with";
+$f[]="# the License.  You may obtain a copy of the License at:";
+$f[]="#";
+$f[]="#     http://www.apache.org/licenses/LICENSE-2.0";
+$f[]="#";
+$f[]="# Unless required by applicable law or agreed to in writing, software";
+$f[]="# distributed under the License is distributed on an \"AS IS\" BASIS,";
+$f[]="# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.";
+$f[]="# See the License for the specific language governing permissions and";
+$f[]="# limitations under the License.";
+$f[]="# </@LICENSE>";
+$f[]="";
+$f[]="=head1 NAME";
+$f[]="";
+$f[]="Mail::SpamAssassin::Plugin::VBounce";
+$f[]="";
+$f[]="=head1 SYNOPSIS";
+$f[]="";
+$f[]=" loadplugin Mail::SpamAssassin::Plugin::VBounce [/path/to/VBounce.pm]";
+$f[]="";
+$f[]="=cut";
+$f[]="";
+$f[]="package Mail::SpamAssassin::Plugin::VBounce;";
+$f[]="";
+$f[]="use Mail::SpamAssassin::Plugin;";
+$f[]="use Mail::SpamAssassin::Logger;";
+$f[]="use strict;";
+$f[]="use warnings;";
+$f[]="";
+$f[]="our @ISA = qw(Mail::SpamAssassin::Plugin);";
+$f[]="";
+$f[]="sub new {";
+$f[]="  my \$class = shift;";
+$f[]="  my \$mailsaobject = shift;";
+$f[]="";
+$f[]="  \$class = ref(\$class) || \$class;";
+$f[]="  my \$self = \$class->SUPER::new(\$mailsaobject);";
+$f[]="  bless (\$self, \$class);";
+$f[]="";
+$f[]="  \$self->register_eval_rule(\"have_any_bounce_relays\");";
+$f[]="  \$self->register_eval_rule(\"check_whitelist_bounce_relays\");";
+$f[]="";
+$f[]="  \$self->set_config(\$mailsaobject->{conf});";
+$f[]="";
+$f[]="  return \$self;";
+$f[]="}";
+$f[]="";
+$f[]="sub set_config {";
+$f[]="  my(\$self, \$conf) = @_;";
+$f[]="  my @cmds = ();";
+$f[]="";
+$f[]="=head1 USER PREFERENCES";
+$f[]="";
+$f[]="The following options can be used in both site-wide (C<local.cf>) and";
+$f[]="user-specific (C<user_prefs>) configuration files to customize how";
+$f[]="SpamAssassin handles incoming email messages.";
+$f[]="";
+$f[]="=over 4";
+$f[]="";
+$f[]="=item whitelist_bounce_relays hostname [hostname2 ...]";
+$f[]="";
+$f[]="This is used to 'rescue' legitimate bounce messages that were generated in";
+$f[]="response to mail you really *did* send.  List the MTA relays that your outbound";
+$f[]="mail is delivered through.  If a bounce message is found, and it contains one";
+$f[]="of these hostnames in a 'Received' header, it will not be marked as a blowback";
+$f[]="virus-bounce.";
+$f[]="";
+$f[]="The hostnames can be file-glob-style patterns, so C<relay*.isp.com> will work.";
+$f[]="Specifically, C<*> and C<?> are allowed, but all other metacharacters are not.";
+$f[]="Regular expressions are not used for security reasons.";
+$f[]="";
+$f[]="Multiple addresses per line, separated by spaces, is OK.  Multiple";
+$f[]="C<whitelist_from> lines is also OK.";
+$f[]="";
+$f[]="";
+$f[]="=cut";
+$f[]="";
+$f[]="  push (@cmds, {";
+$f[]="      setting => 'whitelist_bounce_relays',";
+$f[]="      type => \$Mail::SpamAssassin::Conf::CONF_TYPE_ADDRLIST";
+$f[]="    });";
+$f[]="";
+$f[]="  \$conf->{parser}->register_commands(\@cmds);";
+$f[]="}";
+$f[]="";
+$f[]="sub have_any_bounce_relays {";
+$f[]="  my (\$self, \$pms) = @_;";
+$f[]="  return (defined \$pms->{conf}->{whitelist_bounce_relays} &&";
+$f[]="      (scalar values %{\$pms->{conf}->{whitelist_bounce_relays}} != 0));";
+$f[]="}";
+$f[]="";
+$f[]="sub check_whitelist_bounce_relays {";
+$f[]="  my (\$self, \$pms) = @_;";
+$f[]="";
+$f[]="  my \$body = \$pms->get_decoded_stripped_body_text_array();";
+$f[]="  my \$res;";
+$f[]="";
+$f[]="  # catch lines like:";
+$f[]="  # Received: by dogma.boxhost.net (Postfix, from userid 1007)";
+$f[]="";
+$f[]="  # check the plain-text body, first";
+$f[]="  foreach my \$line (@{\$body}) {";
+$f[]="    next unless (\$line =~ /Received: /);";
+$f[]="    while (\$line =~ / (\S+\.\S+) /g) {";
+$f[]="      return 1 if \$self->_relay_is_in_whitelist_bounce_relays(\$pms, \$1);";
+$f[]="    }";
+$f[]="  }";
+$f[]="";
+$f[]="  # now check any \"message/anything\" attachment MIME parts, too";
+$f[]="  # don't ignore non-leaf nodes, some bounces are odd that way";
+$f[]="  foreach my \$p (\$pms->{msg}->find_parts(qr/^message\//, 0)) {";
+$f[]="    my \$line = \$p->decode();";
+$f[]="    next unless \$line && (\$line =~ /Received: /);";
+$f[]="    while (\$line =~ / (\S+\.\S+) /g) {";
+$f[]="      return 1 if \$self->_relay_is_in_whitelist_bounce_relays(\$pms, \$1);";
+$f[]="    }";
+$f[]="  }";
+$f[]="";
+$f[]="  return 0;";
+$f[]="}";
+$f[]="";
+$f[]="sub _relay_is_in_whitelist_bounce_relays {";
+$f[]="  my (\$self, \$pms, \$relay) = @_;";
+$f[]="  return 1 if \$self->_relay_is_in_list(";
+$f[]="        \$pms->{conf}->{whitelist_bounce_relays}, \$pms, \$relay);";
+$f[]="  dbg(\"rules: relay \$relay doesn't match any whitelist\");";
+$f[]="}";
+$f[]="";
+$f[]="sub _relay_is_in_list {";
+$f[]="  my (\$self, \$list, \$pms, \$relay) = @_;";
+$f[]="  \$relay = lc \$relay;";
+$f[]="";
+$f[]="  if (defined \$list->{\$relay}) { return 1; }";
+$f[]="";
+$f[]="  foreach my \$regexp (values %{\$list}) {";
+$f[]="    if (\$relay =~ qr/\$regexp/i) {";
+$f[]="      dbg(\"rules: relay \$relay matches regexp: \$regexp\");";
+$f[]="      return 1;";
+$f[]="    }";
+$f[]="  }";
+$f[]="";
+$f[]="  return 0;";
+$f[]="}";
+$f[]="";
+$f[]="1;";
+$f[]="__DATA__";
+$f[]="";
+$f[]="=back";
+$f[]="";
+$f[]="=cut";
+$f[]="";
+@file_put_contents('/etc/spamassassin/VBounce.pm',@implode("\n",$f));
+
+
+}
+
 
 
 ?>

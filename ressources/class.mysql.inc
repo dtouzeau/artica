@@ -260,6 +260,7 @@ class mysql{
 	var $hostname;
 	var $ok=false;
 	var $CurrentPageName;
+	var $mysql_connection;
 	var $last_id;
 	
 	function mysql(){
@@ -398,6 +399,7 @@ class mysql{
 			return null;
 		}
 		$bd=@mysql_connect("$this->mysql_server:$this->mysql_port",$this->mysql_admin,$this->mysql_password);
+		$this->mysql_connection=$bd;
 		if($database<>null){
 			$ok=@mysql_select_db($database);
 	    	if (!$ok){
@@ -509,6 +511,11 @@ class mysql{
 	//@mysql_free_result($result); 
 	@mysql_close($bd);
 	return $result_return;}
+	
+	
+	function _mysql_close(){
+		@mysql_close($this->mysql_connection);
+	}
 
 	
 	function REPAIR_TABLE($database,$table){
@@ -1309,10 +1316,92 @@ class mysql{
 		if(!$this->FIELD_EXISTS("options","emailing_db_paths","artica_backup")){
 				$sql="ALTER TABLE `emailing_db_paths` ADD `options` TINYTEXT NOT NULL";
 				$this->QUERY_SQL($sql,'artica_backup');
-		}			
+		}
+
+		if(!$this->TABLE_EXISTS('emailing_templates','artica_backup')){		
+			$sql="CREATE TABLE `artica_backup`.`emailing_templates` (
+					`ID` INT( 2 ) NOT NULL AUTO_INCREMENT PRIMARY KEY ,
+					`zdate` DATETIME NOT NULL ,
+					`template_name` VARCHAR( 255 ) NOT NULL ,
+					`template_datas` longtext NOT NULL,
+					`ou` VARCHAR( 255 ) NOT NULL ,
+					`template_css` longtext NOT NULL,
+					`subject` VARCHAR( 255 ) NOT NULL,
+					 `advopts` MEDIUMTEXT NOT NULL,
+					 KEY `ou` (`ou`)
+				)";		
+			$this->QUERY_SQL($sql,'artica_backup');
+		}
+		
+	if(!$this->TABLE_EXISTS('emailing_tbl_files','artica_backup')){			
+		$sql="CREATE TABLE emailing_tbl_files (
+		     ID tinyint(3) unsigned NOT NULL auto_increment,
+		     bin_data longblob NOT NULL,
+		     template_id INT( 10 ) NOT NULL,
+		     filename varchar(50) NOT NULL,
+		     filesize varchar(50) NOT NULL,
+		     filetype varchar(50) NOT NULL,
+		     PRIMARY KEY (ID),
+		     KEY `template_id` (`template_id`))";		
+			$this->QUERY_SQL($sql,'artica_backup');	
+		}
+
 		
 		
+	if(!$this->TABLE_EXISTS('emailing_mailers','artica_backup')){			
+			$sql="CREATE TABLE `artica_backup`.`emailing_mailers` (
+					`ID` INT( 5 ) NOT NULL AUTO_INCREMENT PRIMARY KEY ,
+					`smtpserver` VARCHAR( 255 ) NOT NULL ,
+					`parameters` LONGTEXT NOT NULL ,
+					`ou` VARCHAR( 255 ) NOT NULL ,
+					INDEX ( `ou` ))";
+			$this->QUERY_SQL($sql,'artica_backup');	
+		}
+		
+	if(!$this->TABLE_EXISTS('emailing_campain_linker','artica_backup')){			
+			$sql="CREATE TABLE IF NOT EXISTS `emailing_campain_linker` (
+				  `ID` int(5) NOT NULL AUTO_INCREMENT,
+				  `template_id` int(5) NOT NULL,
+				  `database_id` int(5) NOT NULL,
+				  `parameters` longtext NOT NULL,
+				  `finish_queue_processing` int(1) NOT NULL DEFAULT '0',
+				  `queue_builder_pourc` INT( 1 ) NOT NULL DEFAULT '0',
+				  `zdate` datetime NOT NULL,
+				  `name` varchar(255) NOT NULL,
+				  `ou` varchar(255) NOT NULL,
+				  PRIMARY KEY (`ID`),
+				  KEY `template_id` (`template_id`,`database_id`,`finish_queue_processing`),
+				  KEY `ou` (`ou`)
+				) ";
+		$this->QUERY_SQL($sql,'artica_backup');	
+	}	
+	
+	
+if(!$this->TABLE_EXISTS('emailing_campain_queues','artica_backup')){			
+			$sql="CREATE TABLE `artica_backup`.`emailing_campain_queues` (
+					`ID` 				INT( 10 ) NOT NULL AUTO_INCREMENT,
+					`body` 				BLOB NOT NULL ,
+					`from` 				VARCHAR( 255 ) NOT NULL ,
+					`rcpt_to` 			VARCHAR( 255 ) NOT NULL ,
+					`msmtp` 			BLOB NOT NULL ,
+					`sended` 			INT( 1 ) NOT NULL DEFAULT '0',
+					`msg_size` 			INT( 5 ) NOT NULL DEFAULT '0',
+					`campain_linker_id` INT( 10 ) NOT NULL ,
+					`ou` 		   		VARCHAR( 255 ) NOT NULL ,
+					`time_created` 		DATETIME NOT NULL ,
+					`time_sended`  		DATETIME NOT NULL ,
+					`template_id`  		INT( 10 ) NOT NULL ,
+					`contact_id`   		INT( 10 ) NOT NULL ,
+					`unique_key`   		VARCHAR( 255 ) NOT NULL,
+					 PRIMARY KEY (`ID`),
+					 UNIQUE KEY `unique_key` (`unique_key`),
+					 KEY `sended` (`sended`),
+					 INDEX ( `rcpt_to` , `campain_linker_id` , `ou` , `template_id` , `contact_id` )
+					)";	
+		$this->QUERY_SQL($sql,'artica_backup');	
 	}
+		
+}
 	
 	
 	public function CheckTableEmailingContacts($tablename){
@@ -1339,6 +1428,10 @@ class mysql{
 	
 		
 	}
+	
+ 	
+	
+	
 	
 	}
 	
@@ -1512,6 +1605,8 @@ class mysql{
 				  `context` varchar(75) NOT NULL DEFAULT 'unknown',
 				  `sended` int(1) NOT NULL DEFAULT '0',
 				  `content` text NOT NULL,
+				  `attached_files` TEXT NOT NULL,
+				  `recipient` VARCHAR( 255 ) NULL,
 				  PRIMARY KEY (`ID`),
 				  KEY `zDate` (`zDate`,`event_id`,`event_type`,`process`,`hostname`),
 				  KEY `context` (`context`),
@@ -1524,13 +1619,26 @@ class mysql{
 				$this->QUERY_SQL($sql,'artica_events');
 		}
 		
+		if(!$this->FIELD_EXISTS("events","recipient","artica_events")){
+				$sql="ALTER TABLE `events` ADD `recipient` VARCHAR( 255 ) NULL DEFAULT";
+				$this->QUERY_SQL($sql,'artica_events');
+		}		
+		
+		
+		
+		
 		
 		
 		if(!$this->FIELD_EXISTS("events","sended","artica_events")){
 				$sql="ALTER TABLE `events` ADD `sended` INT( 1 ) NOT NULL DEFAULT '0',ADD INDEX ( sended )";
 				$this->QUERY_SQL($sql,'artica_events');
 			}
-		
+			
+			if(!$this->FIELD_EXISTS("events","attached_files","artica_events")){
+				$sql="ALTER TABLE `events` ADD `attached_files` TEXT NOT NULL ";
+				$this->QUERY_SQL($sql,'artica_events');
+			}
+
 			if(!$this->FIELD_EXISTS("events","sended","artica_events")){
 				$sql="ALTER TABLE `events` ADD `sended` INT( 1 ) NOT NULL DEFAULT '0',ADD INDEX ( sended )";
 				$this->QUERY_SQL($sql,'artica_events');
@@ -1601,6 +1709,7 @@ class mysql{
 		 $this->CheckTablesSquid();
 		 $this->CheckTablesPostfilter();
 		 $this->check_emailing_tables();
+		 $this->Check_reports_table();
 	
 	
 		if(!$this->FIELD_EXISTS("smtp_logs_day","emails","artica_events")){
@@ -1646,6 +1755,9 @@ class mysql{
 						
 				 $this->QUERY_SQL($sql,'artica_events');
 		}	
+		
+			
+		if(!$this->DATABASE_EXISTS('artica_backup')){if(!$this->CREATE_DATABASE('artica_backup')){return null;}}		
 
 		if(!$this->TABLE_EXISTS('imapsync','artica_backup')){
 			if($GLOBALS["DEBUG"]){writelogs("Table imapsync does not exists....",__CLASS__."/".__FUNCTION__,__FILE__,__LINE__);}
@@ -1662,6 +1774,8 @@ class mysql{
 			  `pid` int(5) NOT NULL,
 			  `zDate` datetime NOT NULL,
 			  `CronSchedule` varchar(90) NOT NULL,
+			  `parameters` text NOT NULL,
+			  `folders` text NOT NULL,
 			  PRIMARY KEY (`ID`),
 			  KEY `uid` (`uid`),
 			  KEY `imap_server` (`imap_server`)
@@ -1674,9 +1788,15 @@ class mysql{
 		}
 		
 		
-		if(!$this->DATABASE_EXISTS('artica_backup')){
-			if(!$this->CREATE_DATABASE('artica_backup')){return null;}
-		}
+	if(!$this->FIELD_EXISTS("imapsync","parameters","artica_backup")){
+		$sql="ALTER TABLE `imapsync` ADD `parameters` text NOT NULL";
+		$this->QUERY_SQL($sql,"artica_backup");
+	}		
+		
+		if(!$this->FIELD_EXISTS("imapsync","folders","artica_backup")){
+		$sql="ALTER TABLE `imapsync` ADD `folders` text NOT NULL";
+		$this->QUERY_SQL($sql,"artica_backup");
+	}
 		
 		if(!$this->TABLE_EXISTS('dspam_stats','artica_events')){	
 		$sql="create table dspam_stats (
@@ -2300,6 +2420,21 @@ public function check_storage_table(){
 
 	$this->QUERY_SQL($sql,"artica_backup");	
 		
+	}
+	
+	
+	function Check_reports_table(){
+		if(!$this->TABLE_EXISTS('reports','artica_backup')){		
+			$sql="CREATE TABLE `artica_backup`.`reports` (
+			`ID` INT( 5 ) NOT NULL AUTO_INCREMENT PRIMARY KEY ,
+			`report_type` INT( 1 ) NOT NULL ,
+			`report_datas` TEXT NOT NULL ,
+			`enabled` INT( 1 ) NOT NULL ,
+			`ou` VARCHAR( 255 ) NOT NULL ,
+			INDEX ( `report_type` , `enabled` , `ou` )
+			)";		
+			$this->QUERY_SQL($sql,'artica_backup');
+		}
 	}
 	
 	

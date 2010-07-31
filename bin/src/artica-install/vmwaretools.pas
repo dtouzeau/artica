@@ -6,7 +6,7 @@ unit vmwaretools;
 interface
 
 uses
-    Classes, SysUtils,variants,strutils,IniFiles, Process,logs,unix,RegExpr,zsystem;
+    Classes, SysUtils,variants,strutils, Process,logs,unix,RegExpr,zsystem;
 
 
 
@@ -84,7 +84,6 @@ var
     RegExpr:TRegExpr;
     FileDatas:TStringList;
     i:integer;
-    BinPath:string;
     filetmp:string;
 begin
 
@@ -112,9 +111,6 @@ SYS.SET_CACHE_VERSION('APP_VMTOOLS',result);
 end;
 //#############################################################################
 procedure tvmtools.RELOAD();
-var
-   count:integer;
-   pid:string;
 begin
     if not FileExists(INITD_PATH()) then exit;
     fpsystem(INITD_PATH()+' reload');
@@ -141,7 +137,7 @@ begin
     fpsystem(INITD_PATH()+' start &');
 
 
-
+count:=0;
  while not SYS.PROCESS_EXIST(PID_NUM()) do begin
         sleep(100);
         inc(count);
@@ -164,15 +160,6 @@ end;
 
 //#############################################################################
 procedure tvmtools.STOP();
-var
-   count:integer;
-   pid:string;
-   tmp:string;
-   l:Tstringlist;
-   i:integer;
-   tt:integer;
-   path:string;
-    RegExpr:TRegExpr;
 begin
   fpsystem(INITD_PATH()+' stop');
 end;
@@ -181,41 +168,13 @@ end;
 //#############################################################################
 function tvmtools.STATUS:string;
 var
-ini:TstringList;
-pid:string;
+pidpath:string;
 begin
-   ini:=TstringList.Create;
-   ini.Add('[APP_VMTOOLS]');
-   if not fileExists(BIN_PATH()) then begin
-      ini.Add('application_installed=0');
-      ini.Add('service_disabled=0');
-      result:=ini.Text;
-      ini.free;
-      exit;
-   end;
-
-   ini.Add('master_version='+VERSION());
-   ini.Add('service_name=APP_VMTOOLS');
-   ini.Add('service_cmd=vmtools');
-   ini.Add('service_disabled=1');
-
-   if SYS.MONIT_CONFIG('APP_VMTOOLS',PID_PATH(),'vmtools') then begin
-    ini.Add('monit=1');
-    result:=ini.Text;
-    ini.free;
-    exit;
-   end;
-
-   pid:=PID_NUM();
-   if SYS.PROCESS_EXIST(pid) then ini.Add('running=1') else  ini.Add('running=0');
-   ini.Add('application_installed=1');
-   ini.Add('application_enabled=1');
-   ini.Add('master_pid='+ pid);
-   ini.Add('master_memory=' + IntToStr(SYS.PROCESS_MEMORY(pid)));
-   ini.Add('status='+SYS.PROCESS_STATUS(pid));
-   result:=ini.Text;
-   ini.free;
-
+ SYS.MONIT_DELETE('APP_VMTOOLS');
+ pidpath:=logs.FILE_TEMP();
+ fpsystem(SYS.LOCATE_PHP5_BIN()+' /usr/share/artica-postfix/exec.status.php --vmtools >'+pidpath +' 2>&1');
+ result:=logs.ReadFromFile(pidpath);
+ logs.DeleteFile(pidpath);
 end;
 //##############################################################################
 

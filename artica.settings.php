@@ -626,6 +626,11 @@ function HTTPS_PORT(){
 	$users=new usersMenus();
 	$page=CurrentPageName();
 	$use_apache=null;
+	$sock=new sockets();
+	$LighttpdUserAndGroup=$sock->GET_INFO("LighttpdUserAndGroup");
+	if($LighttpdUserAndGroup==null){$LighttpdUserAndGroup="www-data:www-data";}
+	$ArticaHttpsPort=$sock->GET_INFO("ArticaHttpsPort");
+	if($ArticaHttpsPort==null){$ArticaHttpsPort="9000";}
 	
 	$lighttp_processes="<tr>
 			<td nowrap nowrap class=legend>{processes}:</strong></td>
@@ -674,11 +679,11 @@ $html=$html . "
 			$lighttpd
 			<tr>
 				<td nowrap class=legend>{https_port}:</strong></td>
-				<td>" . Field_text('https_port',trim($httpd->https_port),'width:100px')."</td>
+				<td>" . Field_text('https_port',trim($ArticaHttpsPort),'width:100px')."</td>
 			</tr>
 			<tr>
 				<td nowrap class=legend>{username}:</strong></td>
-				<td>" . Field_text('LighttpdUserAndGroup',trim($httpd->LighttpdUserAndGroup),'width:120px')."</td>
+				<td>" . Field_text('LighttpdUserAndGroup',trim($LighttpdUserAndGroup),'width:120px')."</td>
 			</tr>
 			<tr>
 				<td colspan=2 align='right'>
@@ -2335,12 +2340,12 @@ function SaveSqlSettings(){
 }
 function HTTPS_PORT_SAVE(){
 	$httpd=new httpd();
-	
-	$user=$_GET["LighttpdUserAndGroup"];
-	if(preg_match('#(.+?):(.+)#',$user)){
-		$httpd->LighttpdUserAndGroup=$user;
+	$sock=new sockets();
+
+	if(preg_match('#(.+?):(.+)#',$_GET["LighttpdUserAndGroup"])){
+		$sock->SET_INFO("LighttpdUserAndGroup",$_GET["LighttpdUserAndGroup"]);
 	}
-	
+	$sock->SET_INFO("ArticaHttpsPort",$_GET["https_port"]);
 	$httpd->https_port=$_GET["https_port"];
 	$httpd->LighttpdUseLdap=$_GET["LighttpdUseLdap"];
 	$httpd->ApacheConfig=$_GET["ApacheArticaEnabled"];

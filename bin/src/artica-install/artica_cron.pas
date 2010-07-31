@@ -581,9 +581,25 @@ logs.DeleteFile('/etc/cron.d/artica-cron-executor-300');
                   l.Add(backups.Strings[i]);
              end;
           except
-            logs.DebugLogs('Starting......: Daemon (cron) Error set backup tasks');
+            logs.DebugLogs('Starting......: Daemon (fcron) Error set backup tasks');
           end;
-          logs.DebugLogs('Starting......: Daemon (cron) set ' +IntToStr(backups.Count)+' backup tasks');
+          logs.DebugLogs('Starting......: Daemon (fcron) set ' +IntToStr(backups.Count)+' backup tasks');
+          backups.free;
+      end;
+
+// ------------------------------------------------REPORTS-------------------------------------------------------------------------------------------
+      fpsystem(SYS.LOCATE_PHP5_BIN()+' /usr/share/artica-postfix/exec.report.director.php --schedules');
+      if FileExists('/etc/artica-postfix/reports.tasks') then begin
+          backups:=Tstringlist.Create;
+          try
+             backups.LoadFromFile('/etc/artica-postfix/reports.tasks');
+             for i:=0 to backups.Count-1 do begin
+                  l.Add('@'+Nicet+nolog+',lavg1('+IntToStr(systemMaxOverloaded)+')  '+backups.Strings[i]);
+             end;
+          except
+            logs.DebugLogs('Starting......: Daemon (fcron) Error set report tasks');
+          end;
+          logs.DebugLogs('Starting......: Daemon (fcron) set ' +IntToStr(backups.Count)+' backup tasks');
           backups.free;
       end;
 
@@ -882,26 +898,15 @@ end;
 
 
 function tcron.STATUS():string;
-var ini:TstringList;
+var pidpath:string;
 begin
-ini:=TstringList.Create;
 
-   ini.Add('[ARTICA]');
-   ini.Add('monit=1');
-   ini.Add('master_version=' + ARTICA_VERSION()+'/' + FCRON_VERSION);
-   ini.Add('service_name=APP_ARTICA');
-   ini.Add('service_cmd=daemon');
-   
-   ini.Add('[ARTICA_WATCHDOG]');
-   ini.Add('monit=1');
-   ini.Add('master_version=' + ARTICA_VERSION()+'/' + FCRON_VERSION);
-   ini.Add('service_name=APP_ARTICA_WATCHDOG');
-
-   SYS.MONIT_CONFIG('APP_ARTICA','/var/run/artica-postfix.pid','daemon');
-   SYS.MONIT_CONFIG('APP_ARTICA_WATCHDOG','/etc/artica-cron/artica-watchdog.pid','daemon');
-   result:=ini.Text;
-   ini.free;
-
+SYS.MONIT_DELETE('APP_ARTICA');
+SYS.MONIT_DELETE('APP_ARTICA_WATCHDOG');
+pidpath:=logs.FILE_TEMP();
+fpsystem(SYS.LOCATE_PHP5_BIN()+' /usr/share/artica-postfix/exec.status.php --fcron >'+pidpath +' 2>&1');
+result:=logs.ReadFromFile(pidpath);
+logs.DeleteFile(pidpath)
 end;
 //#########################################################################################
 function tcron.FCRON_VERSION():string;

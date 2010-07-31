@@ -6,7 +6,7 @@ unit ocsi;
 interface
 
 uses
-    Classes, SysUtils,variants,strutils,IniFiles, Process,logs,unix,RegExpr,zsystem,openldap,mysql_daemon;
+    Classes, SysUtils,variants,strutils,Process,logs,unix,RegExpr,zsystem,openldap;
 
 
 
@@ -62,7 +62,6 @@ var
     RegExpr:TRegExpr;
     FileDatas:TStringList;
     i:integer;
-    BinPath:string;
     filetmp:string;
 begin
 
@@ -114,10 +113,6 @@ function tocsi.VirtualHost(port:string):string;
 var
 l:TstringList;
 ocswebservername:string;
-   COMPTE_BASE:string;
-   SERVEUR_SQL:string;
-   PSWD_BASE:string;
-   sql_port:string;
    ROTATELOGS:string;
 begin
 if not FileExists('/usr/share/ocsinventory-reports/ocsreports/dbconfig.inc.php') then exit;
@@ -125,10 +120,8 @@ if not FileExists('/usr/share/ocsinventory-reports/ocsreports/dbconfig.inc.php')
    ocswebservername:=SYS.GET_INFO('ocswebservername');
    if length(ocswebservername)=0 then ocswebservername:='ocs.localhost.localdomain';
 
-   COMPTE_BASE:=SYS.MYSQL_INFOS('root');
-   PSWD_BASE:=SYS.MYSQL_INFOS('database_password');
-   SERVEUR_SQL:=SYS.MYSQL_INFOS('mysql_server');
-   sql_port:=SYS.MYSQL_INFOS('port');
+
+
    dbconfig();
    fpsystem(SYS.LOCATE_PHP5_BIN()+' /usr/share/artica-postfix/exec.ocsweb.install.php &');
    ROTATELOGS:=SYS.LOCATE_ROTATELOGS();

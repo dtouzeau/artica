@@ -108,6 +108,7 @@ class usersMenus {
 	var $phpmyadmin_installed=false;
 	var $HOSTAPD_INSTALLED=false;
 	var $HOSTAPD_BINVER=0;
+	var $POSTMULTI=false;
 	/* This licence must be used Only with Artica-for postfix */
 	var $ChartLicence="D1XFWGMEW9L.HSK5T4Q79KLYCK07EK";
 	/*you cannot use it without any authorizations of maani.us.
@@ -619,6 +620,7 @@ class usersMenus {
 			$this->DRUPAL_INSTALLED=$_GLOBAL["DRUPAL_INSTALLED"];
 			$this->MAIL_DKIM_VERSION=trim($_GLOBAL["MAIL_DKIM_VERSION"]);
 			$this->HDPARM_INSTALLED=trim($_GLOBAL["HDPARM_INSTALLED"]);
+			$this->POSTMULTI=$_GLOBAL["POSTMULTI"];
 			
 			$this->hostname=str_replace('.(none)','',$this->hostname);
 			$this->fqdn=str_replace('.(none)','',$this->fqdn);
@@ -676,6 +678,7 @@ class usersMenus {
 	}
 	
 	private function postfixmutli(){
+	if(!$this->POSTMULTI){return false;}
 	$vers=explode(".",$this->POSTFIX_VERSION);
 	if($vers[0]>=2){if($vers[1]>=5){return true;}}
 	}
@@ -834,7 +837,7 @@ private function build_user_left_menus(){
 				
 				$array[$OU_TEXT]["SUB"]["{domains}"]="javascript:Loadjs('domains.edit.domains.php?js=yes&ou=$OU_encoded&encoded=yes&in-front-ajax=yes');";
 				$array[$OU_TEXT]["SUB"]["{add_user}"]="javascript:Loadjs('domains.add.user.php?ou=$OU_encoded&encoded=yes');";
-				$array[$OU_TEXT]["SUB"]["{members}"]="javascript:Loadjs('domains.manage.org.index.php?finduser-js=es&ou=$OU_encoded&encoded=yes');";
+				$array[$OU_TEXT]["SUB"]["{members}"]="javascript:Loadjs('domains.manage.org.index.php?finduser-js=yes&ou=$OU_encoded&encoded=yes&in-front-ajax=yes');";
 				$array[$OU_TEXT]["SUB"]["{groups}"]="javascript:Loadjs('domains.edit.group.php?ou=$OU_encoded&js=yes&encoded=yes&in-front-ajax=yes');";
 				$array[$OU_TEXT]["SUB"]["{search}"]="javascript:Loadjs('domains.find.user.php?ou=$OU_encoded&encoded=yes');";
 			
@@ -997,7 +1000,7 @@ private function build_user_left_menus(){
 				
 				$array[$OU_TEXT]["SUB"]["{domains}"]="javascript:Loadjs('domains.edit.domains.php?js=yes&ou=$OU_encoded&encoded=yes&in-front-ajax=yes');";
 				$array[$OU_TEXT]["SUB"]["{add_user}"]="javascript:Loadjs('domains.add.user.php?ou=$OU_encoded&encoded=yes');";
-				$array[$OU_TEXT]["SUB"]["{members}"]="javascript:Loadjs('domains.manage.org.index.php?finduser-js=es&ou=$OU_encoded&encoded=yes&in-front-ajax=yes');";
+				$array[$OU_TEXT]["SUB"]["{members}"]="javascript:Loadjs('domains.manage.org.index.php?finduser-js=yes&ou=$OU_encoded&encoded=yes&in-front-ajax=yes');";
 				$array[$OU_TEXT]["SUB"]["{groups}"]="javascript:Loadjs('domains.edit.group.php?ou=$OU_encoded&js=yes&encoded=yes&in-front-ajax=yes');";
 				$array[$OU_TEXT]["SUB"]["{search}"]="javascript:Loadjs('domains.find.user.php?ou=$OU_encoded&encoded=yes');";
 			}			
@@ -1006,7 +1009,7 @@ private function build_user_left_menus(){
 		if($this->AsArticaAdministrator==true){
 			$array["system"]["MAIN"]="javascript:Loadjs('system.index.php?js=yes')";
 			$array["system"]["SUB"]["{main_parameters}"]="javascript:Loadjs('system.index.php?js=yes')";
-			$array["system"]["SUB"]["{left_menu_internal_hard_drives}"]="javascript:Loadjs('system.internal.disks.php')";
+			$array["system"]["SUB"]["{left_menu_internal_hard_drives}"]="javascript:Loadjs('system.internal.disks.php?in-front-ajax=yes')";
 			$array["system"]["SUB"]["{left_menu_net_settings}"]="javascript:Loadjs('system.nic.config.php?js=yes&in-front-ajax=yes')";
 			if($sock->GET_INFO("WifiCardOk")==1){$array["system"]["SUB"]["WIFI"]="javascript:Loadjs('system.wifi.php')";}
 			if($this->dhcp_installed){
@@ -1030,6 +1033,9 @@ private function build_user_left_menus(){
 				$array["{fileshare}"]["SUB"]["{APP_SAMBA}"]="javascript:Loadjs('samba.index.php?script=smbpop');";
 				$array["{fileshare}"]["SUB"]["{explorer}"]="javascript:Loadjs('tree.php');";
 				$array["{fileshare}"]["SUB"]["{SHARE_FOLDER}"]="javascript:Loadjs('SambaBrowse.php');";
+				if($this->CUPS_INSTALLED){
+					$array["{fileshare}"]["SUB"]["{printers}"]="javascript:Loadjs('cups.index.php?in-front-ajax=yes');";
+				}
 				$array["{fileshare}"]["SUB"]["{computers}"]="javascript:Loadjs('computer-browse.php');";
 				}
 		}

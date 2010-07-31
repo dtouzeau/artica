@@ -26,7 +26,24 @@ class unix {
 		if(is_file("/usr/lib/cyrus/bin/reconstruct")){return "/usr/lib/cyrus/bin/reconstruct";}
 		if(is_file("/usr/lib/cyrus-imapd/reconstruct")){return "/usr/lib/cyrus-imapd/reconstruct";}
 		$this->events("Unable to stat cyrus reconstruct tool");
+	}
+
+	public function LOCATE_SMBD_PID(){
+		if(is_file("/var/run/smbd.pid")){return "/var/run/smbd.pid";}
+		if(is_file("/var/run/samba/smbd.pid")){return "/var/run/samba/smbd.pid";}
+		
+	}
+	public function LOCATE_NMBD_PID(){
+		if(is_file("/var/run/nmbd.pid")){return "/var/run/nmbd.pid";}
+		if(is_file("/var/run/samba/nmbd.pid")){return "/var/run/samba/nmbd.pid";}
+		
 	}	
+	public function LOCATE_WINBINDD_PID(){
+		if(is_file("/var/run/winbindd.pid")){return "/var/run/winbindd.pid";}
+		if(is_file("/var/run/samba/winbindd.pid")){return "/var/run/samba/winbindd.pid";}
+		
+	}		
+
 	
 	public function LOCATE_CYRQUOTA(){
 		if(is_file("/usr/sbin/cyrquota")){return "/usr/sbin/cyrquota";}
@@ -44,6 +61,46 @@ class unix {
 	
 	public function LOCATE_MILTER_GREYLIST_PID(){
 		if(is_file("/var/run/milter-greylist/milter-greylist.pid")){return "/var/run/milter-greylist/milter-greylist.pid";}
+	}
+	
+	public function IS_OPENLDAP_RUNNING(){
+		$pid_path=$this->LOCATE_SLAPD_PID_PATH();
+		if($GLOBALS["DEBUG"]){echo __FUNCTION__." pid path: $pid_path\n";}
+		$pidnum=$this->get_pid_from_file($pid_path);
+		if($GLOBALS["DEBUG"]){echo __FUNCTION__." pid num: $pidnum\n";}
+		return $this->process_exists($pidnum);
+	}
+	
+	private function LOCATE_SLAPD_PID_PATH(){
+		if($GLOBALS[__FUNCTION__]<>null){return $GLOBALS[__FUNCTION__];}
+		$path=$this->LOCATE_SLAPD_CONF_PATH();
+		$f=explode("\n",@file_get_contents($path));
+		while (list ($num, $line) = each ($f)){
+			if(preg_match("#pidfile\s+(.+)#",$line,$re)){
+				if($GLOBALS["DEBUG"]){echo __FUNCTION__." pid path: $path\n";}
+				$GLOBALS[__FUNCTION__]=trim($re[1]);
+				return trim($re[1]);
+			}else{
+			
+			}
+		}
+		
+	}
+	
+	private function LOCATE_SLAPD_CONF_PATH(){
+		if($GLOBALS[__FUNCTION__]<>null){return $GLOBALS[__FUNCTION__];}
+		$f[]="/etc/ldap/slapd.conf";
+		$f[]="/etc/openldap/slapd.conf";
+		$f[]="/usr/local/etc/openldap/slapd.conf";
+		while (list ($num, $path) = each ($f)){
+			if(is_file($path)){
+				if($GLOBALS["DEBUG"]){echo __FUNCTION__." path: $path\n";}
+				$GLOBALS[__FUNCTION__]=$path;
+				return $path;
+			}
+		}
+		
+		
 	}
 
 	
@@ -537,6 +594,15 @@ public function alt_stat($file) {
 		
 	}
 	
+	public function LOCATE_APACHE_BIN_PATH(){
+		if(is_file('/usr/sbin/apache2')){return '/usr/sbin/apache2';}
+		if(is_file('/usr/sbin/apache')){return '/usr/sbin/apache';}
+		if(is_file('/usr/sbin/httpd')){return '/usr/sbin/httpd';}
+		if(is_file('/usr/sbin/httpd2')){return '/usr/sbin/httpd2';}
+		if(is_file('/usr/local/obm-apache/bin/obm-apache')){return '/usr/local/obm-apache/bin/obm-apache';}
+		if(is_file('/usr/local/apache-groupware/bin/apache-groupware')){return '/usr/local/apache-groupware/bin/apache-groupware';} 		
+	}
+	
 
 	public function IMAPD_GET($key){
 		if($GLOBALS["IMAPD_GET"]==null){
@@ -999,7 +1065,6 @@ public function IsProtectedDirectory($folder){
 	public function POSTFIX_PID(){
 		$path=$this->POSTCONF_GET("queue_directory")."/pid/master.pid";
 		$data=trim(@file_get_contents($path));
-		writelogs_framework("POSTFIX_PID->$data",__CLASS__.'/'.__FUNCTION__,__FILE__,__LINE__);
 		return trim($data);
 	}
 	

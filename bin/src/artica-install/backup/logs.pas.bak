@@ -13,7 +13,6 @@ Classes, SysUtils,variants,strutils, Process,IniFiles,baseunix,unix,md5,RegExpr 
 
 
 private
-     GLOBAL_INI:TIniFile;
      MaxlogSize:longint;
      D:boolean;
 
@@ -2042,7 +2041,7 @@ function Tlogs.WriteToFile(zText:string;TargetPath:string):boolean;
 exit(false);
       END;
 //#############################################################################
-function Tlogs.ReadFromFile(TargetPath:string):string; 7
+function Tlogs.ReadFromFile(TargetPath:string):string;
          const
             CR = #$0d;
             LF = #$0a;
@@ -2096,7 +2095,7 @@ end;
 //#############################################################################
 procedure Tlogs.LogGeneric(text:string;path:string);
 var
-zdate,dir,filew,mypid,CurrentInstallProduct:string;
+zdate,mypid:string;
 myFile : TextFile;
 begin
 forcedirectories(ExtractFilePath(path));

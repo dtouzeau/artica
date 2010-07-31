@@ -31,6 +31,7 @@ private
     function  SERVER_GET_PID():string;
     function  DAGENT_GET_PID():string;
     function  ICAL_GET_PID():string;
+    function  LIGHTTPD_PID():string;
 
     function  SPOOLER_STATUS():string;
     function  SERVER_STATUS():string;
@@ -48,9 +49,11 @@ private
     procedure SPOOLER_START();
     procedure MONITOR_START();
     procedure DAGENT_START();
+    procedure LIGHTTPD_START();
     procedure APACHE_CONFIG();
     procedure ICAL_START();
     function  ZARAFA_WEB_PID_NUM():string;
+    procedure lighttpd_config();
 
     procedure SERVER_STOP();
     procedure SPOOLER_STOP();
@@ -1482,8 +1485,8 @@ L.add('zarafa-stats');
 for i:=0 TO l.Count-1 do begin
     path:=SYS.LOCATE_GENERIC_BIN(l.Strings[i]);
     if FileExists(path) then begin
-       writeln('Remove file '+l.Strings[i]);
-       fpsystem('/bin/rm '+ l.Strings[i]);
+       writeln('Remove file '+path);
+       fpsystem('/bin/rm '+ path);
     end else begin
        writeln('file '+l.Strings[i]+' Already removed');
     end;
@@ -1751,6 +1754,237 @@ logs.WriteToFile(l.Text,'/etc/zarafa/httpd.conf');
 l.free;
 end;
 //##############################################################################
+function tzarafa_server.LIGHTTPD_PID():string;
+begin
+   result:=SYS.GET_PID_FROM_PATH('/var/run/zarafa-web/httpd.pid');
+   if length(result)>0 then exit;
+   result:=SYS.PIDOF_PATTERN(SYS.LOCATE_GENERIC_BIN('lighttpd') + ' -f /etc/zarafa/lighttpd.conf');
+
+
+end;
+//##############################################################################
+procedure tzarafa_server.LIGHTTPD_START();
+var
+  pid:string;
+begin
+
+
+     pid:=LIGHTTPD_PID();
+
+
+   if SYS.PROCESS_EXIST(pid) then begin
+      logs.Debuglogs('Starting zarafa..............: lighttpd daemon is already running using PID ' + pid + '...');
+      exit();
+   end;
+
+    lighttpd_config();
+    logs.OutputCmd(SYS.LOCATE_GENERIC_BIN('lighttpd')+ ' -f /etc/zarafa/lighttpd.conf');
+
+
+   if not SYS.PROCESS_EXIST(LIGHTTPD_PID()) then begin
+      logs.Debuglogs('Starting zarafa..............: lighttpd Failed "' + SYS.LOCATE_GENERIC_BIN('lighttpd')+ ' -f /etc/zarafa/lighttpd.conf"');
+    end else begin
+      logs.Debuglogs('Starting zarafa..............: lighttpd Success (PID ' + LIGHTTPD_PID() + ')');
+   end;
+
+end;
+//##############################################################################
+
+procedure tzarafa_server.lighttpd_config();
+var
+   apache:tapache_artica;
+   apache_bin_path:string;
+   modules:string;
+   l:TStringlist;
+   ZarafaApachePort,ZarafaApacheSSL:integer;
+   LighttpdUserAndGroup,username,group,ZarafaApacheServerName:string;
+   RegExpr:TRegExpr;
+
+begin
+apache:=tapache_artica.Create(SYS);
+modules:=apache.SET_MODULES();
+LighttpdUserAndGroup:=SYS.LIGHTTPD_GET_USER();
+ZarafaApacheSSL:=0;
+
+SYS.set_INFO('php5DisableMagicQuotesGpc','1');
+
+
+if not TryStrToInt(SYS.GET_INFO('ZarafaApachePort'),ZarafaApachePort) then ZarafaApachePort:=9010;
+if not TryStrToInt(SYS.GET_INFO('ZarafaApacheSSL'),ZarafaApacheSSL) then ZarafaApacheSSL:=0;
+
+ZarafaApacheServerName:=SYS.GET_INFO('ZarafaApacheServerName');
+if length(ZarafaApacheServerName)=0 then ZarafaApacheServerName:=SYS.HOSTNAME_g();
+
+logs.DebugLogs('Starting zarafa..............: Port: '+INtToStr(ZarafaApachePort));
+logs.DebugLogs('Starting zarafa..............: username:group "'+LighttpdUserAndGroup+'"');
+RegExpr:=TRegExpr.Create;
+RegExpr.Expression:='^(.+?):(.+)';
+if not RegExpr.Exec(LighttpdUserAndGroup) then begin
+ logs.DebugLogs('Starting zarafa..............: Apache daemon unable to stat username and group !');
+ exit;
+end;
+
+if not DirectoryExists('/usr/share/php/mapi') then begin
+   if DirectoryExists('/usr/local/share/php/mapi') then begin
+       logs.DebugLogs('Starting zarafa..............: Apache Create a symbolic link from /usr/local/share/php/mapi');
+      fpsystem('/bin/ln -s /usr/local/share/php/mapi /usr/share/php/mapi');
+   end;
+end;
+
+fpsystem('/bin/cp /usr/share/artica-postfix/img/zarafa-login.jpg /usr/share/zarafa-webaccess/client/layout/img/login.jpg');
+
+username:=RegExpr.Match[1];
+group:=RegExpr.Match[2];
+if length(LighttpdUserAndGroup)=0 then LighttpdUserAndGroup:='www-data:www-data';
+
+forceDirectories('/var/run/zarafa-web');
+ForceDirectories('/var/log/apache-zarafa');
+fpsystem('/bin/chown '+LighttpdUserAndGroup+' /var/run/zarafa-web');
+fpsystem('/bin/chown '+LighttpdUserAndGroup+' /var/log/apache-zarafa');
+l:=Tstringlist.Create;
+
+
+
+l.add('#artica-postfix saved by artica lighttpd.conf');
+l.add('');
+l.add('server.modules = (');
+l.add('        "mod_alias",');
+l.add('        "mod_access",');
+l.add('        "mod_accesslog",');
+l.add('        "mod_compress",');
+l.add('        "mod_fastcgi",');
+l.add('        "mod_cgi",');
+l.add('	       "mod_status",');
+l.add('	       "mod_auth"');
+l.add(')');
+l.add('');
+l.add('server.document-root        = "/usr/share/zarafa-webaccess"');
+l.add('server.username = "'+username+'"');
+l.add('server.groupname = "'+group+'"');
+l.add('server.errorlog             = "/var/log/lighttpd/zarafa-webaccess-error.log"');
+l.add('index-file.names            = ( "index.php")');
+l.add('');
+l.add('mimetype.assign             = (');
+l.add('  ".pdf"          =>      "application/pdf",');
+l.add('  ".sig"          =>      "application/pgp-signature",');
+l.add('  ".spl"          =>      "application/futuresplash",');
+l.add('  ".class"        =>      "application/octet-stream",');
+l.add('  ".ps"           =>      "application/postscript",');
+l.add('  ".torrent"      =>      "application/x-bittorrent",');
+l.add('  ".dvi"          =>      "application/x-dvi",');
+l.add('  ".gz"           =>      "application/x-gzip",');
+l.add('  ".pac"          =>      "application/x-ns-proxy-autoconfig",');
+l.add('  ".swf"          =>      "application/x-shockwave-flash",');
+l.add('  ".tar.gz"       =>      "application/x-tgz",');
+l.add('  ".tgz"          =>      "application/x-tgz",');
+l.add('  ".tar"          =>      "application/x-tar",');
+l.add('  ".zip"          =>      "application/zip",');
+l.add('  ".mp3"          =>      "audio/mpeg",');
+l.add('  ".m3u"          =>      "audio/x-mpegurl",');
+l.add('  ".wma"          =>      "audio/x-ms-wma",');
+l.add('  ".wax"          =>      "audio/x-ms-wax",');
+l.add('  ".ogg"          =>      "application/ogg",');
+l.add('  ".wav"          =>      "audio/x-wav",');
+l.add('  ".gif"          =>      "image/gif",');
+l.add('  ".jar"          =>      "application/x-java-archive",');
+l.add('  ".jpg"          =>      "image/jpeg",');
+l.add('  ".jpeg"         =>      "image/jpeg",');
+l.add('  ".png"          =>      "image/png",');
+l.add('  ".xbm"          =>      "image/x-xbitmap",');
+l.add('  ".xpm"          =>      "image/x-xpixmap",');
+l.add('  ".xwd"          =>      "image/x-xwindowdump",');
+l.add('  ".css"          =>      "text/css",');
+l.add('  ".html"         =>      "text/html",');
+l.add('  ".htm"          =>      "text/html",');
+l.add('  ".js"           =>      "text/javascript",');
+l.add('  ".asc"          =>      "text/plain",');
+l.add('  ".c"            =>      "text/plain",');
+l.add('  ".cpp"          =>      "text/plain",');
+l.add('  ".log"          =>      "text/plain",');
+l.add('  ".conf"         =>      "text/plain",');
+l.add('  ".text"         =>      "text/plain",');
+l.add('  ".txt"          =>      "text/plain",');
+l.add('  ".dtd"          =>      "text/xml",');
+l.add('  ".xml"          =>      "text/xml",');
+l.add('  ".mpeg"         =>      "video/mpeg",');
+l.add('  ".mpg"          =>      "video/mpeg",');
+l.add('  ".mov"          =>      "video/quicktime",');
+l.add('  ".qt"           =>      "video/quicktime",');
+l.add('  ".avi"          =>      "video/x-msvideo",');
+l.add('  ".asf"          =>      "video/x-ms-asf",');
+l.add('  ".asx"          =>      "video/x-ms-asf",');
+l.add('  ".wmv"          =>      "video/x-ms-wmv",');
+l.add('  ".bz2"          =>      "application/x-bzip",');
+l.add('  ".tbz"          =>      "application/x-bzip-compressed-tar",');
+l.add('  ".tar.bz2"      =>      "application/x-bzip-compressed-tar",');
+l.add('  ""              =>      "application/octet-stream",');
+l.add(' )');
+l.add('');
+l.add('');
+l.add('accesslog.filename          = "/var/log/lighttpd/zarafa-webaccess-access.log"');
+l.add('url.access-deny             = ( "~", ".inc" )');
+l.add('');
+l.add('static-file.exclude-extensions = ( ".php", ".pl", ".fcgi" )');
+l.add('server.port                 = '+IntTOStr(ZarafaApachePort));
+l.add('#server.bind                = "127.0.0.1"');
+l.add('#server.error-handler-404   = "/error-handler.html"');
+l.add('#server.error-handler-404   = "/error-handler.php"');
+l.add('server.pid-file             = "/var/run/zarafa-web/httpd.pid"');
+l.add('server.max-fds 		    = 2048');
+l.add('');
+l.add('fastcgi.server = ( ".php" =>((');
+l.add('                "bin-path" => "/usr/bin/php-cgi",');
+l.add('                "socket" => "/var/run/lighttpd/php.socket",');
+l.add('		       "min-procs" => 1,');
+l.add('                "max-procs" => 2,');
+l.add('	               	"max-load-per-proc" => 2,');
+l.add('                "idle-timeout" => 10,');
+l.add('                "bin-environment" => (');
+l.add('                        "PHP_FCGI_CHILDREN" => "4",');
+l.add('                        "PHP_FCGI_MAX_REQUESTS" => "100"');
+l.add('                ),');
+l.add('                "bin-copy-environment" => (');
+l.add('                        "PATH", "SHELL", "USER"');
+l.add('                ),');
+l.add('                "broken-scriptfilename" => "enable"');
+l.add('        ))');
+l.add(')');
+l.add('ssl.engine                 = "enable"');
+l.add('ssl.pemfile                = "/opt/artica/ssl/certs/lighttpd.pem"');
+l.add('status.status-url          = "/server-status"');
+l.add('status.config-url          = "/server-config"');
+l.add('alias.url += (	"/webmail" 			 => "/usr/share/roundcube")');
+l.add('$HTTP["url"] =~ "^/webmail" {');
+l.add('	server.follow-symlink = "enable"');
+l.add('}');
+l.add('$HTTP["url"] =~ "^/webmail/config|/webmail/temp|/webmail/logs" { url.access-deny = ( "" )}');
+l.add('alias.url +=("/monitorix"  => "/var/www/monitorix/")');
+l.add('alias.url += ("/blocked_attachments"=> "/var/spool/artica-filter/bightml")');
+l.add('alias.url += ("/awstats"=> "/usr/share/awstats")');
+l.add('alias.url += ("/pipermail/" => "/var/lib/mailman/archives/public/")');
+l.add('alias.url += ( "/cgi-bin/" => "/usr/lib/cgi-bin/" )');
+l.add('');
+l.add('cgi.assign= (');
+l.add('	".pl"  => "/usr/bin/perl",');
+l.add('	".php" => "/usr/bin/php-cgi",');
+l.add('	".py"  => "/usr/bin/python",');
+l.add('	".cgi"  => "/usr/bin/perl",');
+l.add('	"/admin" => "",');
+l.add('	"/admindb" => "",');
+l.add('	"/confirm" => "",');
+l.add('	"/create" => "",');
+l.add('	"/edithtml" => "",');
+l.add('	"/listinfo" => "",');
+l.add('	"/options" => "",');
+l.add('	"/private" => "",');
+l.add('	"/rmlist" => "",');
+l.add('	"/roster" => "",');
+l.add('	"/subscribe" => ""');
+l.add(')');
+logs.WriteToFile(l.Text,'/etc/zarafa/lighttpd.conf');
+l.free;
+end;
+
 procedure tzarafa_server.APACHE_START();
 var
    apache:tapache_artica;

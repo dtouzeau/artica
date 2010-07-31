@@ -256,6 +256,7 @@ begin
 if EnablePostfixMultiInstance=1 then begin
    logs.DebugLogs('Starting......: multi-postfix instances enabled, switch to artica-cron.');
    FETCHMAIL_DAEMON_STOP(true);
+   FETCHMAIL_LOGGER_START();
    fpsystem(SYS.LOCATE_PHP5_BIN()+' /usr/share/artica-postfix/exec.fetchmail.php');
    exit;
 end;
@@ -615,28 +616,12 @@ var
 pidpath:string;
 pid:string;
 begin
-
-   if not FileExists(FETCHMAIL_BIN_PATH()) then  begin
-      SYS.MONIT_DELETE('APP_FETCHMAIL');
-      SYS.MONIT_DELETE('APP_FETCHMAIL_LOGGER');
-      exit;
-   end;
-
-   if EnablePostfixMultiInstance=1 then begin
-    SYS.MONIT_DELETE('APP_FETCHMAIL');
-   end;
- pidpath:=logs.FILE_TEMP();
- fpsystem(SYS.LOCATE_PHP5_BIN()+' /usr/share/artica-postfix/exec.status.php --fetchmail >'+pidpath +' 2>&1');
- result:=logs.ReadFromFile(pidpath);
- logs.DeleteFile(pidpath);
-
- if EnableFetchmail=0 then begin
-    SYS.MONIT_DELETE('APP_FETCHMAIL');
-    SYS.MONIT_DELETE('APP_FETCHMAIL_LOGGER');
-    exit;
-end;
-SYS.MONIT_CONFIG('APP_FETCHMAIL_LOGGER','/etc/artica-postfix/exec.fetmaillog.php.pid','fetchmail');
-if EnablePostfixMultiInstance=0 then SYS.MONIT_CONFIG('APP_FETCHMAIL','/var/run/fetchmail.pid','fetchmail');
+SYS.MONIT_DELETE('APP_FETCHMAIL');
+SYS.MONIT_DELETE('APP_FETCHMAIL_LOGGER');
+pidpath:=logs.FILE_TEMP();
+fpsystem(SYS.LOCATE_PHP5_BIN()+' /usr/share/artica-postfix/exec.status.php --fetchmail >'+pidpath +' 2>&1');
+result:=logs.ReadFromFile(pidpath);
+logs.DeleteFile(pidpath);
 end;
 //##############################################################################
 

@@ -998,6 +998,7 @@ function BuildRows($appli,$SockStatus,$internetkey){
 	if(($version=="0") OR (strlen($version)==0)){
 		$version="{not_installed}";
 		$bgcolor=null;
+		$uninstall=null;
 	}
 	
 	if(file_exists(dirname(__FILE__). "/ressources/install/$appli.dbg")){

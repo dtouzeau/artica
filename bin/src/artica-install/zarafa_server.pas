@@ -31,14 +31,8 @@ private
     function  SERVER_GET_PID():string;
     function  DAGENT_GET_PID():string;
     function  ICAL_GET_PID():string;
+    function  LIGHTTPD_PID():string;
 
-    function  SPOOLER_STATUS():string;
-    function  SERVER_STATUS():string;
-    function  DAGENT_STATUS():string;
-    function  GATEWAY_STATUS():string;
-    function  MONITOR_STATUS():string;
-    function  APACHE_STATUS():string;
-    function  ICAL_STATUS():string;
     function  APACHE_FOUND_ERROR():boolean;
 
     procedure CHECK_CYRUS_CONFIG();
@@ -48,9 +42,11 @@ private
     procedure SPOOLER_START();
     procedure MONITOR_START();
     procedure DAGENT_START();
+    procedure LIGHTTPD_START();
     procedure APACHE_CONFIG();
     procedure ICAL_START();
     function  ZARAFA_WEB_PID_NUM():string;
+    procedure lighttpd_config();
 
     procedure SERVER_STOP();
     procedure SPOOLER_STOP();
@@ -686,57 +682,21 @@ end;
 //##############################################################################
 function tzarafa_server.STATUS():string;
 var
-   ini:TstringList;
+pidpath:string;
 begin
-ini:=TStringlist.Create;
-ini.Add(SERVER_STATUS());
-ini.Add(SPOOLER_STATUS());
-ini.Add(DAGENT_STATUS());
-ini.Add(GATEWAY_STATUS());
-ini.Add(MONITOR_STATUS());
-ini.Add(APACHE_STATUS());
-ini.Add(ICAL_STATUS());
-result:=ini.Text;
-ini.free;
-end;
-//##############################################################################
-function tzarafa_server.SERVER_STATUS():string;
-var
-   ini:TstringList;
-   pid,pid_path:string;
-begin
-if not FileExists(BIN_PATH()) then begin
-   SYS.MONIT_DELETE('APP_ZARAFA_SERVER');
-   exit;
-end;
-      ini:=TstringList.Create;
-      ini.Add('[APP_ZARAFA_SERVER]');
-      ini.Add('service_name=APP_ZARAFA');
-      ini.Add('service_cmd=zarafa');
-      ini.Add('service_disabled=0');
-      ini.Add('master_version=' + VERSION());
-      ini.Add('remove_cmd=--zarafa-remove');
+SYS.MONIT_DELETE('APP_ZARAFA_WEB');
+SYS.MONIT_DELETE('APP_ZARAFA_ICAL');
+SYS.MONIT_DELETE('APP_ZARAFA_DAGENT');
+SYS.MONIT_DELETE('APP_ZARAFA_MONITOR');
+SYS.MONIT_DELETE('APP_ZARAFA_GATEWAY');
+SYS.MONIT_DELETE('APP_ZARAFA_SPOOLER');
+SYS.MONIT_DELETE('APP_ZARAFA_SERVER');
+if not FileExists(SERVER_BIN_PATH()) then  exit;
 
-
-
-pid_path:='/var/run/zarafa-server.pid';
-if SYS.MONIT_CONFIG('APP_ZARAFA_SERVER',pid_path,'zarafa') then begin
-      ini.Add('monit=1');
-      result:=ini.Text;
-      ini.free;
-      exit;
-end;
-
-pid:=SERVER_GET_PID();
-
-
-      if SYS.PROCESS_EXIST(pid) then ini.Add('running=1') else  ini.Add('running=0');
-      ini.Add('application_installed=1');
-      ini.Add('master_pid='+ pid);
-      ini.Add('master_memory=' + IntToStr(SYS.PROCESS_MEMORY(pid)));
-      ini.Add('status='+SYS.PROCESS_STATUS(pid));
-      result:=ini.Text;
-      ini.free;
+ pidpath:=logs.FILE_TEMP();
+ fpsystem(SYS.LOCATE_PHP5_BIN()+' /usr/share/artica-postfix/exec.status.php --zarafa >'+pidpath +' 2>&1');
+ result:=logs.ReadFromFile(pidpath);
+ logs.DeleteFile(pidpath);
 end;
 //##############################################################################
 procedure tzarafa_server.SPOOLER_START();
@@ -782,44 +742,6 @@ end;
 logs.DebugLogs('Starting zarafa..............: Zarafa-spooler failed "'+cmd+'"');
 
 
-end;
-//##############################################################################
-function tzarafa_server.SPOOLER_STATUS():string;
-var
-   ini:TstringList;
-   pid,pid_path:string;
-begin
-if not FileExists(BIN_PATH()) then begin
-   SYS.MONIT_DELETE('APP_ZARAFA_SPOOLER');
-   exit;
-end;
-      ini:=TstringList.Create;
-      ini.Add('[APP_ZARAFA_SPOOLER]');
-      ini.Add('service_name=APP_ZARAFA_SPOOLER');
-      ini.Add('service_cmd=zarafa');
-      ini.Add('service_disabled=0');
-      ini.Add('master_version=' + VERSION());
-
-
-
-pid_path:='/var/run/zarafa-spooler.pid';
-if SYS.MONIT_CONFIG('APP_ZARAFA_SPOOLER',pid_path,'zarafa') then begin
-      ini.Add('monit=1');
-      result:=ini.Text;
-      ini.free;
-      exit;
-end;
-
-pid:=SPOOLER_GET_PID();
-
-
-      if SYS.PROCESS_EXIST(pid) then ini.Add('running=1') else  ini.Add('running=0');
-      ini.Add('application_installed=1');
-      ini.Add('master_pid='+ pid);
-      ini.Add('master_memory=' + IntToStr(SYS.PROCESS_MEMORY(pid)));
-      ini.Add('status='+SYS.PROCESS_STATUS(pid));
-      result:=ini.Text;
-      ini.free;
 end;
 //##############################################################################
 procedure tzarafa_server.GATEWAY_START();
@@ -869,44 +791,6 @@ logs.DebugLogs('Starting zarafa..............: Zarafa-gateway failed "'+cmd+'"')
 
 end;
 //##############################################################################
-function tzarafa_server.GATEWAY_STATUS():string;
-var
-   ini:TstringList;
-   pid,pid_path:string;
-begin
-if not FileExists(BIN_PATH()) then begin
-   SYS.MONIT_DELETE('APP_ZARAFA_GATEWAY');
-   exit;
-end;
-      ini:=TstringList.Create;
-      ini.Add('[APP_ZARAFA_GATEWAY]');
-      ini.Add('service_name=APP_ZARAFA_GATEWAY');
-      ini.Add('service_cmd=zarafa');
-      ini.Add('service_disabled=0');
-      ini.Add('master_version=' + VERSION());
-
-
-
-pid_path:='/var/run/zarafa-gateway.pid';
-if SYS.MONIT_CONFIG('APP_ZARAFA_GATEWAY',pid_path,'zarafa') then begin
-      ini.Add('monit=1');
-      result:=ini.Text;
-      ini.free;
-      exit;
-end;
-
-pid:=GATEWAY_GET_PID();
-
-
-      if SYS.PROCESS_EXIST(pid) then ini.Add('running=1') else  ini.Add('running=0');
-      ini.Add('application_installed=1');
-      ini.Add('master_pid='+ pid);
-      ini.Add('master_memory=' + IntToStr(SYS.PROCESS_MEMORY(pid)));
-      ini.Add('status='+SYS.PROCESS_STATUS(pid));
-      result:=ini.Text;
-      ini.free;
-end;
-//##############################################################################
 procedure tzarafa_server.MONITOR_START();
 var
    zbin:string;
@@ -949,44 +833,6 @@ end;
 logs.DebugLogs('Starting zarafa..............: Zarafa-monitor failed');
 
 
-end;
-//##############################################################################
-function tzarafa_server.MONITOR_STATUS():string;
-var
-   ini:TstringList;
-   pid,pid_path:string;
-begin
-if not FileExists(BIN_PATH()) then begin
-   SYS.MONIT_DELETE('APP_ZARAFA_MONITOR');
-   exit;
-end;
-      ini:=TstringList.Create;
-      ini.Add('[APP_ZARAFA_MONITOR]');
-      ini.Add('service_name=APP_ZARAFA_MONITOR');
-      ini.Add('service_cmd=zarafa');
-      ini.Add('service_disabled=0');
-      ini.Add('master_version=' + VERSION());
-
-
-
-pid_path:='/var/run/zarafa-monitor.pid';
-if SYS.MONIT_CONFIG('APP_ZARAFA_MONITOR',pid_path,'zarafa') then begin
-      ini.Add('monit=1');
-      result:=ini.Text;
-      ini.free;
-      exit;
-end;
-
-pid:=GATEWAY_GET_PID();
-
-
-      if SYS.PROCESS_EXIST(pid) then ini.Add('running=1') else  ini.Add('running=0');
-      ini.Add('application_installed=1');
-      ini.Add('master_pid='+ pid);
-      ini.Add('master_memory=' + IntToStr(SYS.PROCESS_MEMORY(pid)));
-      ini.Add('status='+SYS.PROCESS_STATUS(pid));
-      result:=ini.Text;
-      ini.free;
 end;
 //##############################################################################
 procedure tzarafa_server.DAGENT_START();
@@ -1033,44 +879,7 @@ logs.DebugLogs('Starting zarafa..............: Zarafa-LMTP failed');
 
 end;
 //##############################################################################
-function tzarafa_server.DAGENT_STATUS():string;
-var
-   ini:TstringList;
-   pid,pid_path:string;
-begin
-if not FileExists(BIN_PATH()) then begin
-   SYS.MONIT_DELETE('APP_ZARAFA_DAGENT');
-   exit;
-end;
-      ini:=TstringList.Create;
-      ini.Add('[APP_ZARAFA_DAGENT]');
-      ini.Add('service_name=APP_ZARAFA_DAGENT');
-      ini.Add('service_cmd=zarafa');
-      ini.Add('service_disabled=0');
-      ini.Add('master_version=' + VERSION());
 
-
-
-pid_path:='/var/run/zarafa-dagent.pid';
-if SYS.MONIT_CONFIG('APP_ZARAFA_DAGENT',pid_path,'zarafa') then begin
-      ini.Add('monit=1');
-      result:=ini.Text;
-      ini.free;
-      exit;
-end;
-
-pid:=DAGENT_GET_PID();
-
-
-      if SYS.PROCESS_EXIST(pid) then ini.Add('running=1') else  ini.Add('running=0');
-      ini.Add('application_installed=1');
-      ini.Add('master_pid='+ pid);
-      ini.Add('master_memory=' + IntToStr(SYS.PROCESS_MEMORY(pid)));
-      ini.Add('status='+SYS.PROCESS_STATUS(pid));
-      result:=ini.Text;
-      ini.free;
-end;
-//##############################################################################
 procedure tzarafa_server.ICAL_START();
 var
    zbin:string;
@@ -1122,54 +931,6 @@ end;
 logs.DebugLogs('Starting zarafa..............: Zarafa iCal/CalDAV gateway failed "'+cmd+'"');
 end;
 //##############################################################################
-function tzarafa_server.ICAL_STATUS():string;
-var
-   ini:TstringList;
-   pid,pid_path:string;
-   ZarafaiCalEnable:integer;
-begin
-if not FileExists(ICAL_BIN_PATH()) then begin
-   SYS.MONIT_DELETE('APP_ZARAFA_ICAL');
-   exit;
-end;
-    if not TryStrToINt(SYS.GET_INFO('ZarafaiCalEnable'),ZarafaiCalEnable) then ZarafaiCalEnable:=0;
-
-
-      ini:=TstringList.Create;
-      ini.Add('[APP_ZARAFA_ICAL]');
-      ini.Add('service_name=APP_ZARAFA_ICAL');
-      ini.Add('service_cmd=zarafa');
-      ini.Add('service_disabled='+INtToSTr(ZarafaiCalEnable));
-      ini.Add('master_version=' + VERSION());
-
-      if ZarafaiCalEnable=0 then begin
-         result:=ini.Text;
-         ini.free;
-         SYS.MONIT_DELETE('APP_ZARAFA_ICAL');
-         exit;
-      end;
-
-      pid_path:='/var/run/zarafa-ical.pid';
-      if SYS.MONIT_CONFIG('APP_ZARAFA_ICAL',pid_path,'zarafa') then begin
-         ini.Add('monit=1');
-         result:=ini.Text;
-         ini.free;
-         exit;
-      end;
-
-      pid:=ICAL_GET_PID();
-
-
-      if SYS.PROCESS_EXIST(pid) then ini.Add('running=1') else  ini.Add('running=0');
-      ini.Add('application_installed=1');
-      ini.Add('master_pid='+ pid);
-      ini.Add('master_memory=' + IntToStr(SYS.PROCESS_MEMORY(pid)));
-      ini.Add('status='+SYS.PROCESS_STATUS(pid));
-      result:=ini.Text;
-      ini.free;
-end;
-//##############################################################################
-
 procedure tzarafa_server.ICAL_STOP();
 var
    zbin:string;
@@ -1751,6 +1512,237 @@ logs.WriteToFile(l.Text,'/etc/zarafa/httpd.conf');
 l.free;
 end;
 //##############################################################################
+function tzarafa_server.LIGHTTPD_PID():string;
+begin
+   result:=SYS.GET_PID_FROM_PATH('/var/run/zarafa-web/httpd.pid');
+   if length(result)>0 then exit;
+   result:=SYS.PIDOF_PATTERN(SYS.LOCATE_GENERIC_BIN('lighttpd') + ' -f /etc/zarafa/lighttpd.conf');
+
+
+end;
+//##############################################################################
+procedure tzarafa_server.LIGHTTPD_START();
+var
+  pid:string;
+begin
+
+
+     pid:=LIGHTTPD_PID();
+
+
+   if SYS.PROCESS_EXIST(pid) then begin
+      logs.Debuglogs('Starting zarafa..............: lighttpd daemon is already running using PID ' + pid + '...');
+      exit();
+   end;
+
+    lighttpd_config();
+    logs.OutputCmd(SYS.LOCATE_GENERIC_BIN('lighttpd')+ ' -f /etc/zarafa/lighttpd.conf');
+
+
+   if not SYS.PROCESS_EXIST(LIGHTTPD_PID()) then begin
+      logs.Debuglogs('Starting zarafa..............: lighttpd Failed "' + SYS.LOCATE_GENERIC_BIN('lighttpd')+ ' -f /etc/zarafa/lighttpd.conf"');
+    end else begin
+      logs.Debuglogs('Starting zarafa..............: lighttpd Success (PID ' + LIGHTTPD_PID() + ')');
+   end;
+
+end;
+//##############################################################################
+
+procedure tzarafa_server.lighttpd_config();
+var
+   apache:tapache_artica;
+   apache_bin_path:string;
+   modules:string;
+   l:TStringlist;
+   ZarafaApachePort,ZarafaApacheSSL:integer;
+   LighttpdUserAndGroup,username,group,ZarafaApacheServerName:string;
+   RegExpr:TRegExpr;
+
+begin
+apache:=tapache_artica.Create(SYS);
+modules:=apache.SET_MODULES();
+LighttpdUserAndGroup:=SYS.LIGHTTPD_GET_USER();
+ZarafaApacheSSL:=0;
+
+SYS.set_INFO('php5DisableMagicQuotesGpc','1');
+
+
+if not TryStrToInt(SYS.GET_INFO('ZarafaApachePort'),ZarafaApachePort) then ZarafaApachePort:=9010;
+if not TryStrToInt(SYS.GET_INFO('ZarafaApacheSSL'),ZarafaApacheSSL) then ZarafaApacheSSL:=0;
+
+ZarafaApacheServerName:=SYS.GET_INFO('ZarafaApacheServerName');
+if length(ZarafaApacheServerName)=0 then ZarafaApacheServerName:=SYS.HOSTNAME_g();
+
+logs.DebugLogs('Starting zarafa..............: Port: '+INtToStr(ZarafaApachePort));
+logs.DebugLogs('Starting zarafa..............: username:group "'+LighttpdUserAndGroup+'"');
+RegExpr:=TRegExpr.Create;
+RegExpr.Expression:='^(.+?):(.+)';
+if not RegExpr.Exec(LighttpdUserAndGroup) then begin
+ logs.DebugLogs('Starting zarafa..............: Apache daemon unable to stat username and group !');
+ exit;
+end;
+
+if not DirectoryExists('/usr/share/php/mapi') then begin
+   if DirectoryExists('/usr/local/share/php/mapi') then begin
+       logs.DebugLogs('Starting zarafa..............: Apache Create a symbolic link from /usr/local/share/php/mapi');
+      fpsystem('/bin/ln -s /usr/local/share/php/mapi /usr/share/php/mapi');
+   end;
+end;
+
+fpsystem('/bin/cp /usr/share/artica-postfix/img/zarafa-login.jpg /usr/share/zarafa-webaccess/client/layout/img/login.jpg');
+
+username:=RegExpr.Match[1];
+group:=RegExpr.Match[2];
+if length(LighttpdUserAndGroup)=0 then LighttpdUserAndGroup:='www-data:www-data';
+
+forceDirectories('/var/run/zarafa-web');
+ForceDirectories('/var/log/apache-zarafa');
+fpsystem('/bin/chown '+LighttpdUserAndGroup+' /var/run/zarafa-web');
+fpsystem('/bin/chown '+LighttpdUserAndGroup+' /var/log/apache-zarafa');
+l:=Tstringlist.Create;
+
+
+
+l.add('#artica-postfix saved by artica lighttpd.conf');
+l.add('');
+l.add('server.modules = (');
+l.add('        "mod_alias",');
+l.add('        "mod_access",');
+l.add('        "mod_accesslog",');
+l.add('        "mod_compress",');
+l.add('        "mod_fastcgi",');
+l.add('        "mod_cgi",');
+l.add('	       "mod_status",');
+l.add('	       "mod_auth"');
+l.add(')');
+l.add('');
+l.add('server.document-root        = "/usr/share/zarafa-webaccess"');
+l.add('server.username = "'+username+'"');
+l.add('server.groupname = "'+group+'"');
+l.add('server.errorlog             = "/var/log/lighttpd/zarafa-webaccess-error.log"');
+l.add('index-file.names            = ( "index.php")');
+l.add('');
+l.add('mimetype.assign             = (');
+l.add('  ".pdf"          =>      "application/pdf",');
+l.add('  ".sig"          =>      "application/pgp-signature",');
+l.add('  ".spl"          =>      "application/futuresplash",');
+l.add('  ".class"        =>      "application/octet-stream",');
+l.add('  ".ps"           =>      "application/postscript",');
+l.add('  ".torrent"      =>      "application/x-bittorrent",');
+l.add('  ".dvi"          =>      "application/x-dvi",');
+l.add('  ".gz"           =>      "application/x-gzip",');
+l.add('  ".pac"          =>      "application/x-ns-proxy-autoconfig",');
+l.add('  ".swf"          =>      "application/x-shockwave-flash",');
+l.add('  ".tar.gz"       =>      "application/x-tgz",');
+l.add('  ".tgz"          =>      "application/x-tgz",');
+l.add('  ".tar"          =>      "application/x-tar",');
+l.add('  ".zip"          =>      "application/zip",');
+l.add('  ".mp3"          =>      "audio/mpeg",');
+l.add('  ".m3u"          =>      "audio/x-mpegurl",');
+l.add('  ".wma"          =>      "audio/x-ms-wma",');
+l.add('  ".wax"          =>      "audio/x-ms-wax",');
+l.add('  ".ogg"          =>      "application/ogg",');
+l.add('  ".wav"          =>      "audio/x-wav",');
+l.add('  ".gif"          =>      "image/gif",');
+l.add('  ".jar"          =>      "application/x-java-archive",');
+l.add('  ".jpg"          =>      "image/jpeg",');
+l.add('  ".jpeg"         =>      "image/jpeg",');
+l.add('  ".png"          =>      "image/png",');
+l.add('  ".xbm"          =>      "image/x-xbitmap",');
+l.add('  ".xpm"          =>      "image/x-xpixmap",');
+l.add('  ".xwd"          =>      "image/x-xwindowdump",');
+l.add('  ".css"          =>      "text/css",');
+l.add('  ".html"         =>      "text/html",');
+l.add('  ".htm"          =>      "text/html",');
+l.add('  ".js"           =>      "text/javascript",');
+l.add('  ".asc"          =>      "text/plain",');
+l.add('  ".c"            =>      "text/plain",');
+l.add('  ".cpp"          =>      "text/plain",');
+l.add('  ".log"          =>      "text/plain",');
+l.add('  ".conf"         =>      "text/plain",');
+l.add('  ".text"         =>      "text/plain",');
+l.add('  ".txt"          =>      "text/plain",');
+l.add('  ".dtd"          =>      "text/xml",');
+l.add('  ".xml"          =>      "text/xml",');
+l.add('  ".mpeg"         =>      "video/mpeg",');
+l.add('  ".mpg"          =>      "video/mpeg",');
+l.add('  ".mov"          =>      "video/quicktime",');
+l.add('  ".qt"           =>      "video/quicktime",');
+l.add('  ".avi"          =>      "video/x-msvideo",');
+l.add('  ".asf"          =>      "video/x-ms-asf",');
+l.add('  ".asx"          =>      "video/x-ms-asf",');
+l.add('  ".wmv"          =>      "video/x-ms-wmv",');
+l.add('  ".bz2"          =>      "application/x-bzip",');
+l.add('  ".tbz"          =>      "application/x-bzip-compressed-tar",');
+l.add('  ".tar.bz2"      =>      "application/x-bzip-compressed-tar",');
+l.add('  ""              =>      "application/octet-stream",');
+l.add(' )');
+l.add('');
+l.add('');
+l.add('accesslog.filename          = "/var/log/lighttpd/zarafa-webaccess-access.log"');
+l.add('url.access-deny             = ( "~", ".inc" )');
+l.add('');
+l.add('static-file.exclude-extensions = ( ".php", ".pl", ".fcgi" )');
+l.add('server.port                 = '+IntTOStr(ZarafaApachePort));
+l.add('#server.bind                = "127.0.0.1"');
+l.add('#server.error-handler-404   = "/error-handler.html"');
+l.add('#server.error-handler-404   = "/error-handler.php"');
+l.add('server.pid-file             = "/var/run/zarafa-web/httpd.pid"');
+l.add('server.max-fds 		    = 2048');
+l.add('');
+l.add('fastcgi.server = ( ".php" =>((');
+l.add('                "bin-path" => "/usr/bin/php-cgi",');
+l.add('                "socket" => "/var/run/lighttpd/php.socket",');
+l.add('		       "min-procs" => 1,');
+l.add('                "max-procs" => 2,');
+l.add('	               	"max-load-per-proc" => 2,');
+l.add('                "idle-timeout" => 10,');
+l.add('                "bin-environment" => (');
+l.add('                        "PHP_FCGI_CHILDREN" => "4",');
+l.add('                        "PHP_FCGI_MAX_REQUESTS" => "100"');
+l.add('                ),');
+l.add('                "bin-copy-environment" => (');
+l.add('                        "PATH", "SHELL", "USER"');
+l.add('                ),');
+l.add('                "broken-scriptfilename" => "enable"');
+l.add('        ))');
+l.add(')');
+l.add('ssl.engine                 = "enable"');
+l.add('ssl.pemfile                = "/opt/artica/ssl/certs/lighttpd.pem"');
+l.add('status.status-url          = "/server-status"');
+l.add('status.config-url          = "/server-config"');
+l.add('alias.url += (	"/webmail" 			 => "/usr/share/roundcube")');
+l.add('$HTTP["url"] =~ "^/webmail" {');
+l.add('	server.follow-symlink = "enable"');
+l.add('}');
+l.add('$HTTP["url"] =~ "^/webmail/config|/webmail/temp|/webmail/logs" { url.access-deny = ( "" )}');
+l.add('alias.url +=("/monitorix"  => "/var/www/monitorix/")');
+l.add('alias.url += ("/blocked_attachments"=> "/var/spool/artica-filter/bightml")');
+l.add('alias.url += ("/awstats"=> "/usr/share/awstats")');
+l.add('alias.url += ("/pipermail/" => "/var/lib/mailman/archives/public/")');
+l.add('alias.url += ( "/cgi-bin/" => "/usr/lib/cgi-bin/" )');
+l.add('');
+l.add('cgi.assign= (');
+l.add('	".pl"  => "/usr/bin/perl",');
+l.add('	".php" => "/usr/bin/php-cgi",');
+l.add('	".py"  => "/usr/bin/python",');
+l.add('	".cgi"  => "/usr/bin/perl",');
+l.add('	"/admin" => "",');
+l.add('	"/admindb" => "",');
+l.add('	"/confirm" => "",');
+l.add('	"/create" => "",');
+l.add('	"/edithtml" => "",');
+l.add('	"/listinfo" => "",');
+l.add('	"/options" => "",');
+l.add('	"/private" => "",');
+l.add('	"/rmlist" => "",');
+l.add('	"/roster" => "",');
+l.add('	"/subscribe" => ""');
+l.add(')');
+logs.WriteToFile(l.Text,'/etc/zarafa/lighttpd.conf');
+l.free;
+end;
+
 procedure tzarafa_server.APACHE_START();
 var
    apache:tapache_artica;
@@ -1839,44 +1831,6 @@ begin
 
 
 
-end;
-//##############################################################################
-
-function tzarafa_server.APACHE_STATUS():string;
-var
-   ini:TstringList;
-   pid,pid_path:string;
-begin
-if not FileExists(BIN_PATH()) then begin
-   SYS.MONIT_DELETE('APP_ZARAFA_WEB');
-   exit;
-end;
-      ini:=TstringList.Create;
-      ini.Add('[APP_ZARAFA_WEB]');
-      ini.Add('service_name=APP_ZARAFA_WEB');
-      ini.Add('service_cmd=zarafa-web');
-      ini.Add('service_disabled=0');
-      ini.Add('master_version=' + VERSION());
-
-pid_path:='/var/run/zarafa-web/httpd.pid';
-
-if SYS.MONIT_CONFIG('APP_ZARAFA_WEB',pid_path,'zarafa-web') then begin
-      ini.Add('monit=1');
-      result:=ini.Text;
-      ini.free;
-      exit;
-end;
-
-pid:=ZARAFA_WEB_PID_NUM();
-
-
-      if SYS.PROCESS_EXIST(pid) then ini.Add('running=1') else  ini.Add('running=0');
-      ini.Add('application_installed=1');
-      ini.Add('master_pid='+ pid);
-      ini.Add('master_memory=' + IntToStr(SYS.PROCESS_MEMORY(pid)));
-      ini.Add('status='+SYS.PROCESS_STATUS(pid));
-      result:=ini.Text;
-      ini.free;
 end;
 //##############################################################################
 function tzarafa_server.ZARAFA_WEB_PID_NUM():string;

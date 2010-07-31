@@ -8,7 +8,7 @@ uses
   RegExpr,zsystem,IniFiles,
   global_conf in 'global_conf.pas',common,process_infos,cyrus,clamav,spamass,pureftpd,roundcube,openldap,spfmilter,samba,mimedefang,bogofilter,squid,stunnel4,dkimfilter,
   postfix_class,mailgraph_daemon,lighttpd,miltergreylist,dansguardian,monitorix,kav4samba,awstats,ntpd,kav4proxy,bind9,fdm,p3scan,syslogng,kas3,isoqlog,dhcp_server,cups,wifi,
-  dnsmasq,kavmilter,  jcheckmail, rdiffbackup,openvpn,strutils,xapian,dstat,BaseUnix,nfsserver,policyd_weight,tcpip,pdns,mysql_daemon,zabbix,assp,postfilter, vmwaretools,phpldapadmin,zarafa_server,squidguard,
+  dnsmasq,kavmilter,  jcheckmail, rdiffbackup,openvpn,strutils,xapian,dstat,BaseUnix,nfsserver,policyd_weight,tcpip,pdns,mysql_daemon,assp,postfilter, vmwaretools,phpldapadmin,zarafa_server,squidguard,
   collectd         in '/home/dtouzeau/developpement/artica-postfix/bin/src/artica-install/collectd.pas',
   fetchmail        in '/home/dtouzeau/developpement/artica-postfix/bin/src/artica-install/fetchmail.pas',
   mailspy_milter   in '/home/dtouzeau/developpement/artica-postfix/bin/src/artica-install/mailspy_milter.pas',
@@ -522,7 +522,7 @@ end;
 
 PROCEDURE Tprocess1.web_settings();
 var
-   lock : TextFile;
+
    application_postgrey:string;
    courier_authdaemon,courier_imap,courier_imap_ssl,courier_pop,courier_pop_ssl,kav_mail,KAV_MILTER_PID:string;
    authmodulelist,mysql_init_path:string;
@@ -544,7 +544,6 @@ var
    kavProxy              :tkav4proxy;
    p3scan                :tp3scan;
    kas3                  :tkas3;
-   arrayqueue            :string;
    dnsmasq               :tdnsmasq;
    kavmilter             :tkavmilter;
    collectd              :tcollectd;
@@ -568,7 +567,6 @@ var
    pdns                  :tpdns;
    mysqld                :tmysql_daemon;
    openldap              :topenldap;
-   zabbix                :tzabbix;
    assp                  :tassp;
    postfilter            :tpostfilter;
    vmwaretools           :tvmtools;
@@ -605,10 +603,10 @@ begin
        amavis:=Tamavis.Create(SYS);
        ddar:=trdiffbackup.Create;
        openvpn:=topenvpn.Create(SYS);
-       zabbix:=tzabbix.Create(SYS);
 
 
-       arrayqueue:='';
+
+
        WifiCardOk:=0;
        kas3:=Tkas3.Create(SYS);
        dnsmasq:=tdnsmasq.Create(SYS);
@@ -1056,7 +1054,7 @@ begin
 //*********************************** POSTFIX **********************************
 logs.Debuglogs('Tprocess1.web_settings():: ############# CHECKING POSTFIX #######################');
 
-if FileExists('/usr/sbin/postconf') then begin
+if FileExists(SYS.LOCATE_GENERIC_BIN('postconf')) then begin
         list.Add('$_GLOBAL["POSTFIX_INSTALLED"]=True;');
 
         //------------- policyd-weight
@@ -1083,6 +1081,7 @@ if FileExists('/usr/sbin/postconf') then begin
             list.Add('$_GLOBAL["MILTERGREYLIST_INSTALLED"]=False;');
         end;
 
+        if FileExists(SYS.LOCATE_GENERIC_BIN('postmulti')) then list.Add('$_GLOBAL["POSTMULTI"]=True;') else list.Add('$_GLOBAL["POSTMULTI"]=False;');
         if postfix.POSTFIX_LDAP_COMPLIANCE() then list.Add('$_GLOBAL["POSTFIX_LDAP_COMPLIANCE"]=True;') else list.Add('$_GLOBAL["POSTFIX_LDAP_COMPLIANCE"]=False;');
         if FileExists(postfix.gnarwl_path()) then list.Add('$_GLOBAL["GNARWL_INSTALLED"]=True;') else list.Add('$_GLOBAL["GNARWL_INSTALLED"]=False;');
         if SYS.PROCESS_EXIST(SYS.PIDOF('master'))=True then list.Add('$_GLOBAL["postfix_on_memorie"]=True;') else list.Add('$_GLOBAL["postfix_on_memorie"]=False;');
@@ -1664,7 +1663,6 @@ end;
 //##############################################################################
 procedure Tprocess1.CleanCpulimit();
 var
-   min:integer;
    CpuPOurc:integer;
    l:Tstringlist;
    i:Integer;

@@ -19,6 +19,30 @@ if($delete_mailbox==1){
 DeleteUser($ou);
 $ldap=new clladp();
 $ldap->ldap_delete("ou=$ou,dc=organizations,$ldap->suffix",true);
+
+	$sql="DELETE FROM postfix_multi WHERE ou='$ou'";
+	$q=new mysql();
+	$q->QUERY_SQL($sql,"artica_backup");
+	
+	$sql="DELETE FROM reports WHERE ou='$ou'";
+	$q->QUERY_SQL($sql,"artica_backup");
+	
+	$sql="DELETE FROM nics_virtuals WHERE org='$ou'";
+	$q->QUERY_SQL($sql,"artica_backup");
+	
+	$sql="DELETE FROM emailing_campain_queues WHERE ou='$ou'";
+	$q->QUERY_SQL($sql,"artica_backup");
+	
+	$sql="DELETE FROM emailing_campain_linker WHERE ou='$ou'";
+	$q->QUERY_SQL($sql,"artica_backup");
+	
+	$sql="DELETE FROM emailing_db_paths WHERE ou='$ou'";
+	$q->QUERY_SQL($sql,"artica_backup");
+	
+	$sql="DELETE FROM emailing_mailers WHERE ou='$ou'";
+	$q->QUERY_SQL($sql,"artica_backup");
+
+
 writelogs("PHP Infos: Delete $ou organization done...","main",__FILE__,__LINE__);
 die();
 

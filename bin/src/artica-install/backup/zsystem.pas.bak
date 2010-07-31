@@ -199,7 +199,7 @@ public
 
        //processes
        function ExecPipe(commandline:string):string;
-       function COMPILE_PROXY():string;
+       procedure COMPILE_PROXY();
        function GET_PHP_INI(key:string):string;
        function LOCATE_OPENSSL_TOOL_PATH():string;
        function LOCATE_APACHE_INITD_PATH:string;
@@ -1884,6 +1884,7 @@ begin
         exit;
      end;
   end;
+
   try
      ini:=TiniFile.Create('/etc/artica-postfix/versions.cache');
   except
@@ -5219,7 +5220,7 @@ if FIleExists('/etc/rsyslog.d/50-default.conf') then exit('/etc/rsyslog.d/50-def
 if FileExists('/etc/rsyslog.conf') then exit('/etc/rsyslog.conf');
 end;
 //##############################################################################
-function Tsystem.COMPILE_PROXY():string;
+procedure Tsystem.COMPILE_PROXY();
 var i:integer;
 l:TstringList;
 RegExpr:TRegExpr;
@@ -7080,7 +7081,6 @@ procedure Tsystem.usb_change_disk_label(dev:string;newname:string);
 var
    logs:Tlogs;
    ExtType:string;
-   mountdev:string;
    l:Tstringlist;
 begin
   logs:=Tlogs.Create;
@@ -7099,22 +7099,32 @@ begin
   ExtType:=usbType(dev);
 
   logs.Debuglogs('usb_change_label:: ' + dev+': ext '+ExtType);
+  logs.Debuglogs('usb_change_label:: New label "' + newname+'"');
 
 
   if ExtType='vfat' then begin
+     logs.Debuglogs('usb_change_label:: using mlabel');
      if FileExists('/usr/bin/mlabel') then logs.OutputCmd('/usr/bin/mlabel -i '+dev+' ::'+newname);
   end;
 
   if ExtType='msdos' then begin
+     logs.Debuglogs('usb_change_label:: using mlabel');
      if FileExists('/usr/bin/mlabel') then logs.OutputCmd('/usr/bin/mlabel -i '+dev+' ::'+newname);
   end;
 
 
   if ExtType='ext2' then begin
+     logs.Debuglogs('usb_change_label:: using e2label');
      if FileExists('/sbin/e2label') then logs.OutputCmd('/sbin/e2label '+dev+' '+newname);
   end;
 
   if ExtType='ext3' then begin
+      logs.Debuglogs('usb_change_label:: using e2label');
+     if FileExists('/sbin/e2label') then logs.OutputCmd('/sbin/e2label '+dev+' '+newname);
+  end;
+
+  if ExtType='ext4' then begin
+      logs.Debuglogs('usb_change_label:: using e2label');
      if FileExists('/sbin/e2label') then logs.OutputCmd('/sbin/e2label '+dev+' '+newname);
   end;
    sleep(2000);
@@ -7180,12 +7190,9 @@ end;
 //##############################################################################
 function Tsystem.disk_change_fstab(dev:string;ext:string;target:string):string;
 var
-   tmpfile:string;
    l:TstringList;
    i:integer;
    RegExpr:TRegExpr;
-   D:boolean;
-   logs:Tlogs;
    devExp:string;
    found:Boolean;
    line:string;
@@ -7224,15 +7231,11 @@ end;
 //##############################################################################
 function Tsystem.disk_fstab_target_already_set(target:string):boolean;
 var
-   tmpfile:string;
+
    l:TstringList;
    i:integer;
    RegExpr:TRegExpr;
-   D:boolean;
-   logs:Tlogs;
    devExp:string;
-   found:Boolean;
-   line:string;
 begin
  if not FileExists('/etc/fstab') then exit;
    result:=false;
@@ -7262,13 +7265,10 @@ var
    l:TstringList;
    i:integer;
    RegExpr:TRegExpr;
-   D:boolean;
    logs:Tlogs;
 begin
-D:=false;
-logs:=Tlogs.Create;
-D:=COMMANDLINE_PARAMETERS('--debug');
 
+logs:=Tlogs.Create;
 tmpfile:=logs.FILE_TEMP();
   fpsystem('/bin/mount -l >'+tmpfile + ' 2>&1');
   if not FileExists(tmpfile) then exit;
@@ -7435,7 +7435,6 @@ function Tsystem.APP_UNZIP_VERSION():string;
 
   var
    RegExpr:TRegExpr;
-   x:string;
    tmpstr:string;
    l:TstringList;
    i:integer;
@@ -7502,12 +7501,8 @@ end;
 function Tsystem.ETC_SERVICES_PORT(servicename:string):integer;
 var
  l:Tstringlist;
- tmpstr:string;
- zlogs:Tlogs;
  RegExpr:TRegExpr;
- r:Tstringlist;
  i:integer;
- cmd:string;
 begin
     result:=0;
     if not FileExists('/etc/services') then exit;
@@ -7626,6 +7621,7 @@ begin
    zlogs.Debuglogs('Tsystem.FSTAB_ADD found "'+devstring+'" AND "'+mountstring+'" in '+IntToStr(l.Count)+' lines');
 
    f:=false;
+   RegExpr:=TRegExpr.Create;
    for i:=0 to l.Count-1 do begin
        RegExpr.Expression:=devstring;
        if RegExpr.Exec(l.Strings[i]) then begin
@@ -7665,11 +7661,9 @@ var
    l:Tstringlist;
    RegExpr:TRegExpr;
    devstring:string;
-   mountstring:string;
    i:integer;
    etc_ld_so_conf_logs:Tlogs;
    f:boolean;
-   cmd:string;
 begin
    f:=false;
    devstring:=path;

@@ -6,7 +6,7 @@ unit fetchmail;
 interface
 
 uses
-    Classes, SysUtils,variants,strutils,IniFiles, Process,md5,logs,unix,RegExpr in 'RegExpr.pas',zsystem,lighttpd;
+    Classes, SysUtils,variants,strutils,IniFiles, Process,logs,unix,RegExpr in 'RegExpr.pas',zsystem;
 
   type
   tfetchmail=class
@@ -256,6 +256,7 @@ begin
 if EnablePostfixMultiInstance=1 then begin
    logs.DebugLogs('Starting......: multi-postfix instances enabled, switch to artica-cron.');
    FETCHMAIL_DAEMON_STOP(true);
+   FETCHMAIL_LOGGER_START();
    fpsystem(SYS.LOCATE_PHP5_BIN()+' /usr/share/artica-postfix/exec.fetchmail.php');
    exit;
 end;

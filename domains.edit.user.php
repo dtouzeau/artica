@@ -2393,9 +2393,7 @@ $listdistri=Paragraphe("64-bg_addresses.png",'{mailing_list}','{user_to_mailing_
 	if(!$usermenus->AMAVIS_INSTALLED){$AmavisSettings=null;}
 	
 	if($usermenus->imapsync_installed){
-		if($usermenus->cyrus_imapd_installed){
-			$imapsync=Paragraphe("sync-64.png","{import_mailbox}","{export_mailbox_text}","javascript:Loadjs('mailsync.php?uid=$us->uid')");
-		}
+		$imapsync=Paragraphe("sync-64.png","{import_mailbox}","{export_mailbox_text}","javascript:Loadjs('mailsync.php?uid=$us->uid')");
 	}
 
 	if($usermenus->cyrus_imapd_installed){

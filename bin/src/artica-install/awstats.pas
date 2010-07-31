@@ -6,7 +6,7 @@ unit awstats;
 interface
 
 uses
-    Classes, SysUtils,variants,strutils,IniFiles, Process,md5,logs,unix,RegExpr in 'RegExpr.pas',zsystem,squid;
+    Classes, SysUtils,variants,strutils,Process,logs,unix,RegExpr in 'RegExpr.pas',zsystem,squid;
 
 type LDAP=record
       admin:string;
@@ -22,8 +22,6 @@ type LDAP=record
 
 private
      LOGS:Tlogs;
-     D:boolean;
-     GLOBAL_INI:TiniFIle;
      SYS:TSystem;
      artica_path:string;
      squid:Tsquid;
@@ -566,11 +564,7 @@ end;
 
 //#############################################################################
 procedure tawstats.AWSTATS_GENERATE();
-var maintool,artica_path:string;
- FileDatas:TStringList;
- D:boolean;
- i:integer;
- Zcommand,zConfig:string;
+var maintool:string;
  EnableAwstatMail:integer;
 
 begin

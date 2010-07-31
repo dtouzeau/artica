@@ -28,7 +28,6 @@ private
      artica_path:string;
      SQUIDEnable:integer;
      SquidEnableProxyPac:integer;
-     myversion:integer;
      TAIL_STARTUP:string;
      function COMMANDLINE_PARAMETERS(FoundWhatPattern:string):boolean;
      function get_INFOS(key:string):string;
@@ -90,8 +89,6 @@ public
     //ProxyPac
     procedure   PROXY_PAC_STOP();
     procedure   PROXY_PAC_START();
-    function    PROXY_PAC_STATUS():string;
-
 
 END;
 
@@ -158,7 +155,6 @@ function tsquid.icap_enabled():boolean;
 var
    l            :TstringList;
    RegExpr      :TRegExpr;
-   Found        :boolean;
    i            :integer;
    FileTemp     :string;
 begin
@@ -193,7 +189,6 @@ function tsquid.ntlm_enabled():boolean;
 var
    l            :TstringList;
    RegExpr      :TRegExpr;
-   Found        :boolean;
    i            :integer;
    FileTemp     :string;
 begin
@@ -227,7 +222,6 @@ procedure tsquid.ERROR_FD();
 var
    l            :TstringList;
    RegExpr      :TRegExpr;
-   Found        :boolean;
    i            :integer;
    FileTemp     :string;
    LastLog      :string;
@@ -337,6 +331,7 @@ var
    D:Boolean;
 begin
 D:=SYS.COMMANDLINE_PARAMETERS('--verbose');
+F:=false;
 result:=false;
 tmpstr:=LOGS.FILE_TEMP();
 fpsystem(SYS.LOCATE_IPTABLES() + ' -L -t nat --line-numbers >'+tmpstr + ' 2>&1');
@@ -375,9 +370,8 @@ end;
 
 function tsquid.GET_LOCAL_PORT():string;
 var
-   l            :TstringList;
    RegExpr      :TRegExpr;
-   i            :integer;
+
 
 begin
     if DansGuardianEnabled=1 then begin
@@ -424,7 +418,6 @@ procedure tsquid.START_SIMPLE();
     pid:string;
     count:integer;
     SYS:Tsystem;
-    sslogs:string;
     pidpath:string;
     l:TstringList;
     FileTemp:string;
@@ -509,16 +502,9 @@ end;
 procedure tsquid.SQUID_START();
  var
     pid:string;
-    count:integer;
     SYS:Tsystem;
-    sslogs:string;
     pidpath:string;
-    l:TstringList;
-    FileTemp:string;
-    options:string;
-    http_port:string;
 begin
-count:=0;
 SYS:=Tsystem.Create;
   if not FileExists(SQUID_BIN_PATH()) then begin
      logs.Debuglogs('Starting......: Squid is not installed aborting...');
@@ -543,13 +529,13 @@ end;
      if SQUIDEnable=0 then SQUID_STOP();
    exit;
   end;
-  http_port:=SQUID_GET_CONFIG('http_port');
-  options:=' -D -sYC -a '+http_port +' -f ' +SQUID_CONFIG_PATH();
+  //http_port:=SQUID_GET_CONFIG('http_port');
+ // options:=' -D -sYC -a '+http_port +' -f ' +SQUID_CONFIG_PATH();
   
 
   pidpath:=SQUID_GET_CONFIG('pid_filename');
   LOGS.DeleteFile(pidpath);
-  FileTemp:=artica_path+'/ressources/logs/squid.start.daemon';
+ // FileTemp:=artica_path+'/ressources/logs/squid.start.daemon';
   
        if not SYS.IsUserExists('squid') then begin
            logs.DebugLogs('Starting......: Squid user "squid" doesn''t exists... reconfigure squid');
@@ -625,10 +611,9 @@ function tsquid.SQUID_GET_CONFIG(key:string):string;
 var
    tmp          :TstringList;
    RegExpr      :TRegExpr;
-   Found        :boolean;
    i            :integer;
 begin
- found:=false;
+
  if not FileExists(SQUID_CONFIG_PATH()) then exit;
  
  tmp:=TstringList.Create;
@@ -652,7 +637,7 @@ PROCEDURE tsquid.SQUID_VERIFY_CACHE();
     RegExpr  :TRegExpr;
     path     :string;
     i        :integer;
-    user,group,cache_store_log,cache_log,access_log,coredump_dir,visible_hostname,cache_dir:string;
+    user,group,cache_store_log,cache_log,access_log,coredump_dir,visible_hostname:string;
 begin
 
    user:=SQUID_GET_CONFIG('cache_effective_user');
@@ -1049,7 +1034,7 @@ begin
  if not FileExists(SQUID_BIN_PATH()) then exit;
  SYS.MONIT_DELETE('APP_SQUID');
  pidpath:=logs.FILE_TEMP();
- fpsystem(SYS.LOCATE_PHP5_BIN()+' /usr/share/artica-postfix/exec.status.php --squid >'+pidpath +' 2>&1');
+ fpsystem(SYS.LOCATE_PHP5_BIN()+' /usr/share/artica-postfix/exec.status.php --all-squid >'+pidpath +' 2>&1');
  result:=logs.ReadFromFile(pidpath);
  logs.DeleteFile(pidpath);
 end;
@@ -1082,8 +1067,6 @@ var
    tmp            :string;
    tmp2           :string;
    RegExpr        :TRegExpr;
-   t              :integer;
-   i              :int64;
 begin
    result:=0;
    RegExpr:=TRegExpr.Create;
@@ -1330,7 +1313,6 @@ end;
 //#############################################################################
 function tsquid.SARG_SCAN():string;
 var
-   tmp            :string;
    RegExpr        :TRegExpr;
    l:Tstringlist;
    i:Integer;
@@ -1782,53 +1764,5 @@ pid:=PROXY_PAC_PID();
    writeln('Stopping proxy.pac service...: failed');
 end;
 //##############################################################################
-function tsquid.PROXY_PAC_STATUS():string;
-var
-   ini:TstringList;
-   pid,pid_path:string;
-
-begin
-if not FileExists(SQUID_BIN_PATH()) then begin
-   SYS.MONIT_DELETE('APP_PROXY_PAC');
-   exit;
-end;
-
-
-
-      ini:=TstringList.Create;
-      ini.Add('[APP_PROXY_PAC]');
-      ini.Add('service_name=APP_PROXY_PAC');
-      ini.Add('service_cmd=proxy-pac');
-      ini.Add('service_disabled='+INtToSTr(SquidEnableProxyPac));
-      ini.Add('master_version=0.00');
-
-      if SquidEnableProxyPac=0 then begin
-         result:=ini.Text;
-         ini.free;
-         SYS.MONIT_DELETE('APP_PROXY_PAC');
-         exit;
-      end;
-
-      pid_path:='/var/run/proxypac.pid';
-      if SYS.MONIT_CONFIG('APP_PROXY_PAC',pid_path,'proxy-pac') then begin
-         ini.Add('monit=1');
-         result:=ini.Text;
-         ini.free;
-         exit;
-      end;
-
-      pid:=PROXY_PAC_PID();
-
-
-      if SYS.PROCESS_EXIST(pid) then ini.Add('running=1') else  ini.Add('running=0');
-      ini.Add('application_installed=1');
-      ini.Add('master_pid='+ pid);
-      ini.Add('master_memory=' + IntToStr(SYS.PROCESS_MEMORY(pid)));
-      ini.Add('status='+SYS.PROCESS_STATUS(pid));
-      result:=ini.Text;
-      ini.free;
-end;
-//#####################################################################################
-
 
 end.

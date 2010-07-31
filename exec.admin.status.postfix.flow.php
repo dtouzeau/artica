@@ -183,6 +183,13 @@ function daemons_status(){
 		
 	}
 	
+	$ldap=new clladp();
+	$hash=$ldap->hash_get_ou();
+	$ldap->ldap_close();
+	if(count($hash)<1){
+		$no_orgs=Paragraphe('org-warning-64.png',"{no_organization}","{no_organization_text_jgrowl}","javascript:TreeAddNewOrganisation()",null,300,76);
+	}
+	
 	
 	
 	if($users->POSTFIX_INSTALLED){
@@ -258,6 +265,7 @@ function daemons_status(){
 	$newversion=null;
 
 	$final="
+	$no_orgs
 	$services
 	$nobackup
 	$events_paragraphe

@@ -382,9 +382,9 @@ class templates{
 		$content=replace_accents($content);
 		if($noremovecrlf==0){
 			$content=nl2br($content);
-			$content=str_replace("\n",'\n',$content);
-			$content=str_replace("<br>",'\n',$content);
-			$content=str_replace("<br />",'\n',$content);
+			$content=str_replace("\n","\\n",$content);
+			$content=str_replace("<br>","\\n",$content);
+			$content=str_replace("<br />","\\n",$content);
 			
 		}else{
 			$content=str_replace("<br />",'',$content);
@@ -2293,7 +2293,11 @@ function hide_ressources($pattern){
 function Paragraphe($img,$title,$text,$link=null,$tips="go_to_section",$width="210",$height=null,$nowrap=0,$float=false,$nojs=false){
 	
 	
-	
+	if(is_array($img)){
+		$img_add_1=$img[1];
+		$img_add_2=$img[2];
+		$img=$img[0];
+	}
 	if(posix_getuid()==0){$GLOBALS["EXECUTED_AS_ROOT"]=true;}
 	$tpl=new templates();
 	$tips=$text;
@@ -2422,16 +2426,18 @@ if(strlen($title)>30){$tips="<b>$title</b><br>$tips";}
 	$text=str_replace("<br />"," ",$text);
 	$text=str_replace("<br>"," ",$text);
 
-	$OnMouseOver="OnMouseOver=\"javascript:this.className='paragraphe_over';this.style.cursor='pointer';$tooltip_over\"";
-	$OnMouseOut="OnMouseOut=\"javascript:this.className='paragraphe';this.style.cursor='default';$tooltip_out\"";
+	$OnMouseOver="OnMouseOver=\"javascript:this.className='paragraphe_over';this.style.cursor='pointer';\"";
+	$OnMouseOut="OnMouseOut=\"javascript:this.className='paragraphe';this.style.cursor='default';\"";
 	
+	$OnMouseOverToolTip="OnMouseOver=\"$tooltip_over\"";
+	$OnMouseOutToolTip="OnMouseOut=\"$tooltip_out\"";
 	
 	$html="
-	<div style='width:{$width}px$height$styleFloat' class='paragraphe' id='$id' $h3style $OnMouseOver $OnMouseOut>
+	<div style='width:{$width}px$height$styleFloat' class='paragraphe' id='$id' $OnMouseOver $OnMouseOut>
 	<table style='width:100%'>
 	<tr>
-	<td width=1% valign='top'>$bigA$hrf$img_p</a></td>
-	<td valign='top' >$title$text</td>
+	<td width=1% valign='top'><div $h3style $OnMouseOverToolTip $OnMouseOutToolTip>$bigA$hrf$img_p</a></div>$img_add_1$img_add_2</td>
+	<td valign='top' ><div $h3style $OnMouseOverToolTip $OnMouseOutToolTip>$title$text</div></td>
 	</tr>
 	</table>
 	</div>
@@ -3622,7 +3628,7 @@ return round($difference/60);
 }
 
 
-function send_email_events($subject,$text,$context,$date=null){
+function send_email_events($subject,$text,$context,$date=null,$attached_files=array(),$recipient=null){
 	
 	$arr_APP=array(
 		"APP_ROUNDCUBE"=>"Web service For RoundCube",
@@ -3700,9 +3706,12 @@ function send_email_events($subject,$text,$context,$date=null){
 	$ini->set('LOG','date',$date);
 	$ini->set('LOG','context',$context);
 	$ini->set('LOG','subject',"[$datesubject]: [ARTICA]: ($users->hostname) : $subject");
+	$ini->set('LOG','recipient',$recipient);
 	$ini->saveFile($filename);
 	$datas=@file_get_contents($filename);
 	$datas=$datas."\n<text>$text</text>\n";
+	$datas=$datas."\n<attachedfiles>". base64_encode(serialize($attached_files))."</attachedfiles>\n";
+	
 	
 if($GLOBALS["VERBOSE"]){echo strlen($datas)." bytes file $filename text\n";}
 	
@@ -3844,7 +3853,7 @@ function button($text,$js){
 	$over="OnMouseOut=\"javascript:this.className='ui-state-default ui-corner-all';this.style.cursor='auto'\"";
 	$out="OnMouseOver=\"javascript:this.className='ui-state-active ui-corner-all';this.style.cursor='pointer'\"";
 	
-	return "<button type='button' style='padding:5px;margin-top:5px' $over $out class='ui-state-default ui-corner-all' OnClick=\"javascript:this.className='ui-state-over';$js;\">&nbsp;$text&nbsp;&nbsp;&raquo</button>";
+	return "<button type='button' style='padding:5px;' $over $out class='ui-state-default ui-corner-all' OnClick=\"javascript:this.className='ui-state-over';$js;\">&nbsp;$text&nbsp;&nbsp;&raquo</button>";
 }
 
 function pourcentage($pourc){
@@ -3998,17 +4007,23 @@ return $html;
 	
 }
  function is_base64_encoded($encodedString) {
+ 	writelogs("$encodedString =\"".substr($encodedString,strlen($encodedString)-2,2)."\"",__FUNCTION__,__FILE__,__LINE__);
+ 	if(substr($encodedString,strlen($encodedString)-2,2)=="=="){return true;}
+ 	
  	$arr["150"]=true;
  	$arr["135"]=true;
  	$arr["181"]=true;
  	$arr["26"]=true;
  	$arr["182"]=true;
+ 	$arr["137"]=true;
  	$arr["139"]=true;
  	$arr["166"]=true;
  	$arr["169"]=true;
  	$arr["186"]=true;
  	$arr["179"]=true;
  	$arr["171"]=true;
+ 	$arr["202"]=true;
+ 	
  	
  	$datas=base64_decode($encodedString);
 	for($i=0;$i<strlen($datas);$i++){

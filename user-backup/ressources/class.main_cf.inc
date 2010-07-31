@@ -1449,27 +1449,12 @@ private function CleanMyNetworks(){
 				$conf=$conf . $this->BuildLdapSettings($ldap_key,"cn=smtp_connection_cache_destinations,cn=artica","(&(objectclass=PostFixSmtpConnectionCacheDestinations)(cn=%s))","cn");
 				}
 			}
-		//.............................................................................................................................................................................................
-		
 
-		
-		
-		
-
-			
-		//Check if there is mailman entries...........................................
 			$VirtualMailManMaps=",ldap:VirtualMailManMaps";
 			$virtual_transport_maps[]="ldap:TransportMailmanMaps";
 			$virtual_transport_maps[]="ldap:SyncArticaMaps";
 
-		//.............................................................................			
-			
-			//$virtual_transport_maps[]="ldap:TransportMapsTable";
-		   // $conf=$conf . "transport_maps=" . implode(",",$virtual_transport_maps)."\n";
-		   // $conf=$conf . "virtual_transport_maps=".implode(",",$virtual_transport_maps)."\n";
-		    //$conf=$conf . $this->BuildLdapSettings("TransportUsersTable",$ldap->suffix,"(&(objectClass=UserArticaClass)(mail=%s))","AlternateSmtpRelay");
-		    //$conf=$conf . $this->BuildLdapSettings("TransportMailmanMaps",null,"(&(objectClass=ArticaMailManRobots)(cn=%s))","TransportMailmanMaps");
-
+	
 		   if(is_array($this->array_mynetworks)){
 		     reset($this->array_mynetworks);
 		     $nets=implode(',',$this->array_mynetworks);
@@ -1481,21 +1466,6 @@ private function CleanMyNetworks(){
 		    }
 		    
 	
-		//$conf=$conf . $this->BuildLdapSettings("ArticaSynMapsTable","cn=artica_smtp_sync,cn=artica","(&(objectClass=InternalRecipients)(cn=%s))","cn");
-		//$conf=$conf . $this->BuildLdapSettings("VirtualMailboxMapsTable",null,"(&(objectClass=userAccount)(mail=%s))","uid");
-				
-		
-		
-		//virtual_mailbox_maps, mailbox_maps  & alias_maps ........................................................................................................................................		
-		//$conf=$conf . "virtual_alias_maps=ldap:AliasMapsTable,ldap:ArticaSynMapsTable,ldap:VirtualAliasMapsTable,$VirtualMailManMaps$WhiteBlackListTableMaps\n";
-		//$conf=$conf . "virtual_mailbox_maps=ldap:VirtualMailboxMapsTable$VirtualMailManMaps\n";
-		//$conf=$conf . "alias_maps=ldap:VirtualAliasMapsTable,ldap:ArticaSynMapsTable$VirtualMailManMaps\n";
-		//$conf=$conf . "local_recipient_maps=ldap:AliasMapsTable,ldap:VirtualMailboxMapsTable\n";
-		//$conf=$conf . "virtual_mailbox_base = /usr/local/virtual\n";
-
-		
-		
-		
 		
 		$conf=$conf . "artica_destination_recipient_limit = 1\n";
 		$conf=$conf.$this->BuildMilters();
@@ -1512,11 +1482,6 @@ private function CleanMyNetworks(){
 		
 		
 		$this->_FixTree();	
-		
-		writepostfixlogs("MAINPERSO:: Replace configuration by users settings",__CLASS__.'/'.__FUNCTION__,__FILE__);
-		$mainperso=new main_perso();
-		$conf=$mainperso->replace_conf($conf);		
-		writepostfixlogs("MAINPERSO:: End",__CLASS__.'/'.__FUNCTION__,__FILE__);
 		
 		$tmp=new bounces_templates();
 		$tmp->Save();	
@@ -3096,8 +3061,7 @@ class main_perso{
 				echo $ldap->ldap_last_error;
 				return false;
 			}
-			$tpl=new templates();
-			echo $tpl->_ENGINE_parse_body("{success}\n");
+			
 			
 		}else{
 			$upd["AdvancedMainCfDatas"][0]=$value;
@@ -3107,9 +3071,12 @@ class main_perso{
 				echo $ldap->ldap_last_error;
 				return false;
 			}
-			$tpl=new templates();
-			echo $tpl->_ENGINE_parse_body("{success}\n");	
-		}	
+			
+		}
+
+		$sock=new sockets();
+		$sock->getFrameWork("cmd.php?postfix-perso-settings=yes");
+		
 		
 	}
 	
@@ -3141,6 +3108,8 @@ class main_perso{
 		$ldap->ldap_delete($dn,true);
 		unset($this->main_array);
 		$this->load_array();
+		$sock=new sockets();
+		$sock->getFrameWork("cmd.php?postfix-perso-settings=yes");
 		
 	}
 	

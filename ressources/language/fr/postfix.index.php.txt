@@ -171,8 +171,8 @@ Avec cette fonctionnalit&eacute; vous allez augmenter les performances par le re
 <SASL_TEXT>Le support SASL peut &ecirc;tre utilis&eacute; pour authentifier les clients SMTP distant au serveur SMTP Postfix</SASL_TEXT>
 <SASL_TITLE>Authentification SMTP</SASL_TITLE>
 <security_settings>Param&egrave;tres de s&eacute;curit&eacute;</security_settings>
-<smtpd_client_restrictions_icon>Senders computers restrictions rules</smtpd_client_restrictions_icon>
-<smtpd_client_restrictions_icon_text>Define parameters that restricts what clients this system accepts SMTP connections from.</smtpd_client_restrictions_icon_text>
+<smtpd_client_restrictions_icon>Restrictions sur les &eacute;metteurs</smtpd_client_restrictions_icon>
+<smtpd_client_restrictions_icon_text>Param&egrave;tres permettant de restreindre les &eacute;metteurs &agrave; travers les sessions SMTP</smtpd_client_restrictions_icon_text>
 <spamassassin_in_amavis>Spamassassin est activ&eacute; dans Amavis</spamassassin_in_amavis>
 <spamassassin_in_amavis_text>Vous utilisez Amavis et celui-ci est d&eacute;j&agrave; configur&eacute; pour utilise le service anti-spam SpamAssassin</spamassassin_in_amavis_text>
 <SPAMASSASSIN_TEXT>SpamAssassin est un projet open source mature, largement d&eacute;ploy&eacute;  qui sert de filtre de courrier afin d'identifier le spam</SPAMASSASSIN_TEXT>

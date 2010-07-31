@@ -13,7 +13,6 @@ Classes, SysUtils,variants,strutils, Process,IniFiles,baseunix,unix,md5,RegExpr 
 
 
 private
-     GLOBAL_INI:TIniFile;
      MaxlogSize:longint;
      D:boolean;
 
@@ -24,9 +23,6 @@ private
      //mquery : string;
      recbuf : PMYSQL_RES;
      alloc : PMYSQL;
-     mem_mysql_password:string;
-     mem_mysql_user:string;
-     mem_mysql_server:string;
      mem_mysql_port:string;
 
      function GetFileSizeKo(path:string):longint;
@@ -2050,9 +2046,7 @@ function Tlogs.ReadFromFile(TargetPath:string):string;
 var
   F:textfile;
   teststr: string;
-  a: char;
   s:string;
-  i: integer;
 begin
   if not FileExists(TargetPath) then exit;
   assignfile(F,TargetPath);
@@ -2096,7 +2090,7 @@ end;
 //#############################################################################
 procedure Tlogs.LogGeneric(text:string;path:string);
 var
-zdate,dir,filew,mypid,CurrentInstallProduct:string;
+zdate,mypid:string;
 myFile : TextFile;
 begin
 forcedirectories(ExtractFilePath(path));

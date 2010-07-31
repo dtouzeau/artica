@@ -826,10 +826,14 @@ function virtual_add_form(){
 	$sock=new sockets();
 	$page=CurrentPageName();
 	$nics=unserialize(base64_decode($sock->getFrameWork("cmd.php?list-nics=yes")));
+	$title_button="{add}";
+	
+	
 	if($_GET["ID"]>0){
 		$sql="SELECT * FROM nics_virtuals WHERE ID='{$_GET["ID"]}'";
 		$q=new mysql();
 		$ligne=@mysql_fetch_array($q->QUERY_SQL($sql,"artica_backup"));
+		$title_button="{apply}";
 	}
 	
 	if(isset($_GET["default-datas"])){
@@ -894,7 +898,7 @@ function virtual_add_form(){
 		</tr>	
 	</table>
 	</div>
-	<div style='text-align:right'><hr>". button("{add}","VirtualIPAddSave()")."</div>
+	<div style='text-align:right'><hr>". button($title_button,"VirtualIPAddSave()")."</div>
 	<script>
 		var cdir=document.getElementById('cdir').value;
 		var netmask=document.getElementById('netmask').value;
@@ -1004,6 +1008,10 @@ function virtuals_list(){
 		
 		if($interfaces[$eth]<>null){
 			$img="22-win-nic.png";
+		}
+		
+		if(trim($ligne["org"])==null){
+			$ligne["org"]="<strong style='color:red'>{no_organization}</strong>";
 		}
 		
 		

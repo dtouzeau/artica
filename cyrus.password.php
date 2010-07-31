@@ -87,6 +87,16 @@ function popup(){
 function SaveCyrusPassword(){
 	$ldap=new clladp();
 	if($_GET["SaveCyrusPassword"]==null){return null;}
+	
+	if(strpos($_GET["SaveCyrusPassword"],'@')>0){
+		echo "@: denied character\n";
+		return;
+	}
+	if(strpos($_GET["SaveCyrusPassword"],':')>0){
+		echo "@: denied character\n";
+		return;
+	}	
+	
 	$attrs["userPassword"][0]=$_GET["SaveCyrusPassword"];
 	$dn="cn=cyrus,dc=organizations,$ldap->suffix";
 	if($ldap->ExistsDN($dn)){
@@ -99,13 +109,11 @@ function SaveCyrusPassword(){
 	}	
 	
 	$sock=new sockets();
-	$sock->getfile("ChangeCyrusPassword:{$_GET["SaveCyrusPassword"]}");
+	$sock->getFrameWork("cmd.php?cyrus-change-password=".base64_encode($_GET["SaveCyrusPassword"]));
 	
-	$tpl=new templates();
-	echo html_entity_decode($tpl->_ENGINE_parse_body('{success}'));
 	
 }
-	
+ 
 	
 
 ?>

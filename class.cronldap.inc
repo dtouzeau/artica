@@ -1,6 +1,8 @@
 <?php
 include_once(dirname(__FILE__) . '/ressources/class.ini.inc');
 include_once(dirname(__FILE__) . '/ressources/class.mail.inc');
+include_once(dirname(__FILE__) . '/ressources/class.phpmailer.inc');
+
 
 class cronldap{
 	
@@ -263,6 +265,7 @@ function write_syslogs($text,$file){
 
 function SendMailNotifWithSendMail($reporting,$subject,$smtp_sender,$email,$debug=false){
 	
+	
 if(file_exists('/etc/artica-postfix/settings/Daemons/PostmasterAdress')){
 	$PostmasterAdress=trim(file_get_contents('/etc/artica-postfix/settings/Daemons/PostmasterAdress'));
 }	
@@ -293,15 +296,24 @@ system($cmd);
 }
 
 
-function SendMailNotif($text=null,$subject=null,$smtp_sender,$smtp_dest,$verbose=false){
+function SendMailNotif($text=null,$subject=null,$smtp_sender,$smtp_dest,$verbose=false,$attached_files=array()){
+	 if($GLOBALS["VERBOSE"] ){$verbose=true;} 
+	$path="/etc/artica-postfix/smtpnotif.conf";
+	if(!file_exists($path)){
+		if($verbose){echo "unable to stat $path\n";}
+		return null;
+	}
 	
-$path="/etc/artica-postfix/smtpnotif.conf";
-if(!file_exists($path)){return null;}
 $ini=new Bs_IniHandler($path);
 
 if(file_exists('/etc/artica-postfix/settings/Daemons/PostmasterAdress')){
 	$PostmasterAdress=trim(file_get_contents('/etc/artica-postfix/settings/Daemons/PostmasterAdress'));
 }
+
+if(file_exists('/etc/artica-postfix/settings/Daemons/PostfixPostmaster')){
+	$PostmasterAdress=trim(file_get_contents('/etc/artica-postfix/settings/Daemons/PostfixPostmaster'));
+}
+
 
 $smtp_server_name=$ini->_params["SMTP"]["smtp_server_name"];
 $smtp_server_port=$ini->_params["SMTP"]["smtp_server_port"];
@@ -312,6 +324,8 @@ $tls_enabled=$ini->_params["SMTP"]["tls_enabled"];
 if(trim($smtp_server_name)==null){$smtp_server_name="127.0.0.1";}
 if(trim($smtp_server_port)==null){$smtp_server_port="25";}
 if(trim($smtp_dest)==null){$smtp_dest="$PostmasterAdress";}
+if(trim($smtp_sender)==null){$smtp_sender="$PostmasterAdress";}
+if(trim($smtp_sender)==null){$smtp_sender="$smtp_dest";}
 
 $conf=$conf . "syslog on\n";
 $conf=$conf . "from $smtp_sender\n";
@@ -327,22 +341,35 @@ if(trim($smtp_auth_user)<>null){
 if($tls_enabled==1){$conf=$conf . "tls on\n";}
 
 if(is_file("/usr/share/artica-postfix/bin/artica-msmtp")){$msmtp="/usr/share/artica-postfix/bin/artica-msmtp";}
+
+
 if(is_file("/usr/bin/msmtp")){$msmtp="/usr/bin/msmtp";}
 
-$mail=new simplemail();
-$mail->set_mode='socket';
-$mail->addrecipient($smtp_dest,$smtp_dest);
+if($verbose){echo "using $msmtp\n";}
 
-$mail->addfrom($smtp_sender,$smtp_sender);
-$mail->addsubject($subject);
-$mail->text = $text;
+$mail = new PHPMailer(true); 
+$mail->IsSendmail();
+$mail->AddAddress($smtp_dest,$smtp_dest);
+$mail->AddReplyTo($smtp_sender,$smtp_sender);
+$mail->From=$smtp_sender;
+$mail->Subject=$subject;
+$mail->Body= $text;
 
 
 
-$mail->makebody();
-$header=$mail->makeheader();
-$mail->AddField2Header("To",$mail->makenameplusaddress($smtp_dest,$smtp_dest));
-$content= $mail->headers."\r\n".$mail->CleanMailDataString($mail->body)."\r\n";
+
+if(count($attached_files)>0){
+	while (list ($num, $file) = each ($attached_files)){
+		if($verbose){echo "Add attachment $file\n";}
+		$mail->AddAttachment($file,basename($file));
+		
+	}
+	
+}
+
+$content=$mail->Send(true);
+
+if($verbose){echo "Building notification from $smtp_sender with $msmtp to $smtp_dest $subject\n";}
 
 write_syslogs("Building notification from $smtp_sender with $msmtp to $smtp_dest $subject",__FILE__);
 
@@ -364,7 +391,7 @@ if($verbose){echo $mail->error_log."\n".$data;}
 }
 
 
-function SendMailNotification($text=null,$subject=null,$verbose=false){
+function SendMailNotification($text=null,$subject=null,$verbose=false,$attached_files=array(),$recipient=null){
 $path="/etc/artica-postfix/smtpnotif.conf";
 if(!file_exists($path)){return null;}
 $ini=new Bs_IniHandler($path);
@@ -381,6 +408,8 @@ if($subject==null){$subject="SMTP NOTIFICATION TEST...";}
 if($text==null){$text="No body was sent,\nthis simply a test body\n";}
 
 events_notif_class("$subject to $smtp_dest");
+if(trim($recipient)<>null){$smtp_dest=$recipient;}
+
 
 SendMailNotif($text,$subject,$smtp_sender,$smtp_dest,$verbose);
 	events_notif_class("list_cc: ". count($list_cc)." recipient(s)");
@@ -388,7 +417,7 @@ SendMailNotif($text,$subject,$smtp_sender,$smtp_dest,$verbose);
 		while (list ($num, $email_addr) = each ($list_cc) ){
 			if(trim($email_addr)==null){continue;}
 			events_notif_class("$subject to $email_addr");
-			SendMailNotif($text,$subject,$smtp_sender,$email_addr,$verbose);
+			SendMailNotif($text,$subject,$smtp_sender,$email_addr,$verbose,$attached_files);
 		}
 	}
 		

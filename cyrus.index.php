@@ -701,63 +701,11 @@ function popup_cyrreconstruct(){
 function main_status(){
 
 $users=new usersMenus();
-	if($_GET["hostname"]==null){$hostname=$users->hostname;$_GET["hostname"]=$hostname;}else{$hostname=$_GET["hostname"];}		
+			
 	$ini=new Bs_IniHandler();
 	$sock=new sockets();
-	$ini->loadString($sock->getfile('cyrus_imap_status',$_GET["hostname"]));	
-	if($ini->_params["CYRUSIMAP"]["running"]==0){
-		$img="okdanger32.png";
-		$status="{stopped}";
-	}else{
-		$img="ok32.png";
-		$status="running";
-		
-	}
-	$v='Mb';
-	$size=round($ini->_params["CYRUSIMAP"]["partition_size"]/1000,2);
-	if($size>1000){
-			$size=round($size/1000,2);
-			$v='Go';
-	}
-	
-	
-	$status="<table style='width:100%'>
-	<tr>
-	<td valign='top'>
-		<img src='img/$img'>
-	</td>
-	<td valign='top'>
-		<table style='width:100%'>
-		<tr>
-		<td align='right' nowrap><strong>{APP_CYRUS_IMAP}:</strong></td>
-		<td><strong>$status</strong></td>
-		</tr>		
-		<tr>
-		<td align='right' class=legend>{pid}:</strong></td>
-		<td><strong>{$ini->_params["CYRUSIMAP"]["master_pid"]}</strong></td>
-		</tr>
-		<tr>
-		<td align='right' class=legend>{memory}:</strong></td>
-		<td nowrap><strong>{$ini->_params["CYRUSIMAP"]["master_memory"]}&nbsp; Kb</strong></td>
-		</tr>
-		<tr>
-		<td align='right' class=legend>{version}:</strong></td>
-		<td><strong>{$ini->_params["CYRUSIMAP"]["master_version"]}</strong></td>
-		</tr>	
-		<tr>
-		<td align='right' class=legend>{mailbox_size}:</strong></td>
-		<td><strong>$size&nbsp;$v</td>
-		</tr>					
-		<tr><td colspan=2>$error</td></tr>	
-		<tr><td colspan=2>&nbsp;</td></tr>	
-		
-		</table>		
-	</td>
-	</tr>
-	</table>";
-	
-	$status=RoundedLightGreen($status);
-	$status_serv=RoundedLightGrey(Paragraphe($rouage ,$rouage_title. " (squid)",$rouage_text,"javascript:$js"));
+	$ini->loadString(base64_decode($sock->getFrameWork('cmd.php?cyrus-imap-status=yes')));	
+	$status=DAEMON_STATUS_ROUND("CYRUSIMAP",$ini,null);
 	$tpl=new templates();
 	return $tpl->_ENGINE_parse_body($status);
 	
@@ -829,60 +777,71 @@ function main_cyrusconf(){
 	$tpl=new templates();
 	
 	$impad_form="
-	
-	<form name='FFM2'>
-	
-	<table style='width:99%' class=table_form>
+	<table style='width:99%'>
 	
 	<tr>
 	<td align='right' class=legend>{allowallsubscribe}:</stong></td>
-	<td>" . Field_numeric_checkbox_img('allowallsubscribe',$cyrus->impad_array["allowallsubscribe"],'{allowallsubscribe_text}')."</td>
+	<td>" . Field_checkbox('allowallsubscribe',1,$cyrus->impad_array["allowallsubscribe"])."</td>
+	<td width=1%>". help_icon("{allowallsubscribe_text}")."</td>
 	</tr>
 
 	<tr>
 	<td align='right' class=legend>{allowanonymouslogin}:</stong></td>
-	<td>" . Field_numeric_checkbox_img('allowanonymouslogin',$cyrus->impad_array["allowanonymouslogin"],'{allowanonymouslogin_text}')."</td>
+	<td>" . Field_checkbox('allowanonymouslogin',1,$cyrus->impad_array["allowanonymouslogin"])."</td>
+	<td width=1%>". help_icon("{allowanonymouslogin_text}")."</td>
 	</tr>		
 	
 	
 	
 	<tr>
 	<td align='right' class=legend>{createonpost}:</stong></td>
-	<td>" . Field_numeric_checkbox_img('createonpost',$cyrus->impad_array["createonpost"],'{createonpost_text}')."</td>
+	<td>" . Field_checkbox('createonpost',1,$cyrus->impad_array["createonpost"])."</td>
+	<td width=1%>". help_icon("{createonpost_text}")."</td>
 	</tr>		
 	
 	<tr>
 	<td align='right' class=legend>{duplicatesuppression}:</stong></td>
-	<td>" . Field_numeric_checkbox_img('duplicatesuppression',$cyrus->impad_array["duplicatesuppression"],'{duplicatesuppression_text}')."</td>
+	<td>" . Field_checkbox('duplicatesuppression',1,$cyrus->impad_array["duplicatesuppression"])."</td>
+	<td width=1%>". help_icon("{duplicatesuppression_text}")."</td>
 	</tr>	
 	
 	
 	
 	<tr>
 	<td align='right' class=legend>{autocreateinboxfolders}:</stong></td>
-	<td>" . Field_text("autocreateinboxfolders",$cyrus->impad_array["autocreateinboxfolders"],'width:190px',null,null,"{autocreateinboxfolders_text}")."</td>
+	<td>" . Field_text("autocreateinboxfolders",$cyrus->impad_array["autocreateinboxfolders"],'width:190px',null,null,null)."</td>
+	<td width=1%>". help_icon("{autocreateinboxfolders_text}")."</td>
 	</tr>		
 	
 	<tr>
 	<td align='right' class=legend>{autocreatequota}:</stong></td>
-	<td>" . Field_text("autocreatequota",$cyrus->impad_array["autocreatequota"],'width:90px',null,null,"{autocreatequota_text}")."</td>
+	<td>" . Field_text("autocreatequota",$cyrus->impad_array["autocreatequota"],'width:90px',null,null)."</td>
+	<td width=1%>". help_icon("{autocreatequota_text}")."</td>
 	</tr>	
 		
 	
 	<tr>
 	<td align='right' class=legend>{maxmessagesize}:</stong></td>
-	<td>" . Field_text("maxmessagesize",$cyrus->impad_array["maxmessagesize"],'width:90px',null,null,"{maxmessagesize_text}")."</td>
-	</tr>	
-	<tr>
-	<td align='right' class=legend>{popminpoll}:</stong></td>
-	<td>" . Field_text("popminpoll",$cyrus->impad_array["popminpoll"],'width:25px',null,null,"{popminpoll_text}")." mn</td>
-	</tr>	
-	<tr>
-	<td align='right' class=legend>{quotawarn}:</stong></td>
-	<td>" . Field_text("quotawarn",$cyrus->impad_array["quotawarn"],'width:25px',null,null,"{quotawarn_text}")." %</td>
+	<td>" . Field_text("maxmessagesize",$cyrus->impad_array["maxmessagesize"],'width:90px',null,null)."</td>
+	<td width=1%>". help_icon("{maxmessagesize_text}")."</td>
 	</tr>	
 	
-	<tr><td colspan=2 align='right'><input type='button' OnClick=\"javascript:ParseForm('FFM2','$page',true);\" Value='{edit}&nbsp;&raquo;'></td></tr>
+	<tr>
+	<td align='right' class=legend>{popminpoll}:</stong></td>
+	<td>" . Field_text("popminpoll",$cyrus->impad_array["popminpoll"],'width:25px',null,null)." mn</td>
+	<td width=1%>". help_icon("{popminpoll_text}")."</td>
+	</tr>	
+	
+	<tr>
+	<td align='right' class=legend>{quotawarn}:</stong></td>
+	<td>" . Field_text("quotawarn",$cyrus->impad_array["quotawarn"],'width:25px',null,null)." %</td>
+	<td width=1%>". help_icon("{quotawarn_text}")."</td>
+	</tr>	
+	
+	<tr><td colspan=3 align='right'>
+	<hr>
+	 ". button("{apply}","CyrusMasterSaveConfig()")."
+	</td></tr>
 	
 	
 	</table>
@@ -893,42 +852,34 @@ function main_cyrusconf(){
 	$hash=$ldap->AllDomains();
 	$hash[null]="None";
 	$defaultsDomain=Field_array_Hash($hash,'defaultdomain',$cyrus->impad_array["defaultdomain"]);
-
-	
-	
-	if(!isset($_GET["reload"])){echo "<div id='main_form_cyrus'>\n";}
-	
 	$html="
 	<p class=caption>{services_settings_text}</p>
-
-	<div style='width:100%;height:400px;overflow:auto'>
+	<div style='width:100%;'>
 	<div id='cyrusconf'>
 	<table style='width:100%'>
-	<tr>
-		<td valign='top' width=1%></td>
-		<td valign='top'>
-		
-	<form name='FFM1'>
-	<table style='width:99%' class=table_form>
-	<tr>
-	<th>{service}</th>
-	<th>{enable}</th>
-	<th>{port}</th>
-	<th>{maxchild}</th>
-	<th>&nbsp;</th>
-	</tr>
-	<tr ".CellRollOver().">
-	<td align='right' class=legend>IMAP:</stong></td>
-	<td width=1%><img src='img/status_ok-grey.gif'></td>
-	<td><input type='hidden' name='service_imap_listen' value='{$cyrus->main_array["CYRUS"]["service_imap_listen"]}'><strong>imap:143</strong></td>
-	<td>" . Field_text("service_imap_maxchild",$cyrus->main_array["CYRUS"]["service_imap_maxchild"],'width:80px')."</td>
-	<td width=1%>"  . help_icon('{maxchild_text}')."</td>
-	</tr>	
+		<tr>
+			<td valign='top' width=1%></td>
+			<td valign='top'>
+		<table style='width:99%'>
+		<tr>
+			<th>{service}</th>
+			<th>{enable}</th>
+			<th>{port}</th>
+			<th>{maxchild}</th>
+			<th>&nbsp;</th>
+		</tr>
+		<tr ".CellRollOver().">
+			<td align='right' class=legend>IMAP:</stong></td>
+			<td width=1%><img src='img/status_ok-grey.gif'></td>
+			<td><input type='hidden' name='service_imap_listen' value='{$cyrus->main_array["CYRUS"]["service_imap_listen"]}'><strong>imap:143</strong></td>
+			<td>" . Field_text("service_imap_maxchild",$cyrus->main_array["CYRUS"]["service_imap_maxchild"],'width:80px')."</td>
+			<td width=1%>"  . help_icon('{maxchild_text}')."</td>
+		</tr>	
 	
 	
 	<tr ".CellRollOver().">
 	<td align='right' class=legend>IMAP SSL:</stong></td>
-	<td width=1%>" . Field_numeric_checkbox_img("service_imapssl_enabed",$cyrus->main_array["CYRUS"]["service_imapssl_enabed"],"{enable_disable}")."</td>
+	<td width=1%>" . Field_checkbox("service_imapssl_enabed",1,$cyrus->main_array["CYRUS"]["service_imapssl_enabed"])."</td>
 	<td>" . Field_text("service_imapssl_listen",$cyrus->main_array["CYRUS"]["service_imapssl_listen"],'width:150px')."</td>
 	<td>" . Field_text("service_imapssl_maxchild",$cyrus->main_array["CYRUS"]["service_imapssl_maxchild"],'width:80px')."</td>
 	<td width=1%>"  . help_icon('{howto_cyrus_service}')."</td>
@@ -936,7 +887,7 @@ function main_cyrusconf(){
 	
 	<tr ".CellRollOver().">
 	<td align='right' class=legend>POP3:</stong></td>
-	<td width=1%>" . Field_numeric_checkbox_img("service_pop3_enabed",$cyrus->main_array["CYRUS"]["service_pop3_enabed"],"{enable_disable}")."</td>
+	<td width=1%>" . Field_checkbox("service_pop3_enabed",1,$cyrus->main_array["CYRUS"]["service_pop3_enabed"])."</td>
 	<td>" . Field_text("service_pop3_listen",$cyrus->main_array["CYRUS"]["service_pop3_listen"],'width:150px')."</td>
 	<td>" . Field_text("service_pop3_maxchild",$cyrus->main_array["CYRUS"]["service_pop3_maxchild"],'width:80px')."</td>
 	<td width=1%>"  . help_icon('{howto_cyrus_service}')."</td>
@@ -945,7 +896,7 @@ function main_cyrusconf(){
 	
 	<tr ".CellRollOver().">
 	<td align='right' class=legend>POP3 SSL:</stong></td>
-	<td width=1%>" . Field_numeric_checkbox_img("service_pop3ssl_enabed",$cyrus->main_array["CYRUS"]["service_pop3ssl_enabed"],"{enable_disable}")."</td>
+	<td width=1%>" . Field_checkbox("service_pop3ssl_enabed",1,$cyrus->main_array["CYRUS"]["service_pop3ssl_enabed"])."</td>
 	<td>" . Field_text("service_pop3ssl_listen",$cyrus->main_array["CYRUS"]["service_pop3ssl_listen"],'width:150px')."</td>
 	<td>" . Field_text("service_pop3ssl_maxchild",$cyrus->main_array["CYRUS"]["service_pop3ssl_maxchild"],'width:80px')."</td>
 	<td width=1%>"  . help_icon('{howto_cyrus_service}')."</td>
@@ -953,7 +904,7 @@ function main_cyrusconf(){
 
 	<tr ".CellRollOver().">
 	<td align='right' class=legend>NNTP:</stong></td>
-	<td width=1%>" . Field_numeric_checkbox_img("service_nntpd_enabed",$cyrus->main_array["CYRUS"]["service_nntpd_enabed"],"{enable_disable}")."</td>
+	<td width=1%>" . Field_checkbox("service_nntpd_enabed",1,$cyrus->main_array["CYRUS"]["service_nntpd_enabed"])."</td>
 	<td>" . Field_text("service_nntpd_listen",$cyrus->main_array["CYRUS"]["service_nntpd_listen"],'width:150px')."</td>
 	<td>&nbsp;</td>
 	<td width=1%>"  . help_icon('{howto_cyrus_service}')."</td>
@@ -961,7 +912,7 @@ function main_cyrusconf(){
 	
 	<tr ".CellRollOver().">
 	<td align='right' class=legend>NNTP SSL:</stong></td>
-	<td width=1%>" . Field_numeric_checkbox_img("service_nntpds_enabed",$cyrus->main_array["CYRUS"]["service_nntpds_enabed"],"{enable_disable}")."</td>
+	<td width=1%>" . Field_checkbox("service_nntpds_enabed",1,$cyrus->main_array["CYRUS"]["service_nntpds_enabed"])."</td>
 	<td>" . Field_text("service_nntpds_listen",$cyrus->main_array["CYRUS"]["service_nntpds_listen"],'width:150px')."</td>
 	<td>&nbsp;</td>
 	<td width=1%>"  . help_icon('{howto_cyrus_service}')."</td>
@@ -974,17 +925,69 @@ function main_cyrusconf(){
 	<td width=1%>"  . help_icon('{defaultdomain_text}')."</td>
 	</tr>	
 	
-	<tr><td colspan=5 align='right'><input type='button' OnClick=\"javascript:ParseForm('FFM1','$page',false,false,false,'cyrusconf','',SaveFormCyrus);\" Value='{edit}&nbsp;&raquo;'></td></tr>
+	<tr>
+		<td colspan=5 align='right'>
+		<hr>
+		 ". button("{apply}","CyrusMasterSaveConfig()")."
+		</td>
+	</tr>
 	</table>
 	</form>
 	</div>
 	</td>
 	</tr>
 	</table>
-	$impad_form</div>";
-if(!isset($_GET["reload"])){echo "</div>\n";}
+	$impad_form
 	
-		return  RoundedLightWhite($tpl->_ENGINE_parse_body($html));
+	
+	</div>
+	</div>
+	<script>
+	
+var x_CyrusMasterSaveConfig= function (obj) {
+	var results=obj.responseText;
+	if(results.length>0){alert(results);}
+	RefreshTab('main_config_cyrus');
+}
+
+
+function CyrusMasterSaveConfig(){
+	var XHR = new XHRConnection();
+	if(document.getElementById('allowallsubscribe').checked){XHR.appendData('allowallsubscribe',1);}else{XHR.appendData('allowallsubscribe',0);}
+	if(document.getElementById('allowanonymouslogin').checked){XHR.appendData('allowanonymouslogin',1);}else{XHR.appendData('allowanonymouslogin',0);}
+	if(document.getElementById('createonpost').checked){XHR.appendData('createonpost',1);}else{XHR.appendData('createonpost',0);}
+	if(document.getElementById('duplicatesuppression').checked){XHR.appendData('duplicatesuppression',1);}else{XHR.appendData('duplicatesuppression',0);}
+	
+	if(document.getElementById('service_imapssl_enabed').checked){XHR.appendData('service_imapssl_enabed',1);}else{XHR.appendData('service_imapssl_enabed',0);}
+	if(document.getElementById('service_pop3_enabed').checked){XHR.appendData('service_pop3_enabed',1);}else{XHR.appendData('service_pop3_enabed',0);}
+	if(document.getElementById('service_pop3ssl_enabed').checked){XHR.appendData('service_pop3ssl_enabed',1);}else{XHR.appendData('service_pop3ssl_enabed',0);}
+	if(document.getElementById('service_nntpd_enabed').checked){XHR.appendData('service_nntpd_enabed',1);}else{XHR.appendData('service_nntpd_enabed',0);}
+	if(document.getElementById('service_nntpds_enabed').checked){XHR.appendData('service_nntpds_enabed',1);}else{XHR.appendData('service_nntpds_enabed',0);}
+	
+	XHR.appendData('autocreateinboxfolders',document.getElementById('autocreateinboxfolders').value);
+	XHR.appendData('autocreatequota',document.getElementById('autocreatequota').value);
+	XHR.appendData('maxmessagesize',document.getElementById('maxmessagesize').value);
+	XHR.appendData('popminpoll',document.getElementById('popminpoll').value);
+	XHR.appendData('quotawarn',document.getElementById('quotawarn').value);
+	XHR.appendData('service_imap_maxchild',document.getElementById('service_imap_maxchild').value);
+	XHR.appendData('service_imapssl_listen',document.getElementById('service_imapssl_listen').value);
+	XHR.appendData('service_imapssl_maxchild',document.getElementById('service_imapssl_maxchild').value);
+	XHR.appendData('service_pop3_listen',document.getElementById('service_pop3_listen').value);
+	XHR.appendData('service_pop3_maxchild',document.getElementById('service_pop3_maxchild').value);
+	XHR.appendData('service_pop3ssl_listen',document.getElementById('service_pop3ssl_listen').value);
+	XHR.appendData('service_pop3ssl_maxchild',document.getElementById('service_pop3ssl_maxchild').value);
+	XHR.appendData('service_nntpd_listen',document.getElementById('service_nntpd_listen').value);
+	XHR.appendData('service_nntpds_listen',document.getElementById('service_nntpds_listen').value);
+	document.getElementById('cyrusconf').innerHTML='<center style=\"margin:20px;padding:20px\"><img src=\"img/wait_verybig.gif\"></center>';
+	
+	
+	XHR.sendAndLoad('$page', 'GET',x_CyrusMasterSaveConfig);
+	
+	}	
+	
+	</script>
+	";
+		return  $tpl->_ENGINE_parse_body($html);
 }
 
 

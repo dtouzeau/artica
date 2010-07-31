@@ -373,18 +373,13 @@ function tkav4proxy.KAV4PROXY_STATUS():string;
 var
 pidpath:string;
 begin
+SYS.MONIT_DELETE('APP_KAV4PROXY');
 if not FileExists(BIN_PATH()) then  exit;
 
  pidpath:=logs.FILE_TEMP();
  fpsystem(SYS.LOCATE_PHP5_BIN()+' /usr/share/artica-postfix/exec.status.php --kav4proxy >'+pidpath +' 2>&1');
  result:=logs.ReadFromFile(pidpath);
  logs.DeleteFile(pidpath);
-
-if(kavicapserverEnabled=0) then begin
-    SYS.MONIT_DELETE('APP_KAV4PROXY');
-    exit;
-end;
-SYS.MONIT_CONFIG('APP_KAV4PROXY',KAV4PROXY_PID_PATH(),'kav4proxy');
 end;
 //##############################################################################
 function tkav4proxy.KAV4PROXY_CHECKLICENSE():string;

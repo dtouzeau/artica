@@ -51,11 +51,11 @@ function start_js(){
 	$html="
 	var uid='$uid';
 	
-var x_FetchmailAddAliase= function (obj) {
-	var tempvalue=obj.responseText;
-	if(tempvalue.length>0){alert(tempvalue)};
-	LoadAjax('FetchmailAddAliaseDIV','$page?page-fetchmail-aliases-list=$uid');
-}		
+	var x_FetchmailAddAliase= function (obj) {
+		var tempvalue=obj.responseText;
+		if(tempvalue.length>0){alert(tempvalue)};
+		LoadAjax('FetchmailAddAliaseDIV','$page?page-fetchmail-aliases-list=$uid');
+	}		
 	
 	
 	function StartFetchmailPage(){
@@ -68,7 +68,7 @@ var x_FetchmailAddAliase= function (obj) {
 	}
 	
 	function DisplayAccount(){
-		
+		Loadjs('wizard.fetchmail.newbee.php?script=yes&uid=$uid')
 	}
 	
 	function SelectRule(num){
@@ -184,13 +184,6 @@ var x_DeleteFetchAccount= function (obj) {
 	
 	
 	echo $html;
-	
-	
-	//bg-wizard-panel-email.png
-	
-	
-	
-	
 }
 
 
@@ -290,7 +283,8 @@ function page_list(){
 	$page=CurrentPageName();
 	$rules=$fetch->LoadUsersRules($_GET["page-display"]);
 	$user=new user($_GET["page-display"]);
-	
+	$sock=new sockets();
+	$EnablePostfixMultiInstance=$sock->GET_INFO("EnablePostfixMultiInstance");
 	
 	if(count($rules)>0){
 		if(count($user->FetchMailMatchAddresses)==0){
@@ -305,7 +299,8 @@ function page_list(){
 	if(is_array($rules)){
 		$tbl="<table style='width:98%'>
 		<tr>
-			<th<strong>{user}</strong></th>
+			
+			<th colspan=2><strong>{user}</strong></th>
 			<th><strong>{imap_server_name}</th>
 			<th colspan=3><strong>{enabled}</th>
 			
@@ -318,11 +313,18 @@ function page_list(){
 			
 			$edit=imgtootltip("24-administrative-tools.png","{edit}","ModifyFetchAccount($num)");
 			$delete=imgtootltip("ed_delete.gif","{delete}","DeleteFetchAccount($num,'{$ligne["poll"]}');");
+			$warn="&nbsp;";
+			
+			
+			if($EnablePostfixMultiInstance==1){
+				if(trim($ligne["smtp_host"])==null){
+					$warn=imgtootltip("icon_mini_warning.gif","{smtp_host_not_set}");
+				}
+			}
+			
 			$tbl=$tbl."
 				<tr ". CellRollOver().">
-			
-			
-			
+				<td>$warn</td>
 				<td style='font-size:11px;color:$color' align='left' nowrap>{$ligne["user"]}</td>
 				<td style='font-size:11px;color:$color' align='left' nowrap>{$ligne["poll"]}:{$ligne["proto"]}</td>
 				<td style='font-size:11px;color:$color' align='right' nowrap>$enabled</td>
@@ -426,9 +428,12 @@ function page_modify_rule(){
 	$page=CurrentPageName();
 	$array=$fetch->LoadRule($_GET["page-modify"]);
 	$sock=new sockets();
+	$warn="&nbsp;";
 	if($sock->GET_INFO("EnablePostfixMultiInstance")==1){
+		if($array["smtp_host"]==null){$warn="<img src='img/icon_mini_warning.gif'>";}
 		$smtp_sender=
 		"<tr>
+			<td width=1%>$warn</td>
 			<td valign='top' class=legend nowrap>{local_smtp_host}:</td>
 			<td valign='top'>".	Field_array_Hash(fetchmail_PostFixMultipleInstanceList($user->ou),"smtp_host",$array["smtp_host"])."</td>
 		</tr>";
@@ -469,45 +474,51 @@ $html="
 				<td valign='top' colspan=2 style='font-size:13px;font-weight:bold;padding-bottom:10px;padding-top:15px'>{session_information}:<br></td>
 			</tr>
 			<tr>
+				<td width=1%>&nbsp;</td>
 				<td class=legend nowrap>{username}:</td>
 				<td>" . Field_text('user',$array["user"])."</td>
 			</tr>
 			<tr>
+				<td width=1%>&nbsp;</td>
 				<td class=legend nowrap>{password}:</td>
 				<td>" . Field_password('pass',$array["pass"])."</td>
 			</tr>	
 			
 			<tr>
-				<td valign='top' colspan=2 style='font-size:13px;font-weight:bold;padding-bottom:10px;padding-top:15px'>{server_information}:<br></td>
+				<td valign='top' colspan=3 style='font-size:13px;font-weight:bold;padding-bottom:10px;padding-top:15px'>{server_information}:<br></td>
 			</tr>
 			<tr>
+				<td width=1%>&nbsp;</td>
 				<td class=legend nowrap valign='top'>{imap_server_name}:</td>
 				<td>
-				<table style='width:100%'>
-				<tr>
-					<td valign='top'>
-						" . Field_text('poll',$array["poll"])."
-					</td>
-					<td valign='top'>" .
-						imgtootltip('22-infos.png','<strong>{GET_RIGHT_ISP_SETTINGS}</strong><br>{GET_RIGHT_ISP_SETTINGS_TEXT}',
-						"LoadFetchmailISPList()")."&nbsp;<span id='choosen_isp' style='font-weight:bolder'></span>
-					</td>
-				</tr>
-				
-				</table>
+					<table style='width:100%'>
+					<tr>
+						<td valign='top'>
+							" . Field_text('poll',$array["poll"])."
+						</td>
+						<td valign='top'>" .
+							imgtootltip('22-infos.png','<strong>{GET_RIGHT_ISP_SETTINGS}</strong><br>{GET_RIGHT_ISP_SETTINGS_TEXT}',
+							"LoadFetchmailISPList()")."&nbsp;<span id='choosen_isp' style='font-weight:bolder'></span>
+						</td>
+					</tr>
+					</table>
+				</td>
 			</tr>
 			
 			<tr>
+				<td width=1%>&nbsp;</td>
 				<td class=legend nowrap>{protocol}:</td>
 				<td>" . Field_array_Hash($arraypr,'proto',$array["proto"])."</td>
 			</tr>	
 			$smtp_sender
 			<tr>
+				<td width=1%>&nbsp;</td>
 				<td class=legend nowrap>{not_delete_messages}:</td>
 				<td>$keep</td>
 			</tr>		
 			<tr>
-				<td valign='top' colspan=2 align='right'>$advanced</td>
+				
+				<td valign='top' colspan=3 align='right'>$advanced</td>
 			</tr>
 			</table>
 	

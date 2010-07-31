@@ -6,7 +6,11 @@
 	include_once('ressources/class.ini.inc');
 	include_once('ressources/class.spamassassin.inc');
 	$user=new usersMenus();
-	if($user->AsPostfixAdministrator==false){header('location:users.index.php');exit();}
+		if($user->AsPostfixAdministrator==false){
+		$tpl=new templates();
+		echo "alert('". $tpl->javascript_parse_text("{ERROR_NO_PRIVS}")."');";
+		die();exit();
+	}
 	
 	
 	if(isset($_GET["popup"])){popup();exit;}
@@ -25,7 +29,8 @@
 	if(isset($_GET["popup-spamass-rewrite-headers"])){rewrite_headers_form();exit;}
 	if(isset($_GET["popup-spamass-add-headers"])){add_headers_form();exit;}
 	
-	
+	if(isset($_GET["popup-spamass-check"])){popup_spamass_check();exit;}
+	if(isset($_GET["popup-spamass-check-perform"])){popup_spamass_check_perform();exit;}
 	
 	js();
 	
@@ -37,6 +42,7 @@ function js(){
 	$title=$tpl->_ENGINE_parse_body("{APP_SPAMASSASSIN}");
 	$scores_behavior=$tpl->_ENGINE_parse_body("{scores_behavior}");
 	$title1=$tpl->_ENGINE_parse_body("{title1}");
+	$spamassassin_check_config=$tpl->_ENGINE_parse_body("{spamassassin_check_config}");
 	$html="
 	
 		function SPAMASS_LOADP(){
@@ -91,10 +97,62 @@ function SpamassinScoreBehavior(){
 		XHR.sendAndLoad('$page', 'GET',X_SpamassinScoreBehavior);
 		}
 		
+function SpamAssassinCheckService(){
+	YahooWin4(750,'$page?popup-spamass-check=yes','$spamassassin_check_config');
+
+}
+		
 	
 	SPAMASS_LOADP()";
 	
 echo $html;	
+}
+
+function popup_spamass_check(){
+	$page=CurrentPageName();
+	$html="
+	
+	<div id='popup_spamass_check_div' style='width:100%;height:400px;overflow:auto'></div>
+	
+	
+	
+	<script>
+		LoadAjax('popup_spamass_check_div','$page?popup-spamass-check-perform=yes');
+	</script>
+	";
+	
+	echo $html;
+}
+
+function popup_spamass_check_perform(){
+	$sock=new sockets();
+	$datas=unserialize(base64_decode($sock->getFrameWork("cmd.php?spamass-check=yes")));
+	
+	
+	while (list ($num, $ligne) = each ($datas) ){
+		$color="#000000";
+		if(preg_match("#error#i",$ligne)){
+			$color="red";
+		}
+		
+	if(preg_match("#failed#i",$ligne)){
+			$color="red";
+		}		
+		
+		
+		
+		if(preg_match("#module installed#",$ligne)){
+			$color="black;font-weight:bolder";
+		}
+		
+		
+		$html[]="<div><code style='font-size:10px;color:$color'>". htmlspecialchars($ligne)."</code></div>";
+		
+	}
+	
+	echo implode("\n",$html);
+	
+	
 }
 
 
@@ -365,12 +423,20 @@ function main_config(){
 	$settings=Paragraphe("64-settings.png","{scores_behavior}","{scores_behavior_text}","javascript:spamass_scores_behavior()");
 	$rewrite_header=Paragraphe("icon_settings-64.png","{rewrite_header}","{spamass_rewrite_header}","javascript:spamass_rewrite_headers()");
 	$add_header=Paragraphe("icon_settings-64.png","{add_header}","{spamass_add_header}","javascript:spamass_add_headers()");
-	 
+	$backsquatter=Paragraphe("bug-warning-64.png","{Virus_Bounce_Ruleset}","{Virus_Bounce_Ruleset_text}",
+	"javascript:Loadjs('spamassassin.backscatter.php')");
+	
+	$service_check=Paragraphe("service-check-64.png","{spamassassin_check_config}","{spamassassin_check_config_text}",
+	"javascript:SpamAssassinCheckService()");
+	
+	
 	
 	$tr[]=$settings;
 	$tr[]=$rewrite_header;
 	$tr[]=$add_header;
 	$tr[]=$mailspy;
+	$tr[]=$backsquatter;
+	$tr[]=$service_check;
 
 	
 $tables[]="<table style='width:100%'><tr>";
@@ -401,6 +467,17 @@ function scores_behavior(){
 	$users=new usersMenus();
 	$spam=new spamassassin();
 	$page=CurrentPageName();	
+	$sock=new sockets();
+	if($users->AMAVIS_INSTALLED){
+		$EnableAmavisDaemon=$sock->GET_INFO("EnableAmavisDaemon");
+		$EnablePostfixMultiInstance=$sock->GET_INFO("EnablePostfixMultiInstance");
+		if($EnablePostfixMultiInstance==1){$EnableAmavisDaemon=1;}
+	}
+	
+	if($EnableAmavisDaemon==1){
+		$js_load="SpamAssassinDisableScores()";
+		$disable_explain_spamassin="{disabled_amavis_enabled}";
+	}
 	
 	
 $html="
@@ -425,11 +502,13 @@ $html="
 		<tr>
 			<td align='right' nowrap valign='top' class=legend>{required_score}:</strong></td>
 			<td valign='top' colspan=2>" . Field_text('required_score',$spam->main_array["required_score"],'width:50px',null,null,'{required_score_text}')."</td>
+			
 		</tr>
 		<tr>
 			<td align='right' nowrap valign='top' class=legend>{block_with_required_score}:</strong></td>
 			<td valign='top' colspan=2>" . Field_text('block_with_required_score',$spam->block_with_required_score,'width:50px',null,null,'{block_with_required_score_text}')."</td>
 		</tr>	
+		<tr><td colspan=3 align='right'><i>$disable_explain_spamassin</i></td></tr>
 		<tr>
 			<td colspan=3 align='right' valign='top'>
 			<hr>
@@ -438,6 +517,16 @@ $html="
 		</tr>
 </table>
 </div>
+<script>
+	function SpamAssassinDisableScores(){
+		document.getElementById('block_with_required_score').disabled=true;
+		document.getElementById('required_score').disabled=true;
+		
+	
+	}
+
+$js_load
+</script>
 ";	
 	
 	$tpl=new templates();

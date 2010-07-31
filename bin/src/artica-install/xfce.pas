@@ -201,6 +201,9 @@ var
    filetemp:string;
 begin
 if not FileExists('/usr/bin/xfwm4') then exit;
+  result:=SYS.GET_CACHE_VERSION('APP_XFCE');
+   if length(result)>2 then exit;
+
    filetemp:=logs.FILE_TEMP();
    fpsystem('/usr/bin/xfwm4 --version >' + filetemp + ' 2>&1');
    
@@ -221,7 +224,7 @@ if not FileExists('/usr/bin/xfwm4') then exit;
   
   RegExpr.free;
   l.free;
-  
+  SYS.SET_CACHE_VERSION('APP_XFCE',result);
 end;
 
 
@@ -253,24 +256,13 @@ end;
 //##############################################################################
 
 function txfce.XFCE_STATUS():string;
-var
-   ini:TstringList;
-   pid:string;
+var pidpath:string;
 begin
-ini:=TstringList.Create;
-pid:=XFCE_DESKTOP_PID();
-    if not FileExists('/usr/bin/xfdesktop') then exit;
-   ini.Add('[XFCE]');
-   if SYS.PROCESS_EXIST(pid) then ini.Add('running=1') else  ini.Add('running=0');
-   ini.Add('application_installed=1');
-   ini.Add('master_pid='+ pid);
-   ini.Add('master_memory=' + IntToStr(SYS.PROCESS_MEMORY(pid)));
-   ini.Add('master_version=' + XFCE_VERSION());
-   ini.Add('status='+SYS.PROCESS_STATUS(pid));
-   ini.Add('service_name=APP_XFCE');
-   result:=ini.Text;
-   ini.free;
-
+if not FileExists('/usr/bin/xfdesktop') then exit;
+pidpath:=logs.FILE_TEMP();
+fpsystem(SYS.LOCATE_PHP5_BIN()+' /usr/share/artica-postfix/exec.status.php --xfce >'+pidpath +' 2>&1');
+result:=logs.ReadFromFile(pidpath);
+logs.DeleteFile(pidpath);
 end;
 //#########################################################################################
 

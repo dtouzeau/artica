@@ -650,36 +650,14 @@ end;
 //#####################################################################################
 function tpostfix.MYSQMAIL_STATUS():string;
 var
-ini:TstringList;
-pid:string;
+pidpath:string;
 begin
-
-// /etc/artica-postfix/exec.maillog.php.pid
-
-
-   ini:=TstringList.Create;
-   ini.Add('[ARTICA_MYSQMAIL]');
-   ini.Add('service_name=APP_ARTICA_MYSQMAIL');
-   ini.Add('service_cmd=postfix-logger');
-   ini.Add('master_version=' + SYS.ReadFileIntoString(artica_path+'/VERSION'));
-
-   if SYS.MONIT_CONFIG('APP_ARTICA_MYSQMAIL','/etc/artica-postfix/exec.maillog.php.pid','postfix-logger') then begin
-      ini.Add('monit=1');
-      result:=ini.Text;
-      ini.free;
-      exit;
-   end;
-
-
-   pid:=MYSQMAIL_PID();
-
-   if SYS.PROCESS_EXIST(pid) then ini.Add('running=1') else  ini.Add('running=0');
-   ini.Add('application_installed=1');
-   ini.Add('master_pid='+ pid);
-   ini.Add('master_memory=' + IntToStr(SYS.PROCESS_MEMORY(pid)));
-   ini.Add('status='+SYS.PROCESS_STATUS(pid));
-   result:=ini.Text;
-   ini.free;
+SYS.MONIT_DELETE('APP_POSTFIX');
+SYS.MONIT_DELETE('APP_ARTICA_MYSQMAIL');
+pidpath:=logs.FILE_TEMP();
+fpsystem(SYS.LOCATE_PHP5_BIN()+' /usr/share/artica-postfix/exec.status.php --postfix-logger >'+pidpath +' 2>&1');
+result:=logs.ReadFromFile(pidpath);
+logs.DeleteFile(pidpath);
 end;
 //#####################################################################################
 function tpostfix.MYSQMAIL_PID():string;
@@ -874,7 +852,7 @@ end else begin
     logs.DebugLogs('Starting......: Postfix, please wait, Checking Artica-filter');
     fpsystem(SYS.LOCATE_PHP5_BIN()+' /usr/share/artica-postfix/exec.postfix.maincf.php --artica-filter');
     logs.DebugLogs('Starting......: Postfix, compiling settings done..');
-
+    //fpsystem(SYS.LOCATE_PHP5_BIN()+' /usr/share/artica-postfix/exec.postfix.hashtables.php');
 end;
     CLEAN_MASTER_CF();
 
@@ -1200,38 +1178,12 @@ end;
 
 function tpostfix.STATUS:string;
 var
-ini:TstringList;
-pid:string;
+    pidpath:string;
 begin
    if not FileExists(POSFTIX_POSTCONF_PATH()) then exit;
-
-   ini:=TstringList.Create;
-   ini.Add('[POSTFIX]');
-      ini.Add('service_name=APP_POSTFIX');
-      ini.Add('service_cmd=postfix-single');
-      ini.Add('master_version='+POSTFIX_VERSION());
-      ini.Add('remove_cmd=--postfix-remove');
-
-      if SYS.MONIT_CONFIG('APP_POSTFIX',POSTFIX_PID_PATH(),'postfix-single') then begin
-         ini.Add('monit=1');
-         result:=ini.Text;
-         ini.free;
-         exit;
-      end;
-
-
-      pid:=POSTFIX_PID();
-      if SYS.PROCESS_EXIST(pid) then ini.Add('running=1') else  ini.Add('running=0');
-      ini.Add('application_installed=1');
-      ini.Add('master_pid='+ pid);
-      ini.Add('master_memory=' + IntToStr(SYS.PROCESS_MEMORY(pid)));
-      ini.Add('status='+SYS.PROCESS_STATUS(pid));
-      ini.add('pid_path='+POSTFIX_PID_PATH());
-
-
-   result:=ini.Text;
-   ini.free;
-
+pidpath:=logs.FILE_TEMP();
+fpsystem(SYS.LOCATE_PHP5_BIN()+' /usr/share/artica-postfix/exec.status.php --postfix >'+pidpath +' 2>&1');
+result:=logs.ReadFromFile(pidpath);
 end;
 //##############################################################################
 procedure tpostfix.POSTFIX_START();
@@ -2301,6 +2253,8 @@ if add then begin
    list.add(' -o smtpd_enforce_tls=yes');
    list.add(' -o smtpd_sasl_auth_enable=yes');
    list.add(' -o smtpd_client_restrictions=permit_sasl_authenticated,reject');
+   list.add(' -o smtp_generic_maps=');
+   list.add(' -o sender_canonical_maps=');
 
 
    try

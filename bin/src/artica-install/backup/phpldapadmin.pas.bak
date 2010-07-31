@@ -120,7 +120,7 @@ l.add('$servers->setValue("server","name","LDAP Server");');
 l.add('$servers->setValue("server","host","'+ldap.ldap_settings.servername+'");');
 l.add('$servers->setValue("server","port",'+ldap.ldap_settings.Port+');');
 l.add('$servers->setValue("server","base",array("'+ldap.ldap_settings.suffix+'"));');
-l.add('$servers->setValue("login","auth_type","cookie");');
+l.add('$servers->setValue("login","auth_type","session");');
 l.add('$servers->setValue("login","bind_id","cn='+ldap.ldap_settings.admin+','+ldap.ldap_settings.suffix+'");');
 l.add('$servers->setValue("login","bind_pass","");');
 l.add('$servers->setValue("server","tls",false);');

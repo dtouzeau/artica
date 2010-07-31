@@ -115,6 +115,7 @@ The address verification status is not updated when the probe fails (optimistic 
 <add_already_member>Ajouter un membre d&eacute;j&agrave; existant dans l'organisation</add_already_member>
 <add_artica_tasks>Ajoutez des t&acirc;ches pr&eacute;d&eacute;termin&eacute;es</add_artica_tasks>
 <add_artica_tasks_text>S&eacute;lectionnez les t&acirc;ches pr&eacute;d&eacute;finies dans la liste des champs ci-dessous.[br]</add_artica_tasks_text>
+<add_attached_files_text>Ajouter des documents joints &agrave; votre message</add_attached_files_text>
 <add_attachment_blocking_text>Ajouter une nouvelle extension interdite</add_attachment_blocking_text>
 <add_attachment_blocking_text_explain>indiquez ici les 3 lettres qui repr&eacute;sentent le type de fichier[br]
 Vous pouvez indiquer plusieurs entr&eacute;es en les s&eacute;parant par une virgule.[br]
@@ -131,9 +132,13 @@ Ajouter une liste : exe,pif,bat,doc</add_attachment_blocking_text_explain>
 <ADD_COMPUTER>Ajouter un nouvel ordinateur</ADD_COMPUTER>
 <add_computer_access>Ajouter un acc&egrave;s ordinateur</add_computer_access>
 <ADD_COMPUTER_TEXT>Ajoute un nouvel ordianteur dans la base d'Artica</ADD_COMPUTER_TEXT>
+<add_contact>Ajouter un contact</add_contact>
+<add_contact_text>Ajouter un contact unique dans la base de donn&eacute;es</add_contact_text>
 <add_default_rules>Ajouter les r&egrave;gles par d&eacute;faut</add_default_rules>
 <add_default_settings>Ajouter des param&egrave;tres par d&eacute;faut</add_default_settings>
 <add_edit_rule>Ajouter &amp; &eacute;diter une r&egrave;gle</add_edit_rule>
+<add_emailing>Ajouter un nouvel envoi</add_emailing>
+<add_emailing_text>liez votre mod&egrave;le avec une base de donn&eacute;es afin d'envoyer en masse le message.</add_emailing_text>
 <add_entry>Ajouter une entr&eacute;e</add_entry>
 <add_every>Ajouter toujours</add_every>
 <add_global_routing_rule>R&egrave;gle de cheminement globale</add_global_routing_rule>
@@ -162,12 +167,14 @@ Ajouter une liste : exe,pif,bat,doc</add_attachment_blocking_text_explain>
 <add_new_member_text>Ajouter un nouveau membre &agrave; votre organisation et s&eacute;lectionner son groupe</add_new_member_text>
 <add_new_network>Ajouter un nouveau r&eacute;seau</add_new_network>
 <add_new_network_text>Indiquez ici les tranches d'adresses et les &eacute;l&eacute;ments qui d&eacute;finissent votre r&eacute;seau local</add_new_network_text>
+<add_new_org>Ajouter une nouvelle organisation</add_new_org>
 <add_new_organisation>Ajouter une nouvelle organisation</add_new_organisation>
 <add_new_organisation_explain>Ajouter un secteur global qui stockera des groupes et des utilisateurs</add_new_organisation_explain>
 <add_new_organisation_text>Donner un nom &agrave; votre organisation:</add_new_organisation_text>
 <add_new_rule>jouter une nouvelle r&egrave;gle</add_new_rule>
 <add_new_sieverule_text>Cr&eacute;ez une nouvelle r&egrave;gle pour votre bo&icirc;te aux lettres, renoncez aux messages, transfert des messages, d&eacute;placer des messages vers un dossier...</add_new_sieverule_text>
 <add_new_sieve_rule>Ajouter une nouvelle r&egrave;gle de boite aux lettres</add_new_sieve_rule>
+<add_new_smtp_server>Ajouter un nouveau serveur SMTP</add_new_smtp_server>
 <ADD_NEW_TAB_ASK>Donnez le nom de votre nouvel onglet</ADD_NEW_TAB_ASK>
 <add_new_task>Ajouter une nouvelle t&acirc;che</add_new_task>
 <add_nic_aliase>Ajouter un alias</add_nic_aliase>
@@ -231,6 +238,8 @@ exemples[br]
 <AllowFetchMails>Fetch mails</AllowFetchMails>
 <AllowManageOwnComputers>Voir/Administrer ses ordinateurs</AllowManageOwnComputers>
 <AllowSender_canonical>Changement r&eacute;crivant l'adresse envoy&eacute;e</AllowSender_canonical>
+<allowsizemismatch>autoriser les tailles inad&eacute;quates</allowsizemismatch>
+<allowsizemismatch_text>Autoriser une taille  RFC822 diff&eacute;rente de la taille du  message r&eacute;cup&eacute;r&eacute;</allowsizemismatch_text>
 <AllowViewStatistics>Voir le secteur statistique</AllowViewStatistics>
 <all_days>Tous les jours</all_days>
 <all_events>Tous les &eacute;v&egrave;nements</all_events>
@@ -611,6 +620,7 @@ Squid optimise donc de fa&ccedil;on cons&eacute;quente le flux de donn&eacute;es
 <artica_wizard>Assistant Artica</artica_wizard>
 <AsArticaAdministrator>Peut acc&eacute;dez &agrave; la totalit&eacute; de l'arborescence</AsArticaAdministrator>
 <AsDansGuardianGroupRule>Peut administrer des r&egrave;gles de filtrage web.</AsDansGuardianGroupRule>
+<ask_perform_operation_delete_item>Supprimer ces &eacute;l&eacute;ments ?:</ask_perform_operation_delete_item>
 <AsMailBoxAdministrator>Gestionnaire de boite aux lettres locales</AsMailBoxAdministrator>
 <AsMailManAdministrator>Peut administrer des listes de distribution</AsMailManAdministrator>
 <AsMessagingOrg>G&egrave;re la messagerie de l'organisation</AsMessagingOrg>
@@ -624,6 +634,7 @@ Squid optimise donc de fa&ccedil;on cons&eacute;quente le flux de donn&eacute;es
 <ASSP_NEWVERSION_TEXT>Une nouvelle version de ASSP est disponible, il est conseill&eacute; d'effectuer la mise &agrave; jour.</ASSP_NEWVERSION_TEXT>
 <AsSquidAdministrator>D&eacute;finissez les proxys HTTP et les r&egrave;gles d'acc&egrave;s</AsSquidAdministrator>
 <AsSystemAdministrator>Syst&egrave;me d'exploitation Linux</AsSystemAdministrator>
+<attached_files>Pi&egrave;ces jointes</attached_files>
 <attachments filters>Filtres d'Attachements</attachments filters>
 <attachment_blocking>Pi&egrave;ces jointes interdites</attachment_blocking>
 <attachment_blocking_text>Mettez des interdictions sur les fichiers .exe .bat .vbs et bloquez certains types de pi&egrave;ces jointes</attachment_blocking_text>
@@ -782,6 +793,7 @@ Specify 0 when mail delivery should be tried only once.</bounce_queue_lifetime_t
 <cache_cleaned>Cache de la console nettoy&eacute;.</cache_cleaned>
 <calendar>Calendrier</calendar>
 <calling_daemon_to_perform_operation>d&eacute;mon d'appel artica pour effectuer des op&eacute;rations</calling_daemon_to_perform_operation>
+<campain_name>Nom de l'envoi en masse</campain_name>
 <cancel>annuler</cancel>
 <catch_all>Catch-all</catch_all>
 <catch_all_mail_text>A catch-all mailbox will receive all mails when recipients not matching your users stored in local database</catch_all_mail_text>
@@ -792,6 +804,7 @@ Specify 0 when mail delivery should be tried only once.</bounce_queue_lifetime_t
 <certificate infos>Infos de certificat</certificate infos>
 <certificate password>Mot de passe de certificat</certificate password>
 <certificate_hosts>Indiquez les h&ocirc;tes (nom complet) qui seront ajout&eacute;s dans le certificat SSL</certificate_hosts>
+<certificate_infos_modify_text>Visualiser et afficher les informations sur le certificat SSL</certificate_infos_modify_text>
 <change>Changer</change>
 <change_antispam_domain_text>Modifiez les param&egrave;tres anti-pourriels pour ce domaine[br]SI aucun param&egrave;tre n'est appliqu&eacute; par les utilisateurs de ce domaine, ces r&egrave;gles seront appliqu&eacute;s par d&eacute;faut.</change_antispam_domain_text>
 <change_email>Changer l'adresse eMail</change_email>
@@ -859,6 +872,7 @@ The relay_domains_reject_code parameter specifies the response code for rejected
 <click_to_dismount>Cliquer pour d&eacute;monter</click_to_dismount>
 <click_to_display>Cliquez sur le lien afin d'afficher l'&eacute;l&eacute;ment</click_to_display>
 <click_to_display_statistics_section>Cliquez pour afficher plus de statistiques</click_to_display_statistics_section>
+<click_to_edit_template>Cliquez pour &eacute;diter le mod&egrave;le.</click_to_edit_template>
 <click_to_expand_or_collapse>Cliquez pour agrandir ou r&eacute;duire</click_to_expand_or_collapse>
 <click_to_launch>Cliquez pour effectuer cette op&eacute;ration</click_to_launch>
 <click_to_mount>Cliquer pour monter</click_to_mount>
@@ -965,6 +979,7 @@ Vous avez besoin de tester cette fonctionnalit&eacute;.[br]Parfois cpulimit effe
 <cpu_usage>Usage CPU (par utilisateur)</cpu_usage>
 <create>cr&eacute;er</create>
 <created>cr&eacute;&eacute;</created>
+<created_on>Cr&eacute;&eacute; le</created_on>
 <create_mailbox>Pas de boite aux lettres trouv&eacute;es: Cr&eacute;er une boite aux lettres</create_mailbox>
 <create_network>Cr&eacute;ez un r&eacute;seau</create_network>
 <create_org_postfix>Cr&eacute;ez vos premiers param&egrave;tres et organisations</create_org_postfix>
@@ -982,6 +997,7 @@ Vous avez besoin de tester cette fonctionnalit&eacute;.[br]Parfois cpulimit effe
 <credentials_informations_text>Indiquez le compte et les mots de passe afin d'autoriser cet ordinateur &agrave; ce connecter au domaine ou d'autoriser Artica &agrave; se connecter dessus.</credentials_informations_text>
 <cron>cron</cron>
 <crypted>Chiffr&eacute;</crypted>
+<css>Feuilles de style</css>
 <Cured>Courant</Cured>
 <CURLE_COULDNT_CONNECT>Impossible de se connecter au serveur distant ou au proxy</CURLE_COULDNT_CONNECT>
 <CURLE_COULDNT_RESOLVE_HOST>Impossible de r&eacute;soudre l'ordinateur distant</CURLE_COULDNT_RESOLVE_HOST>
@@ -1044,8 +1060,8 @@ Vous pouvez ajouter des privil&egrave;ges de groupe afin d'autoriser certains ut
 <dansguardian_user_manage_rule>Cliquez ici afin de personnaliser la r&egrave;gle de filtrage web</dansguardian_user_manage_rule>
 <dansguardian_user_whitelists>Listes blanches.</dansguardian_user_whitelists>
 <Data exchange timeout>Timeout d'&eacute;change de Donn&eacute;es</Data exchange timeout>
-<database>base de donn&eacute;s</database>
-<databases>base de donn&eacute;es</databases>
+<database>base de donn&eacute;es</database>
+<databases>bases de donn&eacute;es</databases>
 <databases_status>Statut des base de donn&eacute;es</databases_status>
 <database_entries_number>Nombre d'entr&eacute;es dans la base de donn&eacute;es</database_entries_number>
 <database_name>Nom de la base de donn&eacute;es</database_name>
@@ -1110,6 +1126,9 @@ Vous pouvez ajouter des privil&egrave;ges de groupe afin d'autoriser certains ut
 <deploy>D&eacute;ployez</deploy>
 <DepositBoxSize>Taille du coffre-fort (Go)</DepositBoxSize>
 <description>Description</description>
+<dest_imap_password>Mot de passe du serveur de destination</dest_imap_password>
+<dest_imap_server>Serveur IMAP de destination</dest_imap_server>
+<dest_imap_username>Compte du serveur de destination</dest_imap_username>
 <detach>D&eacute;tacher</detach>
 <details>d&eacute;tails</details>
 <detected_spam>Spams</detected_spam>
@@ -1120,6 +1139,7 @@ Vous pouvez ajouter des privil&egrave;ges de groupe afin d'autoriser certains ut
 <disable>d&eacute;sactiver</disable>
 <disable tls postfix>D&eacute;sactiver TLS pour Postfix</disable tls postfix>
 <disabled>d&eacute;sactiv&eacute;</disabled>
+<disabled_amavis_enabled>Cette fonctionnalit&eacute; est d&eacute;sactiv&eacute;e car elle est &eacute;cras&eacute;e par les param&egrave;tres de Amavis.</disabled_amavis_enabled>
 <DisableMagicQuotesGpc>D&eacute;sactiver magic_quotes sur les op&eacute;rations GPC</DisableMagicQuotesGpc>
 <DisableMagicQuotesGpc_text>D&eacute;sactive le mode magic_quotes pour les op&eacute;rations GPC (Get/Post/Cookie). Lorsque magic_quotes est activ&eacute;, tous les caract&egrave;res ' (guillemets simples), &quot; (guillemets doubles), \ (antislash) et NUL sont &eacute;chapp&eacute;s avec un antislash. (Assure la compatibilit&eacute; avec eGroupware)</DisableMagicQuotesGpc_text>
 <disable_all_filters>D&eacute;sactiver tous les filtres</disable_all_filters>
@@ -1143,6 +1163,8 @@ Vous pouvez ajouter des privil&egrave;ges de groupe afin d'autoriser certains ut
 <display_queries_list>Afficher les requ&ecirc;tes</display_queries_list>
 <display_statistics_of_this_user>Afficher les statistiques de cet utilisateur/IP</display_statistics_of_this_user>
 <display_statistics_of_this_website>Afficher les statistiques de ce site web</display_statistics_of_this_website>
+<Disposition-Notification-To>Accus&eacute; r&eacute;ception</Disposition-Notification-To>
+<Disposition-Notification-To_text>Si vous mettez une adresse eMail ici, celle-ci activera une notification (accus&eacute; r&eacute;ception) lorsque le destinataire aura lu le message.[br]Si pas d'adresse indiqu&eacute;e, alors l'accus&eacute; r&eacute;ception sera inactif</Disposition-Notification-To_text>
 <dkim_about2>Cette technologie combine des messages sign&eacute;s et les serveurs DNS.[br]Tous les messages sign&eacute;s seront v&eacute;rifi&eacute;s avec les DNS externes (le champs TXT).Pour les messages entrants les messages sign&eacute;s vont influencer n&eacute;gativement le score de l'anti-spam.[br] A l'inverse l'anti-spam sera plus g&eacute;n&eacute;reux si les messages sont sign&eacute;s.[br]Vos messages sortants devront &ecirc;tre sign&eacute;s afin d'aider les serveurs destinataires de vos messages &agrave; v&eacute;rifier vos domaines de messagerie.</dkim_about2>
 <dkim_showkeys_text>Vous avez besoin de param&eacute;trer vos enregistrements dans les DNS pour chaque domaine list&eacute; ci-dessous.[br]Chaque enregistrement DNS devra disposer d'un  champ TXT avec les informations ci-dessous</dkim_showkeys_text>
 <DKIM_SPAMASS_WBL_HOWTO>Les serveurs ou domaines, emails, de cette section vont influencer positivement les scores de l'anti-spam malgr&eacute; un &eacute;chec de v&eacute;rification DKIM</DKIM_SPAMASS_WBL_HOWTO>
@@ -1194,7 +1216,10 @@ Les spammeurs connus sont ainsi bloqu&eacute;s lorsqu'ils tentent d'obtenir l'ad
 <each>chaque</each>
 <edit>Editez.</edit>
 <edit mode>Mode &eacute;dition</edit mode>
+<edit_contact>&Eacute;diter le contact</edit_contact>
 <edit_paremeters>D&eacute;finir les param&egrave;tres pour cette section</edit_paremeters>
+<edit_photo_title_org>Editer le logo de l'organisation</edit_photo_title_org>
+<edit_photo_title_org_text>Charger et changer l'image qui repr&eacute;sente votre organisation.</edit_photo_title_org_text>
 <edit_rule>Modifier un r&egrave;gle</edit_rule>
 <edit_squid_parent_parameters>Editer les param&egrave;tres du proxy parent</edit_squid_parent_parameters>
 <edit_table>Editer le tableau</edit_table>
@@ -1222,6 +1247,11 @@ supports the X-Forward extension for Postfix protocol only if [b]smtp[/b] is use
 <electronic_address>adresse &eacute;lectronique</electronic_address>
 <email>Addresse email</email>
 <emailAddress>addresse email</emailAddress>
+<emailings>Envois en masse</emailings>
+<emailing_campain_linker_delete>Supprimez l'envoi de masse et les donn&eacute;es associ&eacute;es</emailing_campain_linker_delete>
+<emailing_campain_linker_delete_confirm>&ecirc;tes-vous sur de vouloir supprimer cet &eacute;l&eacute;ment ?</emailing_campain_linker_delete_confirm>
+<emailing_queue_not_ready>La file d'attente n'est pas pr&ecirc;te</emailing_queue_not_ready>
+<emailing_queue_not_ready_text>Vous pouvez envoyer l'&eacute;mission en masse que si la file d'attente &agrave; &eacute;t&eacute; correctement construite</emailing_queue_not_ready_text>
 <emailrelay_status>Statut du Relais de Messagerie</emailrelay_status>
 <emails>messages</emails>
 <emails_addresses>Adresses eMail</emails_addresses>
@@ -1235,6 +1265,7 @@ supports the X-Forward extension for Postfix protocol only if [b]smtp[/b] is use
 <emails_recieved>emails re&ccedil;us</emails_recieved>
 <email_campaigns>Campagne marketing</email_campaigns>
 <email_number>nombre d'emails</email_number>
+<email_queue_number>Messages en file d'attente</email_queue_number>
 <email_scenarios>Sc&eacute;narios eMail</email_scenarios>
 <empty_list>Vider la liste</empty_list>
 <empty_quarantine>Vider votre quarantaine</empty_quarantine>
@@ -1566,6 +1597,8 @@ sous cette forme que vous souhaitez pr&eacute;senter</form_error>
 <From Address>De l'Adresse</From Address>
 <from_cache_file>du fichier cache</from_cache_file>
 <from_ip_address>de l'adresse tcp/ip</from_ip_address>
+<from_name>Nom de l'&eacute;metteur</from_name>
+<from_name_help>Indiquez ici le nom ou phrase qui sera visible dans le champ &quot;exp&eacute;diteur&quot; des clients de messagerie.</from_name_help>
 <fs_type>Type de syst&egrave;me de fichiers</fs_type>
 <gateway>Passerelle</gateway>
 <GDPHP_NOT_INSTALLED>Librairie GD !</GDPHP_NOT_INSTALLED>
@@ -1577,6 +1610,7 @@ sous cette forme que vous souhaitez pr&eacute;senter</form_error>
 <generate_a_signing_key_nokey_text>Vous avez besoin de g&eacute;n&eacute;rer une clef de signature afin d'activer l'&eacute;mission des emails sign&eacute;s pour le DKIM.[br]Cliquez simplement sur le bouton Artica le g&eacute;n&egrave;rera pour vous.</generate_a_signing_key_nokey_text>
 <generate_config>Reconstruire la configuration</generate_config>
 <generate_config_text>Reconstruire tous vos param&egrave;tres vers un champ temporaire ldap</generate_config_text>
+<generate_report_each>G&eacute;n&eacute;rer le rapport chaque</generate_report_each>
 <GENERIC_LDAP_ERROR>Erreur g&eacute;n&eacute;rique du serveur LDAP</GENERIC_LDAP_ERROR>
 <give ext>remplir les pi&egrave;ces jointes d'extension afin de bloquer</give ext>
 <give the new interface>Donner une nouvelle interface</give the new interface>
@@ -1594,6 +1628,10 @@ sous cette forme que vous souhaitez pr&eacute;senter</form_error>
 <globally_banned>Interdit en global</globally_banned>
 <global_blacklist>Liste noire de Domaines</global_blacklist>
 <global_blacklist_text>Cette fonctionnalit&eacute; vous permet de refuser des domaines exp&eacute;diteurs pour votre organisation</global_blacklist_text>
+<global_director_report>Rapport du directeur</global_director_report>
+<global_director_report_explain>Le rapport du directeur envoi un rapport en PDF du flux de messagerie de chaque utilisateur.[br]Il est construit pour le responsable de l'entit&eacute; afin de disposer des informations de sa messagerie.[br]
+La charge g&eacute;r&eacute;e par la construction de ce rapport va d&eacute;pendre du nombre d'utilisateurs et de la puissance du serveur</global_director_report_explain>
+<global_director_report_text>Envoyer de fa&ccedil;on p&eacute;riodique un rapport du flux de messagerie.</global_director_report_text>
 <global_memory>M&eacute;moire globale utilis&eacute;e</global_memory>
 <global_organization>organisation global</global_organization>
 <global_quarantine_rules>Param&egrave;tres principaux de quarantaine</global_quarantine_rules>
@@ -1684,6 +1722,9 @@ It send notifications to recipients in order to allow them to "download" attache
 <if_in>si dans</if_in>
 <ignore_all>Tout ignorer</ignore_all>
 <illimited>illimit&eacute;</illimited>
+<imapsync_advanced_options>Param&egrave;tres sp&eacute;cifiques pour am&eacute;liorer la synchronisation.</imapsync_advanced_options>
+<imapsync_folders_text>Indiquez les dossiers qui devront &ecirc;tre r&eacute;pliqu&eacute;s</imapsync_folders_text>
+<imapsync_main_settings>Param&egrave;tres principaux de synchronisation</imapsync_main_settings>
 <imap_connection_broken>La connexion Imap est actuellement rompu et les informations ne peuvent pas &ecirc;tre lus</imap_connection_broken>
 <imap_connection_locked>La connexion imap est actuellement verrouill&eacute; car le serveur imap n'a pas r&eacute;pondu &agrave; temps</imap_connection_locked>
 <imap_server_name>adresse du serveur</imap_server_name>
@@ -1947,6 +1988,7 @@ With the default 100 SMTP server process limit, "in flow delay as 1s" limits the
 <kav_title_infos>Statistiques d'informations</kav_title_infos>
 <keep>garder</keep>
 <keepup2date settings>Param&egrave;tres keepup2date</keepup2date settings>
+<keywords>mots-clefs</keywords>
 <kill_process>Arr&ecirc;ter les processus</kill_process>
 <label>label</label>
 <label_add_transport>Ajouter un serveur relais pour ce domaine</label_add_transport>
@@ -1960,6 +2002,7 @@ With the default 100 SMTP server process limit, "in flow delay as 1s" limits the
 <last_100_mails>Derniers 100 messages</last_100_mails>
 <last_24_h>Derni&egrave;res 24 heures</last_24_h>
 <last_48_h>Derni&egrave;res 48 Heures</last_48_h>
+<last_days>Derniers jours</last_days>
 <last_logoff>Derni&egrave;re fermeture de session</last_logoff>
 <last_logon>Derni&egrave;re session ouverte</last_logon>
 <last_mails>Derniers messages transf&eacute;r&eacute;s</last_mails>
@@ -2020,6 +2063,7 @@ The message delivery transport name is the first field in the entry in the maste
 </local_destination_concurrency_limit_text>
 <local_domains_table>Domaines Locaux</local_domains_table>
 <local_file>fichier local</local_file>
+<local_mailbox>Bo&icirc;te aux lettres locale</local_mailbox>
 <local_smtp_host>Serveur SMTP local</local_smtp_host>
 <locked>v&eacute;rouill&eacute;</locked>
 <locking_type>Type de verrouillages</locking_type>
@@ -2057,14 +2101,24 @@ The message delivery transport name is the first field in the entry in the maste
 <mailbox_created>Cr&eacute;e sur</mailbox_created>
 <mailbox_disabled>Cette bo&icirc;te aux lettres est d&eacute;sactiv&eacute;e</mailbox_disabled>
 <mailbox_does_not_exists>La bo&icirc;te aux lettres n'existe pas</mailbox_does_not_exists>
+<mailbox_folders>Dossiers bo&icirc;te aux lettres</mailbox_folders>
 <mailbox_main_settings>Param&egrave;tres de boites aux lettres</mailbox_main_settings>
 <mailbox_name>Nom de la boite aux lettres</mailbox_name>
 <mailbox_password>Mot de passe</mailbox_password>
 <mailbox_path>R&eacute;pertoire</mailbox_path>
+<mailbox_separator_destination>S&eacute;parateur sur le serveur de destination</mailbox_separator_destination>
+<mailbox_separator_source>S&eacute;parateur sur le serveur source</mailbox_separator_source>
+<mailbox_separator_text>S&eacute;parateur de bo&icirc;tes aux lettres si l'espace de noms n'est pas support&eacute;</mailbox_separator_text>
 <mailbox_server_address>Adresse du serveur de bo&icirc;tes aux lettres</mailbox_server_address>
 <mailbox_title>Editer la boite aux lettres</mailbox_title>
 <mailbox_usage>Utilisation de la boite aux lettres</mailbox_usage>
 <mailbox_username>Nom d'utilisateur</mailbox_username>
+<mailer_engine_settings>Param&egrave;tres d'&eacute;mission</mailer_engine_settings>
+<mailer_engine_settings_explain>Dans cette section, vous devez d&eacute;finir les serveurs de messagerie (SMTP) qui vont &ecirc;tre utilis&eacute;s pour l'&eacute;mission en masse.[br]
+Plus vous avez de serveurs, plus l'envoi en masse sera efficace et rapide.[br]
+Si vous indiquez plusieurs serveurs SMTP, artica divisera les messages &agrave; transmettre par le nombre de serveur afin de r&eacute;partir la charge.[br]
+Artica pour construire des serveurs &quot;virtuels&quot; multiples sur la m&ecirc;me machine si vous administrateur a pr&eacute;c&eacute;demment activ&eacute; la fonctionnalit&eacute;.[br]Vous pouvez aussi utiliser les relais de messagerie de votre fournisseur d'acc&egrave;s Internet.</mailer_engine_settings_explain>
+<mailer_engine_settings_text>D&eacute;finissez les param&egrave;tres des serveurs de messagerie, d'authentification pour l'envoi des messages en masse.</mailer_engine_settings_text>
 <mailgraph_about>Mailgraph est un simple outils de statistiques de messagerie port&eacute; par RRDTool. Il produit des rapports journaliers, hebdomadaires, mensuels et annuels avec des graphiques sur les messages &eacute;mis et re&ccedil;us voir rejet&eacute;s ou en attente.</mailgraph_about>
 <mailgraph_install>Installer l'application mailgraph</mailgraph_install>
 <mailgraph_postfix_database>Base de donn&eacute;es rrd du flux d'emails</mailgraph_postfix_database>
@@ -2337,12 +2391,17 @@ The default is to use the local machine name, $myhostname, which defaults to the
 <NMAP_NEWVERSION>Nouvelle version du Scanner de s&eacute;curit&eacute; r&eacute;seaux</NMAP_NEWVERSION>
 <NMAP_NEWVERSION_TEXT>Une nouvelle version NMAP est disponible sur les serveurs de t&eacute;l&eacute;chargements. Il est conseiller d'effectuer cette mise &agrave; jour.</NMAP_NEWVERSION_TEXT>
 <no>non</no>
+<noauthmd5>Pas d'auth. MD5</noauthmd5>
+<noauthmd5_text>Ne pas utiliser l'authentification bas&eacute;e sur MD5</noauthmd5_text>
+<nofoldersizes>Pas de tailles sur le dossier</nofoldersizes>
+<nofoldersizes_text>Ne pas calculer la taille de chaque dossier dans les comptes respectifs</nofoldersizes_text>
 <NOIEPLEASE>Ne pas utiliser Internet Explorer</NOIEPLEASE>
 <NOIEPLEASE_TEXT>Cette interface n'est pas compatible avec Internet Explorer, vous pouvez t&eacute;l&eacute;charger Mozilla Firefox ou Op&eacute;ra gratuitement.</NOIEPLEASE_TEXT>
 <nokeepmess>Supprimer les message apr&egrave;s r&eacute;cup&eacute;ration</nokeepmess>
 <none>Ne pas utiliser</none>
 <normal>Normale</normal>
 <normal_infos>Information</normal_infos>
+<nosyncacls>Ne pas synchroniser les acls</nosyncacls>
 <not allowed>Vous n'avez pas assez de droits pour effectuer cette op&eacute;ration</not allowed>
 <note>note</note>
 <notifications>Notifications</notifications>
@@ -2367,6 +2426,8 @@ The default is to use the local machine name, $myhostname, which defaults to the
 <no_mailboxes>Pas de boites aux lettres sauvegard&eacute;es</no_mailboxes>
 <no_mailbox_cause_transport>Ce domaine ne stocke pas les alias car tous les courriels seront transmis &agrave; un autre service / serveur</no_mailbox_cause_transport>
 <no_memory_free_to_empty_cache>Il n'y a pas assez de m&eacute;moire libre pour effectuer le vidage du cache,vous devriez red&eacute;marrer la machine ou stopper des services.</no_memory_free_to_empty_cache>
+<no_organization>Pas d'organisation cr&eacute;e</no_organization>
+<no_organization_text_jgrowl>Il n'y a pas d'organisation cr&eacute;e sur ce serveur, certaines fonctionnalit&eacute;s ne seront pas disponibles</no_organization_text_jgrowl>
 <no_plugins_can_be_enabled>Aucun plugin ne peut &ecirc;tre activ&eacute; pour le moment, v&eacute;rifiez avec le Super-Administrateur si vous &ecirc;tes autoris&eacute; &agrave; utiliser les plugins.</no_plugins_can_be_enabled>
 <NO_POSTFIX_NETWORK_SET>Pas de r&eacute;seaux dans Postfix</NO_POSTFIX_NETWORK_SET>
 <NO_POSTFIX_NETWORK_SET_EXPLAIN>Vous devriez ajouter votre r&eacute;seau local afin d'autoriser vos utilisateurs &agrave; &eacute;mettre des messages sur ce serveur.</NO_POSTFIX_NETWORK_SET_EXPLAIN>
@@ -2429,6 +2490,7 @@ Vous devrez alors reconstruire le certificat SSL principal et demander &agrave; 
 <ORG_HD_TITLE>Editeur de partitions</ORG_HD_TITLE>
 <ORG_HD_TITLE_TEXT>Cr&eacute;ez, r&eacute;organisez et supprimez les partitions disques</ORG_HD_TITLE_TEXT>
 <original>originale</original>
+<or_add_db>Ou ajouter une nouvelle base</or_add_db>
 <or_select>Ou s&eacute;lectionnez une valeur</or_select>
 <other>autre</other>
 <others>autres</others>
@@ -2594,9 +2656,12 @@ or when the address is an authorized destination (see "permit auth destination" 
 <postfix_last_errors>Derniers erreurs postfix/cyrus</postfix_last_errors>
 <postfix_main_settings>Param&egrave;tres Postfix</postfix_main_settings>
 <postfix_multi_add_mailserver>Ajouter un nouveau serveur de messagerie dans votre organisation.</postfix_multi_add_mailserver>
+<postfix_multi_add_mailserver_no_ips>Il n'y a pas d'adresse IP libres ou associ&eacute;es &agrave; votre organisation</postfix_multi_add_mailserver_no_ips>
 <POSTFIX_MULTI_INSTANCE>Multiples instances Postfix</POSTFIX_MULTI_INSTANCE>
 <POSTFIX_MULTI_INSTANCE_HOWTO>Lors de l'activation d'instances multiples Postfix, le processus principal sera d&eacute;sactiv&eacute; et n'&eacute;coutera que l'interface r&eacute;seau locale (127.0.0.1) afin de servir uniquement les services web.[br]
 Chaque organisation sera en mesure d'administrer leur propre instance serveur et la console web sera modifi&eacute;e afin de fournir cette fonctionnalit&eacute;</POSTFIX_MULTI_INSTANCE_HOWTO>
+<POSTFIX_MULTI_INSTANCE_INFOS>Informations sur les instances</POSTFIX_MULTI_INSTANCE_INFOS>
+<POSTFIX_MULTI_INSTANCE_INFOS_TEXT>Visualiser les &eacute;tats et supprimer les instances SMTP</POSTFIX_MULTI_INSTANCE_INFOS_TEXT>
 <POSTFIX_MULTI_INSTANCE_TEXT>Les multiples instances de Postfix fournissent un vrai relais de messagerie PAR organisation ajout&eacute;e sur le serveur.[br]Cette fonction permet simplement de configurer un syst&egrave;me &agrave; multiple fonctions.[br]Chaque instance disposera de ses propres r&eacute;pertoires de travail.</POSTFIX_MULTI_INSTANCE_TEXT>
 <POSTFIX_MULTI_INSTANCE_TINY_TEXT>Transformez votre serveur en un serveur &agrave; multiple services SMTP pour vos organisations</POSTFIX_MULTI_INSTANCE_TINY_TEXT>
 <postfix_network>Param&egrave;tres r&eacute;seaux postfix</postfix_network>
@@ -2621,6 +2686,7 @@ This is because Postfix needs to open lookup tables ahead of time, but the reade
 <postfix_statistics>Statistiques SMTP</postfix_statistics>
 <postfix_status>Statut du syst&egrave;me de messagerie Postfix</postfix_status>
 <postfix_status_stopped>Le syst&egrave;me de messagerie Postfix est arr&ecirc;t&eacute;</postfix_status_stopped>
+<postfix_unknown_users_tinytext>Normalement, lorsque Postfix re&ccedil;oit des messages pour des utilisateurs inconnus, il les rejette.[br]Si vous pr&eacute;f&eacute;rez les capturer vous pouvez utiliser cette fonctionnalit&eacute;.</postfix_unknown_users_tinytext>
 <postmaster>postmaster</postmaster>
 <postmaster_explain>L'adresse email qui recevra les notifications de ce syst&egrave;me. Cela veut dire les erreurs SMTP (mails retard&eacute;s ou en erreur), les t&acirc;che syst&egrave;mes programm&eacute;es.</postmaster_explain>
 <postmaster_identity>Identit&eacute; du Postmaster</postmaster_identity>
@@ -2635,6 +2701,7 @@ This is because Postfix needs to open lookup tables ahead of time, but the reade
 </PREPEND_help>
 <prepend_text>ajouter avant au texte trouv&eacute;</prepend_text>
 <previous>pr&eacute;c&eacute;dent</previous>
+<printers>Imprimantes</printers>
 <privileges>droits</privileges>
 <privileges_text>Modifier les droits et les r&egrave;gles de s&eacute;curit&eacute; des utilisateurs enregistr&eacute;s dans ce groupe</privileges_text>
 <Process Server Settings>Param&egrave;tres de Processus Serveur</Process Server Settings>
@@ -2748,6 +2815,9 @@ Les bo&icirc;tes aux lettres d&eacute;j&agrave; cr&eacute;es ne seront pas impac
 <recommend_restart_postfix>Il est obligatoire de red&eacute;marrer postfix pour accepter du courrier</recommend_restart_postfix>
 <recommend_update_kaspersky>Vous devez mettre &agrave; jour des bases antivirus Kaspersky, la version actuelle n'est plus &agrave; jour [br] Kaspersky recommande de mettre &agrave; jour la base de donn&eacute;es chaque heure</recommend_update_kaspersky>
 <reconnect_vpn_clients>Reconnecter tous les connexions VPN</reconnect_vpn_clients>
+<reconstruct_queue>Reconstruire la file d'attente</reconstruct_queue>
+<reconstruct_queue_confirm>&ecirc;tes-vous sur de vouloir reconstruire la file d'attente ?</reconstruct_queue_confirm>
+<reconstruct_queue_text>Delete the saved messages and rebuild messages into queue</reconstruct_queue_text>
 <reconstruct_virtual_ips>Reconstruire les cartes virtuelles</reconstruct_virtual_ips>
 <recreation_humor>Tout ce qui concerne l'humour ou les histoires dr&ocirc;les</recreation_humor>
 <recreation_sports>Tout ce qui concerne le sport</recreation_sports>
@@ -2900,6 +2970,8 @@ Tous les messages seront supprim&eacute;s et ne pourrons pas &ecirc;tre restaure
 <repair>R&eacute;parer</repair>
 <replace>remplacer</replace>
 <replace_line>remplace la ligne courante par</replace_line>
+<Reply-to>Adresse de r&eacute;ponse</Reply-to>
+<Reply-to-explain>Adresse email qui sera utilis&eacute; lorsque les destinataires vont vouloir r&eacute;pondre au message.</Reply-to-explain>
 <reply_body_max_size>Taille Max. d'une r&eacute;ponse</reply_body_max_size>
 <reply_body_max_size_text>Ce param&egrave;tre peut &ecirc;tre utilis&eacute; afin de pr&eacute;venir le t&eacute;l&eacute;chargement de gros fichiers comme les fichier MP3 et les vid&eacute;os.[br]
 La taille est v&eacute;rifi&eacute;e deux fois.[br]
@@ -2935,6 +3007,8 @@ Placer une limite sur les ent&ecirc;tes HTTP peut r&eacute;soudre certains probl
 <restrictions_classes_list>Liste de Classes</restrictions_classes_list>
 <results>R&eacute;sultats</results>
 <RETRANSLATOR_CONNECT_URI>Utilisez ce lien web dans les produits Kaspersky afin de les mettre &agrave; jour &agrave; travers ce serveur (voir le lien ci-dessous)</RETRANSLATOR_CONNECT_URI>
+<Return-Path>Adresse de retour</Return-Path>
+<Return-Path-explain>Utilis&eacute; pour les serveurs de messagerie afin de renvoyer les erreurs de transmission de messages.</Return-Path-explain>
 <return_to>retourner vers</return_to>
 <ringtones>Sites permettant de t&eacute;l&eacute;charger des sonneries ou informations relatives.</ringtones>
 <roomNumber>Num&eacute;ro de chambre</roomNumber>
@@ -3057,9 +3131,12 @@ while distributing domain2.com mail as usual.[br]
 <sendto>Envoy&eacute; un message vers</sendto>
 <send_a_test_mail>Envoyer un message de test</send_a_test_mail>
 <send_a_test_mail_text>Envoyer rapidement un message pr&eacute; &eacute;crit &agrave; cette adresse afin de tester l'acheminement du message</send_a_test_mail_text>
+<send_emailing>Lib&eacute;rer la file d'attente</send_emailing>
+<send_emailing_text>Lib&eacute;rer la file d'attente et lancer votre envoi en masse</send_emailing_text>
 <sent>envoy&eacute;(s)</sent>
 <server>serveur</server>
 <servername>Nom de serveur</servername>
+<servername_already_used>Le nom de serveur est d&eacute;j&agrave; utilis&eacute;</servername_already_used>
 <servers>serveurs</servers>
 <servers_list>Liste de serveurs</servers_list>
 <server_memory>M&eacute;moire du serveur</server_memory>
@@ -3147,10 +3224,14 @@ It refuses delivery of a message by sending back an [MDN] to the sender.[br]
 <sieve_vacation_text>This is a rule for notification that messages will not be immediately answered.</sieve_vacation_text>
 <sieve__text>S&eacute;lectionnez les op&eacute;rations lorsque les r&egrave;gles correspondent</sieve__text>
 <simple_mode>Mode simple</simple_mode>
+<simulation_mode>Mode simulation</simulation_mode>
+<simulation_mode_explain>Le mode simulation va changer chaque destinataire par l'adresse eMail stipul&eacute;e dans le champs ci-dessous.[br]Dans ce cas, vous pouvez envoyer l'envoi en masse en toute confiance afin de tester le processus d'&eacute;mission avant l'envoi d&eacute;finitif.</simulation_mode_explain>
 <since>depuis</since>
 <single_ip>Adresse IP simple</single_ip>
 <size>taille</size>
 <skipped>ignor&eacute;(s)</skipped>
+<skipsize>ne pas faire attention &agrave; la taille</skipsize>
+<skipsize_text>Ne pas faire attention &agrave; la taille du message</skipsize_text>
 <sleeping>en veille</sleeping>
 <smartsieve>r&egrave;gles de boite aux lettres</smartsieve>
 <smbclient_not_installed_fill_form>L'outil smbclient n'est pas install&eacute;, le parcours est alors d&eacute;sactiv&eacute;. Remplissez le formulaire afin d'indiquer les informations de connexion.</smbclient_not_installed_fill_form>
@@ -3350,9 +3431,11 @@ To prevent mailer loops between MX hosts and fall-back hosts, Postfix version 2.
 [strong]Time units: s (seconds), m (minutes), h (hours), d (days), w (weeks). [/strong][br]
 The default time unit is s (seconds).
 </smtp_helo_timeout_text>
+<smtp_host_not_set>Le serveur local SMTP n'est pas d&eacute;fini</smtp_host_not_set>
+<smtp_notification>Notifications SMTP</smtp_notification>
 <smtp_notifications>Notifications eMail</smtp_notifications>
 <smtp_port>Port SMTP</smtp_port>
-<smtp_queues>Files d'attentes</smtp_queues>
+<smtp_queues>Files d'attente</smtp_queues>
 <smtp_sender_dependent_authentication>Authentification d'&eacute;missions SMTP</smtp_sender_dependent_authentication>
 <smtp_sender_dependent_authentication_text>Active l'authentification en fonction de l'&eacute;metteur.[br]Cette fonctionnalit&eacute; est en relation avec l'authentification SMTP</smtp_sender_dependent_authentication_text>
 <smtp_server>serveur SMTP</smtp_server>
@@ -3397,6 +3480,12 @@ by changing 5xx reply codes into 4xx. However, this option is no cure for addres
 <spam option 5r>De confiance</spam option 5r>
 <spam option 6>Si un message est consid&eacute;r&eacute; comme &laquo;non d&eacute;tect&eacute;&raquo;</spam option 6>
 <spam option 6r>Non D&eacute;tect&eacute;</spam option 6r>
+<SpamAssassinVirusBounceEnabled>Activer le groupe de r&egrave;gles &quot;rebonds&quot;</SpamAssassinVirusBounceEnabled>
+<SpamAssassinVirusBounceEnabled_text>L'objectif est simple : provoquer des notifications de non remise de courrier provenant d'une source inconnue en for&ccedil;ant le champ &quot;De&quot; avec l'adresse de la cible (ordinateur infect&eacute;) et des destinataires erron&eacute;s.[br]
+Le r&eacute;sultat peut &ecirc;tre catastrophique : plusieurs centaines, voire milliers, de courriers de notification en retour qui provoquent l'engorgement des r&eacute;seaux, des serveurs, etc.[br]
+Ce jeux de r&egrave;gles permet de combattre &agrave; l'aide de SpamAssassin ces techniques de spam.</SpamAssassinVirusBounceEnabled_text>
+<spamassassin_check_config>V&eacute;rification de la configguration</spamassassin_check_config>
+<spamassassin_check_config_text>V&eacute;rifiez la conformit&eacute; de la configuration de Spamassassin et affichez les r&eacute;sultats du jeux de tests.</spamassassin_check_config_text>
 <SPAMASSASSIN_DNS_BLACKLIST>Listes noires DNS</SPAMASSASSIN_DNS_BLACKLIST>
 <SPAMASSASSIN_DNS_BLACKLIST_TEXT>Activez les listes noires DNS dans Spamassassin afin d'augmenter le niveau de d&eacute;tection.</SPAMASSASSIN_DNS_BLACKLIST_TEXT>
 <SPAMASSASSIN_NEWVERSION>Nouvelle version de SpamAssassin</SPAMASSASSIN_NEWVERSION>
@@ -3552,6 +3641,8 @@ Vous allez &ecirc;tre redirig&eacute; vers la nouvelle adresse IP dans 15 second
 <synchronize_directorylist_each>Synchroniser le listage du r&eacute;pertoire chaque</synchronize_directorylist_each>
 <synchronize_each>Synchroniser chaque</synchronize_each>
 <synchronizing_mailbox>Synchronisation de boites aux lettres</synchronizing_mailbox>
+<syncinternaldate>Synchroniser les dates internes</syncinternaldate>
+<syncinternaldate_text>modifie les dates internes sur le serveur de destination par rapport au serveur source.[br]La date interne est la date d'arriv&eacute;e du message sur le serveur source.</syncinternaldate_text>
 <synthesis>synth&egrave;se</synthesis>
 <system>syst&egrave;me</system>
 <system error>Il y a un soucis syst&egrave;me, peut &ecirc;tre une erreur  preg_match ou la socket ne peut &ecirc;tre ouverte</system error>
@@ -3593,8 +3684,24 @@ Si vous d&eacute;sactivez cette option, Artica utilisera uniquement un cache de 
 <tcp_address>Adresse TCP</tcp_address>
 <tcp_main_settings>Param&egrave;tres cartes r&eacute;seau</tcp_main_settings>
 <templates>Mod&egrave;les</templates>
-<template_add>Add a new template</template_add>
+<template_add>Ajouter un nouveau mod&egrave;le</template_add>
 <template_add_emailing_text>Construire le message qui sera utilis&eacute; lors de l'&eacute;mission en masse des messages</template_add_emailing_text>
+<template_content>contenu du mod&egrave;le</template_content>
+<template_content_text>Modifiez le contenu de votre mod&egrave;le</template_content_text>
+<template_css_text>Modifiez les feuilles de style de votre mod&egrave;le</template_css_text>
+<template_from_help>Indiquez ici l'adresse de l'&eacute;metteur du message utilis&eacute; lors des &eacute;changes techniques entre serveurs de messagerie. (plus basiquement le &quot;From&quot;)</template_from_help>
+<template_keywords_text>Vous allez trouver ici les mots-clefs que vous pouvez mettre dans votre mod&egrave;le.[br]
+Ces mots-clefs seront remplac&eacute;s dynamiquement avec le contenu de votre base de contacts avant la g&eacute;n&eacute;ration du message final.[br]
+[ul]
+[li][b]%gender%[/b]:genre[/li]
+[li][b]%lastname%[/b]:Nom[/li]
+[li][b]%firstname%[/b]:Pr&eacute;nom[/li]
+[li][b]%email%[/b]:email[/li]
+[li][b]%phone%[/b]:T&eacute;l&eacute;phone[/li]
+[li][b]%city%[/b]:Ville[/li]
+[li][b]%cp%[/b]:Code postal[/li]
+[li][b]%postaladdress%[/b]:Adresse postale[/li]
+[/ul]</template_keywords_text>
 <template_name>Nom du mod&egrave;le</template_name>
 <test>test</test>
 <text>Cette page vous montre toutes les 10 secondes les &eacute;v&eacute;nements g&eacute;n&eacute;r&eacute;s par le syst&egrave;me de messagerie Postfix.</text>
@@ -3854,6 +3961,7 @@ Si il est en rouge, vous allez devoir maintenir la base des utilisateurs.[br]Cet
 <uninstall>D&eacute;sinstaller</uninstall>
 <unknown>Inconnu</unknown>
 <unknown_user>utilisateur inconnu</unknown_user>
+<unknown_users>Utilisateurs inconnus</unknown_users>
 <unlink>D&eacute;connecter</unlink>
 <unlink_hard_drive_confirm>Confirmez-vous la d&eacute;connexion de ce disque dur ?</unlink_hard_drive_confirm>
 <UNLINK_VOLUME>D&eacute;connecter ce volume</UNLINK_VOLUME>
@@ -3889,6 +3997,7 @@ Si il est en rouge, vous allez devoir maintenir la base des utilisateurs.[br]Cet
 <upload_max_filesize>Taille Max du fichier de t&eacute;l&eacute;chargement</upload_max_filesize>
 <upload_new_license>T&eacute;l&eacute;charger une nouvel licence</upload_new_license>
 <upload_vpn_configuration>Charger les param&egrave;tres VPN</upload_vpn_configuration>
+<upload_your_file_here>Chargez vos fichiers ici</upload_your_file_here>
 <uptime>temps de vie</uptime>
 <uri_add_in_browser>Lien web &agrave; rajouter dans les param&egrave;tres des navigateurs</uri_add_in_browser>
 <uri_dnsbl>Lien DNSBL</uri_dnsbl>
@@ -3960,6 +4069,8 @@ In the url the "%f" can be used to specify the real name of downloaded file</Vir
 <VIRUSES_FOUND>Codes malicieux trouv&eacute;(s) !</VIRUSES_FOUND>
 <VIRUSES_FOUND_TEXT>Des codes malicieux ont &eacute;t&eacute;s trouv&eacute;s dans votre serveur, v&eacute;rifiez les &eacute;v&egrave;nements afin d'afficher les d&eacute;tections.</VIRUSES_FOUND_TEXT>
 <virusname>Nom du virus</virusname>
+<Virus_Bounce_Ruleset>Groupe de r&egrave;gles &quot;Rebonds&quot;</Virus_Bounce_Ruleset>
+<Virus_Bounce_Ruleset_text>Groupes de r&egrave;gles permettant de limite les techniques de r&eacute;trodiffusions.[br]le &quot;Backscatter&quot; (ou r&eacute;trodiffusion) est une technique de spam bas&eacute;e sur le retour d'emails non sollicit&eacute;s</Virus_Bounce_Ruleset_text>
 <virus_by_sender_domains>D&eacute;tection des virus par les domaines &eacute;metteurs</virus_by_sender_domains>
 <VIRUS_EVENTS>&Eacute;v&egrave;nements viraux</VIRUS_EVENTS>
 <VISIT_WEB_SITE_INFOS>Afficher le site web pour plus d'informations</VISIT_WEB_SITE_INFOS>
@@ -4045,6 +4156,7 @@ Pendant la sauvegarde, le serveur risque d'&ecirc;tre occup&eacute;.[br]Il est i
 <WORKGROUP>Groupe de travail</WORKGROUP>
 <working_title>Emploi</working_title>
 <write>Ecrire</write>
+<WWWMultiSMTPSender>serveur SMTP</WWWMultiSMTPSender>
 <www_adv>Tout sur les publicit&eacute;s</www_adv>
 <www_chat>Site de discussions instantan&eacute;es</www_chat>
 <www_downloads>Couvre le partage de fichiers, perr-to-peer et sites web torrent</www_downloads>
@@ -4057,6 +4169,8 @@ Pendant la sauvegarde, le serveur risque d'&ecirc;tre occup&eacute;.[br]Il est i
 <www_shopping>Sites offrant l'achat sur internet ou de comparaisons de prix sur Internet.</www_shopping>
 <www_spyware>Sites web essayant d'installer des logiciels sans consentements</www_spyware>
 <www_tracker>Site en gardant un %u0153il sur l'endroit o&ugrave; vous naviguez et ce que vous faites d'une mani&egrave;re passive.</www_tracker>
+<X-Mailer>Application eMail</X-Mailer>
+<X-Mailer-explain>S&eacute;lectionnez une application eMail &quot;virtuelle&quot; qui sera utilis&eacute;.</X-Mailer-explain>
 <xapian_packages>Moteurs de recherche</xapian_packages>
 <xapian_processing>Indexation de vos stockages (moteur de recherche)</xapian_processing>
 <xapian_processing_text>omindex est actuellement en cours d'analyse de vos r&eacute;pertoires afin d'am&eacute;liorer la recherche des documents sur votre serveur[br]Pendant ce temps, il est possible que votre serveur soit occup&eacute;.</xapian_processing_text>
@@ -4086,6 +4200,7 @@ Les bo&icirc;tes aux lettres, alias... de ce domaine vont &eacute;galement &ecir
 <zarafaQuotaHard>Quota ferm&eacute;</zarafaQuotaHard>
 <zarafaQuotaSoft>Quota limit&eacute;</zarafaQuotaSoft>
 <zarafaQuotaWarn>Quota d'alerte</zarafaQuotaWarn>
+<ZARAFA_ERROR_NO_APACHE>Le serveur Apache n'a pas &eacute;t&eacute; d&eacute;tect&eacute;.[br]Vous ne pourrez pas avoir acc&egrave;s au webmail Zarafa tant qu'un serveur Apache n'est pas install&eacute;.[br]le service IMAP/POP3 quand &agrave; eux sont disponibles et vous pouvez les utiliser</ZARAFA_ERROR_NO_APACHE>
 <ZARAFA_OU_ICON_TEXT>D&eacute;finir l'acc&egrave;s &agrave; Zarafa et activer cette organisation.</ZARAFA_OU_ICON_TEXT>
 <zarfa_quota_title>Quotas et moniteur de quotas</zarfa_quota_title>
 <zarfa_quota_title_explain>Les utilisateurs peuvent collecter autent de messages tant que votre disque dur contient la place suffisante.[br]Cette fonctionnalit&eacute; vous permet de brider la taille des bo&icirc;tes aux lettres pour cet utilisateur.[br]Le syst&egrave;me de quota dispose de 3 niveaux: alerte,limit&eacute; et ferm&eacute;.[br]

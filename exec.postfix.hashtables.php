@@ -15,6 +15,12 @@ $GLOBALS["newaliases"]=$unix->find_program("newaliases");
 $GLOBALS["postalias"]=$unix->find_program("postalias");
 $GLOBALS["postfix"]=$unix->find_program("postfix");
 $GLOBALS["newaliases"]=$unix->find_program("newaliases");
+$GLOBALS["virtual_alias_maps"]=array();
+$GLOBALS["alias_maps"]=array();
+$GLOBALS["relay_domains"]=array();
+$GLOBALS["bcc_maps"]=array();
+$GLOBALS["transport_maps"]=array();
+$GLOBALS["smtp_generic_maps"]=array();
 
 if(!is_file($GLOBALS["postfix"])){die();}
 
@@ -32,6 +38,9 @@ if($GLOBALS["EnablePostfixMultiInstance"]==1){
 	system(LOCATE_PHP5_BIN2()." ". dirname(__FILE__)."/exec.postfix-multi.php");
 	die();
 }
+
+
+
 
 if($argv[1]=="--postmaster"){postmaster();die();}	
 
@@ -69,6 +78,7 @@ if($argv[1]=="--aliases"){
 if($argv[1]=="--smtp-passwords"){
 	sender_canonical_maps_build();
 	sender_canonical_maps();
+	smtp_generic_maps();
 	sender_dependent_relayhost_maps();
 	smtp_sasl_password_maps();
 	shell_exec("{$GLOBALS["postfix"]} reload >/dev/null 2>&1");
@@ -76,11 +86,7 @@ if($argv[1]=="--smtp-passwords"){
 	
 	
 
-$GLOBALS["virtual_alias_maps"]=array();
-$GLOBALS["alias_maps"]=array();
-$GLOBALS["relay_domains"]=array();
-$GLOBALS["bcc_maps"]=array();
-$GLOBALS["transport_maps"]=array();
+
 
 
 maillings_table();
@@ -102,6 +108,7 @@ recipient_canonical_maps();
 
 sender_canonical_maps_build();
 sender_canonical_maps();
+smtp_generic_maps();
 
 
 sender_dependent_relayhost_maps();
@@ -638,6 +645,7 @@ function sender_canonical_maps_build(){
 		$canonical=$hash[$i][strtolower("SenderCanonical")][0];
 		if($canonical==null){continue;}
 		$GLOBALS["sender_canonical_maps"][]="$mail\t$canonical";
+		$GLOBALS["smtp_generic_maps"][]="$mail\t$canonical";
 	}	
 	
 			
@@ -653,6 +661,21 @@ function sender_canonical_maps(){
 	shell_exec("{$GLOBALS["postmap"]} hash:/etc/postfix/sender_canonical >/dev/null 2>&1");
 	shell_exec("{$GLOBALS["postconf"]} -e \"sender_canonical_maps = hash:/etc/postfix/sender_canonical\" >/dev/null 2>&1");
 }
+
+function smtp_generic_maps(){
+	if(!is_array($GLOBALS["smtp_generic_maps"])){
+		echo "Starting......: 0 SMTP generic retranslations rule(s)\n"; 
+		shell_exec("{$GLOBALS["postconf"]} -e \"smtp_generic_maps =\" >/dev/null 2>&1");
+	}	
+	echo "Starting......: ". count($GLOBALS["smtp_generic_maps"])." SMTP generic retranslations rule(s)\n"; 
+	@file_put_contents("/etc/postfix/smtp_generic_maps",implode("\n",$GLOBALS["smtp_generic_maps"]));
+	shell_exec("{$GLOBALS["postmap"]} hash:/etc/postfix/smtp_generic_maps >/dev/null 2>&1");
+	shell_exec("{$GLOBALS["postconf"]} -e \"smtp_generic_maps = hash:/etc/postfix/smtp_generic_maps\" >/dev/null 2>&1");
+}
+
+
+
+
 
 
 function recipient_canonical_maps(){

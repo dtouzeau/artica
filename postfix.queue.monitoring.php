@@ -119,7 +119,7 @@ while (list ($num, $val) = each ($fields) ){
 	";
 	
 }
-$table=RoundedLightWhite($table . "</table>");
+$table=$table . "</table>";
 $message_content=htmlspecialchars($message_content);
 $messagesT=explode("\n",$message_content);
 $message_content=null;
@@ -129,7 +129,7 @@ while (list ($num, $val) = each ($messagesT) ){
 	
 	
 }
-$message_content=RoundedLightWhite($message_content);
+
 $html="
 <H1>{show_mail}:$messageid</H1>
 <table style='width:100%'>

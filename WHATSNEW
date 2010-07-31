@@ -1,4 +1,41 @@
-1.4.071110:
+1.4.072914:
+========================================================================================
+
+Interface Changes
+-------------------------------------------------
+1.4.072914: Fix minor bugs found on the beach :=)
+
+Messaging Changes:
+-------------------------------------------------
+1.4.072914: Increase parameters on mailboxes synchronization feature.
+Add possibility to modify SSL certificate informations in Postfix multi-instances.
+http://forum.artica.fr/viewtopic.php?f=26&t=2503&sid=ca55f76e467a31803669e743eac73332&p=11940#p11940
+
+Fix wrong informations displayed in postfix queue status in multi-instances.
+
+Interface Changes
+-------------------------------------------------
+Now, Display the label name in disk status table
+
+
+
+1.4.071616:
+========================================================================================
+
+
+Messaging Changes:
+-------------------------------------------------
+1.4.071502: Add a syslog watchdog on zarafa-server[5713]: INNODB engine is not support. Please enable the INNODB engine (Artica action = restart mysql service)
+1.4.071516: Fix wrong insertion of personal main.cf parameters.
+1.4.071616: Fix major bug that die postfix configurator and not set all postfix parameters.
+
+
+Interface Changes
+-------------------------------------------------
+1.4.071516: Fix unable to change Artica web interface listen port
+
+
+1.4.071400:
 ========================================================================================
 
 Messaging Changes:
@@ -8,11 +45,14 @@ Messaging Changes:
 1.4.070814: Add a new feature that allow to add some DNSBL list (especially senderbase has cisco black lists) into SpamAssassin.
 1.4.070900: Force mandatory 127.0.0.0/8 network in postfix mynetwork parameter
 1.4.070900: Add a syslog watchdog on fatal: valid hostname or network address required in server description (Artica action = notify)
-1.4.070917: Adding a syslog watchdog on zarafa-server  Cannot instantiate user plugin: ldap_bind_s: Invalid credentials (Artica action = restart zarafa)
+1.4.070917: Add a syslog watchdog on zarafa-server  Cannot instantiate user plugin: ldap_bind_s: Invalid credentials (Artica action = restart zarafa)
 1.4.070917: Add a syslog watchdog on postfix fatal: specify a password table via the `smtp_sasl_password_maps' configuration parameter (Artica action = disable SMTP SASL)
 1.4.071110: Add a syslog watchdog on amavis : TROUBLE in child_init_hook: BDB can't connect db env. at /var/amavis/db (Artica action=restart amavis)
 1.4.071110: Fix unable to start milter-greylist in multiple postfix instance mode.
 1.4.071110: Add possibility to set the ip address of the local smtp server in the roundcube subdomain when using the postfix multiple instance mode.
+1.4.071301: Add possibility to generate a global messaging report for the organization.
+1.4.071400: Add possibility to enable Virus Bounce Ruleset in Spamassassin
+1.4.071400: Add new feature that display spamassassin configuration checking.
 
 
 System changes

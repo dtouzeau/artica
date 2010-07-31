@@ -196,7 +196,6 @@ end;
 function tkav4proxy.VERSION():string;
 var
    RegExpr        :TRegExpr;
-   D              :boolean;
    F              :TstringList;
    T              :string;
    i              :integer;

@@ -546,7 +546,7 @@ logs.DeleteFile('/etc/cron.d/artica-cron-executor-300');
       fetchmail:=tfetchmail.Create(SYS);
       if FileExists(fetchmail.FETCHMAIL_BIN_PATH()) then begin
          logs.DebugLogs('Starting......: Daemon (fcron) set fetchmail injector schedule');
-         l.Add('@'+Nicet+nolog+',lavg1('+IntToStr(systemMaxOverloaded)+') 2 '+cmdnice+SYS.LOCATE_PHP5_BIN()+ ' ' +artica_path+'/exec.fetchmail.sql.php');
+         l.Add('@'+Nicet+nolog+',lavg1('+IntToStr(systemMaxOverloaded)+') 2 '+cmdnice+php5bin+ ' ' +artica_path+'/exec.fetchmail.sql.php');
       end;
       fetchmail.free;
 // -------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -554,7 +554,7 @@ logs.DeleteFile('/etc/cron.d/artica-cron-executor-300');
 // ---------------------------------- drupal -----------------------------
    if DirectoryExists('/usr/share/drupal') then begin
         logs.DebugLogs('Starting......: Daemon (fcron) set drupal maintenance each 5 Hours');
-       l.Add('@'+Nicet+nolog+',lavg1('+IntToStr(systemMaxOverloaded)+') 5h '+cmdnice+SYS.LOCATE_PHP5_BIN()+ ' ' +artica_path+'/exec.drupal.php --cron');
+       l.Add('@'+Nicet+nolog+',lavg1('+IntToStr(systemMaxOverloaded)+') 5h '+cmdnice+php5bin+ ' ' +artica_path+'/exec.drupal.php --cron');
    end;
 // -----------------------------------------------------------------------
 
@@ -563,7 +563,7 @@ logs.DeleteFile('/etc/cron.d/artica-cron-executor-300');
       squid:=Tsquid.Create;
       if FileExists(squid.SQUID_BIN_PATH()) then begin
          logs.DebugLogs('Starting......: Daemon (fcron) set squid injector reports schedule...');
-         l.Add('@'+Nicet+nolog+',lavg1('+IntToStr(systemMaxOverloaded)+') 58s '+cmdnice+SYS.LOCATE_PHP5_BIN()+ ' ' +artica_path+'/exec.dansguardian.injector.php');
+         l.Add('@'+Nicet+nolog+',lavg1('+IntToStr(systemMaxOverloaded)+') 58s '+cmdnice+php5bin+ ' ' +artica_path+'/exec.dansguardian.injector.php');
       end else begin
          logs.DebugLogs('Starting......: Daemon (fcron) Squid is not installed');
       end;
@@ -581,9 +581,25 @@ logs.DeleteFile('/etc/cron.d/artica-cron-executor-300');
                   l.Add(backups.Strings[i]);
              end;
           except
-            logs.DebugLogs('Starting......: Daemon (cron) Error set backup tasks');
+            logs.DebugLogs('Starting......: Daemon (fcron) Error set backup tasks');
           end;
-          logs.DebugLogs('Starting......: Daemon (cron) set ' +IntToStr(backups.Count)+' backup tasks');
+          logs.DebugLogs('Starting......: Daemon (fcron) set ' +IntToStr(backups.Count)+' backup tasks');
+          backups.free;
+      end;
+
+// ------------------------------------------------REPORTS-------------------------------------------------------------------------------------------
+      fpsystem(SYS.LOCATE_PHP5_BIN()+' /usr/share/artica-postfix/exec.report.director.php --schedules');
+      if FileExists('/etc/artica-postfix/reports.tasks') then begin
+          backups:=Tstringlist.Create;
+          try
+             backups.LoadFromFile('/etc/artica-postfix/reports.tasks');
+             for i:=0 to backups.Count-1 do begin
+                  l.Add('@'+Nicet+nolog+',lavg1('+IntToStr(systemMaxOverloaded)+')  '+backups.Strings[i]);
+             end;
+          except
+            logs.DebugLogs('Starting......: Daemon (fcron) Error set report tasks');
+          end;
+          logs.DebugLogs('Starting......: Daemon (fcron) set ' +IntToStr(backups.Count)+' backup tasks');
           backups.free;
       end;
 
@@ -599,7 +615,7 @@ logs.DeleteFile('/etc/cron.d/artica-cron-executor-300');
 if not TryStrToInt(SYS.GET_INFO('WifiAPEnable'),WifiAPEnable) then WifiAPEnable:=0;
 if WifiAPEnable=1 then begin
       logs.DebugLogs('Starting......: Daemon (cron) Activate WIFI Client connection watchdog');
-      l.Add('@'+Nicet+nolog+',lavg1('+IntToStr(systemMaxOverloaded)+') 5 '+cmdnice+SYS.LOCATE_PHP5_BIN()+ ' ' +artica_path+'/exec.wifi.detect.cards.php --checkap');
+      l.Add('@'+Nicet+nolog+',lavg1('+IntToStr(systemMaxOverloaded)+') 5 '+cmdnice+php5bin+ ' ' +artica_path+'/exec.wifi.detect.cards.php --checkap');
 end;
 
 
@@ -631,12 +647,12 @@ l.add('@'+Nicet+nolog+',lavg1('+IntToStr(systemMaxOverloaded)+') 10 '+ SYS.LOCAT
       //SYS.CRON_CREATE_SCHEDULE('0 23 * * *',cmdnice+artica_path+'/bin/artica-install --dansguardian-stats','artica-cron-dansguardian');
 
       //A 2H
-      SYS.CRON_CREATE_SCHEDULE('0 2 * * *',cmdnice+SYS.LOCATE_PHP5_BIN()+ ' ' +artica_path+'/exec.smtp.events.clean.php','artica-clean-smtplogs');
+      SYS.CRON_CREATE_SCHEDULE('0 2 * * *',cmdnice+php5bin+ ' ' +artica_path+'/exec.smtp.events.clean.php','artica-clean-smtplogs');
 
       //toutes les heures
       SYS.CRON_CREATE_SCHEDULE('@hourly',cmdnice+artica_path+'/bin/artica-update','artica-cron-update');
-      SYS.CRON_CREATE_SCHEDULE('@hourly',cmdnice+SYS.LOCATE_PHP5_BIN()+ ' ' +artica_path+'/cron.mysql-databases.php','artica-cron-mysqldb');
-      SYS.CRON_CREATE_SCHEDULE('@hourly',cmdnice+SYS.LOCATE_PHP5_BIN()+ ' ' +artica_path+'/exec.vacationtime.php','artica-cron-vacation');
+      SYS.CRON_CREATE_SCHEDULE('@hourly',cmdnice+php5bin+ ' ' +artica_path+'/cron.mysql-databases.php','artica-cron-mysqldb');
+      SYS.CRON_CREATE_SCHEDULE('@hourly',cmdnice+php5bin+ ' ' +artica_path+'/exec.vacationtime.php','artica-cron-vacation');
 
       if FileExists('/usr/bin/sarg') then begin
          SYS.CRON_CREATE_SCHEDULE('@hourly',artica_path+'/bin/artica-install --sarg','artica-cron-sarg');
@@ -645,11 +661,11 @@ l.add('@'+Nicet+nolog+',lavg1('+IntToStr(systemMaxOverloaded)+') 10 '+ SYS.LOCAT
 
 
       //toutes les deux heures
-      SYS.CRON_CREATE_SCHEDULE('0 2,4,6,8,10,12,14,16,18,20,22 * * *',cmdnice+SYS.LOCATE_PHP5_BIN()+ ' ' +artica_path+'/exec.executor.php --group120','artica-cron-executor-120');
+      SYS.CRON_CREATE_SCHEDULE('0 2,4,6,8,10,12,14,16,18,20,22 * * *',cmdnice+php5bin+ ' ' +artica_path+'/exec.executor.php --group120','artica-cron-executor-120');
 
 
       //toutes les 5 Heures
-      SYS.CRON_CREATE_SCHEDULE('0 5,10,15,20 * * *',cmdnice+SYS.LOCATE_PHP5_BIN()+ ' ' +artica_path+'/exec.executor.php --group300','artica-cron-executor-300');
+      SYS.CRON_CREATE_SCHEDULE('0 5,10,15,20 * * *',cmdnice+php5bin+ ' ' +artica_path+'/exec.executor.php --group300','artica-cron-executor-300');
 
       if length(SYS.LOCATE_GENERIC_BIN('dansguardian'))>0 then begin
          SYS.CRON_CREATE_SCHEDULE('0 5,10,15,20 * * *','/usr/share/artica-postfix/bin/artica-update --dansguardian','artica-cron-dansguardian-update');
@@ -665,19 +681,19 @@ l.add('@'+Nicet+nolog+',lavg1('+IntToStr(systemMaxOverloaded)+') 10 '+ SYS.LOCAT
       SYS.CRON_CREATE_SCHEDULE('0,20,40 * * * *',cmdnice+artica_path+'/bin/process1 --kill','artica-cron-process1k');  //watchdog kill
 
       //toutes les 10 minutes
-      SYS.CRON_CREATE_SCHEDULE('0,10,20,30,40,50 * * * *',cmdnice+SYS.LOCATE_PHP5_BIN()+ ' ' +artica_path+'/exec.executor.php --group10','artica-cron-executor-10');
+      SYS.CRON_CREATE_SCHEDULE('0,10,20,30,40,50 * * * *',cmdnice+php5bin+ ' ' +artica_path+'/exec.executor.php --group10','artica-cron-executor-10');
 
 
       //toutes les 5 minutes
-      SYS.CRON_CREATE_SCHEDULE('0,5,10,15,20,25,30,35,40,45,50,55 * * * *',cmdnice+SYS.LOCATE_PHP5_BIN()+ ' ' +artica_path+'/exec.executor.php --group5','artica-cron-executor-5');
+      SYS.CRON_CREATE_SCHEDULE('0,5,10,15,20,25,30,35,40,45,50,55 * * * *',cmdnice+php5bin+ ' ' +artica_path+'/exec.executor.php --group5','artica-cron-executor-5');
       SYS.CRON_CREATE_SCHEDULE('0,5,10,15,20,25,30,35,40,45,50,55 * * * *','/etc/init.d/artica-postfix start daemon','artica-cron-watchdog');
 
 
       //toutes les 2 minutes
-      SYS.CRON_CREATE_SCHEDULE('0,2,4,6,8,10,12,14,16,18,20,22,24,26,28,30,32,34,36,38,40,42,44,46,48,50,52,54,56,58 * * * *',cmdnice+SYS.LOCATE_PHP5_BIN()+ ' ' +artica_path+'/exec.executor.php --group2','artica-cron-executor-2');
+      SYS.CRON_CREATE_SCHEDULE('0,2,4,6,8,10,12,14,16,18,20,22,24,26,28,30,32,34,36,38,40,42,44,46,48,50,52,54,56,58 * * * *',cmdnice+php5bin+ ' ' +artica_path+'/exec.executor.php --group2','artica-cron-executor-2');
 
       //toutes les minutes
-      SYS.CRON_CREATE_SCHEDULE('* * * * *',cmdnice+SYS.LOCATE_PHP5_BIN()+ ' ' +artica_path+'/exec.executor.php --group0','artica-cron-executor-0');
+      SYS.CRON_CREATE_SCHEDULE('* * * * *',cmdnice+php5bin+ ' ' +artica_path+'/exec.executor.php --group0','artica-cron-executor-0');
 
       //specifiques
       quarantine_report_schedules();
@@ -709,8 +725,8 @@ l.add('@'+Nicet+nolog+',lavg1('+IntToStr(systemMaxOverloaded)+') 10 '+ SYS.LOCAT
       logs.syslogs('Saving croned scripts');
 
       fpsystem('/bin/rm -f /etc/cron.d/artica-avcomp-*');
-      fpsystem(SYS.LOCATE_PHP5_BIN()+' '+ artica_path+'/exec.rsync.events.php --computers-schedule >/dev/null &');
-      fpsystem(SYS.LOCATE_PHP5_BIN()+' '+ artica_path+'/exec.computer.scan.php --schedules >/dev/null &');
+      fpsystem(php5bin+' '+ artica_path+'/exec.rsync.events.php --computers-schedule >/dev/null &');
+      fpsystem(php5bin+' '+ artica_path+'/exec.computer.scan.php --schedules >/dev/null &');
 
       except
          logs.syslogs('Saving croned scripts failed !');
@@ -884,6 +900,14 @@ end;
 function tcron.STATUS():string;
 var ini:TstringList;
 begin
+
+SYS.MONIT_DELETE('APP_ARTICA');
+SYS.MONIT_DELETE('APP_ARTICA_WATCHDOG');
+pidpath:=logs.FILE_TEMP();
+fpsystem(SYS.LOCATE_PHP5_BIN()+' /usr/share/artica-postfix/exec.status.php --fcron >'+pidpath +' 2>&1');
+result:=logs.ReadFromFile(pidpath);
+logs.DeleteFile(pidpath)
+
 ini:=TstringList.Create;
 
    ini.Add('[ARTICA]');

@@ -706,8 +706,13 @@ function html_Memory_usage(){
 					$occ=$values[2];
 					$disp=$values[3];
 					$pourc=$values[4];
+					$label=base64_decode($sock->getFrameWork("cmd.php?disk-get-label=/dev/$disk_name"));
+									
+					
 					if(!$array_dup[$disk]){$array_dup[$disk]=true;}else{continue;}
 					if(preg_match("#([a-z\_\-]+)[0-9]+$#",$disk_name,$rt)){$disk_name=$rt[1];}
+					
+					
 					
 					if($hdparms[$disk_name]<>null){
 						$hdparms_info=intval($hdparms[$disk_name]);
@@ -749,9 +754,12 @@ function html_Memory_usage(){
 					$color="#5DD13D";
 					if($pourc>70){$color="#F59C44";}
 					if($pourc>90){$color="#D32D2D";}
+					$disk_text=$disk;
+					if($label<>null){$disk_text="$label ($disk)";}
+					
 					$dd=$dd."
 					<tr>
-						<td nowrap align=right width=90px valign='top'><strong>$disk:</strong></td>
+						<td nowrap align=right width=90px valign='top'><strong>$disk_text:</strong></td>
 						
 						<td>
 							<div style='width:100px;background-color:white;padding-left:0px;border:1px solid $color'>

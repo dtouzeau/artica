@@ -809,4 +809,35 @@ function ParseBytes($bytes){
 	$kb=$bytes/1024;
 	return FormatBytes($kb);
 }		
+function Field_hidden($name,$value){return "<input type='hidden' name='$name' id='$name' value=\"$value\">";}
+function help_icon($help,$no_float=false,$additional_langfile=null){
+$tpl=new templates();	
+$help_source=$help;
+		$help_source=str_replace('{','',$help_source);
+		$help_source=str_replace('}','',$help_source);
+		$help=str_replace("[br][br]","[br]",$help);
+		$help=str_replace("\n","",$help);
+		$help=str_replace("\r\n","",$help);
+		$help=str_replace("\r","",$help);
+		$help=str_replace('"',"`",$help);		
+		$help=$tpl->_ENGINE_parse_body($help,$additional_langfile);
+		$help=htmlentities($help);
+		$help=str_replace("\n","",$help);
+		$help=str_replace("\r\n","",$help);
+		$help=str_replace("\r","",$help);		
+
+		$myfloat="float:right";
+		if($no_float>0){$myfloat=null;}
+		if($additional_langfile==null){$additional_langfile=CurrentPageName();}
+		
+return "
+		<div style='$myfloat;margin-top:-5px'>
+		<img src='img/help.png'  
+		onMouseOver=\"javascript:AffBulle('$help');lightup(this, 100);\" 
+		OnMouseOut=\"javascript:HideBulle();lightup(this, 50);\" 
+		style=\"filter:alpha(opacity=50);-moz-opacity:0.5;border:0px;\" 
+		style=\"filter:alpha(opacity=50);-moz-opacity:0.5;border:0px;\" >
+		</div>";	
+	
+}
 ?>

@@ -6,7 +6,7 @@ unit opengoo;
 interface
 
 uses
-    Classes, SysUtils,variants,strutils,IniFiles, Process,md5,logs,unix,RegExpr in 'RegExpr.pas',zsystem,sugarcrm,apache_artica,roundcube,obm2,lighttpd,ocsi;
+    Classes, SysUtils,variants,strutils,IniFiles, Process,logs,unix,RegExpr in 'RegExpr.pas',zsystem,apache_artica,roundcube,obm2,lighttpd,ocsi;
 
   type
   topengoo=class
@@ -14,13 +14,10 @@ uses
 
 private
      LOGS:Tlogs;
-     D:boolean;
-     GLOBAL_INI:TiniFIle;
      SYS:TSystem;
      artica_path:string;
      ApacheGroupware:integer;
      apachebinary_path:string;
-     sugarcrm:Tsugarcrm;
      apache:tapache_artica;
      ocswebservernameEnabled:integer;
      NoEngoughMemory:boolean;
@@ -93,8 +90,6 @@ end;
 function topengoo.VERSION():string;
   var
    RegExpr:TRegExpr;
-   x:string;
-   tmpstr:string;
    l:TstringList;
    i:integer;
    path:string;
@@ -135,7 +130,6 @@ end;
 function topengoo.APACHE_VERSION():string;
   var
    RegExpr:TRegExpr;
-   x:string;
    tmpstr:string;
    l:TstringList;
    i:integer;
@@ -176,7 +170,6 @@ end;
 function topengoo.PHP_VERSION():string;
   var
    RegExpr:TRegExpr;
-   x:string;
    tmpstr:string;
    l:TstringList;
    i:integer;
@@ -382,20 +375,18 @@ procedure topengoo.WRITE_APACHE_CONFIG();
 var
    l:Tstringlist;
    RegExpr:TRegExpr;
-   i:integer;
    ApacheGroupWarePort:string;
    joomla:string;
    rdcube:string;
    obm:tobm2;
    ocsi:tocsi;
    ocswebservername:string;
-   tmpstr:string;
    lighttpd:tlighttpd;
    userfull:string;
    user:string;
    group:string;
 begin
-
+ joomla:='';
 
 ApacheGroupWarePort:=SYS.GET_INFO('ApacheGroupWarePort');
 if length(ApacheGroupWarePort)=0 then begin
@@ -576,7 +567,6 @@ if length(rdcube)>0 then l.add(rdcube);
 
 if ocswebservernameEnabled=1 then l.Add(ocsi.VirtualHost(ApacheGroupWarePort));
 
-tmpstr:=LOGS.FILE_TEMP();
 fpsystem(SYS.LOCATE_PHP5_BIN()+' /usr/share/artica-postfix/exec.www.install.php --Wvhosts');
 L.Add(LOGS.ReadFromFile('/usr/local/apache-groupware/conf/vhosts'));
 
@@ -596,7 +586,6 @@ end;
 function topengoo.OPENGOO_VERSION():string;
  var
    RegExpr:TRegExpr;
-   x:string;
    tmpstr:string;
    l:TstringList;
    i:integer;
@@ -686,29 +675,15 @@ end;
 //##############################################################################
 function topengoo.STATUS();
 var
-   ini:TstringList;
-   
-   pid:string;
+pidpath:string;
 begin
-if not FileExists('/usr/local/apache-groupware/bin/apache-groupware') then exit;
+   pidpath:=logs.FILE_TEMP();
+   fpsystem(SYS.LOCATE_PHP5_BIN()+' /usr/share/artica-postfix/exec.status.php --apache-groupware >'+pidpath +' 2>&1');
+   result:=logs.ReadFromFile(pidpath);
+   logs.DeleteFile(pidpath);
 
-pid:=PID_NUM();
-
-
-      ini:=TstringList.Create;
-      ini.Add('[APP_GROUPWARE_APACHE]');
-      if SYS.PROCESS_EXIST(pid) then ini.Add('running=1') else  ini.Add('running=0');
-      ini.Add('application_installed=1');
-      ini.Add('master_pid='+ pid);
-      ini.Add('master_memory=' + IntToStr(SYS.PROCESS_MEMORY(pid)));
-      ini.Add('master_version=' + VERSION());
-      ini.Add('status='+SYS.PROCESS_STATUS(pid));
-      ini.Add('service_name=APP_OBM2');
-      ini.Add('service_cmd=apache-groupware');
-      ini.Add('service_disabled=1');
-      result:=ini.Text;
-      ini.free;
 end;
+
 //##############################################################################
 function topengoo.CheckRoundCube():string;
 var
@@ -772,9 +747,8 @@ function topengoo.GetJoomlaVersion(path:string):string;
 var
 l:Tstringlist;
 RegExpr:TRegExpr;
-conf:string;
 i:integer;
-xwrite:boolean;
+
 release:string;
 build:string;
 begin
@@ -819,11 +793,8 @@ function topengoo.EACCELERATOR_VERSION():string;
 var
 l:Tstringlist;
 RegExpr:TRegExpr;
-conf:string;
 i:integer;
-xwrite:boolean;
 release:string;
-build:string;
 begin
      result:=SYS.GET_CACHE_VERSION('APP_EACCELERATOR');
      release:=logs.FILE_TEMP();
@@ -1003,7 +974,6 @@ end;
 //##############################################################################
 procedure topengoo.WritePhpConfig();
 var
-   php_ini:TiniFile;
    lighttpd:Tlighttpd;
 begin
 if not FileExists('/usr/local/apache-groupware/php5/lib/php.ini') then begin

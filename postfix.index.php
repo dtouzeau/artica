@@ -1828,12 +1828,11 @@ function tweaks(){
 	}
 
 	
-	if($users->POSTFIX_MULTI){
+	if($users->POSTMULTI){
 		$multi=Paragraphe('postfix-multi-64.png','{POSTFIX_MULTI_INSTANCE}','{POSTFIX_MULTI_INSTANCE_TINY_TEXT}',"javascript:Loadjs('postfix.network.php?POSTFIX_MULTI_INSTANCE_JS=yes')");
 		}
 
-	
-	
+
 	
 	$postfix_restrictions_classes=Paragraphe('folder-64-restrictions-classes.png',
 	'{postfix_restrictions_classes}','{restriction_classes_minitext}',"javascript:Loadjs('postfix.restrictions.classes.php?js=yes')",null,210,null,0,true);
@@ -1848,10 +1847,26 @@ function tweaks(){
 	$main_src=Paragraphe('folder-script-database-64.png','{main_ldap}','{main_ldap_explain}',"javascript:s_PopUp(\"postfix.report.php\",500,500,true)");
 	$postmaster=Paragraphe('postmaster-64.png','{postmaster}','{postmaster_text}',"javascript:Loadjs('postfix.postmaster.php')");
 	$postmaster_identity=Paragraphe('postmaster-identity.png','{postmaster_identity}','{postmaster_identity_text}',"javascript:Loadjs('postfix.postmaster-ident.php')");
+	$UnknownUsers=Paragraphe('unknown-user-64.png','{unknown_users}','{postfix_unknown_users_tinytext}',"javascript:Loadjs('postfix.luser_relay.php')");
+	
+	if($EnablePostfixMultiInstance==1){
+		$main_src=null;
+		$performances=null;
+		$mastercf=null;
+		$maincfedit=null;
+		$maincf=null;
+		$postfix_restrictions_classes=null;
+		$storage=null;
+		$other=null;
+		$multi_infos=Paragraphe('postfix-multi-64-info.png','{POSTFIX_MULTI_INSTANCE_INFOS}','{POSTFIX_MULTI_INSTANCE_INFOS_TEXT}',"javascript:Loadjs('postfix.multiple.instances.infos.php')");
+	}
+	
 	
 		$tr[]=$multi;
+		$tr[]=$multi_infos;
 		$tr[]=$postmaster;
 		$tr[]=$postmaster_identity;
+		$tr[]=$UnknownUsers;
 		$tr[]=$altermime;
 		$tr[]=$pommo;
 		$tr[]=$events;

@@ -76,7 +76,8 @@ if(isset($_GET["system-unique-id"])){GetUniqueID();exit;}
 //amavis restart
 if(isset($_GET["amavis-restart"])){RestartAmavis();exit;}
 if(isset($_GET["amavis-get-events"])){amavis_get_events();exit;}
-
+if(isset($_GET["amavis-configuration-file"])){amavis_get_config();exit;}
+if(isset($_GET["amavis-get-status"])){amavis_get_status();exit;}
 
 //rsync
 if(isset($_GET["RestartRsyncServer"])){RestartRsyncServer();exit;}
@@ -127,6 +128,9 @@ if(isset($_GET["repair-artica-ldap-branch"])){RepairArticaLdapBranch();exit;}
 if(isset($_GET["ChangeSSLCertificate"])){ChangeSSLCertificate();exit;}
 if(isset($_GET["postfix-certificate"])){postfix_certificate();exit;}
 if(isset($_GET["certificate-viewinfos"])){certificate_infos();exit;}
+if(isset($_GET["postfix-perso-settings"])){postfix_perso_settings();exit;}
+
+
 
 //postmulti
 
@@ -179,13 +183,13 @@ if(isset($_GET["cyrus-get-partition-default"])){cyrus_paritition_default_path();
 if(isset($_GET["cyrus-MoveDefaultToCurrentDir"])){cyrus_move_default_dir_to_currentdir();exit;}
 if(isset($_GET["cyrus-SaveNewDir"])){cyrus_move_newdir();exit;}
 if(isset($_GET["cyrus-rebuild-all-mailboxes"])){cyrus_rebuild_all_mailboxes();exit;}
-
-
+if(isset($_GET["cyrus-imap-status"])){cyrus_imap_status();exit;}
+if(isset($_GET["cyrus-change-password"])){cyrus_imap_change_password();}
 
 
 if(isset($_GET["emailing-import-contacts"])){emailing_import_contacts();exit;}
 if(isset($_GET["emailing-database-migrate-perform"])){emailing_database_migrate_export();exit;}
-
+if(isset($_GET["emailing-builder-linker"])){emailing_builder_linker();exit;}
 
 
 //restore
@@ -262,6 +266,7 @@ if(isset($_GET["postfix-others-values"])){postfix_others_values();exit;}
 if(isset($_GET["postfix-mime-header-checks"])){postfix_mime_header_checks();exit;}
 if(isset($_GET["postfix-interfaces"])){postfix_interfaces();exit;}
 if(isset($_GET["postfix-networks"])){postfix_single_mynetworks();exit;}
+if(isset($_GET["postfix-luser-relay"])){postfix_luser_relay();exit;}
 
 
 
@@ -363,6 +368,7 @@ if(isset($_GET["postfix-mutli-stat"])){postfix_multi_stat();exit;}
 if(isset($_GET["postfix-multi-configure-ou"])){postfix_multi_configure();exit;}
 if(isset($_GET["postfix-multi-disable"])){postfix_multi_disable();exit;}
 if(isset($_GET["postfix-restricted-users"])){postfix_restricted_users();exit;}
+if(isset($_GET["postfix-multi-postqueue"])){postfix_multi_postqueue();exit;}
 
 
 
@@ -428,7 +434,8 @@ if(isset($_GET["fstablist"])){fstab_list();exit;}
 if(isset($_GET["path-acls"])){acls_infos();exit;}
 if(isset($_GET["IsDir"])){IsDir();exit;}
 if(isset($_GET["hdparm-infos"])){hdparm_infos();exit;}
-
+if(isset($_GET["disk-change-label"])){disks_change_label();exit;}
+if(isset($_GET["disk-get-label"])){disks_get_label();exit;}
 
 // cmd.php?fstab-acl=yes&acl=$acl&dev=$dev
 if(isset($_GET["fstab-acl"])){fstab_acl();exit;}
@@ -497,7 +504,7 @@ if(isset($_GET["refresh-status"])){RefreshStatus();exit;}
 
 if(isset($_GET["SpamassassinReload"])){reloadSpamAssassin();exit;}
 if(isset($_GET["SpamAssassin-Reload"])){reloadSpamAssassin();exit;}
-
+if(isset($_GET["spamass-check"])){spamassassin_check();exit;}
 
 if(isset($_GET["SetupIndexFile"])){SetupIndexFile();exit;}
 if(isset($_GET["install-web-services"])){InstallWebServices();exit;}
@@ -915,6 +922,10 @@ function ntpd_events(){
 }
 function ReloadArticaFilter(){
 	sys_THREAD_COMMAND_SET( LOCATE_PHP5_BIN2()." /usr/share/artica-postfix/exec.postfix.maincf.php --artica-filter --reload");
+}
+
+function postfix_perso_settings(){
+	sys_THREAD_COMMAND_SET( LOCATE_PHP5_BIN2()." /usr/share/artica-postfix/exec.postfix.maincf.php --perso-settings --reload");
 }
 
 function Reconfigure_nic(){
@@ -1973,6 +1984,24 @@ function disks_list(){
 	echo "<articadatascgi>". base64_encode(serialize($array))."</articadatascgi>";
 }
 
+function disks_change_label(){
+	$dev=$_GET["disk-change-label"];
+	$name=$_GET["name"];
+	exec("/usr/share/artica-postfix/bin/artica-install --disk-change-label $dev $name --verbose",$array);
+	echo "<articadatascgi>". base64_encode(serialize($array))."</articadatascgi>";
+}
+
+function disks_get_label(){
+	$dev=$_GET["disk-get-label"];
+	$unix=new unix();
+	$e2label=$unix->find_program("e2label");
+	if($e2label==null){return;}
+	exec("$e2label $dev",$array);
+	$data=trim(@implode(" ",$array));
+	echo "<articadatascgi>". base64_encode($data)."</articadatascgi>";
+	
+}
+
 function disk_get_mounted_point(){
 	$dev=base64_decode($_GET["get-mounted-path"]);
 	$unix=new unix();
@@ -2371,6 +2400,29 @@ function postfix_multi_queues(){
 	}
 	echo "<articadatascgi>". base64_encode(serialize($array))."</articadatascgi>";
 }
+
+
+function postfix_multi_postqueue(){
+	$instance=$_GET["postfix-multi-postqueue"];
+	$unix=new unix();
+	$postqueue=$unix->find_program("postqueue");
+	exec("$postqueue -c /etc/postfix-$instance -p",$results);
+	while (list ($num, $line) = each ($results) ){
+		if(preg_match("#Mail queue is empty#",$line)){
+			$count=0;
+			break;
+		}
+		
+		if(preg_match("#-- [0-9]+\s+([a-zA-Z]+)\s+in\s+([0-9]+)\s+Requests#",$line,$re)){
+			$count=$re[2];
+			break;
+		}
+		
+	}	
+	echo "<articadatascgi>". base64_encode($count)."</articadatascgi>";
+	
+}
+
 
 function ASSP_MULTI_CONFIG(){
 	$ou=base64_decode($_GET["assp-multi-load-config"]);
@@ -3101,6 +3153,19 @@ function cyrus_rebuild_all_mailboxes(){
 	sys_THREAD_COMMAND_SET(LOCATE_PHP5_BIN2()." /usr/share/artica-postfix/exec.cyrus-restore.php --rebuildmailboxes {$_GET["cyrus-rebuild-all-mailboxes"]}");
 	
 }
+
+function cyrus_imap_status(){
+	exec(LOCATE_PHP5_BIN2()." /usr/share/artica-postfix/exec.status.php --cyrus-imap",$results);
+	echo "<articadatascgi>". base64_encode(@implode("\n",$results))."</articadatascgi>";	
+}
+function cyrus_imap_change_password(){
+	$password=base64_decode($_GET["cyrus-change-password"]);
+	sys_THREAD_COMMAND_SET("/usr/share/artica-postfix/bin/process1 --force verbose password-cyrus");
+	sys_THREAD_COMMAND_SET("/usr/share/artica-postfix/bin/artica-install --cyrus-checkconfig");
+	sys_THREAD_COMMAND_SET("/etc/init.d/artica-postfix restart imap");
+}
+
+
 function postfix_hash_tables(){
 	sys_THREAD_COMMAND_SET(LOCATE_PHP5_BIN2()." /usr/share/artica-postfix/exec.postfix.hashtables.php");
 }
@@ -3732,6 +3797,9 @@ function samba_events_lists(){
 function postfix_single_mynetworks(){
 sys_THREAD_COMMAND_SET(LOCATE_PHP5_BIN2()." /usr/share/artica-postfix/exec.postfix.maincf.php --networks");	
 }
+function postfix_luser_relay(){
+sys_THREAD_COMMAND_SET(LOCATE_PHP5_BIN2()." /usr/share/artica-postfix/exec.postfix.maincf.php --luser-relay --reload");
+}
 
 function samba_move_logs(){
 	$filename=base64_decode($_GET["samba-move-logs"]);
@@ -3785,9 +3853,18 @@ function amavis_get_events(){
 	exec($cmd,$results);
 	writelogs_framework("$cmd (". count($results).")" ,__FUNCTION__,__FILE__,__LINE__);
 	echo "<articadatascgi>". base64_encode(serialize($results))."</articadatascgi>";	
-	
-	
 }
+
+function amavis_get_config(){
+	echo "<articadatascgi>". base64_encode(@file_get_contents("/usr/local/etc/amavisd.conf"))."</articadatascgi>";
+}
+
+function amavis_get_status(){
+	exec(LOCATE_PHP5_BIN2()." /usr/share/artica-postfix/exec.status.php --amavis-full",$results);
+	echo "<articadatascgi>". base64_encode(@implode("\n",$results))."</articadatascgi>";	
+}
+
+
 function move_uploaded_file_framework(){
 	$src=base64_decode($_GET["src"]);
 	$dest_path=base64_decode($_GET["move_uploaded_file"]);
@@ -3866,4 +3943,18 @@ $hdparm=$unix->find_program("hdparm");
 exec("$hdparm -I {$_GET["hdparm-infos"]} 2>&1",$results);
 echo "<articadatascgi>". base64_encode(serialize($results))."</articadatascgi>";
 }
+
+function spamassassin_check(){
+	$unix=new unix();
+	$bin=$unix->find_program("spamassassin");
+	exec("$bin --lint -D 2>&1",$results);
+	echo "<articadatascgi>". base64_encode(serialize($results))."</articadatascgi>";	
+}
+
+function emailing_builder_linker(){
+	$ou=$_GET["emailing-builder-linker"];
+	sys_THREAD_COMMAND_SET(LOCATE_PHP5_BIN2()." /usr/share/artica-postfix/exec.emailing.php --build-queues $ou");
+}
+
+
 ?>

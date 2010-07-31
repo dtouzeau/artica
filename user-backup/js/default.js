@@ -175,14 +175,21 @@ function WinORGOpen(){return $('#WinORG').dialog('isOpen');}
 
 
 
-function LoadAjax(id,query){
-	if(document.getElementById(id)){
-		document.getElementById(id).innerHTML='<center><img src=img/wait_verybig.gif></center>';
+function LoadAjax(ID,uri,concatene) {
+	var uri_add='';
+	var datas='';
+	var xurl='';
+	if(concatene){
+		uri_add='&datas='+concatene;
 	}
-	$.get(query,{ "_microtime": microtime()}  ,
-			  function(data){
-				if(document.getElementById(id)){document.getElementById(id).innerHTML=data;}
-			  });
+	uri=uri+uri_add;
+	if(document.getElementById(ID)){ 
+			var WAITX=ID+'_WAITX';
+			if(document.getElementById(WAITX)){return;}
+	        document.getElementById(ID).innerHTML='<center style="margin:20px;padding:20px" id='+WAITX+'><img src="img/wait_verybig.gif"></center>';
+	        //$('#'+ID).load(uri_add, function() {Orgfillpage();});
+	        $('#'+ID).load(uri);
+	}
 
 }
 

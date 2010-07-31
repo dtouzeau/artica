@@ -899,7 +899,7 @@ $pure=new samba();
 	
 	
 	$html="<h5>{config}</H5>
-	<div style='padding:5px;height:430px;width:100%;overflow:auto;background-color:#FFFFFF'>
+	<div style='padding:5px;;width:100%;;background-color:#FFFFFF'>
 	$c
 	</div>";
 		
@@ -910,13 +910,13 @@ $tpl=new templates();
 function shared_folders(){
 
 $html="
-	<h5>{shared_folders}</H5>
+	
 <table style='width:100%'>
 <tr>
-	<td valign='top'>".shared_folders_list()."</td>
-	<td valign='top' style='border-left:1px solid #005447;padding:5px'></td>
+	<td valign='top' width=99%><h5>{shared_folders}</H5></td>
+	<td valign='top' style='border-left:1px solid #005447;padding:5px' nowrap>". button("{add_a_shared_folder}","Loadjs('SambaBrowse.php')"). "</td>
 </tr>
-</table>";
+</table>".shared_folders_list();
 	
 	$tpl=new templates();
 	echo $tpl->_ENGINE_parse_body($html);		
@@ -933,7 +933,6 @@ function shared_folders_list(){
 	
 	$html="
 	<input type='hidden' id='del_folder_name' value='{del_folder_name}'>
-	<div style='text-align:right'>". button("{add_a_shared_folder}","Loadjs('SambaBrowse.php')"). "</div>
 	<table style='width:100%'>
 	<tr>
 	<th>&nbsp;</th>
@@ -945,7 +944,7 @@ function shared_folders_list(){
 	
 	while (list ($FOLDER, $ligne) = each ($folders) ){
 		$properties=CellRollOver("FolderProp('$FOLDER')");
-		$delete=imgtootltip('ed_delete.gif','{delete}',"FolderDelete('$FOLDER')");
+		$delete=imgtootltip('delete-32.png','{delete}',"FolderDelete('$FOLDER')");
 		if($samba->main_array[$FOLDER]["path"]=="/home/netlogon"){
 			$properties=null;
 			$delete="&nbsp;";
@@ -973,24 +972,37 @@ function shared_folders_list(){
 		if($FOLDER=="netlogon"){
 			$properties=null;
 			$delete="&nbsp;";
-		}			
+		}
+
+		if($FOLDER=="profiles.V2"){
+			$properties=null;
+			$delete="&nbsp;";
+		}
+		if($FOLDER=="profile"){
+			$properties=null;
+			$delete="&nbsp;";
+		}				
 
 		
+
 		
+	$icon="folder-granted-properties-48.png";	
+	if($properties==null){$icon="folder-granted-properties-48-grey.png";}	
 		
 		
 	$html=$html . "
 	<tr $properties>
-	<td width=1%><img src='img/shared20x20.png'></td>
-	<td><strong style='font-size:12px'>$FOLDER</a></td>
-	<td><strong style='font-size:12px'>{$samba->main_array[$FOLDER]["path"]}</a></td>
+	<td width=1%><img src='img/$icon'></td>
+	<td><strong style='font-size:13px'><code style='font-size:13px'>$FOLDER</a></code></td>
+	<td><strong ><code style='font-size:13px'>{$samba->main_array[$FOLDER]["path"]}</a></code></td>
+	<td width=1%>$delete</td>
 	</tr>
 	";
 	}
 	
 	$html=$html ."</table>";
 	
-	$html="<div style='width:99%;height:250px;overflow:auto'>$html</div>";
+	$html="<div style='width:99%;'>$html</div>";
 	
 	
 	return $tpl->_ENGINE_parse_body($html);

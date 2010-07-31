@@ -3,7 +3,7 @@
 // File:        GD_IMAGE.INC.PHP
 // Description: PHP Graph Plotting library. Low level image drawing routines
 // Created:     2001-01-08, refactored 2008-03-29
-// Ver:         $Id: gd_image.inc.php 1904 2009-10-06 18:00:06Z ljp $
+// Ver:         $Id: gd_image.inc.php 1922 2010-01-11 11:42:50Z ljp $
 //
 // Copyright (c) Aditus Consulting. All rights reserved.
 //========================================================================
@@ -1164,12 +1164,18 @@ class Image {
         $s = round($s); $e = round($e);
         $w = round($w); $h = round($h);
         $xc = round($xc); $yc = round($yc);
-        if( $s ==$e ) {
+        if( $s == $e ) {
             // A full circle. We draw this a plain circle
             $this->PushColor($fillcolor);
             imagefilledellipse($this->img,$xc,$yc,2*$w,2*$h,$this->current_color);
-            $this->PopColor();
-            $this->PushColor($arccolor);
+
+            // If antialiasing is used then we often don't have any color no the surrounding
+            // arc. So, we need to check for this special case so we don't send an empty
+            // color to the push function. In this case we use the fill color for the arc as well
+            if( $arccolor != '' ) {
+                $this->PopColor();
+                $this->PushColor($arccolor);
+            }
             imageellipse($this->img,$xc,$yc,2*$w,2*$h,$this->current_color);
             $this->Line($xc,$yc,cos($s*M_PI/180)*$w+$xc,$yc+sin($s*M_PI/180)*$h);
             $this->PopColor();

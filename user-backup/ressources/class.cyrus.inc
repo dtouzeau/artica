@@ -461,7 +461,6 @@ function SaveToLdap(){
 		$sock->SaveConfigFile($this->BuildConfig(),"CyrusConf");
 		$sock->SaveConfigFile($this->Build_imapdconf(),"impadconf");
 		$this->ApplyToServer();
-		echo $tpl->_ENGINE_parse_body('{success}');
 		}
 
 

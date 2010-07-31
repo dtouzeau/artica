@@ -84,7 +84,31 @@ function SAVE(){
 
 function popup(){
 	
-	
+$users=new usersMenus();
+
+if(!$users->APACHE_INSTALLED){
+$html="
+<table style='width:100%'>
+<tr>
+	<td valign='top'><img id='zrfa-logo' src='img/zarfa-web-error-128.png'></td>
+	<td valign='top'>	
+		<table style='width:100%'>
+		<tr>
+			<td colspan=2><H3>{WEBMAIL}</H3>
+			<p style='font-size:14px;color:#C61010'>{ZARAFA_ERROR_NO_APACHE}</p>
+			
+			</td>
+		</tr>
+		</table>
+	</td>
+	</tr>
+	</table>";
+	$tpl=new templates();
+	echo $tpl->_ENGINE_parse_body($html);
+	return;
+}
+
+
 $sock=new sockets();
 $ZarafaApachePort=$sock->GET_INFO("ZarafaApachePort");
 $enable_ssl=$sock->GET_INFO("ZarafaApacheSSL");	

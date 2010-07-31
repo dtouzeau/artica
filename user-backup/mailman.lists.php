@@ -8,7 +8,7 @@ include_once(dirname(__FILE__)."/ressources/class.mailmanCTL.inc");
 include_once(dirname(__FILE__)."/ressources/class.apache.inc");
 include_once(dirname(__FILE__)."/ressources/class.system.network.inc");
 include_once(dirname(__FILE__)."/ressources/class.pdns.inc");
-if(!isset($_SESSION["uid"])){header("Location: session-fermee.php");die();}
+
 
 if(isset($_GET["popup"])){popup();exit;}
 if(isset($_GET["add-list"])){add_list();exit;}
@@ -34,12 +34,12 @@ function js(){
 	
 	$html="
 	function {$prefix}Load(){
-		YahooWin(500,'$page?popup=yes','$title');
+		YahooWin(500,'$page?popup=yes&ou={$_GET["ou"]}','$title');
 	
 	}
 	
 	function MailManPDNS(listname){
-		YahooWin2(500,'$page?pdns='+listname,'$add_mailman_pdns');
+		YahooWin2(500,'$page?ou={$_GET["ou"]}&pdns='+listname,'$add_mailman_pdns');
 	}
 	
 	var x_SaveMailManList= function (obj) {
@@ -50,11 +50,12 @@ function js(){
 
 				}
 				$('#dialog2').dialog('close');
-				LoadAjax('mailman_lists_div','$page?mailman_lists_div=yes');
+				LoadAjax('mailman_lists_div','$page?ou={$_GET["ou"]}&mailman_lists_div=yes');
 			}	
 	
 	function SaveMailManList(){
 		var XHR = new XHRConnection();
+		XHR.appendData('ou','{$_GET["ou"]}');
 		XHR.appendData('listsave','yes');
 		XHR.appendData('listname',document.getElementById('listname').value);
 		XHR.appendData('admin_email',document.getElementById('admin_email').value);
@@ -69,13 +70,14 @@ function js(){
 	function DeleteMailManList(list){
 		if(confirm('$confirm_delete_mailman: '+list)){
 			var XHR = new XHRConnection();
+			XHR.appendData('ou','{$_GET["ou"]}');
 			XHR.appendData('list-delete',list);
 			XHR.sendAndLoad('$page', 'GET',x_SaveMailManList);	
 		}
 	}
 	
 	function InfoMailManList(list){
-		YahooWin2(450,'$page?list-info='+list,'$infos:: '+list);
+		YahooWin2(450,'$page?ou={$_GET["ou"]}&list-info='+list,'$infos:: '+list);
 	}
 	
 	var x_SavePDNSMailman= function (obj) {
@@ -86,6 +88,7 @@ function js(){
 	
 	function SavePDNSMailman(){
 		var XHR = new XHRConnection();
+		XHR.appendData('ou','{$_GET["ou"]}');
 		XHR.appendData('pdns_ip',document.getElementById('pdns_ip').value);
 		XHR.appendData('www',document.getElementById('www').value);
 		XHR.sendAndLoad('$page', 'GET',x_SavePDNSMailman);	
@@ -94,7 +97,7 @@ function js(){
 	function AddMailManList(list){
 		title=list;
 		if(!list){list='';title='$title2'}
-		YahooWin2(600,'$page?add-list='+list,title);
+		YahooWin2(600,'$page?ou={$_GET["ou"]}&add-list='+list,title);
 	
 	}
 	
@@ -120,15 +123,17 @@ function popup(){
 }
 
 function add_list(){
-	$user=new user($_SESSION["uid"]);
+	if($_SESSION["uid"]==-100){if(isset($_GET["ou"])){$ou=base64_decode($_GET["ou"]);}
+	}else{$user=new user($_SESSION["uid"]);$ou=$user->ou;}	
+	
 	$users=new usersMenus();
 	$ldap=new clladp();
-	$domains=$ldap->Hash_domains_table($user->ou);
+	$domains=$ldap->Hash_domains_table($ou);
 	$sock=new sockets();
 	$ApacheGroupWarePort=$sock->GET_INFO("ApacheGroupWarePort");	
 	
-	$pp="<p style='font-size:13px;color:black'>{add_mailman_text}</p>";
-	$mailman=new mailman_control($user->ou,$_GET["add-list"]);
+	$pp="<p style='font-size:14px;color:black'>{add_mailman_text}</p>";
+	$mailman=new mailman_control($ou,$_GET["add-list"]);
 	
 	
 	
@@ -137,9 +142,9 @@ function add_list(){
 		$listename=$re[1];
 		$button_name="{edit}";
 		$pp=null;
-		$filed_list="<strong style='font-size:13px'>$listename</strong><input type='hidden' id='listname' value='$listename'>";
-		$urlLink="<strong style='font-size:13px'>
-		<li><a href='http://$mailman->webservername:$ApacheGroupWarePort' target=_new>{view_list_mailman}</a></li></strong>
+		$filed_list="<strong style='font-size:14px'>$listename</strong><input type='hidden' id='listname' value='$listename'>";
+		$urlLink="<strong style='font-size:14px'>
+		<li><a href='http://$mailman->webservername:$ApacheGroupWarePort' target=_new>{view_list_mailman}</a></li>
 		<li><a href='http://$mailman->webservername:$ApacheGroupWarePort/mailman/admin/$listename' target=_new>{adminweb_mailman}</a></li>";
 		if($users->POWER_DNS_INSTALLED){
 			$add_pnds="<hr>".button("{add_mailman_pdns}","MailManPDNS('{$_GET["add-list"]}')");
@@ -147,20 +152,20 @@ function add_list(){
 		
 	}else{
 		$button_name="{add}";
-		$filed_list=Field_text('listname',null,"width:180px");
+		$filed_list=Field_text('listname',null,"width:180px;font-size:14px;padding:3px");
 	}
 	
 	while (list ($num, $val) = each ($domains) ){
 		$domainsZ[$num]=$num;
 	}
 	
-	$dom2=Field_array_Hash($domainsZ,'wwwdomain',$domain);
+	$dom2=Field_array_Hash($domainsZ,'wwwdomain',$domain,null,null,0,"font-size:14px;padding:3px");
 	
 	if($domain==null){
-		$dom=Field_array_Hash($domainsZ,'domain',$domain);
+		$dom=Field_array_Hash($domainsZ,'domain',$domain,null,null,0,"font-size:14px;padding:3px");
 		
 	}else{
-		$dom="<input type='hidden' id='domain' value='$domain'>$domain";
+		$dom="<input type='hidden' id='domain' value='$domain'><strong style='font-size:14px'>$domain</span>";
 		
 	}
 	
@@ -180,39 +185,42 @@ function add_list(){
 	$html="
 	$pp
 	<div id='mailmandiv'></div>
-	<table class=table_form>
+	<table>
 	<tr>
 		<td class=legend nowrap width=1%>{listname}:</td>
-		<td width=1%>$filed_list</td>
-		<td>@$dom</td>
+		<td width=1% align='right'>$filed_list</td>
+		<td width=1% style='font-size:14px'><strong>@</strong></td>
+		<td width=99%>$dom</td>
 	</tr>
 	<tr>
 		<td class=legend nowrap width=1%>{www_server_name}:</td>
-		<td align='left' width=1%>". Field_text('webservername',$mailman->webservername,"width:180px")."</td>
-		<td>.$dom2</td>
+		<td align='left' width=1%>". Field_text('webservername',$mailman->webservername,"width:180px;font-size:14px;padding:3px")."</td>
+		<td width=1% style='font-size:14px'><strong>.</strong></td>
+		<td>$dom2</td>
 	</tr>	
 	
 	
 	<tr>
 		<td class=legend nowrap width=1%>{admin_mail}:</td>
-		<td align='left' width=1%>". Field_text('admin_email',$mailman->admin_email,"width:180px")."</td>
-		<td>&nbsp;</td>
+		<td align='left' width=1% colspan=3>". Field_text('admin_email',$mailman->admin_email,"width:180px;font-size:14px;padding:3px")."</td>
+		
+		
 	</tr>	
 	<tr>
 		<td class=legend nowrap>{password}:</td>
-		<td width=1%>". Field_password('admin_password',$mailman->admin_password,"width:180px")."</td>
-		<td>&nbsp;</td>
+		<td width=1% colspan=3>". Field_password('admin_password',$mailman->admin_password,"width:180px;font-size:14px;padding:3px")."</td>
+		
 	</tr>	
 	<tr>
-		<td colspan=3 align='right'><hr>
+		<td colspan=4 align='right'><hr>
 		". button("$button_name&nbsp;&raquo;","SaveMailManList()")."
 		</td>
 	</tr>
 	<tr>
-		<td colspan=3 align='right'>$urlLink</td>
+		<td colspan=4 align='right'>$urlLink</td>
 	</tr>
 	<tr>
-		<td colspan=3 align='right'>$add_pnds</td>
+		<td colspan=4 align='right'>$add_pnds</td>
 	</tr>	
 	
 	
@@ -229,8 +237,14 @@ function add_list(){
 }
 
 function GetList(){
-	$ct=new user($_SESSION["uid"]);
-	$ou=$ct->ou;
+	if($_SESSION["uid"]==-100){
+		if(isset($_GET["ou"])){
+			$ou=base64_decode($_GET["ou"]);
+		}
+	}else{
+		$ct=new user($_SESSION["uid"]);
+		$ou=$ct->ou;
+	}
 
 	$ldap=new clladp();
 	$user=new usersMenus();
@@ -246,8 +260,8 @@ function GetList(){
 		$js="AddMailManList('{$hash[$i]["cn"][0]}');";
 		$html=$html."
 		<tr>
-			<td valign='top' width=1% ". CellRollOver($js)."><img src='img/fw_bold.gif'></td>
-			<td valign='top' ". CellRollOver($js)."><span style='font-size:13px'>{$hash[$i]["cn"][0]}</td>
+			<td valign='middle' width=1% ". CellRollOver($js)."><img src='img/fw_bold.gif'></td>
+			<td valign='top' ". CellRollOver($js)."><span style='font-size:16px'>{$hash[$i]["cn"][0]}</span></td>
 			<td valign='top'>". imgtootltip("info-18.png","{infos}","InfoMailManList('{$hash[$i]["cn"][0]}')")."</td>
 			<td valign='top'>". imgtootltip("ed_delete.gif","{delete}","DeleteMailManList('{$hash[$i]["cn"][0]}')")."</td>
 		</tr>
@@ -265,9 +279,8 @@ function list_save(){
 	$listname=$_GET["listname"];
 	$admin_email=$_GET["admin_email"];
 	$tpl=new templates();
-	
-	$ct=new user($_SESSION["uid"]);
-	$ou=$ct->ou;
+	if($_SESSION["uid"]==-100){if(isset($_GET["ou"])){$ou_q=base64_decode($_GET["ou"]);}
+	}else{$ct=new user($_SESSION["uid"]);$ou_q=$ct->ou;}	
 	
 	$ldap=new clladp();
 	$uid=$ldap->uid_from_email($admin_email);
@@ -276,7 +289,7 @@ function list_save(){
 		exit;
 	}
 	$ct=new user($uid);
-	if($ct->ou<>$ou){
+	if($ou_q<>$ou){
 		echo $tpl->_ENGINE_parse_body("{mailman_admin_not_exists}");
 		exit;
 	}
@@ -302,7 +315,7 @@ function list_save(){
 	
 	$admin_password=$_GET["admin_password"];
 	$domain=$_GET["domain"];
-	$mailman=new mailman_control($ou);
+	$mailman=new mailman_control($ou_q);
 	$mailman->list_name=$listname;
 	$mailman->list_domain=$domain;
 	$mailman->admin_email=$admin_email;
@@ -318,9 +331,19 @@ $sock=new sockets();
 	
 	
 function del_list(){
-	$user=new user($_SESSION["uid"]);
+	if($_SESSION["uid"]==-100){
+		if(isset($_GET["ou"])){
+			$ou=base64_decode($_GET["ou"]);
+		}
+	}else{
+		$ct=new user($_SESSION["uid"]);
+		$ou=$ct->ou;
+	}	
+	
+	
+
 	if(!preg_match("#(.+?)@(.+)#",$_GET["list-delete"],$re)){echo "unable to preg_match {$_GET["list-delete"]}\n";return;}
-	$mailman=new mailman_control($user->ou,$_GET["list-delete"]);
+	$mailman=new mailman_control($ou,$_GET["list-delete"]);
 	$mailman->delete();
 	
 	
@@ -328,8 +351,14 @@ function del_list(){
 }
 
 function pdns_popup(){
-	$ct=new user($_SESSION["uid"]);
-	$ou=$ct->ou;	
+	if($_SESSION["uid"]==-100){
+		if(isset($_GET["ou"])){
+			$ou=base64_decode($_GET["ou"]);
+		}
+	}else{
+		$ct=new user($_SESSION["uid"]);
+		$ou=$ct->ou;
+	}		
 	$mailman=new mailman_control($ou,$_GET["pdns"]);
 	$net=new networking();
 	$array=$net->array_TCP;
@@ -385,7 +414,7 @@ function list_info(){
 		$array["request"]="request";
 		$array["subscribe"]="subscribe";
 		$array["unsubscribe"]="unsubscribe";
-		$user=new user($_SESSION["uid"]);
+
 		if(preg_match("#(.+?)@(.+)#",$_GET["list-info"],$re)){
 			$list_name=$re[1];
 			$domain=$re[2];

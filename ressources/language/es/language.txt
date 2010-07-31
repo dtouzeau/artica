@@ -140,6 +140,7 @@ Specify an empty value (address_verify_sender =) or  if you want to use the null
 <add_already_member>Add a member already stored in this organisation</add_already_member>
 <add_artica_tasks>Add predefined tasks</add_artica_tasks>
 <add_artica_tasks_text>Select predefined tasks in the field list bellow.[br]</add_artica_tasks_text>
+<add_attached_files_text>Add documents in your message</add_attached_files_text>
 <add_attachment_blocking_text>Add a new attachment to block</add_attachment_blocking_text>
 <add_attachment_blocking_text_explain>Add here the 3 letters that represent the file type.[br]You can set in the field multiple attachments type by separate them with a comma[br]
 examples:[br]
@@ -155,9 +156,13 @@ Add a list:exe,pif,bat,pdf,doc</add_attachment_blocking_text_explain>
 <ADD_COMPUTER>Add a new computer</ADD_COMPUTER>
 <add_computer_access>Add computer access</add_computer_access>
 <ADD_COMPUTER_TEXT>Add a new computer in Artica Database</ADD_COMPUTER_TEXT>
+<add_contact>Add a contact</add_contact>
+<add_contact_text>Add a single contact into a database</add_contact_text>
 <add_default_rules>Add default rules</add_default_rules>
 <add_default_settings>Add default settings</add_default_settings>
 <add_edit_rule>Add & edit a rule</add_edit_rule>
+<add_emailing>Add a new emailing</add_emailing>
+<add_emailing_text>link template with database in order to send messages</add_emailing_text>
 <add_entry>Add an entry</add_entry>
 <add_every>Add every</add_every>
 <add_global_routing_rule>Global routing rule</add_global_routing_rule>
@@ -186,12 +191,14 @@ Add a list:exe,pif,bat,pdf,doc</add_attachment_blocking_text_explain>
 <add_new_member_text>Add a new member into your organization and selected group</add_new_member_text>
 <add_new_network>Add a new network</add_new_network>
 <add_new_network_text>Give here ip ranges or items that explain you local network</add_new_network_text>
+<add_new_org>Add a new organization</add_new_org>
 <add_new_organisation>Add a new organisation</add_new_organisation>
 <add_new_organisation_explain>Add a global area that will store groups and users</add_new_organisation_explain>
 <add_new_organisation_text>Give the organisation name:</add_new_organisation_text>
 <add_new_rule>Add new rule</add_new_rule>
 <add_new_sieverule_text>Create a new rule for your mailbox, discard messages, transfert messages, move messages to a folder...</add_new_sieverule_text>
 <add_new_sieve_rule>Add a new Mailbox rule</add_new_sieve_rule>
+<add_new_smtp_server>Add a new SMTP server</add_new_smtp_server>
 <ADD_NEW_TAB_ASK>Give the name of your new tab</ADD_NEW_TAB_ASK>
 <add_new_task>Add a new task</add_new_task>
 <add_nic_aliase>Add alias</add_nic_aliase>
@@ -256,6 +263,8 @@ examples[br]
 <AllowFetchMails>Fetch mails</AllowFetchMails>
 <AllowManageOwnComputers>Can view/manage their computers</AllowManageOwnComputers>
 <AllowSender_canonical>Change rewriting sent address</AllowSender_canonical>
+<allowsizemismatch>Allow size mismatch</allowsizemismatch>
+<allowsizemismatch_text>allow RFC822.SIZE != fetched message size.</allowsizemismatch_text>
 <AllowViewStatistics>View statistic area</AllowViewStatistics>
 <all_days>All days</all_days>
 <all_events>All events</all_events>
@@ -647,6 +656,7 @@ all ActiveSync compatible mobile devices and Blackberry via the Blackberry Enter
 <artica_wizard>Artica wizards</artica_wizard>
 <AsArticaAdministrator>Can navigate to the entire tree</AsArticaAdministrator>
 <AsDansGuardianGroupRule>Can manage web filtering rules for this group</AsDansGuardianGroupRule>
+<ask_perform_operation_delete_item>Remove these items ? :</ask_perform_operation_delete_item>
 <AsMailBoxAdministrator>Local Mailbox manager</AsMailBoxAdministrator>
 <AsMailManAdministrator>Can manage email distribution Lists</AsMailManAdministrator>
 <AsMessagingOrg>Can manage messaging features</AsMessagingOrg>
@@ -660,6 +670,7 @@ all ActiveSync compatible mobile devices and Blackberry via the Blackberry Enter
 <ASSP_NEWVERSION_TEXT>a new Anti-Spam SMTP Proxy version in artica update server, it is recommended to upgrade to this version</ASSP_NEWVERSION_TEXT>
 <AsSquidAdministrator>Define HTTP proxies access and rules</AsSquidAdministrator>
 <AsSystemAdministrator>Linux system operations</AsSystemAdministrator>
+<attached_files>Attached files</attached_files>
 <attachments filters>Attachments filters</attachments filters>
 <attachment_blocking>attachment blocking</attachment_blocking>
 <attachment_blocking_text>Put restrictions on .exe .bat .vbs...files and block some attachments</attachment_blocking_text>
@@ -820,6 +831,7 @@ Examples of such clients are MicroSoft Outlook Express version 4 and MicroSoft E
 <cache_cleaned>Web console Cache cleaned</cache_cleaned>
 <calendar>Calendar</calendar>
 <calling_daemon_to_perform_operation>calling artica daemon to perform operations</calling_daemon_to_perform_operation>
+<campain_name>Campaign name</campain_name>
 <cancel>cancel</cancel>
 <catch_all>Catch-all</catch_all>
 <catch_all_mail_text>A catch-all mailbox will receive all mails when recipients not matching your users stored in local database</catch_all_mail_text>
@@ -830,6 +842,7 @@ Examples of such clients are MicroSoft Outlook Express version 4 and MicroSoft E
 <certificate infos>certificate infos</certificate infos>
 <certificate password>Certificate password</certificate password>
 <certificate_hosts>Set hosts (fqdn) that will be added into the certificate</certificate_hosts>
+<certificate_infos_modify_text>Display and modify SSL certificate informations</certificate_infos_modify_text>
 <change>Change</change>
 <change_antispam_domain_text>Change anti-spam settings for this domain.[br]If users has not set it's own anti-spam settings, this rule will be used</change_antispam_domain_text>
 <change_email>Change eMail address</change_email>
@@ -899,6 +912,7 @@ The relay_domains_reject_code parameter specifies the response code for rejected
 <click_to_dismount>Click to umount</click_to_dismount>
 <click_to_display>Click on the link to display item</click_to_display>
 <click_to_display_statistics_section>click to display statistics section</click_to_display_statistics_section>
+<click_to_edit_template>Click to edit the template</click_to_edit_template>
 <click_to_expand_or_collapse>Click to expand or collapse</click_to_expand_or_collapse>
 <click_to_launch>Click in order to perform this operation</click_to_launch>
 <click_to_mount>Click to mount</click_to_mount>
@@ -1008,6 +1022,7 @@ You need to test this feature.[br]Sometimes cpulimit is bugged and do the opposi
 <cpu_usage>CPU Usage (user)</cpu_usage>
 <create>create</create>
 <created>created</created>
+<created_on>created on</created_on>
 <create_mailbox>No mailbox found: Create Mailbox</create_mailbox>
 <create_network>Create a network</create_network>
 <create_org_postfix>Create your first settings and organization</create_org_postfix>
@@ -1025,6 +1040,7 @@ You need to test this feature.[br]Sometimes cpulimit is bugged and do the opposi
 <credentials_informations_text>Define accounts and passwords in order to allow this computer to connect to this domain or to allow artica to connecting to this computer</credentials_informations_text>
 <cron>cron</cron>
 <crypted>crypted</crypted>
+<css>Cascading Style Sheets</css>
 <Cured>Cured</Cured>
 <CURLE_COULDNT_CONNECT>Failed to connect() to host or proxy.</CURLE_COULDNT_CONNECT>
 <CURLE_COULDNT_RESOLVE_HOST>Couldn't resolve host. The given remote host was not resolved</CURLE_COULDNT_RESOLVE_HOST>
@@ -1160,6 +1176,9 @@ Setting this parameter to a value of 1 changes the meaning of the corresponding 
 <deploy>deploy</deploy>
 <DepositBoxSize>Safe-deposit box size (Go)</DepositBoxSize>
 <description>Description</description>
+<dest_imap_password>IMAP password destination</dest_imap_password>
+<dest_imap_server>IMAP server destination</dest_imap_server>
+<dest_imap_username>IMAP username destination</dest_imap_username>
 <detach>Detach</detach>
 <details>details</details>
 <detected_spam>Spams</detected_spam>
@@ -1170,6 +1189,7 @@ Setting this parameter to a value of 1 changes the meaning of the corresponding 
 <disable>disable</disable>
 <disable tls postfix>disable TLS for postfix</disable tls postfix>
 <disabled>disabled</disabled>
+<disabled_amavis_enabled>This feature is disabled because amavis overwrite it</disabled_amavis_enabled>
 <DisableMagicQuotesGpc>Disable magic_quotes on the GPC</DisableMagicQuotesGpc>
 <DisableMagicQuotesGpc_text>Disable fixing the magic_quotes on the GPC operations (get/post/cookie).[br] especially for egroupware compatibility</DisableMagicQuotesGpc_text>
 <disable_all_filters>Disable all filters</disable_all_filters>
@@ -1193,6 +1213,11 @@ Setting this parameter to a value of 1 changes the meaning of the corresponding 
 <display_queries_list>Display queries</display_queries_list>
 <display_statistics_of_this_user>Display statistics of this user</display_statistics_of_this_user>
 <display_statistics_of_this_website>Display statistics of this website</display_statistics_of_this_website>
+<Disposition-Notification-To>Return receipt</Disposition-Notification-To>
+<Disposition-Notification-To_text>Provide a notification of the "disposition" of a message - indicating, for example, 
+whether it is read by a recipient, discarded before being read.[br]
+Define here the email address that will receive notifications.[br]If no email address set, notifications will be disabled.
+</Disposition-Notification-To_text>
 <dkim_about2>This technology is a combination between signed messages and DNS servers, all mails signed will be verified with the public DNS checking method (the TXT field).[br]For incoming mails, not-signed emails will increase the anti-spam score, in the opposite, signed mail decrease scores.[br]
 Outgoing mails can be signed with your certificates in order to be verified by others mails servers.</dkim_about2>
 <dkim_showkeys_text>You need to set up the DNS record of each domain listed above.[br]Each DNS record will should have a 'TXT' type DNS record.</dkim_showkeys_text>
@@ -1249,7 +1274,10 @@ Since the creation of the first DNSBL in 1997, the operation and policies of the
 <each>each</each>
 <edit>Edit.</edit>
 <edit mode>edit mode</edit mode>
+<edit_contact>Edit contact</edit_contact>
 <edit_paremeters>Set parameters for this section</edit_paremeters>
+<edit_photo_title_org>Edit organization's LOGO</edit_photo_title_org>
+<edit_photo_title_org_text>Upload/Change the icon picture that represent your organization</edit_photo_title_org_text>
 <edit_rule>Edit a rule</edit_rule>
 <edit_squid_parent_parameters>Edit Proxy Parent settings</edit_squid_parent_parameters>
 <edit_table>Edit the table</edit_table>
@@ -1277,6 +1305,11 @@ supports the X-Forward extension for Postfix protocol only if [b]smtp[/b] is use
 <electronic_address>Electronic address</electronic_address>
 <email>eMail address</email>
 <emailAddress>email address</emailAddress>
+<emailings>eMailings</emailings>
+<emailing_campain_linker_delete>Delete the eMailing and associated datas</emailing_campain_linker_delete>
+<emailing_campain_linker_delete_confirm>Are you sure to delete this item ?</emailing_campain_linker_delete_confirm>
+<emailing_queue_not_ready>Queue is not ready</emailing_queue_not_ready>
+<emailing_queue_not_ready_text>You can send your emailing only if the queue is successfully build</emailing_queue_not_ready_text>
 <emailrelay_status>E-MailRelay Status</emailrelay_status>
 <emails>emails</emails>
 <emails_addresses>eMails addresses</emails_addresses>
@@ -1290,6 +1323,7 @@ supports the X-Forward extension for Postfix protocol only if [b]smtp[/b] is use
 <emails_recieved>emails recieved</emails_recieved>
 <email_campaigns>eMail Campaigns</email_campaigns>
 <email_number>email number</email_number>
+<email_queue_number>emails in queue</email_queue_number>
 <email_scenarios>eMail Scenarios</email_scenarios>
 <empty_list>Empty list</empty_list>
 <empty_quarantine>Empty your quarantine</empty_quarantine>
@@ -1634,6 +1668,8 @@ in this form you want to submit</form_error>
 <From Address>From Address</From Address>
 <from_cache_file>from cache file</from_cache_file>
 <from_ip_address>from tcp/ip address</from_ip_address>
+<from_name>From name</from_name>
+<from_name_help>set here the name/string of the from address that will be displayed in the recipient email client.</from_name_help>
 <fs_type>filesystem type</fs_type>
 <gateway>Gateway</gateway>
 <GDPHP_NOT_INSTALLED>GD Library !</GDPHP_NOT_INSTALLED>
@@ -1645,6 +1681,7 @@ in this form you want to submit</form_error>
 <generate_a_signing_key_nokey_text>You need first to generate a signing key to enable the DKIM verification.[br]Just click on the button it generate a new one for you</generate_a_signing_key_nokey_text>
 <generate_config>Rebuild config</generate_config>
 <generate_config_text>Build all yours settings to a temporary ldap field</generate_config_text>
+<generate_report_each>generate report each</generate_report_each>
 <GENERIC_LDAP_ERROR>OpenLDAP generic error</GENERIC_LDAP_ERROR>
 <give ext>fill the attachments extension in order to block it</give ext>
 <give the new interface>Give the new interface</give the new interface>
@@ -1662,6 +1699,12 @@ in this form you want to submit</form_error>
 <globally_banned>globally banned</globally_banned>
 <global_blacklist>Domains Black List</global_blacklist>
 <global_blacklist_text>This feature allows you to deny senders domains for all your organization</global_blacklist_text>
+<global_director_report>Global director report</global_director_report>
+<global_director_report_explain>Global director report send a report by email in PDF of the messaging flow for each user, it designed for the manager to get information of the messaging flow of it's origanization.[br]
+the report display messaging flow for each user (spam and good mails).[br]
+depends of the mails number and user number, server performance, generating this report should consume server performance. 
+</global_director_report_explain>
+<global_director_report_text>Send organisation's mail flow report periodically</global_director_report_text>
 <global_memory>Global memory used</global_memory>
 <global_organization>global organization</global_organization>
 <global_quarantine_rules>Global quarantine settings</global_quarantine_rules>
@@ -1760,6 +1803,9 @@ It send notifications to recipients in order to allow them to "download" attache
 <if_in>if in</if_in>
 <ignore_all>Ignore all</ignore_all>
 <illimited>illimited</illimited>
+<imapsync_advanced_options>Define specifics options and tune your mail retreival engine</imapsync_advanced_options>
+<imapsync_folders_text>Define folders to replicate in your mailbox</imapsync_folders_text>
+<imapsync_main_settings>Set main synchronization parameters</imapsync_main_settings>
 <imap_connection_broken>Imap connection is currently broken and informations could not be read</imap_connection_broken>
 <imap_connection_locked>The imap connection is currently locked cause the imap server didn't respond on time</imap_connection_locked>
 <imap_server_name>Mailbox server name</imap_server_name>
@@ -2027,6 +2073,7 @@ With the default 100 SMTP server process limit, "in flow delay as 1s" limits the
 <kav_title_infos>Statics informations</kav_title_infos>
 <keep>Keep</keep>
 <keepup2date settings>keepup2date settings</keepup2date settings>
+<keywords>keywords</keywords>
 <kill_process>Kill process</kill_process>
 <label>label</label>
 <label_add_transport>Add a relay server for this domain</label_add_transport>
@@ -2040,6 +2087,7 @@ With the default 100 SMTP server process limit, "in flow delay as 1s" limits the
 <last_100_mails>last 100 emails</last_100_mails>
 <last_24_h>last 24 hours</last_24_h>
 <last_48_h>last 48 hours</last_48_h>
+<last_days>last days</last_days>
 <last_logoff>Last logoff</last_logoff>
 <last_logon>Last logon</last_logon>
 <last_mails>Last routing mails</last_mails>
@@ -2100,6 +2148,7 @@ The message delivery transport name is the first field in the entry in the maste
 </local_destination_concurrency_limit_text>
 <local_domains_table>SMTP Local domains</local_domains_table>
 <local_file>local file</local_file>
+<local_mailbox>Local mailbox</local_mailbox>
 <local_smtp_host>Local SMTP host</local_smtp_host>
 <locked>locked</locked>
 <locking_type>locking type</locking_type>
@@ -2137,14 +2186,26 @@ The message delivery transport name is the first field in the entry in the maste
 <mailbox_created>Created on</mailbox_created>
 <mailbox_disabled>This mailbox is disabled</mailbox_disabled>
 <mailbox_does_not_exists>Mailbox does not exists</mailbox_does_not_exists>
+<mailbox_folders>Mailbox folders</mailbox_folders>
 <mailbox_main_settings>Mailboxes settings</mailbox_main_settings>
 <mailbox_name>Mailbox name</mailbox_name>
 <mailbox_password>Password</mailbox_password>
 <mailbox_path>Directory</mailbox_path>
+<mailbox_separator_destination>Separator on destination server</mailbox_separator_destination>
+<mailbox_separator_source>Separator on source server</mailbox_separator_source>
+<mailbox_separator_text>separator in case namespace is not supported.</mailbox_separator_text>
 <mailbox_server_address>Mailbox server address</mailbox_server_address>
 <mailbox_title>Edit mailbox</mailbox_title>
 <mailbox_usage>Mailbox usage</mailbox_usage>
 <mailbox_username>Username</mailbox_username>
+<mailer_engine_settings>Mailer settings</mailer_engine_settings>
+<mailer_engine_settings_explain>In this section, you need to define the messaging servers (SMTP servers) that will be used to send mass mailing.[br]
+more you have servers more your mass mailing will be efficient and fast.[br]
+If you set multiple SMTP servers, Artica will divide the messages number by the servers number.[br]
+Artica can build multiple SMTP servers on the same machine if your administrator had previously added some virtuals servers.[br]
+You can also use your ISP SMTP servers of your ISP by set the appropriate authentication parameters.
+</mailer_engine_settings_explain>
+<mailer_engine_settings_text>Define parameters, mails servers, authentication for sending mass mailing</mailer_engine_settings_text>
 <mailgraph_about>Mailgraph is a very simple mail statistics RRDtool frontend for Postfix and Sendmail that produces daily, weekly, monthly and yearly graphs of received/sent and bounced/rejected mail.</mailgraph_about>
 <mailgraph_install>Install mailgraph application</mailgraph_install>
 <mailgraph_postfix_database>emails flow rrd database</mailgraph_postfix_database>
@@ -2417,12 +2478,17 @@ It's the names that Windows boxes see are always the NetBIOS names</netbiosname_
 <NMAP_NEWVERSION>New Network security Scanner version</NMAP_NEWVERSION>
 <NMAP_NEWVERSION_TEXT>A new NMAP version is available in artica update server, it is recommended to upgrade to this version</NMAP_NEWVERSION_TEXT>
 <no>no</no>
+<noauthmd5>No MD5 auth</noauthmd5>
+<noauthmd5_text>don't use MD5 authentification</noauthmd5_text>
+<nofoldersizes>No folder sizes</nofoldersizes>
+<nofoldersizes_text>Do not calculate the size of each folder in bytes and message counts.</nofoldersizes_text>
 <NOIEPLEASE>Don't use Internet Explorer</NOIEPLEASE>
 <NOIEPLEASE_TEXT>Artica is not compliance with Internet Explorer, You can download for Free Mozilla Firefox or Opera</NOIEPLEASE_TEXT>
 <nokeepmess>Delete messages after retreive them</nokeepmess>
 <none>Don't use feature</none>
 <normal>Normal</normal>
 <normal_infos>Information</normal_infos>
+<nosyncacls>Does not synchronise acls</nosyncacls>
 <not allowed>You have not enough privileges to perform this operation</not allowed>
 <note>note</note>
 <notifications>Notifications</notifications>
@@ -2448,6 +2514,8 @@ don't forget to - Save & Apply settings - to make them in production mode</notif
 <no_mailboxes>No mailboxes saved..</no_mailboxes>
 <no_mailbox_cause_transport>This domain does not store aliases cause all emails will be forwarded to another service/server</no_mailbox_cause_transport>
 <no_memory_free_to_empty_cache>No memory free to perform empty cache, you should reboot or stop some services</no_memory_free_to_empty_cache>
+<no_organization>No organization set</no_organization>
+<no_organization_text_jgrowl>There is no organization created on this server, some features will be not available until one organization is created</no_organization_text_jgrowl>
 <no_plugins_can_be_enabled>No plugin can be enabled for the moment, check your Master Administrator if you are allowed to enable content filters</no_plugins_can_be_enabled>
 <NO_POSTFIX_NETWORK_SET>No Networks in Postfix</NO_POSTFIX_NETWORK_SET>
 <NO_POSTFIX_NETWORK_SET_EXPLAIN>You should add your local network in order to allow your users send mails trough this server</NO_POSTFIX_NETWORK_SET_EXPLAIN>
@@ -2510,6 +2578,7 @@ don't forget to - Save & Apply settings - to make them in production mode</notif
 <ORG_HD_TITLE>Parition editor</ORG_HD_TITLE>
 <ORG_HD_TITLE_TEXT>creating, reorganizing, and deleting disk partitions</ORG_HD_TITLE_TEXT>
 <original>original</original>
+<or_add_db>Or add a new database</or_add_db>
 <or_select>Or select value</or_select>
 <other>other</other>
 <others>others</others>
@@ -2677,11 +2746,14 @@ or when the address is an authorized destination (see "permit auth destination" 
 <postfix_last_errors>Last postfix/cyrus errors</postfix_last_errors>
 <postfix_main_settings>Postfix main settings</postfix_main_settings>
 <postfix_multi_add_mailserver>Add a new mail server in your organization</postfix_multi_add_mailserver>
+<postfix_multi_add_mailserver_no_ips>No Free IP addresses associated to your organization</postfix_multi_add_mailserver_no_ips>
 <POSTFIX_MULTI_INSTANCE>multiple Postfix instances</POSTFIX_MULTI_INSTANCE>
 <POSTFIX_MULTI_INSTANCE_HOWTO>
 When enabling multiple Postfix instances feature, the main process will be disabled and switched to listen only loopback address (127.0.0.1) in order to serve WebMails and forwards all mail to a central mail hub.[br]
 Each organization will be able to manage their own instance and the Interface will be changed to provide this feature.
 </POSTFIX_MULTI_INSTANCE_HOWTO>
+<POSTFIX_MULTI_INSTANCE_INFOS>Multiple instances informations</POSTFIX_MULTI_INSTANCE_INFOS>
+<POSTFIX_MULTI_INSTANCE_INFOS_TEXT>Get status and remove SMTP instances</POSTFIX_MULTI_INSTANCE_INFOS_TEXT>
 <POSTFIX_MULTI_INSTANCE_TEXT>multiple Postfix instances will provide a specific MTA for organizations added in your server.[br]
 This may be a simpler way to configure a multi-function Postfix system.[br]
 With multiple Postfix instances, each instance has its own directories for configuration, queue and data files,
@@ -2709,6 +2781,9 @@ This is because Postfix needs to open lookup tables ahead of time, but the reade
 <postfix_statistics>SMTP Statistics</postfix_statistics>
 <postfix_status>Postfix mail system status</postfix_status>
 <postfix_status_stopped>Postfix mail system is stopped</postfix_status_stopped>
+<postfix_unknown_users_tinytext>Normally, when Postfix receives mail for an unknown user, it
+rejects it.[br] If you prefer to capture all of the messages sent to nonexistent accounts, you can
+use this feature</postfix_unknown_users_tinytext>
 <postmaster>postmaster</postmaster>
 <postmaster_explain>email address will receive notifications from this system,
   this means SMTP errors (bounce errors, forward errors...), scheduled tasks notifications</postmaster_explain>
@@ -2725,6 +2800,7 @@ This is because Postfix needs to open lookup tables ahead of time, but the reade
 </PREPEND_help>
 <prepend_text>prepend the matched text to</prepend_text>
 <previous>previous</previous>
+<printers>Printers</printers>
 <privileges>privileges</privileges>
 <privileges_text>Edit privileges and security role of users stored in this group</privileges_text>
 <Process Server Settings>Process Server Settings</Process Server Settings>
@@ -2837,6 +2913,9 @@ See also "maximal backoff time".
 <recommend_restart_postfix>It is mandatory to restart postfix in order to accept mails</recommend_restart_postfix>
 <recommend_update_kaspersky>You should update kaspersky antivirus database, current version is out-of-date[br]Kaspersky recommend to update it's database each hour</recommend_update_kaspersky>
 <reconnect_vpn_clients>Reconnect all VPN clients</reconnect_vpn_clients>
+<reconstruct_queue>Rebuild the Queue</reconstruct_queue>
+<reconstruct_queue_confirm>Are you sure to rebuild the queue ?</reconstruct_queue_confirm>
+<reconstruct_queue_text>Delete the saved messages and rebuild messages into queue</reconstruct_queue_text>
 <reconstruct_virtual_ips>Reconstruct virtuals IPs</reconstruct_virtual_ips>
 <recreation_humor>Humorous pages, comic strips, funny stories</recreation_humor>
 <recreation_sports>All about sports</recreation_sports>
@@ -2995,6 +3074,8 @@ All the emails will be deleted and not be able to restore...</remove_mailqueue_t
 <repair>repair</repair>
 <replace>replace</replace>
 <replace_line>replace current line with</replace_line>
+<Reply-to>Reply to address</Reply-to>
+<Reply-to-explain>email address that will be displayed when recipient will reply to the message</Reply-to-explain>
 <reply_body_max_size>maximum size of a reply body</reply_body_max_size>
 <reply_body_max_size_text>
  It can be used to prevent users from downloading very large files, such as MP3's and movies.[br]
@@ -3034,6 +3115,8 @@ Once backup task selected, you will choose the backup date in order to browse yo
 <restrictions_classes_list>Classes list</restrictions_classes_list>
 <results>Results</results>
 <RETRANSLATOR_CONNECT_URI>Use this uri in the Kaspersky products in order to update them trough this server.(see the link below)</RETRANSLATOR_CONNECT_URI>
+<Return-Path>return path</Return-Path>
+<Return-Path-explain>Used for mail servers to send delivery errors</Return-Path-explain>
 <return_to>return to</return_to>
 <ringtones>Sites that offer the download of ringtones or present other informations about ringtones.</ringtones>
 <roomNumber>Room number</roomNumber>
@@ -3164,9 +3247,12 @@ while distributing domain2.com mail as usual.[br]
 <sendto>Send message to</sendto>
 <send_a_test_mail>Send a test message</send_a_test_mail>
 <send_a_test_mail_text>Send quickly a pre-formatted message to this user</send_a_test_mail_text>
+<send_emailing>release the queue</send_emailing>
+<send_emailing_text>release the queue, and perform your emailing operation</send_emailing_text>
 <sent>sent</sent>
 <server>server</server>
 <servername>Server name</servername>
+<servername_already_used>server name already used</servername_already_used>
 <servers>servers</servers>
 <servers_list>Servers list</servers_list>
 <server_memory>Server memory</server_memory>
@@ -3256,10 +3342,14 @@ Main advantage is filters are executed directly on the server side, not clients 
 <sieve_vacation_text>This is a rule for notification that messages will not be immediately answered.</sieve_vacation_text>
 <sieve__text>Select operations when rules matches</sieve__text>
 <simple_mode>Simple mode</simple_mode>
+<simulation_mode>simulation mode</simulation_mode>
+<simulation_mode_explain>the simulation mode will change each recipient in database to the recipient address set in the field below.[br]In this case you can safely send the mailing to tests the load and emailing process before send it</simulation_mode_explain>
 <since>since</since>
 <single_ip>Single IP address</single_ip>
 <size>size</size>
 <skipped>skipped</skipped>
+<skipsize>Skip size</skipsize>
+<skipsize_text>Don't take message size into account</skipsize_text>
 <sleeping>sleeping</sleeping>
 <smartsieve>MailBox rules</smartsieve>
 <smbclient_not_installed_fill_form>the smblient tool is not installed, the browsing is disabled, fill the form to set informations</smbclient_not_installed_fill_form>
@@ -3462,6 +3552,8 @@ To prevent mailer loops between MX hosts and fall-back hosts, Postfix version 2.
 [strong]Time units: s (seconds), m (minutes), h (hours), d (days), w (weeks). [/strong][br]
 The default time unit is s (seconds).
 </smtp_helo_timeout_text>
+<smtp_host_not_set>local SMTP server not set</smtp_host_not_set>
+<smtp_notification>SMTP notifications</smtp_notification>
 <smtp_notifications>eMail notifications</smtp_notifications>
 <smtp_port>SMTP port</smtp_port>
 <smtp_queues>SMTP queues</smtp_queues>
@@ -3509,6 +3601,23 @@ by changing 5xx reply codes into 4xx. However, this option is no cure for addres
 <spam option 5r>Trusted</spam option 5r>
 <spam option 6>If a message is recognized as 'Not Detected'</spam option 6>
 <spam option 6r>Not Detected</spam option 6r>
+<SpamAssassinVirusBounceEnabled>Enable Virus Bounce Ruleset</SpamAssassinVirusBounceEnabled>
+<SpamAssassinVirusBounceEnabled_text>
+[ul]
+[li]Misdirected "undeliverable email" bounce  messages from spam runs, from mail servers who "accept then bounce" 
+instead of rejecting mail during the SMTP transaction.[/li]
+[li]Misdirected virus/worm "OMG your mail was infected!" email notifications from virus scanners.[/li]
+[li]Misdirected "please confirm your subscription" requests from mailing lists that allow email-based signup requests.[/li]
+[li]Out of office or vacation autoreplies and autoresponders.[/li]
+[li]Challenge requests from "Challenge/Response" anti-spam software.[br] Maybe C/R software works great for you, but it generates significant backscatter to people you don't know. [/li]
+[/ul]
+It used to be OK to send some of these types of mail -- but no longer.[br]
+Nowadays, due to the rise in backscatter caused by spammer/malware abuse, it is no longer considered good practice 
+to "accept then bounce" mail from an SMTP session, or in any other way respond by mail to an unauthorized address of the mail's senders.
+[br]There's a ruleset to block joe-job, virus-blowback, and spam-blowback bounce messages (a.k.a. "backscatter") 
+ </SpamAssassinVirusBounceEnabled_text>
+<spamassassin_check_config>Check spamassassin config</spamassassin_check_config>
+<spamassassin_check_config_text>Check the main configuration and display the reading parameters operation</spamassassin_check_config_text>
 <SPAMASSASSIN_DNS_BLACKLIST>DNS Blacklist</SPAMASSASSIN_DNS_BLACKLIST>
 <SPAMASSASSIN_DNS_BLACKLIST_TEXT>Enable DNS Blacklist tests in Spamassassin in order to increase detection rate</SPAMASSASSIN_DNS_BLACKLIST_TEXT>
 <SPAMASSASSIN_NEWVERSION>New SpamAssassin version</SPAMASSASSIN_NEWVERSION>
@@ -3678,6 +3787,8 @@ you will be redirected to the new IP address in 15 seconds
 <synchronize_directorylist_each>Synchronize Directory listing each</synchronize_directorylist_each>
 <synchronize_each>Synchronize each</synchronize_each>
 <synchronizing_mailbox>synchronizing mailbox</synchronizing_mailbox>
+<syncinternaldate>Synchronize internal dates</syncinternaldate>
+<syncinternaldate_text>sets the internal dates on host2 same as host1.[br]Turned on by default.[br] internal date is the date a message arrived on a host (mtime)</syncinternaldate_text>
 <synthesis>synthesis</synthesis>
 <system>system</system>
 <system error>There was a system problem, perhaps a preg_match problem or no sockets opens</system error>
@@ -3717,6 +3828,24 @@ you will be redirected to the new IP address in 15 seconds
 <templates>Templates</templates>
 <template_add>Add a new template</template_add>
 <template_add_emailing_text>Build your message that will be used to send the mass mailling</template_add_emailing_text>
+<template_content>template content</template_content>
+<template_content_text>modify the content of your template</template_content_text>
+<template_css_text>Edit Style Sheets of your template</template_css_text>
+<template_from_help>Set here the technical routing from address</template_from_help>
+<template_keywords_text>
+You will find here keywords that you can put in your template.[br]
+keywords will be replaced dynamically with the content of your contacts database before generating the final mail body.[br]
+[ul]
+[li][b]%gender%[/b]:gender[/li]
+[li][b]%lastname%[/b]:Last name[/li]
+[li][b]%firstname%[/b]:First name[/li]
+[li][b]%email%[/b]:email[/li]
+[li][b]%phone%[/b]:phone[/li]
+[li][b]%city%[/b]:city[/li]
+[li][b]%cp%[/b]:Postal Code[/li]
+[li][b]%postaladdress%[/b]:Postal Address[/li]
+[/ul]
+</template_keywords_text>
 <template_name>Template name</template_name>
 <test>test</test>
 <text>This page show you every 10 seconds events generated by Postfix mail system.</text>
@@ -3977,6 +4106,7 @@ The rules for transferring (routing) are set in this section.[br]
 <uninstall>uninstall</uninstall>
 <unknown>unknown</unknown>
 <unknown_user>unknown user</unknown_user>
+<unknown_users>Unknown Users</unknown_users>
 <unlink>unlink</unlink>
 <unlink_hard_drive_confirm>Confirm to unlink this hard disk ?</unlink_hard_drive_confirm>
 <UNLINK_VOLUME>Unlink this volume</UNLINK_VOLUME>
@@ -4012,6 +4142,7 @@ The rules for transferring (routing) are set in this section.[br]
 <upload_max_filesize>Max uploading files size</upload_max_filesize>
 <upload_new_license>Upload a new license</upload_new_license>
 <upload_vpn_configuration>Upload VPN settings</upload_vpn_configuration>
+<upload_your_file_here>Upload your file here</upload_your_file_here>
 <uptime>UpTime</uptime>
 <uri_add_in_browser>Uri to add in browsers settings</uri_add_in_browser>
 <uri_dnsbl>DNSBL uri</uri_dnsbl>
@@ -4082,6 +4213,9 @@ In the url the "%f" can be used to specify the real name of downloaded file</Vir
 <VIRUSES_FOUND>Viruse(s) found!</VIRUSES_FOUND>
 <VIRUSES_FOUND_TEXT>Viruses are found on your server or computers, check events to display threats</VIRUSES_FOUND_TEXT>
 <virusname>Virus name</virusname>
+<Virus_Bounce_Ruleset>Virus Bounce Ruleset</Virus_Bounce_Ruleset>
+<Virus_Bounce_Ruleset_text>It is a SpamAssassin  ruleset to catch "backscatter".[br]
+Backscatter is mail you didn't ask to receive, generated by legitimate, non-spam-sending systems in response to spam</Virus_Bounce_Ruleset_text>
 <virus_by_sender_domains>Virus detections by sender domains</virus_by_sender_domains>
 <VIRUS_EVENTS>Viruses events</VIRUS_EVENTS>
 <VISIT_WEB_SITE_INFOS>Visit the website for more informations</VISIT_WEB_SITE_INFOS>
@@ -4170,6 +4304,7 @@ At the opposit, Weekly container will use the incremental benefit but increase r
 <WORKGROUP>Workgroup</WORKGROUP>
 <working_title>Working title</working_title>
 <write>write</write>
+<WWWMultiSMTPSender>SMTP server</WWWMultiSMTPSender>
 <www_adv>All about advertising</www_adv>
 <www_chat>Site for realtime chatting and instant messaging</www_chat>
 <www_downloads>This covers mostly filesharing, p2p and torrent sites. Other download sites (for software, wallpapers, ..) are included as well</www_downloads>
@@ -4182,6 +4317,8 @@ At the opposit, Weekly container will use the incremental benefit but increase r
 <www_shopping>Sites offering online shopping and price comparisons</www_shopping>
 <www_spyware>Sites that tries to actively try to install software</www_spyware>
 <www_tracker>Site keeping an eye on where you surf and what you do in a passive.</www_tracker>
+<X-Mailer>E-mail client</X-Mailer>
+<X-Mailer-explain>Select the virtual E-mail client that will be used</X-Mailer-explain>
 <xapian_packages>Search Engines</xapian_packages>
 <xapian_processing>Indexing Your storage (search engine)</xapian_processing>
 <xapian_processing_text>omindex currently scan directories in order to improve search documents on your server[br]During this time, the server should be busy.</xapian_processing_text>
@@ -4213,6 +4350,7 @@ mailboxes will not remove
 <zarafaQuotaHard>Quota Hard</zarafaQuotaHard>
 <zarafaQuotaSoft>Quota soft</zarafaQuotaSoft>
 <zarafaQuotaWarn>Quota warn</zarafaQuotaWarn>
+<ZARAFA_ERROR_NO_APACHE>No Apache server detected.[br]You will not have access to the Zarafa WebMail until the apache server is not installed on this server.[br]IMAP/POP3 services are enabled and you can have access to mailboxes trought an standard email client</ZARAFA_ERROR_NO_APACHE>
 <ZARAFA_OU_ICON_TEXT>Define Zarafa access and enable this origanization</ZARAFA_OU_ICON_TEXT>
 <zarfa_quota_title>Quota and quota monitoring</zarfa_quota_title>
 <zarfa_quota_title_explain>Users can collect a lot of email, while your disk space is limited. With this feature you can set

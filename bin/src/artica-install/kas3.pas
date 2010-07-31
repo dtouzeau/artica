@@ -32,8 +32,6 @@ private
      FUNCTION  KAS_THTTPD_PID():string;
      FUNCTION  KAS_MILTER_PID():string;
      function  PATTERN_xml():string;
-     FUNCTION  STATUS_KAS():string;
-     FUNCTION  STATUS_MILTER():string;
      procedure DEFAUL_CONF();
 
 public
@@ -47,7 +45,7 @@ public
     function    STATUS():string;
     function    GET_VALUE(key:string):string;
     function    PATTERN_DATE():string;
-    function    PERFORM_UPDATE():string;
+    procedure   PERFORM_UPDATE();
     procedure   DELETE_VALUE(key:string);
     procedure   WRITE_VALUE(key:string;datas:string);
     function    KAS_STATUS():string;
@@ -354,99 +352,16 @@ end;
 
 //##############################################################################
 FUNCTION tkas3.STATUS():string;
-begin
-result:=STATUS_KAS()+ STATUS_MILTER();
-end;
-//#########################################################################################
-FUNCTION tkas3.STATUS_KAS():string;
 var
-   ini:TstringList;
-   mstr:string;
-   KasxFilterEnabled:integer;
-  // RegExpr:TRegExpr;
+   pidpath:string;
 begin
-KasxFilterEnabled:=0;
+SYS.MONIT_DELETE('APP_KAS3_MILTER');
+SYS.MONIT_DELETE('APP_KAS3');
 if not FileExists('/usr/local/ap-mailfilter3/bin/kas-milter') then exit;
-if not TryStrToint(SYS.Get_INFO('KasxFilterEnabled'),KasxFilterEnabled) then KasxFilterEnabled:=0;
-
-ini:=TstringList.Create;
-      ini.Add('');
-      ini.Add('[KAS3]');
-      ini.Add('pattern_date='+PATTERN_DATE());
-      ini.Add('pattern_version=' +PATTERN_DATE());
-      ini.Add('service_name=APP_KAS3');
-      ini.Add('service_disabled='+ IntToStr(KasxFilterEnabled));
-      ini.Add('service_cmd=kas3');
-      ini.Add('master_version=' + VERSION());
-      ini.Add('remove_cmd=--kas3-remove');
-
-
-      if KasxFilterEnabled=0 then begin
-      SYS.MONIT_DELETE('APP_KAS3');
-      result:=ini.Text;
-      ini.free;
-      exit;
-      end;
-
-     if SYS.MONIT_CONFIG('APP_KAS3','/usr/local/ap-mailfilter3/run/ap-process-server.pid','kas3') then begin
-      ini.Add('monit=1');
-      result:=ini.Text;
-      ini.free;
-      exit;
-     end;
-
-      if SYS.PROCESS_EXIST(KAS_AP_PROCESS_SERVER_PID()) then ini.Add('running=1') else  ini.Add('running=0');
-      ini.Add('application_installed=1');
-      ini.Add('master_pid='+ KAS_AP_PROCESS_SERVER_PID());
-      ini.Add('master_memory=' + IntToStr(SYS.PROCESS_MEMORY(KAS_AP_PROCESS_SERVER_PID())));
-      ini.Add('status='+SYS.PROCESS_STATUS(KAS_AP_PROCESS_SERVER_PID()));
-
-end;
-
-//#########################################################################################
-FUNCTION tkas3.STATUS_MILTER():string;
-var
-   ini:TstringList;
-   mstr:string;
-   KasxFilterEnabled:integer;
-  // RegExpr:TRegExpr;
-begin
-KasxFilterEnabled:=0;
-if not FileExists('/usr/local/ap-mailfilter3/bin/kas-milter') then exit;
-if not TryStrToint(SYS.Get_INFO('KasxFilterEnabled'),KasxFilterEnabled) then KasxFilterEnabled:=0;
-
-
-ini:=TstringList.Create;
-      ini.Add('');
-      ini.Add('[KAS_MILTER]');
-      ini.Add('pattern_date='+PATTERN_DATE());
-      ini.Add('pattern_version=' +PATTERN_DATE());
-      ini.Add('service_name=APP_KAS3_MILTER');
-      ini.Add('service_disabled='+ IntToStr(KasxFilterEnabled));
-      ini.Add('service_cmd=kas3');
-      ini.Add('master_version=' + VERSION());
-      ini.Add('remove_cmd=--kas3-remove');
-
-      if KasxFilterEnabled=0 then begin
-      SYS.MONIT_DELETE('APP_KAS3_MILTER');
-      result:=ini.Text;
-      ini.free;
-      exit;
-      end;
-
-     if SYS.MONIT_CONFIG('APP_KAS3_MILTER','/usr/local/ap-mailfilter3/run/kas-milter.pid','kas3') then begin
-      ini.Add('monit=1');
-      result:=ini.Text;
-      ini.free;
-      exit;
-     end;
-
-      if SYS.PROCESS_EXIST(KAS_MILTER_PID()) then ini.Add('running=1') else  ini.Add('running=0');
-      ini.Add('application_installed=1');
-      ini.Add('master_pid='+ KAS_MILTER_PID());
-      ini.Add('master_memory=' + IntToStr(SYS.PROCESS_MEMORY(KAS_MILTER_PID())));
-      ini.Add('status='+SYS.PROCESS_STATUS(KAS_MILTER_PID()));
-
+pidpath:=logs.FILE_TEMP();
+fpsystem(SYS.LOCATE_PHP5_BIN()+' /usr/share/artica-postfix/exec.status.php --kas3 >'+pidpath +' 2>&1');
+result:=logs.ReadFromFile(pidpath);
+logs.DeleteFile(pidpath);
 end;
 //#########################################################################################
 function tkas3.VERSION():string;
@@ -480,7 +395,7 @@ begin
 end;
 
 //###############################################################################
-function tkas3.PERFORM_UPDATE():string;
+procedure tkas3.PERFORM_UPDATE();
 var
 tmp:string;
 pid:string;
@@ -644,6 +559,7 @@ begin
      if FileExists('/usr/local/ap-mailfilter3/bin/scripts/pre-uninstall') then fpsystem('/usr/local/ap-mailfilter3/bin/scripts/pre-uninstall');
      if DirectoryExists('/usr/local/ap-mailfilter3') then fpsystem('/bin/rm -rf /usr/local/ap-mailfilter3');
      fpsystem('/usr/share/artica-postfix/bin/artica-make --empty-cache');
+     fpsystem('/etc/init.d/artica-postfix restart postfix');
 end;
 
 

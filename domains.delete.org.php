@@ -106,6 +106,9 @@ function deleteou(){
 	$sock=new sockets();
 	$sock->getFrameWork("cmd.php?organization-delete=". base64_encode($_GET["delete-ou"])."&delete-mailboxes={$_GET["delete_mailboxes"]}");
 	$sock->getFrameWork("cmd.php?ad-import-remove-schedule=yes&ou=". base64_encode($_GET["delete-ou"]));
+	
+
+	
 	$tpl=new templates();
 	sleep(3);
 	echo $tpl->javascript_parse_text('{apply_upgrade_help}');

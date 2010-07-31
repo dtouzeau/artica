@@ -118,7 +118,7 @@ function LoadAjax(ID,uri,concatene) {
 	if(document.getElementById(ID)){ 
 			var WAITX=ID+'_WAITX';
 			if(document.getElementById(WAITX)){return;}
-	        document.getElementById(ID).innerHTML='<center style="margin:20px;padding:20px" id='+WAITX+'><img src="img/ajax-loader.gif"></center>';
+	        document.getElementById(ID).innerHTML='<center style="margin:20px;padding:20px" id='+WAITX+'><img src="img/wait_verybig.gif"></center>';
 	        //$('#'+ID).load(uri_add, function() {Orgfillpage();});
 	        $('#'+ID).load(uri);
 	}

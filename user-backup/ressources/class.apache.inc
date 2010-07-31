@@ -23,6 +23,24 @@ class vhosts{
 	"DRUPAL"=>"drupal-logo-128.png",
 	
 	);
+	
+	var $IMG_ARRAY_64=array(
+	"LMB"=>"logo_lmb-64.png",
+	"JOOMLA"=>"64.joomla.png",
+	"SUGAR"=>"64-sugarcrm.png",
+	"ARTICA_USR"=>"64-bg_user.png",
+	"OBM2"=>"64-obm2.png",
+	"OPENGOO"=>"64-opengoo.png",
+	"ROUNDCUBE"=>"64-roundcube.png",
+	"GROUPOFFICE"=>"groupoffice-64.png",
+	"ZARAFA"=>"zarafa-logo-64.png",
+	"ZARAFA_MOBILE"=>"zarafa-logo-64.png",
+	"DRUPAL"=>"drupal-64.png",
+	
+	);	
+	
+	
+	
 	var $noneeduser=array("JOOMLA"=>true,"ROUNDCUBE"=>true,"ARTICA_USR"=>true,"ZARAFA_MOBILE"=>true,"ZARAFA"=>true,"DRUPAL"=>true);
 	var $noneeduser_mysql=array("ARTICA_USR"=>true,"ZARAFA_MOBILE"=>true,"ZARAFA"=>true,"DRUPAL"=>true);
 	

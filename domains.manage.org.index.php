@@ -427,30 +427,30 @@ function DeleteOU(){
 
 function popup_tabs(){
 	$_GET["ou"]=base64_decode($_GET["ou"]);
-	if(GET_CACHED(__FILE__,__FUNCTION__,"js:{$_GET["ou"]}")){return null;}
+	//if(GET_CACHED(__FILE__,__FUNCTION__,"js:{$_GET["ou"]}")){return null;}
 	$sock=new sockets();
 	
 	$page=CurrentPageName();
-	
-	
 	$lvm_g=new lvm_org($_GET["ou"]);
-	
+	$usersmenus=new usersMenus();
+	$user=$usersmenus;	
 	
 	if(!isset($_GET["ou"])){
 		if(isset($_COOKIE["SwitchOrgTabs"])){$_GET["SwitchOrgTabs"]=$_COOKIE["SwitchOrgTabs"];}
 		if(isset($_COOKIE["SwitchOrgTabsOu"])){$_GET["ou"]=$_COOKIE["SwitchOrgTabsOu"];}
 		}
-		$usersmenus=new usersMenus();
-		$usersmenus->LoadModulesEnabled();
+	
+	$usersmenus->LoadModulesEnabled();
 	if(!isset($_GET["SwitchOrgTabs"])){$_GET["tab"]=0;};
-	$page=CurrentPageName();
-	$user=new usersMenus();
+	
+	
 	$array["management"]='{management}';
 	$array["users"]='{users}';
 	
 	
+	writelogs("AseMailCampaignsAdmin=$usersmenus->AseMailCampaignsAdmin",__FUNCTION__,__FILE__,__LINE__);
 	if($sock->GET_INFO("EnableInterfaceMailCampaigns")==1){
-		if($usersmenus->AseMailCampaignsAdmin){
+	 if($usersmenus->AseMailCampaignsAdmin){
 		$array["emailings"]="{email_campaigns}";
 		}
 	}	
@@ -629,7 +629,14 @@ if($usersmenus->AllowEditOuSecurity){
 		"javascript:Loadjs('domains.director.report.php?ou=$ou_encoded')",null,210,100,0,true);
 }
 
-
+if($usersmenus->MAILMAN_INSTALLED){
+	if($sock->GET_INFO('MailManEnabled')==1){
+		if($usersmenus->AsMailManAdministrator){
+			$mailman=Paragraphe("mailman-64.png","{APP_MAILMAN}",'{user_mailman_explain}',
+			"javascript:Loadjs('domains.mailman.lists.php?ou=$ou_encoded')",null,210,100,0,true);
+			}
+	}
+}
 	
 	
 	
@@ -642,7 +649,7 @@ if($usersmenus->AllowEditOuSecurity){
 	
 	$html="<div style='width:700px'>
 	$transport$network$zarafa$zarafa_migration$buildAllmailboxes$restrictions$whitelists$dnsbl$director_report
-	$assp$kavmilter$extensions_block$kas3x$whitelistrobots$quarantine_robot$rttm$quarantine$quarantine_admin$quarantine_report$quarantine_query$stats
+	$mailman$assp$kavmilter$extensions_block$kas3x$whitelistrobots$quarantine_robot$rttm$quarantine$quarantine_admin$quarantine_report$quarantine_query$stats
 	$ArticaHtml$icon_backuphtml
 	</div>
 	";
@@ -1061,55 +1068,38 @@ function organization_groupwares(){
 	}
 
 $ou=$_GET["ou"];
-	$usersmenus=new usersMenus();
-	$lmb=Paragraphe('logo_lmb-64.png','{APP_LMB}','{feature_not_installed}',"",null,210,0,0,true);
-	
-if($usersmenus->AsOrgAdmin){
-	if($usersmenus->roundcube_installed){
-			$roundcube=Paragraphe('64-roundcube.png','{APP_ROUNDCUBE}','{manage_your_roundcube_text}',"javascript:Loadjs('domains.roundcube.php?ou=$ou')",null,210,0,0,true);				
-		}
-		$createVhost=Paragraphe('www-add-64.png','{ADD_WEB_SERVICE}','{ADD_WEB_SERVICE_TEXT}',"javascript:Loadjs('domains.www.php?ou=$ou&add=yes')",null,210,0,0,true);		
-		$vhosts=organization_vhostslist($ou);
-		}
+$tr=organization_vhostslist($ou);
 
 	
-//$roundcube
-$html="<div style='width:700px'>
-<table style=width:100%'>
-<tr>
-<td valign='top'>{$createVhost}
-	<div style='width:250px'>
-
-		$sugar
+$tables[]="<table style='width:100%'><tr>";
+$t=0;
+while (list ($key, $line) = each ($tr) ){
+		$line=trim($line);
+		if($line==null){continue;}
+		$t=$t+1;
+		$tables[]="<td valign='top'>$line</td>";
+		if($t==3){$t=0;$tables[]="</tr><tr>";}
 		
-	</div>
-</td>
-<td valign='top'>
-	<div style='width:420px;height:350px;overflow:auto;padding:3px;border:1px dotted #CCCCCC;text-align:center' id='ORG_VHOSTS_LIST'>
-		$vhosts
-	</div>
-	
-</td>
-</tr>
-</table>
-
-	</div>
-	";	
-
-if($usersmenus->SMTP_LEVEL>0){
-	$html="
-	<p style='font-size:18px'>{features_disabled_smtp}</p>
-	
-	";
+}
+if($t<3){
+	for($i=0;$i<=$t;$i++){
+		$tables[]="<td valign='top'>&nbsp;</td>";				
 	}
-	return $html;		
+}
+				
+	$tables[]="</table>";	
+		
+	$tpl=new templates();	
+	return $tpl->_ENGINE_parse_body(implode("\n",$tables));		
 	
 }
 
 function organization_vhostslist($ou){
 	$sock=new sockets();
-	
-
+	$usersmenus=new usersMenus();
+	if($usersmenus->AsOrgAdmin){
+		$tr[]=Paragraphe('www-add-64.png','{ADD_WEB_SERVICE}','{ADD_WEB_SERVICE_TEXT}',"javascript:Loadjs('domains.www.php?ou=$ou&add=yes')",null,210,0,0,true);		
+	}
 	
 	$ApacheGroupWarePort=$sock->GET_INFO("ApacheGroupWarePort");
 	$apache=new vhosts();
@@ -1124,43 +1114,23 @@ function organization_vhostslist($ou){
 		$array=$apache->SearchHosts($host);
 
 		if($array["wwwsslmode"]=="TRUE"){$URI="https://$host$suffix";}
-		
 		switch ($wwwservertype) {
-			case "LMB":$img="logo_lmb-32.png";break;
-			case "ROUNDCUBE":$img="roundcube-32.png";break;
-			case "JOOMLA":$img="32-joomla.png";$suffix="/administrator";break;
-			case "SUGAR":$img="32-sugarcrm.png";break;			
-			case "ARTICA_USR":$img="tank-32.png";break;
-			case "OBM2":$img="obm-32.png";break;
-			case "OPENGOO":$img="opengoo-32.png";break;
-			case "GROUPOFFICE":$img="groupoffice-32.png";break;
-			case "ZARAFA":$img="zarafa-logo-32.png";break;
-			case "ZARAFA_MOBILE":$img="zarafa-logo-32.png";break;
+			case "JOOMLA":$suffix="/administrator";break;
 			case "DRUPAL":$img="drupal-logo-32.png";$suffix="/install.php";break;
-			default:
-				;
-			break;
-		}
+			}
+		
+		$img=$apache->IMG_ARRAY_64[$wwwservertype];
+		
 		$warn=null;
 		$ip=gethostbyname($host);
-		if($ip==$host){
-			$warn=imgtootltip("status_warning.gif","{could_not_find_iphost}:$host");
-		}
-		
-		$html=$html . "
-			<tr ". CellRollOver().">
-				<td width=1%><img src='img/$img'></td>
-				<td width=1%>$warn</td>
-				<td><strong>".texttooltip($host,$host,"Loadjs('domains.www.php?ou=$ou&add=yes&host=$host')","",0,'font-size:14px')."</strong>
-				<td><strong>". imgtootltip("alias-32.gif","$host","s_PopUpFull('$URI',800,800)")."</td>
-			</tr>
-			";	
-		
+		if($ip==$host){$warn=imgtootltip("status_warning.gif","{could_not_find_iphost}:$host");}
+		$link=imgtootltip("alias-32.gif","<b><u>$host</u></b><br>$URI","s_PopUpFull('$URI',800,800)");
+		$js="Loadjs('domains.www.php?ou=$ou&add=yes&host=$host')";
+		$tr[]=Paragraphe(array($img,$warn,$link),$host,'{'.$apache->TEXT_ARRAY[$wwwservertype]["TITLE"].'}<br>{'.$apache->TEXT_ARRAY[$wwwservertype]["TEXT"].'}',"javascript:$js");
 	}
 	
-	$html=$html . "</table>";
-	$tpl=new templates();
-	return $tpl->_ENGINE_parse_body($html);
+	return $tr;
+		
 }
 
 
@@ -1306,7 +1276,7 @@ function organization_users_find_member(){
 	
 	$tofind=$_GET["finduser"];
 	if(is_base64_encoded($_GET["ou"])){$ou=base64_decode($_GET["ou"]);}else{$ou=$_GET["ou"];}
-	writelogs("Find users $tofind in ou=$ou ({$_GET["ou"]})",__FUNCTION__,__FILE__,__LINE__);
+	writelogs("Find users $tofind in ou=$ou (encoded={$_GET["ou"]})",__FUNCTION__,__FILE__,__LINE__);
 	
 	if($_SESSION["uid"]<>-100){$ou=$_SESSION["ou"];}
 	$ldap=new clladp();
@@ -1316,13 +1286,13 @@ function organization_users_find_member(){
 	$dn="ou=$ou,dc=organizations,$ldap->suffix";
 	$hash=$ldap->Ldap_search($dn,$filter,$attrs,150);
 	
-	writelogs("Find users $tofind in ou=$ou ({$_GET["ou"]})",__FUNCTION__,__FILE__,__LINE__);
+	
 	
 	$users=new user();
 	
 	$number=$hash["count"];
 	$bg="#FFFFFF";
-	
+	writelogs("Find users $tofind in ou=$ou (encoded={$_GET["ou"]}) $number items",__FUNCTION__,__FILE__,__LINE__);
 	$html="
 	
 	

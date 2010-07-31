@@ -139,10 +139,16 @@ function popup(){
 	$privs=$ldap->_ParsePrivieleges($hash["ArticaGroupPrivileges"]);
 	$langdef=$privs["ForceLanguageUsers"];
 	
-	$lang=DirFolders('ressources/language');
+	$lang["en"]="English";
+	$lang["fr"]="Francais";
+	$lang["po"]="Portugues";
+	$lang["br"]="Brazilian";
+	$lang["es"]="Espanol";
+	$lang["it"]="Italiano";
+	$lang["de"]="Deutsch";
 	unset($lang["language"]);
 	$lang[null]="{default}";
-	$language=Field_array_Hash($lang,'OUlanguage',$langdef,null,null,0,"font-size:13px;padding:3px");	
+	$language=Field_array_Hash($lang,'OUlanguage',$langdef,null,null,0,"font-size:13px;padding:5px");	
 	
 	
 	//ArticaGroupPrivileges
@@ -162,7 +168,7 @@ function popup(){
 	<tr>
 	<td valign='top' class=legend nowrap style='font-size:13px'>{default_language}:</td>
 	<td valign='top'>$language</td>
-	<td valign='top'><input type='button' OnClick=\"javascript:SaveOUDefSettings();\" value='{apply}&nbsp;&raquo;'></td>
+	<td valign='top'>". button("{apply}","SaveOUDefSettings()")."</td>
 	</tr>
 	</table>";
 	

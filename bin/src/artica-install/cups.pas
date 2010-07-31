@@ -365,36 +365,15 @@ end;
 //##############################################################################
 function tcups.STATUS():string;
 var
-ini:TstringList;
-pid:string;
+pidpath:string;
 begin
    if not FileExists(Daemon_bin_path()) then exit;
    if not FileExists(cups_config_path()) then  exit;
-
-   ini:=TstringList.Create;
-
-   ini.Add('[CUPS]');
-      ini.Add('service_name=APP_CUPS');
-      ini.Add('service_disabled=1');
-      ini.Add('service_cmd=cups');
-      ini.Add('master_version=' + VERSION());
-
-
-      if SYS.MONIT_CONFIG('APP_CUPS',PID_PATH(),'cups') then begin
-         ini.Add('monit=1');
-         result:=ini.Text;
-         ini.free;
-         exit;
-      end;
-
-      pid:=PID_NUM();
-      if SYS.PROCESS_EXIST(pid) then ini.Add('running=1') else  ini.Add('running=0');
-      ini.Add('master_pid='+ pid);
-      ini.Add('master_memory=' + IntToStr(SYS.PROCESS_MEMORY(pid)));
-      ini.Add('status='+SYS.PROCESS_STATUS(pid));
-      result:=ini.Text;
-     ini.free;
-
+   SYS.MONIT_DELETE('APP_CUPS');
+   pidpath:=logs.FILE_TEMP();
+   fpsystem(SYS.LOCATE_PHP5_BIN()+' /usr/share/artica-postfix/exec.status.php --cups >'+pidpath +' 2>&1');
+   result:=logs.ReadFromFile(pidpath);
+   logs.DeleteFile(pidpath);
 end;
 //##############################################################################
 procedure tcups.WINDOWS_DRIVERS();

@@ -54,7 +54,7 @@ $mysql=new mysql();
 	while (list ($num, $file) = each ($hash)){
 		
 		
-		$bigtext=file_get_contents($path.'/'.$file);
+		$bigtext=@file_get_contents($path.'/'.$file);
 		
 		echo date('Y-m-d h:i:s')." Parsing $file ". strlen($bigtext)." bytes text\n";
 		
@@ -66,6 +66,11 @@ $mysql=new mysql();
 			}
 		}
 		
+		if(preg_match("#<attachedfiles>(.+?)</attachedfiles>#is",$bigtext,$re)){
+				$files_text=addslashes($re[1]);
+		}		
+		
+		
 		$ini->loadString($bigtext);
         $processname=$ini->_params["LOG"]["processname"];
         $date=$ini->_params["LOG"]["date"];
@@ -76,18 +81,19 @@ $mysql=new mysql();
         }
         $text=addslashes($text);
         $subject=$ini->_params["LOG"]["subject"];
+        $recipient=$ini->_params["LOG"]["recipient"];
         $subject=addslashes($subject);
         
         echo date('Y-m-d h:i:s')." Parsing subject $subject ". strlen($text)." bytes text\n";
         
         writelogs("New notification: $subject (". strlen($text)." bytes)",__FUNCTION__,__FILE__,__LINE__);
         
-        $sql="INSERT INTO events (zDate,hostname,process,text,context,content) VALUES(
+        $sql="INSERT INTO events (zDate,hostname,process,text,context,content,attached_files,recipient) VALUES(
         	'$date',
         	'$mysql->hostname',
         	'$processname',
         	'$subject',
-        	'$context','$text')";
+        	'$context','$text','$files_text','$recipient')";
         	
         	
         	
@@ -136,12 +142,13 @@ $results=$q->QUERY_SQL($sql,"artica_events");
 while($ligne=@mysql_fetch_array($results,MYSQL_ASSOC)){
 			events("New event: {$ligne["text"]}");
 	
+			$attached_files=unserialize(base64_decode($ligne["attached_files"]));
 			$context=$ligne["context"];
 			$ligne["content"]=str_replace('[br]',"\n",$ligne["content"]);
 			if($ini->_params["SMTP"][$context]==1){
 				$ligne["content"]="{$ligne["zDate"]} :{$ligne["process"]}: {$ligne["text"]}\n\n-----------------------------------------------------\n{$ligne["content"]}\n";
 				events("Notify {$ligne["text"]}");
-				SendMailNotification($ligne["content"],"[$context]: {$ligne["text"]}");
+				SendMailNotification($ligne["content"],"[$context]: {$ligne["text"]}",false,$attached_files,$ligne["recipient"]);
 			}
 			$sql="UPDATE events SET sended=1 WHERE ID={$ligne["ID"]}";
 			$q->QUERY_SQL($sql,"artica_events");

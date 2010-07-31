@@ -968,50 +968,13 @@ end;
 end;
 //#####################################################################################
 function tdansguardian.DANSGUARDIAN_TAIL_STATUS():string;
-var
-ini:TstringList;
-pid:string;
 begin
-
+result:='';
+       SYS.MONIT_DELETE('APP_ARTICA_DANSGUARDIAN_TAIL');
 if not FileExists(BIN_PATH()) then begin
  SYS.MONIT_DELETE('APP_ARTICA_DANSGUARDIAN_TAIL');
  exit;
 end;
-
-
-   if DansGuardianEnabled=0 then begin
-      SYS.MONIT_DELETE('APP_ARTICA_DANSGUARDIAN_TAIL');
-       exit;
-   end;
-
-    ini:=TstringList.Create;
-    ini.Add('[ARTICA_DANS_TAIL]');
-    ini.Add('service_name=APP_ARTICA_DANSGUARDIAN_TAIL');
-    ini.Add('service_cmd=dansguardian-tail');
-    ini.Add('service_disabled='+ IntToStr(DansGuardianEnabled));
-    ini.Add('master_version=' + SYS.ReadFileIntoString(artica_path+'/VERSION'));
-
-
-
-
-     if SYS.MONIT_CONFIG('APP_ARTICA_DANSGUARDIAN_TAIL','/etc/artica-postfix/exec.dansguardian-tail.php.pid','dansguardian-tail') then begin
-       ini.Add('monit=1');
-        result:=ini.Text;
-        ini.free;
-        exit;
-     end;
-
-   pid:=DANSGUARDIAN_TAIL_PID();
-
-      if SYS.PROCESS_EXIST(pid) then ini.Add('running=1') else  ini.Add('running=0');
-      ini.Add('application_installed=1');
-      ini.Add('master_pid='+ pid);
-      ini.Add('master_memory=' + IntToStr(SYS.PROCESS_MEMORY(pid)));
-      ini.Add('status='+SYS.PROCESS_STATUS(pid));
-
-
-   result:=ini.Text;
-   ini.free;
 end;
 //#####################################################################################
 procedure tdansguardian.DANSGUARDIAN_TAIL_STOP();

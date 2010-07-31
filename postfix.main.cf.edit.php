@@ -123,7 +123,7 @@ LoadAjax('main_maincf_datas','$page?table=yes&hostname={$_GET["hostname"]}');
 function popup_main(){
 	$tpl=new templates();
 	
-	echo "<H1>".$tpl->_ENGINE_parse_body('{perso_maincf}')."</H1>";
+	
 	echo "<div id='main_config_cf_datas'>";
 	main_config();
 	echo "</div>";
@@ -151,32 +151,26 @@ function main_config(){
 	
 	$page=CurrentPageName();
 	$options=array("r"=>"{replace}","a"=>"{add}");
-	$intro="<table style='width=100%'>
-	<tr>
-	<td valign='top'><p class=caption>{main_help}</p></td>
-	<td valign='top'>".applysettings_postfix() ."</td>
-	</tr>
-	</table>";
+	$intro="<p class=caption style='font-size:13px'>{main_help}</p>";
 	
 	$form1="
+	<hr>
 	<form name='FFM0'>
+	".Field_hidden("opt","r")."
 	<table style='width:100%'>
 	<tr>
-		<td width=1% nowrap><strong>{maincf_key}:</strong></td>
-		<td>" . Field_text('key',null,'width:100%')."</td>
-		<td width=1% nowrap><strong>{maincf_data}:</strong></td>
-		<td>" . Field_text('data',null,'width:100%')."</td>
-		<td width=1% nowrap><strong>{option}:</strong></td>
-		<td>" . Field_array_Hash($options,'opt')."</td>
-	</tr>
-	<tr>
-	<td colspan=6 align='right'><hr><input type='button' OnClick=\"javascript:ParseForm('FFM0','$page',true);ChargeTable();\" value='{add}&nbsp;&raquo;'></td>
+		<td width=1% nowrap><strong style='font-size:13px'>{maincf_key}:</strong></td>
+		<td>" . Field_text('key',null,'width:100%;font-size:13px;padding:3px')."</td>
+		<td width=1% nowrap><strong style='font-size:13px'>{maincf_data}:</strong></td>
+		<td>" . Field_text('data',null,'width:100%;font-size:13px;padding:3px')."</td>
+		<td>" . button('{add}',"ParseForm('FFM0','$page',true);ChargeTable();")."</td>
 	</tr>
 	</table>
+	<hr>
 	</form>
 	";
 	
-	$form1=RoundedLightGrey("$form1");
+	
 	$tpl=new templates();
 	echo $tpl->_ENGINE_parse_body("$intro$form1");
 	
@@ -200,31 +194,31 @@ function main_table(){
 		$fmname=md5($num);
 		$html=$html . "
 		
-		<div style='margin-top:3px;border:1px dotted #CCCCCC;padding-top:4px;width:100%;height:300px;overflow:auto'>
-		<form name='FFM_$fmname'>
-	<table style='width:100%' class=table_form>
-	<tr>
-		<td width=1% nowrap><strong>{maincf_key}:</strong></td>
-		<td>" . Field_text('key',$num,'width:100%')."</td>
-		<td width=1% nowrap><strong>{maincf_data}:</strong></td>
-		<td>" . Field_text('data',$val["VALUE"],'width:100%')."</td>
-		<td width=1% nowrap><strong>{option}:</strong></td>
-		<td>" . Field_array_Hash($options,'opt',$val["TYPE"])."</td>
-		<td width=1%>" . imgtootltip('ed_delete.gif','{delete}',"MainPersoDelete('$num')")."</td>
-	</tr>
-	<tr>
-	
-	<td colspan=7 align='right'>
-		<table style='width:100%'>
-			<tr>
-			<td width=99%><code>$num={$val["VALUE"]}</code>&nbsp;</td>
-			<td width=1% align='right'><input type='button' OnClick=\"javascript:ParseForm('FFM_$fmname','$page',true);ChargeTable()\" value='{edit}&nbsp;&raquo;'></td>
+		<div style='margin-top:3px;border:1px dotted #CCCCCC;padding-top:4px;width:99%;;overflow:auto'>
+				<form name='FFM_$fmname'>
+			<table style='width:99%'>
+			<tr ". CellRollOver().">
+				<td width=1% nowrap><strong style='font-size:13px'>{maincf_key}:</strong></td>
+				<td>" . Field_text('key',$num,'width:100%;font-size:13px;padding:3px')."</td>
+				<td width=1% nowrap><strong style='font-size:13px'>{maincf_data}:</strong></td>
+				<td>" . Field_text('data',$val["VALUE"],'width:100%;font-size:13px;padding:3px')."</td>
+				<td>" .Field_hidden("opt","r")."</td>
+				<td width=1%>" . imgtootltip('delete-32.png','{delete}',"MainPersoDelete('$num')")."</td>
 			</tr>
-		</table>
-	</td>
-	</tr>
-	</table>
-	</form></div>";
+			<tr>
+			
+			<td colspan=7 align='right'>
+				<table style='width:100%'>
+					<tr ". CellRollOver().">
+					<td width=99%><code style='font-size:13px'>$num={$val["VALUE"]}</code>&nbsp;</td>
+					<td width=1% align='right'>". button("{edit}","ParseForm('FFM_$fmname','$page',true);ChargeTable()")."</td>
+					</tr>
+				</table>
+			</td>
+			</tr>
+			</table>
+			</form>
+	</div>";
 		
 		
 	}

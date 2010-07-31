@@ -254,6 +254,7 @@ function _start_instance($hostname){
 	if(trim($hostname)==null){return;}
 	$pidfile="/var/spool/postfix-$hostname/pid/master.pid";
 	$unix=new unix();
+	if($GLOBALS["postmulti"]==null){$GLOBALS["postmulti"]=$unix->find_program("postmulti");}
 	$pid=$unix->get_pid_from_file($pidfile);
 	$main=new maincf_multi();
 	writelogs("$hostname:: Checking directories",__FUNCTION__,__FILE__,__LINE__);

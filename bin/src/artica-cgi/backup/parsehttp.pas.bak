@@ -358,15 +358,7 @@ RegExpr.expression:='^ClusterDisableSlave';
        exit(true);
   end;
 
-RegExpr.expression:='^ChangeCyrusPassword:(.+)';
-  if RegExpr.Exec(uri) then begin
-       ldap:=topenldap.Create;
-       ldap.set_LDAP('cyrus_password',RegExpr.Match[1]);
-       fpsystem('/usr/share/artica-postfix/bin/process1 --force verbose password-cyrus');
-       GLOBAL_INI.THREAD_COMMAND_SET(GLOBAL_INI.get_ARTICA_PHP_PATH()+'/bin/artica-install --cyrus-checkconfig');
-       GLOBAL_INI.THREAD_COMMAND_SET('/etc/init.d/artica-postfix restart imap');
-       exit(true);
-  end;
+
 
 RegExpr.expression:='^LaunchRemoteInstall';
   if RegExpr.Exec(uri) then begin
@@ -3516,17 +3508,6 @@ RegExpr.expression:='dansguardian_service:(.+)';
         exit;
     end;
 
-
-RegExpr.expression:='miltergl';
-    if RegExpr.Exec(uri) then begin
-        tmpstr:=logs.FILE_TEMP();
-        logs.logs('ParseUri::  -> milter-greylist config');
-        fpsystem(GLOBAL_INI.get_ARTICA_PHP_PATH() + '/bin/artica-ldap -milter-greylist --verbose >'+tmpstr+' 2>&1');
-        FileData.Add(logs.ReadFromFile(tmpstr));
-        logs.DeleteFile(tmpstr);
-        result:=true;
-        exit;
-    end;
 
 RegExpr.expression:='MILTER_GREYLIST_STATUS';
     if RegExpr.Exec(uri) then begin

@@ -54,7 +54,6 @@ public
     procedure   MILTER_START();
     procedure   MILTER_STOP();
     function    MILTER_VERSION():string;
-    FUNCTION    MILTER_STATUS():string;
     FUNCTION    MILTER_DEFAULT_PATH():string;
     procedure   CHANGE_INITD_MILTER();
     function    rewrite_header():string;
@@ -148,8 +147,7 @@ end;
 //##############################################################################
 FUNCTION Tspamass.MILTER_DAEMON_BIN_PATH():string;
 begin
-if FileExists('/usr/local/sbin/spamass-milter') then exit('/usr/local/sbin/spamass-milter');
-if FileExists('/usr/sbin/spamass-milter') then exit('/usr/sbin/spamass-milter');
+result:=SYS.LOCATE_GENERIC_BIN('spamass-milter');
 end;
 //##############################################################################
 function  Tspamass.RAZOR_AGENT_CONF_PATH():string;
@@ -557,46 +555,6 @@ fpsystem(MILTER_DAEMON_BIN_PATH() +' -h >/opt/artica/logs/spamass-v 2>&1');
     SYS.SET_CACHE_VERSION('APP_SPAMASSASSIN_MILTER',result);
 end;
 //#############################################################################
-FUNCTION Tspamass.MILTER_STATUS():string;
-var
-   ini:TstringList;
-begin
-if not FileExists(MILTER_DAEMON_BIN_PATH()) then exit;
-if not SYS.ISMemoryHiger1G() then SpamAssMilterEnabled:=0;
-
-
-      ini:=TstringList.Create;
-      ini.Add('[SPAMASS_MILTER]');
-      ini.Add('service_name=APP_SPAMASS_MILTER');
-      ini.Add('service_cmd=spamd');
-      ini.Add('service_disabled='+ IntToStr(SpamAssMilterEnabled));
-      ini.Add('master_version=' + MILTER_VERSION());
-
-      if SpamAssMilterEnabled=0 then begin
-         result:=ini.Text;
-         ini.free;
-         SYS.MONIT_DELETE('SPAMASS_MILTER');
-         exit;
-      end;
-
-      if SYS.MONIT_CONFIG('SPAMASS_MILTER','/var/run/spamass/spamass.pid','spamd') then begin
-         ini.Add('monit=1');
-         result:=ini.Text;
-         ini.free;
-         exit;
-      end;
-
-      if SYS.PROCESS_EXIST(MILTER_PID()) then ini.Add('running=1') else  ini.Add('running=0');
-      ini.Add('application_installed=1');
-      ini.Add('master_pid='+ MILTER_PID());
-      ini.Add('master_memory=' + IntToStr(SYS.PROCESS_MEMORY(MILTER_PID())));
-      ini.Add('status='+SYS.PROCESS_STATUS(MILTER_PID()));
-
-      
-      result:=ini.Text;
-      ini.free;
-end;
-//#########################################################################################
 function Tspamass.ReadFileIntoString(path:string):string;
 var
    List:TstringList;
@@ -940,43 +898,15 @@ end;
 //##############################################################################
 FUNCTION Tspamass.SPAMASSASSIN_STATUS():string;
 var
-   ini:TstringList;
-   pid:string;
+   pidpath:string;
 begin
 if not FileExists(SPAMASSASSIN_BIN_PATH()) then exit;
-   ini:=TstringList.Create;
-   ini.Add('[SPAMASSASSIN]');
-   ini.Add('service_name=APP_SPAMASSASSIN');
-   ini.Add('pattern_version=' + SPAMASSASSIN_PATTERN_VERSION());
-   ini.Add('service_disabled='+ IntToStr(SpamdEnabled));
-   ini.Add('master_version=' + SPAMASSASSIN_VERSION());
-   ini.Add('service_cmd=spamd');
-
-   if SpamdEnabled=0 then begin
-      SYS.MONIT_DELETE('APP_SPAMASSASSIN');
-      result:=ini.Text;
-      ini.free;
-      pid:=SPAMASSASSIN_PID();
-      if SYS.PROCESS_EXIST(SPAMASSASSIN_PID()) then SPAMASSASSIN_STOP();
-      exit;
-   end;
-
-   if SYS.MONIT_CONFIG('APP_SPAMASSASSIN','/var/run/spamd.pid','spamd') then begin
-      ini.Add('monit=1');
-      result:=ini.Text;
-      ini.free;
-      exit;
-   end;
-
-
-      pid:=SPAMASSASSIN_PID();
-      if SYS.PROCESS_EXIST(SPAMASSASSIN_PID()) then ini.Add('running=1') else  ini.Add('running=0');
-      ini.Add('application_installed=1');
-      ini.Add('master_pid='+ pid);
-      ini.Add('master_memory=' + IntToStr(SYS.PROCESS_MEMORY(pid)));
-      ini.Add('status='+SYS.PROCESS_STATUS(pid));
-      result:=ini.Text;
-      ini.free;
+SYS.MONIT_DELETE('APP_SPAMASSASSIN');
+SYS.MONIT_DELETE('SPAMASS_MILTER');
+pidpath:=logs.FILE_TEMP();
+fpsystem(SYS.LOCATE_PHP5_BIN()+' /usr/share/artica-postfix/exec.status.php --spamassassin >'+pidpath +' 2>&1');
+result:=logs.ReadFromFile(pidpath);
+logs.DeleteFile(pidpath);
 end;
 //#########################################################################################
 procedure Tspamass.DEFAULT_SETTINGS();

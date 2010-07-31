@@ -6,7 +6,7 @@ unit assp;
 interface
 
 uses
-    Classes, SysUtils,variants,strutils,IniFiles, Process,logs,unix,RegExpr,zsystem,openldap,mysql_daemon,tcpip;
+    Classes, SysUtils,variants,strutils,IniFiles, Process,logs,unix,RegExpr,zsystem,openldap,tcpip;
 
 
 
@@ -39,7 +39,7 @@ public
     procedure   STOP();
     procedure   CHECK_POSTFIX();
     FUNCTION    STATUS():string;
-    function    RELOAD():string;
+    procedure    RELOAD();
 END;
 
 implementation
@@ -115,7 +115,7 @@ end;
 
 
 //#############################################################################
-function tassp.RELOAD():string;
+procedure tassp.RELOAD();
 var
    pid:string;
 begin
@@ -210,7 +210,8 @@ var
    mynets:string;
    matchedIp:string;
 begin
-
+noSpoofingCheckIP:='';
+mynets:='';
 tcp:=ttcpip.Create;
 z:=Tstringlist.Create;
 z.AddStrings(tcp.InterfacesStringList());
@@ -324,7 +325,7 @@ begin
    cmd:='/usr/share/assp/assp.pl >/dev/null 2>&1 &';
    logs.DebugLogs('Starting......: ASSP '+ cmd);
    fpsystem(cmd);
-
+   ck:=0;
    pid:=PID_NUM();
        while not SYS.PROCESS_EXIST(pid) do begin
            pid:=PID_NUM();

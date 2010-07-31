@@ -18,7 +18,6 @@ private
      LOGS:Tlogs;
      SYS:TSystem;
      artica_path:string;
-     cdirlist:string;
 public
     procedure   Free;
     constructor Create(const zSYS:Tsystem);
@@ -28,7 +27,6 @@ public
     function    BIN_PATH():string;
     function    VERSIONNUM():integer;
     procedure   START();
-    procedure   STOP();
     function    STATUS:string;
     procedure   RELOAD();
     procedure   BuildStatus();
@@ -107,11 +105,6 @@ SYS.SET_CACHE_VERSION('APP_SQUIDGUARD',result);
 end;
 //#############################################################################
 procedure tsquidguard.START();
-var
-   count:integer;
-   pid:string;
-   loglevel:integer;
-   straces:string;
 begin
 
 end;

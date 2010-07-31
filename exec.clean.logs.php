@@ -162,12 +162,8 @@ function dirsize($path){
 function CleanDirLogs($path){
 	$BigSize=false;
 	if($path=='/var/log'){$BigSize=true;}
-if($GLOBALS["ArticaMaxLogsSize"]<100){
-   $BigSize=false;
-   writelogs('Bad parameter ArticaMaxLogsSize is less than 100mb, skip it for security reason..',__FUNCTION__,__FILE__,__LINE__);
-}
-$maxday=($GLOBALS["MaxTempLogFilesDay"]*24)*60; 
-
+	if($GLOBALS["ArticaMaxLogsSize"]<100){$GLOBALS["ArticaMaxLogsSize"]=100;}
+	$maxday=($GLOBALS["MaxTempLogFilesDay"]*24)*60; 
 
 $unix=new unix();
 $files=$unix->DirRecursiveFiles($path);

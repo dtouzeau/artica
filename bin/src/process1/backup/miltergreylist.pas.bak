@@ -6,7 +6,7 @@ unit miltergreylist;
 interface
 
 uses
-    Classes, SysUtils,variants,strutils,IniFiles, Process,md5,logs,unix,RegExpr in 'RegExpr.pas',zsystem;
+    Classes, SysUtils,variants,strutils,Process,logs,unix,RegExpr in 'RegExpr.pas',zsystem;
 
   type
   tmilter_greylist=class
@@ -14,16 +14,16 @@ uses
 
 private
      LOGS:Tlogs;
-     D:boolean;
-     GLOBAL_INI:TiniFIle;
      SYS:TSystem;
      artica_path:string;
+     why_is_disabled:string;
      EnableASSP:integer;
      MilterGreyListEnabled:integer;
      MilterGreyListEnabled_string:string;
      EnablePostfixMultiInstance:integer;
      procedure START_WITHOUT_INITD(NotRepairIfFailed:boolean=false);
      procedure FIX_START_ERROR();
+
 public
     procedure   Free;
     constructor Create(const zSYS:Tsystem);
@@ -66,13 +66,14 @@ begin
 
        if MilterGreyListEnabled=1 then begin
           if EnableASSP=1 then begin
-             //logs.Debuglogs('tmilter_greylist.Create() :: ASSP is enabled, disable milter-greylist');
+             why_is_disabled:=' ASSP do the same feature';
              MilterGreyListEnabled:=0;
           end;
 
           if EnablePostfixMultiInstance=1 then begin
+             why_is_disabled:='multiple postfix instances enabled';
              MilterGreyListEnabled:=0;
-             logs.Debuglogs('tmilter_greylist.Create() :: Postfix multiple instance is enabled, disable milter-greylist');
+             //logs.Debuglogs('tmilter_greylist.Create() :: Postfix multiple instance is enabled, disable milter-greylist');
           end;
        end;
 
@@ -174,49 +175,25 @@ end;
  //##############################################################################
  function tmilter_greylist.MILTER_GREYLIST_BIN_PATH():string;
 begin
-if FileExists('/usr/local/bin/milter-greylist') then exit('/usr/local/bin/milter-greylist');
-if FileExists('/usr/sbin/milter-greylist') then exit('/usr/sbin/milter-greylist');
-if FileExists('/usr/bin/milter-greylist') then exit('/usr/bin/milter-greylist');
-if FileExists('/opt/artica/bin/milter-greylist') then exit('/opt/artica/bin/milter-greylist');
+result:=sys.LOCATE_GENERIC_BIN('milter-greylist');
 end;
  //##############################################################################
 FUNCTION tmilter_greylist.STATUS():string;
- var ini     :TstringList;
+var  pidpath:string;
 begin
 
-   if not FileExists(MILTER_GREYLIST_BIN_PATH()) then exit;
-
-
-   ini:=TstringList.Create;
-   ini.Add('[MILTER_GREYLIST]');
-      ini.Add('service_name=APP_MILTERGREYLIST');
-      ini.Add('service_cmd=mgreylist');
-      ini.Add('service_disabled='+IntToStr(MilterGreyListEnabled));
-      ini.Add('remove_cmd=--milter-grelist-remove');
-      ini.Add('master_version='+VERSION());
-     if MilterGreyListEnabled=0 then begin
-         result:=ini.Text;
-         ini.free;
-         SYS.MONIT_DELETE('APP_MILTERGREYLIST');
-         exit;
-     end;
-
-      if SYS.MONIT_CONFIG('APP_MILTERGREYLIST',MILTER_GREYLIST_PID_PATH(),'mgreylist') then begin
-         ini.Add('monit=1');
-         result:=ini.Text;
-         ini.free;
-         exit;
-      end;
-
-      if SYS.PROCESS_EXIST(MILTER_GREYLIST_PID()) then ini.Add('running=1') else  ini.Add('running=0');
-      ini.Add('application_installed=1');
-      ini.Add('master_pid='+ MILTER_GREYLIST_PID());
-      ini.Add('master_memory=' + IntToStr(SYS.PROCESS_MEMORY(MILTER_GREYLIST_PID())));
-      ini.Add('status='+SYS.PROCESS_STATUS(MILTER_GREYLIST_PID()));
-      result:=ini.Text;
-      ini.free;
+if not FileExists(MILTER_GREYLIST_BIN_PATH()) then begin
+   SYS.MONIT_DELETE('APP_MILTERGREYLIST');
+   exit;
 end;
-//******************************************************************************
+SYS.MONIT_DELETE('APP_MILTERGREYLIST');
+if not FileExists(MILTER_GREYLIST_BIN_PATH()) then exit;
+pidpath:=logs.FILE_TEMP();
+fpsystem(SYS.LOCATE_PHP5_BIN()+' /usr/share/artica-postfix/exec.status.php --milter-greylist >'+pidpath +' 2>&1');
+result:=logs.ReadFromFile(pidpath);
+logs.DeleteFile(pidpath);
+end;
+ //##############################################################################
  procedure tmilter_greylist.MILTER_GREYLIST_STOP();
  var
     count:integer;
@@ -224,6 +201,11 @@ end;
 begin
 count:=0;
   if not FileExists(MILTER_GREYLIST_BIN_PATH()) then exit;
+
+    if EnablePostfixMultiInstance=1 then begin
+       fpsystem(SYS.LOCATE_PHP5_BIN() +'/usr/share/artica-postfix/exec.milter-greylist.php --stop');
+       exit;
+    end;
 
   if not SYS.PROCESS_EXIST(SYS.PIDOF(MILTER_GREYLIST_BIN_PATH())) then begin
       writeln('Stopping milter-greylist.....: Already stopped');             
@@ -436,7 +418,6 @@ end;
 function tmilter_greylist.MILTER_GREYLIST_ETC_DEFAULT():string;
 var
    l:TstringList;
-   D:boolean;
 begin
 result:='';
 if not FileExists('/etc/default/milter-greylist') then exit;
@@ -598,14 +579,10 @@ end;
 procedure tmilter_greylist.MILTER_GREYLIST_START();
 var
 
-   configfile:string;
-   cmd:string;
-   count:integer;
    socketPath:string;
    user:string;
    pid_path:string;
    pid_dir:string;
-   RegExpr:TRegExpr;
    FullSocketPath:string;
 begin
 
@@ -617,9 +594,13 @@ begin
        exit;
     end;
 
+    if EnablePostfixMultiInstance=1 then begin
+       fpsystem(SYS.LOCATE_PHP5_BIN() +' /usr/share/artica-postfix/exec.milter-greylist.php --start');
+       exit;
+    end;
     logs.Debuglogs('MILTER_GREYLIST_START:: MilterGreyListEnabled_string -> "' + MilterGreyListEnabled_string+'" MilterGreyListEnabled="'+IntToStr(MilterGreyListEnabled) +'" EnableASSP="'+IntToStr(EnableASSP)+'" EnablePostfixMultiInstance="'+IntToStr(EnablePostfixMultiInstance)+'"');
     if MilterGreyListEnabled=0 then begin
-       logs.Debuglogs('Starting......: milter-greylist is disabled by artica');
+       logs.Debuglogs('Starting......: milter-greylist is disabled by artica ('+why_is_disabled+')');
        exit;
     end else begin
 
@@ -634,12 +615,13 @@ begin
   end;
   
    logs.Syslogs('Starting......: milter-greylist');
+
+   if not sys.COMMANDLINE_PARAMETERS('--noconfig') then fpsystem(SYS.LOCATE_PHP5_BIN()+' /usr/share/artica-postfix/exec.milter-greylist.php --norestart');
+
    FIX_RACL();
 
-   MILTER_GREYLIST_SET_VALUE('pidfile','/var/run/milter-greylist/milter-greylist.pid');
-   MILTER_GREYLIST_SET_VALUE('socket','/var/run/milter-greylist/milter-greylist.sock');
-   MILTER_GREYLIST_SET_VALUE('user','postfix');
-   pid_path:=MILTER_GREYLIST_PID_PATH();
+
+   pid_path:='/var/run/milter-greylist/milter-greylist.pid';
    user:='postfix';
    socketPath:=CheckSocket();
    FullSocketPath:=socketPath;
@@ -750,12 +732,10 @@ var
     RegExpr:TRegExpr;
     i:integer;
     l:Tstringlist;
-    confpath,confpath2,socketPath,pid_path,daemon_bin,tmpstr,cmd:string;
-    f:boolean;
+    confpath,confpath2,daemon_bin,tmpstr,cmd:string;
+
 begin
-daemon_bin:=MILTER_GREYLIST_BIN_PATH();
- pid_path:=MILTER_GREYLIST_PID_PATH();
- socketPath:=MILTER_GREYLIST_GET_VALUE('socket');
+ daemon_bin:=MILTER_GREYLIST_BIN_PATH();
  confpath:=MILTER_GREYLIST_CONF_PATH();
 
  tmpstr:=logs.FILE_TEMP();

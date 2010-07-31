@@ -18,7 +18,6 @@ private
      LOGS:Tlogs;
      SYS:TSystem;
      artica_path:string;
-     cdirlist:string;
     procedure   WRITE_INITD();
     function   INIT_D_PATH():string;
 public
@@ -35,7 +34,7 @@ public
     function    STATUS:string;
     procedure   RELOAD();
     procedure   BuildStatus();
-    function    wakeup():string;
+    procedure    wakeup();
 END;
 
 implementation
@@ -80,12 +79,11 @@ begin
     result:=sys.GET_PID_FROM_PATH('/var/run/monit/monit.pid');
 end;
 //##############################################################################
-function tmonit.wakeup():string;
+procedure tmonit.wakeup();
 var
     RegExpr:TRegExpr;
     FileDatas:TStringList;
     i:integer;
-    BinPath:string;
     filetmp:string;
     monitored:integer;
 begin
@@ -118,7 +116,6 @@ var
     RegExpr:TRegExpr;
     FileDatas:TStringList;
     i:integer;
-    BinPath:string;
     filetmp:string;
 begin
 
@@ -221,8 +218,8 @@ procedure tmonit.START();
 var
    count:integer;
    pid:string;
-   loglevel:integer;
-   straces:string;
+
+
 begin
     pid:=PID_NUM();
 
@@ -277,12 +274,10 @@ procedure tmonit.STOP();
 var
    count:integer;
    pid:string;
-   tmp:string;
-   l:Tstringlist;
    i:integer;
-   tt:integer;
-   path:string;
-    RegExpr:TRegExpr;
+
+
+
 begin
 
 

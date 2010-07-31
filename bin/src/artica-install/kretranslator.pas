@@ -268,9 +268,9 @@ end;
 function tkretranslator.STATUS():string;
 var
    ini:TstringList;
-   pid:string;
+   pid,pidpath:string;
 begin
-
+ SYS.MONIT_DELETE('APP_KRETRANSLATOR_HTTPD');
  pid:=PID_NUM();
  ini:=TstringList.Create;
  if not FileExists(bin_path()) then exit;
@@ -288,35 +288,15 @@ begin
  ini.Add('pattern_version='+PATTERN_DATE());
  ini.Add('service_cmd=retranslator-tsk');
  ini.Add('');
- ini.Add('[KRETRANSLATOR_HTTPD]');
- ini.Add('master_version='+LIGHTTPD_VERSION());
- ini.Add('service_name=APP_KRETRANSLATOR_HTTPD');
- ini.Add('service_cmd=retranslator');
+pidpath:=logs.FILE_TEMP();
+fpsystem(SYS.LOCATE_PHP5_BIN()+' /usr/share/artica-postfix/exec.status.php --retranslator >'+pidpath +' 2>&1');
+ini.Add(logs.ReadFromFile(pidpath));
+logs.DeleteFile(pidpath);
 
- if RetranslatorHttpdEnabled=0 then begin
-     ini.Add('service_disabled='+IntToStr(RetranslatorHttpdEnabled));
-     SYS.MONIT_DELETE('APP_KRETRANSLATOR_HTTPD');
-     result:=ini.Text;
-     ini.free;
-     exit;
- end;
+result:=ini.Text;
+ini.Free;
 
-if SYS.MONIT_CONFIG('APP_KRETRANSLATOR_HTTPD','/var/run/lighttpd/lighttpd-retranslator.pid','retranslator') then begin
-   ini.Add('monit=1');
-   result:=ini.Text;
-   ini.free;
-   exit;
-end;
 
- pid:=PID_HTTP();
- if SYS.PROCESS_EXIST(pid) then ini.Add('running=1') else  ini.Add('running=0');
- ini.Add('master_pid='+pid);
- ini.Add('application_installed=1');
- ini.Add('master_memory='+ IntToStr(SYS.PROCESS_MEMORY(pid)));
- ini.Add('status='+SYS.PROCESS_STATUS(pid));
- ini.Add('service_disabled='+IntToStr(RetranslatorHttpdEnabled));
- result:=ini.Text;
- ini.free;
 
 end;
 //##############################################################################

@@ -277,7 +277,7 @@ $users=new usersMenus();
 	if($_GET["hostname"]==null){$hostname=$users->hostname;$_GET["hostname"]=$hostname;}else{$hostname=$_GET["hostname"];}		
 	$ini=new Bs_IniHandler();
 	$sock=new sockets();
-	$ini->loadString($sock->getfile('cyrus_imap_status',$_GET["hostname"]));	
+	$ini->loadString(base64_decode($sock->getFrameWork('cmd.php?cyrus-imap-status=yes')));
 	if($ini->_params["CYRUSIMAP"]["running"]==0){
 		$img="okdanger32.png";
 		$status="{stopped}";

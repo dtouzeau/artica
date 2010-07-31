@@ -545,8 +545,6 @@ function index_page(){
 	$status=status(1);
 	
 	$html="
-	<H1>{APP_OPENVPN}</H1>
-	
 	<table style='width:100%'>
 	<tr>
 		<td valign='top'><p class=caption>{APP_OPENVPN_TEXT}</p></td>

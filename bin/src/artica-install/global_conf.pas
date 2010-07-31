@@ -161,7 +161,6 @@ public
       function ARTICA_MAKE_STATUS():string;
 
       //GDM
-      function     GDM_PID():string;
       function     GDM_STATUS():string;
       function     GDM_VERSION():string;
 
@@ -198,7 +197,6 @@ public
 
       //CONSOLE-KIT
       function       CONSOLEKIT_STATUS():string;
-      function       CONSOLEKIT_PID():string;
 
       //SYSLOGGER
       procedure      SYSLOGER_STOP();
@@ -1964,36 +1962,14 @@ s:='';
          RegExpr.Free;
 end;
 //##############################################################################
-function myconf.CONSOLEKIT_PID():string;
-begin
-    result:='';
-    if FileExists('/usr/sbin/console-kit-daemon') then begin
-       result:=SYS.PIDOF('/usr/sbin/console-kit-daemon');
-    end;
-end;
-//##############################################################################
 function myconf.CONSOLEKIT_STATUS():string;
 var
-   ini:TstringList;
-   pid:string;
+   pidpath:string;
 begin
-if not FileExists('/usr/sbin/console-kit-daemon') then exit;
-ini:=TstringList.Create;
-pid:=CONSOLEKIT_PID();
-   ini.Add('[CONSOLEKIT]');
-   if SYS.PROCESS_EXIST(pid) then ini.Add('running=1') else  ini.Add('running=0');
-   ini.Add('application_installed=1');
-   ini.Add('master_pid='+ pid);
-   ini.Add('master_memory=' + IntToStr(SYS.PROCESS_MEMORY(pid)));
-   ini.Add('master_version=0.00');
-   ini.Add('status='+SYS.PROCESS_STATUS(pid));
-   ini.Add('service_name=APP_CONSOLEKIT');
-   if not SYS.PROCESS_EXIST(pid) then begin
-         ini.Add('service_disabled=1');
-   end;
-   result:=ini.Text;
-   ini.free;
-
+   pidpath:=logs.FILE_TEMP();
+   fpsystem(SYS.LOCATE_PHP5_BIN()+' /usr/share/artica-postfix/exec.status.php --console-kit >'+pidpath +' 2>&1');
+   result:=logs.ReadFromFile(pidpath);
+   logs.DeleteFile(pidpath);
 end;
 //#########################################################################################
 function MyConf.get_SELINUX_ENABLED():boolean;
@@ -9760,7 +9736,7 @@ FUNCTION myconf.GLOBAL_STATUS():string;
  monit:tmonit;
  zarafa_server:tzarafa_server;
  zwifi:twifi;
-
+ opengoo:topengoo;
 begin
 LSHW_TIME:=0;
 INSTANT_SEARCH();
@@ -9790,19 +9766,18 @@ INSTANT_SEARCH();
    Messagerie:=true;
    ini:='';
 
+   opengoo:=topengoo.Create(SYS);
+   ini:=ini+ opengoo.STATUS()+CRLF;
+   opengoo.free;
+
+
+
 // ------------------------------------ SQUID ------------------------------------
 
    if FileExists(squid.SQUID_BIN_PATH()) then begin
       ini:=ini+ squid.SQUID_STATUS() + CRLF;
-      ini:=ini+ kav4proxy.KAV4PROXY_STATUS()+ CRLF;
-      ini:=ini+dansguardian.C_ICAP_STATUS()+CRLF;
-      ini:=ini+dansguardian.DANSGUARDIAN_TAIL_STATUS()+CRLF;
-      ini:=ini+dansguardian.DANSGUARDIAN_STATUS()+CRLF;
-      ini:=ini+SYSLOGER_STATUS()+CRLF;
-      ini:=ini+squid.TAIL_STATUS()+CRLF;
-      ini:=ini+ squid.PROXY_PAC_STATUS()+CRLF;
    end;
-
+   ini:=ini+SYSLOGER_STATUS()+CRLF;
    POSFTIX_POSTCONF_PATH:=postfix.POSFTIX_POSTCONF_PATH();
    logs.Debuglogs('postfix.POSFTIX_POSTCONF_PATH()='+POSFTIX_POSTCONF_PATH);
 if not FileExists(POSFTIX_POSTCONF_PATH) then begin
@@ -10007,14 +9982,11 @@ end;
      ini:=ini+fetchmail.STATUS()+CRLF;
 
 
-     //clamav-milter
-     logs.Debuglogs('clamav milter STATUS ----------------------------------');
-     ini:=ini+clamav.MILTER_STATUS()+CRLF;
 
      //spamassassin
      logs.Debuglogs('SPAMASSASSIN_STATUS STATUS ----------------------------------');
      ini:=ini+spamass.SPAMASSASSIN_STATUS()+CRLF;
-     ini:=ini+spamass.MILTER_STATUS()+CRLF;
+
 
      //milter-greylist
      logs.Debuglogs('SPAMASSASSIN_STATUS STATUS ----------------------------------');
@@ -10151,9 +10123,8 @@ ini:=ini+ fdm.STATUS()+CRLF;
 //clamav
    logs.Debuglogs('CLAMAV_STATUS STATUS ---------------------------------- (monit)');
    ini:=ini+clamav.CLAMAV_STATUS()+CRLF;
-   ini:=ini+clamav.CLAMSCAN_STATUS()+CRLF;
    logs.Debuglogs('starting status FRESHCLAM_STATUS');
-   ini:=ini+clamav.FRESHCLAM_STATUS()+CRLF;
+
 
 // ------------------------------------ SAMBA ------------------------------------
 if fileExists(samba.SMBD_PATH()) then begin
@@ -11242,24 +11213,12 @@ end;
 //#########################################################################################
 function myconf.GDM_STATUS():string;
 var
-   ini:TstringList;
+pidpath:string;
 begin
-
-   if Not FileExists('/usr/sbin/gdm') then exit;
-   ini:=TstringList.Create;
-
-   ini.Add('[GDM]');
-
-   if SYS.PROCESS_EXIST(GDM_PID()) then ini.Add('running=1') else  ini.Add('running=0');
-   ini.Add('application_installed=1');
-   ini.Add('master_pid='+ GDM_PID());
-   ini.Add('master_memory=' + IntToStr(SYS.PROCESS_MEMORY(GDM_PID())));
-   ini.Add('master_version=' + GDM_VERSION());
-   ini.Add('status='+SYS.PROCESS_STATUS(GDM_PID()));
-   ini.Add('service_name=APP_GDM');
-   result:=ini.Text;
-   ini.free;
-
+   pidpath:=logs.FILE_TEMP();
+   fpsystem(SYS.LOCATE_PHP5_BIN()+' /usr/share/artica-postfix/exec.status.php --gdm >'+pidpath +' 2>&1');
+   result:=logs.ReadFromFile(pidpath);
+   logs.DeleteFile(pidpath);
 end;
 //#########################################################################################
 function myconf.ARTICA_MAKE_STATUS():string;
@@ -11291,28 +11250,32 @@ begin
 
 end;
 //#########################################################################################
-function myconf.GDM_PID():string;
-begin
-  result:=SYS.GET_PID_FROM_PATH('/var/run/gdm.pid');
-end;
-//#########################################################################################
 function myconf.GDM_VERSION():string;
  var
     RegExpr:TRegExpr;
     filetemp:string;
-
+    gdm_bin:string;
+    SYS:Tsystem;
+    LOGS:Tlogs;
 begin
-  if Not FileExists('/usr/sbin/gdm') then exit;
+  SYS:=Tsystem.Create();
+  logs:=Tlogs.Create;
+  gdm_bin:=SYS.LOCATE_GENERIC_BIN('gdm');
+  if length(gdm_bin)=0 then exit;
+
+  result:=SYS.GET_CACHE_VERSION('APP_GDM');
+  if length(result)>2 then exit;
   RegExpr:=TRegExpr.Create;
   filetemp:=LOGS.FILE_TEMP();
-  fpsystem('/usr/sbin/gdm --version >' + filetemp + ' 2>&1');
+ // writeln(gdm_bin+' --version');
+  fpsystem(gdm_bin+' --version >' + filetemp + ' 2>&1');
   if not FileExists(filetemp) then exit;
   RegExpr.Expression:='GDM\s+([0-9\.]+)';
   RegExpr.Exec(LOGS.ReadFromFile(filetemp));
   logs.DeleteFile(filetemp);
   result:=RegExpr.Match[1];
   RegExpr.free;
-
+  SYS.SET_CACHE_VERSION('APP_GDM',result);
 
 end;
 //#########################################################################################
@@ -11587,37 +11550,14 @@ RegExpr.free;
 end;
 //#############################################################################
  function myconf.BOA_DAEMON_STATUS():string;
-
-         const
-            CR = #$0d;
-            LF = #$0a;
-            CRLF = CR + LF;
-
  var
-    ini:string;
-    pid:string;
+    pidpath:string;
  begin
-      //
-  ini:='';
-  logs.Debuglogs('starting status BOA');
-  ini:=ini+ '[BOA]'+CRLF;
-  ini:=ini+ 'service_name=APP_BOA'+CRLF;
-  ini:=ini+ 'service_cmd=boa'+CRLF;
-  ini:=ini+ 'master_version=0.94.13'+CRLF;
-  if SYS.MONIT_CONFIG('APP_BOA','/etc/artica-postfix/boa.pid','boa') then begin
-   ini:=ini+ 'monit=1'+CRLF;
-   exit(ini);
-  end;
-
-  pid:=BOA_DAEMON_GET_PID();
-  if SYS.PROCESS_EXIST(pid) then ini:=ini+ 'running=1'+CRLF else  ini:=ini+ 'running=0'+CRLF;
-  ini:=ini+ 'application_installed=1'+CRLF;
-  ini:=ini+ 'master_pid='+ pid+CRLF;
-  ini:=ini+ 'master_memory=' + IntToStr(SYS.PROCESS_MEMORY(pid))+CRLF;
-
-  ini:=ini+ 'status='+SYS.PROCESS_STATUS(pid)+CRLF;
-
-  result:=ini;
+  SYS.MONIT_DELETE('APP_BOA');
+  pidpath:=logs.FILE_TEMP();
+  fpsystem(SYS.LOCATE_PHP5_BIN()+' /usr/share/artica-postfix/exec.status.php --boa >'+pidpath +' 2>&1');
+  result:=logs.ReadFromFile(pidpath);
+  logs.DeleteFile(pidpath);
 end;
 //#############################################################################
 function myconf.LMB_LUNDIMATIN_VERSION():string;

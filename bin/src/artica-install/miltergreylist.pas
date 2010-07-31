@@ -6,7 +6,7 @@ unit miltergreylist;
 interface
 
 uses
-    Classes, SysUtils,variants,strutils,IniFiles, Process,md5,logs,unix,RegExpr in 'RegExpr.pas',zsystem;
+    Classes, SysUtils,variants,strutils,Process,logs,unix,RegExpr in 'RegExpr.pas',zsystem;
 
   type
   tmilter_greylist=class
@@ -14,8 +14,6 @@ uses
 
 private
      LOGS:Tlogs;
-     D:boolean;
-     GLOBAL_INI:TiniFIle;
      SYS:TSystem;
      artica_path:string;
      why_is_disabled:string;
@@ -188,15 +186,8 @@ if not FileExists(MILTER_GREYLIST_BIN_PATH()) then begin
    SYS.MONIT_DELETE('APP_MILTERGREYLIST');
    exit;
 end;
-
-   if not FileExists(MILTER_GREYLIST_BIN_PATH()) then exit;
-
-if MilterGreyListEnabled=1 then begin
-   SYS.MONIT_CONFIG('APP_MILTERGREYLIST',MILTER_GREYLIST_PID_PATH(),'mgreylist');
-end else begin
-   SYS.MONIT_DELETE('APP_MILTERGREYLIST');
-end;
-
+SYS.MONIT_DELETE('APP_MILTERGREYLIST');
+if not FileExists(MILTER_GREYLIST_BIN_PATH()) then exit;
 pidpath:=logs.FILE_TEMP();
 fpsystem(SYS.LOCATE_PHP5_BIN()+' /usr/share/artica-postfix/exec.status.php --milter-greylist >'+pidpath +' 2>&1');
 result:=logs.ReadFromFile(pidpath);
@@ -212,7 +203,7 @@ count:=0;
   if not FileExists(MILTER_GREYLIST_BIN_PATH()) then exit;
 
     if EnablePostfixMultiInstance=1 then begin
-       fpsystem(SYS.LOCATE_PHP5_BIN() +'/usr/share/artica-postfix/exec.milter-greylist.php --stop');
+       fpsystem(SYS.LOCATE_PHP5_BIN() +' /usr/share/artica-postfix/exec.milter-greylist.php --stop');
        exit;
     end;
 
@@ -427,7 +418,6 @@ end;
 function tmilter_greylist.MILTER_GREYLIST_ETC_DEFAULT():string;
 var
    l:TstringList;
-   D:boolean;
 begin
 result:='';
 if not FileExists('/etc/default/milter-greylist') then exit;
@@ -589,14 +579,10 @@ end;
 procedure tmilter_greylist.MILTER_GREYLIST_START();
 var
 
-   configfile:string;
-   cmd:string;
-   count:integer;
    socketPath:string;
    user:string;
    pid_path:string;
    pid_dir:string;
-   RegExpr:TRegExpr;
    FullSocketPath:string;
 begin
 
@@ -609,7 +595,7 @@ begin
     end;
 
     if EnablePostfixMultiInstance=1 then begin
-       fpsystem(SYS.LOCATE_PHP5_BIN() +'/usr/share/artica-postfix/exec.milter-greylist.php --start');
+       fpsystem(SYS.LOCATE_PHP5_BIN() +' /usr/share/artica-postfix/exec.milter-greylist.php --start');
        exit;
     end;
     logs.Debuglogs('MILTER_GREYLIST_START:: MilterGreyListEnabled_string -> "' + MilterGreyListEnabled_string+'" MilterGreyListEnabled="'+IntToStr(MilterGreyListEnabled) +'" EnableASSP="'+IntToStr(EnableASSP)+'" EnablePostfixMultiInstance="'+IntToStr(EnablePostfixMultiInstance)+'"');
@@ -746,12 +732,10 @@ var
     RegExpr:TRegExpr;
     i:integer;
     l:Tstringlist;
-    confpath,confpath2,socketPath,pid_path,daemon_bin,tmpstr,cmd:string;
-    f:boolean;
+    confpath,confpath2,daemon_bin,tmpstr,cmd:string;
+
 begin
-daemon_bin:=MILTER_GREYLIST_BIN_PATH();
- pid_path:=MILTER_GREYLIST_PID_PATH();
- socketPath:=MILTER_GREYLIST_GET_VALUE('socket');
+ daemon_bin:=MILTER_GREYLIST_BIN_PATH();
  confpath:=MILTER_GREYLIST_CONF_PATH();
 
  tmpstr:=logs.FILE_TEMP();
