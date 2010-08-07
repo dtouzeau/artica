@@ -61,7 +61,10 @@ if(isset($_GET["js-ldap-interface"])){LDAP_CONFIG_JS();exit;}
 if(isset($_GET["js-ldap-popup"])){LDAP_CONFIG();exit;}
 if(isset($_GET["main-ldap"])){LDAP_SWITCH();exit;}
 if(isset($_GET["set_cachesize"])){LDAP_SAVE();exit;}
+if(isset($_GET["ldap-networks-list"])){LDAP_CONFIG_NET_LIST();exit;}
 if(isset($_GET["LdapAllowAnonymous"])){LDAP_SAVE();exit;}
+if(isset($_GET["LdapListenIPAddr"])){LDAP_CONFIG_NET_ADD();exit;}
+if(isset($_GET["ldapDelNet"])){LDAP_CONFIG_NET_DEL();exit;}
 
 if(isset($_GET["mysql-audit"])){MYSQL_AUDIT();exit;}
 if(isset($_GET["server_swap"])){MYSQL_AUDIT_PERFORM();exit;}
@@ -1569,7 +1572,7 @@ $notif1="
 $notif2="
 <div id='notif2'>
 <br>
-<p class=caption>{notification_context}</p>
+<p class=caption style='font-size:14px'>{notification_context}</p>
 <table style='width:100%'class=table_form>
 <tr>
 	<td valign='top' class=legend>{sa-learn}:</td>
@@ -1588,6 +1591,11 @@ $notif2="
 	<td valign='top'>" . Field_checkbox('update',1,$ini->_params["SMTP"]["update"])."</td>
 </tr>
 <tr>
+	<td valign='top' class=legend>{KASPERSKY_UPDATES}:</td>
+	<td valign='top'>" . Field_checkbox('update',1,$ini->_params["SMTP"]["KASPERSKY_UPDATES"])."</td>
+</tr>
+
+<tr>
 	<td valign='top' class=legend>{backup}:</td>
 	<td valign='top'>" . Field_checkbox('backup',1,$ini->_params["SMTP"]["backup"])."</td>
 </tr>
@@ -1595,6 +1603,11 @@ $notif2="
 	<td valign='top' class=legend>{mailbox}:</td>
 	<td valign='top'>" . Field_checkbox('mailbox',1,$ini->_params["SMTP"]["mailbox"])."</td>
 </tr>
+<tr>
+	<td valign='top' class=legend>postfix:</td>
+	<td valign='top'>" . Field_checkbox('postfix',1,$ini->_params["SMTP"]["postfix"])."</td>
+</tr>
+
 <tr>
 		<td nowrap class=legend>{APP_MONIT}:</strong></td>
 		<td>" . Field_checkbox('monit',1,$ini->_params["SMTP"]["monit"])."</td>
@@ -1628,7 +1641,7 @@ $notif2="
 $notif3="
 <div id='notif3'>
 <br>
-<p class=caption>{APP_POSTFIX} {notifications}</p>
+<p class=caption style='font-size:14px'>{APP_POSTFIX} {notifications}</p>
 <table style='width:100%' class=table_form>
 <tr>
 	<td valign='top' class=legend>{PostfixQueueEnabled}:</td>
@@ -2428,7 +2441,6 @@ var x_ParseFormLDAP= function (obj) {
 		if(document.getElementById('LdapAllowAnonymous').checked){LdapAllowAnonymous=1;}else{LdapAllowAnonymous=0;}
 		if(document.getElementById('EnableRemoteAddressBook').checked){EnableRemoteAddressBook=1;}else{EnableRemoteAddressBook=0;}	
 		var XHR = new XHRConnection();
-		XHR.appendData('LdapListenIPAddr',document.getElementById('LdapListenIPAddr').value);
 		XHR.appendData('LdapAllowAnonymous',LdapAllowAnonymous);
 		XHR.appendData('EnableRemoteAddressBook',EnableRemoteAddressBook);
 		document.getElementById('ParseFormLDAPNET').innerHTML='<center><img src=\"img/wait_verybig.gif\"></center>';
@@ -2560,14 +2572,13 @@ function LDAP_CONFIG_BDBD(){
 
 function LDAP_CONFIG_NET(){
 	$sock=new sockets();
-	$net=new networking();
-	$nets=$net->ALL_IPS_GET_ARRAY();
+	$page=CurrentPageName();
 	$nets[null]="{loopback}";
 	$nets["all"]="{all}";
 	$return=Paragraphe32("troubleshoot","troubleshoot_explain","Loadjs('index.troubleshoot.php');","48-troubleshoots.png",180);
 
 	
-	$nets=Field_array_Hash($nets,'LdapListenIPAddr',$sock->GET_INFO('LdapListenIPAddr'));
+	
 	$form_network="
 	<table style='width:100%'>
 	<tr>
@@ -2575,10 +2586,7 @@ function LDAP_CONFIG_NET(){
 		<td valign='top'>
 	<div id='ParseFormLDAPNET'>
 	<table style='width:100%' class=table_form>
-		<tr>
-			<td class=legend nowrap>{ListenAddress}:</td>
-			<td><strong style='font-size:11px' nowrap>$nets</td>
-		</tr>
+		
 		<tr>
 			<td class=legend nowrap>{allowanonymouslogin}:</td>
 			<td><strong style='font-size:11px' nowrap>". Field_checkbox("LdapAllowAnonymous",1,$sock->GET_INFO('LdapAllowAnonymous'))."</td>
@@ -2593,16 +2601,116 @@ function LDAP_CONFIG_NET(){
 			</td>
 		</tr>	
 	</table>
+	<div id='ldap_networks'></div>
 	</div>
 	</td>
 	</tr>
 	</table>
+	<br>
+	
+	
+	<script>
+		function LoadLdapNets(){
+			LoadAjax('ldap_networks','$page?ldap-networks-list=yes');
+		}
+	LoadLdapNets();
+	</script>
+	
 	";	
 			
  $tpl=new templates();
  echo $tpl->_ENGINE_parse_body($form_network);
 	
 }
+
+function LDAP_CONFIG_NET_LIST(){
+	$page=CurrentPageName();
+	$sock=new sockets();
+	$net=new networking();
+	$nets=$net->ALL_IPS_GET_ARRAY();	
+	$SavedNets=explode("\n",$sock->GET_INFO('LdapListenIPAddr'));
+	
+	if(is_array($SavedNets)){
+		while (list($num,$ip)=each($SavedNets)){
+			unset($nets[$ip]);
+		}
+		
+	}
+	unset($nets["127.0.0.1"]);
+	$nets_field=Field_array_Hash($nets,'LdapListenIPAddr',null,null,null,0,'font-size:14px;padding:3px');
+	if(is_array($nets)){
+		$form="
+		<table style='width:100%'>
+		<tr>
+			<td class=legend nowrap>{ListenAddress}:</td>
+			<td><strong style='font-size:11px' nowrap>$nets_field</td>
+			<td width=1%>". button("{add}","ldapAddNet()")."</td>
+		</tr>
+		</table>	
+		";
+	}
+	$SavedNets[]="127.0.0.1";
+	if(is_array($SavedNets)){
+		$t="<table style='width:100%'>";
+		
+		reset($SavedNets);
+		while (list($num,$ip)=each($SavedNets)){
+			if($ip==null){continue;}
+			$delete=imgtootltip("delete-24.png","{delete}","ldapDelNet($num)");
+			if($ip=="127.0.0.1"){$delete=null;}
+			$t=$t."<tr ". CellRollOver().">
+			<td width=1%><img src='img/fw_bold.gif'></td>
+			<td><strong><code style='font-size:14px'>$ip</td>
+			<td width=1%>$delete</td>
+			</tr>";
+		}
+	}
+	
+	$t=$t."</table>";
+	
+	$html="
+	$form
+	<hr>
+	$t
+	<script>
+		function ldapAddNet(){
+			var XHR = new XHRConnection();
+			XHR.appendData('LdapListenIPAddr',document.getElementById('LdapListenIPAddr').value);
+			XHR.appendData('ldapAddNet','yes');
+			document.getElementById('ldap_networks').innerHTML='<center><img src=\"img/wait_verybig.gif\"></center>';
+			XHR.sendAndLoad('$page', 'GET',x_ParseFormLDAP);		
+		}
+		
+		function ldapDelNet(num){
+			var XHR = new XHRConnection();
+			XHR.appendData('ldapDelNet',num);
+			document.getElementById('ldap_networks').innerHTML='<center><img src=\"img/wait_verybig.gif\"></center>';
+			XHR.sendAndLoad('$page', 'GET',x_ParseFormLDAP);				
+		}
+		
+	</script>
+	";
+	 $tpl=new templates();
+ 	echo $tpl->_ENGINE_parse_body($html);
+}
+
+function LDAP_CONFIG_NET_ADD(){
+	if(trim($_GET["LdapListenIPAddr"])==null){return;}
+	$sock=new sockets();
+	$SavedNets=explode("\n",$sock->GET_INFO('LdapListenIPAddr'));
+	$SavedNets[]=$_GET["LdapListenIPAddr"];
+	$sock->SaveConfigFile(@implode("\n",$SavedNets),"LdapListenIPAddr");
+	$sock->getFrameWork("cmd.php?ldap-restart=yes");
+}
+function LDAP_CONFIG_NET_DEL(){
+	$sock=new sockets();
+	$SavedNets=explode("\n",$sock->GET_INFO('LdapListenIPAddr'));
+	unset($SavedNets[$_GET["ldapDelNet"]]);
+	$sock->SaveConfigFile(@implode("\n",$SavedNets),"LdapListenIPAddr");
+	$sock->getFrameWork("cmd.php?ldap-restart=yes");	
+}
+
+
 
 function LDAP_CONFIG_STATUS(){
 	$sock=new sockets();
@@ -2664,7 +2772,7 @@ function LDAP_CONFIG_SETTINGS(){
 	
 	$net=new networking();
 	$nets=$net->ALL_IPS_GET_ARRAY();
-	$nets[null]=" ";
+	
 	
 	$nets=Field_array_Hash($nets,'LdapListenIPAddr',$LdapListenIPAddr);
 	$form_network="
@@ -2693,7 +2801,6 @@ function LDAP_CONFIG_SETTINGS(){
 		
 		
 		
-		$db=RoundedLightWhite($db);
 		
 		
 		

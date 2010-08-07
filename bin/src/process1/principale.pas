@@ -197,7 +197,7 @@ var i,mins:Integer;
 begin
    SYS.AllPidsByPatternInPath('artica-install --startall');
    
-   logs.Debuglogs('DeadArticaInstall():: found (' + IntToStr(SYS.ProcessIDList.count) + ') instances');
+   logs.Debuglogs('DeadArticaInstall():: found (' + IntToStr(SYS.ProcessIDList.count) + ') artica-install --startall instances');
    
    for i:=0 to SYS.ProcessIDList.Count-1 do begin
 
@@ -211,21 +211,6 @@ begin
    end;
 
    SYS.ProcessIDList.Clear;
-   SYS.AllPidsByPatternInPath('artica-notif');
-
-   logs.Debuglogs('DeadArticaInstall():: found (' + IntToStr(SYS.ProcessIDList.count) + ') instances for (artica-notif)');
-
-   for i:=0 to SYS.ProcessIDList.Count-1 do begin
-
-      if not FileExists('/proc/' + SYS.ProcessIDList.Strings[i]+'/cmdline') then continue;
-      mins:=SYS.FILE_TIME_BETWEEN_MIN('/proc/' + SYS.ProcessIDList.Strings[i]+'/cmdline');
-      logs.Debuglogs('DeadArticaInstall():: found ID ' + SYS.ProcessIDList.Strings[i] + ' Minutes=' + IntToStr(mins));
-      if mins>5 then begin
-         logs.Syslogs('DeadArticaInstall():: Kill artica-notif process ID ' + SYS.ProcessIDList.Strings[i] + ' cause a ghost more than 5 minutes');
-         fpsystem('/bin/kill ' +SYS.ProcessIDList.Strings[i]);
-      end;
-   end;
-   
 end;
 //##############################################################################
 procedure Tprocess1.maillog_multiples();

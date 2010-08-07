@@ -31,17 +31,12 @@ Allez au Centre d'installation pour installer Altermime.</APP_ALTERMIME_NOT_INST
 <av_rules>R&egrave;gles antivirus</av_rules>
 <back_to_defaults>Retour aux param&egrave;tres par d&eacute;faut</back_to_defaults>
 <child_timeout>Abort child if it does not complete each task in</child_timeout>
-<child_timeout_text>This value increase the timeout for the amavisd process.[br]
-The default is only 8 minutes.[br]
-When amavisd is used with other mail packages in a post queue structure, 
-the message is transferred locally only (from the local mail queue to the amavisd loopback) and is therefore very fast.[br]
- When you use the postfix before-queue filter, the message is being transferred directly from the remote smtp through postfix to amavisd .[br]
-So for example if the remote smtp is sending a 20 megabyte message, it may take longer than 8 minutes to transmit the message 
-(depending on network bandwidth).[br]
-Amavisd would timeout before the message had been transferred and the end user would get the following message: [br]
+<child_timeout_text>Cette valeur augmente le temps imparti pour le processus principal amavisd.[br]
+Par d&eacute;faut la valeur est &agrave; 8 minutes.[br]
+Lorsque amavisd est utilis&eacute; avec un serveur de messagerie , les messages sont transmis sur la boucle locale ce qui va tr&egrave;s vite.[br]
+Lorsque vous utilisez le mode de crochetage autrement que par le milter et avec un serveur de messagerie distant, le message est alors transf&eacute;r&eacute; &agrave; travers la carte r&eacute;seau.[br]Si le serveur de mail postfix envoi 20mb cela peut prendre plus de 8 minutes pour envoyer les donn&eacute;es.[br]Amavis va alors quitter la connexion avant que toutes les donn&eacute;es soient envoy&eacute;es avec le message suivant:[br]
 [i]Out: 451 Error: queue file write error.[/i]
-[br][b]Note that you may want to increase this limit even further if you see this error message from Postfix.[/b]
-</child_timeout_text>
+Avec Artica, amavis est en local avec Postfix, la valeur par d&eacute;faut de 8mn est amplement suffisante...</child_timeout_text>
 <daemon_events>&Eacute;v&egrave;nements</daemon_events>
 <disclaimer>Mentions l&eacute;gales avec alterMIME</disclaimer>
 <disclaimer_explain>Une limite de responsabilit&eacute; est g&eacute;n&eacute;ralement n'importe quel rapport destin&eacute; &agrave; sp&eacute;cifier ou d&eacute;limiter la port&eacute;e des droits et des engagements qui peuvent &ecirc;tre exerc&eacute;s et impos&eacute;s par des parties dans une relation l&eacute;galement reconnu.[br]

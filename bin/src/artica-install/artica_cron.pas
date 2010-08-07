@@ -6,7 +6,7 @@ unit artica_cron;
 interface
 
 uses
-    Classes, SysUtils,variants,strutils,IniFiles, Process,logs,unix,RegExpr in 'RegExpr.pas',zsystem,kas3,isoqlog,squid,fetchmail;
+    Classes, SysUtils,variants,strutils,IniFiles, Process,logs,unix,RegExpr in 'RegExpr.pas',zsystem,kas3,isoqlog,squid,fetchmail,spamass,cyrus;
 
 
 
@@ -377,6 +377,10 @@ EnableFetchmail:integer;
 fetchmail:tfetchmail;
 PostfixPostmaster:string;
 php5bin:string;
+spamass:Tspamass;
+cyrus:Tcyrus;
+
+
 begin
       nolog:=',nolog(true)';
       l:=TstringList.Create;
@@ -529,6 +533,17 @@ logs.DeleteFile('/etc/cron.d/artica-cron-executor-300');
       l.Add('@'+Nicet+nolog+',lavg1('+IntToStr(systemMaxOverloaded)+') 10 ' +cmdnice+php5bin+ ' ' +artica_path+'/exec.rsync.events.php');
       l.Add('@'+Nicet+nolog+',lavg1('+IntToStr(systemMaxOverloaded)+') 20 ' +cmdnice+php5bin+ ' ' +artica_path+'/exec.cleanfiles.php');
       l.Add('@'+Nicet+nolog+',lavg1('+IntToStr(systemMaxOverloaded)+') 1h ' +cmdnice+php5bin+ ' ' +artica_path+'/exec.hdparm.php');
+
+// ---------------------------------- artica-learn ---------------------------------------------------------------------------------------------------------
+      spamass:=Tspamass.Create(SYS);
+      if FileExists(spamass.SPAMASSASSIN_BIN_PATH()) then begin
+         cyrus:=Tcyrus.Create(SYS);
+         if FIleExists(cyrus.CYRUS_DAEMON_BIN_PATH()) then begin
+             logs.DebugLogs('Starting......: Daemon (fcron) set sa-learn for cyrus each 3h');
+            l.Add('@'+Nicet+nolog+',lavg1('+IntToStr(systemMaxOverloaded)+') 3h ' +cmdnice+php5bin+ ' ' +artica_path+'/exec.sa-learn-cyrus.php --execute');
+         end;
+      end;
+
 // ---------------------------------- fetchmail ---------------------------------------------------------------------------------------------------------
 
       if FileExists('/etc/artica-postfix/fetchmail.schedules') then begin

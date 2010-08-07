@@ -65,6 +65,7 @@ session_start();
 	if(isset($_GET["MailAlternateAddress"])){USER_ALTERNATE_EMAIL_SAVE();exit;}
 	if(isset($_GET["UserEndOfLIfe"])){USER_ENDOFLIFE();exit;}
 	
+	// inbound parameters
 	if(isset($_GET["RecipientToAdd"])){USER_BBC_MAP_ADD();exit;}
 	if(isset($_GET["RecipientToAdd_delete"])){USER_BBC_MAP_DEL();exit;}
 	if(isset($_GET["USER_BBC_MAP_LIST"])){echo USER_BBC_MAP_LIST();exit;}
@@ -216,7 +217,7 @@ function AJAX_USER_STARTER(){
 		case "fetchmail":echo USER_FETCHMAIL($_GET["userid"]);break;
 		case "groups":echo USER_GROUP($_GET["userid"]);break;
 		case "email":echo USER_MESSAGING($_GET["userid"]);break;
-		case "ftp_access":echo RoundedLightWhite(USER_FTP($_GET["userid"]));break;
+		case "ftp_access":echo USER_FTP($_GET["userid"]);break;
 		case "file_share":echo USER_SAMBA($_GET["userid"]);break;
 		case "computer":echo AJAX_COMPUTER($_GET["userid"]);break;
 		case "openports":echo AJAX_COMPUTER_OPENPORTS($_GET["userid"]);break;
@@ -2069,60 +2070,7 @@ function USER_SENDER_PARAM($userid){
 	echo $tpl->_ENGINE_parse_body($html);
 	
 }
-function USER_RECIPT_PARAM($userid){
-			
-			$page=CurrentPageName();
-			writelogs("USER_ACCOUNT::$userid",__FUNCTION__,__FILE__,__LINE__);	
-			$user=new user($userid);
-			$ou=$user->ou;
-			$priv=new usersMenus();
-			$sock=new sockets();
-			$EnableArticaSMTPFilter=$sock->GET_INFO("EnableArticaSMTPFilter");
-			if($EnableArticaSMTPFilter==0){
-				$recipient_bcc_maps_text='{recipient_bcc_maps_text}';
-			}
-			
-			
-	
-	$styleTDRight="style='padding:5px;font-size:11px'";
-	$styleTDLeft="style='padding:5px;font-size:11px'";			
-			
-		
 
-	$html="
-		<H1>{recipient_translations}</H1>	
-		<form name='userLdapform2'>
-				<input type='hidden' name='userid' id='userid' value='$userid'>
-				<input type='hidden' name='ou' value='$ou'>
-				<input type='hidden' name='SaveUserInfos' value='yes'>
-				<input type='hidden' name='dn' value='$user->dn'>
-				<input type='hidden' name='mail' value='$user->mail'>
-				<input type='hidden' name='user_domain' value='$user->domainname'>
-		<table style='width:100%' class=table_form>
-		<tr>
-			<td align='right' nowrap class=legend $styleTDRight>{duplicate_mailto}:</strong>
-			<td $styleTDLeft>" . Field_text('RecipientToAdd',null,"width:150px",null,null,null,false,"RecipientToAddCheck(event)")."</td>
-			<td width=20%>" . imgtootltip("plus-24.png",'{add}',"RecipientToAdd()")."</td>
-			<td width=1%>" . help_icon("{duplicate_mailto_text}")."</td>
-		</tr>
-		<tr>
-			<td align='right' nowrap class=legend $styleTDRight>{transforme_mailto}:</strong>
-			<td $styleTDLeft>" . Field_text('MailAlternateAddress',$user->MailAlternateAddress,"width:150px",null,null,null,false,"UserMailAlternateAddressCheck(event)")."</td>
-			<td><input type='button' value='{edit}&nbsp;&raquo;' OnClick=\"javascript:UserMailAlternateAddress();\"></td>
-			<td>" . help_icon("{transforme_mailto_text}")."</td>
-		</tr>			
-		</table>
-		</form>
-		<br>
-		<p class=caption>$recipient_bcc_maps_text</p>
-		".RoundedLightWhite("
-		<div style='width:100%;height:150px;overflow:auto' id='RecipientToAddID'>".USER_BBC_MAP_LIST()."</div>");
-	
-
-	$tpl=new templates();
-	echo $tpl->_ENGINE_parse_body($html);
-	
-}
 
 function USER_CHANGE_PASSWORD_SAVE(){
 	$priv=new usersMenus();
@@ -2141,20 +2089,7 @@ function USER_CHANGE_PASSWORD_SAVE(){
 }
 
 
-function USER_ALTERNATE_EMAIL_SAVE(){
-$priv=new usersMenus();
-	if(!$priv->AllowChangeUserPassword && !$priv->AllowAddUsers){
-		$tpl=new templates();
-		$tpl->_ENGINE_parse_body('{ERROR_NO_PRIVS}');
-		die();
-	}
 
-	$uid=$_GET["uid"];
-	$ct=new user($uid);
-	$ct->MailAlternateAddress=$_GET["MailAlternateAddress"];
-	$ct->SaveMailAlternateAddress();	
-
-}
 
 function USER_ENDOFLIFE(){
 	$priv=new usersMenus();
@@ -2355,10 +2290,14 @@ $sender_settings=Paragraphe("64-export.png",'{sender_parameters}','{sender_param
 "javascript:Loadjs('domains.edit.user.sender.php?uid=$userid')","$userid:{sender_parameters}");	
 
 $button_recipient_features=Paragraphe("64-import.png",'{inbound_parameters}','{recipient_translations}',
-"javascript:YahooWin3(450,'domains.edit.user.php?recipient_translations=yes&userid=$userid','{recipient_translations}');");	
+"javascript:Loadjs('domains.edit.user.inbound.php?userid=$userid');");	
 
 $AmavisSettings=Paragraphe("64-spam.png",'anti-spam','{amavis_as_settings_text}',
 "javascript:Loadjs('users.amavis.php?userid=$userid');",null,210,'font-size:12px;font-weight:bold');	
+
+
+
+
 
 	if($priv->POSTFIX_INSTALLED){
 		if(($priv->fetchmail_installed) OR($priv->fdm_installed)){
@@ -2367,9 +2306,20 @@ $AmavisSettings=Paragraphe("64-spam.png",'anti-spam','{amavis_as_settings_text}'
 			"javascript:Loadjs('wizard.fetchmail.newbee.php?script=yes&uid={$_GET["userid"]}')",null,210,'font-size:12px;font-weight:bold');
 			}
 		}
+		
+		if($priv->cyrus_imapd_installed){
+			if(!$priv->ZARAFA_INSTALLED){
+				if($priv->spamassassin_installed){
+					$antispam_leraning=Paragraphe("anti-spam-learning.png",'{EnableUserSpamLearning}','{EnableUserSpamLearning_text}',
+					"javascript:Loadjs('domains.edit.user.sa.learn.php?uid={$_GET["userid"]}');",null,210,'font-size:12px;font-weight:bold');
+				}
+			}
+		}
+		
+		
 	}
 	
-	
+
 $listdistri=Paragraphe("64-bg_addresses.png",'{mailing_list}','{user_to_mailing_list}',
 "javascript:Loadjs('domains.edit.user.mailling-list.php?uid=$us->uid');",null,210,'font-size:12px;font-weight:bold');
 
@@ -2415,6 +2365,7 @@ $listdistri=Paragraphe("64-bg_addresses.png",'{mailing_list}','{user_to_mailing_
 	$tr[]=$restore_mailbox;
 	$tr[]=$test_mail;
 	$tr[]=$listdistri;
+	$tr[]=$antispam_leraning;
 	$tr[]=$AmavisSettings;
 
 	
@@ -3015,10 +2966,7 @@ function USER_MAILBOX($uid){
 				<td width=1%>" .imgtootltip("icon_sync.gif",'{export_mailbox_text}',"Loadjs('mailsync.php?uid=$uid');") 	."</td>    			
     	</tr>  
     	
-    	<tr ". CellRollOver().">
-    			<td width=99% class=legend nowrap>" . texttooltip('{EnableUserSpamLearning}','{EnableUserSpamLearning_text}',"javascript:Loadjs('$page?EnableUserSpamLearning-js=$uid');")."</td>
-				<td width=1%>" .imgtootltip("18_oeuil.png",'{EnableUserSpamLearning}',"Loadjs('$page?EnableUserSpamLearning-js');") 	."</td>    			
-    	</tr>
+
     	<tr ". CellRollOver().">
     			<td width=99% class=legend nowrap>" . texttooltip('{mailboxes_rules}','{mailboxes_rules_text}',"Loadjs('users.sieve.php?uid=$uid');")."</td>
 				<td width=1%>" .imgtootltip("filter.gif",'{mailboxes_rules}',"Loadjs('users.sieve.php?uid=$uid');") 	."</td>    			
@@ -3864,53 +3812,10 @@ function USER_GROUP_CONTENT($userid){
 	
 }
 
-function USER_BBC_MAP_ADD(){
-	$priv=new usersMenus();if(!$priv->AllowAddUsers){$tpl=new templates();echo $tpl->_ENGINE_parse_body('{ERROR_NO_PRIVS}');die();}
-	$email=$_GET["RecipientToAdd"];
-	if(!preg_match("#(.+?)@(.+)#",$email)){
-		$tpl=new templates();
-		echo $tpl->_ENGINE_parse_body('{ERROR_INVALID_EMAIL_ADDR}');
-		exit;
-	}
-	$ct=new user($_GET["uid"]);
+
+
 	
-	
-	$ct->add_bcc($_GET["RecipientToAdd"]);
-	
-	
-	}
-function USER_BBC_MAP_DEL(){
-	$priv=new usersMenus();if(!$priv->AllowAddUsers){$tpl=new templates();echo $tpl->_ENGINE_parse_body('{ERROR_NO_PRIVS}');die();}
-	$ct=new user($_GET["uid"]);
-	$ct->del_bcc($_GET["RecipientToAdd_delete"]);	
-}
-	
-function USER_BBC_MAP_LIST(){
-	
-	if(isset($_GET["uid"])){$uid=$_GET["uid"];}
-	if(isset($_GET["userid"])){$uid=$_GET["userid"];}
-	
-	$ct=new user($uid);
-	$array=$ct->RecipientToAdd;
-	if(!is_array($array)){return null;}
-	
-	$table="<table style='width:99%'>";
-	
-	while (list ($num, $ligne) = each ($array) ){
-		$table=$table."
-		<tr " .CellRollOver().">
-			<td><code style='font-size:10px'>$ct->mail</td>
-			<td width=1%><img src='img/fw_bold.gif'></td>
-			<td><code style='font-size:10px'>$ligne</td>
-			<td width=1%>" . imgtootltip("ed_delete.gif","{delete}","RecipientToAdd_delete('$num')")."</td>
-		</tr>
-		";
-	}
-	
-	$table=$table."</table>";
-	return $table;
-	
-	}	
+
 
 function USER_GROUP_POPUP_ADD(){
 	$group=new groups();
@@ -4062,75 +3967,11 @@ function COMPUTER_DELETE_ALIAS(){
 	$comp->ComputerDelAlias($_GET["DeletComputerAliases"]);	
 }
 
-	
-function USER_JUNK_LEARNING_JS(){
-	$page=CurrentPageName();
-	$tpl=new templates();
-	$title=$tpl->_ENGINE_parse_body("{EnableUserSpamLearning}");
-	$uid=$_GET["EnableUserSpamLearning-js"];
-	$html="
-	
-	function USER_JUNK_LEARNING_JS(){
-		YahooWin2(650,'$page?EnableUserSpamLearning-popup=$uid','$title');
-	
-	}
-	
-var x_USER_JUNK_LEARNING_SAVE= function (obj) {
-	USER_JUNK_LEARNING_JS();
-}	
-	
-	function USER_JUNK_LEARNING_SAVE(uid){
-		var XHR = new XHRConnection();
-		XHR.appendData('uid',uid);
-		XHR.appendData('EnableUserSpamLearning',document.getElementById('EnableUserSpamLearning').value);
-		document.getElementById('EnableUserSpamLearning_div').innerHTML='<center style=\"width:100%\"><img src=img/wait_verybig.gif></center>';
-		XHR.sendAndLoad('domains.edit.user.php', 'GET',x_USER_JUNK_LEARNING_SAVE);
-	}
-	
-	USER_JUNK_LEARNING_JS();
-	
-	";
-	
-	echo $html;
-	
-}
 
-function USER_JUNK_LEARNING_POPUP(){
-$page=CurrentPageName();
-	$tpl=new templates();	
-	$uid=$_GET["EnableUserSpamLearning-popup"];
-	$users=new user($uid);
-	$field=Paragraphe_switch_img('{EnableUserSpamLearning}','{EnableUserSpamLearning_text}','EnableUserSpamLearning',$users->EnableUserSpamLearning);
-	$html="
-	<H1>{EnableUserSpamLearning}</H1>
-	<table style='width:100%'>
-	<tr>
-	<td valign='top'><img src='img/bg_spam-assassin-250.png'></td>
-	<td valign='top'>
-	<p class=caption>{EnableUserSpamLearning_explain}</p>
-	<br>
-	<div id='EnableUserSpamLearning_div'>
-	$field
-	</div>
-	<br>
-	<div style='text-align:right;width:100%'><hr>
-	". button("{edit}","USER_JUNK_LEARNING_SAVE('$uid')")."
-	
-	</td>
-	</tr>
-	</table>
-	";
-	
-	echo $tpl->_ENGINE_parse_body($html);
-	
-}
 
-function USER_JUNK_LEARNING_SAVE(){
-$uid=$_GET["uid"];	
-$users=new user($uid);
-$users->EnableUserSpamLearning=$_GET["EnableUserSpamLearning"];
-$users->add_user();
-}
+
+
+
 
 
 function USER_FETCHMAIL($uid){

@@ -221,12 +221,18 @@ function main_system(){
 	$usb=Buildicon64('DEF_ICO_DEVCONTROL');
 	$perfs=Paragraphe('64-performances.png','{artica_performances}','{artica_performances_text}',"javascript:Loadjs('artica.performances.php')");
 	$zabix=Buildicon64("DEF_ICO_ZABBIX");
+	$kernel=Paragraphe("linux-inside-64.png","{system_kernel}","{system_kernel_text}","javascript:Loadjs('system.kernel.debian.php')");
+	
+	
+	
+	if(($users->LinuxDistriCode<>"DEBIAN") && ($users->LinuxDistriCode<>"UBUNTU")){$kernel=null;}
 	
 	if(!$users->ZABBIX_INSTALLED){$zabix=null;}
 	$tr[]=$ntp;
 	$tr[]=$hardware;
 	$tr[]=$memory;
 	$tr[]=$proc_infos;
+	$tr[]=$kernel;
 	$tr[]=$philesight;
 	$tr[]=$zabix;
 	$tr[]=$perfs;

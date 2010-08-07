@@ -406,7 +406,7 @@ begin
 
  if FileExists('/home/artica/packages/kav4proxy-5.5-62.tar.gz') then begin
     fpsystem('/bin/tar -xf /home/artica/packages/kav4proxy-5.5-62.tar.gz -C /root/');
-    source_folder:='/root/kav4proxy-5.5-62');
+    source_folder:='/root/kav4proxy-5.5-62';
  end else begin
      source_folder:=libs.COMPILE_GENERIC_APPS('kav4proxy');
  end;

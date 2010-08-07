@@ -448,6 +448,14 @@ SYS:=Tsystem.Create;
    exit;
   end;
 
+
+if DirectoryExists('/var/lib/squidguard') then begin
+     logs.DebugLogs('Starting......: Squid apply security permissions on /var/lib/squidguard');
+     fpsystem('/bin/chmod -R 755 /var/lib/squidguard');
+end;
+
+
+
 squidconf:=SQUID_CONFIG_PATH();
 http_port:=SQUID_GET_CONFIG('http_port');
 options:=' -sYC -a '+http_port +' -f ' +squidconf;

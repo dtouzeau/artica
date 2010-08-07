@@ -331,6 +331,7 @@ end;
 Function GetUserGroup(Const UserName : String) : String;
 
 begin
+  result:='';
   GetGroupName(GetUserGid(UserName));
 end;
 

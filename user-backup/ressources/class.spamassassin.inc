@@ -197,6 +197,7 @@ function SaveRelayCountry(){
 					}	
 				}
 				
+				
 				$conf=$conf ."# trusted_networks 212.17.35.\n";
 				$conf=$conf ."\n";
 				$conf=$conf ."\n";
@@ -211,6 +212,7 @@ function SaveRelayCountry(){
 				$conf=$conf ."\n";
 				$conf=$conf ."\n";
 				$conf=$conf ."#   Use Bayesian classifier (default: 1)\n";
+				$conf=$conf ."bayes_path\t/etc/spamassassin/bayes\n"; 
 				$conf=$conf ."#\n";
 				$conf=$conf ."use_bayes {$this->main_array["use_bayes"]}\n";
 				$conf=$conf ."\n";

@@ -224,6 +224,7 @@ begin
    if FileExists('/etc/roundcube/db.inc.php') then exit('/etc/roundcube/db.inc.php');
    if FileExists('/usr/share/roundcubemail/config/db.inc.php') then exit('/usr/share/roundcubemail/config/db.inc.php');
    if FileExists('/usr/share/roundcube/config/db.inc.php') then exit('/usr/share/roundcube/config/db.inc.php');
+   if DirectoryExists('/usr/share/roundcube/config') then exit('/usr/share/roundcube/config/db.inc.php');
 
 end;
 //##############################################################################
@@ -262,7 +263,7 @@ SourceCOnf:='/etc/artica-postfix/settings/Daemons/RoundCubeConfigurationFile';
 logs.Debuglogs('Starting......: Roundcube configuration file: '+confFile);
      if FileExists(SourceCOnf) then begin
          if logs.MD5FromString(logs.ReadFromFile(SourceCOnf))<>logs.MD5FromString(logs.ReadFromFile(confFile)) then begin
-             logs.Debuglogs('Starting......: Roundcube replicate main.inc.php');
+             logs.Debuglogs('Starting......: Roundcube replicate '+confFile);
              logs.OutputCmd('/bin/cp '+SourceCOnf+' '+confFile);
          end;
      end;
@@ -276,7 +277,7 @@ SourceCOnf:='/etc/artica-postfix/settings/Daemons/RoundCubeLightHTTPD';
              logs.OutputCmd('/bin/cp '+SourceCOnf+' '+confFile);
          end;
      end;
-
+     DEBIAN_CONFIG();
      PHP_CONFIG();
      SavePlugins();
      SYS.THREAD_COMMAND_SET(SYS.LOCATE_PHP5_BIN()+' /usr/share/artica-postfix/exec.www.install.php --only-ROUNDCUBE');

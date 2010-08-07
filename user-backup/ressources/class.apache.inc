@@ -11,6 +11,7 @@ class vhosts{
 	var $WWWAppliUser;
 	var $WWWAppliPassword;
 	var $WWWMultiSMTPSender;
+	var $WWWEnableAddressBook;
 	var $WWWSSLMode="FALSE";
 	var $IMG_ARRAY_128=array("LMB"=>"logo_lmb-200.png",
 	"JOOMLA"=>"128.joomla.png","SUGAR"=>"98-sugarcrm.png","ARTICA_USR"=>"bg_user-120.png",
@@ -37,7 +38,10 @@ class vhosts{
 	"ZARAFA_MOBILE"=>"zarafa-logo-64.png",
 	"DRUPAL"=>"drupal-64.png",
 	
-	);	
+	);
+
+	
+	var $WWWEnableAddressBook_ENABLED=array("ROUNDCUBE"=>true);
 	
 	
 	
@@ -85,6 +89,8 @@ class vhosts{
 				$LoadVhosts["wwwapplipassword"]=$hash[$i]["wwwapplipassword"][0];
 				$LoadVhosts["wwwsslmode"]=$hash[$i]["wwwsslmode"][0];
 				$LoadVhosts["WWWMultiSMTPSender"]=$hash[$i][strtolower("WWWMultiSMTPSender")][0];
+				$LoadVhosts["WWWEnableAddressBook"]=$hash[$i][strtolower("WWWEnableAddressBook")][0];
+				
 				
 				
 				}
@@ -110,6 +116,10 @@ class vhosts{
 				$LoadVhosts["wwwapplipassword"]=$hash[$i]["wwwapplipassword"][0];
 				$LoadVhosts["wwwsslmode"]=$hash[$i]["wwwsslmode"][0];
 				$LoadVhosts["WWWMultiSMTPSender"]=$hash[$i][strtolower("WWWMultiSMTPSender")][0];
+				$LoadVhosts["WWWEnableAddressBook"]=$hash[$i][strtolower("WWWEnableAddressBook")][0];
+				
+				
+				
 				$LoadVhosts["dn"]=$hash[$i]["dn"];
 				$LoadVhosts["apacheDocumentRoot"]=$hash[$i][strtolower("apacheDocumentRoot")][0];
 				if(preg_match("#ou=www,ou=(.+?),dc=organizations#",$dn,$re) ){$LoadVhosts["OU"]=$re[1];}
@@ -170,6 +180,10 @@ class vhosts{
 			if($this->WWWAppliUser<>null){$upd["WWWAppliUser"][]=$this->WWWAppliUser;}
 			if($this->WWWAppliPassword<>null){$upd["WWWAppliPassword"][]=$this->WWWAppliPassword;}
 			if($this->WWWMultiSMTPSender<>null){$upd["WWWMultiSMTPSender"][]=$this->WWWMultiSMTPSender;}
+			if($this->WWWEnableAddressBook<>null){$upd["WWWEnableAddressBook"][]=$this->WWWEnableAddressBook;}
+			
+			
+			
 			$ldap->ldap_add($dn,$upd);
 		}else{
 			$upd["WWWServerType"][]=$servertype;
@@ -179,6 +193,7 @@ class vhosts{
 			if($this->WWWAppliUser<>null){$upd["WWWAppliUser"][]=$this->WWWAppliUser;}
 			if($this->WWWAppliPassword<>null){$upd["WWWAppliPassword"][]=$this->WWWAppliPassword;}
 			if($this->WWWMultiSMTPSender<>null){$upd["WWWMultiSMTPSender"][]=$this->WWWMultiSMTPSender;}
+			if($this->WWWEnableAddressBook<>null){$upd["WWWEnableAddressBook"][]=$this->WWWEnableAddressBook;}
 			
 			
 			

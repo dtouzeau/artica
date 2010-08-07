@@ -57,6 +57,8 @@ public
       function get_LDAP_suffix():string;
       function SLAPD_CONF_PATH():string;
       function PERL_GENERIC_INSTALL(indexWeb:string;ModulesToCheck:string;force:boolean=false;echoyes:boolean=false):boolean;
+      function PERL_MODULES_ARCH_DIR():string;
+      function PERL_MODULES_NO_ARCH_DIR():string;
       function ReadFromFile(TargetPath:string):string;
       function COMPILE_VERSION(package_name:string):integer;
       function COMPILE_VERSION_STRING(package_name:string):string;
@@ -1129,6 +1131,65 @@ begin
 
 end;
 //#############################################################################################
+function tlibs.PERL_MODULES_ARCH_DIR():string;
+var
+   cmd:string;
+   l:TstringList;
+   RegExpr:TRegExpr;
+   i:integer;
+begin
+   if not FileExists('/tmp/artica.perlV') then begin
+      cmd:='perl -V';
+      fpsystem(cmd + ' >/tmp/artica.perlV 2>&1');
+   end;
+
+ l:=TstringList.Create;
+ RegExpr:=TRegExpr.Create;
+ l.LoadFromFile('/tmp/artica.perlV');
+ RegExpr.Expression:='-Darchlib=(.+?)\s+';
+ for i:=0 to l.Count-1 do begin
+     if RegExpr.Exec(l.Strings[i]) then begin
+      result:=trim(RegExpr.Match[1]);
+      break;
+     end else begin
+     //writeln(l.Strings[i]);
+     end;
+ end;
+ L.free;
+ RegExpr.Free;
+end;
+//#############################################################################################
+function tlibs.PERL_MODULES_NO_ARCH_DIR():string;
+var
+   cmd:string;
+   l:TstringList;
+   RegExpr:TRegExpr;
+   i:integer;
+begin
+   if not FileExists('/tmp/artica.perlV') then begin
+      cmd:='perl -V';
+      fpsystem(cmd + ' >/tmp/artica.perlV 2>&1');
+   end;
+
+ l:=TstringList.Create;
+ RegExpr:=TRegExpr.Create;
+ l.LoadFromFile('/tmp/artica.perlV');
+
+ for i:=0 to l.Count-1 do begin
+     RegExpr.Expression:='ndorarch=(.+?)\s+';
+     if RegExpr.Exec(l.Strings[i]) then begin
+      result:=trim(RegExpr.Match[1]);
+      break;
+     end;
+     RegExpr.Expression:='vendorarch=(.+?)\s+';
+     if RegExpr.Exec(l.Strings[i]) then begin
+      result:=trim(RegExpr.Match[1]);
+      break;
+     end;
+ end;
+ L.free;
+ RegExpr.Free;
+end;
 
 function tlibs.CHECK_PERL_MODULES(ModulesToCheck:string):string;
 var

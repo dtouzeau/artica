@@ -6,7 +6,7 @@ unit zabbix;
 interface
 
 uses
-    Classes, SysUtils,variants,strutils,IniFiles, Process,logs,unix,
+    Classes, SysUtils,variants,strutils,Process,logs,unix,
     RegExpr      in '/home/dtouzeau/developpement/artica-postfix/bin/src/artica-install/RegExpr.pas',
     zsystem      in '/home/dtouzeau/developpement/artica-postfix/bin/src/artica-install/zsystem.pas';
 
@@ -231,17 +231,16 @@ end;
 //#############################################################################
 function tzabbix.WRITECONFIG():string;
 begin
-
+  result:='';
 end;
 //#############################################################################
 procedure tzabbix.RELOAD();
 var
-   cmd:string;
+
    pid:string;
-   count:integer;
 begin
 pid:=SERVER_PID();
-cmd:=WRITECONFIG();
+WRITECONFIG();
 if not  SYS.PROCESS_EXIST(pid) then begin
    START();
    exit;
@@ -254,7 +253,7 @@ function tzabbix.STATUS():string;
 var ini:TstringList;
 pid:string;
 begin
-
+ pid:='';
  if not INSTALLED then exit;
 ini:=TstringList.Create;
    ini.Add('[APP_ZABBIX_SERVER]');
@@ -452,7 +451,6 @@ end;
 procedure tzabbix.SERVER_STOP();
 var
    pid:string;
-   cmd:string;
    count:integer;
 begin
 
@@ -485,7 +483,6 @@ end;
 procedure tzabbix.AGENT_STOP();
 var
    pid:string;
-   cmd:string;
    count:integer;
 begin
 

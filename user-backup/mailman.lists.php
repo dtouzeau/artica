@@ -50,7 +50,7 @@ function js(){
 
 				}
 				$('#dialog2').dialog('close');
-				LoadAjax('mailman_lists_div','$page?ou={$_GET["ou"]}&mailman_lists_div=yes');
+				{$prefix}Load();
 			}	
 	
 	function SaveMailManList(){
@@ -279,21 +279,19 @@ function list_save(){
 	$listname=$_GET["listname"];
 	$admin_email=$_GET["admin_email"];
 	$tpl=new templates();
-	if($_SESSION["uid"]==-100){if(isset($_GET["ou"])){$ou_q=base64_decode($_GET["ou"]);}
+	if($_SESSION["uid"]==-100){
+		echo "ok\n";
+		$ou_q=base64_decode($_GET["ou"]);
 	}else{$ct=new user($_SESSION["uid"]);$ou_q=$ct->ou;}	
 	
 	$ldap=new clladp();
 	$uid=$ldap->uid_from_email($admin_email);
 	if($uid==null){
-		echo $tpl->_ENGINE_parse_body("{mailman_admin_not_exists}");
-		exit;
-	}
-	$ct=new user($uid);
-	if($ou_q<>$ou){
-		echo $tpl->_ENGINE_parse_body("{mailman_admin_not_exists}");
+		echo $tpl->_ENGINE_parse_body("$admin_email:{mailman_admin_not_exists}");
 		exit;
 	}
 	
+	$ct=new user($uid);
 	$listuid=$ldap->uid_from_email("$listname@$domain");
 	if($listuid<>null){
 		echo $tpl->_ENGINE_parse_body("{account_already_exists}:$listname@$domain");

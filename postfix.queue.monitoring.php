@@ -17,17 +17,19 @@ if(isset($_GET["MailID"])){MailID();exit;}
 if(isset($_GET["PostQueueF"])){PostQueueF();exit();}
 if(isset($_GET["TableQueue"])){echo Table_queue();exit;}
 if(isset($_GET["DeleteMailID"])){DeleteMailID();exit;}
+if(isset($_GET["PostCatReprocess"])){reprocessMailID();exit;}
 if(isset($_GET["PostfixDeleteMailsQeue"])){PostfixDeleteMailsQeue();exit;}
 if(isset($_GET["js"])){popup_js();exit;}
-if(isset($_GET["popup"])){popup_index();exit;}
+if(isset($_GET["popup"])){popup_tabs();exit;}
+if(isset($_GET["smtp_queues"])){popup_index();exit;}
 if(isset($_GET["show-queue"])){queue_js();exit;}
 if(isset($_GET["popup-queue"])){queue_popup();exit;}
 if(isset($_GET["read-queue"])){queue_popup_list();exit;}
 if(isset($_GET["popup-message"])){popup_message();exit;}
+if(isset($_GET["details"])){popup_postqueue();exit;}
+if(isset($_GET["js-message"])){queue_js();exit;}
 
-
-
-postfix_queue_monitoring();
+//postfix_queue_monitoring();
 
 
 function popup_js(){
@@ -55,6 +57,11 @@ function queue_js(){
 $page=CurrentPageName();
 $queue=$_GET["show-queue"];
 	$tpl=new templates();	
+	$delete_message_text=$tpl->javascript_parse_text("{delete_message_text}");
+	$start="Start$queue();";
+	
+	if(isset($_GET["js-message"])){$start="PostCat('{$_GET["js-message"]}');";}
+	
 	$html="
 	
 	function redqueue(){
@@ -71,6 +78,30 @@ $queue=$_GET["show-queue"];
 		YahooWin2('700','$page?popup-message='+message,message);
 	}
 	
+var X_PostCatDelete= function (obj) {
+	var results=obj.responseText;
+	if(results.length>2){alert(results);}
+	YahooWin2Hide();
+	RefreshTab('queue_monitor'); 
+	}	
+	
+	function PostCatDelete(message){
+		if(confirm('$delete_message_text ?\\n'+message)){
+			var XHR = new XHRConnection();
+			XHR.appendData('DeleteMailID',message);
+			document.getElementById('loupemessage').innerHTML='<center><img src=img/wait_verybig.gif></center>';
+			XHR.sendAndLoad('$page', 'GET',X_PostCatDelete);	
+		}
+	}
+	
+	function PostCatReprocess(message){
+			var XHR = new XHRConnection();
+			XHR.appendData('PostCatReprocess',message);
+			document.getElementById('loupemessage').innerHTML='<center><img src=img/wait_verybig.gif></center>';
+			XHR.sendAndLoad('$page', 'GET',X_PostCatDelete);		
+	}
+	
+	
 function switchDivViewQueue(id){
 	document.getElementById('messageidtable').style.display='none';
    	document.getElementById('messageidbody').style.display='none';
@@ -78,10 +109,52 @@ function switchDivViewQueue(id){
    	
 }	
 	
-	Start$queue();";
+	$start";
 	
 	echo $html;	
 }
+
+function popup_postqueue(){
+	$page=CurrentPageName();
+	$sock=new sockets();
+	$datas=unserialize(base64_decode($sock->getFrameWork("cmd.php?postqueue-master-list=yes")));
+	if(is_array($datas)){
+		while (list ($msgid, $line) = each ($datas) ){
+			$line["TO"]=trim($line["TO"]);
+
+			$html=$html."
+			<tr ". CellRollOver("Loadjs('$page?js-message=$msgid')").">
+			<td>
+				<table style='width:100%'>
+					<td  width=10% style='font-size:12px;' nowrap>{$line["DATE"]}</td>
+					<td width=33% style='font-size:12px;font-weight:bold' nowrap>{$line["FROM"]}</td>
+					<td width=1%><img src='img/fw_bold.gif'></td>
+					<td width=33% style='font-size:12px;font-weight:bold' nowrap>{$line["TO"]}</td>
+					</tr>
+					<tr>
+					<td colspan=4><code style='font-size:11px;'>{$line["STATUS"]}</code><hr></td>
+					</tr>
+				</table>
+			</td>
+			</tr>";
+			
+			
+		}
+		
+	}
+	
+	$html="
+		<div style='font-size:14px;margin:5px'>{postqueue_list_explain}</div>
+		<table style='width:100%'>
+		$html
+		</table>
+	";
+		$tpl=new templates();
+		echo $tpl->_ENGINE_parse_body($html);
+	
+}
+
+
 
 function popup_message(){
 	include_once(dirname(__FILE__).'/ressources/class.mime.parser.inc');
@@ -132,6 +205,7 @@ while (list ($num, $val) = each ($messagesT) ){
 
 $html="
 <H1>{show_mail}:$messageid</H1>
+<div id='loupemessage'>
 <table style='width:100%'>
 <tr>
 	<td valign='top'>
@@ -143,6 +217,15 @@ $html="
 		<tr>
 		<td>" . Paragraphe("64-banned-regex.png",'{body_message}','{body_message_text}',"javascript:switchDivViewQueue('messageidbody');")."</td>
 		</tr>
+		<tr>
+		<td>" . Paragraphe("64-refresh.png",'{reprocess_message}','{reprocess_message_text}',"javascript:PostCatReprocess('$messageid');")."</td>
+		</tr>		
+		<tr>
+		<td>" . Paragraphe("delete-64.png",'{delete_message}','{delete_message_text}',"javascript:PostCatDelete('$messageid');")."</td>
+		</tr>	
+	
+		
+		
 		</table>
 	</td>
 	<td valign='top'>
@@ -152,7 +235,7 @@ $html="
 	</td>
 </tr>
 </table>
-
+</div>
 ";
 
 $tpl=new templates();
@@ -234,12 +317,48 @@ $div="<div style='width:100%;height:300px;overflow:auto'>$err$html</div>";
 $tpl=new templates();
 	echo $tpl->_ENGINE_parse_body($div);
 }
+
+
+function popup_tabs(){
+	$array["details"]="{emails}";
+	$array["smtp_queues"]='{smtp_queues}';
+	$tpl=new templates();
+	$page=CurrentPageName();
+
+	
+	while (list ($num, $ligne) = each ($array) ){
+		$ligne=$tpl->_ENGINE_parse_body("$ligne");
+		$html[]= "<li><a href=\"$page?$num=yes\"><span>$ligne</span></li>\n";
+	}
+	
+	
+	echo "
+	<div id=queue_monitor style='width:100%;height:550px;overflow:auto'>
+		<ul>". implode("\n",$html)."</ul>
+	</div>
+		<script>
+				$(document).ready(function(){
+					$('#queue_monitor').tabs({
+				    load: function(event, ui) {
+				        $('a', ui.panel).click(function() {
+				            $(ui.panel).load(this.href);
+				            return false;
+				        });
+				    }
+				});
+			
+			
+			});
+		</script>";	
+	
+}
+
 	
 function popup_index(){
 	
 	$html="
-	<H1>{queue_monitoring}</H1>
-<input type='hidden' id='remove_mailqueue_text' value=\"{remove_mailqueue_text}\">
+	
+	<input type='hidden' id='remove_mailqueue_text' value=\"{remove_mailqueue_text}\">
 	<table style='width:100%'>
 	<tr>
 		<td width=1%><img src='img/bg_postfix_queue.png'></td>
@@ -482,8 +601,18 @@ function PostQueueF(){
 function DeleteMailID(){
 	$mailid=$_GET["DeleteMailID"];
 	$sock=new sockets();
-	$datas=$sock->getfile('postsuper_d:'.$mailid);	
+	$datas=base64_decode($sock->getFrameWork('cmd.php?postsuper-d-master='.$mailid));	
+	echo $datas;
 	}
+	
+function reprocessMailID(){
+	$mailid=$_GET["PostCatReprocess"];
+	$sock=new sockets();
+	$datas=base64_decode($sock->getFrameWork('cmd.php?postsuper-r-master='.$mailid));	
+	echo $datas;	
+}
+
+
 	
 function PostfixDeleteMailsQeue(){
 	$PostfixDeleteMailsQeue=$_GET["PostfixDeleteMailsQeue"];

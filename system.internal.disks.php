@@ -9,6 +9,7 @@
 	if(!$user->AsSystemAdministrator){echo "alert('no privileges');";die();}
 	
 	if(isset($_GET["display"])){hd_index();exit;}
+	if(isset($_GET["hd-index-list"])){hd_index_list();exit;}
 	if(isset($_GET["partinfos"])){hd_partinfos();exit;}
 	if(isset($_GET["ChangeLabel"])){ChangeLabel();exit;}
 	if(isset($_GET["BuildBigPartition"])){BuildBigPartition();exit;}
@@ -324,16 +325,32 @@ $count=0;
 
 
 function ParseHDline($dev,$array){
+	
 		$ID_MODEL=$array["ID_MODEL_1"];
 		if($ID_MODEL==null){$ID_MODEL=$array["ID_MODEL_2"];}
 		$SIZE=$array["SIZE"];
 		$ID_BUS=$array["ID_BUS"];
-		$ID_FS_LABEL=$array["ID_FS_LABEL"];
+		if($array["ID_FS_LABEL"]<>null){$ID_FS_LABEL[]=$array["ID_FS_LABEL"];}
 		$ID_VENDOR=$array["ID_VENDOR"];
-		$title="$ID_FS_LABEL ($SIZE)";
+		
 		if(strlen($ID_MODEL)>14){$ID_MODEL=substr($ID_MODEL,0,11).'...';}
+		
+		
 		$part_number=count($array["PARTITIONS"]);
 		
+		if($part_number>0){
+			while (list ($num, $line) = each ($array["PARTITIONS"])){
+				if($line["ID_FS_LABEL"]<>null){$ID_FS_LABEL[]=$line["ID_FS_LABEL"];}
+			}
+			
+			
+		}
+		
+		if(count($ID_FS_LABEL)==1){
+			$ID_FS_LABEL_TEXT=$ID_FS_LABEL[0];
+		}
+		
+		$title="$ID_FS_LABEL_TEXT ($SIZE)";
 		
 		if($ID_VENDOR<>null){
 			$ID_VENDOR="<tr>
@@ -362,7 +379,11 @@ function ParseHDline($dev,$array){
 		<tr>
 			<td class=legend nowrap>{partitions_number}:</td>
 			<td><strong>$part_number</strong></td>
-		</tr>		
+		</tr>
+		<tr>
+			<td class=legend nowrap>{label}:</td>
+			<td><strong>". @implode(",",$ID_FS_LABEL)."</strong></td>
+		</tr>				
 							
 		</table>
 		
@@ -372,11 +393,18 @@ function ParseHDline($dev,$array){
 	
 	
 	}
+	
+	
+function hd_index_list(){
+
+	echo hd_list();
+	
+}
 
 function hd_index(){
 	$tpl=new templates();
 	$p=CurrentPageName();
-	$hd_list="<div style='width:99%;height:550px;overflow:auto;' id='hd-display'>".hd_list()."</div>";
+	
 	$html="
 	<H1>{internal_hard_drives}</H1>
 	<table style='width:100%'>
@@ -385,9 +413,11 @@ function hd_index(){
 		<td>". imgtootltip("32-usb-refresh.png","{refresh}","LoadAjax('hd-display','$p?hd-display=yes')")."</td>
 	</tr>
 	</table>
+	<div style='width:99%;height:550px;overflow:auto;' id='hd-display'></div>
 	
-	
-	$hd_list
+	<script>
+		LoadAjax('hd-display','$p?hd-index-list=yes');
+	</script>
 	";
 	
 	

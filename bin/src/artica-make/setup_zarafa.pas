@@ -7,8 +7,8 @@ unit setup_zarafa;
 interface
 
 uses
-  Classes, SysUtils,strutils,RegExpr in 'RegExpr.pas',
-  unix,IniFiles,setup_libs,distridetect,postfix_class,zsystem,
+  Classes, SysUtils,RegExpr in 'RegExpr.pas',
+  unix,setup_libs,distridetect,postfix_class,zsystem,
   install_generic;
 
   type

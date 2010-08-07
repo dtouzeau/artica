@@ -8,7 +8,7 @@ interface
 uses
 //depreciated oldlinux -> linux
 Classes, SysUtils,Process,strutils,IniFiles,RegExpr in 'RegExpr.pas',unix,logs,dateutils,uHashList,Geoip,BaseUnix,md5,dhcp_server,openvpn,cups,pdns, obm2,
-samba,smartd,xapian,opengoo,dstat,sugarcrm,rsync,tcpip,policyd_weight,apache_artica, autofs,nfsserver,framework,ocsi,assp,gluster,zabbix,hamachi,vmwaretools,phpldapadmin,monit,zarafa_server,squidguard,wifi,
+samba,smartd,xapian,opengoo,dstat,sugarcrm,rsync,tcpip,policyd_weight,apache_artica, autofs,nfsserver,framework,ocsi,assp,gluster,zabbix,hamachi,vmwaretools,phpldapadmin,monit,zarafa_server,squidguard,wifi, emailrelay,
 mailarchiver in '/home/dtouzeau/developpement/artica-postfix/bin/src/artica-install/mailarchiver.pas',
 kavmilter    in '/home/dtouzeau/developpement/artica-postfix/bin/src/artica-install/kavmilter.pas',
 kas3         in '/home/dtouzeau/developpement/artica-postfix/bin/src/artica-install/kas3.pas',
@@ -3116,12 +3116,9 @@ begin
     ArrayList.Add('[APP_RRDTOOL] "' + RRDTOOL_VERSION() + '"');
     ArrayList.Add('[APP_AWSTATS] "' + awstats.AWSTATS_VERSION() + '"');
     ArrayList.Add('[APP_MAILGRAPH] "' + mailgraph.MAILGRAPH_VERSION() + '"');
-
+    ArrayList.Add('[APP_EMAILRELAY] "' + EMAILRELAY_VERSION() + '"');
     vmwaretools:=tvmtools.Create(SYS);
     ArrayList.Add('[APP_VMTOOLS] "' + vmwaretools.VERSION() + '"');
-
-
-
     zsmartd:=Tsmartd.Create(SYS);
     ArrayList.Add('[APP_SMARTMONTOOLS] "' + zsmartd.VERSION() + '"');
     zsmartd.free;
@@ -3185,17 +3182,72 @@ begin
     xxfce.free;
 
  end;
+//#############################################################################
+function MyConf.RENATTACH_VERSION():string;
+var
+   RegExpr            :TRegExpr;
+   f                  :TstringList;
+   i                  :integer;
+   tmp                :string;
+   binpath            :string;
+begin
+
+
+   result:=SYS.GET_CACHE_VERSION('APP_RENATTACH');
+   if length(result)>2 then exit;
+
+   tmp:=LOGS.FILE_TEMP();
+   binpath:=SYS.LOCATE_GENERIC_BIN('renattach');
+
+     if not FileExists(binpath) then begin
+        logs.Debuglogs('myconf.RENATTACH_VERSION():: not installed');
+        exit;
+     end;
+
+   fpsystem(binpath+' -V >'+tmp+' 2>&1');
+   if not FileExists(tmp) then exit;
+   f:=TstringList.Create;
+   f.LoadFromFile(tmp);
+   LOGS.DeleteFile(tmp);
+   RegExpr:=TRegExpr.Create;
+   RegExpr.Expression:='renattach\s+([0-9\.]+)';
+   for i:=0 to f.Count-1 do begin
+       if  RegExpr.Exec(f.Strings[i]) then begin
+          result:=RegExpr.Match[1];
+          break;
+       end;
+   end;
+
+RegExpr.free;
+f.free;
+SYS.SET_CACHE_VERSION('APP_RENATTACH',result);
+
+end;
  //#############################################################################
 function MyConf.MHONARC_VERSION():string;
 var
    RegExpr            :TRegExpr;
    f                  :TstringList;
    i                  :integer;
+   tmp                :string;
+   binpath            :string;
 begin
-   forceDirectories('/opt/artica/tmp');
-   fpsystem('/usr/bin/mhonarc -v >/opt/artica/tmp/mhonarc.version 2>&1');
+
+   result:=SYS.GET_CACHE_VERSION('APP_MONARC');
+   if length(result)>2 then exit;
+   tmp:=LOGS.FILE_TEMP();
+   binpath:=SYS.LOCATE_GENERIC_BIN('mhonarc');
+
+     if not FileExists(binpath) then begin
+        logs.Debuglogs('myconf.MHONARC_VERSION():: not installed');
+        exit;
+     end;
+
+   fpsystem(binpath+' -v >'+tmp+' 2>&1');
+   if not FileExists(tmp) then exit;
    f:=TstringList.Create;
-   f.LoadFromFile('/opt/artica/tmp/mhonarc.version');
+   f.LoadFromFile(tmp);
+   LOGS.DeleteFile(tmp);
    RegExpr:=tRegExpr.Create;
    RegExpr.Expression:='MHonArc\s+v([0-9\.]+)';
    for i:=0 to f.Count-1 do begin
@@ -3207,9 +3259,46 @@ begin
 
 RegExpr.free;
 f.free;
+SYS.SET_CACHE_VERSION('APP_MONARC',result);
 end;
 //#############################################################################
+function MyConf.EMAILRELAY_VERSION():string;
+var
+   RegExpr            :TRegExpr;
+   f                  :TstringList;
+   i                  :integer;
+   tmp                :string;
+   binpath            :string;
+begin
 
+   result:=SYS.GET_CACHE_VERSION('APP_EMAILRELAY');
+   if length(result)>2 then exit;
+   tmp:=LOGS.FILE_TEMP();
+   binpath:=SYS.LOCATE_GENERIC_BIN('emailrelay');
+
+     if not FileExists(binpath) then begin
+        logs.Debuglogs('myconf.EMAILRELAY_VERSION():: not installed');
+        exit;
+     end;
+
+   fpsystem(binpath+' -V >'+tmp+' 2>&1');
+   if not FileExists(tmp) then exit;
+   f:=TstringList.Create;
+   f.LoadFromFile(tmp);
+   LOGS.DeleteFile(tmp);
+   RegExpr:=tRegExpr.Create;
+   RegExpr.Expression:='E-MailRelay V([0-9\.]+)';
+   for i:=0 to f.Count-1 do begin
+       if  RegExpr.Exec(f.Strings[i]) then begin
+          result:=RegExpr.Match[1];
+          break;
+       end;
+   end;
+SYS.SET_CACHE_VERSION('APP_EMAILRELAY',result);
+RegExpr.free;
+f.free;
+end;
+//#############################################################################
 
 
 function MyConf.GETLIVE_VERSION():string;
@@ -3263,36 +3352,6 @@ begin
 
 end;
 //#############################################################################
-function MyConf.EMAILRELAY_VERSION():string;
-var
-   RegExpr:TRegExpr;
-   TMP:string;
-begin
-   if not FileExists('/usr/local/sbin/emailrelay') then exit('0.0.0');
-   TMP:=ExecPipe('/usr/local/sbin/emailrelay -V');
-   RegExpr:=TRegExpr.Create;
-   RegExpr.Expression:='E-MailRelay V([0-9\.]+)';
-   if RegExpr.Exec(TMP) then result:=RegExpr.Match[1];
-   RegExpr.free;
-
-end;
-//#############################################################################
-function MyConf.RENATTACH_VERSION():string;
-var
-   RegExpr:TRegExpr;
-   TMP:string;
-begin
-   if not FileExists(get_ARTICA_PHP_PATH() + '/bin/renattach') then exit('0.0.0');
-   TMP:=ExecPipe(get_ARTICA_PHP_PATH() + '/bin/renattach -V');
-   RegExpr:=TRegExpr.Create;
-   RegExpr.Expression:='renattach\s+([0-9\.]+)';
-   if RegExpr.Exec(TMP) then result:=RegExpr.Match[1];
-   RegExpr.free;
-
-end;
-//#############################################################################
-
-
 function MyConf.GetAllApplisInstalled():string;
 begin
  result:='';
@@ -5445,6 +5504,7 @@ var
    l:TstringList;
    xfce:Txfce;
    pidof_path:string;
+   emailrelay:Temailrelay;
 begin
      forcedirectories('/etc/artica-postfix');
      logs:=Tlogs.Create;
@@ -5527,6 +5587,10 @@ begin
      START_MYSQL();
      APACHE_ARTICA_START();
      BOA_START();
+
+     emailrelay:=Temailrelay.CReate(SYS);
+     emailrelay.START();
+     emailrelay.free;
 
 
      logs.OutputCmd(Rootpath + '/bin/artica-ldap -iptables --start');
@@ -9737,6 +9801,7 @@ FUNCTION myconf.GLOBAL_STATUS():string;
  zarafa_server:tzarafa_server;
  zwifi:twifi;
  opengoo:topengoo;
+ emailrelay:temailrelay;
 begin
 LSHW_TIME:=0;
 INSTANT_SEARCH();
@@ -9786,6 +9851,10 @@ if not FileExists(POSFTIX_POSTCONF_PATH) then begin
 end;
    //artica-make
    ini:=ini+ ARTICA_MAKE_STATUS()+CRLF;
+
+   emailrelay:=Temailrelay.CReate(SYS);
+   ini:=ini+ emailrelay.STATUS()+CRLF;
+
 
    //retranslator
     logs.Debuglogs('retranslator STATUS ----------------------------------');
@@ -11262,6 +11331,11 @@ begin
   logs:=Tlogs.Create;
   gdm_bin:=SYS.LOCATE_GENERIC_BIN('gdm');
   if length(gdm_bin)=0 then exit;
+
+     if not FileExists(gdm_bin) then begin
+        logs.Debuglogs('myconf.GDM_VERSION():: not installed');
+        exit;
+     end;
 
   result:=SYS.GET_CACHE_VERSION('APP_GDM');
   if length(result)>2 then exit;

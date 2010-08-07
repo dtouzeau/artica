@@ -7,7 +7,7 @@ unit setup_roundcube;
 interface
 
 uses
-  Classes, SysUtils,strutils,RegExpr in 'RegExpr.pas',
+  Classes, SysUtils,RegExpr in 'RegExpr.pas',
   unix,IniFiles,setup_libs,distridetect,zsystem,roundcube,lighttpd,
   install_generic;
 
@@ -119,12 +119,15 @@ var
    remoteversion:integer;
    remoteversion_srt:string;
    upgrade:boolean;
+
 begin
 
     CODE_NAME:='APP_ROUNDCUBE3';
+    SYS:=Tsystem.Create();
     install.INSTALL_STATUS(CODE_NAME,10);
     web_folder:=roundcube.web_folder();
     if not DirectoryExists(web_folder) then web_folder:='/usr/share/roundcube';
+
 
 
     if DirectoryExists(web_folder) then begin
@@ -143,6 +146,8 @@ begin
        upgrade:=true;
     end;
 
+  ForceDirectories(web_folder);
+  fpsystem('/bin/rm -rf '+web_folder+'/*');
   SetCurrentDir('/root');
   install.INSTALL_STATUS(CODE_NAME,20);
   install.INSTALL_PROGRESS(CODE_NAME,'{downloading}');
@@ -161,7 +166,7 @@ begin
   port:=SYS.MYSQL_INFOS('port');
 
   install.INSTALL_PROGRESS(CODE_NAME,'{installing}');
-  ForceDirectories(web_folder);  
+
 
   if upgrade then begin
      fpsystem('/bin/cp -rfv '+source_folder+'/* '+ web_folder+'/');
@@ -185,6 +190,10 @@ begin
   install.INSTALL_STATUS(CODE_NAME,100);
   fpsystem('/bin/rm /etc/artica-postfix/versions.cache');
 
+
+  fpsystem('/etc/init.d/artica-postfix restart roundcube');
+  fpsystem(SYS.LOCATE_PHP5_BIN()+' /usr/share/artica-postfix/exec.www.install.php');
+
 end;
 //#########################################################################################
 procedure install_roundcube.ConfigDB();
@@ -207,6 +216,7 @@ begin
 
 
  ForceDirectories('/usr/share/roundcube');
+ fpsystem('/bin/rm -rf /usr/share/roundcube/*');
  fpsystem('/bin/cp -rf '+Path+'/* /usr/share/roundcube/');
 
  writeln('');
@@ -258,6 +268,8 @@ begin
  install.INSTALL_STATUS('APP_ROUNDCUBE3',80);
  fpsystem('/usr/share/artica-postfix/bin/process1 --force');
  install.INSTALL_STATUS('APP_ROUNDCUBE3',100);
+  fpsystem('/etc/init.d/artica-postfix restart roundcube');
+  fpsystem(SYS.LOCATE_PHP5_BIN()+' /usr/share/artica-postfix/exec.www.install.php');
 end;
 //############################################################################
 

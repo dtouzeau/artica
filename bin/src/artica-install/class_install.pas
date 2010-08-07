@@ -10,7 +10,7 @@ uses
   BaseUnix,unix,global_conf,zsystem,logs,geoip,debian,spamass,openldap,clamav,cyrus,squid,postfix_class,samba,awstats,process_infos,pureftpd,ntpd,spfmilter,
   mailgraph_daemon, miltergreylist,lighttpd, roundcube,dansguardian,kav4samba,mimedefang,stunnel4,dkimfilter,kav4proxy,bind9,obm,mysql_daemon,p3scan,syslogng,openvpn,cups,
   jcheckmail,dhcp_server,dstat,rsync,smartd,tcpip,policyd_weight,apache_artica,autofs,assp,pdns,gluster,nfsserver,zabbix,hamachi,postfilter, vmwaretools,zarafa_server,monit,wifi,
-  fail2ban,
+  fail2ban,emailrelay,
   mailarchiver in '/home/dtouzeau/developpement/artica-postfix/bin/src/artica-install/mailarchiver.pas',
   kas3         in '/home/dtouzeau/developpement/artica-postfix/bin/src/artica-install/kas3.pas',
   kavmilter    in '/home/dtouzeau/developpement/artica-postfix/bin/src/artica-install/kavmilter.pas',
@@ -601,6 +601,7 @@ var
    zarafa:tzarafa_server;
    monit:tmonit;
    zwifi:twifi;
+   emailrelay:Temailrelay;
 begin
     GLOBAL_INI:=myconf.Create;
     Zclam:=TClamav.Create;
@@ -701,6 +702,13 @@ begin
                  monit.STOP();
                  exit();
               end;
+
+              if ParamStr(2)='artica-notifier' then begin
+                 emailrelay:=temailrelay.Create(SYS);
+                 emailrelay.STOP();
+                 exit();
+              end;
+
 
 
 
@@ -1201,7 +1209,7 @@ begin
                writeln('|tail|daemon|clammilter|dnsmasq|stunnel|dkim|postfix|mailgraph|mimedefang|roundcube|kav4samba|bind9|obm|p3scan|syslogng|mailarchiver|bogom');
                writeln('|collectd|fetchmail|mailspy|amavis|retranslator|retranslator-tsk|watchdog|dotclear|jcheckmail|mailman|kas3|dhcp|cicap|openvpn|postfix-logger');
                writeln('|dansguardian-tail|cups|dstat|dstat-top-mem|dstat-top-cpu|rsync|smartd|policydw|mysql-cluster|assp|pdns|gluster|gluster-cli|sysloger');
-               writeln('|zabbix|hamachi|kav4proxy|postfilter|vmtools|zarafa|zarafa-web|monit|wifi[proxy-pac');
+               writeln('|zabbix|hamachi|kav4proxy|postfilter|vmtools|zarafa|zarafa-web|monit|wifi[proxy-pac|artica-notifier');
                exit();
             end;
 
@@ -1290,6 +1298,7 @@ var
    zarafa:tzarafa_server;
    monit:tmonit;
    zwifi:twifi;
+   emailrelay:temailrelay;
 begin
     GLOBAL_INI:=myconf.Create;
     SYS:=Tsystem.Create;
@@ -1420,7 +1429,11 @@ begin
                  exit();
               end;
 
-
+              if ParamStr(2)='artica-notifier' then begin
+                 emailrelay:=temailrelay.Create(SYS);
+                 emailrelay.START();
+                 exit();
+              end;
 
 
               if ParamStr(2)='mysql-cluster' then begin
@@ -1961,7 +1974,7 @@ begin
                writeln('|daemon|clammilter|dnsmasq|stunnel|postfix|mailgraph|mimedefang|roundcube|kav4samba|bind9|obm|yorel|p3scan|syslogng|mailarchive|bogom');
                writeln('|collectd|mysql|fetchmail|mailspy|amavis|retranslator|spfmilter|dotclear|jcheckmail|mailman|kas3|dhcp|cicap[openvpn|postfix-logger');
                writeln('|dansguardian-tail|apache-groupware|cups|dstat|dstat-top-mem|dstat-top-cpu|rsync|policydw|autofs|mysql-cluster|assp|pdns|gluster|gluster-cli');
-               writeln('|syslogger|zabbix|kav4proxy|postfilter|vmtools|zarafa|zarafa-web|monit|wifi|proxy-pac');
+               writeln('|syslogger|zabbix|kav4proxy|postfilter|vmtools|zarafa|zarafa-web|monit|wifi|proxy-pac|artica-notifier');
                exit();
             end;
 

@@ -6,7 +6,7 @@ include_once(dirname(__FILE__).'/ressources/class.mysql.inc');
 include_once(dirname(__FILE__).'/framework/class.unix.inc');
 include_once(dirname(__FILE__).'/framework/frame.class.inc');
 
-
+if(preg_match("#--verbose#",implode(" ",$argv))){$GLOBALS["VERBOSE"]=true;}
 if($argv[1]=="--sync"){sync($argv[2]);exit;}
 if($argv[1]=="--cron"){cron();exit;}
 if($argv[1]=="--stop"){cron($argv[2]);exit;}
@@ -118,6 +118,10 @@ function sync($id){
 	$cmd=$cmd." --host1 {$ligne["imap_server"]} --user1 {$ligne["username"]} --password1 {$ligne["password"]}$ssl$sep --host2 $host2 --user2 $user2";
 	$cmd=$cmd." --password2 $password2$ssl2$sep2$folders_replicate$delete$noauthmd5$allowsizemismatch$skipsize$nofoldersizes >$file_temp 2>&1";
 	
+	if($GLOBALS["VERBOSE"]){
+		echo "$cmd\n";
+		return;
+	}
 	
 	shell_exec($cmd);
 	update_status(0,addslashes(@file_get_contents($file_temp)));

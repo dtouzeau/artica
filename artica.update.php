@@ -306,14 +306,18 @@ if(!is_array($tbl)){return null;}
 	krsort($tbl);
 while (list ($num, $ligne) = each ($tbl) ){
 		if(trim($ligne)==null){continue;}
+		  
 		  if(preg_match('#Couldn.+?t#i',$ligne)){$color=true;}
 		  if(preg_match('#can.+?t#i',$ligne)){$color=true;}
 		  if(preg_match('#didn\'t#i',$ligne)){$color=true;}
 		  if(preg_match('#FATAL ERROR#i',$ligne)){$color=true;}
-		  
-		  
-		  
 		  if($color){$colorw="color:red";}
+		  
+		  if(preg_match("#Downloading new version#",$ligne)){
+		  	$colorw="color:#005447;font-weight:bold;";
+		  }
+		  
+		  
 		  $table=$table . "
 		  <tr>
 		  <td width=1% valign='top'><img src='img/fw_bold.gif'></td>

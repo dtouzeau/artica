@@ -87,7 +87,7 @@ function main_tabs(){
 	$page=CurrentPageName();
 	$squid=new squid();
 	$users=new usersMenus();
-	$array["networking"]='{net_settings}';
+	$array["networking"]='{squid_net_settings}';
 	$array["acl"]='{acls}';
 	$array["access"]='{access_rules}';
 	

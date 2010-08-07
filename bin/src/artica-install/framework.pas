@@ -22,9 +22,11 @@ private
      awstats:tawstats;
      mem_pid:string;
     function    Explode(const Separator, S: string; Limit: Integer = 0):TStringDynArray;
-
-
-
+    function    APACHE_SET_MODULES():string;
+    procedure   START_APACHE();
+    procedure   APACHE_CONFIG();
+    function    APACHE_ADD_MODULE(moduleso_file:string):string;
+    function    APACHE_AuthorizedModule(module_so:string):boolean;
 
 public
 EnableLighttpd:integer;
@@ -85,6 +87,300 @@ begin
    if FileExists('/usr/local/bin/php-cgi') then exit('/usr/local/bin/php-cgi');
 end;
 //##############################################################################
+
+procedure tframework.START_APACHE();
+var
+  pid:string;
+  bin_path:string;
+  count:integer;
+begin
+     pid:=LIGHTTPD_PID();
+
+ if SYS.PROCESS_EXIST(pid) then begin
+      logs.DebugLogs('Starting......: Framework Apache daemon already running PID '+pid);
+      exit;
+ end;
+
+ bin_path:=SYS.LOCATE_APACHE_BIN_PATH();
+
+   if not FileExists(bin_path) then begin
+       logs.Debuglogs('Starting......: Framework Apache it seems that apache is not installed... Aborting');
+       exit;
+   end;
+
+   logs.DebugLogs('Starting......: Framework Apache daemon libphp....:'+SYS.LOCATE_APACHE_LIBPHP5());
+   logs.Debuglogs('Starting......: Framework Apache daemon Building configuration');
+   fpsystem('useradd apache-root >/dev/null 2>&1');
+   fpsystem('usermod -G root apache-root >/dev/null 2>&1');
+   APACHE_CONFIG();
+   fpsystem(bin_path+' -f /etc/artica-postfix/framework.conf');
+
+ count:=0;
+ while not SYS.PROCESS_EXIST(LIGHTTPD_PID()) do begin
+              sleep(150);
+              inc(count);
+              if count>50 then begin
+                 logs.DebugLogs('Starting......: Framework Apache daemon. (timeout!!!)');
+                 logs.DebugLogs('Starting......: Framework Apache daemon. "'+bin_path+' -f /etc/artica-postfix/framework.conf" failed');
+                 break;
+              end;
+        end;
+
+ pid:=LIGHTTPD_PID();
+ if SYS.PROCESS_EXIST(pid) then begin
+      logs.DebugLogs('Starting......: Framework Apache daemon with new PID '+pid);
+ end;
+
+
+
+end;
+
+//##############################################################################
+
+procedure tframework.APACHE_CONFIG();
+
+var
+l:Tstringlist;
+begin
+l:=Tstringlist.Create;
+l.add('ServerRoot "/usr/share/artica-postfix/framework"');
+l.add('Listen 127.0.0.1:47980');
+l.add('');
+l.add('<IfModule !mpm_netware_module>');
+l.add('User apache-root');
+l.add('Group root');
+l.add('ServerName '+GetHostname());
+l.add('</IfModule>');
+l.add('');
+l.add('ServerAdmin you@example.com');
+l.add('DocumentRoot "/usr/share/artica-postfix/framework"');
+l.add('');
+l.add('<Directory />');
+l.add('    Options FollowSymLinks');
+l.add('    AllowOverride None');
+l.add('    Order deny,allow');
+l.add('    Deny from all');
+l.add('</Directory>');
+l.add('');
+l.add('');
+l.add('<Directory "/usr/share/artica-postfix/framework">');
+l.add('    Options Indexes FollowSymLinks');
+l.add('    AllowOverride None');
+l.add('    Order allow,deny');
+l.add('    Allow from all');
+l.add('');
+l.add('</Directory>');
+l.add('');
+l.add('<IfModule dir_module>');
+l.add('    DirectoryIndex index.php');
+l.add('</IfModule>');
+l.add('');
+l.add('');
+l.add('ErrorLog	/var/log/artica-postfix/framework_error.log');
+l.add('');
+l.add('LogLevel warn');
+l.add('');
+l.add('<IfModule log_config_module>');
+l.add('    LogFormat "%h %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-Agent}i\"" combined');
+l.add('    LogFormat "%h %l %u %t \"%r\" %>s %b" common');
+l.add('');
+l.add('    <IfModule logio_module>');
+l.add('      LogFormat "%h %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-Agent}i\" %I %O" combinedio');
+l.add('    </IfModule>');
+l.add('');
+l.add('CustomLog	/var/log/artica-postfix/framework_error.log common');
+l.add('</IfModule>');
+l.add('');
+l.add('<IfModule alias_module>');
+l.add('    ScriptAlias /cgi-bin/ "/opt/artica/cgi-bin/"');
+l.add('');
+l.add('</IfModule>');
+l.add('');
+l.add('<IfModule cgid_module>');
+l.add('</IfModule>');
+l.add('');
+l.add('<Directory "/opt/artica/cgi-bin">');
+l.add('    AllowOverride None');
+l.add('    Options None');
+l.add('    Order allow,deny');
+l.add('    Allow from all');
+l.add('</Directory>');
+l.add('');
+l.add('DefaultType text/plain');
+l.add('');
+l.add('<IfModule mime_module>');
+l.add('TypesConfig	/etc/mime.types');
+l.add('');
+l.add('    #AddType application/x-gzip .tgz');
+l.add('    #AddEncoding x-compress .Z');
+l.add('    #AddEncoding x-gzip .gz .tgz');
+l.add('    AddType application/x-compress .Z');
+l.add('    AddType application/x-gzip .gz .tgz');
+l.add('    AddType application/x-httpd-php .php .phtml');
+l.add('    AddType application/x-httpd-php-source .phps');
+l.add('    #AddHandler cgi-script .cgi');
+l.add('    #AddType text/html .shtml');
+l.add('    #AddOutputFilter INCLUDES .shtml');
+l.add('</IfModule>');
+l.add('');
+l.add('#MIMEMagicFile conf/magic');
+l.add('#ErrorDocument 500 "The server made a boo boo."');
+l.add('#ErrorDocument 404 /missing.html');
+l.add('#ErrorDocument 404 "/cgi-bin/missing_handler.pl"');
+l.add('#ErrorDocument 402 http://www.example.com/subscription_info.html');
+l.add('#EnableMMAP off');
+l.add('#EnableSendfile off');
+l.add('');
+l.add('PidFile	/var/run/lighttpd/framework.pid');
+l.Add(APACHE_SET_MODULES());
+logs.WriteToFile(l.Text,'/etc/artica-postfix/framework.conf');
+l.free;
+end;
+//##############################################################################
+function tframework.APACHE_SET_MODULES():string;
+var
+i:integer;
+APACHE_MODULES_PATH:string;
+l:Tstringlist;
+xmod:string;
+begin
+l:=Tstringlist.Create;
+APACHE_MODULES_PATH:=SYS.LOCATE_APACHE_MODULES_PATH();
+
+if length(APACHE_MODULES_PATH)=0 then begin
+    logs.DebugLogs('Starting......: Framework Apache daemon unable to locate modules path');
+    result:='';
+    exit;
+end;
+
+
+logs.DebugLogs('Starting......: Framework Apache daemon modules are stored in '+APACHE_MODULES_PATH);
+SYS.DirFiles(SYS.LOCATE_APACHE_MODULES_PATH(),'*.so');
+ for i:=0 to SYS.DirListFiles.Count-1 do begin
+       xmod:=trim(APACHE_ADD_MODULE(SYS.DirListFiles.Strings[i]));
+       if length(xmod)=0 then begin
+          logs.DebugLogs('Apache daemon refused mod:"'+SYS.DirListFiles.Strings[i]+'"');
+          continue;
+       end;
+       logs.DebugLogs('Starting......: Framework Apache daemon add mod:"'+SYS.DirListFiles.Strings[i]+'"');
+       l.Add(APACHE_ADD_MODULE(SYS.DirListFiles.Strings[i]));
+end;
+
+if FileExists('/usr/lib/apache-extramodules/mod_php5.so') then begin
+   logs.DebugLogs('Starting......: Framework Apache daemon add mod:"mod_php5.so"');
+   l.add('LoadModule php5_module'+chr(9)+'/usr/lib/apache-extramodules/mod_php5.so');
+end;
+
+
+logs.DebugLogs('Starting......: Framework Apache daemon '+IntTOstr(l.Count) +' modules');
+result:=l.Text;
+
+end;
+//##############################################################################
+function tframework.APACHE_ADD_MODULE(moduleso_file:string):string;
+  var
+   RegExpr:TRegExpr;
+   ADD:boolean;
+   l:TstringList;
+   i:integer;
+   moduleso_file_pattern:string;
+   APACHE_MODULES_PATH:string;
+   module_name:string;
+begin
+moduleso_file:=trim(moduleso_file);
+APACHE_MODULES_PATH:=SYS.LOCATE_APACHE_MODULES_PATH();
+
+
+if moduleso_file='mod_perl.so' then begin
+    result:='LoadModule perl_module'+chr(9)+APACHE_MODULES_PATH+'/'+moduleso_file;
+    exit;
+end;
+
+if moduleso_file='mod_log_config.so' then begin
+    result:='LoadModule log_config_module'+chr(9)+APACHE_MODULES_PATH+'/'+moduleso_file;
+    exit;
+end;
+
+if moduleso_file='mod_vhost_ldap.so' then begin
+    result:='LoadModule vhost_ldap_module'+chr(9)+APACHE_MODULES_PATH+'/'+moduleso_file;
+    exit;
+end;
+
+
+if moduleso_file='mod_ldap.so' then begin
+    result:='LoadModule ldap_module'+chr(9)+APACHE_MODULES_PATH+'/'+moduleso_file;
+    exit;
+end;
+
+if moduleso_file='mod_rewrite.so' then begin
+    result:='LoadModule rewrite_module'+chr(9)+APACHE_MODULES_PATH+'/'+moduleso_file;
+    exit;
+end;
+
+
+
+if not APACHE_AuthorizedModule(moduleso_file) then exit;
+if moduleso_file='mod_proxy_connect.so' then exit;
+if moduleso_file='mod_dav_lock.so' then exit;
+if moduleso_file='mod_mem_cache.so' then exit;
+if moduleso_file='mod_cgid.so' then exit;
+if moduleso_file='mod_proxy.so' then exit;
+if moduleso_file='mod_proxy_http.so' then exit;
+if moduleso_file='mod_proxy_ajp.so' then exit;
+
+ADD:=false;
+moduleso_file_pattern:=AnsiReplaceText(moduleso_file,'.','\.');
+RegExpr:=TRegExpr.CReate;
+RegExpr.Expression:='^mod_(.+?)\.so';
+if RegExpr.Exec(moduleso_file) then begin
+     module_name:=RegExpr.Match[1]+'_module';
+end else begin
+    RegExpr.Expression:='^(.+?)\.so';
+    module_name:=RegExpr.Match[1]+'_module';
+end;
+
+
+if moduleso_file='libphp5.so' then module_name:='php5_module';
+result:='LoadModule '+ module_name+chr(9)+APACHE_MODULES_PATH+'/'+moduleso_file;
+end;
+//##############################################################################
+function tframework.APACHE_AuthorizedModule(module_so:string):boolean;
+var
+   l:Tstringlist;
+   i:integer;
+begin
+
+l:=Tstringlist.Create;
+result:=false;
+l.add('mod_alias.so');
+l.add('mod_auth_basic.so');
+l.add('mod_authn_file.so');
+l.add('mod_authz_default.so');
+l.add('mod_authz_groupfile.so');
+l.add('mod_authz_host.so');
+l.add('mod_authz_user.so');
+l.add('mod_autoindex.so');
+l.add('mod_cgi.so');
+l.add('mod_deflate.so');
+l.add('mod_dir.so');
+l.add('mod_env.so');
+l.add('mod_mime.so');
+l.add('mod_negotiation.so');
+l.add('libphp5.so');
+l.add('mod_setenvif.so');
+l.add('mod_status.so');
+l.add('mod_ssl.so');
+for i:=0 to l.Count-1 do begin
+    if l.Strings[i]=module_so then begin
+       result:=true;
+       break;
+    end;
+
+end;
+l.free;
+
+end;
+//##############################################################################
 procedure tframework.START();
 var
   pid:string;
@@ -95,6 +391,7 @@ logs.Debuglogs('###################### FRAMEWORK #####################');
 
    if not FileExists(LIGHTTPD_BIN_PATH()) then begin
        logs.Debuglogs('LIGHTTPD_START():: it seems that lighttpd is not installed... Aborting');
+       START_APACHE();
        exit;
    end;
 
@@ -211,11 +508,30 @@ begin
 end;
 //##############################################################################
 function tframework.LIGHTTPD_PID():string;
+var
+   lighttpd_bin:string;
+   pid:string;
 begin
 
-   result:=SYS.PIDOF_PATTERN(LIGHTTPD_BIN_PATH() + ' -f /etc/artica-postfix/framework.conf');
-   mem_pid:=result;
-   exit;
+   pid:=SYS.GET_PID_FROM_PATH('/var/run/lighttpd/framework.pid');
+   if SYS.PROCESS_EXIST(pid) then begin
+        result:=pid;
+        mem_pid:=pid;
+       exit;
+   end;
+
+   lighttpd_bin:=LIGHTTPD_BIN_PATH();
+   if FileExists(lighttpd_bin) then begin
+      result:=SYS.PIDOF_PATTERN(lighttpd_bin + ' -f /etc/artica-postfix/framework.conf');
+      mem_pid:=result;
+      exit;
+   end;
+   lighttpd_bin:=SYS.LOCATE_APACHE_BIN_PATH();
+   if FileExists(lighttpd_bin) then begin
+      result:=SYS.PIDOF_PATTERN(lighttpd_bin + ' -f /etc/artica-postfix/framework.conf');
+      mem_pid:=result;
+      exit;
+   end;
 end;
 //##############################################################################
 function tframework.DEFAULT_CONF():string;

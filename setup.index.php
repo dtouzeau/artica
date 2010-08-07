@@ -549,7 +549,7 @@ if($users->POSTFIX_INSTALLED){
 	$html=$html.spacer('{CORE_PRODUCTS}');
 	$html=$html.BuildRows("APP_POSTFIX",$GlobalApplicationsStatus,"postfix");
 	if(!$users->ZARAFA_APPLIANCE){
-		$html=$html.BuildRows("APP_CYRUS_IMAP",$GlobalApplicationsStatus,"cyrus-imapd");
+		$html=$html.BuildRows("APP_CYRUS_IMAP",$GlobalApplicationsStatus,"cyrus-imapd",true);
 	}
 	$html=$html.BuildRows("APP_ZARAFA",$GlobalApplicationsStatus,"zarafa");
 	
@@ -888,6 +888,9 @@ if($users->VMWARE_HOST){
 	//$html=$html.BuildRows("APP_EACCELERATOR",$GlobalApplicationsStatus,"eaccelerator");
 	if(!$KASPERSKY_APPLIANCE){$html=$html.BuildRows("APP_DAR",$GlobalApplicationsStatus,"dar");}
 	$html=$html.BuildRows("APP_MSMTP",$GlobalApplicationsStatus,"msmtp");
+	$html=$html.BuildRows("APP_EMAILRELAY",$GlobalApplicationsStatus,"emailrelay");
+	
+	
 	if(!$KASPERSKY_APPLIANCE){$html=$html.BuildRows("APP_PUREFTPD",$GlobalApplicationsStatus,"pure-ftpd");}
 	$html=$html.BuildRows("APP_SMARTMONTOOLS",$GlobalApplicationsStatus,"smartmontools");
 	$html=$html.BuildRows("APP_PHPLDAPADMIN",$GlobalApplicationsStatus,"phpldapadmin");
@@ -986,7 +989,7 @@ return "
 }
 
 
-function BuildRows($appli,$SockStatus,$internetkey){
+function BuildRows($appli,$SockStatus,$internetkey,$noupgrade=false){
 	$ini=new Bs_IniHandler();
 	$ini->loadFile(dirname(__FILE__). '/ressources/index.ini');
 	$tpl=new templates();
@@ -1028,6 +1031,8 @@ function BuildRows($appli,$SockStatus,$internetkey){
 		$ini->_params["NEXT"]["$internetkey"]="<div style='color:red'>{error_network}</div>";
 		$button_install=null;
 		}
+		
+	if($noupgrade){$button_install=null;}
 	
 	return "
 	<tr $bgcolor>

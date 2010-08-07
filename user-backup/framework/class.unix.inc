@@ -27,6 +27,14 @@ class unix {
 		if(is_file("/usr/lib/cyrus-imapd/reconstruct")){return "/usr/lib/cyrus-imapd/reconstruct";}
 		$this->events("Unable to stat cyrus reconstruct tool");
 	}
+	
+	public function LOCATE_SIEVEC(){
+		if(is_file("/usr/sbin/sievec")){return "/usr/sbin/sievec";}
+		if(is_file("/usr/lib/cyrus/bin/sievec")){return "/usr/lib/cyrus/bin/sievec";}
+		if(is_file("/usr/lib/cyrus-imapd/sievec")){return "/usr/lib/cyrus-imapd/sievec";}
+		$this->events("Unable to stat cyrus sievec tool");
+	}
+
 
 	public function LOCATE_SMBD_PID(){
 		if(is_file("/var/run/smbd.pid")){return "/var/run/smbd.pid";}
@@ -42,7 +50,14 @@ class unix {
 		if(is_file("/var/run/winbindd.pid")){return "/var/run/winbindd.pid";}
 		if(is_file("/var/run/samba/winbindd.pid")){return "/var/run/samba/winbindd.pid";}
 		
-	}		
+	}	
+
+	public function LOCATE_CYRUS_IPURGE(){
+		if(is_file("/usr/sbin/ipurge")){return "/usr/sbin/ipurge";}
+		if(is_file("/usr/lib/cyrus/bin/ipurge")){return "/usr/lib/cyrus/bin/ipurge";}
+		if(is_file("/usr/lib/cyrus-imapd/ipurge")){return "/usr/lib/cyrus-imapd/ipurge";}
+		$this->events("Unable to stat cyrus ipurge tool");
+	}	
 
 	
 	public function LOCATE_CYRQUOTA(){

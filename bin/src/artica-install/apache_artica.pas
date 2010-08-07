@@ -152,6 +152,7 @@ begin
      logs.DebugLogs('Starting......: Apache daemon libphp....:'+SYS.LOCATE_APACHE_LIBPHP5());
      logs.DebugLogs('Starting......: Apache daemon mod_ssl...:'+SYS.LOCATE_APACHE_MODSSLSO());
 
+
      BuildConf();
      CERTIFICATE_SERVER_NAME();
      MIME_TYPES_DIRECTIVES();
@@ -365,6 +366,7 @@ group:=RegExpr.Match[2];
 
      logs.OutputCmd('/bin/chown '+LighttpdUserAndGroup+' /var/run/artica-apache');
      logs.OutputCmd('/bin/chown '+LighttpdUserAndGroup+' /var/log/artica-postfix/apache');
+     logs.OutputCmd('/bin/chown '+LighttpdUserAndGroup+' /var/lib/php5');
 
 logs.Debuglogs('Starting......: Apache daemon Building configuration');
 logs.Debuglogs('Starting......: Apache logs is set to "'+ debug_apache+'"');

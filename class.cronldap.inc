@@ -2,7 +2,8 @@
 include_once(dirname(__FILE__) . '/ressources/class.ini.inc');
 include_once(dirname(__FILE__) . '/ressources/class.mail.inc');
 include_once(dirname(__FILE__) . '/ressources/class.phpmailer.inc');
-
+include_once(dirname(__FILE__).'/framework/frame.class.inc');
+include_once(dirname(__FILE__).'/framework/class.unix.inc');
 
 class cronldap{
 	
@@ -292,14 +293,23 @@ write_syslog("Sending postfix report trought sendmail from $smtp_sender for $ema
 $cmd="/usr/sbin/sendmail -bm -t -f $smtp_sender <$tmpfile";
 system($cmd);
 @unlink($tmpfile);
-
 }
 
 
 function SendMailNotif($text=null,$subject=null,$smtp_sender,$smtp_dest,$verbose=false,$attached_files=array()){
-	 if($GLOBALS["VERBOSE"] ){$verbose=true;} 
+	if($GLOBALS["VERBOSE"] ){$verbose=true;}
+
+	$unix=new unix();
+	$emailrelay_submit=$unix->find_program("emailrelay-submit");
+	
+	if(!is_file("$emailrelay_submit")){
+		write_syslogs("Unable to stat emailrelay-submit, notifications cannot be sent"); 
+		return;
+	}
+	
 	$path="/etc/artica-postfix/smtpnotif.conf";
 	if(!file_exists($path)){
+		events_notif_class("SendMailNotif():: unable to stat $path");
 		if($verbose){echo "unable to stat $path\n";}
 		return null;
 	}
@@ -315,37 +325,9 @@ if(file_exists('/etc/artica-postfix/settings/Daemons/PostfixPostmaster')){
 }
 
 
-$smtp_server_name=$ini->_params["SMTP"]["smtp_server_name"];
-$smtp_server_port=$ini->_params["SMTP"]["smtp_server_port"];
-$smtp_auth_user=$ini->_params["SMTP"]["smtp_auth_user"];
-$smtp_auth_passwd=$ini->_params["SMTP"]["smtp_auth_passwd"];
-$tls_enabled=$ini->_params["SMTP"]["tls_enabled"];
-
-if(trim($smtp_server_name)==null){$smtp_server_name="127.0.0.1";}
-if(trim($smtp_server_port)==null){$smtp_server_port="25";}
 if(trim($smtp_dest)==null){$smtp_dest="$PostmasterAdress";}
 if(trim($smtp_sender)==null){$smtp_sender="$PostmasterAdress";}
 if(trim($smtp_sender)==null){$smtp_sender="$smtp_dest";}
-
-$conf=$conf . "syslog on\n";
-$conf=$conf . "from $smtp_sender\n";
-$conf=$conf . "protocol smtp\n";
-$conf=$conf . "host $smtp_server_name\n";
-$conf=$conf . "port $smtp_server_port\n";
-if(trim($smtp_auth_user)<>null){
-	$conf=$conf . "user $smtp_auth_user\n";
-	$conf=$conf . "password $smtp_auth_passwd\n";
-	$conf=$conf . "auth on\n";
-}
-
-if($tls_enabled==1){$conf=$conf . "tls on\n";}
-
-if(is_file("/usr/share/artica-postfix/bin/artica-msmtp")){$msmtp="/usr/share/artica-postfix/bin/artica-msmtp";}
-
-
-if(is_file("/usr/bin/msmtp")){$msmtp="/usr/bin/msmtp";}
-
-if($verbose){echo "using $msmtp\n";}
 
 $mail = new PHPMailer(true); 
 $mail->IsSendmail();
@@ -356,11 +338,10 @@ $mail->Subject=$subject;
 $mail->Body= $text;
 
 
-
-
 if(count($attached_files)>0){
 	while (list ($num, $file) = each ($attached_files)){
 		if($verbose){echo "Add attachment $file\n";}
+		events_notif_class("SendMailNotif():: Add attachment $file");
 		$mail->AddAttachment($file,basename($file));
 		
 	}
@@ -370,24 +351,16 @@ if(count($attached_files)>0){
 $content=$mail->Send(true);
 
 if($verbose){echo "Building notification from $smtp_sender with $msmtp to $smtp_dest $subject\n";}
-
+events_notif_class("SendMailNotif():: Building notification from $smtp_sender with $msmtp to $smtp_dest $subject");
 write_syslogs("Building notification from $smtp_sender with $msmtp to $smtp_dest $subject",__FILE__);
 
-if($verbose){$cmd_verbose=" -d";}
+$f=$unix->FILE_TEMP();
 
-$tmpfile="/tmp/".md5(date('Y-m-d H:is')."-msmtp");
-$tmpfileConf="/tmp/".md5(date('Y-m-d H:is')."-msmtp.conf");
-$logfile="/tmp/".md5(date('Y-m-d H:is')."-msmtp.log");
-file_put_contents($tmpfile,$content);
-file_put_contents($tmpfileConf,$conf);
-chmod($tmpfileConf,0600);
-$cmd="$msmtp $cmd_verbose --tls-certcheck=off --timeout=10 --file=$tmpfileConf --syslog=on  --logfile=$logfile -- $smtp_dest <$tmpfile";
-$data=system($cmd);
-$data=@file_get_contents($logfile);
-if($verbose){echo $mail->error_log."\n".$data;}
-@unlink($tmpfile);
-@unlink($tmpfileConf);
-@unlink($logfile);				
+$cmd="$emailrelay_submit --spool-dir /var/spool/artica-notifier --from $smtp_sender $smtp_dest <$f 2>&1";
+events_notif_class("SendMailNotif():: $cmd");
+exec($cmd,$results);
+events_notif_class("$cmd",__FILE__);
+events_notif_class(@implode("\n",$results));
 }
 
 
@@ -411,12 +384,12 @@ events_notif_class("$subject to $smtp_dest");
 if(trim($recipient)<>null){$smtp_dest=$recipient;}
 
 
-SendMailNotif($text,$subject,$smtp_sender,$smtp_dest,$verbose);
+	SendMailNotif($text,$subject,$smtp_sender,$smtp_dest,$verbose);
 	events_notif_class("list_cc: ". count($list_cc)." recipient(s)");
 	if(is_array($list_cc)){
 		while (list ($num, $email_addr) = each ($list_cc) ){
 			if(trim($email_addr)==null){continue;}
-			events_notif_class("$subject to $email_addr");
+			events_notif_class("$email_addr -> SendMailNotif()");
 			SendMailNotif($text,$subject,$smtp_sender,$email_addr,$verbose,$attached_files);
 		}
 	}
@@ -455,7 +428,7 @@ function events_notif_class($text){
 		$size=filesize($logFile);
 		if($size>1000000){unlink($logFile);}
 		$f = @fopen($logFile, 'a');
-		$line="$date $filename[$pid] $text\n";
+		$line="$date {$filename}[{$pid}] $text\n";
 		if($_GET["DEBUG"]){echo $line;}
 		@fwrite($f,$line);
 		@fclose($f);

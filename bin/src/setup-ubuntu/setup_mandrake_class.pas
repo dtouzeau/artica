@@ -132,7 +132,7 @@ begin
 
     if lowercase(u)='a' then begin
        InstallPackageLists(base + ' ' + postfix+' '+cyrus+' '+samba+' '+squid);
-       fpsystem('/usr/share/artica-postfix/bin/artica-roundcube --install --verbose');
+       fpsystem('/usr/share/artica-postfix/bin/artica-make APP_ROUNDCUBE3');
        fpsystem('/etc/init.d/artica-postfix restart');
        Show_Welcome();
        exit;
@@ -154,7 +154,7 @@ begin
 
    if u='2' then begin
           InstallPackageLists(cyrus);
-          fpsystem('/usr/share/artica-postfix/bin/artica-roundcube --install --verbose');
+          fpsystem('/usr/share/artica-postfix/bin/artica-make APP_ROUNDCUBE3');
           fpsystem('/etc/init.d/artica-postfix restart');
           Show_Welcome;
           exit;

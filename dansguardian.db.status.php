@@ -53,6 +53,7 @@ function popup_squidguard(){
 	$tpl=new templates();
 	
 	$html="
+	<div style='font-size:14px;'>{DANSGUARDIAN_DB_STATUS_EXPLAIN}</div>
 	<div style='width:100%;height:350px;overflow:auto'>
 	<table style='width:100%'>
 		<tr>
@@ -98,7 +99,8 @@ function popup_squidguard(){
 	
 		if(is_array($array2["domainlist"])){
 			if($array2["domainlist"]["size"]==null){
-				$array2["domainlist"]["size"]="<strong style='color:red'>{not_compiled}</strong>";	
+				$not_compiled=texttooltip("{not_compiled}","{compile_squidguard_databases}<hr><i>{compile_squidguard_databases_text}</i>","Loadjs('squidguard.status.php?compile=yes')",0,"color:red;font-size:14px;font-weight:bold");
+				$array2["domainlist"]["size"]="<span style='color:red'>$not_compiled</span>";
 			
 		}else{$array2["domainlist"]["size"]=FormatBytes($array2["domainlist"]["size"]/1024);}
 		
@@ -171,6 +173,7 @@ function popup(){
 		exit;
 	}
 	$html="
+	<div style='font-size:14px;'>{DANSGUARDIAN_DB_STATUS_EXPLAIN}</div>
 	<div style='width:100%;height:350px;overflow:auto'>
 	<table style='width:100%'>
 		<tr>
@@ -179,12 +182,17 @@ function popup(){
 		<th style='font-size:14px' nowrap>{urls}</th>
 		<th style='font-size:14px' nowrap>{pattern_date}</th>
 	</tr>";
+	
+	//javascript:Loadjs('squidguard.status.php?compile=yes')
+	
+	
 	while (list ($num, $array) = each ($datas) ){
 		
 		$Y=date('Y');
 		$d=date('Y-m-d');
 		$array[2]=str_replace($d,"{today}",$array[2]);
 		$array[2]=str_replace("$Y-","",$array[2]);
+		
 		
 		
 		$html=$html."

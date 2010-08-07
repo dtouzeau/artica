@@ -9,9 +9,8 @@ interface
 uses
   Classes, SysUtils,strutils,RegExpr in 'RegExpr.pas',
   unix,IniFiles,setup_libs,distridetect,
-  setup_suse_class,
   install_generic,
-  setup_ubuntu_class,zsystem,
+  zsystem,
   postfix_class;
 
   type
@@ -46,6 +45,7 @@ public
       procedure dspam_install();
       procedure altermime_install();
       procedure install_MAIL_DKIM();
+      procedure COMPRESS_ROW_ZLIB();
 END;
 
 implementation
@@ -325,6 +325,54 @@ begin
   if not libs.PERL_GENERIC_INSTALL('Mail-DKIM','Mail::DKIM',true) then exit;
 end;
 //#########################################################################################
+procedure  amavisd.COMPRESS_ROW_ZLIB();
+var
+   l:Tstringlist;
+   archdir:string;
+   noarchdir:string;
+   i:integer;
+begin
+    l:=Tstringlist.Create;
+    l.Add('auto/Compress/Raw/Zlib/Zlib.bs');
+    l.add('auto/Compress/Raw/Zlib/Zlib.bs');
+    l.add('auto/Compress/Raw/Zlib/Zlib.so');
+    l.add('auto/Compress/Raw/Zlib/autosplit.ix');
+    l.add('Compress/Raw/Zlib.pm');
+    archdir:=libs.PERL_MODULES_ARCH_DIR();
+    noarchdir:=libs.PERL_MODULES_NO_ARCH_DIR();
+    writeln('Archidr:',archdir,' no-arch:',noarchdir);
+    if DirectoryExists(archdir) then begin
+       writeln('removing Compress::Raw::Zlib');
+       for i:=0 to l.Count-1 do begin
+           if FileExists(archdir+'/'+l.Strings[i]) then begin
+              writeln('removing '+archdir+'/'+l.Strings[i]);
+              fpsystem('/bin/rm '+archdir+'/'+l.Strings[i]);
+           end;
+
+           if FileExists(noarchdir+'/'+l.Strings[i]) then begin
+              writeln('removing '+noarchdir+'/'+l.Strings[i]);
+              fpsystem('/bin/rm '+noarchdir+'/'+l.Strings[i]);
+           end;
+       end;
+    end;
+
+
+
+
+
+     libs.CHECK_PERL_MODULES('Compress::Raw::Zlib');
+     if libs.PERL_GENERIC_INSTALL('Compress-Raw-Zlib','Compress::Raw::Zlib',true) then begin
+        libs.CHECK_PERL_MODULES('Compress::Raw::Zlib');
+        fpsystem('/etc/init.d/artica-postfix restart amavis');
+     end else begin
+         writeln('Failed');
+     end;
+end;
+//#########################################################################################
+
+
+
+
 function amavisd.xinstallamavis():boolean;
 begin
 if not FileExists(postfix.POSFTIX_POSTCONF_PATH()) then begin

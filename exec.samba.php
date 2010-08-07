@@ -63,6 +63,11 @@ if($argv[1]=='--logon-scripts'){
 	LogonScripts();
 	die();
 }
+if($argv[1]=='--fix-lmhost'){
+	fix_lmhosts();
+	die();
+}
+
 
 
 $users=new usersMenus();
@@ -544,6 +549,13 @@ function CountDeUsers(){
 	$ldap=new clladp();
 	$arr=$ldap->hash_users_ou(null);
 	@file_put_contents("/etc/artica-postfix/UsersNumber",count($arr));
+}
+
+function fix_lmhosts(){
+	$smb=new samba();
+	$smb->main_array["global"]["name resolve order"]=null;
+	$smb->SaveToLdap();
+	
 }
 
 

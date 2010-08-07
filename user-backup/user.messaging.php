@@ -56,6 +56,17 @@ function page(){
 					}
 				}
 			}	
+			
+			
+		if($users->cyrus_imapd_installed){
+			if(!$users->ZARAFA_INSTALLED){
+				if($users->spamassassin_installed){
+					$block7=iconTable("anti-spam-learning.png",'{EnableUserSpamLearning}','{EnableUserSpamLearning_text}',
+					"Loadjs('domains.edit.user.sa.learn.php?uid={$_SESSION["uid"]}');");
+				}
+			}
+		}			
+			
 	
 	//$block2=iconTable("canonical-64.png","{sender_canonical}",'{sender_canonical_text}');
 	
@@ -78,6 +89,7 @@ function page(){
 		$block4
 		$block5
 		$block6
+		$block7
 		</td>
 	</tr>
 	</table>

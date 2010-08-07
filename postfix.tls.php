@@ -579,25 +579,28 @@ function postfix_tls_certificate_save(){
 	$sock->SET_INFO('CertificateMaxDays',$CertificateMaxDays);
 	
 	$cert=new ssl_certificate();
-	$cert->array_ssl["server_policy"]["countryName"]=$country_code;
-	$cert->array_ssl["server_policy"]["stateOrProvinceName"]=$_GET["stateOrProvinceName"];
-	$cert->array_ssl["server_policy"]["localityName"]=$_GET["localityName"];
-	$cert->array_ssl["server_policy"]["organizationName"]=$_GET["organizationName"];
-	$cert->array_ssl["server_policy"]["organizationalUnitName"]=$_GET["organizationalUnitName"];
-	$cert->array_ssl["server_policy"]["commonName"]=$_GET["commonName"];
-	$cert->array_ssl["server_policy"]["emailAddress"]=$_GET["emailAddress"];
+	$cert->array_ssl["server_policy"]["countryName"]="supplied";
+	$cert->array_ssl["server_policy"]["stateOrProvinceName"]="supplied";
+	$cert->array_ssl["server_policy"]["localityName"]="supplied";
+	$cert->array_ssl["server_policy"]["organizationName"]="supplied";
+	$cert->array_ssl["server_policy"]["organizationalUnitName"]="supplied";
+	$cert->array_ssl["server_policy"]["commonName"]="supplied";
+	$cert->array_ssl["server_policy"]["emailAddress"]="supplied";
 	
-	$cert->array_ssl["default_ca"]["countryName"]=$country_code;
+	$cert->array_ssl["default_ca"]["countryName"]="Country Code";
 	$cert->array_ssl["default_ca"]["countryName_value"]=$country_code;
 	
-	$cert->array_ssl["default_ca"]["stateOrProvinceName"]=$_GET["stateOrProvinceName"];
+	$cert->array_ssl["default_ca"]["stateOrProvinceName"]="State Name";
 	$cert->array_ssl["default_ca"]["stateOrProvinceName_value"]=$_GET["stateOrProvinceName"];
+	$cert->array_ssl["default_ca"]["localityName"]="Locality Name";
 	$cert->array_ssl["default_ca"]["localityName_value"]=$_GET["localityName"];
-	$cert->array_ssl["default_ca"]["organizationalUnitName"]=$_GET["organizationName"];
+	$cert->array_ssl["default_ca"]["organizationName"]="Organization Name";
 	$cert->array_ssl["default_ca"]["organizationName_value"]=$_GET["organizationName"];
-	$cert->array_ssl["default_ca"]["organizationalUnitName"]=$_GET["organizationalUnitName"];
+	$cert->array_ssl["default_ca"]["organizationalUnitName"]="Organizational Unit Name";
 	$cert->array_ssl["default_ca"]["organizationalUnitName_value"]=$_GET["organizationalUnitName"];
+	$cert->array_ssl["default_ca"]["commonName"]="Common Name";
 	$cert->array_ssl["default_ca"]["commonName_value"]=$_GET["commonName"];
+	$cert->array_ssl["default_ca"]["emailAddress"]="Email Address";
 	$cert->array_ssl["default_ca"]["emailAddress_value"]=$_GET["emailAddress"];
 	$cert->array_ssl["artica"]["country"]=$countryName;
 	
@@ -610,8 +613,8 @@ function postfix_tls_certificate_save(){
 	$cert->array_ssl["policy_anything"]["emailAddress"]="optional";
 	
 	
-	$cert->array_ssl["user_policy"]["commonName"]=$_GET["commonName"];
-	$cert->array_ssl["user_policy"]["emailAddress"]=$_GET["emailAddress"];
+	$cert->array_ssl["user_policy"]["commonName"]="supplied";
+	$cert->array_ssl["user_policy"]["emailAddress"]="supplied";
 	
 	$cert->array_ssl["req"]["input_password"]=$_GET["input_password"];
 	$cert->array_ssl["req"]["output_password"]=$_GET["input_password"];

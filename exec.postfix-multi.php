@@ -170,7 +170,10 @@ function reconfigure_instance($hostname){
 	$instance_path="/etc/postfix-$hostname";	
 	$maincf=new maincf_multi($hostname);
 	$maincf->buildconf();	
+	$maincf->buildmaster();
 	writelogs("Building configuration done",__FUNCTION__,__FILE__,__LINE__);
+	shell_exec("{$GLOBALS["postmulti"]} -i postfix-$hostname -p stop");
+	shell_exec("{$GLOBALS["postmulti"]} -i postfix-$hostname -p start");	
 	_start_instance($hostname);
 	
 	
@@ -189,7 +192,7 @@ function reconfigure_instance_ssl($hostname){
 	$maincf=new maincf_multi($hostname);
 	$maincf->certificate_generate();
 	$maincf->buildconf();	
-	
+	$maincf->buildmaster();
 	
 	echo "Starting......: restarting Postfix {$GLOBALS["postmulti"]} -i postfix-$hostname -p stop\n";		
 	shell_exec("{$GLOBALS["postmulti"]} -i postfix-$hostname -p stop");
@@ -200,6 +203,7 @@ function reconfigure_instance_ssl($hostname){
 function reconfigure_instance_minimal($hostname){
 	$maincf=new maincf_multi($hostname);
 	$maincf->buildconf();	
+	$maincf->buildmaster();
 	echo "Starting......: Postfix {$GLOBALS["postmulti"]} -i postfix-$hostname -p reload\n";		
 	shell_exec("{$GLOBALS["postmulti"]} -i postfix-$hostname -p reload");		
 }

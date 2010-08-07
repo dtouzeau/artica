@@ -54,6 +54,13 @@ if($argv[1]=="--bcc"){
 	die();
 }
 
+if($argv[1]=="--recipient-canonical"){
+	recipient_canonical_maps_build();
+	recipient_canonical_maps();
+	shell_exec("{$GLOBALS["postfix"]} reload >/dev/null 2>&1");
+	die();	
+}
+
 
 if($argv[1]=="--transport"){
 	transport_maps_search();

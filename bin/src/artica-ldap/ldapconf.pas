@@ -649,6 +649,7 @@ end;
 //#############################################################################
 PROCEDURE tldapconf.sa_learn();
 begin
+exit;
 fpsystem(GLOBAL_INI.get_ARTICA_PHP_PATH()+'/bin/artica-learn &');
 
 end;

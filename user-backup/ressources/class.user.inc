@@ -874,25 +874,17 @@ class user{
 	function add_bcc($email){
 		$sock=new sockets();
 		$ldap=new clladp();
-		$EnableArticaSMTPFilter=$sock->GET_INFO("EnableArticaSMTPFilter");
-		if($EnableArticaSMTPFilter==0){
-			$array["RecipientToAdd"][0]=$email;
-			if(!$ldap->Ldap_modify($this->dn,$array)){
+		$array["RecipientToAdd"][0]=$email;
+		if(!$ldap->Ldap_modify($this->dn,$array)){
 				echo "RecipientToAdd:$ldap->ldap_last_error\n";
 				return;
-			}
-			
-			$sock=new sockets();
-			$sock->getFrameWork("cmd.php?postfix-bcc-tables=yes");			
-			return ;	
 		}
-		
-		$array["RecipientToAdd"]=$email;
-		
-		if(!$ldap->Ldap_add_mod($this->dn,$array)){echo "RecipientToAdd:$ldap->ldap_last_error\n";}	
+			
 		$sock=new sockets();
-		$sock->getFrameWork("cmd.php?postfix-bcc-tables=yes");
+		$sock->getFrameWork("cmd.php?postfix-bcc-tables=yes");			
+		return ;	
 		
+
 	}
 	
 	function add_sender_bcc($email){
@@ -936,6 +928,24 @@ class user{
 		
 	}
 	
+	function del_all_bcc(){
+		if(!is_array($this->RecipientToAdd)){return;}
+		reset($this->RecipientToAdd);
+		$tpl=new templates();
+		$ldap=new clladp();
+		while (list ($num, $email) = each ($this->RecipientToAdd) ){
+			$array["RecipientToAdd"]=$email;
+			if(!$ldap->Ldap_del_mod($this->dn,$array)){
+				echo $tpl->_ENGINE_parse_body("{failed} index:$num\nRecipientToAdd:$email\n$ldap->ldap_last_error\n");return;
+				}
+		}
+		
+		$sock=new sockets();
+		$sock->getFrameWork("cmd.php?postfix-bcc-tables=yes");
+		
+	}
+	
+	
 	function del_bcc($num){
 		$email=$this->RecipientToAdd[$num];
 		$array["RecipientToAdd"]=$email;
@@ -944,7 +954,7 @@ class user{
 		if(!$ldap->Ldap_del_mod($this->dn,$array)){echo $tpl->_ENGINE_parse_body("{failed} index:$num\nRecipientToAdd:$email\n$ldap->ldap_last_error\n");}
 		else{echo html_entity_decode($tpl->_ENGINE_parse_body("{success}\n{delete}:$email\n"));}
 		$sock=new sockets();
-		$sock->getFrameWork("cmd.php?postfix-hash-tables=yes");
+		$sock->getFrameWork("cmd.php?postfix-bcc-tables=yes");
 	}
 	
 	function add_transport($line){

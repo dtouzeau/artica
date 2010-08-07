@@ -114,6 +114,40 @@ function services(){
 }
 
 
+function kernel_mismatch(){
+	$users=new usersMenus();
+	if(($users->LinuxDistriCode<>"DEBIAN") && ($users->LinuxDistriCode<>"UBUNTU")){return;}
+	$sock=new sockets();
+	$sock->getFrameWork("cmd.php?system-debian-kernel=yes");
+	$array=unserialize(base64_decode(@file_get_contents(dirname(__FILE__)."/ressources/logs/kernel.lst")));
+	$CPU_FAMILY=$array["INFOS"]["CPU_FAMILY"];
+	$soitquatrebits=$array["INFOS"]["64BITS"];
+	$HT_SUPPORT=$array["INFOS"]["HT"];
+	$CURRENT=$array["INFOS"]["CURRENT"];
+	$MODEL=$array["INFOS"]["MODEL"];
+	if($CPU_FAMILY<10){$icpu="i{$CPU_FAMILY}86";}
+	if(preg_match("#.+?-([0-9]+)86#",$CURRENT,$re)){$kernel_arch="i{$re[1]}86";}
+	
+	if($kernel_arch<>null){
+		if($icpu<>null){
+			if($icpu<>$kernel_arch){
+				$must_change=true;
+			}
+		}
+	}
+if(!$must_change){return null;}
+	
+	
+	return 	Paragraphe('warning64.png',
+		"{kernel_mismatch}",
+		"{kernel_mismatch_text}",
+		"javascript:Loadjs('system.kernel.debian.php')",
+		"{kernel_mismatch_text}",300,80);
+	
+}
+
+
+
 function daemons_status(){
 	$users=new usersMenus();
 	$artica=new artica_general();
@@ -166,7 +200,11 @@ function daemons_status(){
 	if($sock->GET_INFO("DisableWarnNotif")<>1){
 		if(trim($ini->_params["SMTP"]["enabled"]==null)){
 		$js="javascript:Loadjs('artica.settings.php?ajax-notif=yes')";
-		$services=Paragraphe('danger64.png',"{smtp_notification_not_saved}","{smtp_notification_not_saved_text}","$js","{smtp_notification_not_saved}",300,80);
+		$services=Paragraphe('danger64.png',
+		"{smtp_notification_not_saved}",
+		"{smtp_notification_not_saved_text}",
+		"$js",
+		"{smtp_notification_not_saved}",300,80);
 		
 	}}
 	
@@ -261,11 +299,14 @@ function daemons_status(){
 			"javascript:Loadjs('artica.events.php')","{$events_sql["tcount"]} {events}",300,76,1);
 		}
 	}
+	
+	$kernel_mismatch=kernel_mismatch();
 
 	$newversion=null;
 
 	$final="
 	$no_orgs
+	$kernel_mismatch
 	$services
 	$nobackup
 	$events_paragraphe

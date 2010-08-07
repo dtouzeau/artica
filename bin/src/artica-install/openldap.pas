@@ -6,7 +6,7 @@ unit openldap;
 interface
 
 uses
-    Classes, SysUtils,variants,strutils,IniFiles, Process,md5,logs,unix,RegExpr in 'RegExpr.pas',zsystem;
+    Classes, SysUtils,variants,strutils,IniFiles, Process,logs,unix,RegExpr in 'RegExpr.pas',zsystem;
 
 type LDAP=record
       admin:string;
@@ -437,43 +437,43 @@ end;
 procedure topenldap.LDAP_START();
 var
    pid:string;
-   ck:integer;
+   ck,i:integer;
    cmd:string;
    ldaps:string;
    ldapl:string;
    EnableNonEncryptedLdapSession:integer;
-   LdapListenIPAddr:string;
+   LdapListenIPAddr:Tstringlist;
+   CertificateCreated:boolean;
 begin
   ck:=0;
   pid:=LDAP_PID();
   ldapl:='ldap://127.0.0.1:389/';
-  LdapListenIPAddr:=trim(SYS.GET_INFO('LdapListenIPAddr'));
-  if not TryStrToInt(SYS.GET_INFO('EnableNonEncryptedLdapSession'),EnableNonEncryptedLdapSession) then EnableNonEncryptedLdapSession:=1;
-  
   logs.Debuglogs('###################### OPENLDAP #####################"');
-  
+  CertificateCreated:=false;
+
   if not FileExists(SLAPD_BIN_PATH()) then begin
      logs.DebugLogs('Starting......: OpenLDAP Is not installed, skip..');
      exit;
   end;
 
-  if OpenLDAPDisableSSL=0 then begin
-     if CREATE_CERTIFICATE() then begin
-        if trim(LdapListenIPAddr)='all' then LdapListenIPAddr:='';
-        ldaps:='ldaps://'+LdapListenIPAddr+'/';
-     end;
+  if not TryStrToInt(SYS.GET_INFO('EnableNonEncryptedLdapSession'),EnableNonEncryptedLdapSession) then EnableNonEncryptedLdapSession:=1;
+  if OpenLDAPDisableSSL=0 then CertificateCreated:=CREATE_CERTIFICATE();
+  if FileExists('/etc/artica-postfix/settings/Daemons/LdapListenIPAddr') then begin
+       LdapListenIPAddr:=Tstringlist.Create;
+       LdapListenIPAddr.LoadFromFile('/etc/artica-postfix/settings/Daemons/LdapListenIPAddr');
+       for i:=0 to  LdapListenIPAddr.Count-1 do begin
+           if length(trim(LdapListenIPAddr.Strings[i]))>1 then begin
+                if EnableNonEncryptedLdapSession=0 then begin
+                    if CertificateCreated then ldaps:=ldaps+' ldaps://'+trim(LdapListenIPAddr.Strings[i])+'/';
+                end;
+
+                ldapl:=ldapl+' ldap://'+trim(LdapListenIPAddr.Strings[i])+'/';
+                logs.DebugLogs('Starting......: OpenLDAP Listent IP '+LdapListenIPAddr.Strings[i]);
+           end;
+       end;
+       LdapListenIPAddr.Free;
   end;
 
-  if EnableNonEncryptedLdapSession=1 then begin
-     if length(LdapListenIPAddr)>0 then begin
-        if trim(LdapListenIPAddr)<>'127.0.0.1' then begin
-           ldapl:=ldapl+' ldap://'+LdapListenIPAddr+'/ ';
-        end;
-     end;
-  end;
-
-  if trim(LdapListenIPAddr)='all' then ldapl:='ldap:/// ';
-  
   
   if SYS.PROCESS_EXIST(SYS.GET_PID_FROM_PATH('/etc/artica-postfix/artica-backup.pid')) then begin
      logs.DebugLogs('Starting......: OpenLDAP a backup task currently is in use');
@@ -523,12 +523,12 @@ begin
      logs.DebugLogs('Starting......: /etc/artica-postfix/start-ldap.sh');
      fpsystem('/etc/artica-postfix/start-ldap.sh');
   end;
-  
+       ck:=0;
        while not SYS.PROCESS_EXIST(pid) do begin
            pid:=LDAP_PID();
            sleep(100);
            inc(ck);
-           if ck>40 then begin
+           if ck>20 then begin
                 logs.DebugLogs('Starting......: OpenLDAP server timeout...');
                 break;
            end;

@@ -558,35 +558,7 @@ function UserEndOfLIfeSave(){
 	XHR.sendAndLoad('domains.edit.user.php', 'GET',x_ChangeUserPasswordSave);
 	}
 
-var x_RecipientToAdd= function (obj) {
-	var tempvalue=obj.responseText;
-	if(tempvalue.length>0){alert(tempvalue);}
-	LoadAjax('RecipientToAddID','domains.edit.user.php?uid='+m_userid+'&USER_BBC_MAP_LIST=yes');
-}
 
-function RecipientToAdd(){
-	var UserID=document.getElementById("userid").value;
-	m_userid=UserID;
-	var RecipientToAdd=document.getElementById("RecipientToAdd").value;
-	document.getElementById('RecipientToAddID').innerHTML='<center style="width:100%"><img src=img/wait_verybig.gif></center>';
-	var XHR = new XHRConnection();
-	XHR.appendData('RecipientToAdd',RecipientToAdd);
-	XHR.appendData('uid',UserID);
-	XHR.sendAndLoad('domains.edit.user.php', 'GET',x_RecipientToAdd);	
-	
-}
-function RecipientToAddCheck(e){if(checkEnter(e)){RecipientToAdd();}}
-
-function RecipientToAdd_delete(num){
-	var UserID=document.getElementById("userid").value;
-	m_userid=UserID;
-	document.getElementById('RecipientToAddID').innerHTML='<center style="width:100%"><img src=img/wait_verybig.gif></center>';
-	var XHR = new XHRConnection();
-	XHR.appendData('RecipientToAdd_delete',num);
-	XHR.appendData('uid',UserID);
-	XHR.sendAndLoad('domains.edit.user.php', 'GET',x_RecipientToAdd);	
-	
-}
 
 
 var x_RebuildSambaFields= function (obj) {
@@ -612,18 +584,7 @@ function RebuildSambaFields(uid){
 	XHR.sendAndLoad('domains.edit.user.php', 'GET',x_RebuildSambaFields);
 }
 
-function UserMailAlternateAddress(){
-	var UserID=document.getElementById("userid").value;
-	var MailAlternateAddress=document.getElementById("MailAlternateAddress").value;
-	m_userid=UserID;
-	document.getElementById('RecipientToAddID').innerHTML='<center style="width:100%"><img src=img/wait_verybig.gif></center>';
-	var XHR = new XHRConnection();
-	XHR.appendData('MailAlternateAddress',MailAlternateAddress);
-	XHR.appendData('uid',UserID);
-	XHR.sendAndLoad('domains.edit.user.php', 'GET',x_RecipientToAdd);	
-	
-}
-function UserMailAlternateAddressCheck(e){if(checkEnter(e)){UserMailAlternateAddress();}}
+
 
 
 

@@ -70,7 +70,8 @@ if(isset($_GET["status-forced"])){Global_Applications_Status();exit;}
 if(isset($_GET["system-reboot"])){shell_exec("reboot");exit;}
 if(isset($_GET["system-shutdown"])){shell_exec("init 0");exit;}
 if(isset($_GET["system-unique-id"])){GetUniqueID();exit;}
-
+if(isset($_GET["system-debian-kernel"])){system_debian_kernel();exit;}
+if(isset($_GET["system-debian-upgrade-kernel"])){system_debian_kernel_upgrade();exit;}
 
 
 //amavis restart
@@ -261,12 +262,16 @@ if(isset($_GET["postfix-hash-tables"])){postfix_hash_tables();exit;}
 if(isset($_GET["postfix-transport-maps"])){postfix_hash_transport_maps();exit;}
 if(isset($_GET["postfix-hash-senderdependent"])){postfix_hash_senderdependent();exit;}
 if(isset($_GET["postfix-hash-aliases"])){postfix_hash_aliases();exit;}
+if(isset($_GET["postfix-hash-r-canonical"])){postfix_hash_recipient_canonical();exit;}
 if(isset($_GET["postfix-bcc-tables"])){postfix_hash_bcc();exit;}
 if(isset($_GET["postfix-others-values"])){postfix_others_values();exit;}
 if(isset($_GET["postfix-mime-header-checks"])){postfix_mime_header_checks();exit;}
 if(isset($_GET["postfix-interfaces"])){postfix_interfaces();exit;}
 if(isset($_GET["postfix-networks"])){postfix_single_mynetworks();exit;}
 if(isset($_GET["postfix-luser-relay"])){postfix_luser_relay();exit;}
+if(isset($_GET["postqueue-master-list"])){postfix_postqueue_master();exit;}
+if(isset($_GET["postsuper-d-master"])){postfix_postqueue_delete_msgid();exit;}
+if(isset($_GET["postsuper-r-master"])){postfix_postqueue_reprocess_msgid();exit;}
 
 
 
@@ -2404,9 +2409,10 @@ function postfix_multi_queues(){
 
 function postfix_multi_postqueue(){
 	$instance=$_GET["postfix-multi-postqueue"];
+	if($instance=="MASTER"){$instance=null;}else{$instance="-$instance";}
 	$unix=new unix();
 	$postqueue=$unix->find_program("postqueue");
-	exec("$postqueue -c /etc/postfix-$instance -p",$results);
+	exec("$postqueue -c /etc/postfix$instance -p",$results);
 	while (list ($num, $line) = each ($results) ){
 		if(preg_match("#Mail queue is empty#",$line)){
 			$count=0;
@@ -2422,6 +2428,61 @@ function postfix_multi_postqueue(){
 	echo "<articadatascgi>". base64_encode($count)."</articadatascgi>";
 	
 }
+
+
+
+function postfix_postqueue_delete_msgid(){
+	$unix=new unix();
+	$postsuper=$unix->find_program("postsuper");
+	exec("$postsuper -d {$_GET["postsuper-d-master"]}",$results);
+	echo "<articadatascgi>". base64_encode(trim(@implode(" ",$results)))."</articadatascgi>";
+}
+function postfix_postqueue_reprocess_msgid(){
+	$unix=new unix();
+	$postsuper=$unix->find_program("postsuper");
+	exec("$postsuper -r {$_GET["postsuper-r-master"]}",$results);
+	echo "<articadatascgi>". base64_encode(trim(@implode(" ",$results)))."</articadatascgi>";	
+}
+
+
+function postfix_postqueue_master(){
+$unix=new unix();
+	$postqueue=$unix->find_program("postqueue");
+	exec("$postqueue -c /etc/postfix$instance -p",$results);
+	$count=count($results);
+	if($count>900){$count=900;}
+	for($i=0;$i<=$count;$i++){
+		$line=$results[$i];
+		if(preg_match("#([A-Z0-9]+)\s+([0-9]+)\s+(.+?)\s+([0-9]+)\s+([0-9:]+)\s+(.+?)$#",$line,$re)){
+			$MSGID=$re[1];
+			$size=$re[2];
+			$day=$re[3];
+			$dayNum=$re[4];
+			$time=$re[5];
+			$from=$re[6];
+			$array[$MSGID]["DATE"]="$day $dayNum $time";
+			$array[$MSGID]["FROM"]="$from";
+			continue;
+		}
+		if(preg_match("#^\((.+?)\)$#",trim($line),$re)){
+			$array[$MSGID]["STATUS"]=$re[1];
+			continue;
+		}
+		
+		if(preg_match("#^\s+\s+\s+(.+?)$#",$line,$re)){
+			$array[$MSGID]["TO"]=trim($re[1]);
+			continue;
+		}
+		
+		
+	}
+	
+	echo "<articadatascgi>". base64_encode(serialize($array))."</articadatascgi>";
+	
+}
+
+
+
 
 
 function ASSP_MULTI_CONFIG(){
@@ -3175,6 +3236,10 @@ function postfix_hash_transport_maps(){
 function postfix_hash_senderdependent(){
 	sys_THREAD_COMMAND_SET(LOCATE_PHP5_BIN2()." /usr/share/artica-postfix/exec.postfix.hashtables.php --smtp-passwords");
 }
+function postfix_hash_recipient_canonical(){
+	sys_THREAD_COMMAND_SET(LOCATE_PHP5_BIN2()." /usr/share/artica-postfix/exec.postfix.hashtables.php --recipient-canonical");
+}
+
 function postfix_hash_aliases(){
 	sys_THREAD_COMMAND_SET(LOCATE_PHP5_BIN2()." /usr/share/artica-postfix/exec.postfix.hashtables.php --aliases");
 }
@@ -3470,7 +3535,9 @@ function squidguardTests(){
 function SQUID_CACHE_INFOS(){
 	$unix=new unix();
 	$squidclient=$unix->find_program("squidclient");
-	if($squidclient==null){return;}
+	if($squidclient==null){
+		writelogs_framework("Unable to stat squidclient !!",__FUNCTION__,__LINE__);;
+		return;}
 	
 	$ini=new Bs_IniHandler("/etc/artica-postfix/settings/Daemons/ArticaSquidParameters");
 	if($ini->_params["NETWORK"]["LDAP_AUTH"]==1){
@@ -3481,6 +3548,9 @@ function SQUID_CACHE_INFOS(){
 	
 	
 	$cmd="$squidclient$auth mgr:storedir";
+	writelogs_framework("$cmd",__FUNCTION__,__LINE__);;
+	
+	
 	exec($cmd,$results);
 	while (list ($index, $line) = each ($results) ){
 		if(preg_match("#Store Directory\s+\#([0-9]+).+?:\s+(.+)#",$line,$re)){
@@ -3498,7 +3568,12 @@ function SQUID_CACHE_INFOS(){
 
 		if(preg_match("#Percent Used:\s+([0-9\.]+)#",$line,$re)){
 			$array[$path]["POURC"]=$re[1];
-		}			
+		}
+
+		if(preg_match("#ERR_ACCESS_DENIED#",$line)){
+			writelogs_framework("ACCESS DENIED",__FUNCTION__,__LINE__);;
+			break;
+		}
 		
 		
 	}
@@ -3954,6 +4029,14 @@ function spamassassin_check(){
 function emailing_builder_linker(){
 	$ou=$_GET["emailing-builder-linker"];
 	sys_THREAD_COMMAND_SET(LOCATE_PHP5_BIN2()." /usr/share/artica-postfix/exec.emailing.php --build-queues $ou");
+}
+function system_debian_kernel(){
+	exec(LOCATE_PHP5_BIN2()." /usr/share/artica-postfix/exec.apt-cache.kernel.php --detect");
+}
+
+function system_debian_kernel_upgrade(){
+	$pkg=$_GET["system-debian-upgrade-kernel"];
+	sys_THREAD_COMMAND_SET(LOCATE_PHP5_BIN2()." /usr/share/artica-postfix/exec.apt-cache.kernel.php --install $pkg");
 }
 
 

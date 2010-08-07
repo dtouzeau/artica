@@ -54,6 +54,8 @@
 	
 	
 	if(isset($_GET["addipfrom"])){CalculCDR();exit;}
+	if(isset($_GET["add-ip-single"])){network_add_single();exit;}
+	
 	if(isset($_GET["NetDelete"])){network_delete();exit;}
 	if(isset($_GET["listenport"])){listen_port_save();exit;}
 	if(isset($_GET["visible_hostname_save"])){visible_hostname_save();exit;}
@@ -102,6 +104,20 @@
 		function SquidnetaddCheck(e){
 			if(checkEnter(e)){netadd();}
 		}
+		
+		function SquidnetaddSingleCheck(e){
+			if(checkEnter(e)){SquidnetaddSingle();}
+		}
+		
+		function SquidnetaddSingle(){
+			var XHR = new XHRConnection();
+			XHR.appendData('add-ip-single',document.getElementById('FREE_FIELD').value);
+			document.getElementById('squid_network_id').innerHTML='<center style=\"width:100%\"><img src=img/wait_verybig.gif></center>';
+			XHR.sendAndLoad('$page', 'GET',x_netadd);	
+		}		
+
+		
+		
 		";
 		
 	}
@@ -711,7 +727,7 @@ function plugins_popup(){
 	$dans=Paragraphe_switch_disable('{enable_dansguardian}','{feature_not_installed}','{feature_not_installed}');	
 	$cicap=Paragraphe_switch_disable('{enable_c_icap}','{feature_not_installed}','{feature_not_installed}');
 	$squidguard=Paragraphe_switch_disable('{enable_squidguard}','{feature_not_installed}','{feature_not_installed}');
-	
+
 	
 	//C_ICAP_INSTALLED
 	
@@ -901,6 +917,18 @@ $html="
 			
 	
 }
+
+
+function network_add_single(){
+	$SIP=$_GET["add-ip-single"];
+	$squid=new squidbee();
+	$squid->network_array[]=$SIP;	
+	
+	if(!$squid->SaveToLdap()){
+		echo $squid->ldap_error;
+		exit;
+	}	
+}
 	
 	
 function CalculCDR(){
@@ -1008,6 +1036,15 @@ $squid=new squidbee();
 				</td>		
 			</tr>
 		</table>
+		{SQUID_NETWORK_HELP}
+		
+		<table style='width:100%'>
+		<tr>
+			<td class=legend style='font-size:14px'>{pattern}:</td>
+			<td>". Field_text("FREE_FIELD",null,"font-size:14px;padding:3px",null,null,null,false,"SquidnetaddSingleCheck(event)")."</td>
+		</tr>
+		</table>
+		
 		</div>
 		";
 		

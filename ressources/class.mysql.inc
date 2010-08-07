@@ -329,7 +329,11 @@ class mysql{
 				$date=date("Y-m-d H:i:s");
 				@fwrite($f, "$date:[$function()][{$_SERVER['REMOTE_ADDR']}]:: $text (L.$line)\n");
 				@fclose($f);
-		}	
+		}
+
+	FUNCTION TABLE_STATUS($table,$database){
+		return mysql_fetch_array($this->QUERY_SQL("SHOW TABLE STATUS WHERE Name='$table'",$database));		
+	}
 	
 	
 	function DATABASE_STATUS($database){

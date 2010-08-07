@@ -340,22 +340,14 @@ function popup(){
 	$array["white"]='{white list}';
 	$array["black"]='{black list}';	
 	$array[null]='{all}';
-	$field=Field_array_Hash($domain,'selected_domain',null,"SelectDomain()");
-	$field2=Field_array_Hash($array,'selected_form',null,"SelectDomain()");
+	$field=Field_array_Hash($domain,'selected_domain',null,"SelectDomain()",null,0,"font-size:13px;padding:3px");
+	$field2=Field_array_Hash($array,'selected_form',null,"SelectDomain()",null,0,"font-size:13px;padding:3px");
 	$tpl=new templates();
 	
 	$whitelist_explain=$tpl->_ENGINE_parse_body("{whitelist_explain}");
-	if(strlen($whitelist_explain)>200){$whitelist_explain="<div style='float:right;margin:3px'>".help_icon('{whitelist_explain}')."</div><p class=caption>".substr($whitelist_explain,0,197).'...'."</p>";}
-	else{$whitelist_explain="<p class=caption>$whitelist_explain</p>";}
-	$html="<H1>{global_whitelist}</H1>
+	$whitelist_explain="<p style='font-size:13px'>$whitelist_explain</p>";
 	
-	<table style='width:100%' class=table_form>
-	
-	<tr>	
-	<td valign='top'>
-	<table style='widh:100%'>
-	<tr>
-		<td valign='top'>
+	$old_wbl="<td valign='top'>
 			<table style='width:100%' class=table_form ". element_rollover("Loadjs('$page?wblopt=yes')").">
 				<tr>
 					<td width=1% valign='top'>" . imgtootltip('32-settings-black.png',"{options}","Loadjs('$page?wblopt=yes')")."</td>
@@ -365,9 +357,19 @@ function popup(){
 					</td>
 				</tr>
 			</table>
-		</td>
+		</td>";
+	
+	$html="
+	
+	<table style='width:100%'>
+	
+	<tr>	
+	<td valign='top'>
+	<table style='widh:100%'>
+	<tr>
+		
 		<td valign='top'>
-			<div style='border:1px solid #CCCCCC;padding-top:3px;;padding-right:3px;padding-left:3px;margin-top:4px'>$whitelist_explain</div>
+			<div style=''>$whitelist_explain</div>
 		</td>
 	</tr>
 	</table>
@@ -381,12 +383,10 @@ function popup(){
 		<td class=legend>{type}:</td>
 		<td>$field2</td>	
 		</tr>
-		<tr>
-			<td colspan=2 align='right' style='height:41px'><a href='#' OnClick=\"Loadjs('$page?wblopt=yes')\" style='font-size:12px;font-weight:bold'>&laquo;&nbsp;{options}&nbsp;&raquo;</a></td>
 		</table>
 	</td>	
 	</tr>
-	</table>". RoundedLightWhite("<div id='wblarea' style='width:100%;height:250px;overflow:auto'></div>");
+	</table><div id='wblarea' style='width:100%;height:250px;overflow:auto'></div>";
 	
 	
 	

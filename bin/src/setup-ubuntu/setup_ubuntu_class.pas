@@ -165,7 +165,7 @@ begin
           fpsystem('DEBIAN_FRONTEND=noninteractive /usr/bin/apt-get -o Dpkg::Options::="--force-confnew" install -f');
           fpsystem('DEBIAN_FRONTEND=noninteractive /usr/bin/apt-get -o Dpkg::Options::="--force-confnew" autoremove');
           if FileExists('/etc/init.d/artica-postfix') then fpsystem('/etc/init.d/artica-postfix restart imap');
-          fpsystem('/usr/share/artica-postfix/bin/artica-roundcube --install --verbose');
+          fpsystem('/usr/share/artica-postfix/bin/artica-make APP_ROUNDCUBE3');
           if FileExists('/etc/init.d/artica-postfix') then fpsystem('/etc/init.d/artica-postfix restart');
           Show_Welcome;
           exit;
@@ -416,7 +416,7 @@ f:='';
 UbuntuIntVer:=9;
 l:=TstringList.Create;
 distri:=tdistriDetect.Create();
-
+writeln('Checking Code '+distri.DISTRINAME);
 if not TryStrToInt(distri.DISTRINAME_VERSION,UbuntuIntVer) then UbuntuIntVer:=9;
 
 if(UbuntuIntVer=0) then begin
@@ -435,12 +435,6 @@ l.add('libkrb5-dev');
 l.add('libldap2-dev');
 l.add('libmcrypt-dev');
 l.add('libmhash-dev');
-
-
-
-
-
-
 
 l.add('libncurses5-dev');
 l.add('libpam0g-dev');
@@ -493,7 +487,7 @@ if distri.DISTRINAME_CODE='DEBIAN' then begin
 end;
 
 if distri.DISTRINAME_CODE='UBUNTU' then begin
-   writeln('Checking Code UBUNTU ('+distri.DISTRINAME_VERSION+')');
+   writeln('Checking Code UBUNTU ('+distri.DISTRINAME_VERSION+') UbuntuIntVer='+IntToStr(UbuntuIntVer));
    l.add('libc-client2007b-dev');
    l.add('libcurl4-openssl-dev');
    l.add('libsnmp-dev');
@@ -545,18 +539,15 @@ UbuntuIntVer:=9;
 l:=TstringList.Create;
 distri:=tdistriDetect.Create();
 libs:=tlibs.Create;
+if not TryStrToInt(distri.DISTRINAME_VERSION,UbuntuIntVer) then UbuntuIntVer:=9;
+
+
 l.Add('dhcp3-client');
 l.Add('cron');
 l.Add('debconf-utils');
-l.Add('discover');
 l.Add('file');
-l.Add('hdparm');
-l.Add('jove');
 l.Add('less');
-//l.Add('nscd');
-l.Add('rdate');
 l.Add('rsync');
-l.Add('rsh-client');
 l.Add('openssh-client ');
 l.Add('openssh-server');
 l.Add('strace');
@@ -564,29 +555,15 @@ l.add('mtools');
 l.add('re2c');
 l.add('cron');
 l.add('debconf-utils');
-l.add('discover');
 l.add('file');
-l.add('hdparm');
-l.add('jove');
 l.add('less');
-l.add('rdate');
 l.add('rsync');
-l.add('rsh-client');
 l.add('sudo');
 l.add('iproute');
 l.add('curl');
 l.add('lm-sensors');
-l.add('hddtemp');
 l.add('bison');
-l.add('autofs');
-l.add('autofs-ldap');
 l.add('e2fsprogs');
-//NFS
-
-
-//l.add('gfs2-tools');
-//l.add('drbd8-utils');
-
 
 //lvm
 if not libs.COMMANDLINE_PARAMETERS('--without-lvm') then begin
@@ -604,17 +581,14 @@ l.Add('build-essential');
 l.Add('flex');
 l.add('libsasl2-dev');
 l.add('libcdb-dev');
-l.Add('libmcrypt-dev');
-l.add('autofs');
-l.add('sshfs');
-l.add('fuse-utils');
-l.add('autofs-ldap');
 
-l.Add('tcsh');
+
+l.add('fuse-utils');
+
 l.Add('time');
 l.Add('eject');
 l.Add('locales');
-l.Add('console-common');
+
 l.Add('pciutils ');
 l.Add('usbutils');
 l.Add('slapd ');
@@ -623,130 +597,83 @@ l.Add('openssl ');
 l.Add('strace');
 l.add('smbclient');
 
-l.Add('tcsh');
+
 l.Add('time');
 l.Add('eject');
 l.Add('locales');
 l.Add('pciutils');
 l.Add('usbutils');
-L.add('sysstat');
+
 
 //PHP engines
 l.Add('php5-cgi');
 l.Add('php5-cli');
 l.Add('php5-ldap');
 l.Add('php5-mysql');
-l.Add('php5-imap');
-l.add('php-net-sieve');
 l.Add('php5-gd');
 l.add('php5-curl');
-l.Add('php5-mcrypt');
-l.Add('php-log');
-l.add('php-apc');
 l.Add('php-pear');
 l.add('php5-dev'); // To compile PHP5
-l.Add('lighttpd');
-
-
-//process limitations
-L.add('cpulimit');
 
 l.Add('mysql-server');
-l.Add('rrdtool');
 l.add('libmodule-build-perl');
-
-l.Add('librrdp-perl');
 l.Add('librrds-perl');
-l.Add('libfile-tail-perl');
-l.Add('libgeo-ipfree-perl');
-l.Add('libnet-xwhois-perl');
 L.Add('libcompress-zlib-perl');
-l.Add('librrdp-perl');
-l.Add('librrds-perl');
-l.Add('libfile-tail-perl');
-l.Add('libgeo-ipfree-perl');
-l.Add('libnet-xwhois-perl');
-l.Add('libgssapi-perl');
 l.Add('libwww-perl');
-l.Add('libcrypt-openssl-rsa-perl');
-l.Add('libcrypt-openssl-bignum-perl');
-l.Add('libcrypt-openssl-random-perl');
-l.Add('libmailtools-perl');
+
 l.Add('libio-stringy-perl');
-l.Add('libunix-syslog-perl');
-l.Add('libberkeleydb-perl');
+
+
 l.Add('libdigest-sha1-perl');
-l.Add('libdigest-sha-perl');
-l.Add('libmail-dkim-perl');
 l.Add('libauthen-sasl-perl');
 l.Add('libdbi-perl');
 l.Add('libxml-namespacesupport-perl');
 l.Add('libxml-sax-expat-perl');
 l.Add('libxml-sax-perl');
 l.Add('libxml-filter-buffertext-perl');
-l.Add('libtest-simple-perl');
 l.Add('libtext-iconv-perl');
 l.Add('libxml-sax-writer-perl');
 l.Add('libconvert-asn1-perl');
-l.Add('libconvert-uulib-perl');
 l.Add('libnet-ldap-perl');
-l.Add('libconfig-inifiles-perl');
-l.add('libnet-server-perl');
-
-
 l.Add('libio-socket-ssl-perl');
-l.Add('libcrypt-ssleay-perl');
 l.Add('libnet-ssleay-perl');
-l.Add('libgeo-ipfree-perl');
-l.Add('libconvert-tnef-perl');
 l.Add('libhtml-parser-perl');
-l.Add('libfile-scan-perl');
 l.Add('libarchive-zip-perl');
-l.Add('libinline-perl');
+
 l.Add('libcompress-zlib-perl');
-l.Add('libhtml-format-perl');
 l.Add('libwww-perl');
 l.add('libgd2-xpm-dev');                           
 l.Add('libnss-ldap');
 l.Add('libpam-ldap');
 l.Add('libpam-smbpass');
 l.Add('ldap-utils');
-l.add('libunix-syslog-perl');
-l.add('libnet-server-perl');
-l.add('libtext-template-perl');
-l.add('libnet-dns-perl');
-l.add('libstring-random-perl');
 
-l.add('mailsync');
+
+
 l.Add('sasl2-bin');
 l.Add('sudo');
 l.Add('ntp');
 l.Add('iproute');
 l.add('bzip2');
-l.add('unrar-free');
-l.add('arj');
 l.add('zip');
 l.add('re2c');
-if not TryStrToInt(distri.DISTRINAME_VERSION,UbuntuIntVer) then UbuntuIntVer:=9;
+
 
 l.add('libgdbm-dev'); //for grawl
 
 l.Add('dhcp3-server');
 l.Add('libexpat1-dev');
 l.Add('libxml2-dev');  //for squid & dansguardian
-l.Add('libgssapi-perl');
+
 l.add('zlib1g-dev');
-l.add('libdotconf-dev');
 l.Add('libpcre3-dev');
 l.add('pkg-config');
 l.add('libldap2-dev');
 l.add('libpam0g-dev');
-l.add('libconfuse-dev');
 l.add('libcdio-dev');
 l.add('libusb-dev');
 l.add('libkrb5-dev');
 l.add('zlib1g-dev');
-l.add('libdotconf-dev');
 l.add('libfreetype6-dev');
 l.add('libt1-dev');
 l.add('libpaper-dev');
@@ -761,47 +688,109 @@ l.add('libpcap0.8-dev');
 l.add('libpcre3-dev');
 l.add('libsasl2-dev');
 l.add('libreadline5-dev');
-l.add('libmcrypt-dev');
 l.add('libcdb-dev');
 l.add('pkg-config');
 l.add('libpspell-dev');
 l.add('libjpeg62-dev');
 l.add('libpng12-dev');
 l.add('mtools');
-l.add('dar');
+
 l.add('libgeoip-dev');
 l.add('libgeoip1');
 l.add('libwrap0-dev');
 l.add('gettext');
 l.add('ruby');
-l.add('libdb4.2-ruby1.8');
-l.add('libcairo-ruby1.8');
-l.add('monit');
-
-l.add('libtommath-dev'); //clamav
 l.add('libclamav-dev'); //clamav
-
-
-;
 l.add('rsync');
-l.add('stunnel4');
 l.add('smbfs');
 
 //python
 l.add('python-dev');
 
 //groupOffice:
-l.add('libwbxml2-utils');
-
 l.add('apache2-mpm-prefork');
 l.add('libapache2-mod-php5');
 l.add('libiodbc2-dev');
 
 
 
-if not TryStrToInt(distri.DISTRINAME_VERSION,UbuntuIntVer) then UbuntuIntVer:=9;
+
 
 if distri.DISTRINAME_CODE='DEBIAN' then begin
+
+      l.Add('discover');
+      l.Add('jove');
+      l.Add('rdate'); // sets the system's date from a remote host
+      l.Add('rsh-client');
+      l.add('hddtemp');
+      l.add('autofs');
+      l.add('autofs-ldap');
+      l.Add('tcsh');
+      l.Add('console-common');
+      l.Add('libmcrypt-dev');
+      l.add('libconfuse-dev');
+      l.add('libltdl-dev'); //Clamav compilation
+      L.add('sysstat');
+      l.Add('php5-imap');
+      l.add('php-net-sieve');
+      l.Add('php5-mcrypt');
+      l.Add('php-log');
+      l.Add('lighttpd');
+      L.add('cpulimit');
+      l.Add('rrdtool');
+      l.Add('librrdp-perl');
+      l.Add('libfile-tail-perl');
+      l.Add('libgeo-ipfree-perl');
+      l.Add('libgeo-ip-perl');
+      l.Add('libnet-xwhois-perl');
+      l.Add('libgssapi-perl');
+      l.Add('libcrypt-openssl-rsa-perl');
+      l.Add('libcrypt-openssl-bignum-perl');
+      l.Add('libcrypt-openssl-random-perl');
+      l.Add('libconfig-inifiles-perl');
+      l.Add('libconvert-uulib-perl');
+      l.Add('libtest-simple-perl');
+      l.Add('libdigest-sha-perl');
+      l.Add('libmail-dkim-perl');
+      l.Add('libberkeleydb-perl');
+      l.Add('libunix-syslog-perl');
+      l.add('libsoap-lite-perl');
+      l.add('libnet-ip-perl');
+      l.Add('libinline-perl');
+      l.add('libapache-dbi-perl');
+      l.Add('libmailtools-perl');
+      l.Add('libsasl2-modules-ldap');
+      l.add('hostapd');
+      l.add('hostap-utils');
+      l.Add('arj');
+      l.Add('htop');
+      l.Add('dar');
+      l.add('sshfs');
+      l.Add('hdparm');
+      l.add('libdb4.2-ruby1.8');
+      l.add('libcairo-ruby1.8');
+      l.add('libnet-server-perl');
+      l.Add('libcrypt-ssleay-perl');
+      l.Add('libconvert-tnef-perl');
+      l.Add('libhtml-format-perl');
+      l.Add('libfile-scan-perl');
+      l.add('libtext-template-perl');
+      l.add('libnet-dns-perl');
+      l.add('libstring-random-perl');
+      l.add('mailsync');
+      l.add('unrar-free');
+      l.add('arj');
+      l.Add('libgssapi-perl');
+      l.add('libdotconf-dev');
+      l.add('dar');
+      l.add('monit');
+      l.add('stunnel4');
+      l.add('libwbxml2-utils');
+      l.Add('unrar');
+      l.Add('lha');
+      l.add('pike7.6');
+
+
    if distri.DISTRINAME_VERSION='4' then begin
       l.Add('libdb4.4-dev');
       l.Add('sysutils');
@@ -814,21 +803,21 @@ if distri.DISTRINAME_CODE='DEBIAN' then begin
    end;
 
    if distri.DISTRINAME_VERSION='5' then begin
+      l.add('libtommath-dev'); //clamav
       l.Add('libdb4.6-dev');
       l.add('memtester');
       l.add('procinfo');
       l.Add('libgeo-ip-perl');
       l.add('libcurl4-openssl-dev');
       l.add('php5-geoip');
-      l.add('libtommath-dev');
       l.add('libsnmp-dev');
       l.add('perl-modules');
       l.add('libmysqlclient15-dev');
+      l.add('php-apc');
 
    end;
 
    l.Add('libpam0g-dev');
-   l.Add('unrar-free');
    l.add('pike7.6-core');
    l.add('pike7.6-dev');
    l.add('libltdl3-dev');
@@ -836,17 +825,87 @@ if distri.DISTRINAME_CODE='DEBIAN' then begin
 end;
 
 if distri.DISTRINAME_CODE='UBUNTU' then begin
-   l.Add('unrar');
-   l.Add('lha');
-   l.add('pike7.6');
-   l.Add('libdb4.6-dev');
-   l.add('memtester');
-   l.add('procinfo');
-   l.Add('libgeo-ip-perl');
-   l.add('libcurl4-openssl-dev');
-   l.add('libsnmp-dev');
-   l.add('libltdl-dev'); //Clamav compilation
-   l.add('language-pack-nl'); // Zarafa
+    writeln('Checking.............: Code UBUNTU ('+distri.DISTRINAME_VERSION+') MAJOR='+IntToStr(UbuntuIntVer));
+   if UbuntuIntVer>7 then begin
+      l.Add('libdb4.6-dev');
+      l.add('memtester');
+      l.add('procinfo');
+      l.Add('discover');
+      l.Add('jove');
+      l.Add('rdate'); // sets the system's date from a remote host
+      l.Add('rsh-client');
+      l.add('hddtemp');
+      l.add('autofs');
+      l.add('autofs-ldap');
+      l.Add('tcsh');
+      l.Add('console-common');
+      l.Add('libmcrypt-dev');
+      l.add('libconfuse-dev');
+      l.add('libltdl-dev'); //Clamav compilation
+      L.add('sysstat');
+      l.Add('php5-imap');
+      l.add('php-net-sieve');
+      l.Add('php5-mcrypt');
+      l.Add('php-log');
+      l.Add('lighttpd');
+      L.add('cpulimit');
+      l.Add('rrdtool');
+      l.Add('librrdp-perl');
+      l.Add('libfile-tail-perl');
+      l.Add('libgeo-ipfree-perl');
+      l.Add('libgeo-ip-perl');
+      l.Add('libnet-xwhois-perl');
+      l.Add('libgssapi-perl');
+      l.Add('libcrypt-openssl-rsa-perl');
+      l.Add('libcrypt-openssl-bignum-perl');
+      l.Add('libcrypt-openssl-random-perl');
+      l.Add('libconfig-inifiles-perl');
+      l.Add('libconvert-uulib-perl');
+      l.Add('libtest-simple-perl');
+      l.Add('libdigest-sha-perl');
+      l.Add('libmail-dkim-perl');
+      l.Add('libberkeleydb-perl');
+      l.Add('libunix-syslog-perl');
+      l.add('libsoap-lite-perl');
+      l.add('libnet-ip-perl');
+      l.Add('libinline-perl');
+      l.add('libapache-dbi-perl');
+      l.Add('libmailtools-perl');
+      l.Add('libsasl2-modules-ldap');
+      l.add('hostapd');
+      l.add('hostap-utils');
+      l.Add('arj');
+      l.Add('htop');
+      l.Add('dar');
+      l.add('sshfs');
+      l.Add('hdparm');
+      l.add('libdb4.2-ruby1.8');
+      l.add('libcairo-ruby1.8');
+      l.add('libnet-server-perl');
+      l.Add('libcrypt-ssleay-perl');
+      l.Add('libconvert-tnef-perl');
+      l.Add('libhtml-format-perl');
+      l.Add('libfile-scan-perl');
+      l.add('libtext-template-perl');
+      l.add('libnet-dns-perl');
+      l.add('libstring-random-perl');
+      l.add('mailsync');
+      l.add('unrar-free');
+      l.add('arj');
+      l.Add('libgssapi-perl');
+      l.add('libdotconf-dev');
+      l.add('dar');
+      l.add('monit');
+      l.add('stunnel4');
+      l.add('libwbxml2-utils');
+      l.Add('unrar');
+      l.Add('lha');
+      l.add('pike7.6');
+   end;
+
+  l.add('libcurl4-openssl-dev');
+  l.add('libsnmp-dev');
+  l.add('language-pack-nl'); // Zarafa
 
 
    if UbuntuIntVer=8 then begin
@@ -854,17 +913,21 @@ if distri.DISTRINAME_CODE='UBUNTU' then begin
       l.add('libmysqlclient15-dev');
    end;
 
-   if UbuntuIntVer>8 then begin
+   if UbuntuIntVer=9 then begin
+      l.add('libmysqlclient15-dev');
       l.add('php5-geoip');
       l.add('libtommath-dev');
       l.add('perl-modules');
-      l.add('libmysqlclient15-dev');
+      l.add('php-apc');
    end;
-
 
    if UbuntuIntVer>9 then begin
        l.add('udisks');
        l.add('libmysqlclient-dev');
+       l.add('php-apc');
+       l.add('php5-geoip');
+       l.add('libtommath-dev');
+       l.add('perl-modules');
     end;
 
 
@@ -875,35 +938,22 @@ l.Add('libapache2-mod-perl2');
 l.Add('libxml-simple-perl');
 l.Add('libcompress-zlib-perl');
 l.Add('libdbi-perl');
-l.add('libapache-dbi-perl');
 l.add('libdbd-mysql-perl');
-l.add('libapache-dbi-perl');
-l.add('libnet-ip-perl');
-l.add('libsoap-lite-perl');
-l.add('libnet-ip-perl');
-l.add('libsoap-lite-perl');
 l.Add('libusb-dev ');
 l.Add('libusb-0.1-4 ');
-l.Add('libinline-perl ');
 l.Add('libcdio-dev ');
-l.Add('libconfuse-dev');
 l.add('libssl-dev');
 l.Add('curl');
 l.Add('lm-sensors');
-l.Add('hddtemp');
 l.Add('libsasl2-modules ');
-l.Add('libsasl2-modules-ldap');
 l.Add('libauthen-sasl-perl');
 l.add('xutils-dev');
 l.Add('bzip2');
 l.add('unzip');
-l.Add('arj');
-l.Add('htop');
 l.Add('telnet');
 l.Add('lsof');
-l.Add('dar');
-l.add('hostapd');
-l.add('hostap-utils');
+
+
 
 
 
@@ -1000,65 +1050,105 @@ UbuntuIntVer:=9;
 libs:=tlibs.Create;
 if not TryStrToInt(distri.DISTRINAME_VERSION,UbuntuIntVer) then UbuntuIntVer:=9;
 
-l.Add('razor');
-l.Add('pyzor');
-l.Add('queuegraph');
-l.Add('mailgraph');
+
+if distri.DISTRINAME_CODE='UBUNTU' then begin
+   writeln('Checking.............: Postfix: Code UBUNTU ('+distri.DISTRINAME_VERSION+') MAJOR='+IntToStr(UbuntuIntVer));
+    if UbuntuIntVer>7 then begin
+         l.Add('razor');
+         l.Add('pyzor');
+         l.Add('sanitizer');
+         l.Add('spamass-milter');
+         l.Add('spamassassin');
+         l.add('libsys-syslog-perl');
+         l.Add('libcrypt-ssleay-perl');
+         l.Add('libgeo-ipfree-perl');
+         l.Add('libconvert-tnef-perl');
+         l.Add('libfile-scan-perl');
+         l.add('libmail-spf-query-perl');
+         l.add('libmail-imapclient-perl');
+         L.add('libemail-mime-perl');
+         l.add('libmail-srs-perl');
+         l.add('libemail-mime-modifier-perl');
+         l.add('libemail-valid-perl');
+         l.add('libfile-readbackwards-perl');
+         l.add('libemail-send-perl');
+         l.Add('queuegraph');
+         l.Add('mailgraph');
+         l.Add('wv');
+         l.add('libmilter-dev');
+         l.add('pflogsumm');
+         l.add('dkim-filter');
+         l.Add('mhonarc');
+         l.Add('p7zip'); // 7zr
+         l.Add('p7zip-full'); //7za
+         l.Add('arc'); // arc
+         l.Add('zoo');
+         l.Add('lha');
+         l.add('lzop');
+         l.Add('tnef');
+         l.add('libgsasl7-dev'); //gsasl.h
+         l.add('libnet-dns-perl');
+         l.Add('cabextract');
+         l.add('python-ldap');
+    end;
+end;
+
+if distri.DISTRINAME_CODE='DEBIAN' then begin
+         l.Add('razor');
+         l.Add('pyzor');
+         l.Add('sanitizer');
+         l.Add('spamass-milter');
+         l.Add('spamassassin');
+         l.add('libsys-syslog-perl');
+         l.Add('libcrypt-ssleay-perl');
+         l.Add('libgeo-ipfree-perl');
+         l.Add('libconvert-tnef-perl');
+         l.Add('libfile-scan-perl');
+         l.add('libmail-spf-query-perl');
+         l.add('libmail-imapclient-perl');
+         L.add('libemail-mime-perl');
+         l.add('libmail-srs-perl');
+         l.add('libemail-mime-modifier-perl');
+         l.add('libemail-valid-perl');
+         l.add('libfile-readbackwards-perl');
+         l.add('libemail-send-perl');
+         l.Add('queuegraph');
+         l.Add('mailgraph');
+         l.Add('wv');
+         l.add('libmilter-dev');
+         l.add('pflogsumm');
+         l.add('dkim-filter');
+         l.Add('mhonarc');
+         l.Add('p7zip'); // 7zr
+         l.Add('p7zip-full'); //7za
+         l.Add('arc'); // arc
+         l.Add('zoo');
+         l.Add('lha');
+         l.add('lzop');
+         l.Add('tnef');
+         l.add('libgsasl7-dev'); //gsasl.h
+         l.add('libnet-dns-perl');
+         l.Add('cabextract');
+         l.add('python-ldap');
+end;
+
 l.Add('libio-socket-ssl-perl');
-l.Add('libcrypt-ssleay-perl');
 l.Add('libnet-ssleay-perl');
-l.Add('libgeo-ipfree-perl');
-l.Add('libconvert-tnef-perl');
-l.Add('libhtml-parser-perl ');
-l.Add('libfile-scan-perl ');
+l.Add('libhtml-parser-perl');
 l.Add('libarchive-zip-perl ');
-l.add('libmail-spf-query-perl');
-l.Add('sanitizer ');
-l.Add('wv');
 l.Add('ttf-dustin ');
 l.Add('libgd-tools ');
 l.Add('awstats');
 l.add('postfix');
 l.Add('postfix-ldap');
-l.Add('spamass-milter');
-l.Add('spamassassin');
 l.Add('mailman');
 l.Add('spamc');
-l.add('wv');
-l.add('libmilter-dev');
-l.add('pflogsumm');
-l.add('dkim-filter');
-l.Add('mhonarc');
-l.Add('p7zip'); // 7zr
-l.Add('p7zip-full'); //7za
-l.Add('arc'); // arc
-l.Add('zoo');
-l.Add('lha');
-l.Add('cabextract');
-l.Add('tnef');
 l.Add('rpm');
-l.add('lzop');
-
-
 
 //Zarafa
 l.add('uuid-dev'); //zarafa
-l.add('libgsasl7-dev'); //gsasl.h
-
-//ASSP
-
 l.add('libcompress-zlib-perl');
-l.add('libemail-valid-perl');
-l.add('libfile-readbackwards-perl');
-
-l.add('libmail-imapclient-perl');
-L.add('libemail-mime-perl');
-l.add('libemail-mime-modifier-perl');
-l.add('libmail-srs-perl');
-l.add('libnet-dns-perl');
-l.add('libsys-syslog-perl');
 l.add('libnet-ldap-perl');
-l.add('libemail-send-perl');
 l.add('libio-socket-ssl-perl');
 
  if distri.DISTRINAME_CODE='DEBIAN' then begin
@@ -1141,22 +1231,42 @@ var
    f:string;
    i:integer;
    distri:tdistriDetect;
-
+   UbuntuIntVer:integer;
 begin
 f:='';
 distri:=tdistriDetect.Create();
 l:=TstringList.Create;
-l.Add('cyrus-imapd-2.2');
-l.Add('cyrus-admin-2.2');
-l.Add('sasl2-bin');
-l.Add('cyrus-pop3d-2.2');
-l.Add('cyrus-murder-2.2');
-l.add('libsnmp-dev');
-l.add('libopenafs-dev');
-l.add('cyrus-clients-2.2');
-l.add('imapsync');
+UbuntuIntVer:=9;
+libs:=tlibs.Create;
+if not TryStrToInt(distri.DISTRINAME_VERSION,UbuntuIntVer) then UbuntuIntVer:=9;
+
 if distri.DISTRINAME_CODE='UBUNTU' then begin
-   l.Add('fdm');
+   writeln('Checking.............: Cyrus: Code UBUNTU ('+distri.DISTRINAME_VERSION+') MAJOR='+IntToStr(UbuntuIntVer));
+   if UbuntuIntVer<8 then begin
+        l.Add('cyrus21-imapd');
+   end else begin
+       l.Add('cyrus-imapd-2.2');
+       l.Add('cyrus-admin-2.2');
+       l.Add('sasl2-bin');
+       l.Add('cyrus-pop3d-2.2');
+       l.Add('cyrus-murder-2.2');
+       l.add('libsnmp-dev');
+       l.add('libopenafs-dev');
+       l.add('cyrus-clients-2.2');
+       l.add('imapsync');
+       l.Add('fdm');
+   end;
+end;
+if distri.DISTRINAME_CODE='DEBIAN' then begin
+       l.Add('cyrus-imapd-2.2');
+       l.Add('cyrus-admin-2.2');
+       l.Add('sasl2-bin');
+       l.Add('cyrus-pop3d-2.2');
+       l.Add('cyrus-murder-2.2');
+       l.add('libsnmp-dev');
+       l.add('libopenafs-dev');
+       l.add('cyrus-clients-2.2');
+       l.add('imapsync');
 end;
 
 for i:=0 to l.Count-1 do begin
@@ -1265,13 +1375,27 @@ var
    l:TstringList;
    f:string;
    i:integer;
-
+   UbuntuIntVer:integer;
+   distri:tdistriDetect;
 begin
+distri:=tdistriDetect.Create();
+UbuntuIntVer:=0;
+if not TryStrToInt(distri.DISTRINAME_VERSION,UbuntuIntVer) then UbuntuIntVer:=9;
+
+
+
 f:='';
 l:=TstringList.Create;
 l.Add('squid3');
 l.Add('squidclient');
 l.Add('dansguardian');
+l.add('libcap2');
+
+if distri.DISTRINAME_CODE='UBUNTU' then begin
+        if UbuntuIntVer=9 then l.add('libltdl-dev');  // lt_system.h
+        if UbuntuIntVer>9 then l.add('libltdl-dev');  // lt_system.h
+end;
+
 for i:=0 to l.Count-1 do begin
      if not is_application_installed(l.Strings[i]) then begin
           f:=f + ',' + l.Strings[i];

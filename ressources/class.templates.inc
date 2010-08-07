@@ -705,16 +705,36 @@ function writelogsSocketsLogs($text=null,$function=null,$file_source=null){
 	
 function Field_hidden($name,$value){return "<input type='hidden' name='$name' id='$name' value=\"$value\">";}
 	
-function Field_checkbox($name,$enabledatas,$value=null,$js=null,$help=null){
+function Field_checkbox($name,$enabledatas,$value=null,$js=null,$help=null,$DISABLED=false){
 	$def=$value;
 if($value<>null){if($value==$enabledatas){$value="checked";}else{$value="";}}else{$value=null;}
 		if($js<>null){
 			if(strpos($js,"script:")==0){$js="javascript:$js";}
 			if(strpos($js,"lick=\"")==0){$js="OnClick=\"$js\"";}
 		}
+		
+		
+		if($help<>null){
+			$tpl=new templates();	
+			$help=str_replace("[br][br]","[br]",$help);
+			$help=str_replace("\n","",$help);
+			$help=str_replace("\r\n","",$help);
+			$help=str_replace("\r","",$help);
+			$help=str_replace('"',"`",$help);		
+			$help=$tpl->_ENGINE_parse_body($help,$additional_langfile);
+			$help=htmlentities($help);
+			$help=str_replace("\n","",$help);
+			$help=str_replace("\r\n","",$help);
+			$help=str_replace("\r","",$help);
+			$help="OnMouseOver=\"javascript:AffBulle('$help');\" OnMouseOut=\"javascript:HideBulle();\"";
+		}
+		
+		if($DISABLED){
+			$disabled_infos=" DISABLED";
+		}
 
 
-$html="<input type=\"checkbox\" id='$name' name=\"$name\" value=\"$enabledatas\" $value style='padding:0px;margin:0px;border:0px' $js>";
+$html="<input type=\"checkbox\" id='$name' name=\"$name\" value=\"$enabledatas\" $value style='padding:0px;margin:0px;border:0px' $help $js $disabled_infos>";
 return $html;}
 
 
@@ -2130,7 +2150,7 @@ function Paragraphe_switch_img($title,$text,$field_name=null,$value=null,$tips=n
 	</table>
 	
 	</div>";
-	return RoundedLightWhite($html);
+	return $html;
 	
 	
 }
@@ -2310,7 +2330,10 @@ function Paragraphe($img,$title,$text,$link=null,$tips="go_to_section",$width="2
 	$tips=str_replace("	","",$tips);
 	$height=null;
 	if($height==null){$height="min-height:70px;";}
-
+	if(!$GLOBALS["EXECUTED_AS_ROOT"]){
+		if(strpos($title," ")==0){
+		if(strlen($title)>20){$title=wordwrap($title,19," ",true);}
+		}}
 	
 	$id=md5($img.$text.$title.$link);
 	
@@ -2390,7 +2413,9 @@ if(strlen($title)>30){$tips="<b>$title</b><br>$tips";}
 			
 		}		
 		
-		$title="<h3 style='$min_height_title'>$title</h3>";
+		
+		
+		$title="<h3 style='$min_height_title;text-transform:none'>$title</h3>";
 
 		if($nowrap==0){
 			if(strlen($text)>$max_text_caracts){
@@ -3682,6 +3707,7 @@ function send_email_events($subject,$text,$context,$date=null,$attached_files=ar
 		"APP_ZARAFA_DAGENT"=>"Zarafa Delivery Agent",
 		"APP_ZARAFA_GATEWAY"=>"Zarafa Gateway",			
 		"APP_ZARAFA_MONITOR"=>"Zarafa Monitor",
+		"APP_GROUPWARE_APACHE"=>"Apache for Groupwares",
 		
 		
 	);
@@ -4010,20 +4036,21 @@ return $html;
  	writelogs("$encodedString =\"".substr($encodedString,strlen($encodedString)-2,2)."\"",__FUNCTION__,__FILE__,__LINE__);
  	if(substr($encodedString,strlen($encodedString)-2,2)=="=="){return true;}
  	
- 	$arr["150"]=true;
- 	$arr["135"]=true;
- 	$arr["181"]=true;
  	$arr["26"]=true;
- 	$arr["182"]=true;
- 	$arr["137"]=true;
+ 	$arr["135"]=true;
+	$arr["137"]=true;
  	$arr["139"]=true;
- 	$arr["166"]=true;
+	$arr["150"]=true;
+ 	$arr["158"]=true;
+ 	$arr["181"]=true;
+ 	$arr["182"]=true;
+  	$arr["166"]=true;
  	$arr["169"]=true;
- 	$arr["186"]=true;
  	$arr["179"]=true;
  	$arr["171"]=true;
+ 	$arr["186"]=true;
  	$arr["202"]=true;
- 	
+ 	$arr["247"]=true;
  	
  	$datas=base64_decode($encodedString);
 	for($i=0;$i<strlen($datas);$i++){

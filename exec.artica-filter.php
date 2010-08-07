@@ -6,8 +6,9 @@ include_once(dirname(__FILE__).'/ressources/class.ldap.inc');
 include_once(dirname(__FILE__).'/ressources/class.domains.diclaimers.inc');
 include_once(dirname(__FILE__).'/ressources/class.mail.inc');
 include_once(dirname(__FILE__).'/ressources/class.mysql.inc');
-
 include_once(dirname(__FILE__).'/framework/class.unix.inc');
+include_once(dirname(__FILE__).'/ressources/class.smtp.sockets.inc');
+
 define( 'EX_TEMPFAIL', 75 );
 define( 'EX_UNAVAILABLE', 69 );
 define( RM_STATE_READING_HEADER, 1 );
@@ -43,7 +44,7 @@ $GLOBALS["sender"]= strtolower($options['s']);
 $GLOBALS["recipients"] = $options['r'];
 $GLOBALS["original_recipient"]=$options['r'];
 $client_address = $options['c'];
-$fqhostname = strtolower($options['h']);
+$smtp_final_sender = strtolower($options['h']);
 $sasl_username = strtolower($options['u']);
 
 // make sure recipients is an array
@@ -85,13 +86,13 @@ while (!feof(STDIN) && $state != RM_STATE_READING_BODY) {
     		}
     	}
     
-      if( $params['allow_sender_header'] && eregi( '^Sender: (.*)', $line, $regs ) ) {
+      if( $params['allow_sender_header'] && preg_match( '#^Sender: (.*)#i', $line, $regs ) ) {
 			$from = $regs[1];
 			$state = RM_STATE_READING_SENDER;
-      		} else if( !$from && eregi( '^From: (.*)', $line, $regs ) ) {
+      		} else if( !$from && preg_match( '#^From: (.*)#i', $line, $regs ) ) {
 				$from = $regs[1];
 				$state = RM_STATE_READING_FROM;
-      			} else if( eregi( '^Subject: (.*)', $line, $regs ) ) {
+      			} else if( preg_match( '#^Subject: (.*)#i', $line, $regs ) ) {
 					$subject = $regs[1];
 					$state = RM_STATE_READING_SUBJECT;
       				}
@@ -127,26 +128,28 @@ $send_result_file=$unix->FILE_TEMP();
 for( $i = 0; $i < count($GLOBALS["recipients"]); $i++ ) {
 	CheckOutOfOffice($GLOBALS["recipients"][$i],$GLOBALS["sender"],$subject);
 	CheckDisclaimerGlobal($GLOBALS["sender"],$GLOBALS["recipients"][$i],$tmpfname);
-	WriteToSyslogMail("from=<{$GLOBALS["sender"]}> to: <{$GLOBALS["recipients"][$i]}> (in $tmpfname)","artica-filter");
-	RecipientsToAdd($GLOBALS["recipients"][$i],$tmpfname);
 	}
 
-//X_ReplaceTo($tmpfname);
+
 $mailsize=@filesize($tmpfname);
-$cmd="/usr/share/artica-postfix/bin/artica-msmtp --host 127.0.0.1 --port 33559 --read-envelope-from --logfile=$send_result_file -- {$GLOBALS["original_recipient"]} < $tmpfname";
-events("Mailsize:$mailsize","main",__LINE__);
-events($cmd,"main",__LINE__);
-exec($cmd,$results);
-if(count($results)>0){
-	while (list ($num, $ligne) = each ($results) ){
-		events("mstmp_results:$ligne","main",__LINE__);
-	}
-}
+$unix=new unix();
 
-@unlink($tmpfname);
-if(!SendResultOK($send_result_file)){exit(EX_TEMPFAIL);}
+
+
+if($smtp_final_sender==null){$smtp_final_sender="127.0.0.1";}
+
+$smtp_sock=new SMTP_SOCKETS();
+$smtp_sock->myhostname=$unix->hostname_g();
+if(!$smtp_sock->SendSMTPMailFromPath($smtp_final_sender,"33559",
+		$GLOBALS["sender"],$GLOBALS["original_recipient"],$tmpfname)){
+		events("error:smtp_sock ERROR".@implode("\n",$smtp_sock->error),"main",__LINE__);
+		exit(EX_TEMPFAIL);
+	}
+WriteToSyslogMail("from=<{$GLOBALS["sender"]}> to: <{$GLOBALS["original_recipient"]}> success delivered trough $smtp_final_sender:33559","artica-filter");	
 events("Success", "main",__LINE__);
 exit(0);
+
+
 
 function parse_args( $opts, $args ){
   $ret = array();
@@ -433,6 +436,7 @@ function X_ReplaceTo($tmpfname){
 
 function RecipientsToAdd($mailto,$tmpfname){
 	$sock=new sockets();
+	return null;
 	$RecipientsToAddEnableSingleMail=$sock->GET_INFO("RecipientsToAddEnableSingleMail");
 	if($RecipientsToAddEnableSingleMail==null){$RecipientsToAddEnableSingleMail=1;}
 	$ldap=new clladp();

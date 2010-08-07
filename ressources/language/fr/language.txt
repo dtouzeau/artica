@@ -244,6 +244,7 @@ exemples[br]
 <all_days>Tous les jours</all_days>
 <all_events>Tous les &eacute;v&egrave;nements</all_events>
 <all_hours>Toutes les heures</all_hours>
+<all_mailbackup_text>Effectuez des recherches dans la zone de sauvegarde des messages afin de les lib&eacute;rer, de les supprimer ou bien de les visualiser.</all_mailbackup_text>
 <all_minutes>Toutes les minutes</all_minutes>
 <all_quarantines>Gestionnaire de quarantaine global</all_quarantines>
 <all_services_running>en fonctionnement</all_services_running>
@@ -309,6 +310,7 @@ Si un ordinateur d&eacute;passe la limite des X &eacute;v&eacute;nements, Artica
 <APP_APACHE>Apache pour le serveur de base Artica</APP_APACHE>
 <APP_ARTICA>Serveur de base Artica</APP_ARTICA>
 <APP_ARTICA_DANSGUARDIAN_TAIL>D&eacute;mon de statistiques Dansguardian</APP_ARTICA_DANSGUARDIAN_TAIL>
+<APP_ARTICA_FILTER>Filtre Artica</APP_ARTICA_FILTER>
 <APP_ARTICA_FILTER_NOT_ENABLED>Le filtre Artica &quot;artica-filter&quot; n'est pas activ&eacute;, certaines fonctionnalit&eacute;s ne seront pas disponibles</APP_ARTICA_FILTER_NOT_ENABLED>
 <APP_ARTICA_GAYTEWAY>Mode Passerelle</APP_ARTICA_GAYTEWAY>
 <APP_ARTICA_GAYTEWAY_TEXT>Transformez votre serveur Artica en un serveur passerelle</APP_ARTICA_GAYTEWAY_TEXT>
@@ -569,6 +571,7 @@ Squid optimise donc de fa&ccedil;on cons&eacute;quente le flux de donn&eacute;es
 <april>Avril</april>
 <APT_GET_RUNNING>Mise &agrave; jour syst&egrave;me</APT_GET_RUNNING>
 <APT_GET_RUNNING_TEXT>Artica effectue actuellement une mise &agrave; jour syst&egrave;me.</APT_GET_RUNNING_TEXT>
+<architecture>architecture</architecture>
 <are_you_sure_to_delete>&Ecirc;tes-vous s&ucirc;r de vouloir supprimer</are_you_sure_to_delete>
 <ARRAY_ALIASES>Email Aliases</ARRAY_ALIASES>
 <ARRAY_TITLE>Liste de Domaines</ARRAY_TITLE>
@@ -617,6 +620,7 @@ Squid optimise donc de fa&ccedil;on cons&eacute;quente le flux de donn&eacute;es
 <ARTICA_PROTOCOL_ERROR_OR_WRONG_VERSION>Erreur de protocole Artica ou mauvaise version d'Artica sur le serveur distant</ARTICA_PROTOCOL_ERROR_OR_WRONG_VERSION>
 <artica_update_processing>artica-update en ex&eacute;cution</artica_update_processing>
 <artica_update_processing_text>Artica-update est actuellement en cours de traitement</artica_update_processing_text>
+<ARTICA_WATCHDOG_INFOS>Ce param&egrave;tre Active ou d&eacute;sactive un service qui s'assure que les service sont bien d&eacute;marr&eacute;s.[br]Si le param&egrave;tre est activ&eacute;, lorsque Artica calcul l'&eacute;tat du service et que celui-ci est arr&ecirc;t&eacute;, il va le red&eacute;marrer tout seul.[br]Une notification par email est envoy&eacute;e &agrave; l'administrateur (si les notifications sont activ&eacute;es).</ARTICA_WATCHDOG_INFOS>
 <artica_wizard>Assistant Artica</artica_wizard>
 <AsArticaAdministrator>Peut acc&eacute;dez &agrave; la totalit&eacute; de l'arborescence</AsArticaAdministrator>
 <AsDansGuardianGroupRule>Peut administrer des r&egrave;gles de filtrage web.</AsDansGuardianGroupRule>
@@ -791,6 +795,12 @@ Specify 0 when mail delivery should be tried only once.</bounce_queue_lifetime_t
 <cached>cache</cached>
 <cached_files_number>Nombre de fichiers mis en cache</cached_files_number>
 <cache_cleaned>Cache de la console nettoy&eacute;.</cache_cleaned>
+<cache_type_text>Squid dispose de plusieurs m&eacute;thode d'&eacute;criture de son cache.[br]
+[ul]
+[li]UFS, la m&eacute;thode par d&eacute;faut[/li]
+[li]AUFS, une version %u201Cposix%u201D de UFS[/li]
+[li]DISKD, Squid invoque un thread suppl&eacute;mentaire pour stocker en UFS[/li]
+[/ul]</cache_type_text>
 <calendar>Calendrier</calendar>
 <calling_daemon_to_perform_operation>d&eacute;mon d'appel artica pour effectuer des op&eacute;rations</calling_daemon_to_perform_operation>
 <campain_name>Nom de l'envoi en masse</campain_name>
@@ -975,6 +985,7 @@ SI l'erreur n'est pas corrig&eacute;e, contactez le support technique profession
 <cpuLimitEnabled>Utiliser l'outil CpuLimit</cpuLimitEnabled>
 <cpuLimitEnabled_explain>Ce param&egrave;tre autorise artica &agrave; utiliser le programme CpuLimit afin de limiter les processus qui tournent en t&acirc;che de fond.[br]
 Vous avez besoin de tester cette fonctionnalit&eacute;.[br]Parfois cpulimit effectue l'oppos&eacute; de ce qui est demand&eacute;.[br]</cpuLimitEnabled_explain>
+<cpu_family>Famille du processeur</cpu_family>
 <cpu_stat>Usage CPU</cpu_stat>
 <cpu_usage>Usage CPU (par utilisateur)</cpu_usage>
 <create>cr&eacute;er</create>
@@ -1044,6 +1055,7 @@ Dans ce cas, vous ne conserverez pas deux fois les m&ecirc;mes &eacute;l&eacute;
 <dansguardian_blacklist_categories>Restreindre l'acc&egrave;s aux sites web par l'utilisation des cat&eacute;gories de sites web.</dansguardian_blacklist_categories>
 <dansguardian_blacklist_users_categories>Bloquer des sites web en utilisant des listes pr&eacute;-d&eacute;finies.</dansguardian_blacklist_users_categories>
 <dansguardian_categorize_explain>define available categories that will handle this website</dansguardian_categorize_explain>
+<DANSGUARDIAN_DB_STATUS_EXPLAIN>Vous trouverez ici l'&eacute;tat des bases de donn&eacute;es des cat&eacute;gories que vous avez [b]activ&eacute;[/b] dans vos r&egrave;gles de filtrage.[br]Cela veut dire qu'il ne s'agit pas des cat&eacute;gories disponibles mais seulement des cat&eacute;gories en utilisation....</DANSGUARDIAN_DB_STATUS_EXPLAIN>
 <dansguardian_exception_site_list>Ajouter des sites web qui ne seront pas filtr&eacute;s</dansguardian_exception_site_list>
 <DANSGUARDIAN_GROUP_EXPLAIN>Cette fonctionnalit&eacute; permet de d&eacute;l&eacute;guer des r&egrave;gles &agrave; un groupe d'une organisation.[br]
 Elle offre plusieurs avantages:[br]
@@ -1104,6 +1116,8 @@ Vous pouvez ajouter des privil&egrave;ges de groupe afin d'autoriser certains ut
 <delete_mailbox>supprimer la bo&icirc;te aux lettres</delete_mailbox>
 <delete_mailboxes>Supprimer les bo&icirc;tes aux lettres</delete_mailboxes>
 <delete_members>Supprimer des membres</delete_members>
+<delete_message>Supprimer ce message</delete_message>
+<delete_message_text>Supprimer d&eacute;finitivement ce message</delete_message_text>
 <delete_not_forget_to_compile>L'&eacute;l&eacute;ment &agrave; &eacute;t&eacute; correctement supprim&eacute;, n'oubliez pas de compiler vos r&egrave;gles afin d'appliquer ces changements.</delete_not_forget_to_compile>
 <delete_organisation_text>Supprimer cette organisation?</delete_organisation_text>
 <delete_ou>Supprimez cette organisation</delete_ou>
@@ -1296,7 +1310,7 @@ The settings applied are :[br]
 <EnableZabbixServer>Activer/d&eacute;sactiver le serveur Zabbix</EnableZabbixServer>
 <EnableZabbixServer_text>Si vous activez cette option, ce serveur sera autoris&eacute; &agrave; collecter des donn&eacute;es des agents afin de fournir des graphiques et alertes sur les d&eacute;mons et processus</EnableZabbixServer_text>
 <ENABLE_APP_NTPD>Activation du service NTP</ENABLE_APP_NTPD>
-<enable_artica_filter>Activation de Artica-filter</enable_artica_filter>
+<enable_artica_filter>Activation du filtre Artica</enable_artica_filter>
 <enable_artica_filter_text>Activez d'autres fonctionnalit&eacute;s, Avis de Non Responsabilit&eacute;, copies cach&eacute;es et d'autres am&eacute;liorations de la messagerie</enable_artica_filter_text>
 <enable_artica_wbl_robots>Robot Artica des listes blanches et noires</enable_artica_wbl_robots>
 <enable_artica_wbl_robots_icon>Indiquez les adresses eMail qui recevront les requ&ecirc;tes de listes blanches ou noires</enable_artica_wbl_robots_icon>
@@ -1988,6 +2002,8 @@ With the default 100 SMTP server process limit, "in flow delay as 1s" limits the
 <kav_title_infos>Statistiques d'informations</kav_title_infos>
 <keep>garder</keep>
 <keepup2date settings>Param&egrave;tres keepup2date</keepup2date settings>
+<kernel_mismatch>Mauvais noyau Linux</kernel_mismatch>
+<kernel_mismatch_text>Il semble que votre noyau Linux ne correspond pas &agrave; l'architecture de votre syst&egrave;me, essayez d'installer le noyau syst&egrave;me qui correspond...</kernel_mismatch_text>
 <keywords>mots-clefs</keywords>
 <kill_process>Arr&ecirc;ter les processus</kill_process>
 <label>label</label>
@@ -2081,6 +2097,7 @@ The message delivery transport name is the first field in the entry in the maste
 <logs_cleaning>Nettoyage des fichiers de logs</logs_cleaning>
 <logs_size>Taille des logs</logs_size>
 <logs_viewer_text>Voir les &eacute;v&eacute;nements des applications en temps r&eacute;el</logs_viewer_text>
+<loopback>boucle locale</loopback>
 <LSHW_RUNNING>Parcours du mat&eacute;riel...</LSHW_RUNNING>
 <LSHW_RUNNING_TEXT>Parcours du mat&eacute;riel en cours : configurations m&eacute;moires, CPU, carte m&egrave;re...</LSHW_RUNNING_TEXT>
 <mac_addr>Adresse MAC</mac_addr>
@@ -2263,6 +2280,7 @@ This parameter also limits the time an unreachable destination is kept in the sh
 [strong]Time units: s (seconds), m (minutes), h (hours), d (days), w (weeks). The default time unit is s (seconds).[/strong]
 </minimal_backoff_time_text>
 <minimal_time>Temps minimum</minimal_time>
+<minor>mineure</minor>
 <minutes>minutes</minutes>
 <missing>il manque</missing>
 <mobile>t&eacute;l&eacute;phone portable</mobile>
@@ -2351,6 +2369,7 @@ The default is to use the local machine name, $myhostname, which defaults to the
 <name_the_new_account_explain>Ce nom est l'identificateur unique dans la base de donn&eacute;es des utilisateurs, il sera utilis&eacute; pour acc&eacute;der &agrave; la bo&icirc;te aux lettres et sur le portail</name_the_new_account_explain>
 <name_the_new_account_field>Type de l'identificateur unique du nouveau compte</name_the_new_account_field>
 <name_the_new_account_title>Le nouvel identifiant unique</name_the_new_account_title>
+<nb_cpus>Nombre de CPUs</nb_cpus>
 <nb_domains>Nombre de domaines</nb_domains>
 <nb_fetchmails>NB de messages r&eacute;cup&eacute;r&eacute;s</nb_fetchmails>
 <nb_fetchmails_size>Poids des messages</nb_fetchmails_size>
@@ -2540,7 +2559,7 @@ Il est recommand&eacute; d'utiliser 0 si ICP n'est pas utilis&eacute;.</parent_o
 <parent_options_proxy_ttl>Sp&eacute;cifiez une dur&eacute;e de vie multicast (TTL) lors de l'envoi de requ&ecirc;tes de groupes ICP. [br] Nous n'acceptons pas les r&eacute;ponses &agrave; partir d'h&ocirc;tes ICP al&eacute;atoire. [br]Donc, vous devez configurer d'autres membres du groupe en tant que pairs avec l'option  multicast-responder</parent_options_proxy_ttl>
 <parent_options_proxy_weight>Pond&eacute;ration du proxy parent. Le poids doit &ecirc;tre un entier. Le poids par d&eacute;faut est de 1, plus le poids est important plus le proxy sera favoris&eacute;</parent_options_proxy_weight>
 <partitions>Partitions</partitions>
-<partitions_number>Nombre de partitions</partitions_number>
+<partitions_number>Partitions</partitions_number>
 <partition_infos>Information sur la partition</partition_infos>
 <pass>passer</pass>
 <PassiveFtp>Utilisez le FTP passif</PassiveFtp>
@@ -2588,6 +2607,7 @@ or until further truncation is not possible.(eg:192.168.1.0/24)
 <performance>Performance</performance>
 <performances_settings>Performances</performances_settings>
 <performances_settings_text>Tous les param&egrave;tres qui pourrait acc&eacute;l&eacute;rer les processus postfix</performances_settings_text>
+<perform_installation_of>Installer le paquetage</perform_installation_of>
 <perform_operation_ask>Ex&eacute;cuter cette op&eacute;ration ?</perform_operation_ask>
 <perform_operation_on_services_scheduled>Les modification &agrave; &eacute;t&eacute; programm&eacute;es. Patientez quelques temps et rafra&icirc;chissez cette page afin de visualiser les services actifs ou inactifs.</perform_operation_on_services_scheduled>
 <permission>permission</permission>
@@ -2694,6 +2714,7 @@ This is because Postfix needs to open lookup tables ahead of time, but the reade
 <postmaster_identity_text>Indiquez l'adresse eMail &eacute;mettrice des messages de notifications</postmaster_identity_text>
 <POSTMASTER_NOT_EDITED>Le Postmaster n'a pas &eacute;t&eacute; configur&eacute;</POSTMASTER_NOT_EDITED>
 <POSTMASTER_NOT_EDITED_TEXT>Vous devez d&eacute;finir l'adresse eMail qui sera destinatrice des messages de notification SMTP</POSTMASTER_NOT_EDITED_TEXT>
+<postqueue_list_explain>Cette section vous permet de visualiser les messages en attente dans la file d'attente de Postfix (les 300 premiers max).[br]En cliquant sur une ligne vous serez en mesure de visualiser les informations du message s&eacute;lectionn&eacute;, de le supprimer ou de forcer Postfix &agrave; le retraiter.</postqueue_list_explain>
 <prepend to the subject>Pr&eacute;fixer au sujet</prepend to the subject>
 <PREPEND_help>Prepend  the  specified  message header to the message.
 [br]When more than one PREPEND action  executes,[br]the  first prepended header appears before the second etc. prepended header.
@@ -2705,6 +2726,10 @@ This is because Postfix needs to open lookup tables ahead of time, but the reade
 <privileges>droits</privileges>
 <privileges_text>Modifier les droits et les r&egrave;gles de s&eacute;curit&eacute; des utilisateurs enregistr&eacute;s dans ce groupe</privileges_text>
 <Process Server Settings>Param&egrave;tres de Processus Serveur</Process Server Settings>
+<processed>trait&eacute;(s)</processed>
+<processed_messages_explain>Ce chiffre est tous les messages trait&eacute;s depuis la derni&egrave;re purge des &eacute;v&egrave;nements de messagerie.[br]
+Lorsque postfix traite un message, Artica enregistre sont &eacute;v&egrave;nements dans Mysql (le moteur de base de donn&eacute;es).[br]
+Vous visualisez ici le nombre total d'&eacute;v&egrave;nements sauvegard&eacute;s.</processed_messages_explain>
 <processes>processus</processes>
 <processes_memory>Processus en m&eacute;moire</processes_memory>
 <processes_memory_text>Affichez les processus qui prennent le plus de m&eacute;moire</processes_memory_text>
@@ -2979,6 +3004,8 @@ En premier &agrave; la r&eacute;ception de l'ent&ecirc;te HTTP du serveur (valeu
 L'utilisateur recevra l'erreur &quot;the request or reply is too large&quot;.[br]
 Si l'ent&ecirc;te ne contient pas de &quot;content-length&quot; et que le t&eacute;l&eacute;chargement exc&egrave;de la valeur alors la connexion sera tout simplement ferm&eacute;e et l'utilisateur n'aura re&ccedil;u qu'une contenu partiel.</reply_body_max_size_text>
 <report_settings>param&egrave;tres de rapport</report_settings>
+<reprocess_message>retraiter ce message</reprocess_message>
+<reprocess_message_text>Force Postfix &agrave; placer ce message dans la file d'attente active afin de le retraiter</reprocess_message_text>
 <reprocess_queue>retraiter toutes les files d'attente</reprocess_queue>
 <request_body_max_size>Taille Max. du corps de la requ&ecirc;te HTTP</request_body_max_size>
 <request_body_max_size_text>Ceci sp&eacute;cifie la taille maximale d'un corps de requ&ecirc;te HTTP.[br]
@@ -3143,6 +3170,7 @@ while distributing domain2.com mail as usual.[br]
 <server_name>Nom du serveur</server_name>
 <server_swap>M&eacute;moire swap du serveur</server_swap>
 <server_time>temps du serveur</server_time>
+<server_will_be_rebooted>Votre serveur va red&eacute;marrer automatiquement apr&egrave;s l'ex&eacute;cution de l'op&eacute;ration</server_will_be_rebooted>
 <service>service</service>
 <services_family>Famille des services</services_family>
 <services_family_text>Cette section vous autorise &agrave; modifier le comportement de votre serveur par l'ajout ou la suppression de services.</services_family_text>
@@ -3150,6 +3178,8 @@ while distributing domain2.com mail as usual.[br]
 <services_status>Statut des services</services_status>
 <services_status_failed>Services &eacute;chou&eacute;s</services_status_failed>
 <services_status_text>Voir tous les services et leur statut dans une page</services_status_text>
+<services_status_text_explain>Cette section affiche les &eacute;tats des services g&eacute;r&eacute;s par Artica.[br]Ceci va vous aider &agrave; analyser les consommations m&eacute;moires de chaque d&eacute;mon et vous permettra d'activer ou de d&eacute;sactiver les processus de surveillance des d&eacute;mons.[br]
+En-dessous, vous pouvez visualiser les derniers &eacute;v&egrave;nements syst&egrave;mes que vous avez ou auriez d&ucirc;t recevoir par email.</services_status_text_explain>
 <service_disabled>Ce service est d&eacute;sactiv&eacute; par artica...</service_disabled>
 <service_info>Information de service</service_info>
 <service_name>Nom du d&eacute;mon</service_name>
@@ -3238,6 +3268,7 @@ It refuses delivery of a message by sending back an [MDN] to the sender.[br]
 <smb_bcast>m&eacute;thode par broadcast</smb_bcast>
 <smb_host>R&eacute;solution standard des noms</smb_host>
 <smb_lmhost>fichier LMHOSTS Lan Manager</smb_lmhost>
+<smb_lmhosts>fichier LMHOSTS Lan Manager</smb_lmhosts>
 <smb_wins>Serveur WINS</smb_wins>
 <SMTP SASL Authentication>Authentification SASL SMTP</SMTP SASL Authentication>
 <SMTP SASL Authentication enable>Activer le mode d'authentification SASL SMTP</SMTP SASL Authentication enable>
@@ -3532,9 +3563,11 @@ Vous pouvez d&eacute;finir par exemple joe@domain.tld ou bien  *@domain.tld, le 
 <squid_advanced_parameters_text>Personnalisation et param&egrave;tres avanc&eacute;s du proxy SQUID</squid_advanced_parameters_text>
 <SQUID_CACHES_OVER>Caches proxy en surcapacit&eacute;</SQUID_CACHES_OVER>
 <SQUID_CACHES_OVER_TEXT>Il semble que votre syst&egrave;me de cache soit en surcapacit&eacute;, afin d'am&eacute;liorer les performances, veuillez &eacute;tendre vos caches sur le disque dur</SQUID_CACHES_OVER_TEXT>
+<SQUID_CACHE_TINYTEXT>Squid est un des meilleurs Proxy cache et acc&eacute;l&eacute;rateur de navigation Internet qui existe.[br]Plus de 10 ans exp&eacute;rience on fait de lui un produit puissant et adapt&eacute; &agrave; l'acc&eacute;l&eacute;ration Internet.</SQUID_CACHE_TINYTEXT>
 <squid_events>&Eacute;v&egrave;nements de Squid</squid_events>
 <squid_filter_stats_text>Cr&eacute;ez un filtre afin de pr&eacute;ciser l'affichage des &eacute;v&egrave;nements</squid_filter_stats_text>
 <squid_main_settings>Param&egrave;tres de cache Squid</squid_main_settings>
+<squid_net_settings>Param&egrave;tres r&eacute;seaux</squid_net_settings>
 <SQUID_NEWVERSION>Nouvelle version du Proxy web SQUID</SQUID_NEWVERSION>
 <SQUID_NEWVERSION_TEXT>Une nouvelle version du proxy Internet SQUID est disponible. Il est conseill&eacute; de la mettre &agrave; jour.</SQUID_NEWVERSION_TEXT>
 <SQUID_NOT_COMPILED_NTLM_RUN_RECONFIGURE>Le proxy principale (SQUID) n'est pas compil&eacute; avec la directive NTLM, si vous voulez utiliser l'authentification &agrave; travers un domaine NT, vous devez mettre &agrave; jour SQUID.[br]
@@ -3662,6 +3695,8 @@ Le cache est alors permanent.[br]
 Cette m&eacute;thode &agrave; pour but d'am&eacute;liorer les performances de navigation &agrave; travers l'interface.[br]
 Si vous d&eacute;sactivez cette option, Artica utilisera uniquement un cache de &quot;session&quot; non permanent qui sera d&eacute;truit &agrave; chaque fermeture de session.</SystemV5CacheEnabled_explain>
 <system_disk>Disque syst&egrave;me</system_disk>
+<system_kernel>Noyau syst&egrave;me</system_kernel>
+<system_kernel_text>Mettre &agrave; jour et afficher les paquetages noyaux</system_kernel_text>
 <system_perfomances>Performances syst&egrave;me</system_perfomances>
 <system_perfomances_datas>Perf. de donn&eacute;es syst&egrave;me</system_perfomances_datas>
 <system_perfomances_datas_text>Syst&egrave;me E/S, Disque dur et statistiques r&eacute;seau</system_perfomances_datas_text>
@@ -3988,6 +4023,7 @@ Si il est en rouge, vous allez devoir maintenir la base des utilisateurs.[br]Cet
 <update_kaspersky_database_title>Base de donn&eacute;es de mise &agrave; jour antivirale</update_kaspersky_database_title>
 <update_now>faites la mise &agrave; jour maintenant</update_now>
 <update_settings>Param&egrave;tres de mise &agrave; jour</update_settings>
+<upgrade>Mise &agrave; jour</upgrade>
 <upgrade_artica>Nouvelle version d'Artica</upgrade_artica>
 <upgrade_artica_text>Une nouvelle version d'Artica est disponible, vous pouvez effectuer une mise &agrave; jour si vous voulez ...</upgrade_artica_text>
 <upgrade_your_system>Mettez &agrave; jour votre syst&egrave;me</upgrade_your_system>

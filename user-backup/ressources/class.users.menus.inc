@@ -1003,6 +1003,7 @@ private function build_user_left_menus(){
 				$array[$OU_TEXT]["SUB"]["{members}"]="javascript:Loadjs('domains.manage.org.index.php?finduser-js=yes&ou=$OU_encoded&encoded=yes&in-front-ajax=yes');";
 				$array[$OU_TEXT]["SUB"]["{groups}"]="javascript:Loadjs('domains.edit.group.php?ou=$OU_encoded&js=yes&encoded=yes&in-front-ajax=yes');";
 				$array[$OU_TEXT]["SUB"]["{search}"]="javascript:Loadjs('domains.find.user.php?ou=$OU_encoded&encoded=yes');";
+				$array[$OU_TEXT]["SUB"]["{groupwares}"]="javascript:Loadjs('domains.manage.org.index.php?ou=$OU_encoded&encoded=yes&groupwares-in-front-ajax=yes');";
 			}			
 		}
 		
@@ -1143,6 +1144,13 @@ private function build_user_left_menus(){
 
 		if($this->AsAnAdministratorGeneric){
 			$array["{events}"]["MAIN"]="";
+			
+			if($this->AsSystemAdministrator){
+				$array["{events}"]["SUB"]["{artica_events}"]="javascript:Loadjs('artica.events.php?in-front-ajax=yes')";
+				
+				
+			}
+			
 			if($this->POSTFIX_INSTALLED){
 				$array["{events}"]["SUB"]["{messaging}"]="javascript:s_PopUp('postfix.events.php?pop=true',450,400)";
 			}

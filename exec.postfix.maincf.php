@@ -212,6 +212,7 @@ function mynetworks(){
 	
 	
 	$inline=@implode(", ",$nets);
+	$inline=str_replace(',,',',',$inline);
 	$config_net=@implode("\n",$nets);
 	echo "Starting......: Building mynetworks ". count($nets)." Networks ($inline)\n";
 	@file_put_contents("/etc/artica-postfix/mynetworks",$config_net);
@@ -905,17 +906,50 @@ function inet_interfaces(){
 	
 	if(!is_array($newarray)){$newarray[]="all";}
 	$finale=implode(",",$newarray);
+	$finale=str_replace(',,',',',$finale);
 	echo "Starting......: Postfix Listen interface(s) \"$finale\"\n";
 	system("{$GLOBALS["postconf"]} -e \"inet_interfaces = $finale\" >/dev/null 2>&1");
+	shell_exec("{$GLOBALS["postconf"]} -e \"artica-filter_destination_recipient_limit = 1\" >/dev/null 2>&1");
 }
 
 function MailBoxTransport(){
 	$main=new maincf_multi();
+	$sock=new sockets();
+	$users=new usersMenus();
 	$default=$main->getMailBoxTransport();
 	
 	system("{$GLOBALS["postconf"]} -e \"zarafa_destination_recipient_limit = 1\" >/dev/null 2>&1");
 	system("{$GLOBALS["postconf"]} -e \"mailbox_transport = $default\" >/dev/null 2>&1");
+	
+	if(preg_match("#lmtp:(.+?):[0-9]+#",$default)){
+		if(!$users->ZARAFA_INSTALLED){
+			if(!$users->cyrus_imapd_installed){
+				disable_lmtp_sasl();
+				return null;
+			}
+			echo "Starting......: Postfix LMTP is enabled $default\n";
+			$ldap=new clladp();
+			$CyrusLMTPListen=trim($sock->GET_INFO("CyrusLMTPListen"));
+			$cyruspass=$ldap->CyrusPassword();
+			@file_put_contents("/etc/postfix/lmtpauth","$CyrusLMTPListen\tcyrus:$cyruspass");
+			shell_exec("{$GLOBALS["postmap"]} hash:/etc/postfix/lmtpauth");
+			system("{$GLOBALS["postconf"]} -e \"lmtp_sasl_auth_enable = yes\" >/dev/null 2>&1");
+			system("{$GLOBALS["postconf"]} -e \"lmtp_sasl_password_maps = hash:/etc/postfix/lmtpauth\" >/dev/null 2>&1");
+			system("{$GLOBALS["postconf"]} -e \"lmtp_sasl_mechanism_filter = plain, login\" >/dev/null 2>&1");
+			system("{$GLOBALS["postconf"]} -e \"lmtp_sasl_security_options =\" >/dev/null 2>&1");			
+		}
+	}else{
+		disable_lmtp_sasl();
 	}
+	
+	
+	}
+	
+function disable_lmtp_sasl(){
+	echo "Starting......: Postfix LMTP is disabled\n";
+	system("{$GLOBALS["postconf"]} -e \"lmtp_sasl_auth_enable = no\" >/dev/null 2>&1");
+			
+}
 	
 function disable_smtp_sasl(){
 	shell_exec("{$GLOBALS["postconf"]} -e \"smtp_sasl_password_maps =\" >/dev/null 2>&1");

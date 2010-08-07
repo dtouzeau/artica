@@ -3605,7 +3605,8 @@ Although this allows Windows clients to resolve fully qualified Internet domain 
 </SambaDnsProxy_explain>
 <name_resolve_order>Name Resolution Order</name_resolve_order>
 <smb_host>standard name resolution</smb_host>	
-<smb_lmhost>LAN Manager LMHOSTS file</smb_lmhost>	
+<smb_lmhost>LAN Manager LMHOSTS file</smb_lmhost>
+<smb_lmhosts>LAN Manager LMHOSTS file</smb_lmhost>
 <smb_wins>WINS server</smb_wins>
 <smb_bcast>broadcast method</smb_bcast>
 <ACLS_SUPPORT>ACLs support</ACLS_SUPPORT>
@@ -4228,3 +4229,51 @@ use this feature</postfix_unknown_users_tinytext>
 <ask_perform_operation_delete_item>Remove these items ? :</ask_perform_operation_delete_item>
 <servername_already_used>server name already used</servername_already_used>
 <certificate_infos_modify_text>Display and modify SSL certificate informations</certificate_infos_modify_text>
+<loopback>loopback</loopback>
+<delete_message>Delete this message</delete_message>
+<delete_message_text>remove permanently this message</delete_message_text>
+<postqueue_list_explain>This section display messages stored in postfix queues, you can see in this table the 300 (max) first stored mails.[br]By clicking on a row, you will be able to get message informations,to delete it or to reprocess it</postqueue_list_explain>
+<reprocess_message>Reprocess this message</reprocess_message>
+<reprocess_message_text>Force Postfix to Requeue the message</reprocess_message>
+<processed>processed</processed>
+<all_mailbackup_text>Query the mail backup area an reprocess messages from the backup storage area</all_mailbackup_text>
+<processed_messages_explain>Here it is all messages processed since the last cleaned events process.[br]When Postfix process a message artica will save the event into the mysql database.[br]
+You will see here the total of messages events saved</processed_messages_explain>
+<squid_net_settings>Squid Network parameters</squid_net_settings>
+<cache_type_text>Squid provide several methods for writing it's cache:
+[ul]
+[li]"ufs" is the old well-known Squid storage format that has always been there.[/li]
+[li]"aufs" uses the same storage format as "ufs", utilizing POSIX-threads to avoid blocking the main Squid process on disk-I/O.[br]
+This was formerly known in Squid as async-io.[/li]
+[li]"diskd" uses the same storage format as "ufs", utilizing a separate process to avoid blocking the main Squid process on disk-I/O.[/li]
+[/ul] 
+</cache_type_text>
+<APP_ARTICA_FILTER>Artica Filter</APP_ARTICA_FILTER>
+<ARTICA_WATCHDOG_INFOS>This parameter enable or disable watchdog feature on this daemon.[br]If enabled, when parsing the daemon status and if the daemon is stopped , artica will send a notification and try to start the daemon automatically.</ARTICA_WATCHDOG_INFOS>
+<services_status_text_explain>This section display status of each services managed by Artica.[br]
+It helps you to analyze memory consumption of each daemon, enable/disable watchdog on each daemon.[br]
+Below, you can view that last system events.</services_status_text_explain>
+<SQUID_CACHE_TINYTEXT>Squid is the famous proxy cache used for most companies, more than 10 years old it is a scalable and strong web internet accelerator</SQUID_CACHE_TINYTEXT>
+<DANSGUARDIAN_DB_STATUS_EXPLAIN>You will find here categories databases status [br]enabled[/b] in your rules.[br]This means that only activated categories in your rules are displayed in this section.[br]It does not list categories [b]available[/b]</DANSGUARDIAN_DB_STATUS_EXPLAIN>
+<system_kernel>System kernel</system_kernel>
+<system_kernel_text>Upgrade/display kernel packages</system_kernel_text>
+<kernel_mismatch>Kernel mismatch</kernel_mismatch>
+<kernel_mismatch_text>It seems that your kernel did not match your process architecture, try to install the correct kernel version</kernel_mismatch_text>
+<perform_installation_of>Perform installation of the package</perform_installation_of>
+<server_will_be_rebooted>Your server will be rebooted after the execution task</server_will_be_rebooted>
+<upgrade>upgrade</upgrade>
+<nb_cpus>CPUs number</nb_cpus>
+<cpu_family>CPU Family</cpu_family>
+<architecture>architecture</architecture>
+<minor>minor</minor>
+<APTGET_CURRENT_INSTALL_TEXT>The system package currently installing packages: </APTGET_CURRENT_INSTALL_TEXT>
+<SQUID_NETWORK_HELP>
+[ul]
+[li]This refers to the whole Network with address 172.16.1.0: [b]172.16.1.0/24[/b][/li]
+[li]This refers specific single IP Address 172.16.1.25: [b]172.16.1.25/32[/b][/li]
+[li]This refers specific single IP Address 172.16.1.25: [b]172.16.1.25[/b][/li]
+[li]This refers range of IP Addresses from 172.16.1.25-172.16.1.35 :[b]172.16.1.25-172.16.1.35/32[/b][/li]
+[/ul]
+</SQUID_NETWORK_HELP>
+<APP_ARTICA_NOTIFIER>Artica SMTP Notifier</APP_ARTICA_NOTIFIER>
+<KASPERSKY_UPDATES>Kaspersky products updates</KASPERSKY_UPDATES>

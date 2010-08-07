@@ -124,7 +124,7 @@ begin
    if u='2' then begin
           OpenSuse11specific();
           InstallPackageLists(cyrus);
-          fpsystem('/usr/share/artica-postfix/bin/artica-roundcube --install --verbose');
+          fpsystem('/usr/share/artica-postfix/bin/artica-make APP_ROUNDCUBE3');
           fpsystem('/usr/share/artica-postfix/bin/artica-make APP_DOTCLEAR');
           Show_Welcome;
           exit;

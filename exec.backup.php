@@ -9,6 +9,10 @@ include_once(dirname(__FILE__).'/ressources/class.backup.inc');
 include_once(dirname(__FILE__).'/ressources/class.os.system.inc');
 include_once(dirname(__FILE__).'/ressources/class.cyrus.inc');
 include_once(dirname(__FILE__).'/ressources/class.user.inc');
+include_once(dirname(__FILE__).'/framework/class.unix.inc');
+include_once(dirname(__FILE__)."/framework/frame.class.inc");
+
+
 
 $date=date('Y-m-d');
 $GLOBALS["ADDLOG"]="/var/log/artica-postfix/backup-starter-$date.log";

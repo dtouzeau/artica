@@ -179,7 +179,7 @@ begin
     end;
 
    if u='9' then begin
-          InstallPackageLists(zabbix);
+          InstallPackageLists(openvpn);
           Show_Welcome;
           exit;
     end;

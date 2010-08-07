@@ -280,7 +280,7 @@ if(is_array($array2)){
 function group30s(){
 	$array[]="exec.mpstat.php";
 	$array[]="exec.jgrowl.php --build";
-	
+	$array[]="cron.notifs.php";
     
 
 	if($GLOBALS["cpuLimitEnabled"]){$array2[]="process1 --cpulimit";}

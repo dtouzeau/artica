@@ -1167,6 +1167,7 @@ begin
     l.Add('/usr/bin');
     l.Add('/usr/local/bin');
     l.Add('/usr/local/sbin');
+    l.add('/usr/share/artica-postfix/bin');
 
     for i:=0 to l.Count-1 do begin
        if FIleExists(l.Strings[i]+'/'+StrProgram)  then begin
@@ -3744,6 +3745,11 @@ var
    conf:TiniFile;
    policy_match:boolean;
    HOSTS_ADDONS:string;
+   countryName:string;
+   stateOrProvinceName:string;
+   localityName:string;
+   organizationName:string;
+   emailAddress:string;
 begin
 
     default_conf:=OPENSSL_CONFIGURATION_PATH();
@@ -3751,8 +3757,15 @@ begin
        writeln('OPENSSL_CERTIFCATE_CONFIG():: OPENSSL_CONFIGURATION_PATH() function failed');
        exit;
     end;
-
+    writeln('starting certificate.........: Using certificate path '+default_conf);
     conf:=TiniFile.Create(default_conf);
+
+    countryName:=conf.ReadString('default_ca','countryName_value','US');
+    stateOrProvinceName:=conf.ReadString('default_ca','stateOrProvinceName_value','Delaware');
+    localityName:=conf.ReadString('default_ca','localityName_value','Wilmington');
+    organizationName:=conf.ReadString('default_ca','organizationName_value','Apache Software Foundation');
+    emailAddress:=conf.ReadString('default_ca','emailAddress_value','coyote@apache.org');
+
     conf.EraseSection('HOSTS_ADDONS');
 
 
@@ -3779,28 +3792,49 @@ begin
     end;
 
     writeln('starting certificate.........: Hostname is "'+HostName+'"');
-          conf.WriteString('CA_default','policy','policy_match');
-          conf.WriteString('ca','unique_subject','no');
-          conf.WriteString('default_ca','unique_subject','no');
-          conf.WriteString('default_db','policy','policy_match');
-          conf.WriteString('policy_match','countryName','match');
-          conf.WriteString('policy_match','stateOrProvinceName','match');
-          conf.WriteString('policy_match','organizationName','match');
-          conf.WriteString('policy_match','organizationalUnitName','optional');
-          conf.WriteString('policy_match','commonName','supplied');
-          conf.WriteString('policy_match','emailAddress','optional');
-          conf.WriteString('policy_anything','countryName','optional');
-          conf.WriteString('policy_anything','stateOrProvinceName','optional');
-          conf.WriteString('policy_anything','localityName','optional');
-          conf.WriteString('policy_anything','organizationName','optional');
-          conf.WriteString('policy_anything','organizationalUnitName','optional');
-          conf.WriteString('policy_anything','commonName','supplied');
-          conf.WriteString('policy_anything','emailAddress','optional');
-          conf.WriteString('v3_ca','subjectKeyIdentifier','hash');
-          conf.WriteString('v3_ca','authorityKeyIdentifier','keyid:always,issuer:always');
-          conf.WriteString('v3_ca','basicConstraints','critical,CA:false');
-          conf.UpdateFile;
-          conf.Free;
+    conf.WriteString('CA_default','policy','policy_match');
+    conf.WriteString('ca','unique_subject','no');
+    conf.WriteString('default_ca','unique_subject','no');
+    conf.WriteString('default_db','policy','policy_match');
+    conf.WriteString('policy_match','countryName','match');
+    conf.WriteString('policy_match','stateOrProvinceName','match');
+    conf.WriteString('policy_match','organizationName','match');
+    conf.WriteString('policy_match','organizationalUnitName','optional');
+    conf.WriteString('policy_match','commonName','supplied');
+    conf.WriteString('policy_match','emailAddress','optional');
+    conf.WriteString('policy_anything','countryName','optional');
+    conf.WriteString('policy_anything','stateOrProvinceName','optional');
+    conf.WriteString('policy_anything','localityName','optional');
+    conf.WriteString('policy_anything','organizationName','optional');
+    conf.WriteString('policy_anything','organizationalUnitName','optional');
+    conf.WriteString('policy_anything','commonName','supplied');
+    conf.WriteString('policy_anything','emailAddress','optional');
+    conf.WriteString('v3_ca','subjectKeyIdentifier','hash');
+    conf.WriteString('v3_ca','authorityKeyIdentifier','keyid:always,issuer:always');
+    conf.WriteString('v3_ca','basicConstraints','critical,CA:false');
+    conf.WriteString('req','distinguished_name','default_ca');
+
+    conf.WriteString('default_ca','countryName_value',countryName);
+    conf.WriteString('default_ca','countryName_min','2');
+    conf.WriteString('default_ca','countryName_max','2');
+
+    conf.WriteString('default_ca','stateOrProvinceName','State Name');
+    conf.WriteString('default_ca','stateOrProvinceName_value',stateOrProvinceName);
+
+    conf.WriteString('default_ca','localityName','Locality Name');
+    conf.WriteString('default_ca','localityName_value',localityName);
+
+    conf.WriteString('default_ca','organizationName','organization Name');
+    conf.WriteString('default_ca','organizationName_value',organizationName);
+
+    conf.WriteString('default_ca','commonName','common Name');
+    conf.WriteString('default_ca','commonName_value',HostName);
+
+    conf.WriteString('default_ca','emailAddress','email Address');
+    conf.WriteString('default_ca','emailAddress_value',emailAddress);
+
+    conf.UpdateFile;
+    conf.Free;
 
 
     RegExpr:=TRegExpr.create;
@@ -3817,16 +3851,6 @@ begin
     FILI.LoadFromFile(default_conf);
 
     for i:=0 to FILI.Count -1 do begin
-        RegExpr.Expression:='commonName[\s=]+';
-
-        if RegExpr.Exec(FILI.Strings[i]) then begin
-           FILI.Strings[i]:='  commonName                      = ' + HostName;
-           writeln('starting certificate.........: commonName=' + HostName+' line:'+IntToStr(i));
-        end;
-
-        RegExpr.Expression:='commonName_value[\s=]+';
-        if RegExpr.Exec(FILI.Strings[i]) then FILI.Strings[i]:='  commonName_value                = '+HostName;
-
         RegExpr.Expression:='basicConstraints[\s=]+';
         if RegExpr.Exec(FILI.Strings[i]) then FILI.Strings[i]:='  basicConstraints                = critical,CA:false';
 
@@ -7154,11 +7178,12 @@ begin
   logs:=Tlogs.Create;
   l:=Tstringlist.Create;
   lo:=Tstringlist.Create;
-  l.Add(';');
+  l.Add(',,L');
   tmpstr:=logs.FILE_TEMP();
   if FileExists('/tmp/sfdisk.txt') then logs.DeleteFile('/tmp/sfdisk.txt');
   l.SaveToFile('/tmp/sfdisk.txt');
-  fpsystem('sfdisk '+dev+' </tmp/sfdisk.txt >'+tmpstr + ' 2>&1');
+  fpsystem('dd if=/dev/zero of='+dev+' bs=512 count=1');
+  fpsystem('sfdisk -f '+dev+' </tmp/sfdisk.txt >'+tmpstr + ' 2>&1');
   lo.Add(logs.ReadFromFile(tmpstr));
   logs.DeleteFile(tmpstr);
   if FileExists('/sbin/mkfs.ext4') then begin

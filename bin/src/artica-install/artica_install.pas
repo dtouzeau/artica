@@ -17,7 +17,7 @@ artica_cron, kretranslator, isoqlog, obm, openvpn, jcheckmail, mailmanctl,
 imapsync, dhcp_server, samba4, obm2, xapian, opengoo, dstat, rsync, tcpip,
 nfsserver, lvm, assp, pdns, gluster, kav4proxy, zabbix, hamachi, kavmilter,
 kavm4mls, postfilter, fetchmail, vmwaretools, zarafa_server, monit,
-squidguard, wifi,fail2ban,mysql_daemon,saslauthd,xfce;
+squidguard, wifi,fail2ban,mysql_daemon,saslauthd,xfce, emailrelay;
 
 var
 install:Tclass_install;
@@ -100,6 +100,7 @@ zfail2ban:tfail2ban;
 zmysql:tmysql_daemon;
 zsaslauthd:tsaslauthd;
 zxfce:txfce;
+
 
 begin
 SYS:=Tsystem.Create;
@@ -541,6 +542,13 @@ end;
    writeln(zhamachi.VERSION());
    halt(0);
 end;
+
+ if ParamStr(2)='emailrelay' then begin
+   writeln(GLOBAL_INI.EMAILRELAY_VERSION());
+   halt(0);
+end;
+
+
 
 writeln('help:');
 writeln('--export-version squid');

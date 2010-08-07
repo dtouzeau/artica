@@ -99,6 +99,7 @@ var x_AddWebService= function (obj) {
 		XHR.appendData('WWWMysqlPassword',document.getElementById('WWWMysqlPassword').value);
 		if(document.getElementById('WWWAppliUser')){XHR.appendData('WWWAppliUser',document.getElementById('WWWAppliUser').value);}
 		if(document.getElementById('WWWMultiSMTPSender')){XHR.appendData('WWWMultiSMTPSender',document.getElementById('WWWMultiSMTPSender').value);}
+		if(document.getElementById('WWWEnableAddressBook')){XHR.appendData('WWWEnableAddressBook',document.getElementById('WWWEnableAddressBook').value);}
 		
 		
 		
@@ -213,6 +214,19 @@ if($_GET["host"]<>null){
 	}
 	
 	
+	if($h->WWWEnableAddressBook_ENABLED[$LoadVhosts["wwwservertype"]]){
+		if($LoadVhosts["WWWEnableAddressBook"]==null){$LoadVhosts["WWWEnableAddressBook"]=1;}
+		$WWWEnableAddressBook="
+		<tr>
+			<td class=legend >{roundcube_ldap_directory}:</td>
+			<td style='width:170px'>". Field_checkbox("WWWEnableAddressBook",1,$LoadVhosts["WWWEnableAddressBook"])."</td>
+		</tr>";
+		
+		
+	}
+	
+	
+	
 	$html="<H1>$title</H1>
 	<table style='width:100%'>
 	<tr>
@@ -243,6 +257,7 @@ if($_GET["host"]<>null){
 					<td class=legend>{WWWAppliPassword}:</td>
 					<td>". Field_password("WWWAppliPassword",$LoadVhosts["wwwapplipassword"])."</td>
 				</tr>		
+				$WWWEnableAddressBook
 				<tr>
 					<td colspan=2 align='right'><hr>
 					". button("$button","AddWebService();")."
@@ -432,6 +447,11 @@ function add_web_service(){
 	$vhosts->WWWMysqlUser=$_GET["WWWMysqlUser"];
 	$vhosts->WWWMysqlPassword=$_GET["WWWMysqlPassword"];
 	$vhosts->WWWSSLMode=$_GET["WWWSSLMode"];
+	if(isset($_GET["WWWEnableAddressBook"])){
+		$vhosts->WWWEnableAddressBook=$_GET["WWWEnableAddressBook"];
+	}
+	
+	
 	
 	writelogs("WWWMultiSMTPSender={$_GET["WWWMultiSMTPSender"]}",__FUNCTION__,__FILE__,__LINE__);
 	
@@ -449,42 +469,20 @@ function listOfAvailableServices(){
 	$user=new usersMenus();
 	$array[]="{select}";
 	
-	if($user->LMB_LUNDIMATIN_INSTALLED){
-		$array["LMB"]="{APP_LMB}";
-		
-	}
-	
-	if($user->JOOMLA_INSTALLED){
-		$array["JOOMLA"]="{APP_JOOMLA}";
-	}
-	
-	if($user->SUGARCRM_INSTALLED){
-		$array["SUGAR"]="{APP_SUGARCRM}";
-	}	
-	
-	if($user->roundcube_installed){
-		$array["ROUNDCUBE"]="{APP_ROUNDCUBE}";
-	}
-	
-	if($user->OBM2_INSTALLED){
-		$array["OBM2"]="{APP_OBM2}";
-	}
-	if($user->OPENGOO_INSTALLED){
-			$array["OPENGOO"]="{APP_OPENGOO}";
-	}
-	
-	if($user->GROUPOFFICE_INSTALLED){
-			$array["GROUPOFFICE"]="{APP_GROUPOFFICE}";
-	}	
+	if($user->LMB_LUNDIMATIN_INSTALLED){$array["LMB"]="{APP_LMB}";}
+	if($user->JOOMLA_INSTALLED){$array["JOOMLA"]="{APP_JOOMLA}";}
+	if($user->SUGARCRM_INSTALLED){$array["SUGAR"]="{APP_SUGARCRM}";}	
+	if($user->roundcube_installed){$array["ROUNDCUBE"]="{APP_ROUNDCUBE}";}
+	if($user->OBM2_INSTALLED){$array["OBM2"]="{APP_OBM2}";}
+	if($user->OPENGOO_INSTALLED){$array["OPENGOO"]="{APP_OPENGOO}";}
+	if($user->GROUPOFFICE_INSTALLED){$array["GROUPOFFICE"]="{APP_GROUPOFFICE}";}	
 	
 	if($user->ZARAFA_INSTALLED){
 		$array["ZARAFA"]="{APP_ZARAFA}";
 		$array["ZARAFA_MOBILE"]="{APP_ZARAFA_MOBILE_ACCESS}";
 	}
 	
-	if($user->DRUPAL_INSTALLED){
-		$array["DRUPAL"]="{APP_DRUPAL}";
-	}
+	if($user->DRUPAL_INSTALLED){$array["DRUPAL"]="{APP_DRUPAL}";}
 
 	
 	

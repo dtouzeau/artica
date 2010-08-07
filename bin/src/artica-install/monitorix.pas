@@ -22,7 +22,6 @@ type LDAP=record
 
 private
      LOGS:Tlogs;
-     GLOBAL_INI:TiniFIle;
      SYS:TSystem;
      artica_path:string;
      lighttp:Tlighttpd;

@@ -838,7 +838,7 @@ private function LoadMultiplePoliciesConfig($hostname){
 	
 	
 	if(is_array($nets)){
-		$conf[]="\tinet_acl => [qw( ".@implode(" ",$nets)." )],";
+		$conf[]="\tinet_acl => [qw( ".@implode(" ",$nets)." $main->ip_addr 127.0.0.1 )],";
 	}
 	
 	if($params["sa_tag_level_deflt"]<>null){$conf[]="\tspam_tag_level_maps => [{$params["sa_tag_level_deflt"]}],";}

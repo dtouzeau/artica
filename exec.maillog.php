@@ -25,12 +25,13 @@ $_GET["server"]=$users->hostname;
 $_GET["IMAP_HACK"]=array();
 $GLOBALS["POP_HACK"]=array();
 $GLOBALS["SMTP_HACK"]=array();
+$GLOBALS["PHP5_BIN"]=LOCATE_PHP5_BIN2();
 $GLOBALS["PopHackEnabled"]=$sock->GET_INFO("PopHackEnabled");
 $GLOBALS["PopHackCount"]=$sock->GET_INFO("PopHackCount");
 if($GLOBALS["PopHackEnabled"]==null){$GLOBALS["PopHackEnabled"]=1;}
 if($GLOBALS["PopHackCount"]==null){$GLOBALS["PopHackCount"]=10;}
-
-
+$GLOBALS["MYPATH"]=dirname(__FILE__);
+$GLOBALS["SIEVEC_PATH"]=$unix->LOCATE_SIEVEC();
 
 $GLOBALS["postfix_bin_path"]=$unix->find_program("postfix");
 
@@ -112,11 +113,49 @@ if(preg_match("#amavis\[.+?\s+Creating db#",trim($buffer))){return null;}
 
 
 
+if(preg_match("#cyrus\/lmtp\[.+?:\s+IOERROR: not a sieve bytecode file\s+(.+?)$#",$buffer,$re)){
+	THREAD_COMMAND_SET("{$GLOBALS["SIEVEC_PATH"]} {$re[1]} {$re[1]}");
+	return;	
+}
+
+
+if(preg_match("#postfix\/lmtp\[.+?:\s+(.+?):\s+to=<(.+)>,\s+relay=([0-9\.]+)\[.+?:[0-9]+,.+?status=deferred.+?430 Authentication required#",$buffer,$re)){
+	events("postfix LMTP error to {$re[2]}");
+	$file="/etc/artica-postfix/croned.1/postfix.lmtp.auth.failed";
+	event_messageid_rejected($re[1],"Mailbox Authentication required",$re[3],$re[2]);
+	if(file_time_min($file)>5){
+		email_events("Postfix: LMTP Error","Postfix\n$buffer\nArtica will reconfigure LMTP settings","postfix");
+		THREAD_COMMAND_SET("{$GLOBALS["PHP5_BIN"]} {$GLOBALS["MYPATH"]}/exec.postfix.maincf.php --mailbox-transport");
+		@unlink($file);
+		file_put_contents($file,"#");
+	}
+	
+	return;	
+	
+}
+
+
+if(preg_match("#postfix\/lmtp\[.+?:\s+connect to ([0-9\.]+)\[.+?:[0-9]+:\s+Connection refused",$buffer)){
+	events("postfix LMTP error");
+	$file="/etc/artica-postfix/croned.1/postfix.lmtp.auth.failed";
+	event_messageid_rejected($re[1],"Mailbox Authentication required","127.0.0.1",$re[2]);
+	if(file_time_min($file)>5){
+		email_events("Postfix: LMTP Error","Postfix\n$buffer\nArtica will reconfigure LMTP settings","postfix");
+		THREAD_COMMAND_SET("{$GLOBALS["PHP5_BIN"]} {$GLOBALS["MYPATH"]}/exec.postfix.maincf.php --mailbox-transport");
+		@unlink($file);
+		file_put_contents($file,"#");
+	}
+	
+	return;		
+}
+
+
+
 if(preg_match("#KASERROR.+?keepup2date\s+failed.+?no valid license info found#",$buffer,$re)){
 	events("Kas3, license error, uninstall kas3");
 	$file="/etc/artica-postfix/croned.1/kas3.license.error";
 	if(file_time_min($file)>5){
-		email_events("Kaspersky Antispam: license error","Kaspersku Updater claim\n$buffer\nArtica will uninstall Kaspersky Anti-spam","postfix");
+		email_events("Kaspersky Antispam: license error","Kaspersky Updater claim\n$buffer\nArtica will uninstall Kaspersky Anti-spam","postfix");
 		THREAD_COMMAND_SET("/usr/share/artica-postfix/bin/artica-install --kas3-remove");
 		@unlink($file);
 		file_put_contents($file,"#");
@@ -171,7 +210,7 @@ if(preg_match("#smtp\[.+? fatal: specify a password table via the.+?smtp_sasl_pa
 	events("postfix -> smtp_sasl_password_maps");
 	if(file_time_min($file)>5){
 		email_events("Postfix configuration problem","Postfix claim\n$buffer\nArtica will disable SMTP Sasl feature","postfix");
-		THREAD_COMMAND_SET(LOCATE_PHP5_BIN2()." /usr/share/artica-postfix/exec.postfix.maincf.php --disable-smtp-sasl");
+		THREAD_COMMAND_SET("{$GLOBALS["PHP5_BIN"]} /usr/share/artica-postfix/exec.postfix.maincf.php --disable-smtp-sasl");
 		@unlink($file);
 		file_put_contents($file,"#");
 	}
@@ -182,7 +221,7 @@ if(preg_match("#amavis\[.+?TROUBLE.+?in child_init_hook: BDB can't connect db en
 	$file="/etc/artica-postfix/croned.1/amavis.BDB.error";
 	events("amavis BDB ERROR");
 	if(file_time_min($file)>5){
-		email_events("avais BDB Error","amavis claim\n$buffer\nArtica will restart amavis service","postfix");
+		email_events("AMAVIS BDB Error","amavis claim\n$buffer\nArtica will restart amavis service","postfix");
 		THREAD_COMMAND_SET("/etc/init.d/artica-postfix restart amavis");
 		@unlink($file);
 		file_put_contents($file,"#");
@@ -191,9 +230,17 @@ if(preg_match("#amavis\[.+?TROUBLE.+?in child_init_hook: BDB can't connect db en
 }
 
 
-
-
-
+if(preg_match("#Decoding of p[0-9]+\s+\(.+?data, at least.+?failed, leaving it unpacked: Compress::Raw::Zlib version\s+(.+?)\s+required.+?this is only version\s+(.+?)\s+#",$buffer,$re)){
+	$file="/etc/artica-postfix/croned.1/amavis.Compress.Raw.Zlib.error";
+	events("amavis Compress::Raw::Zlib need to be upgraded");
+	if(file_time_min($file)>20){
+		email_events("AMAVIS Compress::Raw::Zlib need to be upgraded from {$re[1]} to {$re[2]}","amavis claim\n$buffer\nArtica will install a newest Compress::Raw::Zlib version","postfix");
+		THREAD_COMMAND_SET("/usr/share/artica-postfix/bin/artica-make APP_COMPRESS_ROW_ZLIB");
+		@unlink($file);
+		file_put_contents($file,"#");
+	}
+	return;	
+}
 
 if(preg_match("#smtp\[.+?:\s+fatal: valid hostname or network address required in server description:(.+?)#",$buffer,$re)){
 	mail_events("{$re[1]} Bad configuration parameters","Postfix claim\n$buffer\nPlease come back to the interface and check your configuration!","postfix");
@@ -350,8 +397,8 @@ if(preg_match("#cyrus\/lmtpunix.+?IOERROR:\s+opening.+?\/user\/(.+?)\/cyrus.head
 	events("lmtpunix -> mailbox IOERROR error");
 	if(file_time_min($file)>5){
 		email_events("{$re[1]} Mailbox is deleted but postfix wants to tranfert mails !","Postfix claim\n$buffer\nArtica will re-create the mailbox","mailbox");
-		events(LOCATE_PHP5_BIN2(). " /usr/share/artica-postfix/exec.cyrus-restore.php --create-mbx {$re[1]}"); 
-		THREAD_COMMAND_SET(LOCATE_PHP5_BIN2(). " /usr/share/artica-postfix/exec.cyrus-restore.php --create-mbx {$re[1]}");
+		events("{$GLOBALS["PHP5_BIN"]} /usr/share/artica-postfix/exec.cyrus-restore.php --create-mbx {$re[1]}"); 
+		THREAD_COMMAND_SET("{$GLOBALS["PHP5_BIN"]} /usr/share/artica-postfix/exec.cyrus-restore.php --create-mbx {$re[1]}");
 		@unlink($file);
 		file_put_contents($file,"#");
 	}
@@ -1720,7 +1767,7 @@ function AmavisConfigErrorInPostfix($buffer){
 		return null;}	
 	events("amavisd-new socket error time:$timeFile Mn!!!");
 	email_events("amavisd-new socket error","Postfix claim \"$buffer\", Artica will reload Postfix and compile new Postfix settings",'postfix');
-	THREAD_COMMAND_SET(LOCATE_PHP5_BIN2()." ".dirname(__FILE__)."/exec.postfix.maincf.php --reconfigure");
+	THREAD_COMMAND_SET("{$GLOBALS["PHP5_BIN"]} ".dirname(__FILE__)."/exec.postfix.maincf.php --reconfigure");
 	THREAD_COMMAND_SET('/etc/init.d/artica-postfix restart amavis');
 	THREAD_COMMAND_SET('/usr/share/artica-postfix/bin/artica-install --postfix-reload');
 	@unlink($file);
@@ -1953,7 +2000,7 @@ function multi_instances_reconfigure($buffer){
 	$file="/etc/artica-postfix/cron.1/".__FUNCTION__.".postfix.file";
 	if(file_time_min($file)<15){return null;}	
 	@unlink($file);
-	$cmd=LOCATE_PHP5_BIN2() ."/usr/share/artica-postfix/exec.postfix-multi.php";
+	$cmd="{$GLOBALS["PHP5_BIN"]} /usr/share/artica-postfix/exec.postfix-multi.php";
 	events(__FUNCTION__. " <$cmd>");
 	THREAD_COMMAND_SET($cmd);	
 	email_events("multi-instances not correctly set","Service postfix claim \"$buffer\" Artica will rebuild multi-instances settings",'smtp');
@@ -1968,7 +2015,7 @@ function postfix_bind_error($ip,$port,$buffer){
 		return null;
 	}	
 	@unlink($file);
-	$cmd=LOCATE_PHP5_BIN2() ."/usr/share/artica-postfix/exec.postfix-multi.php --restart-all";
+	$cmd="{$GLOBALS["PHP5_BIN"]} /usr/share/artica-postfix/exec.postfix-multi.php --restart-all";
 	events(__FUNCTION__. " <$cmd>");
 	THREAD_COMMAND_SET($cmd);	
 	email_events("Unable to bind $ip:$port","Service postfix claim \"$buffer\" Artica will restart all daemons to fix it",'smtp');
@@ -2027,7 +2074,7 @@ function zarafa_rebuild_db($table,$buffer){
 	}	
 	@unlink($file);
 	email_events("Zarafa missing Mysql table $table","Service Zarafa claim \"$buffer\" artica will destroy the zarafa database in order to let the Zarafa service create a new one' ",'mailbox');
-	THREAD_COMMAND_SET(LOCATE_PHP5_BIN2()." ".dirname(__FILE__)."/exec.mysql.build.php --rebuild-zarafa");
+	THREAD_COMMAND_SET("{$GLOBALS["PHP5_BIN"]} ".dirname(__FILE__)."/exec.mysql.build.php --rebuild-zarafa");
 	@file_put_contents($file,"#");	
 	return;		
 	

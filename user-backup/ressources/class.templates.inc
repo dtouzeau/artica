@@ -840,4 +840,48 @@ return "
 		</div>";	
 	
 }
+
+function Paragraphe_switch_img($title,$text,$field_name=null,$value=null,$tips=null,$width="220"){
+	
+	$id=md5('Paragraphe_switch_img'.$field_name.$text.$title);
+	$hrf="<a href='$link' class='nostylea'>";
+
+	if(trim($tooltip)==null){$tooltip='{click_enable_disable}';}
+	$tooltip=ParseTooltip($tooltip);
+	if($value==null){$value="0";}
+	if($tooltip<>null){$tooltip="
+	onMouseOver=\"javascript:AffBulle('$tooltip');lightup(this,100);\" 
+	OnMouseOut=\"javascript:HideBulle();lightup(this, 50);\" 
+	style=\"filter:alpha(opacity=50);-moz-opacity:0.5;border:0px;\"";}
+	
+	
+	if($value=='1'){$img='img/64-green.png';}else{$img='img/64-red.png';}
+	$field="<input type='hidden' name='$field_name' id='$field_name' value='$value'>";
+	
+	
+	
+	
+	
+	$img="<div OnClick=\"javascript:SwitchBigNumeric('$field_name');\" OnMouseOver=\";this.style.cursor='pointer';\" OnMouseOut=\";this.style.cursor='default';\" >
+			<img src='$img' id='img_$field_name'  $tooltip>
+		</div>";
+	
+	
+	
+	$html="<div style='width:{$width}px;' >
+	<table style='width:100%;'>
+	<tr>
+	<td width=1% valign='top' style='background-image:url(img/bg_pic-2.png);background-position:top center;background-repeat:no-repeat'><div style='min-height: 120px;'>$img</a></div></td>
+	<td valign='top' id='$id'><h3 style='font-size:16px;color:#005447'>$title</h3>
+	<div style='text-align:left;font-size:11px' id='text_$id'>$field$text</div>
+	</td>
+	</tr>
+	</table>
+	
+	</div>";
+	return $html;
+	
+	
+}
+
 ?>

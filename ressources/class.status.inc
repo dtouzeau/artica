@@ -681,10 +681,16 @@ function Postfix_satus(){
 	$usersmenus=new usersMenus();
 	$usersmenus->LoadModulesEnabled();
 	$stat=$usersmenus->POSTIFX_STATUS;
+	$sock=new sockets();
+	$total=base64_decode($sock->getFrameWork("cmd.php?postfix-multi-postqueue=MASTER"));
+	
+	$ini_notifs=new Bs_IniHandler();
+	$ini_notifs->loadString($sock->getFrameWork("cmd.php?SmtpNotificationConfigRead=yes"));	
+	
 	$stat=explode(';',$stat);
 	$this->_postfix_status=$stat[0];
 	$tot=$this->array_queue["incoming"]+$this->array_queue["active"]+$this->array_queue["deferred"]+$this->array_queue["corrupt"];
-	$link=CellRollOver("Loadjs('postfix.queue.monitoring.php?js')");
+	$link="Loadjs('postfix.queue.monitoring.php?js')";
 	$logs="javascript:s_PopUp('postfix.events.php?pop=true',450,400);";
 	
 	if($usersmenus->DSTAT_INSTALLED){
@@ -735,40 +741,63 @@ $oldaddon="				<tr>
 				$artica_backup";	
 	
 	
-	$link_corrupt=CellRollOver("Loadjs('postfix.corrupt.queue.php')");
+	$link_corrupt="Loadjs('postfix.corrupt.queue.php')";
 	$link_incoming=CellRollOver("Loadjs('postfix.queue.monitoring.php?show-queue=incoming&count={$this->array_queue["incoming"]}');");
 	$link_active=CellRollOver("Loadjs('postfix.queue.monitoring.php?show-queue=active&count={$this->array_queue["active"]}');");
 	$link_deferred=CellRollOver("Loadjs('postfix.queue.monitoring.php?show-queue=deferred&count={$this->array_queue["deferred"]}');");
 	
+	if($ini_notifs->_params["SMTP"]["PostfixQueueMaxMails"]==null){$ini_notifs->_params["SMTP"]["PostfixQueueMaxMails"]=20;}
+	
+	if($ini_notifs->_params["SMTP"]["PostfixQueueMaxMails"]>0){
+		if($tot>$ini_notifs->_params["SMTP"]["PostfixQueueMaxMails"]){
+			$tot="<span style='font-size:14px;font-weight:bold;color:red'>$tot</span>";
+		}
+	}
+		
+	$q=new mysql();
+	$table_storage=$q->TABLE_STATUS("storage","artica_backup");
+	$table_storage_length=FormatBytes($table_storage["Data_length"]/1024);
+	
+	$table_quarantine=$q->TABLE_STATUS("quarantine","artica_backup");
+	$table_quarantine_length=FormatBytes($table_quarantine["Data_length"]/1024);
+	
+	
+	$table_smtp_logs=$q->TABLE_STATUS("mails_events","artica_events");
+	if($table_quarantine["Rows"]>0){$quarantines="
+		<tr ". CellRollOver("Loadjs('domains.quarantine.php?js=yes&Master=yes')","{all_quarantines_text}").">
+					<td align='right' style='font-size:12px'>{quarantine}:</a>&nbsp;</td>
+					<td colspan=2 nowrap><strong style='font-size:12px'>{$table_quarantine["Rows"]}</strong>&nbsp;emails&nbsp;($table_quarantine_length)</td>
+		</tr>";
+	}	
+	
+	if($table_storage["Rows"]>0){$backup="
+				<tr ". CellRollOver("Loadjs('domains.backup.php?js=yes&Master=yes')","{all_mailbackup_text}").">
+					<td align='right' style='font-size:12px'>{backup}:</a>&nbsp;</td>
+					<td colspan=2 nowrap><strong style='font-size:12px'>{$table_storage["Rows"]}</strong>&nbsp;emails&nbsp;($table_storage_length)</td>
+				</tr>	";
+	}	
+
+	
+	if($table_smtp_logs["Rows"]>0){$nb_events="
+				<tr ". CellRollOver().">
+					<td align='right' style='font-size:12px'>{processed}:</a>&nbsp;</td>
+					<td nowrap><strong style='font-size:12px'>{$table_smtp_logs["Rows"]}</strong>&nbsp;emails</td>
+					<td width=1%>". imgtootltip("icon_info.gif","{processed_messages_explain}","$link")."</td>
+				</tr>	";
+	}		
+	
+	
+	
 	$status_queues="
 			<table>
-			<tr>
-				<td colspan=2 style='border-bottom:1px solid #005447'><span style='font-size:13px;color:#005447;'><strong>{smtp_queues}:</strong></span></td>
-			</tr>
-			<tr><td colspan=2>&nbsp;</td></tr>
-				<tr>
-					<td align='right' $link_incoming style='font-size:12px'>{incoming_queue}:</a>&nbsp;</td>
-					<td $link_incoming><strong style='font-size:12px'>{$this->array_queue["incoming"]} </strong>emails</td>
+				<tr ". CellRollOver().">
+					<td align='right' style='font-size:12px' nowrap>{smtp_queues}:</a>&nbsp;</td>
+					<td ><strong style='font-size:12px'>$tot</strong>&nbsp;emails</td>
+					<td width=1%>". imgtootltip("icon_info.gif","{smtp_queues}","$link")."</td>
 				</tr>
-				<tr>
-					<td align='right' $link_active style='font-size:12px'>{active_queue}:</a>&nbsp;</td>
-					<td $link_active><strong style='font-size:12px'>{$this->array_queue["active"]} </strong>emails</td>
-				</tr>
-				<tr>
-					<td align='right' $link_deferred style='font-size:12px'>{deferred_queue}:</a>&nbsp;</td>
-					<td $link_deferred><strong style='font-size:12px'>{$this->array_queue["deferred"]} </strong>emails</td>
-				</tr>
-				<tr $link_corrupt>
-					<td align='right' style='font-size:12px'>{corrupt_queue}:</a>&nbsp;</td>
-					<td><strong style='font-size:12px'>{$this->array_queue["corrupt"]} </strong>emails</td>
-				</tr>				
-	
-				<tr $link>
-					<td align='right' style='color:#C53110;border-top:1px dotted #CCCCCC;font-size:12px'>Total:&nbsp;</td>
-					<td style='color:#C53110;border-top:1px dotted #CCCCCC;font-size:12px'>
-					<strong style='font-size:12px'>$tot&nbsp;</strong>emails</td>
-				</tr>
-				
+			$nb_events
+			$backup
+			$quarantines
 			</table>";
 	
 	$queue="

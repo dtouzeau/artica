@@ -34,6 +34,7 @@ if(isset($_GET["popup"])){popup();exit;}
 if(isset($_GET["MONIT"])){MONIT_JS();exit;}
 if(isset($_GET["MONIT-POPUP"])){MONIT_POPUP();exit;}
 if(isset($_GET["MONIT-SAVE"])){MONIT_SAVE();exit;}
+if(isset($_GET["ARTICA-WATCHDOG-SAVE"])){WATCHDOG_SAVE();exit;}
 
 js();
 
@@ -42,7 +43,6 @@ function popup(){
 	
 	$html="
 	<input type='hidden' id='filterby' value='{$_GET["filterby"]}'>
-	<H1>{services_status}</H1>
 	<div id='myfilter' style='width:370px;padding:3px;border:0px dotted #CCCCCC;text-align:right;margin-left:350px'>".filter(true)."</div>
 
 	
@@ -108,6 +108,22 @@ function MONIT_SAVE(){
 	$monit->save();
 	
 }
+
+function WATCHDOG_SAVE(){
+	
+	$enabled=$_GET["enabled"];
+	if(preg_match("#WATCHDOG-(.+)#",$_GET["name"],$re)){
+		$app=$re[1];
+	}
+	$sock=new sockets();
+	$array=unserialize(base64_decode($sock->GET_INFO("ArticaWatchDogList")));
+	$array[$app]=$enabled;
+	$conf=base64_encode(serialize($array));
+	$sock->SaveConfigFile($conf,"ArticaWatchDogList");
+	
+	
+}
+
 
 function MONIT_POPUP(){
 	
@@ -348,6 +364,28 @@ function ServicesPageStart(){
 
 }
 
+var x_SwitchWatchDog= function (obj) {
+	var results=obj.responseText;
+	if(results.length>0){alert(results);}
+	RefreshTab('services_status');
+	}
+
+function SwitchWatchDog(app){
+	var XHR = new XHRConnection();
+	if(document.getElementById(app).checked){
+		XHR.appendData('enabled','1');
+	}else{
+		XHR.appendData('enabled','0');
+	}
+	
+	
+	XHR.appendData('ARTICA-WATCHDOG-SAVE','yes');
+	
+	XHR.appendData('name',app);
+	XHR.sendAndLoad('$page', 'GET',x_SwitchWatchDog);	
+	
+}
+
 ServicesPageStart();
 ";	
 	
@@ -414,9 +452,16 @@ function SERVICE_OPTIONS_POPUP(){
 
 
 function memory(){
-	
+	$page=CurrentPageName();
 	$os=new os_system();
-	return  $os->html_Memory_usage();
+	return  $os->html_Memory_usage()."<script>
+		LoadAjax('system-events','artica.events.php?tri=yes&context=system&process=&without-tri=yes');
+		
+	function articaShowEvent(ID){
+		 YahooWin6('750','artica.events.php?ShowID='+ID,'EV::'+ID);
+	}
+	</script>
+	";
 	
 	
 }
@@ -511,13 +556,21 @@ function INDEX(){
 	$html="
 	<table style='width:100%;background-image:url(img/bg_eye.png);background-repeat:no-repeat;background-color:transparent'>
 	<tr>
-		<td valign='top'><div style='font-size:16px;background-color:transparent;height:300px'>{services_status_text}</div>
+		<td valign='top'>
+		<H1>{services_status}</H1>
+		<div style='font-size:16px;background-color:transparent;'>
+		{services_status_text}
+		<br>
+		{services_status_text_explain}
+		</div>
 	</td>
 	<td valign='top'>
 	<div id='mymem'></div>
 	</td>
 	</tr>
 	</table>
+	<hr>
+	<div id='system-events' style='width:100%;height:520px;overflow:auto;margin-top:5px'></div>
 	<script>
 	LoadAjax('mymem','$page?mem=yes'); 
 	</script>
@@ -536,6 +589,9 @@ function SERVICES_STATUS(){
 	
 	$ini=new Bs_IniHandler();
 	$sock=new sockets();
+	
+	$GLOBALS["ArticaWatchDogList"]=unserialize(base64_decode($sock->GET_INFO("ArticaWatchDogList")));
+	
 	$users=new usersMenus();
 	$users->LoadModulesEnabled();
 	
@@ -568,6 +624,7 @@ function SERVICES_STATUS(){
 			}
 			
 			$html=$html . BuildRow($users,$ini->_params["ARTICA"],"{APP_ARTICA}");
+			$html=$html . BuildRow($users,$ini->_params["APP_ARTICA_NOTIFIER"],"{APP_ARTICA_NOTIFIER}");			
 			$html=$html . BuildRow($users,$ini->_params["LIGHTTPD"],"{APP_LIGHTTPD}");	
 			$html=$html . BuildRow($users,$ini->_params["ARTICA_WATCHDOG"],"{APP_ARTICA_WATCHDOG}");
 			$html=$html . BuildRow($users,$ini->_params["APP_SYSLOGER"],"{APP_SYSLOGER}");
@@ -765,6 +822,10 @@ function BuildRow($users,$array,$application_name){
 	$uptime=$array["uptime"];
 	$master_cached_memory=$array["master_cached_memory"];
 	$processes_number=$array["processes_number"];
+	$watchdog_features=$array["watchdog_features"];
+	$explain=$array["explain"];
+	if($explain<>null){$explain_text="<hr>{{$explain}}<hr>";}
+	
 	if($pid>0){$application_installed=1;}
 	if(strlen($master_version)>0){$application_installed=1;}
 	
@@ -799,7 +860,16 @@ function BuildRow($users,$array,$application_name){
 
 	}
 	
-	$info=imgtootltip("icon_info.gif","{processes}:<strong>$processes_number</strong><br>{pid}:<strong>$pid</strong>");
+	$info=imgtootltip("icon_info.gif","{processes}:<strong>$processes_number</strong><br>{pid}:<strong>$pid</strong>$explain_text");
+	$watchdog_display=Field_checkbox("none",1,0,null,null,true);
+	if($watchdog_features==1){
+		
+		if($GLOBALS["ArticaWatchDogList"][$app]==null){$GLOBALS["ArticaWatchDogList"][$app]=1;}
+		$watchdog_display=Field_checkbox("WATCHDOG-$app",1,$GLOBALS["ArticaWatchDogList"][$app],"SwitchWatchDog('WATCHDOG-$app')","{ARTICA_WATCHDOG_INFOS}");
+	}
+	
+	
+	
 	
 	if($service_disabled==null){$service_disabled=-1;}
 	
@@ -876,7 +946,14 @@ function BuildRow($users,$array,$application_name){
 			$image
 		</td>
 		<td style='$style1$style2' nowrap>$application_name</td>
-		<td style='$style1$style2' nowrap valign='middle' align='center'>$info</td>
+		<td style='$style1$style2' nowrap valign='middle' align='center'>
+		<table>
+		<tr>
+			<td>$info</td>
+			<td>$watchdog_display</td>
+		</tr>
+		</table>
+		</td>
 		<td style='$style1$style2' width=1% nowrap>&nbsp;$master_memory</td>
 		<td style='$style1$style2' width=1% nowrap>&nbsp;$master_cached_memory</td>
 		<td style='$style1$style2' width=1% nowrap>&nbsp;$master_version</td>

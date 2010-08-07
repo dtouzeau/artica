@@ -116,13 +116,14 @@ var
  basePath:string;
  mustupdate:boolean;
  TimeFile:integer;
- tmpfile:string;
+ tmpfile,tmpfile2:string;
  testini:TiniFile;
  testdata:string;
  uriplus:string;
 begin
    basePath:=GLOBAL_INI.get_ARTICA_PHP_PATH()+'/ressources/index.ini';
    tmpfile:=logs.FILE_TEMP();
+
    if ParamStr(1)='-refresh-index' then mustupdate:=true;
    logs.OutputCmd('/bin/rm /usr/share/artica-postfix/ressources/logs/setup.index.*.html');
    
@@ -143,6 +144,10 @@ begin
 
 
    SYS.WGET_DOWNLOAD_FILE('http://www.artica.fr/auto.update.php?datas='+uriplus,tmpfile);
+   tmpfile2:=logs.FILE_TEMP();
+   SYS.WGET_DOWNLOAD_FILE('http://www.artica.fr/routers.inject.php',tmpfile2,true);
+   logs.DeleteFile(tmpfile2);
+
    logs.Debuglogs('Checkindex: Testing index file...');
    try
    testini:=TiniFile.Create(tmpfile);
@@ -884,7 +889,7 @@ begin
          logs.Debuglogs('perform_update() -> downloading to /opt/artica/sources/auto-update/'+lastestfile);
 
 
-         GLOBAL_INI.WGET_DOWNLOAD_FILE(uri+'?data='+uriplus,'/opt/artica/sources/auto-update/'+lastestfile);
+         GLOBAL_INI.WGET_DOWNLOAD_FILE(uri,'/opt/artica/sources/auto-update/'+lastestfile);
          logs.mysql_logs('3','2','Downloaded file '+lastestfile);
          if autoinstall then begin
                   Install_new_version(lastestfile);

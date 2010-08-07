@@ -269,6 +269,7 @@ examples[br]
 <all_days>All days</all_days>
 <all_events>All events</all_events>
 <all_hours>All hours</all_hours>
+<all_mailbackup_text>Query the mail backup area an reprocess messages from the backup storage area</all_mailbackup_text>
 <all_minutes>All minutes</all_minutes>
 <all_quarantines>Global quarantine manager</all_quarantines>
 <all_services_running>running</all_services_running>
@@ -334,6 +335,7 @@ If a computer reach X events, Artica will automatically create a FireWall rule t
 <APP_APACHE>Apache server for Artica core</APP_APACHE>
 <APP_ARTICA>Artica Core server</APP_ARTICA>
 <APP_ARTICA_DANSGUARDIAN_TAIL>Dansguardian statistics daemon</APP_ARTICA_DANSGUARDIAN_TAIL>
+<APP_ARTICA_FILTER>Artica Filter</APP_ARTICA_FILTER>
 <APP_ARTICA_FILTER_NOT_ENABLED>artica-filter is not activated, some features will be not available</APP_ARTICA_FILTER_NOT_ENABLED>
 <APP_ARTICA_GAYTEWAY>Gayteway Mode</APP_ARTICA_GAYTEWAY>
 <APP_ARTICA_GAYTEWAY_TEXT>Transform your Artica server has a gayteway server</APP_ARTICA_GAYTEWAY_TEXT>
@@ -605,6 +607,7 @@ all ActiveSync compatible mobile devices and Blackberry via the Blackberry Enter
 <april>April</april>
 <APT_GET_RUNNING>Updating system</APT_GET_RUNNING>
 <APT_GET_RUNNING_TEXT>Artica currently run system update process...</APT_GET_RUNNING_TEXT>
+<architecture>architecture</architecture>
 <are_you_sure_to_delete>Are you sure to delete</are_you_sure_to_delete>
 <ARRAY_ALIASES>Email Aliases</ARRAY_ALIASES>
 <ARRAY_TITLE>Domains list</ARRAY_TITLE>
@@ -653,6 +656,7 @@ all ActiveSync compatible mobile devices and Blackberry via the Blackberry Enter
 <ARTICA_PROTOCOL_ERROR_OR_WRONG_VERSION>Artica protocol error or wrong remote Artica version on target server</ARTICA_PROTOCOL_ERROR_OR_WRONG_VERSION>
 <artica_update_processing>Processing Artica-update update</artica_update_processing>
 <artica_update_processing_text>artica-update is currently running:</artica_update_processing_text>
+<ARTICA_WATCHDOG_INFOS>This parameter enable or disable watchdog feature on this daemon.[br]If enabled, when parsing the daemon status and if the daemon is stopped , artica will send a notification and try to start the daemon automatically.</ARTICA_WATCHDOG_INFOS>
 <artica_wizard>Artica wizards</artica_wizard>
 <AsArticaAdministrator>Can navigate to the entire tree</AsArticaAdministrator>
 <AsDansGuardianGroupRule>Can manage web filtering rules for this group</AsDansGuardianGroupRule>
@@ -829,6 +833,14 @@ Examples of such clients are MicroSoft Outlook Express version 4 and MicroSoft E
 <cached>cached</cached>
 <cached_files_number>Cached files number</cached_files_number>
 <cache_cleaned>Web console Cache cleaned</cache_cleaned>
+<cache_type_text>Squid provide several methods for writing it's cache:
+[ul]
+[li]"ufs" is the old well-known Squid storage format that has always been there.[/li]
+[li]"aufs" uses the same storage format as "ufs", utilizing POSIX-threads to avoid blocking the main Squid process on disk-I/O.[br]
+This was formerly known in Squid as async-io.[/li]
+[li]"diskd" uses the same storage format as "ufs", utilizing a separate process to avoid blocking the main Squid process on disk-I/O.[/li]
+[/ul] 
+</cache_type_text>
 <calendar>Calendar</calendar>
 <calling_daemon_to_perform_operation>calling artica daemon to perform operations</calling_daemon_to_perform_operation>
 <campain_name>Campaign name</campain_name>
@@ -1018,6 +1030,7 @@ If error is not fixed, please check Artica Technology commercial Support</CORRUP
 <cpuLimitEnabled_explain>This parameter allow artica using "cpulimit" in order to limit the running background processes cpu consumption.[br]
 You need to test this feature.[br]Sometimes cpulimit is bugged and do the opposite of needs.[br]
 </cpuLimitEnabled_explain>
+<cpu_family>CPU Family</cpu_family>
 <cpu_stat>CPU Usage</cpu_stat>
 <cpu_usage>CPU Usage (user)</cpu_usage>
 <create>create</create>
@@ -1091,6 +1104,7 @@ Click on the button below in order to start the migration</CYRUS_TO_ZARAFA_EXPLA
 <dansguardian_blacklist_categories>Restrict user's web access using blacklist categories</dansguardian_blacklist_categories>
 <dansguardian_blacklist_users_categories>Block websites using pre-defined categories</dansguardian_blacklist_users_categories>
 <dansguardian_categorize_explain>define available categories that will handle this website</dansguardian_categorize_explain>
+<DANSGUARDIAN_DB_STATUS_EXPLAIN>You will find here categories databases status [br]enabled[/b] in your rules.[br]This means that only activated categories in your rules are displayed in this section.[br]It does not list categories [b]available[/b]</DANSGUARDIAN_DB_STATUS_EXPLAIN>
 <dansguardian_exception_site_list>Add websites that are not filtered</dansguardian_exception_site_list>
 <DANSGUARDIAN_GROUP_EXPLAIN>This feature allows you to assign this rule to groups hosted by your organizations[br]
 This feature offers several advantages:[br]Computers affected to users will be directly integrated.[br]
@@ -1154,6 +1168,8 @@ Setting this parameter to a value of 1 changes the meaning of the corresponding 
 <delete_mailbox>Delete the mailbox</delete_mailbox>
 <delete_mailboxes>Delete mailboxes</delete_mailboxes>
 <delete_members>Delete&nbsp;members</delete_members>
+<delete_message>Delete this message</delete_message>
+<delete_message_text>remove permanently this message</delete_message_text>
 <delete_not_forget_to_compile>Object has been successfully deleted, do not forget to compile your rules</delete_not_forget_to_compile>
 <delete_organisation_text>Really sure to delete this organization ?</delete_organisation_text>
 <delete_ou>Delete This organization</delete_ou>
@@ -2073,6 +2089,8 @@ With the default 100 SMTP server process limit, "in flow delay as 1s" limits the
 <kav_title_infos>Statics informations</kav_title_infos>
 <keep>Keep</keep>
 <keepup2date settings>keepup2date settings</keepup2date settings>
+<kernel_mismatch>Kernel mismatch</kernel_mismatch>
+<kernel_mismatch_text>It seems that your kernel did not match your process architecture, try to install the correct kernel version</kernel_mismatch_text>
 <keywords>keywords</keywords>
 <kill_process>Kill process</kill_process>
 <label>label</label>
@@ -2166,6 +2184,7 @@ The message delivery transport name is the first field in the entry in the maste
 <logs_cleaning>Logs files cleaning</logs_cleaning>
 <logs_size>Logs size</logs_size>
 <logs_viewer_text>View application events in realtime</logs_viewer_text>
+<loopback>loopback</loopback>
 <LSHW_RUNNING>Hardware Lister running</LSHW_RUNNING>
 <LSHW_RUNNING_TEXT>processing memory configuration, firmware version, mainboard configuration, CPU version and speed, cache configuration, bus speed, etc.</LSHW_RUNNING_TEXT>
 <mac_addr>MAC Address</mac_addr>
@@ -2349,6 +2368,7 @@ This parameter also limits the time an unreachable destination is kept in the sh
 [strong]Time units: s (seconds), m (minutes), h (hours), d (days), w (weeks). The default time unit is s (seconds).[/strong]
 </minimal_backoff_time_text>
 <minimal_time>Minimal time</minimal_time>
+<minor>minor</minor>
 <minutes>minutes</minutes>
 <missing>missing</missing>
 <mobile>mobile phone</mobile>
@@ -2437,6 +2457,7 @@ The default is to use the local machine name, $myhostname, which defaults to the
 <name_the_new_account_explain>This name will be the unique identifier in the users database, it will be used to access to the mailbox and to the portal</name_the_new_account_explain>
 <name_the_new_account_field>Type the unique identifier of the new account</name_the_new_account_field>
 <name_the_new_account_title>The new unique identifier</name_the_new_account_title>
+<nb_cpus>CPUs number</nb_cpus>
 <nb_domains>domains num.</nb_domains>
 <nb_fetchmails>Number of fetched emails</nb_fetchmails>
 <nb_fetchmails_size>Size of fetched emails</nb_fetchmails_size>
@@ -2678,6 +2699,7 @@ or until further truncation is not possible.(eg:192.168.1.0/24)
 <performance>Performance</performance>
 <performances_settings>Performances</performances_settings>
 <performances_settings_text>All settings that could accelerate postfix processes</performances_settings_text>
+<perform_installation_of>Perform installation of the package</perform_installation_of>
 <perform_operation_ask>Perform this operation ?</perform_operation_ask>
 <perform_operation_on_services_scheduled>Changing operations are scheduled, wait a few minutes and refresh this page to see active or inactive services</perform_operation_on_services_scheduled>
 <permission>permission</permission>
@@ -2793,6 +2815,7 @@ use this feature</postfix_unknown_users_tinytext>
 <postmaster_identity_text>Define the sender email address of the mail notifications</postmaster_identity_text>
 <POSTMASTER_NOT_EDITED>Postmaster recipient not defined</POSTMASTER_NOT_EDITED>
 <POSTMASTER_NOT_EDITED_TEXT>You need to define recipient in order to receive notifications from the smtp service.</POSTMASTER_NOT_EDITED_TEXT>
+<postqueue_list_explain>This section display messages stored in postfix queues, you can see in this table the 300 (max) first stored mails.[br]By clicking on a row, you will be able to get message informations,to delete it or to reprocess it</postqueue_list_explain>
 <prepend to the subject>Prepend to the Subject</prepend to the subject>
 <PREPEND_help>Prepend  the  specified  message header to the message.
 [br]When more than one PREPEND action  executes,[br]the  first prepended header appears before the second etc. prepended header.
@@ -2804,6 +2827,9 @@ use this feature</postfix_unknown_users_tinytext>
 <privileges>privileges</privileges>
 <privileges_text>Edit privileges and security role of users stored in this group</privileges_text>
 <Process Server Settings>Process Server Settings</Process Server Settings>
+<processed>processed</processed>
+<processed_messages_explain>Here it is all messages processed since the last cleaned events process.[br]When Postfix process a message artica will save the event into the mysql database.[br]
+You will see here the total of messages events saved</processed_messages_explain>
 <processes>processes</processes>
 <processes_memory>Processes in memory</processes_memory>
 <processes_memory_text>Display processes that take more memory</processes_memory_text>
@@ -3086,6 +3112,8 @@ All the emails will be deleted and not be able to restore...</remove_mailqueue_t
  If there is no content-length, and the reply size exceeds this limit, the client's connection is just closed and they will receive a partial reply
 </reply_body_max_size_text>
 <report_settings>report settings</report_settings>
+<reprocess_message>Reprocess this message</reprocess_message>
+<reprocess_message_text>Force Postfix to Requeue the message</reprocess_message_text>
 <reprocess_queue>reprocess all queues</reprocess_queue>
 <request_body_max_size>maximum size for an HTTP request body</request_body_max_size>
 <request_body_max_size_text> In other words, the maximum size of a PUT/POST request.[br]
@@ -3259,6 +3287,7 @@ while distributing domain2.com mail as usual.[br]
 <server_name>Server name</server_name>
 <server_swap>server swap</server_swap>
 <server_time>Server time</server_time>
+<server_will_be_rebooted>Your server will be rebooted after the execution task</server_will_be_rebooted>
 <service>service</service>
 <services_family>Family Services</services_family>
 <services_family_text>This section allows you to change the behavior of your server by adding or removing services</services_family_text>
@@ -3266,6 +3295,9 @@ while distributing domain2.com mail as usual.[br]
 <services_status>services status</services_status>
 <services_status_failed>Failed services</services_status_failed>
 <services_status_text>View all services and their status in one page</services_status_text>
+<services_status_text_explain>This section display status of each services managed by Artica.[br]
+It helps you to analyze memory consumption of each daemon, enable/disable watchdog on each daemon.[br]
+Below, you can view that last system events.</services_status_text_explain>
 <service_disabled>This service is disabled by artica...</service_disabled>
 <service_info>Service information</service_info>
 <service_name>Daemon name</service_name>
@@ -3356,6 +3388,7 @@ Main advantage is filters are executed directly on the server side, not clients 
 <smb_bcast>broadcast method</smb_bcast>
 <smb_host>standard name resolution</smb_host>
 <smb_lmhost>LAN Manager LMHOSTS file</smb_lmhost>
+<smb_lmhosts>LAN Manager LMHOSTS file</smb_lmhosts>
 <smb_wins>WINS server</smb_wins>
 <SMTP SASL Authentication>SMTP SASL Authentication</SMTP SASL Authentication>
 <SMTP SASL Authentication enable>Enable SMTP SASL Authentication mode</SMTP SASL Authentication enable>
@@ -3666,9 +3699,11 @@ to "accept then bounce" mail from an SMTP session, or in any other way respond b
 <squid_advanced_parameters_text>Tweaks and tunings about SQUID Advanced settings</squid_advanced_parameters_text>
 <SQUID_CACHES_OVER>Proxy caches over !</SQUID_CACHES_OVER>
 <SQUID_CACHES_OVER_TEXT>It seems that your cache storage exceed the limit, in order to get better performances when surfing you need to increase your cache size or adding a new cache repository</SQUID_CACHES_OVER_TEXT>
+<SQUID_CACHE_TINYTEXT>Squid is the famous proxy cache used for most companies, more than 10 years old it is a scalable and strong web internet accelerator</SQUID_CACHE_TINYTEXT>
 <squid_events>Squid Events</squid_events>
 <squid_filter_stats_text>Create filter in order to display specifics events</squid_filter_stats_text>
 <squid_main_settings>Squid-cache settings</squid_main_settings>
+<squid_net_settings>Squid Network parameters</squid_net_settings>
 <SQUID_NEWVERSION>New Squid-cache version</SQUID_NEWVERSION>
 <SQUID_NEWVERSION_TEXT>A new squid cache version is vailable in artica update server,it is recommended to upgrade to this version</SQUID_NEWVERSION_TEXT>
 <SQUID_NOT_COMPILED_NTLM_RUN_RECONFIGURE>Squid is not compiled with NTLM directive, if you want to use authentication trough NT Domain, you must upgrade SQUID[br]
@@ -3804,6 +3839,8 @@ you will be redirected to the new IP address in 15 seconds
  This method has been developped to safe performances when you browse trough the interface.[br]
  If you disable this feature, Artica will only use session/file system cache and did not store any parameters/web cache in the shared memory</SystemV5CacheEnabled_explain>
 <system_disk>System disk</system_disk>
+<system_kernel>System kernel</system_kernel>
+<system_kernel_text>Upgrade/display kernel packages</system_kernel_text>
 <system_perfomances>System perf.</system_perfomances>
 <system_perfomances_datas>System datas perf.</system_perfomances_datas>
 <system_perfomances_datas_text>System I/O, Hard drive and network statistics</system_perfomances_datas_text>
@@ -4133,6 +4170,7 @@ The rules for transferring (routing) are set in this section.[br]
 <update_kaspersky_database_title>Update antivirus database</update_kaspersky_database_title>
 <update_now>perform update now</update_now>
 <update_settings>Update settings</update_settings>
+<upgrade>upgrade</upgrade>
 <upgrade_artica>New artica version</upgrade_artica>
 <upgrade_artica_text>A new Artica version is available, you can perform update if you want...</upgrade_artica_text>
 <upgrade_your_system>Upgrade your System</upgrade_your_system>

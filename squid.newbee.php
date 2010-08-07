@@ -604,9 +604,9 @@ function main_cache_list(){
 	$tpl=new templates();
 	$sock=new sockets();
 	$cacheinfo=unserialize(base64_decode($sock->getFrameWork("cmd.php?squid-cache-infos=yes")));
-	
+	$stats="<table style=width:100%>";
 	if(is_array($cacheinfo)){
-		$stats="<table style=width:100%>";
+		
 		while (list ($path, $array) = each ($cacheinfo) ){
 			
 			$pourc=pourcentage($array["POURC"]);
@@ -636,87 +636,93 @@ function main_cache_list(){
 			";
 		}
 		
+
+		
+	}	
+	
 		$stats=$stats."
 		<tr>
 			<td align='right' colspan=2>". imgtootltip("database-48-add.png","{add_cache_dir}","AddCache('');")."</td>
 		</tr>		
-		</table>";
-		
-	}	
-	
-	
+		</table>";	
 	echo $tpl->_ENGINE_parse_body($stats);
 	
 }
 
 
 function main_cache(){
-	
-	
-
-$squid=new squidbee();
+	$squid=new squidbee();
 	$usermenus=new usersMenus();
 	$page=CurrentPageName();	
 						
-
-
+	$squid_infos=new squid();
+	$squid_infos->cache_type_list[null]='{select}';
+	$cache_type=Field_array_Hash($squid_infos->cache_type_list,'master_cache_type',$squid->CACHE_TYPE);
 
 $cache_settings="
 <div id='cachesettingsinfo'>
 <table style='width:100%' class=table_form>
 		<tr>
-		<td align='right' class=legend nowrap nowrap>{main_cache_size}</strong></td>
-		<td>" . Field_text('cache_size',$squid->CACHE_SIZE,'width:40px')."&nbsp;Mbytes</td>
-		<td><input type='button' OnClick=\"javascript:Loadjs('$page?changecache-js=$squid->CACHE_PATH');\" value='{browse}...'></td>
+			<td align='right' class=legend nowrap nowrap>{main_cache_size}:</strong></td>
+			<td>" . Field_text('cache_size',$squid->CACHE_SIZE,'width:40px')."&nbsp;Mbytes</td>
+			<td><input type='button' OnClick=\"javascript:Loadjs('$page?changecache-js=$squid->CACHE_PATH');\" value='{browse}...'></td>
 		</tr>
+		<tr>
+			<td align='right' class=legend nowrap nowrap>{type}:</strong></td>
+			<td>$cache_type</td>
+			<td>" . help_icon('{cache_type_text}',false,'squid.index.php')."</td>
+		</tr>		
+		
+		
+		
 <tr>
 		<tr>
-		<td align='right' class=legend nowrap>{cache_mem}</strong></td>
+		<td align='right' class=legend nowrap>{cache_mem}:</strong></td>
 		<td>" . Field_text('cache_mem',$squid->global_conf_array["cache_mem"],'width:70px')."</td>
 		<td>" . help_icon('{cache_mem_text}',false,'squid.index.php')."</td>
 		</tr>
 <tr>
-		<td align='right' class=legend nowrap>{cache_swap_low}</strong></td>
+		<td align='right' class=legend nowrap>{cache_swap_low}:</strong></td>
 		<td>" . Field_text('cache_swap_low',$squid->global_conf_array["cache_swap_low"],'width:70px')."%</td>
 		<td>" . help_icon('{cache_swap_low_text}',false,'squid.index.php')."</td>
 		</tr>
 <tr>
-		<td align='right' class=legend nowrap>{cache_swap_high}</strong></td>
+		<td align='right' class=legend nowrap>{cache_swap_high}:</strong></td>
 		<td>" . Field_text('cache_swap_high',$squid->global_conf_array["cache_swap_high"],'width:70px')."%</td>
 		<td>" . help_icon('{cache_swap_high_text}',false,'squid.index.php')."</td>
 		</tr>
 <tr>
-		<td align='right' class=legend nowrap>{maximum_object_size}</strong></td>
+		<td align='right' class=legend nowrap>{maximum_object_size}:</strong></td>
 		<td>" . Field_text('maximum_object_size',$squid->global_conf_array["maximum_object_size"],'width:70px')."</td>
 		<td>" . help_icon('{maximum_object_size_text}',false,'squid.index.php')."</td>
 		</tr>
 <tr>
-		<td align='right' class=legend nowrap>{minimum_object_size}</strong></td>
+		<td align='right' class=legend nowrap>{minimum_object_size}:</strong></td>
 		<td>" . Field_text('minimum_object_size',$squid->global_conf_array["minimum_object_size"],'width:70px')."</td>
 		<td>" . help_icon('{minimum_object_size_text}',false,'squid.index.php')."</td>
 		</tr>
 <tr>
-		<td align='right' class=legend nowrap>{maximum_object_size_in_memory}</strong></td>
+		<td align='right' class=legend nowrap>{maximum_object_size_in_memory}:</strong></td>
 		<td>" . Field_text('maximum_object_size_in_memory',$squid->global_conf_array["maximum_object_size_in_memory"],'width:70px')."</td>
 		<td>" . help_icon('{maximum_object_size_in_memory_text}',false,'squid.index.php')."</td>
 		</tr>			
 <tr>
-		<td align='right' class=legend nowrap>{ipcache_size}</strong></td>
+		<td align='right' class=legend nowrap>{ipcache_size}:</strong></td>
 		<td>" . Field_text('ipcache_size',$squid->global_conf_array["ipcache_size"],'width:70px')."</td>
 		<td>" . help_icon('{ipcache_size_text}',false,'squid.index.php')."</td>
 		</tr>	
 <tr>
-		<td align='right' class=legend nowrap>{ipcache_low}</strong></td>
+		<td align='right' class=legend nowrap>{ipcache_low}:</strong></td>
 		<td>" . Field_text('ipcache_low',$squid->global_conf_array["ipcache_low"],'width:70px')."%</td>
 		<td>" . help_icon('{ipcache_low_text}',false,'squid.index.php')."</td>
 		</tr>
 <tr>
-		<td align='right' class=legend nowrap>{ipcache_high}</strong></td>
+		<td align='right' class=legend nowrap>{ipcache_high}:</strong></td>
 		<td>" . Field_text('ipcache_high',$squid->global_conf_array["ipcache_high"],'width:70px')."%</td>
 		<td>" . help_icon('{ipcache_high_text}',false,'squid.index.php')."</td>
 		</tr>
 <tr>
-		<td align='right' class=legend nowrap>{fqdncache_size}</strong></td>
+		<td align='right' class=legend nowrap>{fqdncache_size}:</strong></td>
 		<td>" . Field_text('fqdncache_size',$squid->global_conf_array["fqdncache_size"],'width:70px')."</td>
 		<td>" . help_icon('{fqdncache_size_text}',false,'squid.index.php')."</td>
 		</tr>
@@ -740,6 +746,7 @@ $cache_settings="
 	function SaveCacheSettingsInfos(){
 		var XHR = new XHRConnection();
 		XHR.appendData('cache_size',document.getElementById('cache_size').value);
+		XHR.appendData('cache_type',document.getElementById('master_cache_type').value);		
 		XHR.appendData('cache_mem',document.getElementById('cache_mem').value);
 		XHR.appendData('cache_swap_low',document.getElementById('cache_swap_low').value);
 		XHR.appendData('cache_swap_high',document.getElementById('cache_swap_high').value);
@@ -1796,14 +1803,17 @@ function main_save_array(){
 		$squid->CACHE_SIZE=$_GET["cache_size"];
 		unset($_GET["cache_size"]);
 	}
+	if(isset($_GET["cache_type"])){
+		$squid->CACHE_TYPE=$_GET["cache_type"];
+		unset($_GET["cache_type"]);
+	}
+	
 	
 	while (list ($num, $val) = each ($_GET) ){
 		$squid->global_conf_array[$num]=$val;
 	}
-	if($squid->SaveToLdap()){
-		
-	}else{
-		echo $squid->ldap_error;  
+	if(!$squid->SaveToLdap()){
+		echo $squid->ldap_error; 
 	}
 }
 

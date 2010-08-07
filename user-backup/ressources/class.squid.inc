@@ -1463,6 +1463,7 @@ class squidbee{
 
 	var $CACHE_SIZE=2000;
 	var $CACHE_PATH;
+	var $CACHE_TYPE="ufs";
 	var $alt_listen_port;
 	var $kav_accept=false;
 	var $kav_accept_why='';
@@ -1549,6 +1550,7 @@ class squidbee{
 		$this->alt_listen_port=$ini->_params["NETWORK"]["ALT_PORT"];
 		$this->CACHE_SIZE=$ini->_params["CACHE"]["CACHE_SIZE"];
 		$this->CACHE_PATH=$ini->_params["CACHE"]["CACHE_PATH"];
+		$this->CACHE_TYPE=$ini->_params["CACHE"]["CACHE_TYPE"];
 		$this->enable_cicap=$sock->GET_INFO('CicapEnabled');
 		$this->enable_squidguard=$sock->GET_INFO('squidGuardEnabled');
 		
@@ -1583,6 +1585,7 @@ class squidbee{
 		if($this->enable_dansguardian==null){$this->enable_dansguardian=0;}
 		if($this->CACHE_SIZE==null){$this->CACHE_SIZE=2000;}
 		if($this->CACHE_PATH==null){$this->CACHE_PATH="/var/cache/squid";}
+		if($this->CACHE_TYPE==null){$this->CACHE_TYPE="ufs";}
 		
 		
 		while (list ($num, $cidr) = each ($network)){
@@ -1723,6 +1726,7 @@ function SaveToLdap(){
 			$ini=$ini."[CACHE]\n";
 			$ini=$ini."CACHE_SIZE=$this->CACHE_SIZE\n";
 			$ini=$ini."CACHE_PATH=$this->CACHE_PATH\n";
+			$ini=$ini."CACHE_TYPE=$this->CACHE_TYPE\n";
 
 			if(is_array($this->cache_list)){
 				reset($this->cache_list);
@@ -2142,7 +2146,13 @@ function BuildSquidConf(){
 		
 		$conf=$conf  .$acl_blocked_sites;
 		$conf=$conf ."acl localhost src 127.0.0.1/32\n";
-		$conf=$conf ."acl to_localhost dst 127.0.0.0/32\n";
+		if($this->SQUID_BIN_VERSION>310000000000){
+			if($this->ASROOT){echo "Starting......: Add IPv6 address $this->SQUID_BIN_VERSION>310000000000\n";}
+			$conf=$conf ."acl localhost src ::1/128\n";
+			$conf=$conf ."acl to_localhost dst ::1/128\n";
+		}
+		
+		
 		$conf=$conf. "acl CONNECT method CONNECT\n";
 		$conf=$conf. "acl manager proto cache_object\n";
 		$conf=$conf. "acl FTP proto FTP\n";
@@ -2234,6 +2244,7 @@ function BuildSquidConf(){
 		
 		$conf=$conf."# --------- SAFE ports\n";
 		$conf=$conf.$this->SAFE_PORTS();
+		
 		$conf=$conf."#\n";
 		$conf=$conf ."http_access allow localhost\n";
 		$conf=$conf ."http_access allow manager localhost\n";
@@ -2261,8 +2272,10 @@ function BuildSquidConf(){
 		$conf=$conf .$acl_ldap_auth;
 		$conf=$conf .$acl_access_time;
 		$conf=$conf .$office_network;
+		$conf=$conf. $this->SSL_PORTS();
 		$conf=$conf ."http_access deny !Safe_ports\n";
-		//$conf=$conf ."http_access deny !SSL_ports\n";
+		$conf=$conf ."http_access deny CONNECT !SSL_ports\n";
+		$conf=$conf ."http_access deny to_localhost\n";
 		$conf=$conf ."http_access deny all\n";
 		$conf=$conf . $kav_rules;
 		$conf=$conf."# --------- ident_lookup_access\n";
@@ -2350,7 +2363,7 @@ function BuildSquidConf(){
 		
 		
 		$conf=$conf."\n";
-		$conf=$conf."cache_dir	ufs {$this->CACHE_PATH} {$this->CACHE_SIZE} 16 256\n";
+		$conf=$conf."cache_dir	{$this->CACHE_TYPE} {$this->CACHE_PATH} {$this->CACHE_SIZE} 16 256\n";
 		$conf=$conf."# --------- OTHER CACHES\n";
 		if(is_array($this->cache_list)){
 		reset($this->cache_list);
@@ -2419,6 +2432,7 @@ private function refresh_pattern_list(){
 		
 function SAFE_PORTS(){
 	$ports["80"]="http";
+	$ports["20"]="ftp-data";
 	$ports["21"]="ftp";
 	$ports["22"]="ssh";
 	$ports["443 563"]="https, snews";
@@ -2440,7 +2454,18 @@ function SAFE_PORTS(){
 	return implode("\n",$conf);
 	
 }
-		
+
+
+private function SSL_PORTS(){
+	$ports[]="443";
+	$ports[]="563";
+	$ports[]="6667";
+	$ports[]="9000";
+	$ports[]="2";
+	return "acl SSL_ports port ". implode(" ",$ports)."\n";
+	
+}
+
 		
 function acls_multimedias(){
 	
@@ -2666,6 +2691,14 @@ class cicap{
 			
 			
 			if(is_file("$modules_path/srv_clamav.so")){
+				echo "Starting......: c-icap VirSaveDir: \"{$this->main_array["CONF"]["VirSaveDir"]}\"\n";
+				
+				if($this->main_array["CONF"]["VirSaveDir"]<>null){
+					if(!is_dir($this->main_array["CONF"]["VirSaveDir"])){
+						@mkdir($this->main_array["CONF"]["VirSaveDir"],0755,true);
+					}
+				}
+				
 				$conf[]="";
 				$conf[]="#Clamav";
 				$conf[]="Service antivirus_module srv_clamav.so srv_url_check.so";
@@ -2705,6 +2738,10 @@ class cicap{
 				shell_exec("/bin/chown -R $user:$user /var/lib/c_icap");
 				shell_exec("/bin/chown -R $user:$user /var/tmp");
 				shell_exec("/bin/chown -R $user:$user /usr/share/c_icap");
+				if(is_dir($this->main_array["CONF"]["VirSaveDir"])){
+					shell_exec("/bin/chown -R $user:$user {$this->main_array["CONF"]["VirSaveDir"]}");
+				}
+				
 				echo "Starting......: c-icap apply securities on user \"$user\" done\n";
 				@file_put_contents("/etc/c-icap.conf",@implode("\n",$conf));
 		
@@ -2735,7 +2772,4 @@ class cicap{
 		}
 	
 }
-
-
-
-
+?>

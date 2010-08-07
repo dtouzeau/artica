@@ -48,7 +48,7 @@ if(preg_match("#artica-install\[#",$buffer)){return true;}
 if(preg_match("#monitor action done#",$buffer)){return true;}
 if(preg_match("#monitor service.+?on user request#",$buffer)){return true;}
 if(preg_match("#CRON\[.+?\(root\).+CMD#",$buffer)){return true;}
-
+if(preg_match("#winbindd\[.+?winbindd_listen_fde_handler#",$buffer)){return true;}
 
 if(preg_match("#smbd_audit:\s+(.+?)\|(.+?)\|(.+?)\|(.+?)\|(.+?)\|(.+?)\|(.+?)\|(.+?)$#",$buffer,$re)){
 	events("{$re[5]}/{$re[8]} in xapian queue");
@@ -136,6 +136,21 @@ if(preg_match("#winbindd\[.+?failed to bind to server\s+(.+?)\s+with dn.+?Error:
 }
 
 
+if(preg_match("#winbindd\[.+?resolve_name: unknown name switch type lmhost#",$buffer,$re)){
+	$file="/etc/artica-postfix/croned.1/winbindd.lmhost.failed";
+	if(IfFileTime($file,10)){
+		events("winbindd -> lmhost failed");
+		WriteFileCache($file);
+		THREAD_COMMAND_SET("{$GLOBALS["LOCATE_PHP5_BIN"]} /usr/share/artica-postfix/exec.samba.php --fix-lmhost");
+		return;	
+	}	
+}
+
+if(preg_match("#nmbd\[.+?become_logon_server_success: Samba is now a logon server for workgroup (.+?)\s+on subnet\s+([A-Z0-9\._-]+)#",$buffer,$re)){
+	email_events("Samba (file sharing) started domain {$re[1]}/{$re[2]}","Samba notice: \"$buffer\"",'system');
+	return;	
+}
+
 
 
 
@@ -152,12 +167,12 @@ if(preg_match("#zarafa-server.+?Unable to connect to database.+?MySQL server on.
 		}			
 }
 
-if(preg_match("#winbindd: Exceeding\s+[0-9]+\s+client connections, no idle connection found#",$buffer)){
+if(preg_match("#winbindd:\s+Exceeding\s+[0-9]+\s+client\s+connections.+?no idle connection found#",$buffer)){
 	$file="/etc/artica-postfix/croned.1/Winbindd.connect.error";
 	if(IfFileTime($file,2)){
 			events("winbindd Error connections");
 			email_events("Winbindd exceeding connections","Samba server  claim \"$buffer\" \nArtica will restart samba",'system');
-			THREAD_COMMAND_SET('/etc/init.d/artica-postfix restart samba');
+			shell_exec('/etc/init.d/artica-postfix restart samba &');
 			WriteFileCache($file);
 			return;
 		}else{

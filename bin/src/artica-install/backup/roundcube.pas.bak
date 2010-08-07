@@ -126,8 +126,7 @@ end;
 //##############################################################################
 function troundcube.STATUS:string;
 var
-ini:TstringList;
-pid:string;
+pidpath:string;
 begin
 
    if not DirectoryExists(web_folder()) then exit;
@@ -225,6 +224,7 @@ begin
    if FileExists('/etc/roundcube/db.inc.php') then exit('/etc/roundcube/db.inc.php');
    if FileExists('/usr/share/roundcubemail/config/db.inc.php') then exit('/usr/share/roundcubemail/config/db.inc.php');
    if FileExists('/usr/share/roundcube/config/db.inc.php') then exit('/usr/share/roundcube/config/db.inc.php');
+   if DirectoryExists('/usr/share/roundcube/config') then exit('/usr/share/roundcube/config/db.inc.php');
 
 end;
 //##############################################################################
@@ -263,7 +263,7 @@ SourceCOnf:='/etc/artica-postfix/settings/Daemons/RoundCubeConfigurationFile';
 logs.Debuglogs('Starting......: Roundcube configuration file: '+confFile);
      if FileExists(SourceCOnf) then begin
          if logs.MD5FromString(logs.ReadFromFile(SourceCOnf))<>logs.MD5FromString(logs.ReadFromFile(confFile)) then begin
-             logs.Debuglogs('Starting......: Roundcube replicate main.inc.php');
+             logs.Debuglogs('Starting......: Roundcube replicate '+confFile);
              logs.OutputCmd('/bin/cp '+SourceCOnf+' '+confFile);
          end;
      end;

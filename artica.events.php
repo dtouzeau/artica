@@ -27,8 +27,20 @@ function js(){
 	$page=CurrentPageName();
 	$tpl=new templates();
 	$title=$tpl->_ENGINE_parse_body('{artica_events}');
+	$start="artica_events_start()";
+	if(isset($_GET["in-front-ajax"])){
+		$start="artica_events_start2()";
+	}
+	
 	$html="
-	 YahooWin5('750','$page?popup=yes','$title');
+	
+	function artica_events_start(){
+	 	YahooWin5('750','$page?popup=yes&without-tri={$_GET["without-tri"]}','$title');
+	}
+	
+	function artica_events_start2(){
+		$('#BodyContent').load('$page?popup=yes');
+	}
 	 
 	 function tripar(){
 	 	var context=document.getElementById('context').value;
@@ -43,7 +55,7 @@ function js(){
 	 
 	
 	
-	";
+	$start;";
 	
 	echo $html;	
 	
@@ -74,55 +86,62 @@ function events_table(){
 	
 	
 	$q=new mysql();
-	
-	$sql="SELECT process FROM events GROUP BY process ORDER BY process";
-	$results=$q->QUERY_SQL($sql,"artica_events");	
-	while($ligne=@mysql_fetch_array($results,MYSQL_ASSOC)){
-	if($ligne["process"]==null){$ligne["process"]="{unknown}";}
-			$text_interne=$ligne["process"];
-		$text_externe=$ligne["process"];
-		if($text_externe=="class.templates.inc"){$text_externe="system";}
-		if($text_externe=="process1"){$text_externe="watchdog";}
-	
-		$arr[$text_interne]=$text_externe;
+	if($_GET["without-tri"]==null){
+			$sql="SELECT process FROM events GROUP BY process ORDER BY process";
+			$results=$q->QUERY_SQL($sql,"artica_events");	
+			while($ligne=@mysql_fetch_array($results,MYSQL_ASSOC)){
+			if($ligne["process"]==null){$ligne["process"]="{unknown}";}
+					$text_interne=$ligne["process"];
+				$text_externe=$ligne["process"];
+				if($text_externe=="class.templates.inc"){$text_externe="system";}
+				if($text_externe=="process1"){$text_externe="watchdog";}
+			
+				$arr[$text_interne]=$text_externe;
+			}
+			$arr[null]="{select}";
+			
+			$sql="SELECT context FROM events GROUP BY context ORDER BY context";
+			$results=$q->QUERY_SQL($sql,"artica_events");	
+			while($ligne=@mysql_fetch_array($results,MYSQL_ASSOC)){
+			if($ligne["context"]==null){$ligne["context"]="{unknown}";}
+			
+				$text_interne=$ligne["context"];
+				$text_externe=$ligne["context"];
+			
+				$arr1[$text_interne]=$text_externe;
+			}
+			
+					
+			$arr1[null]="{select}";
+			
+			$field_process=Field_array_Hash($arr,'process',$_GET["process"],"tripar()");
+			$field_context=Field_array_Hash($arr1,'context',$_GET["context"],"tripar()");
+			
+			
+			
+		
+			
+		
+			$html="
+			<table style='width:99%'>
+				<tr>
+					<td class=legend>{process}:</td>
+					<td>$field_process</td>
+					<td class=legend>{context}:</td>
+					<td>$field_context</td>			
+				</tr>
+			</table>
+			<br>
+			";
 	}
-	$arr[null]="{select}";
-	
-	$sql="SELECT context FROM events GROUP BY context ORDER BY context";
-	$results=$q->QUERY_SQL($sql,"artica_events");	
-	while($ligne=@mysql_fetch_array($results,MYSQL_ASSOC)){
-	if($ligne["context"]==null){$ligne["context"]="{unknown}";}
-	
-		$text_interne=$ligne["context"];
-		$text_externe=$ligne["context"];
-	
-		$arr1[$text_interne]=$text_externe;
-	}
-	$arr1[null]="{select}";
-	
-	$field_process=Field_array_Hash($arr,'process',$_GET["process"],"tripar()");
-	$field_context=Field_array_Hash($arr1,'context',$_GET["context"],"tripar()");
-	
-	
 	
 	if($_GET["process"]<>null){$pp1=" AND process='{$_GET["process"]}'";}
 	if($_GET["context"]<>null){$pp2=" AND context='{$_GET["context"]}'";}
-	
+	$html=$html."<table style='width:99%'>";
 	$sql="SELECT * FROM events WHERE 1 $pp2$pp1 ORDER by zDate DESC LIMIT 0,300";
 	$results=$q->QUERY_SQL($sql,"artica_events");
-	$html="
-	<table style='width:99%'>
-		<tr>
-			<td class=legend>{process}:</td>
-			<td>$field_process</td>
-			<td class=legend>{context}:</td>
-			<td>$field_context</td>			
-		</tr>
-	</table>
-	<br>
 	
 	
-	<table style='width:99%'>";
 	$tt=date('Y-m-d');
 	while($ligne=mysql_fetch_array($results,MYSQL_ASSOC)){
 		if($ligne["process"]==null){$ligne["process"]="{unknown}";}

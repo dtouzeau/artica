@@ -215,7 +215,7 @@ begin
        cmd:=cmd+' --enable-async-io ';
        cmd:=cmd+' --enable-delay-pools ';
        cmd:=cmd+' --enable-ssl';
-       cmd:=cmd+' CFLAGS="-DNUMTHREADS=60 -O3 -pipe -fomit-frame-pointer -funroll-loops -ffast-math -fno-exceptions"';
+       cmd:=cmd+' CFLAGS="-DNUMTHREADS=60 -O3 -pipe -fomit-frame-pointer -funroll-loops -ffast-math -fno-exceptions" CPPFLAGS="-I../libltdl"';
        writeln(cmd);
        result:=cmd;
 

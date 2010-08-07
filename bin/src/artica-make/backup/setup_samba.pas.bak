@@ -28,8 +28,9 @@ private
    mysql_admin:string;
    mysql_password:string;
    ldap_server:string;
-   function SMBD_PATH():string;
    SYS:Tsystem;
+   function SMBD_PATH():string;
+
    function talloc():boolean;
    procedure uninstall();
    function SAMBA_VERSION():string;

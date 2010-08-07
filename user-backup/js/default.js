@@ -353,7 +353,27 @@ function CurrentPageName(){
 	var sPage = sPath.substring(sPath.lastIndexOf('/') + 1);
 	return sPage;		
 }
+function SwitchBigNumeric(id){
+	id_value=document.getElementById(id).value;
 
+	if(!id_value){
+		document.getElementById(id).value='1';
+		document.getElementById('img_' + id).src='img/64-green.png';
+		return;
+	}
+	
+	if(id_value=='1'){
+		document.getElementById(id).value='0';
+		document.getElementById('img_' + id).src='img/64-red.png';
+		return;
+	}else{
+		document.getElementById(id).value='1';
+		document.getElementById('img_' + id).src='img/64-green.png';
+		return;
+	}        
+        
+        
+}
 
 	
 	

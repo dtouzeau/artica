@@ -651,10 +651,8 @@ return  $html;
 
 
 function multidomains_save(){
-	$artica=new artica_general();
-	$artica->EnableVirtualDomainsInMailBoxes=$_GET["EnableVirtualDomainsInMailBoxes"];
-	$artica->Save();
 	$sock=new sockets();
+	$sock->SET_INFO("EnableVirtualDomainsInMailBoxes",$_GET["EnableVirtualDomainsInMailBoxes"]);
 	$sock->getFrameWork("cmd.php?reconfigure-cyrus=yes");
 	$sock->getFrameWork("cmd.php?restart-cyrus=yes");
 }
@@ -1376,7 +1374,7 @@ function filters_connect_section(){
 				$dkim=Paragraphe('folder-64-certified.png','{APP_DKIM_FILTER}','{dkim_filter}',"javascript:Loadjs('amavis.dkim.php?ou=". base64_encode("postfix-master")."&hostname=". $sock->GET_INFO("myhostname")."')",null,210,null,0,true);
 			}
 			
-			$senderbase=Paragraphe('hearth-blocked-64.png','{SPAMASSASSIN_DNS_BLACKLIST}','{SPAMASSASSIN_DNS_BLACKLIST_TEST}',
+			$senderbase=Paragraphe('hearth-blocked-64.png','{SPAMASSASSIN_DNS_BLACKLIST}','{SPAMASSASSIN_DNS_BLACKLIST_TEXT}',
 			"javascript:Loadjs('spamassassin.dnsbl.php?ou=". base64_encode("postfix-master")."&hostname=". $sock->GET_INFO("myhostname")."')",null,210,null,0,true);
 			
 		}
@@ -1859,14 +1857,26 @@ function tweaks(){
 		$storage=null;
 		$other=null;
 		$multi_infos=Paragraphe('postfix-multi-64-info.png','{POSTFIX_MULTI_INSTANCE_INFOS}','{POSTFIX_MULTI_INSTANCE_INFOS_TEXT}',"javascript:Loadjs('postfix.multiple.instances.infos.php')");
+		
+		if($users->MAILMAN_INSTALLED){
+			$mailman=Buildicon64('DEF_ICO_POSTFIX_MAILMAN');
+		}
 	}
 	
+	$q=new mysql();
+	$table_storage=$q->TABLE_STATUS("storage","artica_backup");
+	if($table_storage["Rows"]>0){
+		$backup_query=Paragraphe('64-backup.png',"{$table_storage["Rows"]} {backuped_mails}",'{all_mailbackup_text}',"javascript:Loadjs('domains.backup.php?js=yes&Master=yes')");
+		
+	}
 	
 		$tr[]=$multi;
 		$tr[]=$multi_infos;
 		$tr[]=$postmaster;
 		$tr[]=$postmaster_identity;
 		$tr[]=$UnknownUsers;
+		$tr[]=$backup_query;
+		$tr[]=$mailman;
 		$tr[]=$altermime;
 		$tr[]=$pommo;
 		$tr[]=$events;

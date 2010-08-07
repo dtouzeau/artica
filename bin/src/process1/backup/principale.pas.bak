@@ -8,7 +8,7 @@ uses
   RegExpr,zsystem,IniFiles,
   global_conf in 'global_conf.pas',common,process_infos,cyrus,clamav,spamass,pureftpd,roundcube,openldap,spfmilter,samba,mimedefang,bogofilter,squid,stunnel4,dkimfilter,
   postfix_class,mailgraph_daemon,lighttpd,miltergreylist,dansguardian,monitorix,kav4samba,awstats,ntpd,kav4proxy,bind9,fdm,p3scan,syslogng,kas3,isoqlog,dhcp_server,cups,wifi,
-  dnsmasq,kavmilter,  jcheckmail, rdiffbackup,openvpn,strutils,xapian,dstat,BaseUnix,nfsserver,policyd_weight,tcpip,pdns,mysql_daemon,zabbix,assp,postfilter, vmwaretools,phpldapadmin,zarafa_server,squidguard,
+  dnsmasq,kavmilter,  jcheckmail, rdiffbackup,openvpn,strutils,xapian,dstat,BaseUnix,nfsserver,policyd_weight,tcpip,pdns,mysql_daemon,assp,postfilter, vmwaretools,phpldapadmin,zarafa_server,squidguard,
   collectd         in '/home/dtouzeau/developpement/artica-postfix/bin/src/artica-install/collectd.pas',
   fetchmail        in '/home/dtouzeau/developpement/artica-postfix/bin/src/artica-install/fetchmail.pas',
   mailspy_milter   in '/home/dtouzeau/developpement/artica-postfix/bin/src/artica-install/mailspy_milter.pas',
@@ -211,21 +211,6 @@ begin
    end;
 
    SYS.ProcessIDList.Clear;
-   SYS.AllPidsByPatternInPath('artica-notif');
-
-   logs.Debuglogs('DeadArticaInstall():: found (' + IntToStr(SYS.ProcessIDList.count) + ') instances for (artica-notif)');
-
-   for i:=0 to SYS.ProcessIDList.Count-1 do begin
-
-      if not FileExists('/proc/' + SYS.ProcessIDList.Strings[i]+'/cmdline') then continue;
-      mins:=SYS.FILE_TIME_BETWEEN_MIN('/proc/' + SYS.ProcessIDList.Strings[i]+'/cmdline');
-      logs.Debuglogs('DeadArticaInstall():: found ID ' + SYS.ProcessIDList.Strings[i] + ' Minutes=' + IntToStr(mins));
-      if mins>5 then begin
-         logs.Syslogs('DeadArticaInstall():: Kill artica-notif process ID ' + SYS.ProcessIDList.Strings[i] + ' cause a ghost more than 5 minutes');
-         fpsystem('/bin/kill ' +SYS.ProcessIDList.Strings[i]);
-      end;
-   end;
-   
 end;
 //##############################################################################
 procedure Tprocess1.maillog_multiples();

@@ -15,7 +15,7 @@ uses
   setup_eaccelerator, setup_bacula, setup_roundcube, setup_acxdrv,
   setup_hostapd, zsystem, setup_mysql, setup_winexe, setup_assp, setup_ocs,
   setup_lmb, setup_glusterfs, setup_postfilter, setup_vmtools,
-  setup_phpldapadmin, setup_zarafa, setup_cpulimit, setup_drupal;
+  setup_phpldapadmin, setup_zarafa, setup_cpulimit, setup_drupal, setup_emailrelay;
 
 var
    collectd:tsetup_collectd;
@@ -34,7 +34,6 @@ var
    kavmilter:tsetup_kavmilter;
    squid:tsetup_squid;
    kavsamba:tsetup_kavsamba;
-   zlogs:Tlogs;
    pommo:tpommo;
    ddar:dar;
    fetchmail:install_fetchmail;
@@ -77,7 +76,7 @@ var
    zarafa:tzarafa;
    cpulimit:tsetup_cpulimit;
    drupal:tsetup_drupal;
-
+   emailrelay:tsetup_emailrelay;
 begin
 
 
@@ -117,6 +116,29 @@ begin
          halt(0);
    end;
 
+
+   if ParamStr(1)='APP_EMAIL_RELAY' then begin
+         fpsystem('/usr/share/artica-postfix/bin/setup-ubuntu --check-base-system');
+         emailrelay:=tsetup_emailrelay.Create;
+         emailrelay.xinstall();
+         zinstall.EMPTY_CACHE();
+         halt(0);
+   end;
+
+   if ParamStr(1)='APP_EMAILRELAY_REMOVE' then begin
+         emailrelay:=tsetup_emailrelay.Create;
+         emailrelay.xremove();
+         zinstall.EMPTY_CACHE();
+         halt(0);
+   end;
+
+   if ParamStr(1)='APP_EMAILRELAY' then begin
+         fpsystem('/usr/share/artica-postfix/bin/setup-ubuntu --check-base-system');
+         emailrelay:=tsetup_emailrelay.Create;
+         emailrelay.xinstall();
+         zinstall.EMPTY_CACHE();
+         halt(0);
+   end;
 
    if ParamStr(1)='APP_DRUPAL' then begin
          drupal:=tsetup_drupal.Create;
@@ -196,7 +218,7 @@ begin
    end;
 
 
-   zlogs:=tlogs.Create;
+
    if ParamStr(1)='APP_SQUID' then begin
          squid:=tsetup_squid.Create;
          if length(ParamStr(2))>0 then begin
@@ -950,6 +972,13 @@ begin
       halt(0);
    end;
 
+   //APP_COMPRESS_ROW_ZLIB
+   if ParamStr(1)='APP_COMPRESS_ROW_ZLIB' then begin
+      amavis:=amavisd.Create();
+      amavis.COMPRESS_ROW_ZLIB();
+      halt(0);
+   end;
+
 
    if ParamStr(1)='APP_AMAVISD_MILTER' then begin
          fpsystem('/usr/share/artica-postfix/bin/setup-ubuntu --check-base-system');
@@ -1007,11 +1036,9 @@ begin
          fpsystem('/usr/share/artica-postfix/bin/setup-ubuntu --check-postfix');
          amavis:=amavisd.Create();
          amavis.dspam_install();
-
          zinstall.EMPTY_CACHE();
          halt(0);
    end;
-
 
 
    if ParamStr(1)='APP_IMAPSYNC' then begin
@@ -1056,7 +1083,6 @@ begin
 
 
    writeln('APP_COLLECTD.............: install collectd from sources');
-   writeln('APP_PHPLDAPADMIN.........: install phpldapadmin');
    writeln('APP_VMTOOLS..............: install VMWare Tools');
    writeln('APP_POMMO................: install poMMo from sources');
    writeln('APP_CLAMAV_MILTER........: install clamav and clamav milter');
@@ -1074,18 +1100,8 @@ begin
    writeln('APP_DSTAT................: install gnuplot,dtsat');
    writeln('APP_HOSTAPD..............: install hostapd (wifi)');
    writeln('APP_GLUSTERFS............: install GlusterFS (Clustering)');
-
-
-
    writeln('APP_JCHKMAIL.............: install jcheckmail');
    writeln('APP_ISOQLOG..............: install isoqlog');
-
-
-   writeln('');
-   writeln('Groupware engine');
-   writeln('___________________________________________________________');
-   writeln('APP_GROUPWARE_APACHE.....: Install dedicated Apache engine for groupwares applications');
-   writeln('APP_GROUPWARE_PHP........: Install dedicated PHP engine for groupwares applications');
 
    writeln('');
    writeln('Groupwares applications');
@@ -1097,46 +1113,41 @@ begin
    writeln('APP_ATOPENMAIL...........: install @Mail open (webmail)');
    writeln('APP_ROUNDCUBE3...........: install RoundCube WebMail generation 3');
    writeln('APP_ROUNDCUBE3_SIEVE_RULE: install RoundCube Sieve plugin for RoundCube generation 3');
-
-
-   writeln('Tools');
-   writeln('___________________________________________________________');
+   writeln('APP_GROUPWARE_APACHE.....: Install dedicated Apache engine for groupwares applications');
+   writeln('APP_GROUPWARE_PHP........: Install dedicated PHP engine for groupwares applications');
    writeln('APP_PHPLDAPADMIN.........: Install PhpLDAPadmin');
    writeln('APP_PHPMYADMIN...........: Install phpMyadmin');
-
-
-   writeln('');
-   writeln('OBM');
-   writeln('___________________________________________________________');
    writeln('APP_OBM..................: install OBM v2.1 groupware calendar');
    writeln('APP_OBM2.................: install OBM v2.2 groupware calendar');
    writeln('');
+   writeln('SQUID');
+   writeln('___________________________________________________________');
    writeln('APP_SQUID................: install SQUID3 with ICAP enabled');
    writeln('APP_SQUID................:  --reconfigure to recompile');
    writeln('APP_SQUID................:  --configure to display only configure directives');
-   writeln('');
-
    writeln('');
    writeln('APP_SQUIDGUARD...........: install SquidGuard');
    writeln('APP_SQUIDGUARD...........:  --reconfigure to recompile (not implemented)');
    writeln('APP_SQUIDGUARD...........:  --configure to display only configure directives');
    writeln('');
+   writeln('APP_KAV4PROXY............: install Kaspersky For Squid');
+   writeln('APP_C_ICAP...............: install c-icap');
+   writeln('APP_DANSGUARDIAN.........: install/reconfigure Dansguardian');
+   writeln('');
 
-
-
-
+   writeln('APP_EMAIL_RELAY..........: install/reconfigure Email-relay');
+   writeln('APP_EMAILRELAY_REMOVE....: Uninstall Email-relay');
+   writeln('');
    writeln('APP_SAMBA................: install/reconfigure Samba');
    writeln('APP_KAV4SAMBA............: install Kaspersky For Samba server');
    writeln('APP_ALTERMIME............: install AlterMIME for amavis');
-   writeln('APP_KAV4PROXY............: install Kaspersky For Squid');
-   writeln('APP_C_ICAP...............: install c-icap');
+
    writeln('APP_CLAMAV...............: install/update clamav engines');
    writeln('APP_GNARWL...............: install gnarwl vacation addon');
    writeln('APP_MHONARC..............: install MHonArc has a Perl mail-to-HTML converter');
    writeln('APP_MSMTP................: install/reconfigure artica-msmtp ');
    writeln('APP_PFLOGSUMM............: install/reconfigure PFLOGSUMM ');
    writeln('APP_SPAMASSASSIN.........: install/reconfigure SpamAssassin');
-   writeln('APP_DANSGUARDIAN.........: install/reconfigure Dansguardian');
    writeln('APP_CUPS_DRV.............: install/reconfigure Cups printers drivers');
    writeln('APP_CUPS_BROTHER.........: install/reconfigure Cups Brother printers drivers');
 

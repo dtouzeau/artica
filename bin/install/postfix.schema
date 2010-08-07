@@ -1993,7 +1993,12 @@ attributetype ( 1.1.2.1.1.10.1.391 NAME 'WWWMultiSMTPSender'
   SYNTAX 1.3.6.1.4.1.1466.115.121.1.26 SINGLE-VALUE)
   )
 #-------------------------------------------------------------------
-
+attributetype ( 1.1.2.1.1.10.1.392 NAME 'WWWEnableAddressBook'
+  DESC 'WWWEnableAddressBook'
+  EQUALITY caseIgnoreIA5Match
+  SYNTAX 1.3.6.1.4.1.1466.115.121.1.26 SINGLE-VALUE)
+  )
+#-------------------------------------------------------------------
 #deleted old attribute : ProcMailRcConfig ArticaPolicyEnabled kasxFilterEnabled
 
 
@@ -2704,7 +2709,7 @@ objectclass (1.3.6.1.4.1.15347.2.178
     	DESC 'Used to set additional configurations on VHOST'
 	SUP apacheConfig
 	STRUCTURAL
-	MAY(WWWServerType $ WWWMysqlUser $ WWWMysqlPassword $ WWWAppliUser $ WWWAppliPassword $ WWWSSLMode $ WWWMultiSMTPSender)
+	MAY(WWWServerType $ WWWMysqlUser $ WWWMysqlPassword $ WWWAppliUser $ WWWAppliPassword $ WWWSSLMode $ WWWMultiSMTPSender $ WWWEnableAddressBook)
 	)
 #===========================================================
 objectclass ( 1.3.6.1.4.1.15347.2.179

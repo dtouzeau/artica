@@ -163,7 +163,7 @@ begin
 
    if u='2' then begin
           InstallPackageLists(cyrus);
-          fpsystem('/usr/share/artica-postfix/bin/artica-roundcube --install --verbose');
+         fpsystem('/usr/share/artica-postfix/bin/artica-make APP_ROUNDCUBE3');
           fpsystem('/etc/init.d/artica-postfix restart');
           Show_Welcome;
           exit;
@@ -628,7 +628,6 @@ l.Add('perl-HTML-Parser');
 l.Add('perl-Archive-Zip');
 l.Add('perl-Font-TTF');
 l.Add('perl-BerkeleyDB');
-l.add('perl-Mail-SPF');
 l.add('gd');
 l.Add('wv');
 l.Add('postfix');

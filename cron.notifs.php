@@ -53,7 +53,12 @@ $mysql=new mysql();
 
 	while (list ($num, $file) = each ($hash)){
 		
-		
+		$text=null;
+		$processname=null;
+		$date=null;
+		$context=null;
+		$subject=null;
+		$recipient=null;
 		$bigtext=@file_get_contents($path.'/'.$file);
 		
 		echo date('Y-m-d h:i:s')." Parsing $file ". strlen($bigtext)." bytes text\n";
@@ -140,15 +145,18 @@ $sql="SELECT * FROM `events` WHERE sended=0 ORDER BY zDate DESC LIMIT 0,100";
 
 $results=$q->QUERY_SQL($sql,"artica_events");
 while($ligne=@mysql_fetch_array($results,MYSQL_ASSOC)){
-			events("New event: {$ligne["text"]}");
+			
 	
 			$attached_files=unserialize(base64_decode($ligne["attached_files"]));
 			$context=$ligne["context"];
 			$ligne["content"]=str_replace('[br]',"\n",$ligne["content"]);
+			events("New event: {$ligne["text"]}, context=$context");
 			if($ini->_params["SMTP"][$context]==1){
 				$ligne["content"]="{$ligne["zDate"]} :{$ligne["process"]}: {$ligne["text"]}\n\n-----------------------------------------------------\n{$ligne["content"]}\n";
-				events("Notify {$ligne["text"]}");
+				events("Notify {$ligne["text"]} -> SendMailNotification()");
 				SendMailNotification($ligne["content"],"[$context]: {$ligne["text"]}",false,$attached_files,$ligne["recipient"]);
+			}else{
+				events("$context is not enabled, notifications disabled");
 			}
 			$sql="UPDATE events SET sended=1 WHERE ID={$ligne["ID"]}";
 			$q->QUERY_SQL($sql,"artica_events");
@@ -170,7 +178,7 @@ function events($text){
 		$size=filesize($logFile);
 		if($size>1000000){unlink($logFile);}
 		$f = @fopen($logFile, 'a');
-		$line="$date $filename[$pid] $text\n";
+		$line="$date {$filename}[{$pid}] $text\n";
 		if($_GET["DEBUG"]){echo $line;}
 		@fwrite($f,$line);
 		@fclose($f);

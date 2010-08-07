@@ -66,8 +66,9 @@ s'il vous pla&icirc;t v&eacute;rifiez si tous les &eacute;l&eacute;ments sont co
 <duplicate_mailto>Dupliquer les mails vers</duplicate_mailto>
 <duplicate_mailto_text>Si vous remplissez ce champ, tous les mails de cet utilisateur seront reproduit &agrave; l'adresse de courriel configur&eacute;e</duplicate_mailto_text>
 <EnableUserSpamLearning>Apprentissage Anti-spam</EnableUserSpamLearning>
-<EnableUserSpamLearning_explain>Si des mails ind&eacute;sirables sont enregistr&eacute;s dans le dossier utilisateur de cette bo&icirc;te aux lettres, les mails seront import&eacute;s &agrave; des fins d'analyse afin d'augmenter le taux de d&eacute;tection de Spamassassin. [br]
-Apr&egrave;s avoir analyser le courrier, il sera automatiquement supprim&eacute;e afin de ne pas polluer le dossier spam</EnableUserSpamLearning_explain>
+<EnableUserSpamLearning_explain>Si des mails ind&eacute;sirables sont enregistr&eacute;s dans le dossier  &quot;Junk&quot; ou &quot;Courriers Ind&eacute;sirables&quot; de cette, Ils seront donn&eacute;s &agrave; SpamAssassin [b]toutes les 3 heures[/b] &agrave; des fins d'analyse.[br]Ceci afin d'augmenter consid&eacute;rablement le taux de d&eacute;tection de l'anti-Spam de messagerie Spamassassin. [br]
+Apr&egrave;s avoir analyser les messages, ils seront automatiquement supprim&eacute;s afin de ne pas polluer le dossier de la bo&icirc;te aux lettres.[br]
+[b]La proc&eacute;dure est tr&egrave;s simple[/b], placez les messages que vous consid&eacute;rez comme &eacute;tant des pourriels dans le dossier &quot;courriers ind&eacute;sirables&quot; ou &quot;Junk&quot;.[br]Pour &eacute;viter les faux positifs vous pouvez cr&eacute;er un dossier Ham dans la bo&icirc;te aux lettres et y placer les messages que vous consid&eacute;rez comme des messages non-pourriels.</EnableUserSpamLearning_explain>
 <EnableUserSpamLearning_text>Permet &agrave; artica l'analyse de la boites aux lettres junk / Spam pour envoyer des mails ind&eacute;sirables &agrave; spamassassin</EnableUserSpamLearning_text>
 <enable_file_share>Activer le partage des Fichiers</enable_file_share>
 <error_image_missing>Il y a une erreur, selon les librairies gd, assurez-vous que vous avez install&eacute; php5-gd ou les modules requis</error_image_missing>

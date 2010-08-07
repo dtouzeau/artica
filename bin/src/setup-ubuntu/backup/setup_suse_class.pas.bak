@@ -14,24 +14,22 @@ type
 
 
 private
+       libs:tlibs;
        function OpenSuseVersion():string;
-
-
        function CheckCyrus():string;
        function CheckDevcollectd():string;
        function Explode(const Separator, S: string; Limit: Integer = 0):TStringDynArray;
-       libs:tlibs;
        procedure OpenSuse11specific();
        procedure pyzor();
 
 
 
 public
+      distri:tdistriDetect;
       constructor Create();
       function CheckBaseSystem():string;
       procedure Free;
       function InstallPackageLists(list:string):boolean;
-      distri:tdistriDetect;
       procedure Show_Welcome;
       function checkSamba():string;
       function checkApps(l:tstringlist):string;
@@ -274,6 +272,7 @@ l.Add('php5-imap ');
 l.Add('php5-pear');
 l.add('php5-gd');
 l.add('php5-posix');
+l.add('php5-APC');
 //l.Add('php5-pear-log');
 //l.Add('php5-pear-mail_mime');
 //l.add('php5-pear-Net-Sieve');

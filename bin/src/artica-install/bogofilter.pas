@@ -6,7 +6,7 @@ unit bogofilter;
 interface
 
 uses
-    Classes, SysUtils,variants,IniFiles, Process,logs,unix,RegExpr in 'RegExpr.pas',zsystem;
+    Classes, SysUtils,variants,Process,logs,unix,RegExpr in 'RegExpr.pas',zsystem;
 
 
   type

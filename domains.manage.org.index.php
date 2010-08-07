@@ -64,6 +64,10 @@ function js(){
 		$LoadSingleOrg="$('#BodyContent').load('$page?js-pop=yes&ou=$ou_encoded');";	
 	}
 	
+	if(isset($_GET["groupwares-in-front-ajax"])){
+		$LoadSingleOrg="$('#BodyContent').load('$page?org_section=groupwares&SwitchOrgTabs={$_GET["ou"]}&ou={$_GET["ou"]}&mem=yes');";
+	}
+	
 	$start_function="LoadSingleOrg()";
 	
 	if(isset($_GET["panel"])){

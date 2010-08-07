@@ -242,7 +242,7 @@ function plugins_sieve_popup(){
 	var x_RoundCubeEnableSieve= function (obj) {
 		var results=obj.responseText;
 		if(results.length>0){alert(results);}
-		RoundCubeEnableCalendarPage();
+		RoundCubeEnableSievePage();
 	}	
 	
 		function RoundCubeEnableSieve(){

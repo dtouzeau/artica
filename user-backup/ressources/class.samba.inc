@@ -63,7 +63,7 @@ function BuildDefaults(){
 	if($this->main_array["global"]["os level"]==null){$this->main_array["global"]["os level"]="40";}
 	if($this->main_array["global"]["netbios name"]==null){$this->main_array["global"]["netbios name"]=$users->hostname;}
 	if($this->main_array["global"]["dns proxy"]==null){$this->main_array["global"]["dns proxy"]="no";}
-	if($this->main_array["global"]["name resolve order"]==null){$this->main_array["global"]["name resolve order"]="host lmhost wins bcast";}
+	if($this->main_array["global"]["name resolve order"]==null){$this->main_array["global"]["name resolve order"]="host lmhosts wins bcast";}
 	
 	if($this->main_array["global"]["nt acl support"]==null){$this->main_array["global"]["nt acl support"]="yes";}
 	if($this->main_array["global"]["map acl inherit"]==null){$this->main_array["global"]["map acl inherit"]="yes";}
