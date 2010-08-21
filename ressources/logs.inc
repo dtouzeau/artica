@@ -18,7 +18,7 @@ function writeToFile($text,$filepath){
 }
 function writelogs($text=null,$function=null,$file_source=null,$line=null){
 if($file_source==null){$file_source= __FILE__ ;}
-if(posix_getuid()==0){$prefix="[DAEMON]";}else{$prefix="[CONSOLE]::{$_SESSION["uid"]}";}
+if(posix_getuid()==0){$prefix="[DAEMON]::";}else{$prefix="[CONSOLE]::";}
 if(function_exists("getmypid")){$pid=getmypid();}
 
 $p=dirname(__FILE__);
@@ -30,7 +30,10 @@ $file_source=str_replace("/usr/share/artica-postfix/","",$file_source);
 $file_source=str_replace("/home/dtouzeau/developpement/artica-postfix/","",$file_source);
 if($GLOBALS["VERBOSE"]){echo "[$pid] $prefix::$function:: $text in $file_source$line\n";}
 $text2=date('H:i:s')." $function:: $text $line";
-$text="[$pid] $prefix::$function:: $text in $file_source$line";
+if(posix_getuid()>0){
+if($_SESSION["uid"]==-100){$name="[SuperAdmin]";}else{$name="[{$_SESSION["uid"]}]";}
+}
+$text="[$pid] $prefix::$name:$function:: $text in $file_source$line";
 writeOtherlogs(dirname(__FILE__)."/logs/web/interface.debug",$text2);
 if($GLOBALS["ADDLOG"]<>null){writeOtherlogs($GLOBALS["ADDLOG"],$text2);}
 error_log("$text");

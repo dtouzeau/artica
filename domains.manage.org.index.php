@@ -43,6 +43,8 @@ if(isset($_GET["finduser-js"])){organization_users_find_member_js();exit;}
 if(isset($_GET["finduser-popup"])){organization_users_list();exit;}
 if(isset($_GET["finduser"])){organization_users_find_member();exit;}
 
+if(isset($_GET["EnableApacheGroupware"])){EnableApacheGroupware();exit;}
+
 js();	
 
 
@@ -453,9 +455,11 @@ function popup_tabs(){
 	
 	
 	writelogs("AseMailCampaignsAdmin=$usersmenus->AseMailCampaignsAdmin",__FUNCTION__,__FILE__,__LINE__);
-	if($sock->GET_INFO("EnableInterfaceMailCampaigns")==1){
-	 if($usersmenus->AseMailCampaignsAdmin){
-		$array["emailings"]="{email_campaigns}";
+	if($usersmenus->EMAILRELAY_INSTALLED){
+		if($sock->GET_INFO("EnableInterfaceMailCampaigns")==1){
+		 if($usersmenus->AseMailCampaignsAdmin){
+			$array["emailings"]="{email_campaigns}";
+			}
 		}
 	}	
 	
@@ -591,7 +595,7 @@ function organization_messaging(){
 if(($usersmenus->AsPostfixAdministrator) OR ($usersmenus->AsMessagingOrg) OR ($usersmenus->AsOrgAdmin) OR ($usersmenus->AllowEditOuSecurity)){
 	$quarantine=icon_quarantine($usersmenus);
 	$quarantine_admin=Paragraphe("64-banned-regex.png","{all_quarantines}","{all_quarantines_text}","javascript:Loadjs('domains.quarantine.php?js=yes&Master=yes')",null,210,100,0,true);
-	$quarantine_report=Paragraphe("64-administrative-tools.png","{quarantine_reports}","{quarantine_reports_text}","javascript:Loadjs('domains.quarantine.php?js=yes&MailSettings=yes')",null,210,100,0,true);
+	
 	$rttm="<div style='float:left'>".Buildicon64('DEF_ICO_EVENTS_RTMMAIL')."</div>";
 	$stats=Paragraphe('64-milterspy.png','{statistics}','{statistics_ou_text}',"javascript:Loadjs('statistics.ou.php?ou=$ou')",null,210,100,0,true);
 	$quarantine_robot=Paragraphe("folder-64-denycontries.png","{quarantine_robots}","{quarantine_robots_text}","javascript:Loadjs('domains.white.list.robots.php?ou=$ou');",null,210,100,0,true);
@@ -1070,6 +1074,14 @@ function organization_groupwares(){
 		return $html;
 		
 	}
+	
+	
+	$sock=new sockets();
+	$ApacheGroupware=$sock->GET_INFO("ApacheGroupware");
+	if($ApacheGroupware==null){$ApacheGroupware=1;}
+	
+	
+	if($ApacheGroupware==0){return organization_vhostslist_disabled();}	
 
 $ou=$_GET["ou"];
 $tr=organization_vhostslist($ou);
@@ -1095,6 +1107,54 @@ if($t<3){
 		
 	$tpl=new templates();	
 	return $tpl->_ENGINE_parse_body(implode("\n",$tables));		
+	
+}
+
+function organization_vhostslist_disabled(){
+	
+	$page=CurrentPageName();
+	$users=new usersMenus();
+	if($users->AsSystemAdministrator){
+		$button="<hr>".button("{ACTIVATE_APP_GROUPWARE_APACHE}","EnableApacheGroupware()");
+		
+		
+		
+	}
+	
+	$html="
+	<table style='width:100%'>
+	<tr>
+		<td valign='top' width=1%><img src='img/software-remove-128.png'></td>
+		<td valign='top'>
+			<H2 style='color:red'>{APP_GROUPWARE_APACHE}:: {DISABLED}</H2>
+			<div style='font-size:14px' id='EnableApacheGroupware'>
+			{APP_GROUPWARE_APACHE_DISABLED_TEXT}
+			</div>
+			<p>&nbsp;</p>
+			<div style='text-align:right'>$button</div>
+			
+		</td>
+	</tr>
+	</table>
+	<script>
+var x_EnableApacheGroupware= function (obj) {
+	var response=obj.responseText;
+	if(response){alert(response);}
+    RefreshTab('org_main');
+	}	
+	
+	function EnableApacheGroupware(){
+	var XHR = new XHRConnection();
+	XHR.appendData('EnableApacheGroupware','yes');
+	document.getElementById('EnableApacheGroupware').innerHTML='<img src=\"img/wait_verybig.gif\">';
+	XHR.sendAndLoad('$page', 'GET',x_EnableApacheGroupware);	
+	
+	}	
+	
+	</script>
+	";
+	
+	return $html;
 	
 }
 
@@ -1384,7 +1444,18 @@ function VerifyRights(){
 	if(!$usersmenus->AllowChangeDomains){return false;}
 }
 
-	
+function EnableApacheGroupware(){
+	$tpl=new templates();
+
+	$usersmenus=new usersMenus();
+	if(!$usersmenus->AsSystemAdministrator){
+		echo $tpl->javascript_parse_text("{ERROR_NO_PRIVS}");
+		return;
+	}
+	$sock=new sockets();
+	$sock->SET_INFO("ApacheGroupware","1");
+	$sock->getFrameWork("cmd.php?RestartApacheGroupwareForce=yes");	
+}
 
 
 ?>	

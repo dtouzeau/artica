@@ -41,6 +41,7 @@ public
       function CheckPDNS():string;
       function CheckZabbix():string;
       function CheckOpenVPN():string;
+      function CheckFuppes():string;
 END;
 
 implementation
@@ -284,6 +285,11 @@ if LowerCase(u)<>'y' then exit;
    ll:=Explode(',',list);
    for i:=0 to length(ll)-1 do begin
        if length(trim(ll[i]))>0 then begin
+
+          if(ll[i]='lighttpd') then begin
+              if Fileexists('/etc/init.d/apache2') then fpsystem('/etc/init.d/apache2 stop');
+          end;
+
           cmd:='DEBIAN_FRONTEND=noninteractive /usr/bin/apt-get -o Dpkg::Options::="--force-confnew" --force-yes -fuy install ' + ll[i];
           fpsystem(cmd);
        end;
@@ -532,6 +538,7 @@ var
    distri:tdistriDetect;
    UbuntuIntVer:integer;
    libs:tlibs;
+   non_free:boolean;
    
 begin
 f:='';
@@ -540,7 +547,7 @@ l:=TstringList.Create;
 distri:=tdistriDetect.Create();
 libs:=tlibs.Create;
 if not TryStrToInt(distri.DISTRINAME_VERSION,UbuntuIntVer) then UbuntuIntVer:=9;
-
+non_free:=libs.IS_DEBIAN_NON_FREE_IN_SOURCE_LIST();
 
 l.Add('dhcp3-client');
 l.Add('cron');
@@ -729,7 +736,7 @@ if distri.DISTRINAME_CODE='DEBIAN' then begin
       l.Add('console-common');
       l.Add('libmcrypt-dev');
       l.add('libconfuse-dev');
-      l.add('libltdl-dev'); //Clamav compilation
+      l.add('libltdl3-dev'); //Clamav compilation
       L.add('sysstat');
       l.Add('php5-imap');
       l.add('php-net-sieve');
@@ -786,9 +793,9 @@ if distri.DISTRINAME_CODE='DEBIAN' then begin
       l.add('monit');
       l.add('stunnel4');
       l.add('libwbxml2-utils');
-      l.Add('unrar');
-      l.Add('lha');
+      if non_free then l.Add('lha');
       l.add('pike7.6');
+      l.add('libmagic-dev'); // MLDOnkey
 
 
    if distri.DISTRINAME_VERSION='4' then begin
@@ -841,6 +848,7 @@ if distri.DISTRINAME_CODE='UBUNTU' then begin
       l.Add('console-common');
       l.Add('libmcrypt-dev');
       l.add('libconfuse-dev');
+      l.add('libmagic-dev'); // MLDOnkey
       l.add('libltdl-dev'); //Clamav compilation
       L.add('sysstat');
       l.Add('php5-imap');
@@ -933,6 +941,9 @@ if distri.DISTRINAME_CODE='UBUNTU' then begin
 
 end;
 
+
+
+
 //OCS
 l.Add('libapache2-mod-perl2');
 l.Add('libxml-simple-perl');
@@ -999,6 +1010,59 @@ for i:=0 to l.Count-1 do begin
 end;
  result:=f;
 end;
+
+//#########################################################################################
+function tubuntu.CheckFuppes():string;
+var
+   l:TstringList;
+   f:string;
+   i:integer;
+   distri:tdistriDetect;
+   UbuntuIntVer:integer;
+begin
+
+f:='';
+l:=TstringList.Create;
+distri:=tdistriDetect.Create();
+UbuntuIntVer:=9;
+libs:=tlibs.Create;
+if not TryStrToInt(distri.DISTRINAME_VERSION,UbuntuIntVer) then UbuntuIntVer:=9;
+
+   l.add('ffmpeg');
+   l.add('build-essential');
+   l.add('libavutil-dev');
+   l.add('libavformat-dev');
+   l.add('libavcodec-dev');
+   l.add('libsqlite3-dev');
+   l.add('libpcre3-dev');
+   l.add('libxml2-dev');
+   l.add('liblame-dev');
+   l.add('libmpeg4ip-dev');
+   l.add('libmpcdec-dev');  //   mpcdec/config_types.h
+   l.add('libmyth-dev'); // ffmpeg/avstring.h
+   L.add('libflac-dev');  // /FLAC/stream_decoder.h
+   l.add('libfaad-dev'); //faad.h
+   l.add('imagemagick');
+   l.add('libtag1-dev');
+   L.add('libmagickwand-dev'); // /usr/include/ImageMagick/wand/MagickWand.h
+   l.add('libffmpegthumbnailer-dev'); // /usr/lib/libffmpegthumbnailer.a
+   l.add('libavformat-extra-52');
+   l.add('libsimage-dev');
+   l.add('exiv2');
+fpsystem('/bin/rm -rf /tmp/packages.list');
+
+for i:=0 to l.Count-1 do begin
+     if not is_application_installed(l.Strings[i]) then begin
+          f:=f + ',' + l.Strings[i];
+     end;
+end;
+ result:=f;
+
+
+end;
+//#########################################################################################
+
+
 
 function tubuntu.CheckZabbix():string;
 var
@@ -1129,6 +1193,7 @@ if distri.DISTRINAME_CODE='DEBIAN' then begin
          l.add('libgsasl7-dev'); //gsasl.h
          l.add('libnet-dns-perl');
          l.Add('cabextract');
+         l.add('python-ldap');
 end;
 
 l.Add('libio-socket-ssl-perl');

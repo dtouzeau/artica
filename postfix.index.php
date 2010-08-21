@@ -1384,12 +1384,13 @@ function filters_connect_section(){
 	$policydweight=Buildicon64("DEF_ICO_MAIL_POLICYDWEIGHT");
 	$block_domain=Buildicon64('DEF_ICO_MAIL_BLOCKDOM');	
 	$whitelist=Buildicon64("DEF_ICO_POSTFIX_WHITELIST");
+	$postfixInstantIptables=Buildicon64("DEF_ICO_MAIL_IPABLES");
 	
 	if($EnablePostfixMultiInstance==1){
 		$miltergreylist=null;
 		$policydweight=null;
 	}
-	
+		$tr[]=$postfixInstantIptables;
 		$tr[]=$miltergreylist;
 		$tr[]=$senderbase;
 		$tr[]=$policydweight;
@@ -1536,7 +1537,12 @@ function filters_section(){
 	$assp=Buildicon64("DEF_ICO_ASSP");
 	$quarantine_admin=Paragraphe("64-banned-regex.png","{all_quarantines}","{all_quarantines_text}","javascript:Loadjs('domains.quarantine.php?js=yes&Master=yes')",null,210,100,0,true);
 	$quarantine_report=Paragraphe("64-administrative-tools.png","{quarantine_reports}","{quarantine_reports_text}","Loadjs('domains.quarantine.php?js=yes&MailSettings=yes')",null,210,100,0,true);	
+	$clamav_unofficial=Paragraphe("clamav-64.png","{clamav_unofficial}","{clamav_unofficial_text}",
+	"javascript:Loadjs('clamav.unofficial.php')",null,210,100,0,true);
 		
+	
+	
+	
 	
 	if($users->EnableAmavisDaemon==0){$amavis=null;}
 	if(!$users->AMAVIS_INSTALLED){$amavis=null;}		
@@ -1567,7 +1573,7 @@ function filters_section(){
 	if($EnablePostfixMultiInstance==1){$mg=null;}
 	if($users->EnableMilterSpyDaemon<>1){$mailspy=null;}
 	if(!$users->MILTER_SPY_INSTALLED){$mailspy=null;}
-
+	if(!$users->CLAMD_INSTALLED){$clamav_unofficial=null;}
 		$tr[]=$apply;
 		$tr[]=$activate;
 		$tr[]=$amavis;
@@ -1579,7 +1585,8 @@ function filters_section(){
 		$tr[]=$quarantine_admin;
 		$tr[]=$quarantine_report;
 		$tr[]=$wbl;
-		$tr[]=$clamav;		
+		$tr[]=$clamav;	
+		$tr[]=$clamav_unofficial;	
 		$tr[]=$mailspy;
 		$tr[]=$plugins_activate;
 

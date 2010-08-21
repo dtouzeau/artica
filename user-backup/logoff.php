@@ -1,5 +1,6 @@
 <?php
 session_start();
+unset($_SESSION["MLDONKEY_{$_SESSION["uid"]}"]);
 unset($_SESSION["uid"]);
 unset($_SESSION["LANG_FILES"]);
 unset($_SESSION["PATTERN_FILE"]);

@@ -137,7 +137,7 @@ class user{
 	var $zarafaQuotaSoft=0;
 	var $zarafaQuotaHard=0;
 	var $zarafaQuotaOverride=0;
-	
+	var $WebDavUser=0;
 
 			
 	function user($uid=null){
@@ -228,7 +228,7 @@ class user{
 			if($this->zarafaQuotaSoft==null){$this->zarafaQuotaSoft="0";}
 			if($this->zarafaQuotaHard==null){$this->zarafaQuotaHard="0";}
 			if($this->zarafaQuotaOverride==null){$this->zarafaQuotaOverride="0";}
-			
+			if($this->WebDavUser==null){$this->WebDavUser=0;}
 			
 			
 			}
@@ -563,6 +563,8 @@ class user{
 		$this->FTPStatus=$attrs["FTPStatus"][0];
 		$this->FTPUploadBandwidth=$attrs["FTPUploadBandwidth"][0];
 		$this->FTPUploadRatio=$attrs["FTPUploadRatio"][0];
+		
+		$this->WebDavUser=$attrs["WebDavUser"][0];
 		
 		
 		$this->UsersInterfaceDatas=$attrs["UsersInterfaceDatas"][0];
@@ -1248,10 +1250,17 @@ class user{
 	
 	
 	
-	function find_samba_items($users){
+	function find_samba_items($users,$ou=null){
 		$ldap=new clladp();
-		writelogs("(&(objectClass=sambaSamAccount)(uid=$users*))",__CLASS__.'/'.__FUNCTION__,__FILE__,__LINE__);
-		$sr =@ldap_search($ldap->ldap_connection,$ldap->suffix,"(&(objectClass=sambaSamAccount)(|(uid=$users*)(cn=$users*)(displayName=$users*)))",array("displayname","uid"));
+		$suffix=$ldap->suffix;
+		if($ou<>null){
+			$suffix="ou=$ou,dc=organizations,$ldap->suffix";
+		}
+		$users=$users."*";
+		$users=str_replace('**','*',$users);
+	
+		
+		$sr =@ldap_search($ldap->ldap_connection,$suffix,"(&(objectClass=sambaSamAccount)(|(uid=$users)(cn=$users)(displayName=$users)))",array("displayname","uid"));
 		if($sr){
 				$result = ldap_get_entries($ldap->ldap_connection, $sr);
 				for($i=0;$i<$result["count"];$i++){
@@ -1261,11 +1270,13 @@ class user{
 					$res[$uid]=$displayname;
 				}
 				
+		}else{
+			writelogs("Error for sambaSamAccount (".ldap_err2str(ldap_errno($ldap->ldap_connection)).")",__CLASS__.'/'.__FUNCTION__,__FILE__,__LINE__);
 		}
 		
 		
 		
-		$sr =@ldap_search($ldap->ldap_connection,$ldap->suffix,"(&(objectClass=sambaGroupMapping)(|(cn=$users*)(displayName=$users*)))",array("displayname","cn"));
+		$sr =@ldap_search($ldap->ldap_connection,$suffix,"(&(objectClass=sambaGroupMapping)(|(cn=$users)(displayName=$users)))",array("displayname","cn"));
 		if($sr){
 				$result = ldap_get_entries($ldap->ldap_connection, $sr);
 				for($i=0;$i<$result["count"];$i++){
@@ -1275,8 +1286,10 @@ class user{
 					$res["@$uid"]="@$displayname";
 				}
 				
-		}		
-		
+		}else{
+			writelogs("Error for sambaGroupMapping",__CLASS__.'/'.__FUNCTION__,__FILE__,__LINE__);		
+		}
+		writelogs("(&(objectClass=sambaSamAccount)(uid=$users)) in $suffix ". count($res)." elements",__CLASS__.'/'.__FUNCTION__,__FILE__,__LINE__);
 		return $res;
 		
 	}
@@ -1848,6 +1861,41 @@ function joomla(){
 		$this->add_user();
 	}
 	
+	
+	function SaveWebDav(){
+		$ldap=new clladp();
+		$upd["WebDavUser"][0]=$this->WebDavUser;
+		if(!$ldap->Ldap_modify($this->dn,$upd)){
+			echo $ldap->ldap_last_error;	
+			return;
+		}
+
+		$sock=new sockets();
+		$sock->getFrameWork("cmd.php?reload-apache-groupware=yes");
+		
+	}
+	
+function FTPSettingsEdit(){
+	$ldap=new clladp();
+	$upd["FTPDownloadBandwidth"][0]=$this->FTPDownloadBandwidth;
+	$upd["FTPDownloadRatio"][0]=$this->FTPDownloadRatio;
+	$upd["FTPQuotaFiles"][0]=$this->FTPQuotaFiles;
+	$upd["FTPQuotaMBytes"][0]=$this->FTPQuotaMBytes;
+	$upd["FTPStatus"][0]=$this->FTPStatus;
+	$upd["FTPUploadBandwidth"][0]=$this->FTPUploadBandwidth;
+	$upd["FTPUploadRatio"][0]=$this->FTPUploadRatio;
+	
+	if(!$ldap->Ldap_modify($this->dn,$upd)){
+		echo $ldap->ldap_last_error;	
+		return;
+	}
+	$sock=new sockets();
+	$datas=trim(base64_decode($sock->getFrameWork("cmd.php?chown=".base64_encode($this->homeDirectory)."&uid=".base64_encode($this->uid))));
+	if(strlen($datas)>0){echo $datas;}
+}
+	
+	
+	
 	function zarafaSaveInfos(){
 		$upd["zarafaQuotaHard"][0]=$this->zarafaQuotaHard;
 		$upd["zarafaQuotaSoft"][0]=$this->zarafaQuotaSoft;
@@ -2162,7 +2210,7 @@ function joomla(){
 					$this->AutoAliases();
 					$this->SieveScripts();
 					$this->obm();
-					
+					$this->MLDonKey();
 					$this->joomla();
 					$nab=new nab($this->uid,$this->ou);		
 				}
@@ -2192,6 +2240,22 @@ function joomla(){
 			}			
 		
 	}
+	
+	
+	private function MLDonKey(){
+		$users=new usersMenus();
+		$sock=new sockets();
+		if(!$users->MLDONKEY_INSTALLED){return false;}
+		$EnableMLDonKey=$sock->GET_INFO("EnableMLDonKey");
+		if($EnableMLDonKey==null){$EnableMLDonKey=1;}
+		if($EnableMLDonKey==0){return null;}
+		
+		include_once(dirname(__FILE__)."/class.donkey.inc");
+		$ml=new EmuleTelnet();
+		if(!$ml->UserIsActivated($this->uid)){return;}
+		$ml->UserAdd($this->uid,0);
+	}
+	
 	
 function stripAccents($string){
 if ( !preg_match('/[\x80-\xff]/', $string) )
@@ -2624,6 +2688,7 @@ function UsersInterfaceDatasDelete(){
 			$sock=new sockets();
 			writelogs("Deleting $dn ($ui)",__CLASS__.'/'.__FUNCTION__,__FILE__,__LINE__);
 			$ldap=new clladp();
+			$users=new usersMenus();
 			
 			if(!$ldap->ExistsDN($dn)){return false;}
 			
@@ -2662,15 +2727,32 @@ function UsersInterfaceDatasDelete(){
 			//delete fetchmail rules.
 			$sql="DELETE FROM fetchmail_rules WHERE uid='$uid'";
 			$q->QUERY_SQL($sql,"artica_backup");
-			$sock->getFrameWork("cmd.php?restart-fetchmail=yes");
-			$sock->getFrameWork("cmd.php?postfix-hash-aliases=yes");
 			
+			//delete Quarantine reports
+			$sql="DELETE FROM quarantine_report_users WHERE userid='$uid'";
+			$q->QUERY_SQL($sql,"artica_backup");
 			
-				
+			if($users->POSTFIX_INSTALLED){
+				$sock->getFrameWork("cmd.php?restart-fetchmail=yes");
+				$sock->getFrameWork("cmd.php?postfix-hash-aliases=yes");
 			}
+			$sock->getFrameWork("cmd.php?pdf-quarantine-cron=yes");
+			$sock->getFrameWork("cmd.php?reload-apache-groupware=yes");
+			
+			//Emule user ?
+			
+			if($users->MLDONKEY_INSTALLED){
+				$EnableMLDonKey=$sock->GET_INFO("EnableMLDonKey");
+				if($EnableMLDonKey==null){$EnableMLDonKey=1;}
+				if($EnableMLDonKey==1){
+					include_once(dirname(__FILE__)."/class.donkey.inc");
+					$ml=new EmuleTelnet();
+					if($ml->UserIsActivated($this->uid)){$ml->UserDelete($this->uid);}
+				}
+			}			
+		}
 			
 		function Rebuild_groups(){
-			
 			$upd["gidNumber"][0]=$this->sambaPrimaryGroupGID;
 			$ldap=new clladp();
 			if(!$ldap->Ldap_modify($this->dn,$upd)){echo $ldap->ldap_last_error."\n".__FUNCTION__."\n".__FILE__."\n line ".__LINE__;}

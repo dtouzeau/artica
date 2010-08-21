@@ -155,12 +155,14 @@ if ($cyrus->error) {
 
 # -----------------------------------------------------------------------------------------------------------------
 sub userdelete {
-
+	
         my ($user) = @_;
         $user=trim($user);
 	if(length($user)<3){
 	  die("user \"$user\" lenght is under 3, corrupted userid");
 	}
+
+	print "Mailbox:DELETE $user\n";
 	$mailbox = "user/$user";
 	my $sub_mailboxe="user/$user/";
       print "listing sub mailboxes $sub_mailboxe", "\n";

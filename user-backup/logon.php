@@ -77,6 +77,7 @@ $sr =@ldap_search($ldap->ldap_connection,"dc=organizations,$ldap->suffix","(uid=
 		if($passw<>$_POST["password"]){
 			return $tpl->_ENGINE_parse_body('{bad_password}');
 		}
+		unset($_SESSION["MLDONKEY_{$_POST["uid"]}"]);
 		$_SESSION["NOM"]=$attrs["DisplayName"][0];
 		$privs=$ldap->_Get_privileges_userid($_POST["uid"]);
 		$_SESSION["privileges"]["ArticaGroupPrivileges"]=$privs;

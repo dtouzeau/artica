@@ -13,6 +13,10 @@ if(isset($_GET["find-program"])){find_sock_program();exit;}
 
 if(isset($_GET["LaunchRemoteInstall"])){LaunchRemoteInstall();exit;}
 if(isset($_GET["restart-web-server"])){RestartWebServer();exit;}
+if(isset($_GET["RestartApacheGroupwareForce"])){RestartApacheGroupwareForce();exit;}
+
+
+
 if(isset($_GET["ChangeMysqlLocalRoot"])){ChangeMysqlLocalRoot();exit;}
 if(isset($_GET["viewlogs"])){viewlogs();exit;}
 if(isset($_GET["LdapdbStat"])){LdapdbStat();exit;}
@@ -29,7 +33,10 @@ if(isset($_GET["stop-service-name"])){StopServiceCMD();exit;}
 if(isset($_GET["START-STOP-SERVICES"])){START_STOP_SERVICES();exit;}
 if(isset($_GET["monit-status"])){MONIT_STATUS();exit;}
 if(isset($_GET["monit-restart"])){MONIT_RESTART();exit;}
+if(isset($_GET["fcron-restart"])){FCRON_RESTART();exit;}
+if(isset($_GET["restart-mldonkey"])){MLDONKEY_RESTART();exit;}
 if(isset($_GET["restart-artica-maillog"])){ARTICA_MAILLOG_RESTART();exit;}
+if(isset($_GET["notifier-restart"])){EMAILRELAY_RESTART();exit;}
 
 if(isset($_GET["hamachi-net"])){hamachi_net();exit;}
 if(isset($_GET["hamachi-status"])){hamachi_status();exit;}
@@ -72,6 +79,18 @@ if(isset($_GET["system-shutdown"])){shell_exec("init 0");exit;}
 if(isset($_GET["system-unique-id"])){GetUniqueID();exit;}
 if(isset($_GET["system-debian-kernel"])){system_debian_kernel();exit;}
 if(isset($_GET["system-debian-upgrade-kernel"])){system_debian_kernel_upgrade();exit;}
+
+//clamav
+if(isset($_GET["update-clamav"])){ClamavUpdate();exit;}
+
+
+//reports
+if(isset($_GET["pdf-quarantine-cron"])){reports_build_quarantine_cron();exit;}
+if(isset($_GET["pdf-quarantine-send"])){reports_build_quarantine_send();exit;}
+
+//pure-ftpd
+
+if(isset($_GET["pure-ftpd-status"])){pureftpd_status();exit;}
 
 
 //amavis restart
@@ -186,12 +205,17 @@ if(isset($_GET["cyrus-SaveNewDir"])){cyrus_move_newdir();exit;}
 if(isset($_GET["cyrus-rebuild-all-mailboxes"])){cyrus_rebuild_all_mailboxes();exit;}
 if(isset($_GET["cyrus-imap-status"])){cyrus_imap_status();exit;}
 if(isset($_GET["cyrus-change-password"])){cyrus_imap_change_password();}
+if(isset($_GET["cyrus-empty-mailbox"])){cyrus_empty_mailbox();exit;}
 
 
 if(isset($_GET["emailing-import-contacts"])){emailing_import_contacts();exit;}
 if(isset($_GET["emailing-database-migrate-perform"])){emailing_database_migrate_export();exit;}
 if(isset($_GET["emailing-builder-linker"])){emailing_builder_linker();exit;}
+if(isset($_GET["emailing-builder-linker-simple"])){emailing_builder_linker_simple();exit;}
+if(isset($_GET["emailing-build-emailrelays"])){emailing_build_emailrelays();exit;}
+if(isset($_GET["emailrelay-ou-status"])){emailing_emailrelays_status_ou();exit;}
 
+if(isset($_GET["emailing-remove-emailrelays"])){emailing_emailrelays_remove();exit;}
 
 //restore
 
@@ -229,6 +253,13 @@ if(isset($_GET["squidguard-db-status"])){squidGuardDatabaseStatus();exit;}
 if(isset($_GET["squidguard-status"])){squidGuardStatus();exit;}
 if(isset($_GET["compile-squidguard-db"])){squidGuardCompile();exit;}
 if(isset($_GET["squidguard-tests"])){squidguardTests();exit;}
+
+
+//mldonkey
+
+if(isset($_GET["mldonkey-ini-status"])){MLDONKEY_INI_STATUS();exit;}
+
+
 
 if(isset($_GET["philesize-img"])){philesizeIMG();exit;}
 if(isset($_GET["philesize-img-path"])){philesizeIMGPath();exit;}
@@ -376,7 +407,7 @@ if(isset($_GET["postfix-restricted-users"])){postfix_restricted_users();exit;}
 if(isset($_GET["postfix-multi-postqueue"])){postfix_multi_postqueue();exit;}
 
 
-
+if(isset($_GET["smtp-hack-reconfigure"])){smtp_hack_reconfigure();exit;}
 
 //organizations
 if(isset($_GET["upload-organization"])){ldap_upload_organization();exit;}
@@ -415,6 +446,12 @@ if(isset($_GET["view-file-logs"])){ViewArticaLogs();exit;}
 if(isset($_GET["ExecuteImportationFrom"])){ExecuteImportationFrom();exit;}
 if(isset($_GET["squid-reconfigure"])){RestartSquid();exit;}
 if(isset($_GET["mempy"])){mempy();exit;}
+
+
+//apache-groupware
+if(isset($_GET["reload-apache-groupware"])){ReloadApacheGroupWare();exit;}
+
+
 if(isset($_GET["build-vhosts"])){BuildVhosts();exit;}
 if(isset($_GET["vhost-delete"])){DeleteVHosts();exit;}
 if(isset($_GET["replicate-performances-config"])){ReplicatePerformancesConfig();exit;}
@@ -422,6 +459,9 @@ if(isset($_GET["reload-dansguardian"])){reload_dansguardian();exit;}
 if(isset($_GET["dansguardian-template"])){dansguardian_template();exit;}
 if(isset($_GET["searchww-cat"])){dansguardian_search_categories();exit;}
 if(isset($_GET["export-community-categories"])){dansguardian_community_categories();exit;}
+if(isset($_GET["create-user-folder"])){directory_create_user();exit;}
+if(isset($_GET["delete-user-folder"])){directory_delete_user();exit;}
+
 
 
 //disks
@@ -449,7 +489,7 @@ if(isset($_GET["DiskInfos"])){DiskInfos();exit;}
 if(isset($_GET["fstab-get-mount-point"])){fstab_get_mount_point();exit;}
 if(isset($_GET["get-mounted-path"])){disk_get_mounted_point();exit;}
 if(isset($_GET["fdisk-build-big-partitions"])){disk_format_big_partition();}
-
+if(isset($_GET["chown"])){directory_chown();exit;}
 
 
 
@@ -744,6 +784,11 @@ function SQUID_INI_STATUS(){
 	exec(LOCATE_PHP5_BIN2()." /usr/share/artica-postfix/exec.status.php --all-squid",$results);
 	echo "<articadatascgi>". base64_encode(implode("\n",$results))."</articadatascgi>";
 }
+function MLDONKEY_INI_STATUS(){
+	exec(LOCATE_PHP5_BIN2()." /usr/share/artica-postfix/exec.status.php --mldonkey",$results);
+	echo "<articadatascgi>". base64_encode(implode("\n",$results))."</articadatascgi>";
+}
+
 
 function MILTER_GREYLIST_INI_STATUS(){
 	exec(LOCATE_PHP5_BIN2()." /usr/share/artica-postfix/exec.status.php --milter-greylist",$results);
@@ -1195,6 +1240,12 @@ function RestartWebServer(){
 	sys_THREAD_COMMAND_SET("/etc/init.d/artica-postfix restart apache");
 	sys_THREAD_COMMAND_SET("/etc/init.d/artica-postfix restart apache-groupware");
 }
+
+
+function RestartApacheGroupwareForce(){
+	fpsystem('/etc/init.d/artica-postfix restart apache-groupware');
+}
+
 function RestartMailManService(){
 	sys_THREAD_COMMAND_SET("/etc/init.d/artica-postfix restart mailman");	
 }
@@ -1321,6 +1372,10 @@ while (list ($num, $line) = each ($ri)){
 function RestartGroupwareWebServer(){
 	sys_THREAD_COMMAND_SET("/etc/init.d/artica-postfix restart apache");
 	sys_THREAD_COMMAND_SET("/etc/init.d/artica-postfix restart apache-groupware");
+}
+
+function ReloadApacheGroupWare(){
+	sys_THREAD_COMMAND_SET("/usr/share/artica-postfix/bin/artica-install --reload-apache-groupware");
 }
 
 
@@ -1758,6 +1813,57 @@ function dirdir(){
 	echo "<articadatascgi>". serialize($array)."</articadatascgi>";
 }
 
+
+function directory_delete_user(){
+	$path=base64_decode($_GET["delete-user-folder"]);
+	$uid=base64_decode($_GET["uid"]);
+	if($uid==null){return;}
+	if($path==null){return;}
+	if($path=="/"){return;}	
+	$dir_uid=posix_getpwuid(fileowner($path));
+	$dir_uid_name=$dir_uid["name"];
+	writelogs_framework("Delete folder '$path' for $uid against $dir_uid_name",__FUNCTION__,__FILE__,__LINE__);
+	if($dir_uid_name<>$uid){
+		echo "<articadatascgi>{ERROR_NO_PRIVS}</articadatascgi>;";
+		return;
+		
+	}
+	if(is_dir($path)){
+		$path=shellEscapeChars($path);
+		writelogs_framework("Delete folder '$path' finally",__FUNCTION__,__FILE__,__LINE__);
+		shell_exec("/bin/rm -rf $path");
+	}
+	
+	//@mkdir($path,0666,true);
+	//shell_exec("/bin/chown $uid $path");
+}
+
+function shellEscapeChars($path){
+		$unix=new unix();
+		return $unix->shellEscapeChars($path);	
+}
+
+
+function directory_create_user(){
+	$path=base64_decode($_GET["create-user-folder"]);
+	$uid=base64_decode($_GET["uid"]);
+	if($uid==null){return;}
+	if($path==null){return;}
+	if($path=="/"){return;}
+	writelogs_framework("Create new folder '$path' for $uid",__FUNCTION__,__FILE__,__LINE__);
+	@mkdir($path,0777,true);
+	shell_exec("/bin/chown $uid $path");
+	@chmod($path,0777);
+}
+
+function dirdirEncoded(){
+	$path=$_GET["dirdir-encoded"];
+	$unix=new unix();
+	$array=$unix->dirdir($path);
+	writelogs_framework("$path=".count($array)." directories",__FUNCTION__,__FILE__,__LINE__);
+	echo "<articadatascgi>". serialize($array)."</articadatascgi>";
+}
+
 function Dir_Files(){
 	$path=base64_decode($_GET["Dir-Files"]);
 	writelogs_framework("$path",__FUNCTION__,__FILE__,__LINE__);
@@ -1775,7 +1881,7 @@ function filestat(){
 }
 
 function folder_create(){
-$path=base64_decode($_GET["create-folder"]);
+$path=utf8_decode(base64_decode($_GET["create-folder"]));
 $perms=base64_decode($_GET["perms"]);
 $unix=new unix();
 writelogs_framework("path=$path (".base64_decode($_GET["perms"]).")",__FUNCTION__,__FILE__,__LINE__);
@@ -1809,9 +1915,11 @@ shell_exec($unix->find_program("rm")." -rf \"$path\"");
 
 
 function dirdirBase64(){
-	$path=$_GET["B64-dirdir"];
+	$path=base64_decode($_GET["B64-dirdir"]);
 	$unix=new unix();
-	$array=$unix->dirdir(base64_decode($path));
+	
+	$array=$unix->dirdir($path);
+	writelogs_framework("path=$path (".count($array)." elements)",__FUNCTION__,__FILE__,__LINE__);
 	echo "<articadatascgi>". base64_encode(serialize($array))."</articadatascgi>";
 }
 
@@ -2409,23 +2517,10 @@ function postfix_multi_queues(){
 
 function postfix_multi_postqueue(){
 	$instance=$_GET["postfix-multi-postqueue"];
-	if($instance=="MASTER"){$instance=null;}else{$instance="-$instance";}
-	$unix=new unix();
-	$postqueue=$unix->find_program("postqueue");
-	exec("$postqueue -c /etc/postfix$instance -p",$results);
-	while (list ($num, $line) = each ($results) ){
-		if(preg_match("#Mail queue is empty#",$line)){
-			$count=0;
-			break;
-		}
-		
-		if(preg_match("#-- [0-9]+\s+([a-zA-Z]+)\s+in\s+([0-9]+)\s+Requests#",$line,$re)){
-			$count=$re[2];
-			break;
-		}
-		
-	}	
-	echo "<articadatascgi>". base64_encode($count)."</articadatascgi>";
+	if($instance==null){$instance="MASTER";}
+	$array=unserialize(@file_get_contents("/var/log/artica-postfix/postqueue.$instance"));
+	echo "<articadatascgi>". base64_encode($array["COUNT"])."</articadatascgi>";
+	sys_THREAD_COMMAND_SET(LOCATE_PHP5_BIN2()." /usr/share/artica-postfix/exec.watchdog.postfix.queue.php");
 	
 }
 
@@ -2446,38 +2541,11 @@ function postfix_postqueue_reprocess_msgid(){
 
 
 function postfix_postqueue_master(){
-$unix=new unix();
-	$postqueue=$unix->find_program("postqueue");
-	exec("$postqueue -c /etc/postfix$instance -p",$results);
-	$count=count($results);
-	if($count>900){$count=900;}
-	for($i=0;$i<=$count;$i++){
-		$line=$results[$i];
-		if(preg_match("#([A-Z0-9]+)\s+([0-9]+)\s+(.+?)\s+([0-9]+)\s+([0-9:]+)\s+(.+?)$#",$line,$re)){
-			$MSGID=$re[1];
-			$size=$re[2];
-			$day=$re[3];
-			$dayNum=$re[4];
-			$time=$re[5];
-			$from=$re[6];
-			$array[$MSGID]["DATE"]="$day $dayNum $time";
-			$array[$MSGID]["FROM"]="$from";
-			continue;
-		}
-		if(preg_match("#^\((.+?)\)$#",trim($line),$re)){
-			$array[$MSGID]["STATUS"]=$re[1];
-			continue;
-		}
-		
-		if(preg_match("#^\s+\s+\s+(.+?)$#",$line,$re)){
-			$array[$MSGID]["TO"]=trim($re[1]);
-			continue;
-		}
-		
-		
-	}
-	
-	echo "<articadatascgi>". base64_encode(serialize($array))."</articadatascgi>";
+	$instance=$_GET["postfix-multi-postqueue"];
+	if($instance==null){$instance="MASTER";}
+	writelogs_framework("OPEN:: /var/log/artica-postfix/postqueue.$instance",__FUNCTION__,__LINE__);
+	$array=unserialize(@file_get_contents("/var/log/artica-postfix/postqueue.$instance"));
+	echo "<articadatascgi>". base64_encode(serialize($array["LIST"]))."</articadatascgi>";
 	
 }
 
@@ -3078,6 +3146,19 @@ function MONIT_STATUS(){
 function MONIT_RESTART(){
 	sys_THREAD_COMMAND_SET("/etc/init.d/artica-postfix restart monit");
 }
+
+function FCRON_RESTART(){
+	sys_THREAD_COMMAND_SET("/etc/init.d/artica-postfix restart cron");
+}
+
+function MLDONKEY_RESTART() {
+	sys_THREAD_COMMAND_SET("/etc/init.d/artica-postfix restart mldonkey");
+}
+
+function EMAILRELAY_RESTART(){
+	sys_THREAD_COMMAND_SET("/etc/init.d/artica-postfix restart artica-notifier");
+}
+
 function DNS_LIST(){
 	exec("/usr/share/artica-postfix/bin/artica-install --local-dns",$results);
 	echo "<articadatascgi>". implode("",$results)."</articadatascgi>";
@@ -3631,6 +3712,11 @@ function ChangeHostName(){
 	shell_exec("/usr/share/artica-postfix/bin/artica-install --change-hostname $servername");
 	
 }
+
+function ClamavUpdate(){
+	sys_THREAD_COMMAND_SET("/usr/share/artica-postfix/bin/artica-update --clamav");
+}
+
 function hostname_full(){
 	$unix=new unix();
 	$ypdomainname=$unix->find_program("ypdomainname");
@@ -4030,6 +4116,18 @@ function emailing_builder_linker(){
 	$ou=$_GET["emailing-builder-linker"];
 	sys_THREAD_COMMAND_SET(LOCATE_PHP5_BIN2()." /usr/share/artica-postfix/exec.emailing.php --build-queues $ou");
 }
+
+function emailing_builder_linker_simple(){
+	$ou=base64_decode($_GET["ou"]);
+	sys_THREAD_COMMAND_SET(LOCATE_PHP5_BIN2()." /usr/share/artica-postfix/exec.emailing.php --build-single-queue {$_GET["ID"]} $ou");
+	
+}
+
+
+function emailing_build_emailrelays(){
+	sys_THREAD_COMMAND_SET(LOCATE_PHP5_BIN2()." /usr/share/artica-postfix/exec.emailrelay.php --emailrelays-emailing");
+}
+
 function system_debian_kernel(){
 	exec(LOCATE_PHP5_BIN2()." /usr/share/artica-postfix/exec.apt-cache.kernel.php --detect");
 }
@@ -4037,6 +4135,76 @@ function system_debian_kernel(){
 function system_debian_kernel_upgrade(){
 	$pkg=$_GET["system-debian-upgrade-kernel"];
 	sys_THREAD_COMMAND_SET(LOCATE_PHP5_BIN2()." /usr/share/artica-postfix/exec.apt-cache.kernel.php --install $pkg");
+}
+
+function reports_build_quarantine_cron(){
+	sys_THREAD_COMMAND_SET(LOCATE_PHP5_BIN2()." /usr/share/artica-postfix/exec.quarantine.reports.php --build-cron-users");
+	
+}
+function reports_build_quarantine_send(){
+	sys_THREAD_COMMAND_SET(LOCATE_PHP5_BIN2()." /usr/share/artica-postfix/exec.quarantine.reports.php ----user {$_GET["pdf-quarantine-send"]}");
+	
+}
+
+
+
+function emailing_emailrelays_status_ou(){
+	$cmd=LOCATE_PHP5_BIN2()." /usr/share/artica-postfix/exec.emailrelay.php --emailing-ou-status {$_GET["ou"]}";
+	writelogs_framework("$cmd" ,__FUNCTION__,__FILE__,__LINE__);
+	exec($cmd,$results);
+	$datas=@implode("\n",$results);
+	echo "<articadatascgi>". base64_encode($datas)."</articadatascgi>";	
+	}
+	
+function emailing_emailrelays_remove(){
+	$cmd=LOCATE_PHP5_BIN2()." /usr/share/artica-postfix/exec.emailrelay.php --emailing-remove {$_GET["emailing-remove-emailrelays"]}";
+	writelogs_framework("$cmd" ,__FUNCTION__,__FILE__,__LINE__);
+	exec($cmd,$results);
+	}
+function cyrus_empty_mailbox(){
+	$unix=new unix();
+	$ipurge=$unix->LOCATE_CYRUS_IPURGE();
+	if($ipurge==null){echo "<articadatascgi>". base64_encode("Could not locate ipurge")."</articadatascgi>";return;}
+	$user=$_GET["uid"];
+	if($user==null){echo "<articadatascgi>". base64_encode("No user set")."</articadatascgi>";return;}
+	
+	if(trim($_GET["size_of_message"])<>null){$params[]="-m{$_GET["size_of_message"]}";}
+	if(trim($_GET["age_of_message"])<>null){$params[]="-d{$_GET["age_of_message"]}";}	
+	if($_GET["submailbox"]<>null){$submailbox="/{$_GET["submailbox"]}";}
+	$params[]="user/$user$submailbox";
+	$cmd="su cyrus -c \"$ipurge -f ".@implode(" ",$params)." 2>&1\"";
+	writelogs_framework("$cmd" ,__FUNCTION__,__FILE__,__LINE__);
+	exec($cmd,$results);
+	
+	if($_GET["by"]==-100){$_GET["by"]="Super Administrator";}
+	
+	$finale=trim(implode("",$results));
+	if($finale==null){$results[]="Executed...";}
+	$unix->send_email_events("Messages task deletion on mailbox $user$submailbox by {{$_GET["by"]} executed",@implode("\n",$results),"mailbox");
+	echo "<articadatascgi>". base64_encode(@implode("\n",$results))."</articadatascgi>";
+	
+}
+
+function smtp_hack_reconfigure(){
+	shell_exec("/bin/touch /var/log/artica-postfix/smtp-hack-reconfigure");
+}
+
+function pureftpd_status(){
+	$cmd=LOCATE_PHP5_BIN2()." /usr/share/artica-postfix/exec.status.php --pure-ftpd";
+	writelogs_framework("$cmd" ,__FUNCTION__,__FILE__,__LINE__);
+	exec($cmd,$results);
+	$datas=@implode("\n",$results);
+	echo "<articadatascgi>". base64_encode($datas)."</articadatascgi>";	
+}
+function directory_chown(){
+	$path=shellEscapeChars(utf8_encode(base64_decode($_GET["chown"])));
+	$uid=base64_decode($_GET["uid"]);
+	$unix=new unix();
+	$cmd=$unix->find_program("chown")." $uid $path 2>&1";
+		
+	exec($cmd,$results);
+	writelogs_framework("\n$cmd\n". @implode("\n",$results) ,__FUNCTION__,__FILE__,__LINE__);
+	echo "<articadatascgi>". base64_encode(@implode("\n",$results))."</articadatascgi>";
 }
 
 

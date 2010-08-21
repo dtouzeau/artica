@@ -316,10 +316,6 @@ function SendMailNotif($text=null,$subject=null,$smtp_sender,$smtp_dest,$verbose
 	
 $ini=new Bs_IniHandler($path);
 
-if(file_exists('/etc/artica-postfix/settings/Daemons/PostmasterAdress')){
-	$PostmasterAdress=trim(file_get_contents('/etc/artica-postfix/settings/Daemons/PostmasterAdress'));
-}
-
 if(file_exists('/etc/artica-postfix/settings/Daemons/PostfixPostmaster')){
 	$PostmasterAdress=trim(file_get_contents('/etc/artica-postfix/settings/Daemons/PostfixPostmaster'));
 }
@@ -349,13 +345,11 @@ if(count($attached_files)>0){
 }
 
 $content=$mail->Send(true);
-
 if($verbose){echo "Building notification from $smtp_sender with $msmtp to $smtp_dest $subject\n";}
 events_notif_class("SendMailNotif():: Building notification from $smtp_sender with $msmtp to $smtp_dest $subject");
-write_syslogs("Building notification from $smtp_sender with $msmtp to $smtp_dest $subject",__FILE__);
-
+write_syslogs("Building notification from $smtp_sender with $msmtp to $smtp_dest $subject ". strlen($content) . " bytes",__FILE__);
 $f=$unix->FILE_TEMP();
-
+@file_put_contents($f,$content);
 $cmd="$emailrelay_submit --spool-dir /var/spool/artica-notifier --from $smtp_sender $smtp_dest <$f 2>&1";
 events_notif_class("SendMailNotif():: $cmd");
 exec($cmd,$results);
@@ -377,8 +371,8 @@ if($smtp_sender==null){if($PostmasterAdress<>null){$smtp_sender=$PostmasterAdres
 $list_m=@file_get_contents("/etc/artica-postfix/settings/Daemons/SmtpNotificationConfigCC");
 $list_cc=explode("\n",$list_m);
 
-if($subject==null){$subject="SMTP NOTIFICATION TEST...";}
-if($text==null){$text="No body was sent,\nthis simply a test body\n";}
+if(trim($subject)==null){$subject="SMTP NOTIFICATION TEST...";}
+if(trim($text)==null){$text="No body was sent,\nthis simply a test body\n";}
 
 events_notif_class("$subject to $smtp_dest");
 if(trim($recipient)<>null){$smtp_dest=$recipient;}

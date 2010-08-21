@@ -9,6 +9,10 @@ if(!isset($_SESSION["uid"])){header("Location: session-fermee.php");die();}
 $tpl=new templates();
 if(isset($_GET["UserIdentity"])){echo UserIdentity();exit;}
 
+if(isset($_GET["mldonkey-status"])){mldonkey_status();exit;}
+
+
+$page=CurrentPageName();
 $users=new usersMenus();
 
 if($users->POSTFIX_INSTALLED){
@@ -29,7 +33,9 @@ $html="
 
 	<table style='width:100%;'>
 	<tr>
-	<td valign='top'>$websites
+	<td valign='top'>
+		$websites
+		<div id='mldonkey-status'></div>
 	</td>
 	<td valign='top' align='right'>
 	<div id='UserIdentity'>
@@ -44,7 +50,9 @@ $html="
 </div>
 
 
-
+<script>
+	LoadAjax('mldonkey-status','$page?mldonkey-status=yes');
+</script>
 			
 
 ";
@@ -86,7 +94,7 @@ function Building_bottom_section_mail(){
       		<div class=\"bottom-box1-inside\"><span class=\"title-14\">$count {events}</span>
       		<div class=\"bottom-box-th\"><img src=\"img/eve-pic.jpg\"></div>
 	    		<div class=bottom-box-tx>{user_events_emails_query_text}</div>
-		   		<div class=\"green-link-box\"><a href=\"rtmm.php\" class=\"read-more\">&raquo;&raquo;&nbsp;{events}</a></div>
+		   		<div class=\"green-link-box\"></div>
 
 	 		</div>
 	  	</div>";
@@ -106,7 +114,7 @@ function Building_bottom_section_mail(){
       		<div class=\"bottom-box1-inside\"><span class=\"title-14\">$count {backup}</span>
       		<div class=\"bottom-box-th\"><img src=\"img/eve-pic-1.jpg\"></div>
 	    		<div class=bottom-box-tx>{user_backup_emails_query_text}</div>
-		   		<div class=\"green-link-box\"><a href=\"backup.php\" class=\"read-more\">&raquo;&raquo;&nbsp;{backup}</a></div>
+		   		<div class=\"green-link-box\"></div>
 
 	 		</div>
 	  	</div>";
@@ -126,7 +134,7 @@ $quarantine="
       		<div class=\"bottom-box1-inside\"><span class=\"title-14\">$count {quarantinems}</span>
       		<div class=\"bottom-box-th\"><img src=\"img/eve-pic-2.jpg\"></div>
 	    		<div class=bottom-box-tx>{user_quarantine_emails_query_text}</div>
-		   		<div class=\"green-link-box\"><a href=\"backup.php\" class=\"read-more\">&raquo;&raquo;&nbsp;{backup}</a></div>
+		   		<div class=\"green-link-box\"></div>
 
 	 		</div>
 	  	</div>";	  	
@@ -201,6 +209,7 @@ function Websites(){
 		if($www==null){continue;}
 		if($type==null){continue;}
 		if($type=="ARTICA_USR"){continue;}
+		if($type=="WEBDAV"){continue;}
 		$LoadVhosts=$h->LoadHost($usr->ou,$www);
 		if($LoadVhosts["wwwsslmode"]=="TRUE"){
 			$js="s_PopUp('https://$www',800,800)";
@@ -210,7 +219,7 @@ function Websites(){
 		
 		$text=$tpl->_ENGINE_parse_body("{{$h->TEXT_ARRAY[$type]["TEXT"]}}");
 		if(strlen($text)>90){$text=substr($text,0,87)."...";}
-		$html=$html.iconTable("","{{$h->TEXT_ARRAY[$type]["TITLE"]}}","$text",$js);
+		$html=$html.iconTable("","{{$h->TEXT_ARRAY[$type]["TITLE"]}}","$text<br><strong><u>$www</u></strong>",$js);
 
 	}
 	
@@ -258,6 +267,48 @@ function vacation(){
 	$tpl=new templates();	
 	return $tpl->_ENGINE_parse_body($html);		
 	
+	
+}
+
+function mldonkey_status(){
+		$users=new usersMenus();
+		$tpl=new templates();
+		$sock=new sockets();
+		if(!$users->MLDONKEY_INSTALLED){return false;}
+		$EnableMLDonKey=$sock->GET_INFO("EnableMLDonKey");
+		if($EnableMLDonKey==null){$EnableMLDonKey=1;}
+		if($EnableMLDonKey==0){return null;}
+		
+		include_once(dirname(__FILE__)."/ressources/class.donkey.inc");
+		$ml=new EmuleTelnet();
+		if(!$ml->UserIsActivated($_SESSION["uid"])){return;}
+		$array=$ml->download_queue($_SESSION["uid"]);
+		if(!is_array($array["INFOS"]["LIST"])){return;}
+		$count=0;
+while (list ($num, $array_2) = each ($array["INFOS"]["LIST"]) ){
+	$count=$count+1;
+	$js="Loadjs('donkey.php');";
+	$color="black";
+	$unit_rate="&nbsp;Ko/s";
+	if($array_2["RATE"]=="Paused"){$color="red";$unit_rate=null;}
+	$array_2["FILE"]=wordwrap($array_2["FILE"],30," ",true);
+	$html=$html."
+	<tr ". CellRollOver($js,$textToolTip).">
+		<td width=1%><img src='img/forwd_18.gif'></td>
+		<td><strong style='color:$color'>{$array_2["FILE"]}</td>
+		<td width=1% style='color:$color'>{$array_2["POURC_ACCOMPLISH"]}%</td>
+		
+	</tr>
+		
+		
+	";
+		
+	}
+	if($count==0){return;}
+	$title="{download_list}";
+	
+	$html=iconTable("","$title","$html");
+	echo $tpl->_ENGINE_parse_body($html);
 	
 }
 

@@ -451,7 +451,9 @@ var x_ChangeUniqueIdentifier= function (obj) {
 	var tempvalue=obj.responseText;
 	if(tempvalue.length>0){alert(tempvalue)};
 	YahooWin(740,'domains.edit.user.php?userid='+m_userid+'&ajaxmode=yes','windows: '+m_userid);
-	YAHOO.example.container.dialog3.hide();
+	YahooWin3Hide();
+	YahooUserHide();
+	YahooSearchUserHide();
 }
 
 function ChangeUniqueIdentifier(uid){
@@ -460,7 +462,7 @@ function ChangeUniqueIdentifier(uid){
 	var XHR = new XHRConnection();
 	XHR.appendData('changeuidFrom',uid);
 	XHR.appendData('changeuidTo',newuid);
-	document.getElementById('userform').innerHTML='<center style="width:100%"><img src=img/wait_verybig.gif></center>';
+	document.getElementById('chuiseriddiv').innerHTML='<center style="width:100%"><img src=img/wait_verybig.gif></center>';
 	m_userid=newuid;
 	XHR.sendAndLoad('domains.edit.user.php', 'GET',x_ChangeUniqueIdentifier);
 	
@@ -511,7 +513,7 @@ var x_ChangeUserPasswordSave= function (obj) {
 	
 
 function ChangeUserPassword(uid){
-	YahooWin5('300','domains.edit.user.php?ChangeUserPassword=yes&uid='+uid,'');
+	YahooWin5('400','domains.edit.user.php?ChangeUserPassword=yes&uid='+uid,'');
 	
 }
 function ChangeUserPasswordSave(){

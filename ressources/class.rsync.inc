@@ -64,7 +64,7 @@
 			
 			$ini=new Bs_IniHandler();
 			$ini->loadString($datas);
-			
+			if(!is_array($ini->_params)){return;}
 			while (list ($num, $line) = each ($ini->_params)){
 				if($ini->_params[$num]["path"]<>null){
 					$this->paths[$ini->_params[$num]["path"]]=$num;

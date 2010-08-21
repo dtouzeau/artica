@@ -351,7 +351,7 @@ $users=new usersMenus();
 	if($_GET["hostname"]==null){$hostname=$users->hostname;$_GET["hostname"]=$hostname;}else{$hostname=$_GET["hostname"];}		
 	$ini=new Bs_IniHandler();
 	$sock=new sockets();
-	$ini->loadString($sock->getfile('daemons_status',$_GET["hostname"]));	
+	$ini->loadString(base64_decode($sock->getFrameWork('cmd.php?pure-ftpd-status=yes')));	
 	
 	$tpl=new templates();
 	return $tpl->_ENGINE_parse_body(DAEMON_STATUS_ROUND("PUREFTPD",$ini));

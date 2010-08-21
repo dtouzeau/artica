@@ -1738,6 +1738,7 @@ function SMTP_NOTIFICATIONS_SAVE(){
 	$sock->getFrameWork("cmd.php?SmtpNotificationConfig=yes");
 	$sock->getFrameWork("cmd.php?RestartDaemon=yes");
 	$sock->getFrameWork("cmd.php?monit-restart=yes");
+	$sock->getFrameWork("cmd.php?notifier-restart=yes");
 	
 	
 	

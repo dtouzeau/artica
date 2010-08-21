@@ -62,6 +62,7 @@ function listemails(){
 	<td valign='middle' width=99%>
 		<H3>{quarantine_mails}</H3>
 	</td>
+	<td>". imgtootltip("48-logs.png",'{quarantine_email_report}',"Loadjs('quarantine.report.php')")."</td>
 	<td>". imgtootltip("question-48.png",'{search}',"Loadjs('$page?search-js=yes')")."</td>
 	<td>". imgtootltip("48-infos.png",'{infos}',"Loadjs('user.messaging.php?email-infos-js=quarantine')")."</td>
 	</tr>

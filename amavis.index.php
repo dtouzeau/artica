@@ -328,7 +328,7 @@ $tpl=new templates();
 function sanesecurity_popup(){
 	
 	$amavis=new amavis();
-	$level=Paragraphe_switch_img('{enable} SaneSecurity',"{sanesecurity_switch}","sanesecurity_enable",$amavis->EnableScanSecurity);
+	$level=Paragraphe_switch_img('{enable_sanesecurity}',"{sanesecurity_switch}","sanesecurity_enable",$amavis->EnableScanSecurity);
 	
 	$tpl=new templates();
 	$html="<H1>SaneSecurity Addons</H1>
@@ -340,8 +340,11 @@ function sanesecurity_popup(){
 			$level
 			</div>
 		</td>
-		<td valign='top'><input type='button' OnClick=\"javascript:sanesecurity_enable();\" value='{edit}&nbsp;&raquo;'></td>
-	</tr>";
+		<td valign='top'>
+			<hr>". button("{apply}","sanesecurity_enable()")."
+		</td>
+	</tr>
+	</table>";
 	echo $tpl->_ENGINE_parse_body($html);
 	}
 function sanesecurity_enable(){

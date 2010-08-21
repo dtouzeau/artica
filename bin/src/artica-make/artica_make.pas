@@ -15,7 +15,8 @@ uses
   setup_eaccelerator, setup_bacula, setup_roundcube, setup_acxdrv,
   setup_hostapd, zsystem, setup_mysql, setup_winexe, setup_assp, setup_ocs,
   setup_lmb, setup_glusterfs, setup_postfilter, setup_vmtools,
-  setup_phpldapadmin, setup_zarafa, setup_cpulimit, setup_drupal, setup_emailrelay;
+  setup_phpldapadmin, setup_zarafa, setup_cpulimit, setup_drupal,
+  setup_emailrelay, setup_mldonkey;
 
 var
    collectd:tsetup_collectd;
@@ -77,6 +78,7 @@ var
    cpulimit:tsetup_cpulimit;
    drupal:tsetup_drupal;
    emailrelay:tsetup_emailrelay;
+   mldonkey:tsetup_mldonkey;
 begin
 
 
@@ -139,6 +141,15 @@ begin
          zinstall.EMPTY_CACHE();
          halt(0);
    end;
+
+   if ParamStr(1)='APP_MLDONKEY' then begin
+         fpsystem('/usr/share/artica-postfix/bin/setup-ubuntu --check-base-system');
+         mldonkey:=tsetup_mldonkey.Create;
+         mldonkey.xinstall();
+         zinstall.EMPTY_CACHE();
+         halt(0);
+   end;
+
 
    if ParamStr(1)='APP_DRUPAL' then begin
          drupal:=tsetup_drupal.Create;
@@ -1138,26 +1149,31 @@ begin
    writeln('APP_EMAIL_RELAY..........: install/reconfigure Email-relay');
    writeln('APP_EMAILRELAY_REMOVE....: Uninstall Email-relay');
    writeln('');
+   writeln('File Sharing');
+   writeln('___________________________________________________________');
    writeln('APP_SAMBA................: install/reconfigure Samba');
    writeln('APP_KAV4SAMBA............: install Kaspersky For Samba server');
-   writeln('APP_ALTERMIME............: install AlterMIME for amavis');
+   writeln('APP_MLDONKEY.............: install MlDonkey');
+   writeln('APP_CUPS_DRV.............: install/reconfigure Cups printers drivers');
+   writeln('APP_CUPS_BROTHER.........: install/reconfigure Cups Brother printers drivers');
+   writeln('APP_GUTENPRINT...........: install/reconfigure Cups gimp additionals drivers');
+   writeln('APP_FOO2ZJS..............: install/reconfigure foo2hp --force to install/upgrade');
+   writeln('APP_HPINLINUX............: install/reconfigure HP Printers');
+   writeln('');
 
+
+   writeln('APP_CYRUS_IMAP...........: install/reconfigure Cyrus-imapd');
+   writeln('APP_ALTERMIME............: install AlterMIME for amavis');
    writeln('APP_CLAMAV...............: install/update clamav engines');
    writeln('APP_GNARWL...............: install gnarwl vacation addon');
    writeln('APP_MHONARC..............: install MHonArc has a Perl mail-to-HTML converter');
    writeln('APP_MSMTP................: install/reconfigure artica-msmtp ');
    writeln('APP_PFLOGSUMM............: install/reconfigure PFLOGSUMM ');
    writeln('APP_SPAMASSASSIN.........: install/reconfigure SpamAssassin');
-   writeln('APP_CUPS_DRV.............: install/reconfigure Cups printers drivers');
-   writeln('APP_CUPS_BROTHER.........: install/reconfigure Cups Brother printers drivers');
-
-   writeln('APP_GUTENPRINT...........: install/reconfigure Cups gimp additionals drivers');
-   writeln('APP_FOO2ZJS..............: install/reconfigure foo2hp --force to install/upgrade');
-   writeln('APP_HPINLINUX............: install/reconfigure HP Printers');
 
 
 
-   writeln('APP_CYRUS_IMAP...........: install/reconfigure Cyrus-imapd');
+
 
 
    writeln('');

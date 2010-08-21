@@ -84,7 +84,7 @@ function group5(){
 	writelogs("DANSGUARDIAN_INSTALLED={$GLOBALS["DANSGUARDIAN_INSTALLED"]}",__FUNCTION__,__FILE__,__LINE__);
 	
 	$unix=new unix();
-	
+	if($GLOBALS["POSTFIX_INSTALLED"]){$array[]="exec.watchdog.postfix.queue.php";}
 	$array["exec.dstat.top.php"]="exec.dstat.top.php";
 	$array["exec.admin.status.postfix.flow.php"]="exec.admin.status.postfix.flow.php";
 	$array["exec.admin.smtp.flow.status.php"]="exec.admin.smtp.flow.status.php";
@@ -93,7 +93,7 @@ function group5(){
 	$array["exec.import-networks.php"]="exec.import-networks.php";
 	$array["cron.notifs.php"]="cron.notifs.php";
 	$array["exec.watchdog.php"]="exec.watchdog.php";
-	
+	$array["exec.postfix.iptables.php"]="exec.postfix.iptables.php --parse-queue";
 
 	
 	if($GLOBALS["DANSGUARDIAN_INSTALLED"]){
@@ -171,6 +171,9 @@ function group10(){
 	
 	if($EnablePhileSight==1){$array[]="exec.philesight.php --check";}
 	$array[]="exec.kaspersky-update-logs.php";
+	$array[]="exec.emailrelay.php --notifier-queue";
+	
+	
 	
 	if($GLOBALS["SQUID_INSTALLED"]){
 		$array[]="exec.dansguardian.last.php";
@@ -235,7 +238,7 @@ function Group2(){
 	$array[]="exec.dhcpd-leases.php";
 	$array[]="exec.mailbackup.php";
 
-	if($GLOBALS["POSTFIX_INSTALLED"]){$array[]="exec.watchdog.postfix.queue.php";}
+	
 	if($GLOBALS["DANSGUARDIAN_INSTALLED"]){$array[]="exec.dansguardian.injector.php";}
 
 	if(is_array($array)){

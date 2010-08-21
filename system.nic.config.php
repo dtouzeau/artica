@@ -159,7 +159,7 @@ function js_addon(){
 	$page=CurrentPageName();
 	return "var x_ChangeHostName= function (obj) {
 	var results=obj.responseText;
-	alert(results);
+	if(results.length>0){alert(results);}
 	NicSettingsChargeLogs();
 }
 

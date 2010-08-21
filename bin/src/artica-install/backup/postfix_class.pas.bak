@@ -2253,6 +2253,8 @@ if add then begin
    list.add(' -o smtpd_enforce_tls=yes');
    list.add(' -o smtpd_sasl_auth_enable=yes');
    list.add(' -o smtpd_client_restrictions=permit_sasl_authenticated,reject');
+   list.add(' -o smtp_generic_maps=');
+   list.add(' -o sender_canonical_maps=');
 
 
    try

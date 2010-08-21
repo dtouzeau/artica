@@ -93,7 +93,8 @@ $mysql=new mysql();
         
         writelogs("New notification: $subject (". strlen($text)." bytes)",__FUNCTION__,__FILE__,__LINE__);
         
-        $sql="INSERT INTO events (zDate,hostname,process,text,context,content,attached_files,recipient) VALUES(
+        $sql="INSERT INTO events (zDate,hostname,
+        	process,text,context,content,attached_files,recipient) VALUES(
         	'$date',
         	'$mysql->hostname',
         	'$processname',
@@ -108,6 +109,12 @@ $mysql=new mysql();
 			unlink($path.'/'.$file);}
 			else{
 				error_log("Mysql error keep $path/$file;");
+				error_log("$mysql->mysql_error");
+				if(preg_match("#Unknown column#",$mysql->mysql_error)){
+					error_log("->BuildTables()");
+					$mysql->BuildTables();
+					
+				}
 			}
 		
 	}

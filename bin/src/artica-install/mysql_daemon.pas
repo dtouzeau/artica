@@ -260,7 +260,13 @@ var Ini:TMemIniFile;
 begin
   result:='';
   if not FileExists(CNF_PATH()) then exit();
+try
   ini:=TMemIniFile.Create(CNF_PATH());
+
+except
+      writeln('tmysql_daemon.SERVER_PARAMETERS() :: unable to open file ',CNF_PATH());
+      exit;
+end;
   result:=ini.ReadString('mysqld',key,'');
 
   if length(result)=0 then result:=ini.ReadString('mysqld_safe',key,'');

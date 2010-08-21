@@ -137,6 +137,8 @@ function popup_add(){
 	$domains=Field_array_Hash($domns,"domain",null);
 	
 	
+	$wwwmysqluser_disabled=false;
+	$wwwmysqlpassword_disabled=false;
 	
 	
 	$ip=new networking();
@@ -160,9 +162,24 @@ function popup_add(){
 $h=new vhosts();
 	
 if($_GET["host"]<>null){
+	
+	
+
+	
 		$title=$_GET["host"];
 		$button="{edit}";
 		$LoadVhosts=$h->LoadHost($_GET["ou"],$_GET["host"]);
+		$serv=$LoadVhosts["wwwservertype"];
+		
+		if($h->noneeduser["$serv"]){
+			$wwwmysqluser_disabled=true;
+			$wwwmysqlpassword_disabled=true;
+		}
+		
+		if($h->noneeduser_mysql["$serv"]){		
+		}
+		
+		
 		$img=$h->IMG_ARRAY_128[$LoadVhosts["wwwservertype"]];
 		$list="<input type='hidden' id='ServerWWWType' name='ServerWWWType' value='{$LoadVhosts["wwwservertype"]}'>{$LoadVhosts["wwwservertype"]}";
 		$server_row="<tr>
@@ -226,6 +243,7 @@ if($_GET["host"]<>null){
 	}
 	
 	
+
 	
 	$html="<H1>$title</H1>
 	<table style='width:100%'>
@@ -246,16 +264,16 @@ if($_GET["host"]<>null){
 				$WWWMultiSMTPSender				
 				<tr>
 					<td class=legend>{WWWMysqlUser}:</td>
-					<td>". Field_text("WWWMysqlUser",$LoadVhosts["wwwmysqluser"],'width:120px')."</td>
+					<td>". Field_text("WWWMysqlUser",$LoadVhosts["wwwmysqluser"],'width:120px',null,null,null,false,null,$wwwmysqluser_disabled)."</td>
 				</tr>
 				<tr>
 					<td class=legend>{WWWMysqlPassword}:</td>
-					<td>". Field_password("WWWMysqlPassword",$LoadVhosts["wwwmysqlpassword"])."</td>
+					<td>". Field_password("WWWMysqlPassword",$LoadVhosts["wwwmysqlpassword"],null,null,null,null,false,null,$wwwmysqlpassword_disabled)."</td>
 				</tr>				
 				$users_row
 				<tr>
 					<td class=legend>{WWWAppliPassword}:</td>
-					<td>". Field_password("WWWAppliPassword",$LoadVhosts["wwwapplipassword"])."</td>
+					<td>". Field_password("WWWAppliPassword",$LoadVhosts["wwwapplipassword"],null,null,null,null,false,null,$wwwapplipassword_disabled)."</td>
 				</tr>		
 				$WWWEnableAddressBook
 				<tr>
@@ -475,12 +493,12 @@ function listOfAvailableServices(){
 	if($user->roundcube_installed){$array["ROUNDCUBE"]="{APP_ROUNDCUBE}";}
 	if($user->OBM2_INSTALLED){$array["OBM2"]="{APP_OBM2}";}
 	if($user->OPENGOO_INSTALLED){$array["OPENGOO"]="{APP_OPENGOO}";}
-	if($user->GROUPOFFICE_INSTALLED){$array["GROUPOFFICE"]="{APP_GROUPOFFICE}";}	
+	if($user->GROUPOFFICE_INSTALLED){$array["GROUPOFFICE"]="{APP_GROUPOFFICE}";}
+
+	if($user->APACHE_MODE_WEBDAV){$array["WEBDAV"]="{APP_GROUPWAREDAV}";}
 	
-	if($user->ZARAFA_INSTALLED){
-		$array["ZARAFA"]="{APP_ZARAFA}";
-		$array["ZARAFA_MOBILE"]="{APP_ZARAFA_MOBILE_ACCESS}";
-	}
+	
+	if($user->ZARAFA_INSTALLED){$array["ZARAFA"]="{APP_ZARAFA}";$array["ZARAFA_MOBILE"]="{APP_ZARAFA_MOBILE_ACCESS}";}
 	
 	if($user->DRUPAL_INSTALLED){$array["DRUPAL"]="{APP_DRUPAL}";}
 

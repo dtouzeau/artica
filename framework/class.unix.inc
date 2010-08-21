@@ -34,6 +34,27 @@ class unix {
 		if(is_file("/usr/lib/cyrus-imapd/sievec")){return "/usr/lib/cyrus-imapd/sievec";}
 		$this->events("Unable to stat cyrus sievec tool");
 	}
+	
+	public function POLICYD_WEIGHT_GET($key){
+		$f=@explode("\n",@file_get_contents($this->LOCATE_POLICYDWEIGHT_CONF()));
+		while (list ($num, $val) = each ($f) ){
+			if(preg_match("#\$$key.*?=(.+?);#",$val)){
+				return trim($re[1]);
+			}
+		}
+	}
+	
+	
+	public function LOCATE_POLICYDWEIGHT_CONF(){
+		    $l[]='/etc/policyd-weight.conf';
+    		$l[]='/etc/postfix/policyd-weight.cf';	
+    		$l[]='/usr/local/etc/policyd-weight.conf';
+
+    		while (list ($num, $path) = each ($l) ){
+    			if(is_file($path)){return $path;}
+    		}
+		
+	}
 
 
 	public function LOCATE_SMBD_PID(){
@@ -117,6 +138,225 @@ class unix {
 		
 		
 	}
+	
+public function GetMemoriesOf($pid){
+	
+	$rss=$this->PROCESS_MEMORY($pid,true);
+	$vm=$this->PROCESS_CACHE_MEMORY($pid,true);
+	exec("pgrep -P $pid",$results);
+	$count=0;
+	while (list ($num, $ligne) = each ($results) ){
+		$ligne=trim($ligne);
+		if($ligne<1){continue;}
+		$count=$count+1;
+		$rss=$rss+$this->PROCESS_MEMORY($ligne,true);
+		$vm=$vm+$this->PROCESS_CACHE_MEMORY($ligne,true);		
+		
+	}
+	if($count==0){$count=1;}
+	if($this->process_exists($pid)){$l[]="installed=1";$l[]="running=1";}
+	$l[]="application_installed=1";
+	$l[]="master_pid=$pid";	
+    $l[]="master_memory=$rss";
+    $l[]="master_cached_memory=$vm";
+    $l[]="processes_number=$count";
+    
+    
+    exec("/usr/share/artica-postfix/bin/procstat $pid 2>&1",$results);
+    while (list ($num, $ligne) = each ($results) ){
+    	if(preg_match("#start_time:.+?\(([0-9]+)#",$ligne,$re)){
+    		$tt=$this->time_duration($re[1]);
+    		$tt=str_replace(" Months,","M",$tt);
+    		$tt=str_replace(" days,","d",$tt);
+    		$tt=str_replace(" hours,","h",$tt);
+    		$tt=str_replace(" minutes,","mn",$tt);
+    		$tt=str_replace(" seconds","s",$tt);
+    		$tt=str_replace(" hour,","h",$tt);
+    		$tt=str_replace(" minute,","mn",$tt);
+    		$tt=str_replace(" second","s",$tt);    		
+    		$l[]="uptime=$tt";}
+    		
+    	}
+    $l[]="";	
+    return implode("\n",$l);return;
+	
+}
+
+function vhosts_BuildCertificate($hostname){
+	$dir=$GLOBALS["SSLKEY_PATH"];
+	if(is_file("$dir/$hostname.crt")){
+		if(is_file("$dir/$hostname.key")){
+			return true;
+		}
+	}
+	@mkdir($dir,0600,true);
+	
+	$sock=new sockets();
+	$CertificateMaxDays=$sock->GET_INFO('CertificateMaxDays');
+	if($CertificateMaxDays==null){$CertificateMaxDays=730;}
+	$ini=new Bs_IniHandler("/etc/artica-postfix/ssl.certificate.conf");
+	$conf="/etc/ssl/certs/apache/$hostname.conf";
+	$openssl=$this->find_program("openssl");
+	
+	
+	unset($ini->_params["HOSTS_ADDONS"]);
+	$ini->_params["default_db"]["default_days"]=$CertificateMaxDays;
+	$ini->_params["server_policy"]["commonName"]=$hostname;
+	$ini->_params["user_policy"]["commonName"]=$hostname;
+	$ini->_params["default_ca"]["commonName"]=$hostname;
+	$ini->_params["default_ca"]["commonName_value"]=$hostname;
+	$ini->_params["policy_match"]["commonName"]=$hostname;
+	$ini->_params["policy_anything"]["commonName"]=$hostname;
+	$ini->saveFile($conf);
+	$cmd="$openssl req -new -x509 -batch -config $conf -nodes -out $dir/$hostname.crt -keyout $dir/$hostname.key -days $CertificateMaxDays";
+	shell_exec($cmd);
+	
+}
+
+function send_email_events($subject,$text,$context,$date=null,$attached_files=array(),$recipient=null){
+	
+	$arr_APP=array(
+		"APP_ARTICA_NOTIFIER"=>"Artica SMTP Notifier",
+		"APP_ROUNDCUBE"=>"Web service For RoundCube",
+		"APP_ZABBIX_SERVER"=>"Zabbix server",
+		"APP_MYSQL_ARTICA"=>"Mysql server",
+		"APP_ARTICA_MYSQMAIL"=>"Postfix Monitor",
+		"APP_ARTICA_DANSGUARDIAN_TAIL"=>"DansGuardian Monitor",
+		"APP_ARTICA_WATCHDOG"=>"Artica Watchdog",
+		"APP_ASSP"=>"Anti-Spam SMTP Proxy",
+		"APP_BOA"=>"Boa Daemon",
+		"APP_CLAMAV"=>"ClamAV Daemon",
+		"APP_CUPS"=>"Printer service",
+		"APP_CYRUS"=>"Cyrus-imap service",
+		"APP_DANSGUARDIAN"=>"DansGuardian",
+		"APP_FETCHMAIL_LOGGER"=>"Fetchmail Monitor",
+		"APP_FRAMEWORK"=>"Artica FrameWork",
+		"APP_FETCHMAIL"=>"Fetchmail Daemon",
+		"APP_MAILMAN"=>"Mailman mailinglist Daemon",
+		"APP_FRESHCLAM"=>"ClamAV Updater",
+		"APP_KAS3_MILTER"=>"Kaspersky Anti-Spam hook",
+		"APP_KAS3"=>"Kaspersky Anti-Spam service",
+		"APP_KAVMILTER"=>"Kaspersky Anti-virus For Mail",
+		"APP_KRETRANSLATOR_HTTPD"=>"Kaspersky Antivirus updater web service",
+		"APP_LDAP"=>"OpenLDAP service",
+		"APP_LIGHTTPD"=>"Artica Web server",
+		"APP_MONIT"=>"Watchdog system",
+		"APP_RSYNC"=>"Rsync service",
+		"APP_PDNS_RECURSOR"=>"PowerDNS external query ",
+		"APP_PDNS"=>"PowerDNS service",
+		"APP_POSTFIX"=>"Postfix",
+		"APP_SAMBA_NMBD"=>"Samba NetBIOS name service",
+		"APP_SAMBA_WINBIND"=>"Samba Name Service Switch",
+		"APP_SAMBA_SMBD"=>"Samba Filesharing and printing services",
+		"APP_SASLAUTHD"=>"System Authentication",
+		"APP_SPAMASSASSIN"=>"SpamAssassin",
+		"APP_SQUID"=>"Proxy service (squid)",
+		"APP_SYSLOGER"=>"Artica System monitor",
+		"APP_KAV4PROXY"=>"Kaspersky Antivirus For Squid",
+		"APP_C_ICAP"=>"C-ICAP For Squid",
+		"APP_SCANNED_ONLY"=>"Samba Antivirus Scanner",
+		"APP_PUREFTPD"=>"FTP Service",
+		"APP_MILTERGREYLIST"=>"Greylist service for Postfix",
+		"APP_AMAVISD_MILTER"=>"Amavis listener milter",
+		"APP_AMAVISD_NEW"=>"Amavis Daemon",
+		"APP_CLAMAV_MILTER"=>"ClamAV For Postfix",
+		"APP_MAILSPY"=>"MailSpy",
+		"APP_ZARAFA_WEB"=>"Zarafa web server",
+		"APP_ZARAFA_SERVER"=>"Zarafa server",
+		"APP_ZARAFA_SPOOLER"=>"Zarafa Spooler",
+		"APP_ZARAFA_DAGENT"=>"Zarafa Delivery Agent",
+		"APP_ZARAFA_GATEWAY"=>"Zarafa Gateway",			
+		"APP_ZARAFA_MONITOR"=>"Zarafa Monitor",
+		"APP_GROUPWARE_APACHE"=>"Apache for Groupwares",
+		"APP_ARTICA"=>"Artica service",
+		
+		
+	);
+	
+
+	while (list ($tok, $service_name) = each ($arr_APP) ){
+		$subject=str_replace($tok,$service_name,$subject);
+		$text=str_replace($tok,$service_name,$text);
+	}
+		
+	$users=new usersMenus();
+	if($date==null){
+		$date=date('Y-m-d H:i:s');
+		$datesubject=date('H:i:s');
+	}else{
+		$datesubject=$date;
+	}
+	$filename="/var/log/artica-postfix/events/".md5($context.$subject);
+	if(is_file($filename)){return null;}
+	$ini=new Bs_IniHandler($filename);
+	$ini->set('LOG','processname',basename(__FILE__));
+	$ini->set('LOG','date',$date);
+	$ini->set('LOG','context',$context);
+	$ini->set('LOG','subject',"[$datesubject]: [ARTICA]: ($users->hostname) : $subject");
+	$ini->set('LOG','recipient',$recipient);
+	$ini->saveFile($filename);
+	$datas=@file_get_contents($filename);
+	$datas=$datas."\n<text>$text</text>\n";
+	$datas=$datas."\n<attachedfiles>". base64_encode(serialize($attached_files))."</attachedfiles>\n";
+	
+	
+if($GLOBALS["VERBOSE"]){echo strlen($datas)." bytes file $filename text\n";}
+	
+	@file_put_contents($filename,$datas);
+	@mkdir("/usr/share/artica-postfix/ressources/logs/jGrowl",0775,true);
+	@file_put_contents("/usr/share/artica-postfix/ressources/logs/jGrowl/".basename($filename).".txt",$datas);
+	@chmod("/usr/share/artica-postfix/ressources/logs/jGrowl/".basename($filename).".txt",0777);
+	}
+
+private function time_duration($seconds, $use = null, $zeros = false){
+    // Define time periods
+    $periods = array (
+        'years'     => 31556926,
+        'Months'    => 2629743,
+        'weeks'     => 604800,
+        'days'      => 86400,
+        'hours'     => 3600,
+        'minutes'   => 60,
+        'seconds'   => 1
+        );
+
+    // Break into periods
+    $seconds = (float) $seconds;
+    $segments = array();
+    foreach ($periods as $period => $value) {
+        if ($use && strpos($use, $period[0]) === false) {
+            continue;
+        }
+        $count = floor($seconds / $value);
+        if ($count == 0 && !$zeros) {
+            continue;
+        }
+        $segments[strtolower($period)] = $count;
+        $seconds = $seconds % $value;
+    }
+
+    // Build the string
+    $string = array();
+    foreach ($segments as $key => $value) {
+        $segment_name = substr($key, 0, -1);
+        $segment = $value . ' ' . $segment_name;
+        if ($value != 1) {
+            $segment .= 's';
+        }
+        $string[] = $segment;
+    }
+
+    return implode(', ', $string);
+}
+
+public function GetVersionOf($name){
+	if($GLOBALS["version-of-$name"]<>null){return $GLOBALS["version-of-$name"];}
+	exec("/usr/share/artica-postfix/bin/artica-install --export-version $name",$results);
+	$version=trim(implode("",$results));
+	$version=trim(implode("",$results));
+	$GLOBALS["version-of-$name"]=$version;
+	return $version;	
+}
 
 	
 	public function DANSGUARDIAN_CATEGORIES(){
@@ -128,6 +368,21 @@ class unix {
 				
 			}
 		}
+		
+		
+public function shellEscapeChars($path){
+		$path=str_replace(" ","\ ",$path);
+		$path=str_replace("$","\$",$path);
+		$path=str_replace("&","\&",$path);
+		$path=str_replace("?","\?",$path);
+		$path=str_replace("#","\#",$path);
+		$path=str_replace("[","\[",$path);
+		$path=str_replace("]","\]",$path);
+		$path=str_replace("{","\{",$path);
+		$path=str_replace("}","\}",$path);
+		$path=str_replace("*","\*",$path);	
+		return $path;	
+}		
 		
 		
 	public function APACHE_GROUPWARE_ACCOUNT(){
@@ -222,11 +477,23 @@ class unix {
 	
 	
 	
-	public function LOCATE_SQUID_CONF(){
+public function LOCATE_SQUID_CONF(){
 	   if(is_file('/etc/squid3/squid.conf')){ return '/etc/squid3/squid.conf';}
    	   if(is_file('/opt/artica/etc/squid.conf')){ return '/opt/artica/etc/squid.conf';}
    	   if(is_file('/etc/squid/squid.conf')){ return '/etc/squid/squid.conf';}
 	}
+	
+public function LOCATE_DHCPD_PID_PATH(){
+	   if(is_file('/var/run/dhcpd.pid')){ return '/var/run/dhcpd.pid';}
+   	   if(is_file('/var/run/dhcpd/dhcpd.pid')){ return '/var/run/dhcpd/dhcpd.pid';}
+   	   if(is_file('/var/run/dhcp3-server/dhcpd.pid')){ return '/var/run/dhcp3-server/dhcpd.pid';}
+	}	
+	
+public function LOCATE_PURE_FTPD_PID_PATH(){
+	if(is_file('/var/run/pure-ftpd/pure-ftpd.pid')){return "/var/run/pure-ftpd/pure-ftpd.pid";}
+	if(is_file('/var/run/pure-ftpd.pid')){return "/var/run/pure-ftpd.pid";}
+}
+	
 	
  public function SQUID_CONFIG_PATH(){
    if(is_file("/etc/squid3/squid.conf")){return '/etc/squid3/squid.conf';}
@@ -1093,21 +1360,12 @@ public function IsProtectedDirectory($folder){
 		}
 
 	public function dirdir($path){
-		$dir_handle = @opendir($path);
-		if(!$dir_handle){
-			writelogs_framework("Unable to dir $path",__CLASS__.'/'.__FUNCTION__,__FILE__,__LINE__);
-			return array();
+		foreach (glob("$path/*",GLOB_ONLYDIR) as $directory) {
+			$directory=utf8_decode($directory);
+			$array[$directory]=$directory;
 		}
-			$count=0;	
-			while ($file = readdir($dir_handle)) {
-			  if($file=='.'){continue;}
-			  if($file=='..'){continue;}
-			  if(!is_dir("$path/$file")){continue;}
-			  $array["$path/$file"]=$file;
-			  }
-			if(!is_array($array)){return array();}
-			@closedir($dir_handle);
-			return $array;
+		
+		return $array;
 	}
 	
 public	function getDirectories($directory){

@@ -56,14 +56,24 @@ This parameter allows Samba to permit delegation of the control over a point in 
 <action_keepup2date>Update database now</action_keepup2date>
 <action_start_service>Start the service</action_start_service>
 <action_stop_service>Detener el Servicio</action_stop_service>
+<ACTIVATE_APP_GROUPWARE_APACHE>Activate the groupware web service</ACTIVATE_APP_GROUPWARE_APACHE>
 <ACTIVATE_BACKUP_AGENT>Activate remote backup</ACTIVATE_BACKUP_AGENT>
 <ACTIVATE_BACKUP_AGENT_EXPLAIN>This feature enable Artica Network Agent to store backup on your ressource disk[br]
 select your ressource[br]
 This operation will activate service and enable remote backup trough Artica Network Agent feature</ACTIVATE_BACKUP_AGENT_EXPLAIN>
 <ACTIVATE_BACKUP_AGENT_TEXT>Enable Artica Network agents to backup folders to your storages</ACTIVATE_BACKUP_AGENT_TEXT>
 <ACTIVATE_HD_ORG_DEFAULT_EXPLAIN>The selected storage will be the default storage for your user's home directory</ACTIVATE_HD_ORG_DEFAULT_EXPLAIN>
+<ACTIVATE_MLDONKEY>Activate MLDonkey service</ACTIVATE_MLDONKEY>
+<ACTIVATE_MLDONKEY_TEXT>If you turn on this feature, administators will be able to activate some users has MLDonkey users in organizations.[br]
+IN this case, users can retreive peer-to-peer files trough their Artica End-user interfaces.</ACTIVATE_MLDONKEY_TEXT>
 <ACTIVATE_SPF>Activate Sender Policy Framework checking</ACTIVATE_SPF>
 <ACTIVATE_SPF_TEXT>If this feature is enabled, anti-spam scores will be modified with sender verification SPF method</ACTIVATE_SPF_TEXT>
+<ACTIVATE_THIS_MLDONKEY_USER>Activate this user</ACTIVATE_THIS_MLDONKEY_USER>
+<ACTIVATE_THIS_MLDONKEY_USER_TEXT>If you turn on, this user will be able to download shared files from peer-to-peer networks using the end-user Artica Interface</ACTIVATE_THIS_MLDONKEY_USER_TEXT>
+<ACTIVATE_THIS_USER_WEBDAV>Activate HTTP remote access</ACTIVATE_THIS_USER_WEBDAV>
+<ACTIVATE_THIS_USER_WEBDAV_TEXT>If you turn on user will be have access to it's Home directory using WebDav protocol using Linux,Windows XP or Vista/Windows 7.[br]
+In the end-user fronted user can read documentation howto connect to it's shared folder trough Internet.
+</ACTIVATE_THIS_USER_WEBDAV_TEXT>
 <ActiveDirectorySettings>ActiveDirectory Parameters</ActiveDirectorySettings>
 <ActiveDirectorySettings_text>Define credentials in order to help Artica connecting to the remote ActiveDirectory parameters</ActiveDirectorySettings_text>
 <activedirectory_admin>Active Directory Administrator</activedirectory_admin>
@@ -206,6 +216,7 @@ Add a list:exe,pif,bat,pdf,doc</add_attachment_blocking_text_explain>
 <add_routing_relay_recipient_rule>Add recipients to relay</add_routing_relay_recipient_rule>
 <add_routing_rule>Add a routing rule</add_routing_rule>
 <add_rule>add a new rule</add_rule>
+<add_schedule_parameter>add_schedule_parameter</add_schedule_parameter>
 <add_search_connector_text>Add a search connector directly in your browser in order to find documents without need to logon</add_search_connector_text>
 <add_sender_routing_rule>New sender routing</add_sender_routing_rule>
 <add_server>Add a server</add_server>
@@ -242,6 +253,7 @@ examples[br]
 <advanced_options>Advanced options</advanced_options>
 <ad_samba_member>Active Directory Member</ad_samba_member>
 <ad_samba_member_text>Make this server has a member of a Microsoft Active Directory domain</ad_samba_member_text>
+<age_of_message>Age of message</age_of_message>
 <aggressive>Sites of obvious aggressive content. This coveres hate speech and all kinds of rassism</aggressive>
 <alias>Alias</alias>
 <aliases>Aliases</aliases>
@@ -266,8 +278,10 @@ examples[br]
 <allowsizemismatch>Allow size mismatch</allowsizemismatch>
 <allowsizemismatch_text>allow RFC822.SIZE != fetched message size.</allowsizemismatch_text>
 <AllowViewStatistics>View statistic area</AllowViewStatistics>
+<allow_access>Allow access</allow_access>
 <all_days>All days</all_days>
 <all_events>All events</all_events>
+<all_folders>All folders</all_folders>
 <all_hours>All hours</all_hours>
 <all_mailbackup_text>Query the mail backup area an reprocess messages from the backup storage area</all_mailbackup_text>
 <all_minutes>All minutes</all_minutes>
@@ -341,6 +355,7 @@ If a computer reach X events, Artica will automatically create a FireWall rule t
 <APP_ARTICA_GAYTEWAY_TEXT>Transform your Artica server has a gayteway server</APP_ARTICA_GAYTEWAY_TEXT>
 <APP_ARTICA_MAKE>Artica installer</APP_ARTICA_MAKE>
 <APP_ARTICA_MYSQMAIL>Artica-Postfix logs watcher</APP_ARTICA_MYSQMAIL>
+<APP_ARTICA_NOTIFIER>Artica SMTP Notifier</APP_ARTICA_NOTIFIER>
 <APP_ARTICA_POLICY>Artica Policy server</APP_ARTICA_POLICY>
 <APP_ARTICA_SQUID_TAIL>Squid RealTime log</APP_ARTICA_SQUID_TAIL>
 <APP_ARTICA_TAIL>Artica-tail</APP_ARTICA_TAIL>
@@ -401,6 +416,7 @@ Unlike other systems for load balancing IMAP mailboxes, the aggregator allows us
 <APP_DSTAT>Versatile resource statistics tool</APP_DSTAT>
 <APP_EACCELERATOR>PHP accelerator</APP_EACCELERATOR>
 <APP_EMAILRELAY>E-MailRelay</APP_EMAILRELAY>
+<APP_EMAILRELAY_NOT_INSTALLED>Email-relay software is not installed, this feature cannot be enable[br]Go into the setup Center and install Email-relay software</APP_EMAILRELAY_NOT_INSTALLED>
 <APP_FDM>FDM fetch</APP_FDM>
 <APP_FETCHMAIL>Fetchmail remote-mail retrieval</APP_FETCHMAIL>
 <APP_FETCHMAIL_LOGGER>Artica fetchmail logger</APP_FETCHMAIL_LOGGER>
@@ -417,7 +433,10 @@ Unlike other systems for load balancing IMAP mailboxes, the aggregator allows us
 <APP_GROUPOFFICE>Group-Office</APP_GROUPOFFICE>
 <APP_GROUPOFFICE_TEXT>The online suite puts independent office applications onto a central server,
  making them accessible through a web browser.[br]The suite includes addressbook, calendar, email, timesheet, notes and website content management modules</APP_GROUPOFFICE_TEXT>
+<APP_GROUPWAREDAV>WebDav Sharing domain</APP_GROUPWAREDAV>
+<APP_GROUPWAREDAV_TEXT>Give access to some users to the filesystem server (usually Home directories) using WebDav protocol .[br]WebDAV is a recently-developed protocol for connecting to a file server. It's easier and more secure than FTP</APP_GROUPWAREDAV_TEXT>
 <APP_GROUPWARE_APACHE>Apache groupware engine</APP_GROUPWARE_APACHE>
+<APP_GROUPWARE_APACHE_DISABLED_TEXT>For some reasons/issues, the groupware web service is disabled.[br]You need to contact your administrator if you want to activate this feature.</APP_GROUPWARE_APACHE_DISABLED_TEXT>
 <APP_GROUPWARE_PHP>Php groupware engine</APP_GROUPWARE_PHP>
 <APP_HOTWAYD>Hotwayd remote-mail retrieval</APP_HOTWAYD>
 <APP_HPINLINUX>HP Printers drivers</APP_HPINLINUX>
@@ -459,9 +478,12 @@ This feature will help you to concentrate and factorize internet updates.</APP_K
 <APP_MAILMAN_TEXT>Mailman is the GNU Mailing List Manager has a free software for managing electronic mail discussion and e-newsletter lists</APP_MAILMAN_TEXT>
 <APP_MAILSPY>Milter MailSPy</APP_MAILSPY>
 <APP_MAILSYNC>MailSync (synchronization)</APP_MAILSYNC>
+<APP_MASSMAILING_ENABLE_TEXT>Enable mass mailing feature for your organizations</APP_MASSMAILING_ENABLE_TEXT>
 <APP_MILTERGREYLIST>Milter-greylist</APP_MILTERGREYLIST>
 <APP_MIMEDEFANG>MimeDefang</APP_MIMEDEFANG>
 <APP_MIMEDEFANGX>MimeDefang Multiplexor</APP_MIMEDEFANGX>
+<APP_MLDONKEY>MLDonkey server</APP_MLDONKEY>
+<APP_MLDONKEY_TEXT>MLDonkey has the Open Source eDonkey client Allow your users to retreive files trough peer-to-peer Internet network</APP_MLDONKEY_TEXT>
 <APP_MONIT>Realtime Daemons monitor</APP_MONIT>
 <APP_MONIT_EXPLAIN>This section will drive the watchdog daemon that ensure the service is up, you can set settings in order to define when you are notified of troubles on this daemon</APP_MONIT_EXPLAIN>
 <APP_MSMTP>msmtp (SMTP client)</APP_MSMTP>
@@ -605,6 +627,7 @@ all ActiveSync compatible mobile devices and Blackberry via the Blackberry Enter
 <APP_ZARAFA_WEB>Zarafa web server</APP_ZARAFA_WEB>
 <APP_ZARAFA_WEB_TEXT>Manage the web server that serve Zarafa web access applications</APP_ZARAFA_WEB_TEXT>
 <april>April</april>
+<APTGET_CURRENT_INSTALL_TEXT>The system package currently installing packages: </APTGET_CURRENT_INSTALL_TEXT>
 <APT_GET_RUNNING>Updating system</APT_GET_RUNNING>
 <APT_GET_RUNNING_TEXT>Artica currently run system update process...</APT_GET_RUNNING_TEXT>
 <architecture>architecture</architecture>
@@ -679,6 +702,8 @@ all ActiveSync compatible mobile devices and Blackberry via the Blackberry Enter
 <attachment_blocking>attachment blocking</attachment_blocking>
 <attachment_blocking_text>Put restrictions on .exe .bat .vbs...files and block some attachments</attachment_blocking_text>
 <attach_report>Attach&nbsp;report</attach_report>
+<at_this_time>At this time</at_this_time>
+<Audio>Audio</Audio>
 <audit_main_domains>Audit the main.cf about domains</audit_main_domains>
 <august>August</august>
 <authenticate_users_ntlm>SAMBA/Windows Authentication</authenticate_users_ntlm>
@@ -750,6 +775,7 @@ If a path is set artica will execute at regular time statistics generation.
 <back_to>Back to</back_to>
 <bad_format>bad format</bad_format>
 <bad_password>bad password</bad_password>
+<bandwith>bandwith</bandwith>
 <bannedextensionlist_user_explain>Prohibit downloads based on file extension</bannedextensionlist_user_explain>
 <BannedMimetype_user_explain>Prohibit downloads based on file formats</BannedMimetype_user_explain>
 <BasesPath>Antivirus database path</BasesPath>
@@ -861,6 +887,7 @@ This was formerly known in Squid as async-io.[/li]
 <change_email_text>Change the master email address</change_email_text>
 <change_label>Modify the label</change_label>
 <change_label_explain>Change the label name of this device</change_label_explain>
+<change_parameters>Change parameters</change_parameters>
 <change_password>Change Password</change_password>
 <Check MS Word and RTF files>Check MS Word and RTF files</Check MS Word and RTF files>
 <Check Options>Check Options</Check Options>
@@ -905,6 +932,9 @@ The relay_domains_reject_code parameter specifies the response code for rejected
 <CICAP_DNSBL>DNS black list lookup</CICAP_DNSBL>
 <CICAP_DNSBL_TEXT>Use dynamics DNS black lists servers in order to ban websites</CICAP_DNSBL_TEXT>
 <city>City</city>
+<clamav_unofficial>clamav unofficial signatures</clamav_unofficial>
+<clamav_unofficial_text>update the 3rd-party signature databases
+provide by Sanesecurity, SecuriteInfo, MalwarePatrol, OITC, INetMsg and ScamNailer</clamav_unofficial_text>
 <CLAMD_NOT_INSTALLED>Clamd Deamon missing</CLAMD_NOT_INSTALLED>
 <CLAMD_NOT_INSTALLED_TEXT>It seems that Clamd Daemon is not installed, antivirus checking will not be available</CLAMD_NOT_INSTALLED_TEXT>
 <clean_database>clean database</clean_database>
@@ -954,6 +984,7 @@ The default is accept message.
 <closed_session>Closed session</closed_session>
 <coffrefort>safe-deposit box</coffrefort>
 <coffrefort_create_user>Set home Directory has a safe-deposit box</coffrefort_create_user>
+<Col>Collection</Col>
 <collectd_statistics>Statistics collection</collectd_statistics>
 <collectd_statistics_text>View statistics collected by System statistics collection daemon</collectd_statistics_text>
 <comment>comment</comment>
@@ -978,9 +1009,11 @@ The default is accept message.
 <computer_popup_import_explain>This section allow you to import computers in Artica database.[br]
 copy and past a list with each computer name separated by a carriage return.</computer_popup_import_explain>
 <config file>Datas config</config file>
+<configure>configure</configure>
 <config_file>Config file</config_file>
 <confirm>confirm</confirm>
 <confirm_deletion_of>confirm deletion of</confirm_deletion_of>
+<confirm_mailbox_deletetion>Confirm delete messages task in all your mailbox folders</confirm_mailbox_deletetion>
 <confirm_restore_mbx>Confirm restore this mailbox ?</confirm_restore_mbx>
 <connect>connect</connect>
 <Connect in SSL mode>Connect in SSL mode</Connect in SSL mode>
@@ -1061,6 +1094,7 @@ You need to test this feature.[br]Sometimes cpulimit is bugged and do the opposi
 <currently_scanning>Currently scanning</currently_scanning>
 <current_config>Current configuration</current_config>
 <current_directory>Current directory</current_directory>
+<current_parameters>Current parameters</current_parameters>
 <cyrus admin>Cyrus master account</cyrus admin>
 <cyrus password>Cyrus Master account password</cyrus password>
 <cyrus_apply_config>Apply these settings to imap server</cyrus_apply_config>
@@ -1260,6 +1294,7 @@ Since the creation of the first DNSBL in 1997, the operation and policies of the
 <DNS_RECORDS_TESTS>DNS records validations</DNS_RECORDS_TESTS>
 <dns_server>DNS server</dns_server>
 <dns_servers>DNS Servers</dns_servers>
+<Doc>Documents</Doc>
 <documents>documents</documents>
 <Does not Contain>Does not Contain</Does not Contain>
 <Does not End width>Does not End width</Does not End width>
@@ -1279,8 +1314,14 @@ Since the creation of the first DNSBL in 1997, the operation and policies of the
 <double_bounce_sender_text>The sender address of postmaster notifications that are generated by the mail system.[br]All mail to this address is silently discarded, in order to terminate mail bounce loops</double_bounce_sender_text>
 <down>down</down>
 <download>download</download>
+<downloaded>Downloaded</downloaded>
 <downloading>Downloading</downloading>
 <downloads>This covers mostly filesharing, p2p and torrent sites</downloads>
+<downloads_edk_section>Downloads</downloads_edk_section>
+<DOWNLOAD_CONFIRM_CANCEL>Stop downloading task ?</DOWNLOAD_CONFIRM_CANCEL>
+<download_kbs>Download bandwith</download_kbs>
+<download_list>Downloads list</download_list>
+<download_this_file>Download this file</download_this_file>
 <do_nothing>do nothing</do_nothing>
 <driver>driver</driver>
 <DUNNO_help>
@@ -1288,6 +1329,12 @@ Since the creation of the first DNSBL in 1997, the operation and policies of the
 <duration>duration</duration>
 <during>during</during>
 <each>each</each>
+<ED2K-port>eMule Client port</ED2K-port>
+<ED2K-port_help>This is the port that allow other eMule client and servers to connect.[br]You need to open this port on your Internet box in order to increase your connection rate.[br]
+If you did not open this port, you will have a LowID and you will not be able to obtain the maximal sources to retreive files.</ED2K-port_help>
+<ED2K-udp-port>eMule Client UDP port</ED2K-udp-port>
+<ED2K-update_server_list_server>Update server list automatically</ED2K-update_server_list_server>
+<ED2K-update_server_list_server_help>These options control whether MLdonkey should add new servers or just use a fixed server list.</ED2K-update_server_list_server_help>
 <edit>Edit.</edit>
 <edit mode>edit mode</edit mode>
 <edit_contact>Edit contact</edit_contact>
@@ -1298,6 +1345,10 @@ Since the creation of the first DNSBL in 1997, the operation and policies of the
 <edit_squid_parent_parameters>Edit Proxy Parent settings</edit_squid_parent_parameters>
 <edit_table>Edit the table</edit_table>
 <edit_user>Edit this user</edit_user>
+<edonkey_bandwith_explain>This section will change the allowed bandwith during the day.[br]
+For example, you can set 50kbs download and 10kbs upload during the working time and 1Mb download and 1mb upload during the night.[br]
+Define here the time when configuration will be switched.
+</edonkey_bandwith_explain>
 <EHLOattrsXFORWARD>X-forward attributes</EHLOattrsXFORWARD>
 <EHLOsupport8BITMIME>Support 8BITMIME in EHLO</EHLOsupport8BITMIME>
 <EHLOsupport8BITMIME_text>
@@ -1347,6 +1398,12 @@ supports the X-Forward extension for Postfix protocol only if [b]smtp[/b] is use
 <empty_quarantine_text_mesgbox>Are you sure to empty your quarantine area ? All mails wille be deleted </empty_quarantine_text_mesgbox>
 <empty_swap>Empty swap and memory</empty_swap>
 <empty_table_confirm>This operation will delete all SQL table rows. Execute this operation ?</empty_table_confirm>
+<empty_this_mailbox>Empty this mailbox</empty_this_mailbox>
+<empty_this_mailbox_explain>Deletes messages from this mailbox are older or larger than...[br]it perform this operation on all messages stored in your mailbox tree
+so be carrefull when performing this task, a false parameter should remove all mails</empty_this_mailbox_explain>
+<empty_this_mailbox_text>Delete messages according size, age...</empty_this_mailbox_text>
+<empty_your_mailbox>Empty your mailbox</empty_your_mailbox>
+<eMuleIDServers>ID Rate on servers</eMuleIDServers>
 <enable>enable</enable>
 <enable tls postfix>enable TLS for PostFix</enable tls postfix>
 <EnableArticaWatchDog>Enable watchdog</EnableArticaWatchDog>
@@ -1376,6 +1433,7 @@ The settings applied are :[br]
 <enable_artica_wbl_robots_icon>Define email addresses that will receive White & Black lists requests</enable_artica_wbl_robots_icon>
 <enable_backup_email_text>If you set it to green, all mails that will be sent to Internet or sent to mailboxes (excluding blocked mails) will be backuped to Mysql database.
 In this case, your users will be allowed to search/resend backuped mails</enable_backup_email_text>
+<enable_clamav_unofficial>Activate unofficial ClamAV databases</enable_clamav_unofficial>
 <ENABLE_COFFREFORT>Activate safe-deposit box</ENABLE_COFFREFORT>
 <ENABLE_COFFREFORT_TEXT>If you turn to green this feature, the home directory will be turn to a crypted file[br]To open safe-deposit box, you have 2 ways.[br]First is to set the password in the field below.[br]
 But this will not safety because passwords are stored on this server and someone should retreive it.[br]
@@ -1394,10 +1452,15 @@ If devices or this server is stolen, nobody can use it except your users compute
 <enable_lmtp_unix>Enable LMTP in unix socket</enable_lmtp_unix>
 <ENABLE_MAILMAN>Enable Mailman distribution list</ENABLE_MAILMAN>
 <ENABLE_MAILMAN_TEXT>If you activate this feature, your users will be allowed to create their own distribution list according their rights</ENABLE_MAILMAN_TEXT>
+<ENABLE_MASSMAILING>Enable mass mailing feature</ENABLE_MASSMAILING>
+<ENABLE_MASSMAILING_TEXT>If you turn on this feature, organizations administrators will be able to create mass mailing campaigns trough this server.[br]
+This server will be not act has an real email server with this feature, it just send mass mailling to targeted servers sets in organizations</ENABLE_MASSMAILING_TEXT>
 <enable_mynetwork>Enable my current network</enable_mynetwork>
 <enable_mynetwork_text>If enabled, it will automatically include parameters set in Postfix Networks settings</enable_mynetwork_text>
 <enable_non_encrypted_sessions>Enable non-encrypted sessions</enable_non_encrypted_sessions>
 <enable_outbound>Enable outbound</enable_outbound>
+<enable_pdf_reports>Activate quarantine PDF report</enable_pdf_reports>
+<enable_pdf_report_user_explain>If you activate this feature, you will receive a PDF report of your quarantine area in your mailbox</enable_pdf_report_user_explain>
 <enable_philesight>Activate the scanner</enable_philesight>
 <enable_philesight_text>if turned to green, the scanner will parse your entire disk periodically in order to fill the folders size database.[br]
 This to display graphic about size used on your disks.[br]
@@ -1405,6 +1468,7 @@ This feature is an ergonomic option. Disabling this feature will not perturb mai
 disabling it just safe performances... </enable_philesight_text>
 <enable_plugins_text>Enable/Disable plugins</enable_plugins_text>
 <ENABLE_POSTFIX_MULTI_INSTANCE>Activate multiple instances</ENABLE_POSTFIX_MULTI_INSTANCE>
+<enable_sanesecurity>Activate SanSecurity ClamAV updates</enable_sanesecurity>
 <ENABLE_SA_BLACKLIST_UPDATE>Enable/Disable updating blacklisted domains</ENABLE_SA_BLACKLIST_UPDATE>
 <ENABLE_SA_BLACKLIST_UPDATE_TEXT>If you turn to green this feature, Artica will update each 2 hours the pattern file for improve your spamassassin detection rate by adding more than 300 000 black listed domains</ENABLE_SA_BLACKLIST_UPDATE_TEXT>
 <enable_scanned_only>Enable ScannedOnly</enable_scanned_only>
@@ -1631,6 +1695,8 @@ Fetchmail is licensed under the GNU General Public License</fetchmail_about>
 <files_size_disk>Files size on disk</files_size_disk>
 <files_size_tmp>Temp files size</files_size_tmp>
 <files_transfered>files transfered</files_transfered>
+<filetp_explain>this feature downloads file from a HTTP, FTP url.[br]Give the full link in the form bellow in order to download the file</filetp_explain>
+<FILE_ALREADY_SCHEDULED>File already scheduled</FILE_ALREADY_SCHEDULED>
 <file_path>File path</file_path>
 <file_to_upload>File to upload</file_to_upload>
 <fill_form>Fill the form</fill_form>
@@ -1687,6 +1753,7 @@ in this form you want to submit</form_error>
 <from_name>From name</from_name>
 <from_name_help>set here the name/string of the from address that will be displayed in the recipient email client.</from_name_help>
 <fs_type>filesystem type</fs_type>
+<full_access>Full access</full_access>
 <gateway>Gateway</gateway>
 <GDPHP_NOT_INSTALLED>GD Library !</GDPHP_NOT_INSTALLED>
 <gender>gender</gender>
@@ -1726,6 +1793,7 @@ depends of the mails number and user number, server performance, generating this
 <global_quarantine_rules>Global quarantine settings</global_quarantine_rules>
 <global_rule>Global rule</global_rule>
 <global_services_status>Global services status</global_services_status>
+<global_size>global size</global_size>
 <global_smtp_rules>Global SMTP rules</global_smtp_rules>
 <global_whitelist>White & black list admin</global_whitelist>
 <go>go</go>
@@ -1781,6 +1849,7 @@ If you speed is under 30% you need to review your computer hardware performances
 <hide_unwriteable_files_text>Prevents clients from seeing the existance of files that cannot be written to.[br]
 Note that unwriteable directories are shown as usual.</hide_unwriteable_files_text>
 <high>High</high>
+<higher_than>higher than</higher_than>
 <hits>hits</hits>
 <hits_number>Hits number</hits_number>
 <hobby-cooking> Sites concering food and food preparation.</hobby-cooking>
@@ -1805,6 +1874,32 @@ Log the optional text if  specified,[br]otherwise log a generic message.
 <hourly>hourly</hourly>
 <hours>hours</hours>
 <howto_access_computer>Howto access to this computer</howto_access_computer>
+<HOWTO_MAP_WEBDAV_P1>
+Windows XP and 2003 requires following preconditions to be met:[br]
+Make sure WebClient service is running.[br]
+Open Services snap-in and find WebClient service.[br]
+On Windows Server 2003 this service is disabled by default.[br]
+If the service is disabled open WebClient Properties dialog and on General tab set Startup Type to Automatic.[br]
+Restart the computer.
+[br][br][b]To reenable WebDAV on XP SP2 client[/b]
+[br]Open registry editor and go to the following key:
+[br]HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\WebClient\Parameters
+[br]Add a new DWORD Value named UseBasicAuth and give it the value 1. 
+</HOWTO_MAP_WEBDAV_P1>
+<HOWTO_MAP_WEBDAV_P2>[br]Click on My Network Places (in &quot;XP View&quot; for XP users)
+[br]Click on Add Network Place
+[br]Click on Add Site
+[br]Type in your WebDAV URL
+[br]Type in your username and password when asked
+</HOWTO_MAP_WEBDAV_P2>
+<HOWTO_MAP_WEBDAV_P3>
+To map a drive in Windows Explorer right click on a ‘Computer’ icon and select ‘Map Network Drive’.
+[br]
+Note that when copying a file from local disk to mapped drive the file content is cached on a local system drive prior to submitting to server.[br]
+You must have enough disk space to keep the entire file content.
+</HOWTO_MAP_WEBDAV_P3>
+<HOWTO_MAP_WEBDAV_P4>
+To connect to WebDAV server using Nautilus, in File menu select Connect to Server. In the Service Type field select WebDAV (HTTP) or Secure WebDAV (HTTPS) and fill in at last Server field.</HOWTO_MAP_WEBDAV_P4>
 <htmlSizeBlocker>HTML Size Manager</htmlSizeBlocker>
 <htmlSizeBlocker_intro>HTML Size Manager allows you to define rule to transform messages with a specified size and allow recipients to donwload attached files</htmlSizeBlocker_intro>
 <htmlSizeBlocker_text>HTML Size Manager use mhonarc application to transform big messages,defined in rules, to HTML[br]This to prevent sending mails with a big size to pass trought network.[br]
@@ -1819,6 +1914,7 @@ It send notifications to recipients in order to allow them to "download" attache
 <if_in>if in</if_in>
 <ignore_all>Ignore all</ignore_all>
 <illimited>illimited</illimited>
+<Image>Image</Image>
 <imapsync_advanced_options>Define specifics options and tune your mail retreival engine</imapsync_advanced_options>
 <imapsync_folders_text>Define folders to replicate in your mailbox</imapsync_folders_text>
 <imapsync_main_settings>Set main synchronization parameters</imapsync_main_settings>
@@ -1848,6 +1944,7 @@ This form allows you to put a csv file in order to import users in this organiza
 <import_contacts_db_explain>This area will import contacts from a CSV file, the csv file must be formatted:</import_contacts_db_explain>
 <import_contacts_db_text>Import mass contacts in database from an external source</import_contacts_db_text>
 <import_fingerprint>Import SSL fingerprint</import_fingerprint>
+<import_servers>Import servers</import_servers>
 <import_sub_branch>Start importation from this sub-branch</import_sub_branch>
 <in>in</in>
 <INACTIVE>Inactive</INACTIVE>
@@ -2074,6 +2171,7 @@ With the default 100 SMTP server process limit, "in flow delay as 1s" limits the
 <kasdelete>Delete this message</kasdelete>
 <kasforward>Redirect this message to other recipient(s)</kasforward>
 <kaspersky>Kaspersky Lab Inc</kaspersky>
+<KASPERSKY_UPDATES>Kaspersky products updates</KASPERSKY_UPDATES>
 <kasreject>Reject this message</kasreject>
 <kassendcopy>Send a copy of this message to other recipient(s)</kassendcopy>
 <kas_licence_text>Upload the *.key file about Kaspersky Anti-Spam gateway in order to update the licence.</kas_licence_text>
@@ -2244,6 +2342,7 @@ You can also use your ISP SMTP servers of your ISP by set the appropriate authen
 <main.cf>Main configuration file</main.cf>
 <main.cf_explain>Read the main configuration file generated and executed by Postfix</main.cf_explain>
 <maintenance>maintenance</maintenance>
+<main_folder>Main folder</main_folder>
 <main_interfaces>Main Interfaces</main_interfaces>
 <main_parameters>Main parameters</main_parameters>
 <main_settings>Main settings</main_settings>
@@ -2324,6 +2423,9 @@ The default time unit is d (days).[br]Specify 0 when mail delivery should be tri
 <max_daemon_cpu>Daemon CPU usage</max_daemon_cpu>
 <max_daemon_cycles>During X minutes</max_daemon_cycles>
 <max_daemon_memory>Daemon memory usage</max_daemon_memory>
+<max_downloads>Max. Downloads</max_downloads>
+<max_hard_download_rate>Download bandwith</max_hard_download_rate>
+<max_hard_upload_rate>Upload bandwith</max_hard_upload_rate>
 <Max_idle_time_in_seconds>Max. idle time (in seconds)</Max_idle_time_in_seconds>
 <may>May</may>
 <mbx_con>Mailboxes connections</mbx_con>
@@ -2369,8 +2471,14 @@ This parameter also limits the time an unreachable destination is kept in the sh
 </minimal_backoff_time_text>
 <minimal_time>Minimal time</minimal_time>
 <minor>minor</minor>
+<minsize>Minimal size</minsize>
 <minutes>minutes</minutes>
 <missing>missing</missing>
+<MLDONKEY_CONNECT_TO_THIS_SERVER>Connect to this perr-to-peer server</MLDONKEY_CONNECT_TO_THIS_SERVER>
+<MLDONKEY_DISCONNECT_FROM_THIS_SERVER>Disconnect this server</MLDONKEY_DISCONNECT_FROM_THIS_SERVER>
+<MLDONKEY_SEARCH_FORM>build your search queries</MLDONKEY_SEARCH_FORM>
+<MLDONKEY_USER>MLDonkey user</MLDONKEY_USER>
+<MLDONKEY_USER_TEXT>Give this user to peer-to-peer networks such has eMule, BitTorrent,FastTrack,HTTP, FTP,SSH, Kad Network,DirectConnect</MLDONKEY_USER_TEXT>
 <mobile>mobile phone</mobile>
 <mode>mode</mode>
 <model>model</model>
@@ -2501,6 +2609,7 @@ It's the names that Windows boxes see are always the NetBIOS names</netbiosname_
 <no>no</no>
 <noauthmd5>No MD5 auth</noauthmd5>
 <noauthmd5_text>don't use MD5 authentification</noauthmd5_text>
+<NoDisplayIPBlocked>Hide IP Blocked servers</NoDisplayIPBlocked>
 <nofoldersizes>No folder sizes</nofoldersizes>
 <nofoldersizes_text>Do not calculate the size of each folder in bytes and message counts.</nofoldersizes_text>
 <NOIEPLEASE>Don't use Internet Explorer</NOIEPLEASE>
@@ -2521,6 +2630,7 @@ don't forget to - Save & Apply settings - to make them in production mode</notif
 <not_installed>not installed</not_installed>
 <not_match>didn't match</not_match>
 <november>November</november>
+<no_accents_feature>Accents are not supported in this configuration</no_accents_feature>
 <no_aliases>No aliases</no_aliases>
 <no_backup>No backup container</no_backup>
 <NO_CONFIG_FILE>No configuration file found</NO_CONFIG_FILE>
@@ -2695,6 +2805,9 @@ or until further truncation is not possible.(eg:192.168.1.0/24)
 <pcfg_title1>Basic Configuration</pcfg_title1>
 <pcfg_title2>View main.cf</pcfg_title2>
 <pcfg_title3>View master.cf</pcfg_title3>
+<pdf_report_quarantine_default_subject>My last quarantines mails</pdf_report_quarantine_default_subject>
+<PEER_TO_PEER_NETWORKS>Your Peer to peer networks</PEER_TO_PEER_NETWORKS>
+<PEER_TO_PEER_NETWORKS_TEXT>Search, retreive, download files from peer to peer Internet networks</PEER_TO_PEER_NETWORKS_TEXT>
 <percentage>percentage</percentage>
 <performance>Performance</performance>
 <performances_settings>Performances</performances_settings>
@@ -2759,6 +2872,8 @@ or when the address is an authorized destination (see "permit auth destination" 
 <postalcode>Postal code</postalcode>
 <Postfix Global settings>Postfix Global settings</Postfix Global settings>
 <postfix rules>postfix rules</postfix rules>
+<PostfixAutoBlockParameters>Scores and parameters</PostfixAutoBlockParameters>
+<PostfixAutoBlockParameters_text>Define max connections rates and scores that will match a blocking rule</PostfixAutoBlockParameters_text>
 <POSTFIX_BUNDLE>Postfix bundles</POSTFIX_BUNDLE>
 <POSTFIX_BUNDLE_TEXT>Enable Antivirus/Anti-spam filters connected with postfix</POSTFIX_BUNDLE_TEXT>
 <postfix_events>postfix events</postfix_events>
@@ -2826,6 +2941,7 @@ use this feature</postfix_unknown_users_tinytext>
 <printers>Printers</printers>
 <privileges>privileges</privileges>
 <privileges_text>Edit privileges and security role of users stored in this group</privileges_text>
+<Pro>Program</Pro>
 <Process Server Settings>Process Server Settings</Process Server Settings>
 <processed>processed</processed>
 <processed_messages_explain>Here it is all messages processed since the last cleaned events process.[br]When Postfix process a message artica will save the event into the mysql database.[br]
@@ -2879,6 +2995,7 @@ You will see here the total of messages events saved</processed_messages_explain
 <quarantines_graph>Quarantine Graph</quarantines_graph>
 <quarantine_and_backup_storage>Quarantine and backup</quarantine_and_backup_storage>
 <quarantine_and_backup_storage_text>Manage your quarantine and backup storage area</quarantine_and_backup_storage_text>
+<quarantine_email_report>Quarantine eMail report</quarantine_email_report>
 <quarantine_mails>Quarantined mails</quarantine_mails>
 <quarantine_mails>quarantine mails</quarantine_mails>
 <quarantine_manager>Quarantine Manager</quarantine_manager>
@@ -3327,6 +3444,7 @@ You will receive a quote from Artica Technology.</shallalist_buye>
 <shalla_success_order>Your request has been successfully sent to Artica Technology</shalla_success_order>
 <shared>shared</shared>
 <shared_folder>Shared folder name</shared_folder>
+<SHARE_A_FOLDER_USER_TEXT>Share a folder in your personal folder and give rights access to users in your organization</SHARE_A_FOLDER_USER_TEXT>
 <SHARE_FOLDER>Share a folder</SHARE_FOLDER>
 <SHARE_FOLDER_TEXT>Share a folder on this system.[br]Browse your hard drives and point a directory to share</SHARE_FOLDER_TEXT>
 <share_name>Share name</share_name>
@@ -3379,6 +3497,7 @@ Main advantage is filters are executed directly on the server side, not clients 
 <since>since</since>
 <single_ip>Single IP address</single_ip>
 <size>size</size>
+<size_of_message>Size of message</size_of_message>
 <skipped>skipped</skipped>
 <skipsize>Skip size</skipsize>
 <skipsize_text>Don't take message size into account</skipsize_text>
@@ -3504,6 +3623,11 @@ the Postfix SMTP server delays all responses by "error sleep time" seconds.</smt
  Only information that was recorded by the final destination can be trusted</smtpd_tls_received_header_text>
 <smtpd_tls_security_level>SMTP TLS security level</smtpd_tls_security_level>
 <smtpd_tls_security_level_text>The SMTP TLS security level for the Postfix SMTP server</smtpd_tls_security_level_text>
+<SMTPHACK_BLOCKED_SPAM>Blocked by the anti-spam filter (amavis/spamassassin)</SMTPHACK_BLOCKED_SPAM>
+<SMTPHACK_NAME_SERVICE_NOT_KNOWN>Unable to resolve hostname</SMTPHACK_NAME_SERVICE_NOT_KNOWN>
+<SMTPHACK_RBL>Blocked by black lists servers</SMTPHACK_RBL>
+<SMTPHACK_SASL_LOGIN>SMTP Authentification failed</SMTPHACK_SASL_LOGIN>
+<SMTPHACK_USER_UNKNOWN>local Recipient did not exists</SMTPHACK_USER_UNKNOWN>
 <smtp_connection_cache_destinations>Postfix Connection Cache</smtp_connection_cache_destinations>
 <smtp_connection_cache_destinations_field>Per-destination connection caching</smtp_connection_cache_destinations_field>
 <smtp_connection_cache_destinations_minitext>Permanently enable SMTP connection caching for the specified destinations. With SMTP connection caching, a connection is not closed immediately after completion of a mail transaction. </smtp_connection_cache_destinations_minitext>
@@ -3703,6 +3827,14 @@ to "accept then bounce" mail from an SMTP session, or in any other way respond b
 <squid_events>Squid Events</squid_events>
 <squid_filter_stats_text>Create filter in order to display specifics events</squid_filter_stats_text>
 <squid_main_settings>Squid-cache settings</squid_main_settings>
+<SQUID_NETWORK_HELP>
+[ul]
+[li]This refers to the whole Network with address 172.16.1.0: [b]172.16.1.0/24[/b][/li]
+[li]This refers specific single IP Address 172.16.1.25: [b]172.16.1.25/32[/b][/li]
+[li]This refers specific single IP Address 172.16.1.25: [b]172.16.1.25[/b][/li]
+[li]This refers range of IP Addresses from 172.16.1.25-172.16.1.35 :[b]172.16.1.25-172.16.1.35/32[/b][/li]
+[/ul]
+</SQUID_NETWORK_HELP>
 <squid_net_settings>Squid Network parameters</squid_net_settings>
 <SQUID_NEWVERSION>New Squid-cache version</SQUID_NEWVERSION>
 <SQUID_NEWVERSION_TEXT>A new squid cache version is vailable in artica update server,it is recommended to upgrade to this version</SQUID_NEWVERSION_TEXT>
@@ -3795,6 +3927,7 @@ Also check that your server is running to have minimal data in order to correcly
 <string>string</string>
 <subdirectory>sub directory</subdirectory>
 <subject>subject</subject>
+<submailbox>sub-mailbox</submailbox>
 <submit>Submit</submit>
 <submit_license>Submit your license</submit_license>
 <subnet>subnet</subnet>
@@ -3860,6 +3993,7 @@ you will be redirected to the new IP address in 15 seconds
 <task_name>Task name</task_name>
 <task_postfix_network_auto>Postfix Prevent DHCP change IP interfaces (eth0 & eth1)</task_postfix_network_auto>
 <task_q1>Give the task name</task_q1>
+<task_success_check_mailbox>Success, please check the mailbox...</task_success_check_mailbox>
 <tcp_address>TCP Address</tcp_address>
 <tcp_main_settings>Network cards parameters</tcp_main_settings>
 <templates>Templates</templates>
@@ -4169,6 +4303,7 @@ The rules for transferring (routing) are set in this section.[br]
 <UPDATE_KAS3_TEXT>Update databases now in order to increase detection rate</UPDATE_KAS3_TEXT>
 <update_kaspersky_database_title>Update antivirus database</update_kaspersky_database_title>
 <update_now>perform update now</update_now>
+<update_servers_sources>Update server list</update_servers_sources>
 <update_settings>Update settings</update_settings>
 <upgrade>upgrade</upgrade>
 <upgrade_artica>New artica version</upgrade_artica>
@@ -4176,7 +4311,9 @@ The rules for transferring (routing) are set in this section.[br]
 <upgrade_your_system>Upgrade your System</upgrade_your_system>
 <upload>upload</upload>
 <upload file>Upload file</upload file>
+<uploaded>Uploaded</uploaded>
 <upload_a_file>upload a file</upload_a_file>
+<upload_kbs>Upload bandwith</upload_kbs>
 <upload_max_filesize>Max uploading files size</upload_max_filesize>
 <upload_new_license>Upload a new license</upload_new_license>
 <upload_vpn_configuration>Upload VPN settings</upload_vpn_configuration>
@@ -4209,6 +4346,8 @@ The rules for transferring (routing) are set in this section.[br]
 <user_quarantine_emails_query_text>SPAMs or infected emails are stored in your quarantine area.[br]You can search email, resend them trough this area.</user_quarantine_emails_query_text>
 <user_tab_groups>Groups</user_tab_groups>
 <user_to_mailing_list>Transform this user to a mailing list</user_to_mailing_list>
+<USER_WEBDAV>Home Directory sharing trough Internet</USER_WEBDAV>
+<USER_WEBDAV_TEXT>Share the Home directory of this user using WebDav protocol.[br]WebDAV is a recently-developed protocol for connecting to a file server. It's easier and more secure than FTP</USER_WEBDAV_TEXT>
 <UseUpdateServerUrl>Use Update Server Url</UseUpdateServerUrl>
 <UseUpdateServerUrlOnly>Use Update Server Url Only</UseUpdateServerUrlOnly>
 <use_apache>Use apache only</use_apache>
@@ -4233,9 +4372,11 @@ The rules for transferring (routing) are set in this section.[br]
 <vgcreate_dev>Add a volumes group</vgcreate_dev>
 <vgcreate_dev_explain>Add a new group in order to create Logical volumes in this group</vgcreate_dev_explain>
 <vgextend_explain>Choose the hard drive you want to link to the Virtual disk group in order to increase the storage size</vgextend_explain>
+<Video>Video</Video>
 <view>View</view>
 <view_config>View configuration file</view_config>
 <view_members>Display members</view_members>
+<view_results>View results</view_results>
 <view_script>View script</view_script>
 <violence>Sites about killing and harming people</violence>
 <VirHTTPServer>Web uri to retreive files</VirHTTPServer>
@@ -4268,6 +4409,9 @@ Backscatter is mail you didn't ask to receive, generated by legitimate, non-spam
 <warn_if_reject_text>Change the meaning of the next restriction,[br] so that it logs a warning instead of rejecting a request[br] (look for logfile records that contain "reject_warning").[br] This is useful for testing new restrictions[br] in a "live" environment without risking unnecessary loss of mail</warn_if_reject_text>
 <warn_shutdown_computer>This operation will turn off the computer, do want to perfom this operation ?</warn_shutdown_computer>
 <weapons>Sites offering all kinds of weapons or accessories for weapons</weapons>
+<WEBDAV_ACCESS>WebDav (Internet Folder) access</WEBDAV_ACCESS>
+<WEBDAV_HOWTO>Your internet folder</WEBDAV_HOWTO>
+<WEBDAV_HOWTO_TEXT>How to access to your internet Folder using Windows XP, 2000, Windows 7...</WEBDAV_HOWTO_TEXT>
 <webmail>webmail</webmail>
 <webphone>Sites that enable user to phone via Internet/WWW.</webphone>
 <webproxy_service>Web Proxy service</webproxy_service>

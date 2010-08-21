@@ -30,7 +30,7 @@ function js(){
 	$html="
 		$js_add
 		function loadAdduser(){
-			YahooUser(650,'$page?index=yes&ou=$ou_encoded&gpid={$_GET["gpid"]}','$title');
+			YahooUser(670,'$page?index=yes&ou=$ou_encoded&gpid={$_GET["gpid"]}','$title');
 		
 		}
 		
@@ -102,7 +102,7 @@ function INDEX_CREATE(){
 	</tr>
 	</table>";
 	
-	$step3=RoundedLightWhite("
+	$step3="
 	<table style='width:100%'>
 	<tr>
 	<td valign='top' width=1%><img src='img/chiffre3.png'></td>
@@ -114,7 +114,7 @@ function INDEX_CREATE(){
 	</td>
 	</tr>
 	</table>
-	");
+	";
 	
 	$step4="
 	<table style='width:100%'>

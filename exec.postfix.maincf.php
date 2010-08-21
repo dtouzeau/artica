@@ -249,6 +249,11 @@ function headers_check($noreload=0){
 function ReloadPostfix(){
 	echo "Starting......: Postfix Compiling tables...\n";
 	system(LOCATE_PHP5_BIN2()." /usr/share/artica-postfix/exec.postfix.hashtables.php");
+	shell_exec("{$GLOBALS["postconf"]} -e \"myorigin =\\\$mydomain \" >/dev/null 2>&1");
+	shell_exec("{$GLOBALS["postconf"]} -e \"smtpd_delay_reject =no \" >/dev/null 2>&1");
+	
+	
+	
 	echo "Starting......: Postfix Apply securities issues\n"; 
 	appliSecu();
 	echo "Starting......: Postfix Reloading ASSP\n"; 

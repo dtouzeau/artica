@@ -775,6 +775,21 @@ class mysql{
 		
 	}
 	
+	
+	private function Check_mldonkey_table(){
+		
+		
+		if(!$this->TABLE_EXISTS('mldonkey','artica_backup')){	
+		$sql="CREATE TABLE `artica_backup`.`mldonkey` (
+			`ID` INT NOT NULL AUTO_INCREMENT PRIMARY KEY ,
+			`schedule_time` INT( 10 ) NOT NULL ,
+			`parameters` MEDIUMTEXT NOT NULL ,
+			INDEX ( `schedule_time` ))";
+			$this->QUERY_SQL($sql,"artica_backup");
+		}
+		
+	}
+	
 	function Check_iptables_table(){
 		if(!$this->TABLE_EXISTS('iptables','artica_backup')){	
 			$sql="
@@ -818,7 +833,14 @@ class mysql{
 		if(!$this->FIELD_EXISTS("iptables","log","artica_backup")){	
 			$sql="ALTER TABLE `iptables` ADD `log` INT( 1 ) NOT NULL ,ADD INDEX (`log`)";
 			$this->QUERY_SQL($sql,'artica_backup');
-		}				
+		}	
+
+		if(!$this->FIELD_EXISTS("iptables","events_block","artica_backup")){	
+			$sql="ALTER TABLE `iptables` ADD `events_block` MEDIUMTEXT NOT NULL";
+			$this->QUERY_SQL($sql,'artica_backup');
+			$sql="ALTER TABLE `iptables` ADD `date_created` DATETIME NOT NULL ,ADD INDEX ( `date_created` )";
+			$this->QUERY_SQL($sql,'artica_backup');			
+		}		
 
 
 		
@@ -1373,6 +1395,7 @@ class mysql{
 				  `zdate` datetime NOT NULL,
 				  `name` varchar(255) NOT NULL,
 				  `ou` varchar(255) NOT NULL,
+				  `locked` INT( 1 ) NOT NULL DEFAULT '0',
 				  PRIMARY KEY (`ID`),
 				  KEY `template_id` (`template_id`,`database_id`,`finish_queue_processing`),
 				  KEY `ou` (`ou`)
@@ -1404,7 +1427,25 @@ if(!$this->TABLE_EXISTS('emailing_campain_queues','artica_backup')){
 					)";	
 		$this->QUERY_SQL($sql,'artica_backup');	
 	}
-		
+	
+	
+	
+	if(!$this->TABLE_EXISTS('emailing_campain_queues','artica_backup')){			
+			$sql="CREATE TABLE `artica_backup`.`emailing_campain_events` (
+				`ID` INT( 5 ) NOT NULL AUTO_INCREMENT PRIMARY KEY ,
+				`campain_linker_id` INT( 5 ) NOT NULL ,
+				`zDate` DATETIME NOT NULL ,
+				`time_duration` VARCHAR( 255 ) NOT NULL ,
+				`template_id` INT( 5 ) NOT NULL ,
+				`database_id` INT( 5 ) NOT NULL ,
+				`messages_number` INT( 5 ) NOT NULL ,
+				`massmailing_size` INT( 10 ) NOT NULL ,
+				`events_details` LONGTEXT NOT NULL,
+				`task_success` INT( 1 ) NOT NULL DEFAULT '0',
+				INDEX ( `campain_linker_id` , `zDate` ))";
+
+		$this->QUERY_SQL($sql,'artica_backup');		
+		}
 }
 	
 	
@@ -1618,14 +1659,26 @@ if(!$this->TABLE_EXISTS('emailing_campain_queues','artica_backup')){
 			$this->QUERY_SQL($sql,'artica_events');
 		}
 		
+		
+		
 		if(!$this->FIELD_EXISTS("events","context","artica_events")){
+			 	writelogs("create events.context",__FUNCTION__,__FILE__,__LINE__);
 				$sql="ALTER TABLE `events` ADD `context` VARCHAR( 75 ) NOT NULL DEFAULT 'unknown',ADD INDEX ( context )";
 				$this->QUERY_SQL($sql,'artica_events');
+				if(!$this->ok){
+					writelogs("$sql",__FUNCTION__,__FILE__,__LINE__);
+					writelogs("$this->mysql_error",__FUNCTION__,__FILE__,__LINE__);
+				}
 		}
 		
 		if(!$this->FIELD_EXISTS("events","recipient","artica_events")){
-				$sql="ALTER TABLE `events` ADD `recipient` VARCHAR( 255 ) NULL DEFAULT";
+				writelogs("create events.recipient",__FUNCTION__,__FILE__,__LINE__);
+				$sql="ALTER TABLE `events` ADD `recipient` VARCHAR( 255 ) NOT NULL";
 				$this->QUERY_SQL($sql,'artica_events');
+				if(!$this->ok){
+					writelogs("$sql",__FUNCTION__,__FILE__,__LINE__);
+					writelogs("$this->mysql_error",__FUNCTION__,__FILE__,__LINE__);
+				}				
 		}		
 		
 		
@@ -1676,6 +1729,24 @@ if(!$this->TABLE_EXISTS('emailing_campain_queues','artica_backup')){
 			 
 			$this->QUERY_SQL($sql,'artica_events');
 			}	
+			
+	if(!$this->TABLE_EXISTS('quarantine_report_users','artica_backup')){				
+		$sql="CREATE TABLE IF NOT EXISTS `quarantine_report_users` (
+			  `userid` varchar(255) NOT NULL,
+			  `MaxDays` int(1) NOT NULL,
+			  `hour_execution` int(2) NOT NULL,
+			  `min_execution` int(2) NOT NULL,
+			  `type` int(1) NOT NULL,
+			  `enabled` int(1) NOT NULL,
+			  `parameters` TEXT NOT NULL,
+			  PRIMARY KEY (`userid`),
+			  KEY `enabled` (`enabled`),
+			  KEY `type` (`type`),
+			  
+			)";
+
+		$this->QUERY_SQL($sql,'artica_backup');
+		}
 	}
 	
 	private function CheckOutOfOfficeTable(){
@@ -1714,6 +1785,7 @@ if(!$this->TABLE_EXISTS('emailing_campain_queues','artica_backup')){
 		 $this->CheckTablesPostfilter();
 		 $this->check_emailing_tables();
 		 $this->Check_reports_table();
+		 $this->Check_mldonkey_table();
 	
 	
 		if(!$this->FIELD_EXISTS("smtp_logs_day","emails","artica_events")){

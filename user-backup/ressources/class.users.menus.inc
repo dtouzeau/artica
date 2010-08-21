@@ -109,6 +109,8 @@ class usersMenus {
 	var $HOSTAPD_INSTALLED=false;
 	var $HOSTAPD_BINVER=0;
 	var $POSTMULTI=false;
+	var $MLDONKEY_INSTALLED=false;
+	
 	/* This licence must be used Only with Artica-for postfix */
 	var $ChartLicence="D1XFWGMEW9L.HSK5T4Q79KLYCK07EK";
 	/*you cannot use it without any authorizations of maani.us.
@@ -349,6 +351,8 @@ class usersMenus {
 	var $DRUPAL_INSTALLED=false;
 	var $MAIL_DKIM_VERSION=null;
 	var $HDPARM_INSTALLED=false;
+	var $APACHE_MODE_WEBDAV=false;
+	
 	
 	function usersMenus($priv=null,$nobuild=0,$hostname=null){
 
@@ -621,7 +625,8 @@ class usersMenus {
 			$this->MAIL_DKIM_VERSION=trim($_GLOBAL["MAIL_DKIM_VERSION"]);
 			$this->HDPARM_INSTALLED=trim($_GLOBAL["HDPARM_INSTALLED"]);
 			$this->POSTMULTI=$_GLOBAL["POSTMULTI"];
-			
+			$this->MLDONKEY_INSTALLED=$_GLOBAL["MLDONKEY_INSTALLED"];
+			$this->APACHE_MODE_WEBDAV=$_GLOBAL["APACHE_MODE_WEBDAV"];
 			$this->hostname=str_replace('.(none)','',$this->hostname);
 			$this->fqdn=str_replace('.(none)','',$this->fqdn);
 			
@@ -1057,6 +1062,14 @@ private function build_user_left_menus(){
 			}	
 		}
 		
+		
+		if($this->AsSystemAdministrator){
+			if($this->MLDONKEY_INSTALLED){
+				$array["{fileshare}"]["MAIN"]="javascript:Loadjs('fileshares.index.php?js=yes')";
+				$array["{fileshare}"]["SUB"]["{APP_MLDONKEY}"]="javascript:Loadjs('mldonkey.php?in-front-ajax=yes');";
+				$array["{fileshare}"]["SUB"]["{explorer}"]="javascript:Loadjs('tree.php');";
+			}	
+		}		
 		
 		
 		

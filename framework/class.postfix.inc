@@ -39,6 +39,7 @@ class postfix_system{
 		$queue_directory=$this->queue_directory();
 		if(!is_dir($queue_directory)){return array();}
 		while (list ($num, $ligne) = each ($queues) ){
+			if($ligne=="defer"){continue;}
 			$array[$ligne]=$this->DirCount("$queue_directory/$ligne");
 		}
 		

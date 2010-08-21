@@ -213,7 +213,7 @@ begin
      logs.DebugLogs('Starting......: Unable to stat my.cnf (DELETE_MYSQLD_PARAMETERS)');
      exit();
   end;
-  start:=false;
+
   found:=false;
   l:=Tstringlist.Create;
   l.LoadFromFile(CNF_PATH());
@@ -260,7 +260,13 @@ var Ini:TMemIniFile;
 begin
   result:='';
   if not FileExists(CNF_PATH()) then exit();
+try
   ini:=TMemIniFile.Create(CNF_PATH());
+
+except
+      writeln('unable to open file ',CNF_PATH());
+      exit;
+end;
   result:=ini.ReadString('mysqld',key,'');
 
   if length(result)=0 then result:=ini.ReadString('mysqld_safe',key,'');

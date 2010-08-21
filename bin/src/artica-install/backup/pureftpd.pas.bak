@@ -207,49 +207,13 @@ end;
 //##############################################################################
 function Tpureftpd.PURE_FTPD_STATUS:string;
 var
-ini:TstringList;
-STANDALONE_OR_INETD:string;
-pid:string;
+pidpath:string;
 begin
-
-   if not FileExists(DAEMON_BIN_PATH()) then  exit;
-   ini:=TstringList.Create;
-   ini.Add('[PUREFTPD]');
-      ini.Add('service_name=APP_PUREFTPD');
-      ini.Add('service_cmd=ftp');
-      ini.Add('service_disabled='+IntToStr(PureFtpdEnabled));
-      ini.Add('remove_cmd=--pureftpd-remove');
-      ini.Add('master_version=' + PURE_FTPD_VERSION());
-
-     if PureFtpdEnabled=0 then begin
-         result:=ini.Text;
-         ini.free;
-         SYS.MONIT_DELETE('APP_PUREFTPD');
-         exit;
-     end;
-
-     STANDALONE_OR_INETD:=GET_DEFAULT_VALUES('STANDALONE_OR_INETD');
-
-     if STANDALONE_OR_INETD<>'inetd' then begin
-      if SYS.MONIT_CONFIG('APP_PUREFTPD',PURE_FTPD_PID_PATH(),'ftp') then begin
-         ini.Add('monit=1');
-         result:=ini.Text;
-         ini.free;
-         exit;
-      end;
-     end;
-
-   
- if STANDALONE_OR_INETD='inetd' then pid:=SYS.INETD_PID() else pid:=PURE_FTPD_PID();
- if SYS.PROCESS_EXIST(pid) then ini.Add('running=1') else  ini.Add('running=0');
-      ini.Add('pureftpd_installed=1');
-      ini.Add('application_installed=1');
-      ini.Add('master_pid='+ pid);
-      ini.Add('master_memory=' + IntToStr(SYS.PROCESS_MEMORY(pid)));
-      ini.Add('status='+SYS.PROCESS_STATUS(pid));
-      result:=ini.Text;
-      ini.free;
-   
+SYS.MONIT_DELETE('APP_PUREFTPD');
+pidpath:=logs.FILE_TEMP();
+fpsystem(SYS.LOCATE_PHP5_BIN()+' /usr/share/artica-postfix/exec.status.php --pure-ftpd >'+pidpath +' 2>&1');
+result:=logs.ReadFromFile(pidpath);
+logs.DeleteFile(pidpath);
 end;
 //##############################################################################
 procedure Tpureftpd.PURE_FTPD_LDAP();
@@ -410,9 +374,10 @@ l.Add('LDAPPort   ' + ldap_server_port);
 l.Add('LDAPBaseDN dc=organizations,'+artica_suffix);
 l.Add('LDAPBindDN cn='+artica_admin+',' + artica_suffix);
 l.Add('LDAPBindPW ' + artica_password);
+l.Add('LDAPAuthMethod BIND');
 l.Add('# LDAPDefaultUID 500');
 l.Add('# LDAPDefaultGID 100');
-l.Add('LDAPFilter (&(objectClass=PureFTPdUser)(uid=\L)(FTPStatus=TRUE))');
+l.Add('LDAPFilter (&(objectClass=PureFTPdUser)(uid=\L)(FTPStatus=yes))');
 l.Add('LDAPHomeDir homeDirectory');
 l.Add('LDAPVersion 3');
 
@@ -497,7 +462,6 @@ var
    l:TstringList;
    i:integer;
    RegExpr:TRegExpr;
-   ftmp:string;
 begin
 
 if not FileExists('/etc/inetd.conf') then begin

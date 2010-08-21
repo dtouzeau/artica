@@ -34,7 +34,7 @@ public
     function  STATUS():string;
     function  INIT_PATH():string;
    function GET_VALUE(key:string):string;
-
+   procedure VERIFCONFIG();
 
 END;
 
@@ -217,11 +217,10 @@ begin
         exit;
     end;
 
-if not FileExists('/etc/artica-postfix/settings/Daemons/PolicydWeightConfig') then begin
-   fpsystem(SYS.LOCATE_PHP5_BIN()+' /usr/share/artica-postfix/exec.postfix.maincf.php --policyd-reconfigure');
-end;
+
 
   pid:=PID_NUM();
+
   LOCK_PATH:=GET_VALUE('LOCK_PATH');
 
 if SYS.PROCESS_EXIST(pid) then begin
@@ -229,34 +228,15 @@ if SYS.PROCESS_EXIST(pid) then begin
      exit;
 end;
 
+VERIFCONFIG();
 configpath:=CONFIG_PATH();
 binpath:=BIN_PATH();
-
 pid_path:=GET_VALUE('PIDFILE');
-     logs.DebugLogs('Starting......: policyd-weight Pid path...:'+pid_path);
-     logs.DebugLogs('Starting......: policyd-weight lock path..:'+LOCK_PATH);
-     logs.DebugLogs('Starting......: policyd-weight config path:'+configpath);
-     logs.DebugLogs('Starting......: policyd-weight bin path...:'+binpath);
-
-
-     logs.DebugLogs('Starting......: policyd-weight PID......:'+pid);
-
-forceDirectories('/tmp/.policyd-weight');
-fpsystem('/bin/chown postfix:postfix /tmp/.policyd-weight');
-
-
-
-
-if FileExists('/etc/artica-postfix/settings/Daemons/PolicydWeightConfig') then begin
-   fpsystem('/bin/cp -f /etc/artica-postfix/settings/Daemons/PolicydWeightConfig '+configpath);
-end else begin
-   logs.DebugLogs('Starting......: policyd-weight unable to stat PolicydWeightConfig artica config');
-end;
-
-ForceDirectories('/var/run/policyd-weight');
-fpsystem('/bin/chown postfix:postfix /var/run/policyd-weight');
-fpsystem('/bin/chmod 770 /var/run/policyd-weight');
-
+logs.DebugLogs('Starting......: policyd-weight Pid path...:'+pid_path);
+logs.DebugLogs('Starting......: policyd-weight lock path..:'+LOCK_PATH);
+logs.DebugLogs('Starting......: policyd-weight config path:'+configpath);
+logs.DebugLogs('Starting......: policyd-weight bin path...:'+binpath);
+logs.DebugLogs('Starting......: policyd-weight PID......:'+pid);
 
  if FileExists(INIT_PATH()) then begin
     fpsystem(INIT_PATH()+' start');
@@ -289,6 +269,36 @@ logs.DebugLogs('Starting......: policyd-weight daemon success with new PID ' + P
 
 end;
 //##############################################################################
+procedure tpolicyd_weight.VERIFCONFIG();
+
+var
+   configpath:string;
+
+begin
+configpath:=CONFIG_PATH();
+forceDirectories('/tmp/.policyd-weight');
+fpsystem('/bin/chown postfix:postfix /tmp/.policyd-weight');
+
+
+ if not FileExists('/etc/artica-postfix/settings/Daemons/PolicydWeightConfig') then begin
+   fpsystem(SYS.LOCATE_PHP5_BIN()+' /usr/share/artica-postfix/exec.postfix.maincf.php --policyd-reconfigure');
+end;
+
+if FileExists('/etc/artica-postfix/settings/Daemons/PolicydWeightConfig') then begin
+   fpsystem('/bin/cp -f /etc/artica-postfix/settings/Daemons/PolicydWeightConfig '+configpath);
+end else begin
+   logs.DebugLogs('Starting......: policyd-weight unable to stat PolicydWeightConfig artica config');
+end;
+
+ForceDirectories('/var/run/policyd-weight');
+fpsystem('/bin/chown postfix:postfix /var/run/policyd-weight');
+if FileExists(configpath) then fpsystem('/bin/chown postfix:postfix '+ configpath);
+fpsystem('/bin/chmod 770 /var/run/policyd-weight');
+
+
+end;
+
+
 function tpolicyd_weight.PID_NUM():string;
 var
    pid_path:string;
@@ -302,7 +312,7 @@ begin
 
 
 
-     if length(trim(result))=0 then result:=SYS.PIDOF(BIN_PATH());
+     if length(trim(result))=0 then result:=SYS.PIDOF('policyd-weight');
 end;
 //##############################################################################
 procedure tpolicyd_weight.STOP();
@@ -324,10 +334,22 @@ writeln('Stopping policyd-weight......:  ' + PID_NUM() + ' PID..');
 fpsystem(BIN_PATH()+ ' -k stop');
 
 
-
+  count:=0;
   while SYS.PROCESS_EXIST(PID_NUM()) do begin
         sleep(100);
         count:=count+1;
+        writeln('Stopping policyd-weight......:  ' + PID_NUM() + ' PID..');
+        if count>20 then begin
+            fpsystem('/bin/kill -9 ' + PID_NUM());
+            break;
+        end;
+  end;
+
+  count:=0;
+  while SYS.PROCESS_EXIST(PID_NUM()) do begin
+        sleep(100);
+        count:=count+1;
+        writeln('Stopping policyd-weight......:  ' + PID_NUM() + ' PID..');
         if count>20 then begin
             fpsystem('/bin/kill -9 ' + PID_NUM());
             break;
@@ -336,9 +358,13 @@ fpsystem(BIN_PATH()+ ' -k stop');
 
 if  not SYS.PROCESS_EXIST(PID_NUM()) then begin
     writeln('Stopping policyd-weight......:  success');
+    VERIFCONFIG();
     exit;
 end;
+
+    VERIFCONFIG();
     writeln('Stopping policyd-weight......:  failed');
+
 end;
 
 
@@ -346,41 +372,16 @@ end;
 
 function tpolicyd_weight.STATUS();
 var
-   ini:TstringList;
-   pid,pid_path:string;
+   pidpath:string;
 begin
+SYS.MONIT_DELETE('APP_POLICYD_WEIGHT');
 if not FileExists(BIN_PATH()) then exit;
-      ini:=TstringList.Create;
-      ini.Add('[POLICYD_WEIGHT]');
-      ini.Add('service_name=APP_POLICYD_WEIGHT');
-      ini.Add('service_cmd=policydw');
-      ini.Add('service_disabled='+IntToStr(EnablePolicydWeight));
-      ini.Add('master_version=' + VERSION());
+pidpath:=logs.FILE_TEMP();
+fpsystem(SYS.LOCATE_PHP5_BIN()+' /usr/share/artica-postfix/exec.status.php --policydw >'+pidpath +' 2>&1');
+result:=logs.ReadFromFile(pidpath);
+logs.DeleteFile(pidpath);
+ini:=TstringList.Create;
 
-      if EnablePolicydWeight=0 then begin
-      result:=ini.Text;
-      ini.free;
-      exit;
-      end;
-
-pid_path:=GET_VALUE('PIDFILE');
-if SYS.MONIT_CONFIG('APP_POLICYD_WEIGHT',pid_path,'policydw') then begin
-       ini.Add('monit=1');
-      result:=ini.Text;
-      ini.free;
-      exit;
-end;
-
-pid:=PID_NUM();
-
-
-      if SYS.PROCESS_EXIST(pid) then ini.Add('running=1') else  ini.Add('running=0');
-      ini.Add('application_installed=1');
-      ini.Add('master_pid='+ pid);
-      ini.Add('master_memory=' + IntToStr(SYS.PROCESS_MEMORY(pid)));
-      ini.Add('status='+SYS.PROCESS_STATUS(pid));
-      result:=ini.Text;
-      ini.free;
 end;
 //##############################################################################
 end.

@@ -4277,3 +4277,152 @@ Below, you can view that last system events.</services_status_text_explain>
 </SQUID_NETWORK_HELP>
 <APP_ARTICA_NOTIFIER>Artica SMTP Notifier</APP_ARTICA_NOTIFIER>
 <KASPERSKY_UPDATES>Kaspersky products updates</KASPERSKY_UPDATES>
+<empty_this_mailbox>Empty this mailbox</empty_this_mailbox>
+<empty_your_mailbox>Empty your mailbox</empty_your_mailbox>
+<empty_this_mailbox_text>Delete messages according size, age...</empty_this_mailbox_text>
+<empty_this_mailbox_explain>Deletes messages from this mailbox are older or larger than...[br]it perform this operation on all messages stored in your mailbox tree
+so be carrefull when performing this task, a false parameter should remove all mails</empty_this_mailbox_explain>
+<confirm_mailbox_deletetion>Confirm delete messages task in all your mailbox folders</confirm_mailbox_deletetion>
+<size_of_message>Size of message</size_of_message>
+<all_folders>All folders</all_folders>
+<age_of_message>Age of message</age_of_message>
+<global_size>global size</global_size>
+<APP_MASSMAILING_ENABLE_TEXT>Enable mass mailing feature for your organizations</APP_MASSMAILING_ENABLE_TEXT>
+<ENABLE_MASSMAILING>Enable mass mailing feature</ENABLE_MASSMAILING>
+<ENABLE_MASSMAILING_TEXT>If you turn on this feature, organizations administrators will be able to create mass mailing campaigns trough this server.[br]
+This server will be not act has an real email server with this feature, it just send mass mailling to targeted servers sets in organizations</ENABLE_MASSMAILING_TEXT>
+<APP_EMAILRELAY_NOT_INSTALLED>Email-relay software is not installed, this feature cannot be enable[br]Go into the setup Center and install Email-relay software</APP_EMAILRELAY_NOT_INSTALLED>
+<submailbox>sub-mailbox</submailbox>
+<PostfixAutoBlockParameters>Scores and parameters</PostfixAutoBlockParameters>
+<PostfixAutoBlockParameters_text>Define max connections rates and scores that will match a blocking rule</PostfixAutoBlockParameters_text>
+<SMTPHACK_NAME_SERVICE_NOT_KNOWN>Unable to resolve hostname</SMTPHACK_NAME_SERVICE_NOT_KNOWN>
+<SMTPHACK_SASL_LOGIN>SMTP Authentification failed</SMTPHACK_SASL_LOGIN>
+<SMTPHACK_RBL>Blocked by black lists servers</SMTPHACK_RBL>
+<SMTPHACK_USER_UNKNOWN>local Recipient did not exists</SMTPHACK_USER_UNKNOWN>
+<SMTPHACK_BLOCKED_SPAM>Blocked by the anti-spam filter (amavis/spamassassin)</SMTPHACK_BLOCKED_SPAM>
+<quarantine_email_report>Quarantine eMail report</quarantine_email_report>
+<clamav_unofficial>clamav unofficial signatures</clamav_unofficial>
+<clamav_unofficial_text>update the 3rd-party signature databases
+provide by Sanesecurity, SecuriteInfo, MalwarePatrol, OITC, INetMsg and ScamNailer</clamav_unofficial_text>
+<enable_clamav_unofficial>Activate unofficial ClamAV databases</enable_clamav_unofficial>
+<enable_sanesecurity>Activate SanSecurity ClamAV updates</enable_sanesecurity>
+<enable_pdf_reports>Activate quarantine PDF report</enable_pdf_reports>
+<enable_pdf_report_user_explain>If you activate this feature, you will receive a PDF report of your quarantine area in your mailbox</enable_pdf_report_user_explain>
+<pdf_report_quarantine_default_subject>My last quarantines mails</pdf_report_quarantine_default_subject>
+<task_success_check_mailbox>Success, please check the mailbox...</task_success_check_your_mailbox>
+<SHARE_A_FOLDER_USER_TEXT>Share a folder in your personal folder and give rights access to users in your organization</SHARE_A_FOLDER_USER_TEXT>
+<main_folder>Main folder</main_folder>
+<no_accents_feature>Accents are not supported in this configuration</no_accents_feature>
+<allow_access>Allow access</allow_access>
+<APP_MLDONKEY>MLDonkey server</APP_MLDONKEY>
+<MLDONKEY_USER>MLDonkey user</MLDONKEY_USER>
+<MLDONKEY_USER_TEXT>Give this user to peer-to-peer networks such has eMule, BitTorrent,FastTrack,HTTP, FTP,SSH, Kad Network,DirectConnect</MLDONKEY_USER_TEXT>
+<max_downloads>Max. Downloads</max_downloads>
+<ACTIVATE_THIS_MLDONKEY_USER>Activate this user</ACTIVATE_THIS_MLDONKEY_USER>
+<ACTIVATE_THIS_MLDONKEY_USER_TEXT>If you turn on, this user will be able to download shared files from peer-to-peer networks using the end-user Artica Interface</ACTIVATE_THIS_MLDONKEY_USER_TEXT>
+<PEER_TO_PEER_NETWORKS>Your Peer to peer networks</PEER_TO_PEER_NETWORKS>
+<PEER_TO_PEER_NETWORKS_TEXT>Search, retreive, download files from peer to peer Internet networks</PEER_TO_PEER_NETWORKS_TEXT>
+<MLDONKEY_CONNECT_TO_THIS_SERVER>Connect to this peer-to-peer server</MLDONKEY_CONNECT_TO_THIS_SERVER>
+<MLDONKEY_DISCONNECT_FROM_THIS_SERVER>Disconnect this server</MLDONKEY_DISCONNECT_FROM_THIS_SERVER>
+<minsize>Minimal size</minsize>
+<CONTAINS>Contains</CONTAINS>
+<higher_than>higher than</higher_than>
+<Video>Video</Video>
+<Audio>Audio</Audio>
+<Pro>Program</Pro>
+<Doc>Documents</Doc>
+<Image>Image</Image>
+<Col>Collection</Col>
+<view_results>View results</view_results>
+<FILE_ALREADY_SCHEDULED>File already scheduled</FILE_ALREADY_SCHEDULED>
+<downloads_edk_section>Downloads</downloads_edk_section>
+<download_kbs>Download bandwith</download_kbs>
+<upload_kbs>Upload bandwith</upload_kbs>
+<downloaded>Downloaded</downloaded>
+<uploaded>Uploaded</uploaded>
+<DOWNLOAD_CONFIRM_CANCEL>Stop downloading task ?</DOWNLOAD_CONFIRM_CANCEL>
+<APP_MLDONKEY_TEXT>MLDonkey has the Open Source eDonkey client Allow your users to retreive files trough peer-to-peer Internet network</APP_MLDONKEY_TEXT>
+<ACTIVATE_MLDONKEY_TEXT>If you turn on this feature, administators will be able to activate some users has MLDonkey users in organizations.[br]
+IN this case, users can retreive peer-to-peer files trough their Artica End-user interfaces.</ACTIVATE_MLDONKEY_TEXT>
+<ACTIVATE_MLDONKEY>Activate MLDonkey service</ACTIVATE_MLDONKEY>
+<ED2K-port>eMule Client port</ED2K-port>
+<ED2K-udp-port>eMule Client UDP port</ED2K-udp-port>
+<ED2K-port_help>This is the port that allow other eMule client and servers to connect.[br]You need to open this port on your Internet box in order to increase your connection rate.[br]
+If you did not open this port, you will have a LowID and you will not be able to obtain the maximal sources to retreive files.</ED2K-port_help>
+<update_servers_sources>Update server list</update_servers_sources>
+<ED2K-update_server_list_server>Update server list automatically</ED2K-update_server_list_server>
+<ED2K-update_server_list_server_help>These options control whether MLdonkey should add new servers or just use a fixed server list.</ED2K-update_server_list_server_help>
+<download_list>Downloads list</download_list>
+<configure>configure</configure>
+<import_servers>Import servers</import_servers>
+<MLDONKEY_SEARCH_FORM>build your search queries</MLDONKEY_SEARCH_FORM>
+<download_this_file>Download this file</download_this_file>
+<members>members</members>
+<eMuleIDServers>ID Rate on servers</eMuleIDServers>
+<APP_GROUPWARE_APACHE_DISABLED_TEXT>For some reasons/issues, the groupware web service is disabled.[br]You need to contact your administrator if you want to activate this feature.</APP_GROUPWARE_APACHE_DISABLED_TEXT>
+<ACTIVATE_APP_GROUPWARE_APACHE>Activate the groupware web service</ACTIVATE_APP_GROUPWARE_APACHE>
+<NoDisplayIPBlocked>Hide IP Blocked servers</NoDisplayIPBlocked>
+<filetp_explain>this feature downloads file from a HTTP, FTP url.[br]Give the full link in the form bellow in order to download the file</filetp_explain>
+<edonkey_bandwith_explain>This section will change the allowed bandwith during the day.[br]
+For example, you can set 50kbs download and 10kbs upload during the working time and 1Mb download and 1mb upload during the night.[br]
+Define here the time when configuration will be switched.
+</edonkey_bandwith_explain>
+<add_schedule_parameter>add_schedule_parameter</add_schedule_parameter>
+<at_this_time>At this time</at_this_time>
+<max_hard_upload_rate>Upload bandwith</max_hard_upload_rate>
+<current_parameters>Current parameters</current_parameters>
+<max_hard_download_rate>Download bandwith</max_hard_download_rate>
+<bandwith>bandwith</bandwith>
+<USER_WEBDAV>Home Directory sharing trough Internet</USER_WEBDAV>
+<USER_WEBDAV_TEXT>Share the Home directory of this user using WebDav protocol.[br]WebDAV is a recently-developed protocol for connecting to a file server. It's easier and more secure than FTP</USER_WEBDAV_TEXT>
+<ACTIVATE_THIS_USER_WEBDAV>Activate HTTP remote access</ACTIVATE_THIS_USER_WEBDAV>
+<ACTIVATE_THIS_USER_WEBDAV_TEXT>If you turn on user will be have access to it's Home directory using WebDav protocol using Linux,Windows XP or Vista/Windows 7.[br]
+In the end-user fronted user can read documentation howto connect to it's shared folder trough Internet.
+</ACTIVATE_THIS_USER_WEBDAV_TEXT>
+<APP_GROUPWAREDAV>WebDav Sharing domain</APP_GROUPWAREDAV>
+<APP_GROUPWAREDAV_TEXT>Give access to some users to the filesystem server (usually Home directories) using WebDav protocol .[br]WebDAV is a recently-developed protocol for connecting to a file server. It's easier and more secure than FTP</APP_GROUPWAREDAV_TEXT>
+<WEBDAV_HOWTO>Your internet folder</WEBDAV_HOWTO>
+<WEBDAV_HOWTO_TEXT>How to access to your internet Folder using Windows XP, 2000, Windows 7...</WEBDAV_HOWTO>
+<HOWTO_MAP_WEBDAV_P1>
+Windows XP and 2003 requires following preconditions to be met:[br]
+Make sure WebClient service is running.[br]
+Open Services snap-in and find WebClient service.[br]
+On Windows Server 2003 this service is disabled by default.[br]
+If the service is disabled open WebClient Properties dialog and on General tab set Startup Type to Automatic.[br]
+Restart the computer.
+[br][br][b]To reenable WebDAV on XP SP2 client[/b]
+[br]Open registry editor and go to the following key:
+[br]HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\WebClient\Parameters
+[br]Add a new DWORD Value named UseBasicAuth and give it the value 1. 
+</HOWTO_MAP_WEBDAV_P1>
+
+<HOWTO_MAP_WEBDAV_P2>
+[br]Click on My Network Places (in “XP View” for XP users)
+[br]Click on Add Network Place
+[br]Click on Add Site
+[br]Type in your WebDAV URL
+[br]Type in your username and password when asked
+</HOWTO_MAP_WEBDAV_P2>
+
+<HOWTO_MAP_WEBDAV_P3>
+To map a drive in Windows Explorer right click on a ‘Computer’ icon and select ‘Map Network Drive’.
+[br]
+Note that when copying a file from local disk to mapped drive the file content is cached on a local system drive prior to submitting to server.[br]
+You must have enough disk space to keep the entire file content.
+</HOWTO_MAP_WEBDAV_P3>
+
+<HOWTO_MAP_WEBDAV_P4>
+To connect to WebDAV server using Nautilus, in File menu select Connect to Server. In the Service Type field select WebDAV (HTTP) or Secure WebDAV (HTTPS) and fill in at last Server field.</HOWTO_MAP_WEBDAV_P4>
+<full_access>Full access</full_access>
+<WEBDAV_ACCESS>WebDav (Internet Folder) access</WEBDAV_ACCESS>
+<change_parameters>Change parameters</change_parameters>
+<schedule>Schedule</schedule>
+<add_schedule_parameter>Add a schedule parameters switch</add_schedule_parameter>
+
+
+
+
+
+
+
+ 

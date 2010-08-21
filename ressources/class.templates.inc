@@ -379,7 +379,7 @@ class templates{
 		
 		$content=html_entity_decode($content);
 		
-		$content=replace_accents($content);
+		$content=utf8_encode($content);
 		if($noremovecrlf==0){
 			$content=nl2br($content);
 			$content=str_replace("\n","\\n",$content);
@@ -2885,12 +2885,10 @@ if($bsini->_params["$key"]["service_name"]==null){return null;}
 if($bsini->_params["$key"]["service_disabled"]==null){$bsini->_params["$key"]["service_disabled"]=-1;}
 $app=$bsini->_params["$key"]["service_name"];
 $monit=$bsini->_params["$key"]["monit"];
+$change_name=$bsini->_params["$key"]["change-name"];
 
 if($monit==1){
-if(!isset($GLOBALS["MONIT_ARRAY"])){
-		$sock=new sockets();
-		$GLOBALS["MONIT_ARRAY"]=unserialize(base64_decode($sock->getFrameWork("cmd.php?monit-status=yes")));
-	}
+		if(!isset($GLOBALS["MONIT_ARRAY"])){$sock=new sockets();$GLOBALS["MONIT_ARRAY"]=unserialize(base64_decode($sock->getFrameWork("cmd.php?monit-status=yes")));}
 		$monit_status=$GLOBALS["MONIT_ARRAY"][$app]["status"];
 		$monit_uptime=$GLOBALS["MONIT_ARRAY"][$app]["uptime"];
 		$bsini->_params["$key"]["master_memory"]=$GLOBALS["MONIT_ARRAY"][$app]["memory kilobytes total"];
@@ -2901,6 +2899,7 @@ if(!isset($GLOBALS["MONIT_ARRAY"])){
 		$uptime=$GLOBALS["MONIT_ARRAY"][$app]["uptime"];
 		$service_disabled=0;
 		$application_installed=1;
+		
 		
 		switch ($monit_status) {
 			case "monitored":$bsini->_params[$key]["running"]=1;$status="sleeping";break;
@@ -2989,6 +2988,15 @@ if($bsini->_params["$key"]["master_pid"]<>null){
 				</tr>	
 			";		
 			}
+			if(trim($bsini->_params[$key]["queue_num"])>0){	
+				$pid=$pid."
+				<tr>
+					<td align='right'><strong>{active}:</strong></td>
+					<td><strong>".$bsini->_params[$key]["queue_num"]." {emails}</strong></td>
+				</tr>	
+			";	
+			}
+			
 			
 }
 
@@ -3037,7 +3045,8 @@ if($bsini->_params["$key"]["other"]<>null){
 
 
 
-
+$master_title="{{$bsini->_params["$key"]["service_name"]}}";
+if($change_name<>null){$master_title=$change_name;}
 
 $html="<table style='width:1OO%'>
 <tr>
@@ -3045,7 +3054,7 @@ $html="<table style='width:1OO%'>
 <td>
 	<table style='width:100%'>
 		<tr>
-		<td align='right' nowrap><strong>{{$bsini->_params["$key"]["service_name"]}}:</td>
+		<td align='right' nowrap><strong>$master_title:</td>
 		<td><strong><span style='font-size:12px'>$status</span>$pid_text</strong></td>
 		</tr>
 		$pid
@@ -3656,13 +3665,16 @@ return round($difference/60);
 function send_email_events($subject,$text,$context,$date=null,$attached_files=array(),$recipient=null){
 	
 	$arr_APP=array(
+		"APP_MLDONKEY"=>"MLDonkey server",
+		"APP_DHCP"=>"DHCP Server",
+		"APP_ARTICA_NOTIFIER"=>"Artica SMTP Notifier",
+		"APP_GROUPWARE_APACHE"=>"Apache for groupware applications",
 		"APP_ROUNDCUBE"=>"Web service For RoundCube",
 		"APP_ZABBIX_SERVER"=>"Zabbix server",
 		"APP_MYSQL_ARTICA"=>"Mysql server",
 		"APP_ARTICA_MYSQMAIL"=>"Postfix Monitor",
 		"APP_ARTICA_DANSGUARDIAN_TAIL"=>"DansGuardian Monitor",
 		"APP_ARTICA_WATCHDOG"=>"Artica Watchdog",
-		"APP_ARTICA"=>"Artica service",
 		"APP_ASSP"=>"Anti-Spam SMTP Proxy",
 		"APP_BOA"=>"Boa Daemon",
 		"APP_CLAMAV"=>"ClamAV Daemon",
@@ -3708,6 +3720,7 @@ function send_email_events($subject,$text,$context,$date=null,$attached_files=ar
 		"APP_ZARAFA_GATEWAY"=>"Zarafa Gateway",			
 		"APP_ZARAFA_MONITOR"=>"Zarafa Monitor",
 		"APP_GROUPWARE_APACHE"=>"Apache for Groupwares",
+		"APP_ARTICA"=>"Artica service",
 		
 		
 	);
@@ -3888,8 +3901,9 @@ function pourcentage($pourc){
 	$pourc=round($pourc);
 	
 	
+	if($pourc<0){$pourc=0;}
 	if($pourc==0){$int=-119;}
-	if($pourc>1){$int=$pourc-118;}
+	if($pourc>0){$int=$pourc-118;}
 	if($pourc>50){$int=$pourc-100;}
 	
 	

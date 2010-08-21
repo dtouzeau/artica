@@ -50,6 +50,30 @@ if(preg_match("#monitor service.+?on user request#",$buffer)){return true;}
 if(preg_match("#CRON\[.+?\(root\).+CMD#",$buffer)){return true;}
 if(preg_match("#winbindd\[.+?winbindd_listen_fde_handler#",$buffer)){return true;}
 
+
+if(preg_match("#amavis\[.+?:\s+\(.+?\)TROUBLE\s+in child_init_hook:#",$buffer,$re)){
+	events("AMAVIS TROUBLE in child_init_hook");
+	$file="/etc/artica-postfix/croned.1/amavis.".md5("AMAVIS:TROUBLE in child_init_hook");
+	if(IfFileTime($file)){
+		email_events("Amavis child error","Amavis claim \"$buffer\" the amavis daemon will be restarted",'postfix');
+		shell_exec('/etc/init.d/artica-postfix restart amavis &');
+		@file_put_contents($file,"#");
+	}
+	return true;
+}
+
+if(preg_match("#amavis\[.+?:\s+\(.+?\)_DIE:\s+Suicide in child_init_hook#",$buffer,$re)){
+	events("AMAVIS TROUBLE in child_init_hook");
+	$file="/etc/artica-postfix/croned.1/amavis.".md5("AMAVIS:TROUBLE in child_init_hook");
+	if(IfFileTime($file)){
+		email_events("Amavis child error","Amavis claim \"$buffer\" the amavis daemon will be restarted",'postfix');
+		shell_exec('/etc/init.d/artica-postfix restart amavis &');
+		@file_put_contents($file,"#");
+	}
+	return true;
+}
+
+
 if(preg_match("#smbd_audit:\s+(.+?)\|(.+?)\|(.+?)\|(.+?)\|(.+?)\|(.+?)\|(.+?)\|(.+?)$#",$buffer,$re)){
 	events("{$re[5]}/{$re[8]} in xapian queue");
 	WriteXapian("{$re[5]}/{$re[8]}"); 
@@ -189,7 +213,7 @@ if(preg_match("#winbindd:\s+Exceeding\s+[0-9]+\s+client\s+connections.+?no idle 
 
 if(preg_match("#'(.+?)'\s+total mem amount of\s+([0-9]+).+?matches resource limit#",$buffer,$re)){
 	$file="/etc/artica-postfix/croned.1/mem.{$re[1]}.monit";
-	if(IfFileTime($file,5)){
+	if(IfFileTime($file,15)){
 				events("{$re[1]} limit memory exceed");
 				email_events("{$re[1]}: memory limit","Monitor claim \"$buffer\"",'system');
 				WriteFileCache($file);
@@ -225,9 +249,26 @@ if(preg_match("#monit\[.+?'(.+?)'\s+process is not running#",$buffer,$re)){
 			}			
 	}
 	
+	
+if(preg_match("#pdns\[.+?:\s+binding UDP socket to.+?Address already in use#",$buffer,$re)){
+$file="/etc/artica-postfix/croned.1/restart.pdns.bind.error";
+	if(IfFileTime($file,5)){
+				events("PowerDNS: Unable to bind UDP socket");
+				email_events("PowerDNS: Unable to bind UDP socket","Artica will restart PowerDNS",'system');
+				THREAD_COMMAND_SET('/etc/init.d/artica-postfix restart pdns');
+				WriteFileCache($file);
+				return;
+			}else{
+				events("PowerDNS: Unable to bind UDP socket: but take action after 10mn");
+				return;
+			}			
+	}	
+	
+
+	
 if(preg_match("#cpu system usage of ([0-9\.]+)% matches#",$buffer,$re)){
 	$file="/etc/artica-postfix/croned.1/cpu.system.monit";
-	if(IfFileTime($file,5)){
+	if(IfFileTime($file,15)){
 				events("cpu exceed");
 				email_events("cpu warning {$re[1]}%","Monitor claim \"$buffer\"",'system');
 				WriteFileCache($file);

@@ -8,7 +8,7 @@ interface
 uses
 //depreciated oldlinux -> linux
 Classes, SysUtils,Process,strutils,IniFiles,RegExpr in 'RegExpr.pas',unix,logs,dateutils,uHashList,Geoip,BaseUnix,md5,dhcp_server,openvpn,cups,pdns, obm2,
-samba,smartd,xapian,opengoo,dstat,sugarcrm,rsync,tcpip,policyd_weight,apache_artica, autofs,nfsserver,framework,ocsi,assp,gluster,zabbix,hamachi,vmwaretools,phpldapadmin,monit,zarafa_server,squidguard,wifi, emailrelay,
+samba,smartd,xapian,opengoo,dstat,sugarcrm,rsync,tcpip,policyd_weight,apache_artica, autofs,nfsserver,framework,ocsi,assp,gluster,zabbix,hamachi,vmwaretools,phpldapadmin,monit,zarafa_server,squidguard,wifi, emailrelay,mldonkey,
 mailarchiver in '/home/dtouzeau/developpement/artica-postfix/bin/src/artica-install/mailarchiver.pas',
 kavmilter    in '/home/dtouzeau/developpement/artica-postfix/bin/src/artica-install/kavmilter.pas',
 kas3         in '/home/dtouzeau/developpement/artica-postfix/bin/src/artica-install/kas3.pas',
@@ -113,12 +113,6 @@ private
        procedure  SYSTEM_NETWORKS_SET_NIC_DEBIAN(nicname:string;ipadress:string;netmask:string;gateway:string;dhcp:string);
        function   FileSize_ko(path:string):longint;
        procedure  GETTY_CHANGE_INITTAB();
-
-
-       procedure MAIL_IMAP_CLIENT_CHECK();
-       function  MAIL_IMAP_CLIENT_VERSION():string;
-       procedure MAIL_IMAP_CLIENT_INSTALL();
-
        procedure SYSTEM_VERIFY_ISO();
 
        function  SCAN_DISK_PARTITIONS_SIZE_PHP(dev:string):string;
@@ -977,65 +971,6 @@ begin
     end;
 end;
 //##############################################################################
-
-procedure myconf.MAIL_IMAP_CLIENT_CHECK();
-var
-   version:string;
-   versionint:integer;
-begin
-versionint:=0;
-if not SYS.CHECK_PERL_MODULES('Mail::IMAPClient') then begin
-            logs.Debuglogs('Starting......: Mail::IMAPClient does not exists');
-            MAIL_IMAP_CLIENT_INSTALL();
-     end else begin
-       version:=trim(MAIL_IMAP_CLIENT_VERSION());
-       logs.Debuglogs('Starting......: Mail::IMAPClient v'+version);
-       version:=AnsiReplaceText(version,'.','');
-       if TryStrToInt(version,versionint) then begin
-          if versionint<314 then MAIL_IMAP_CLIENT_INSTALL();
-       end;
-
-   end;
-end;
-//##############################################################################
-function myconf.MAIL_IMAP_CLIENT_VERSION():string;
-var  version:string;
-begin
-version:=SYS.GET_CACHE_VERSION('Mail::IMAPClient');
-if length(version)>0 then exit(version);
-result:=SYS.CHECK_PERL_MODULES_VERSION('Mail::IMAPClient');
-SYS.SET_CACHE_VERSION('Mail::IMAPClient',result);
-end;
-//##############################################################################
-procedure myconf.MAIL_IMAP_CLIENT_INSTALL();
-begin
-   if not fileExists(get_ARTICA_PHP_PATH()+'/bin/install/Mail-IMAPClient-3.14.tar.gz') then begin
-       logs.Syslogs('Starting......:  WARNING !!! cannot install Mail::IMAPClient unable to stat '+get_ARTICA_PHP_PATH()+'/bin/install/Mail-IMAPClient-3.14.tar.gz');
-       exit;
-   end;
-
-
-       forceDirectories('/tmp/artica/install');
-       fpsystem('tar -xf '+get_ARTICA_PHP_PATH()+'/bin/install/Mail-IMAPClient-3.14.tar.gz -C /tmp/artica/install/');
-
-       if not FileExists('/tmp/artica/install/Mail-IMAPClient-3.14/Makefile.PL') then begin
-        logs.Syslogs('Starting......:  WARNING !!! cannot extract '+get_ARTICA_PHP_PATH()+'/bin/install/Mail-IMAPClient-3.14.tar.gz');
-        exit;
-       end;
-
-      SetCurrentDir('/tmp/artica/install/Mail-IMAPClient-3.14');
-      fpsystem('/bin/touch /tmp/artica/install/Mail-IMAPClient-3.14/test.txt');
-      fpsystem(SYS.LOCATE_PERL_BIN()+' Makefile.PL');
-      fpsystem('make');
-      fpsystem('make install');
-      SetCurrentDir('/root');
-      fpsystem('/bin/rm -rf /tmp/artica/install/Mail-IMAPClient-3.14');
-      logs.DeleteFile('/etc/artica-postfix/versions.cache');
-
-end;
-//##############################################################################
-
-
 function myconf.SCAN_USB():string;
 var
    l,s:TstringList;
@@ -2836,6 +2771,7 @@ var
    zphpldapadmin:tphpldapadmin;
    zarafa_server:tzarafa_server;
    zsquidguard:tsquidguard;
+   mldonkey:tmldonkey;
 begin
 
    debug:=false;
@@ -2917,6 +2853,11 @@ begin
     stunnel:=Tstunnel.Create(SYS);
     ArrayList.Add('[APP_STUNNEL] "' + stunnel.VERSION() + '"');
     stunnel.free;
+
+    //mldonkey
+    mldonkey:tmldonkey.Create(SYS);
+    ArrayList.Add('[APP_MLDONKEY] "' + mldonkey.VERSION() + '"');
+    mldonkey.free;
 
     //rsync
     rsync:=Trsync.Create(SYS);
@@ -3048,6 +2989,8 @@ begin
     ArrayList.Add('[APP_JOOMLA] "' + opengoo.JOOMLA_VERSION() + '"');
     ArrayList.Add('[APP_EACCELERATOR] "' + opengoo.EACCELERATOR_VERSION() + '"');
     ArrayList.Add('[APP_SUGARCRM] "' + sugarcrm.VERSION('/usr/local/share/artica/sugarcrm_src') + '"');
+
+
 
     opengoo.FRee;
 
@@ -3269,6 +3212,7 @@ var
    i                  :integer;
    tmp                :string;
    binpath            :string;
+
 begin
 
    result:=SYS.GET_CACHE_VERSION('APP_EMAILRELAY');
@@ -5687,7 +5631,7 @@ var
    pdns:tpdns;
    gluster:tgluster;
    zabbix:tzabbix;
-
+   mldonkey:tmldonkey;
 begin
      logs:=Tlogs.Create;
      spfm:=tspf.Create;
@@ -5750,6 +5694,11 @@ begin
     autofs.START();
     autofs.free;
 
+    mldonkey:=tmldonkey.CReate(SYS);
+    mldonkey.START();
+    mldonkey.free;
+
+
     if NetWorkAvailable then begin
        logs.Debuglogs('############ nfs ##################');
        nfs:=tnfs.Create(SYS);
@@ -5760,14 +5709,7 @@ begin
 
     logs.Debuglogs('############ Gayteway mode ##################');
     ARTICA_HAS_GAYTEWAY();
-    logs.Debuglogs('############ imap client ##################');
-    MAIL_IMAP_CLIENT_CHECK();
-
-
-
-
-
-      logs.Debuglogs('############ apache groupware ##################');
+    logs.Debuglogs('############ apache groupware ##################');
       opengoo:=topengoo.Create(SYS);
       opengoo.START();
       opengoo.free;
@@ -9801,7 +9743,7 @@ FUNCTION myconf.GLOBAL_STATUS():string;
  zarafa_server:tzarafa_server;
  zwifi:twifi;
  opengoo:topengoo;
- emailrelay:temailrelay
+ emailrelay:temailrelay;
 begin
 LSHW_TIME:=0;
 INSTANT_SEARCH();

@@ -219,6 +219,7 @@ begin
 
 if NoEngoughMemory then begin
     logs.DebugLogs('Starting......: Apache Need more than 512Mb memory installed to run');
+    SYS.set_INFO('ApacheGroupware','0');
     STOP();
     exit;
 end;
@@ -304,6 +305,7 @@ end;
 procedure topengoo.RELOAD();
 var
 pid:string;
+APACHECTL:string;
 begin
 
   pid:=PID_NUM();
@@ -315,23 +317,34 @@ end;
 
 WRITE_APACHE_CONFIG();
 WritePhpConfig();
-STOP();
-START();
 
-  pid:=PID_NUM();
-
+ pid:=PID_NUM();
 if not SYS.PROCESS_EXIST(pid) then begin
      START();
      exit;
 end;
+
+APACHECTL:=SYS.LOCATE_APACHECTL();
+if FileExists(APACHECTL) then begin
+   logs.OutputCmd(SYS.LOCATE_APACHECTL() +' -f /usr/local/apache-groupware/conf/apache-groupware.conf -k restart');
+   exit;
+end;
+
+STOP();
+START();
+
+
+
+
 
 end;
 
 //##############################################################################
 procedure topengoo.STOP();
 var
-   count:integer;
+   count,pidInt,i:integer;
    pid:string;
+   pids:Tstringlist;
 begin
 
     if not FileExists(apachebinary_path) then begin
@@ -349,7 +362,7 @@ begin
     end else begin
        writeln('Stopping Apache Daemon.......: failed to stat apachectl');
     end;
-
+ pid:=PID_NUM();
  count:=0;
  while SYS.PROCESS_EXIST(pid) do begin
               sleep(150);
@@ -362,9 +375,28 @@ begin
 
               pid:=PID_NUM();
         end;
- pid:=PID_NUM();
+
+ count:=0;
+ pids:=Tstringlist.Create;
+ try
+ pids.AddStrings(SYS.PIDOF_PATTERN_PROCESS_LIST(apachebinary_path+' -f /usr/local/apache-groupware/conf/apache-groupware.conf'));
+ writeln('Stopping Apache groupware....: ',pids.Count,' childs');
+  for i:=0 to pids.Count-1 do begin
+              if TryStrToInt(pids.Strings[i],pidInt) then begin
+                if pidInt>1 then begin
+                   writeln('Stopping Apache groupware....: PID ',pidInt,' pid child');
+                   fpsystem('/bin/kill -9 '+intTostr(pidInt));
+                end;
+              end;
+        end;
+ finally
+ end;
+
+
+
 if  not SYS.PROCESS_EXIST(pid) then begin
     writeln('Stopping Apache groupware....: success');
+    fpsystem(SYS.LOCATE_PHP5_BIN()+' /usr/share/artica-postfix/exec.www.webdav.php --users');
     exit;
 end;
     writeln('Stopping Apache groupware....: failed');
@@ -568,9 +600,20 @@ if length(rdcube)>0 then l.add(rdcube);
 if ocswebservernameEnabled=1 then l.Add(ocsi.VirtualHost(ApacheGroupWarePort));
 
 fpsystem(SYS.LOCATE_PHP5_BIN()+' /usr/share/artica-postfix/exec.www.install.php --Wvhosts');
+fpsystem(SYS.LOCATE_PHP5_BIN()+' /usr/share/artica-postfix/exec.www.webdav.php --users');
 L.Add(LOGS.ReadFromFile('/usr/local/apache-groupware/conf/vhosts'));
 
+l.add('Include /usr/local/apache-groupware/conf/webdav-vhosts.conf');
+l.add('# If you want create others vhost, file the file below');
+l.add('Include /usr/local/apache-groupware/conf/others-vhosts.conf');
+
 forceDirectories('/usr/local/apache-groupware/conf');
+if not FileExists('/usr/local/apache-groupware/conf/others-vhosts.conf') then logs.WriteToFile('#','/usr/local/apache-groupware/conf/others-vhosts.conf');
+if not FileExists('/usr/local/apache-groupware/conf/webdav-vhosts.conf') then logs.WriteToFile('#','/usr/local/apache-groupware/conf/webdav-vhosts.conf');
+
+
+
+
 forceDirectories('/usr/local/apache-groupware/php5/lib/php');
 logs.Debuglogs('Starting......: Apache groupware daemon writing apache-groupware.conf');
 logs.WriteToFile(l.Text,'/usr/local/apache-groupware/conf/apache-groupware.conf');

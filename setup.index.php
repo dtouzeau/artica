@@ -579,6 +579,7 @@ if($users->POSTFIX_INSTALLED){
 	$html=$html.BuildRows("APP_ALTERMIME",$GlobalApplicationsStatus,"altermime");
 	if(!$users->KASPERSKY_SMTP_APPLIANCE){$html=$html.BuildRows("APP_POMMO",$GlobalApplicationsStatus,"pommo");}
 	$html=$html.BuildRows("APP_MSMTP",$GlobalApplicationsStatus,"msmtp");
+	$html=$html.BuildRows("APP_EMAILRELAY",$GlobalApplicationsStatus,"emailrelay");
 	$html=$html.BuildRows("APP_STUNNEL",$GlobalApplicationsStatus,"stunnel");
 	
 	
@@ -831,7 +832,7 @@ $html="
 	$html=$html.BuildRows("APP_HPINLINUX",$GlobalApplicationsStatus,"hpinlinux");
 	$html=$html.BuildRows("APP_SCANNED_ONLY",$GlobalApplicationsStatus,"scannedonly");			
 	$html=$html.BuildRows("APP_PUREFTPD",$GlobalApplicationsStatus,"pure-ftpd");
-	
+	$html=$html.BuildRows("APP_MLDONKEY",$GlobalApplicationsStatus,"mldonkey");
 	
 	$html=$html.spacer('{LICENSED_FILTERS_PRODUCTS}');
 	$html=$html.BuildRows("APP_KAV4SAMBA",$GlobalApplicationsStatus,"kav4samba");
@@ -901,6 +902,7 @@ if($users->VMWARE_HOST){
  if(!$KASPERSKY_APPLIANCE){
 		$html=$html.BuildRows("APP_CLAMAV",$GlobalApplicationsStatus,"clamav");
 		$html=$html.BuildRows("APP_AMACHI",$GlobalApplicationsStatus,"hamachi");
+		$html=$html.BuildRows("APP_MLDONKEY",$GlobalApplicationsStatus,"mldonkey");
 		$html=$html.spacer('{computers_management}');
 		$html=$html.BuildRows("APP_NMAP",$GlobalApplicationsStatus,"nmap");
 		$html=$html.BuildRows("APP_WINEXE",$GlobalApplicationsStatus,"winexe-static");

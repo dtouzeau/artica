@@ -310,7 +310,7 @@ function main_tabs(){
 	$page=CurrentPageName();
 	$users=new usersMenus();
 	$array["index"]='{index}';
-	$array["yes"]='{net_settings}';
+	$array["yes"]='{squid_net_settings}';
 	$array["filters"]='{filters}';
 	$array["cache"]='{cache_title}';
 	$array["events"]='{events_stats}';
@@ -493,6 +493,8 @@ if($users->KAV4PROXY_INSTALLED){
 if($users->C_ICAP_INSTALLED){
 	if($squid->enable_cicap==1){
 		$cicap=Paragraphe('clamav-64.png','{CICAP_AV}','{CICAP_AV_TEXT}',"javascript:Loadjs('c-icap.index.php');");
+		$clamav_unofficial=Paragraphe("clamav-64.png","{clamav_unofficial}","{clamav_unofficial_text}",
+	"javascript:Loadjs('clamav.unofficial.php')",null,210,100,0,true);
 	}
 }
 $denywebistes_2="&nbsp;";
@@ -500,7 +502,8 @@ if($users->DANSGUARDIAN_INSTALLED){
 	if($squid->enable_dansguardian==1){
 		$denywebistes=null;
 		$dansguardian=Paragraphe('icon-chevallier-564.png','{DANSGUARDIAN_RULES}','{dansguardian_rules_text}',"javascript:Loadjs('dansguardian.index.php?js=yes&switch=from-squid')");
-		
+		$clamav_unofficial=Paragraphe("clamav-64.png","{clamav_unofficial}","{clamav_unofficial_text}",
+	"javascript:Loadjs('clamav.unofficial.php')",null,210,100,0,true);
 	}}
 	
 if($users->SQUIDGUARD_INSTALLED){
@@ -525,6 +528,7 @@ if($users->SQUIDGUARD_INSTALLED){
 	$tr[]=$denywebistes;
 	$tr[]=$connection_time;
 	$tr[]=$cicap;
+	$tr[]=$clamav_unofficial;
 	$tr[]=$dansguardian;
 	$tr[]=$license_kaspersky;
 	$tr[]=$update_kaspersky;

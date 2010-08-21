@@ -31,10 +31,7 @@ if(systemMaxOverloaded()){
 	die();
 }
 
-if($argv[1]=='--home'){
-	CheckHomeFor($argv[2],null);
-	die();
-}
+if($argv[1]=='--home'){CheckHomeFor($argv[2],null);die();}
 
 
 if($argv[1]=='--homes'){
@@ -115,6 +112,8 @@ function CheckHomeFor($uid,$homeDirectory=null){
 	$ct=new user($uid);
 	if($homeDirectory==null){$homeDirectory=$ct->homeDirectory;}
 	
+	echo "Starting......: Home $uid checking home: $homeDirectory\n";
+	
 	if($GLOBALS["profile_path"]==null){
 		$sock=new sockets();
 		$profile_path=$sock->GET_INFO('SambaProfilePath');
@@ -155,6 +154,22 @@ if($homeDirectory==null){
 	@mkdir($homeDirectory);
 	@chmod($homeDirectory,0775);
 	@chown($homeDirectory,$uid);
+	
+	if($ct->WebDavUser==1){
+		$unix=new unix();
+		$find=$unix->find_program("find");
+		$apacheuser=$unix->APACHE_GROUPWARE_ACCOUNT();
+		$internet_folder="$homeDirectory/Internet Folder";
+		@mkdir($internet_folder);
+		@chmod($internet_folder,0775);
+		$internet_folder=$unix->shellEscapeChars($internet_folder);
+		echo "Starting......: Home $uid checking home: $internet_folder\n";
+		writelogs("Checking $ct->uid:$apacheuser :$internet_folder",__FUNCTION__,__FILE__,__LINE__);
+		shell_exec("/bin/chown -R $ct->uid:$apacheuser $internet_folder >/dev/null 2>&1 &");
+		shell_exec("$find $internet_folder -type d -exec chmod 755 {} \; >/dev/null 2>&1 &");
+	}
+	
+	
 	
 }
 

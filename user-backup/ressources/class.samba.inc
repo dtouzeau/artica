@@ -106,7 +106,6 @@ function SaveUSB(){
 function SaveToLdap(){
 	
 	$conf=$this->BuildConfig();
-	$upd["SambaSMBConf"][]=$conf;
 	$upd["SambaUsbShare"][]=$this->SambaUsbShare;
 	
 	$group=new groups();
@@ -174,6 +173,40 @@ function ParseFolders(){
 		}
 	}
 	reset($this->main_array);
+}
+
+function UnShareFolder($fullpath_no_utf8encode=null){
+	if($fullpath_no_utf8encode==null){return;}
+	$requested_path=utf8_encode($fullpath_no_utf8encode);
+	while (list ($key, $array) = each ($this->main_array)){
+		if($key==null){continue;}
+		if($array["path"]==$requested_path){
+			$key_to_delete=$key;
+			writelogs("directory {$array["path"]}/$key match $requested_path",__CLASS__."/".__FUNCTION__,__FILE__,__LINE__);
+			break;
+		}
+	}
+	
+	reset($this->main_array);
+	if($key_to_delete==null){return false;}
+	unset($this->main_array[$key_to_delete]);
+	$this->SaveToLdap();
+	return true;
+}
+function GetShareName($fullpath_no_utf8encode=null){
+	if($fullpath_no_utf8encode==null){return;}
+	$requested_path=utf8_encode($fullpath_no_utf8encode);
+	while (list ($key, $array) = each ($this->main_array)){
+		if($key==null){continue;}
+		if($array["path"]==$requested_path){
+			reset($this->main_array);
+			return $key;
+			
+		}
+	}
+	
+	
+	
 }
 
 
@@ -524,7 +557,12 @@ function BuildConfig(){
 			$conf=$conf ."log level = {$this->main_array["global"]["log level"]}\n";
 			$conf=$conf ."log file = {$this->main_array["global"]["log file"]}\n";
 			$conf=$conf ."debug timestamp = yes\n";
+			$conf=$conf ."\n";
+			$conf=$conf ."# Enable symbolics links -----------------------------------\n";
+			$conf=$conf ."follow symlinks = yes\n";
+			$conf=$conf ."wide links = yes\n";
 			$conf=$conf ."unix extensions = no\n";
+			$conf=$conf ."\n";
 			$conf=$conf ."usershare allow guests = no\n";
 			$conf=$conf ."usershare max shares = 100\n";
 			$conf=$conf ."usershare owner only = true\n";

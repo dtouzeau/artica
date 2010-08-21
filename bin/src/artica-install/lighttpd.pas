@@ -422,6 +422,7 @@ logs.Debuglogs('###################### LIGHTTPD #####################');
    ForceDirectories('/usr/share/artica-postfix/ressources/sessions');
    ForceDirectories('/usr/share/artica-postfix/user-backup/ressources/conf');
    ForceDirectories('/usr/share/artica-postfix/user-backup/ressources/databases');
+   ForceDirectories('/usr/share/artica-postfix/ressources/conf/upload');
    fpsystem('/bin/cp -rf /usr/share/artica-postfix/ressources/databases/* /usr/share/artica-postfix/user-backup/ressources/databases/');
    fpsystem('/bin/chmod 755 /usr/share/artica-postfix/ressources/sessions');
    fpsystem('/bin/chmod 777 /usr/share/artica-postfix/user-backup/ressources/conf');
@@ -432,6 +433,7 @@ logs.Debuglogs('###################### LIGHTTPD #####################');
    fpsystem('/bin/chown -R '+user+':'+group+' /usr/share/artica-postfix/ressources/sessions');
    fpsystem('/bin/chown -R '+user+':'+group+' /usr/share/artica-postfix/ressources');
    fpsystem('/bin/chown -R '+user+':'+group+' /usr/share/artica-postfix/user-backup/ressources');
+
 
    if DirectoryExists('/usr/share/zarafa-webaccess') then begin
         logs.Debuglogs('Starting......: lighttpd: fixing permissions on Zarafa');

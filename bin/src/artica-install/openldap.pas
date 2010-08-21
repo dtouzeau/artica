@@ -751,7 +751,7 @@ var
   i:integer;
   LdapDBCachesize:integer;
   LdapAllowAnonymous:integer;
-
+  loglevel:integer;
 begin
    EnableRemoteAddressBook:=0;
    EnablePerUserRemoteAddressBook:=0;
@@ -862,7 +862,14 @@ end;
 
 l.Add('');
 l.Add('argsfile        /var/run/slapd/slapd.args');
-l.Add('loglevel        none');
+if not TryStrToint(SYS.GET_INFO('LDAPloglevel'),loglevel) then loglevel:=0;
+if loglevel>0 then begin
+l.Add('loglevel        '+IntTOStr(loglevel));
+     logs.Syslogs('Starting......: OpenLDAP log level to '+IntTOStr(loglevel));
+end else begin
+   l.Add('loglevel        0');
+end;
+
 if length(modulepath)>0 then l.Add('modulepath	'+modulepath);
 //if dyngroup then l.Add('moduleload'+chr(9)+'dynlist');
 
@@ -875,7 +882,6 @@ end else begin
 end;
    
    
-l.Add('loglevel 0');
 l.Add('sizelimit 500');
 l.Add('tool-threads 1');
 

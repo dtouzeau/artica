@@ -13,7 +13,7 @@ LDAP est utilis&eacute; pour l'ensemble des param&egrave;tres et comptes utilisa
 <backup_time>Sauvegarder tous les jours &agrave;</backup_time>
 <browse_dar>Parcourir les conteneurs DAR</browse_dar>
 <browse_dar_text>Cette section vous aide &agrave; trouver et restaurer les fichiers sauvegard&eacute;s dans votre conteneur.[br]
-Utilisez le champ de recherche pour trouver les fichiers que vous voulez restaurer ou pour obtenir leurs statuts</browse_dar_text>
+Utilisez le champ de recherche pour trouver les fichiers que vous voulez restaurer ou pour obtenir leurs Etats</browse_dar_text>
 <close_windows>Toutes les op&eacute;ration de sauvegarde on &eacute;t&eacute;s ex&eacute;cut&eacute;es ... Vous pouvez fermer cette fen&ecirc;tre</close_windows>
 <compile_rules_ok>Enregistrement des param&egrave;tres OK ...</compile_rules_ok>
 <connect_as>Se connecter en tant que</connect_as>

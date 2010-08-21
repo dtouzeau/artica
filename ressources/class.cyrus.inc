@@ -51,8 +51,45 @@ class cyrus{
 	}
 	
 	
+	public function ListMailboxes($cn){
+		$uid=$cn;
+		$ldap=new clladp();
+		
+		if(preg_match("#(.+?)@(.+)#",$cn,$re)){
+			writelogs("Mailbox in multidomain $cn",__CLASS__.'/'.__FUNCTION__,__FILE__,__LINE__);
+			$uid=$re[1];
+			
+			$ldap->CyrusAdminOtherCreate("cyrus@{$re[2]}",$this->PasswordOfCyrus);	
+			$this->PasswordOfCyrus=$ldap->CyrusPassword("cyrus@{$re[2]}");
+			$this->cyr_params= array(
+				'hostspec'=>'localhost',
+				'protocol'=>'imap',
+				'username'=>"cyrus@{$re[2]}",
+				'password'=>$this->PasswordOfCyrus
+    			);	
+			}
+			
+			
+		$cyradm=new CyrusAdmin($this->cyr_params);
+		if(!$cyradm->_connect()){
+			$this->cyrus_infos="{unable_to_connect_imap}";
+			return false;	
+		}
+    
+        $mbx=$cyradm->listmbox("user/$uid/*");
+        if(is_array($mbx)){
+        	while (list ($num, $box) = each ($mbx) ){
+        		$folder=str_replace("user/$uid/","",$box);
+        		$array[$folder]=$folder;
+        	}
+        }
+        $cyradm->_disconnect();
+        return $array;
+	}
+	
+	
 	public function IfMailBoxExists($cn){
-	$uid=$cn;
+		$uid=$cn;
 		$ldap=new clladp();
 		
 		if(preg_match("#(.+?)@(.+)#",$cn,$re)){

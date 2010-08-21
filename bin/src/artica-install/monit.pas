@@ -237,6 +237,8 @@ begin
     WRITE_INITD();
     CONFIG_DEFAULT();
     fpsystem('/bin/chmod 600 /etc/monit/monitrc >/dev/null 2>&1');
+    fpsystem('/bin/rm -rf /var/monit/*');
+
     logs.DebugLogs('Starting......: daemon monitor...');
     logs.Debuglogs(BIN_PATH()+' -c /etc/monit/monitrc -p /var/run/monit/monit.pid -s /var/run/monit/monit.state >/dev/null 2>&1 &');
     fpsystem(BIN_PATH()+' -c /etc/monit/monitrc -p /var/run/monit/monit.pid -s /var/run/monit/monit.state >/dev/null 2>&1 &');

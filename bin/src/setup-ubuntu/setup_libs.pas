@@ -78,6 +78,7 @@ public
       function  GET_FIRMWARE_PATH():string;
       function  ExtractLocalPackage(filepath:string):string;
       function  VersionToInteger(version:string):integer;
+      function  IS_DEBIAN_NON_FREE_IN_SOURCE_LIST():boolean;
       function  ArchStruct():integer;
 END;
 
@@ -195,7 +196,25 @@ if RegExpr.Exec(data) then begin
 end;
 end;
 //##############################################################################
-
+function tlibs.IS_DEBIAN_NON_FREE_IN_SOURCE_LIST():boolean;
+var
+   tmpstr,data:string;
+   RegExpr:TRegExpr;
+begin
+result:=false;
+if not FileExists('/etc/apt/sources.list') then exit;
+tmpstr:=FILE_TEMP();
+data:=trim(ReadFromFile('/etc/apt/sources.list'));
+RegExpr:=TRegExpr.Create;
+RegExpr.Expression:='non-free';
+if RegExpr.Exec(data) then begin
+   RegExpr.free;
+   result:=true;
+   exit;
+end;
+RegExpr.free;
+end;
+//##############################################################################
 
 
 function tlibs.CheckReposKernel():string;

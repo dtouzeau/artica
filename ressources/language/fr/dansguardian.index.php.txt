@@ -167,12 +167,10 @@ On large sites you might want to try 180
 <maxcontentfilecachescansize>Taille maximal du cache pour l'analyse des fichiers</maxcontentfilecachescansize>
 <maxcontentfilecachescansize_text>Utilis&eacute; uniquement si vous utilisez un moteur antivirus.[br]C'est la taille maximale du t&eacute;l&eacute;chargement effectu&eacute; pour l'envoi vers un moteur antivirus.[br]Cette valeur doit &ecirc;tre plus grande ou &eacute;gale &agrave; la valeur de &quot;Taille de la m&eacute;moire physique Max du cache de contenu&quot;.[br] la valeur est en KB (10240 = 10Mb).</maxcontentfilecachescansize_text>
 <maxcontentfiltersize>Taille Maximum du Filtre de Contenu</maxcontentfiltersize>
-<maxcontentfiltersize_text>
-Sometimes web servers label binary files as text which can be very large which causes a huge drain on memory and cpu resources.[br]
-To counter this, you can limit the size of the document to be filtered and get it to just pass it straight through.[br]
-This setting also applies to content regular expression modification.[br]
-The value must not be higher than "max content ram cache scan size" The size is in Kibibytes - eg 2048 = 2Mb, use 0 to set it to "max content ram cache scan size"
-</maxcontentfiltersize_text>
+<maxcontentfiltersize_text>Des fois, les serveurs web affiche les fichiers binaires comme des fichiers texte ce qui pourrait causer un fort besoin en CPU ou m&eacute;moire pour l'analyse du fichier.[br]
+Pour limiter, vous pouvez indiquer la taille maximale du document &agrave; filtrer.[br]
+Ce param&egrave;tre s'applique aussi au moteur d'expressions r&eacute;guli&egrave;res.[br]
+La valeur ne doit pas &ecirc;tre sup&eacute;rieur &agrave; la valeur &quot;Taille de la m&eacute;moire physique maximale du cache de contenu&quot;. La taille est en Kibibytes (2048=2M). Utilisez 0 pour limiter &agrave; la valeur de Taille de la m&eacute;moire physique maximale du cache de contenu</maxcontentfiltersize_text>
 <maxcontentramcachescansize>Taille de la m&eacute;moire physique maximale du cache de contenu</maxcontentramcachescansize>
 <maxcontentramcachescansize_text>
 This is only used if you use a content scanner plugin such as AV[br]
@@ -264,7 +262,7 @@ Par d&eacute;faut et afin de ne pas surcharger le processeur, les fichiers analy
 <showweightedfound>Voir la pond&eacute;ration des phrases trouv&eacute;es</showweightedfound>
 <showweightedfound_text>Si cette option est activ&eacute;e et que le total des phrases trouv&eacute;es qui exc&egrave;de la valeur du score des &quot;mauvaises phrases&quot;,un &eacute;v&egrave;nement sera rapport&eacute;</showweightedfound_text>
 <sport>Sites Sportif</sport>
-<strict_redirector>Same as redirector, but with google, yahoo, and other cache/images search robots.</strict_redirector>
+<strict_redirector>Identique au redirecteur, mais avec google, yahoo et autre robots de recherche et de cache d'images</strict_redirector>
 <strong_redirector>Same as strict_redirector, but, for google, yahoo, we are only blocking terms.</strong_redirector>
 <template_explain>Le mod&egrave;le de Fichier HTML est la mani&egrave;re la plus courante de fournir un message de pages bloqu&eacute;e &agrave; un utilisateur.[br] 
 Il d&eacute;livre un message de page bloqu&eacute;e rapidement et facilement &agrave; tous les navigateurs web, et ne fait presque rien d'autre.[br] 

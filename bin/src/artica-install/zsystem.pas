@@ -3235,6 +3235,7 @@ var
    mypid:string;
    org_cmdline:string;
    pgrep:string;
+   cmdtoexec:string;
 begin
     xjklogs:=Tlogs.Create;
     tmpstr:=xjklogs.FILE_TEMP();
@@ -3256,16 +3257,27 @@ begin
        pattern:=AnsiReplaceText(pattern,'-','\-');
        pattern:=AnsiReplaceText(pattern,'.','\.');
     end;
-    if verbosed then xjklogs.Syslogs('PIDOF_PATTERN():: Search "'+ pattern+'"');
-    fpsystem(pgrep+' -f "'+pattern+'" >'+tmpstr+' 2>&1');
+
+    cmdtoexec:=pgrep+' -f "'+pattern+'" >'+tmpstr+' 2>&1';
+    if verbosed then begin
+
+       xjklogs.Debuglogs('PIDOF_PATTERN():: Search "'+ pattern+'"');
+       xjklogs.Debuglogs('PIDOF_PATTERN():: cmd '+cmdtoexec);
+       writeln('..............');
+       fpsystem(pgrep+' -f "'+pattern+'"');
+       writeln('..............');
+    end;
+    fpsystem(cmdtoexec);
+
+
+
     ll:=Tstringlist.CReate;
     if not FileExists(tmpstr) then begin
         xjklogs.debuglogs('PIDOF_PATTERN():: FATAL ERROR while reading file '+ tmpstr);
         exit;
     end;
 
-
-     mypid:=IntToStr(fpgetpid);
+    mypid:=IntToStr(fpgetpid);
     try
        ll.LOadFromFile(tmpstr);
     except
@@ -3273,7 +3285,7 @@ begin
       exit;
     end;
 
-
+     if verbosed then writeln('PIDOF_PATTERN()::',ll.Count,' lines');
     xjklogs.DeleteFile(tmpstr);
     RegExpr:=TRegExpr.Create;
     RegExpr2:=TRegExpr.Create;

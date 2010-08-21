@@ -221,6 +221,11 @@ end;
 
 //##############################################################################
 function tapache_artica.ADD_MODULE(moduleso_file:string):string;
+
+ const
+            CR = #$0d;
+            LF = #$0a;
+            CRLF = CR + LF;
   var
    RegExpr:TRegExpr;
    ADD:boolean;
@@ -252,6 +257,7 @@ end;
 
 if moduleso_file='mod_ldap.so' then begin
     result:='LoadModule ldap_module'+chr(9)+APACHE_MODULES_PATH+'/'+moduleso_file;
+    if FileExists(APACHE_MODULES_PATH+'/mod_authnz_ldap.so') then result:=result+CRLF+'LoadModule authnz_ldap_module'+chr(9)+APACHE_MODULES_PATH+'/mod_authnz_ldap.so';
     exit;
 end;
 
@@ -259,6 +265,14 @@ if moduleso_file='mod_rewrite.so' then begin
     result:='LoadModule rewrite_module'+chr(9)+APACHE_MODULES_PATH+'/'+moduleso_file;
     exit;
 end;
+
+if moduleso_file='mod_dav.so' then begin
+    result:='LoadModule dav_module'+chr(9)+APACHE_MODULES_PATH+'/'+moduleso_file;
+    if FileExists(APACHE_MODULES_PATH+'/mod_dav_fs.so') then result:=result+CRLF+'LoadModule dav_fs_module'+chr(9)+APACHE_MODULES_PATH+'/mod_dav_fs.so';
+    exit;
+end;
+
+
 
 
 
@@ -316,6 +330,8 @@ l.add('libphp5.so');
 l.add('mod_setenvif.so');
 l.add('mod_status.so');
 l.add('mod_ssl.so');
+L.add('mod_dav.so');
+l.add('mod_ldap.so');
 for i:=0 to l.Count-1 do begin
     if l.Strings[i]=module_so then begin
        result:=true;

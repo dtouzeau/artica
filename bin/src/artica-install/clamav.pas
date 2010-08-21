@@ -88,6 +88,7 @@ public
     function  CLAMAV_BINVERSION():integer;
     function  AMAVISD_PID() :string;
     function  clamd_LocalSocket():string;
+    PROCEDURE CLAMAV_UNOFICIAL();
 
 
 
@@ -488,9 +489,121 @@ begin
          logs.DebugLogs('Starting......: failed start clamav daemon...');
      end;
      FRESHCLAM_START();
+     CLAMAV_UNOFICIAL();
 
 end;
 //##############################################################################
+
+PROCEDURE Tclamav.CLAMAV_UNOFICIAL();
+var
+l:Tstringlist;
+socket:string;
+PidFile:string;
+DatabaseDirectory:string;
+Proxy,ProxyUser,ProxyPassword,ProxyName:string;
+RegExpr:TRegExpr;
+curlstring:string;
+begin
+
+  Proxy:=SYS.GET_HTTP_PROXY();
+  Proxy:=AnsiReplaceStr(Proxy,'"','');
+  Proxy:=AnsiReplaceStr(Proxy,'http://','');
+  Proxy:=AnsiReplaceStr(Proxy,'https://','');
+
+   if length(Proxy)>0 then begin
+       RegExpr:=TRegExpr.CReate();
+       RegExpr.Expression:='(.+?):(.+?)@(.+)';
+       if RegExpr.Exec(Proxy) then begin
+            ProxyUser:=RegExpr.Match[1];
+            ProxyPassword:=RegExpr.Match[2];
+            ProxyName:=RegExpr.Match[3];
+       end;
+       RegExpr.Expression:='(.+?)@(.+)';
+       if RegExpr.Exec(Proxy) then begin
+           ProxyUser:=RegExpr.Match[1];
+           ProxyName:=RegExpr.Match[3];
+       end;
+   end;
+
+   if length(ProxyName)=0 then ProxyName:=Proxy;
+
+   if length(ProxyName)>0 then begin
+        curlstring:='-x '+ProxyName;
+        if length( ProxyUser)>0 then  curlstring:=curlstring+' -U '+ProxyUser;
+        if length( ProxyPassword)>0 then  curlstring:=curlstring+':'+ProxyPassword;
+   end;
+
+  socket:=CLAMD_GETINFO('LocalSocket');
+  PidFile:=CLAMD_GETINFO('PidFile');
+  DatabaseDirectory:=CLAMD_GETINFO('DatabaseDirectory');
+l:=Tstringlist.Create;
+l.add('PATH="/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin"');
+l.add('export PATH');
+l.add('');
+l.add('clam_user="clamav"');
+l.add('clam_group="clamav"');
+l.add('clam_dbs="'+DatabaseDirectory+'"');
+l.add('clamd_pid="'+PidFile+'"');
+l.add('reload_dbs="yes"');
+l.add('');
+l.add('reload_opt="clamdscan --reload"  # Default');
+l.add('clamd_socket="'+socket+'"');
+l.add('start_clamd="service clamd start"');
+l.add('enable_random="yes"');
+l.add('min_sleep_time="60"    # Default minimum is 60 seconds (1 minute).');
+l.add('max_sleep_time="600"   # Default maximum is 600 seconds (10 minutes).');
+l.add('ss_dbs="');
+l.add('   junk.ndb');
+l.add('   jurlbl.ndb');
+l.add('   phish.ndb');
+l.add('   rogue.hdb');
+l.add('   sanesecurity.ftm');
+l.add('   scam.ndb');
+l.add('   spamimg.hdb');
+l.add('   winnow_malware.hdb');
+l.add('   winnow_malware_links.ndb');
+l.add('"');
+l.add('');
+l.add('si_dbs="');
+l.add('   honeynet.hdb');
+l.add('   securiteinfobat.hdb');
+l.add('   securiteinfodos.hdb');
+l.add('   securiteinfoelf.hdb');
+l.add('   securiteinfo.hdb');
+l.add('   securiteinfohtml.hdb');
+l.add('   securiteinfooffice.hdb');
+l.add('   securiteinfopdf.hdb');
+l.add('   securiteinfosh.hdb');
+l.add('"');
+l.add('');
+l.add('si_update_hours="4"   # Default is 4 hours (6 update checks daily).');
+l.add('mbl_dbs="');
+l.add('   mbl.ndb');
+l.add('"');
+l.add('mbl_update_hours="6"   # Default is 6 hours (4 downloads daily).');
+l.add('work_dir="/usr/unofficial-dbs"   #Top level working directory');
+l.add('ss_dir="$work_dir/ss-dbs"        # Sanesecurity sub-directory');
+l.add('si_dir="$work_dir/si-dbs"        # SecuriteInfo sub-directory');
+l.add('mbl_dir="$work_dir/mbl-dbs"      # MalwarePatrol sub-directory');
+l.add('config_dir="$work_dir/configs"   # Script configs sub-directory');
+l.add('gpg_dir="$work_dir/gpg-key"      # Sanesecurity GPG Key sub-directory');
+l.add('add_dir="$work_dir/add-dbs"      # User defined databases sub-directory');
+l.add('keep_db_backup="no"');
+l.add('curl_silence="no"      # Default is "no" to report curl statistics');
+l.add('rsync_silence="no"     # Default is "no" to report rsync statistics');
+l.add('gpg_silence="no"       # Default is "no" to report gpg signature status');
+l.add('comment_silence="no"   # Default is "no" to report script comments');
+l.add('');
+l.add('enable_logging="yes"');
+l.add('log_file_path="/var/log"');
+l.add('log_file_name="clamav-unofficial-sigs.log"');
+l.add('curl_proxy="'+curlstring+'"');
+l.add('user_configuration_complete="yes"');
+logs.WriteToFile(l.Text,'/etc/clamav-unofficial-sigs.conf');
+logs.Debuglogs('Starting......: clamav-unofficial-sigs.conf done...');
+end;
+
+
 PROCEDURE Tclamav.SCAMP_CONF();
 var
    l:Tstringlist;

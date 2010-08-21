@@ -17,7 +17,7 @@ artica_cron, kretranslator, isoqlog, obm, openvpn, jcheckmail, mailmanctl,
 imapsync, dhcp_server, samba4, obm2, xapian, opengoo, dstat, rsync, tcpip,
 nfsserver, lvm, assp, pdns, gluster, kav4proxy, zabbix, hamachi, kavmilter,
 kavm4mls, postfilter, fetchmail, vmwaretools, zarafa_server, monit,
-squidguard, wifi,fail2ban,mysql_daemon,saslauthd,xfce, emailrelay;
+squidguard, wifi,fail2ban,mysql_daemon,saslauthd,xfce, emailrelay,mldonkey,policyd_weight;
 
 var
 install:Tclass_install;
@@ -100,7 +100,8 @@ zfail2ban:tfail2ban;
 zmysql:tmysql_daemon;
 zsaslauthd:tsaslauthd;
 zxfce:txfce;
-
+zmldonkey:tmldonkey;
+zpolicyd_weight:tpolicyd_weight;
 
 begin
 SYS:=Tsystem.Create;
@@ -265,6 +266,7 @@ end;
 
 if ParamStr(1)='--export-version' then
 begin
+GLOBAL_INI:=myconf.Create();
 if ParamStr(2)='squid' then
 begin
 zsquid:=Tsquid.Create;
@@ -514,7 +516,7 @@ end;
    halt(0);
 end;
  if ParamStr(2)='gdm' then begin
-   xopengoo:=topengoo.Create(SYS);
+
    writeln(GLOBAL_INI.GDM_VERSION());
    halt(0);
 end;
@@ -544,7 +546,29 @@ end;
 end;
 
  if ParamStr(2)='emailrelay' then begin
+
    writeln(GLOBAL_INI.EMAILRELAY_VERSION());
+   halt(0);
+end;
+
+ if ParamStr(2)='dhcpd' then begin
+   dhcp3:=Tdhcp3.Create(SYS);
+   writeln(dhcp3.VERSION());
+   halt(0);
+end;
+  if ParamStr(2)='pure-ftpd' then begin
+   zpureftpd:=Tpureftpd.Create();
+   writeln(zpureftpd.PURE_FTPD_VERSION());
+   halt(0);
+end;
+  if ParamStr(2)='mldonkey' then begin
+   zmldonkey:=tmldonkey.Create(SYS);
+   writeln(zmldonkey.VERSION());
+   halt(0);
+end;
+  if ParamStr(2)='policydw' then begin
+   zpolicyd_weight:=tpolicyd_weight.Create(SYS);
+   writeln(zpolicyd_weight.VERSION());
    halt(0);
 end;
 
@@ -565,27 +589,35 @@ writeln('--export-version lighttpd');
 writeln('--export-version pdns');
 writeln('--export-version vmtools');
 writeln('--export-version hamachi');
+writeln('--export-version emailrelay');
+writeln('--export-version dhcpd');
+writeln('--export-version pure-ftpd');
+writeln('--export-version mldonkey');
+
+
 halt(0);
 end;
 
 
 
-
-
-
-if ParamStr(1)='--reload-dansguardian' then
-begin
-zdansguardian.DANSGUARDIAN_RELOAD();
-halt(0);
+if ParamStr(1)='--reload-apache-groupware' then begin
+   xopengoo:=Topengoo.Create(SYS);
+   xopengoo.RELOAD();
+   halt(0);
 end;
 
-if ParamStr(1)='--monit-status' then
-begin
-zmonit:=tmonit.Create(SYS);
-zmonit.BuildStatus();
-zmonit.free;
-SYS.free;
-halt(0);
+
+if ParamStr(1)='--reload-dansguardian' then begin
+   zdansguardian.DANSGUARDIAN_RELOAD();
+   halt(0);
+end;
+
+if ParamStr(1)='--monit-status' then begin
+   zmonit:=tmonit.Create(SYS);
+   zmonit.BuildStatus();
+   zmonit.free;
+   SYS.free;
+   halt(0);
 end;
 
 

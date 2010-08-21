@@ -560,7 +560,7 @@ var
    squidguard            :tsquidguard;
    WifiCardOk            :integer;
    wifi                  :twifi;
-   
+   APACHE_MODULES_PATH   :string;
 
 begin
 
@@ -715,6 +715,11 @@ begin
    //DRUPAL
    if FileExists('/usr/share/drupal/install.php') then list.Add('$_GLOBAL["DRUPAL_INSTALLED"]=True;') else list.Add('$_GLOBAL["DRUPAL_INSTALLED"]=False;');
 
+   //emailrelay
+   if FileExists(SYS.LOCATE_GENERIC_BIN('emailrelay')) then list.Add('$_GLOBAL["EMAILRELAY_INSTALLED"]=True;') else list.Add('$_GLOBAL["EMAILRELAY_INSTALLED"]=False;');
+
+   //mldonkey
+   if FileExists(SYS.LOCATE_GENERIC_BIN('mlnet')) then list.Add('$_GLOBAL["MLDONKEY_INSTALLED"]=True;') else list.Add('$_GLOBAL["MLDONKEY_INSTALLED"]=False;');
 
    //cpu,mem...
    list.Add('$_GLOBAL["CPU_NUMBER"]="'+ IntToStr(sys.CPU_NUMBER())+'";');
@@ -994,9 +999,20 @@ begin
      if FileExists(SYS.LOCATE_APACHE_BIN_PATH()) then begin
         list.Add('$_GLOBAL["APACHE_INSTALLED"]=True;');
         list.Add('$_GLOBAL["APACHE_PORT"]="'+SYS.APACHE_STANDARD_PORT()+'";');
-        if FileExists(SYS.LOCATE_APACHE_MODULES_PATH()+'/mod_vhost_ldap.so') then  list.Add('$_GLOBAL["APACHE_MODE_VHOSTS_LDAP"]=True;') else list.Add('$_GLOBAL["APACHE_MODE_VHOSTS_LDAP"]=False;');
+        APACHE_MODULES_PATH:=SYS.LOCATE_APACHE_MODULES_PATH();
+        if FileExists(APACHE_MODULES_PATH+'/mod_vhost_ldap.so') then  list.Add('$_GLOBAL["APACHE_MODE_VHOSTS_LDAP"]=True;') else list.Add('$_GLOBAL["APACHE_MODE_VHOSTS_LDAP"]=False;');
+        if FileExists(APACHE_MODULES_PATH+'/mod_dav.so') then begin
+           if FileExists(APACHE_MODULES_PATH+'/mod_ldap.so') then begin
+               list.Add('$_GLOBAL["APACHE_MODE_WEBDAV"]=True;');
+           end else begin
+               list.Add('$_GLOBAL["APACHE_MODE_WEBDAV"]=False;');
+           end;
+        end else begin
+               list.Add('$_GLOBAL["APACHE_MODE_WEBDAV"]=False;');
+        end;
      end else begin
          list.Add('$_GLOBAL["APACHE_INSTALLED"]=False;');
+         list.Add('$_GLOBAL["APACHE_MODE_WEBDAV"]=False;');
      end;
 
 

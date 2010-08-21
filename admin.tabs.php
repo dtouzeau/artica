@@ -80,7 +80,7 @@ function admin_system(){
 		$phpmyadmin=Paragraphe('phpmyadmin-grey-64.png','{APP_PHPMYADMIN}','{error_app_not_installed_disabled}',"","{APP_PHPMYADMIN_TEXT}");
 	}	
 	
-	
+	$massmailing=Paragraphe('mass-mailing-64.png','{email_campaigns}','{APP_MASSMAILING_ENABLE_TEXT}',"javascript:Loadjs('system.enable.massmailing.php');","{APP_MASSMAILING_ENABLE_TEXT}");
 	$tr[]=$frontend_settings;
 	$tr[]=$memdump;
 	$tr[]=$artica_events;
@@ -91,8 +91,7 @@ function admin_system(){
 	$tr[]=$backup;
 	$tr[]=$phpldapadmin;
 	$tr[]=$phpmyadmin;
-
-
+	$tr[]=$massmailing;
 	
 $tables[]="<table style='width:100%'><tr>";
 $t=0;

@@ -1,19 +1,39 @@
-1.4.080521:
+1.4.082116:
 ========================================================================================
 
 Proxy Changes
 -------------------------------------------------
-Add possibility to set a pattern in the Local SQUID network section 
+1.4.081200: Add possibility to set a pattern in the Local SQUID network section 
 
 Messaging Changes:
 -------------------------------------------------
-Fiw cannot add SMTP server in the organization when using multiple postfix instances.
-
+1.4.081200: Fix cannot add SMTP server in the organization when using multiple postfix instances.
+1.4.081200: Fix unable to create senders BCC and recients BCC in postfix when using multiple postfix instances.
+1.4.081200: Add possibility to purge a single mailbox in administrator web interface and end-user web interface.
+1.4.081223: Improve PostfixInstant Iptables feature.
+1.4.081415: Add possibility to schedule quarantine PDF reports for each user (the last HTML report was removed for performances issues).
+1.4.082102: Add a syslog watchdog on amavis[5302]: (!)_DIE: Suicide in child_init_hook (artica action = restart amavisd)
+1.4.082116: Fix unable to restart policyd-weight cause monit take the hand
 
 File Sharing changes:
 -----------------------------------------------
-Activate symbolic links by default in Samba.
+1.4.081200: Activate symbolic links by default in Samba.
+1.4.081613: Adding possibility to play with file sharing in user's Home directory in the end-user interface.
+1.4.081616: Fix unable to FTP login with Pure-ftpd 
+1.4.081913: Fix wrong parameter "wide symlinks" change to "wide links" in samba.
+1.4.081913: Starting MLDonkey support
+1.4.082102: WebDav support for users Home Directory
 
+System Changes:
+-------------------------------------------------
+1.4.081402: Support enable/disable clamav unofficial updates.
+1.4.081613: Fix wrong DHCP server status when running on Ubuntu 8.04
+
+
+Interface Changes
+-------------------------------------------------
+1.4.081200: Add new feature (in beta mode) enables mass mailing tasks with artica !
+1.4.081402: Fix unable to change the Unique identifier trough interface.
 
 1.4.080521: release
 ========================================================================================

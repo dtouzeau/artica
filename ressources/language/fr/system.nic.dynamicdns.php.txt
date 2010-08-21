@@ -1,6 +1,6 @@
 <add_dynamic_dns>Ajouter une r&egrave;gle de DNS Dynamique</add_dynamic_dns>
 <add_dynamic_dns_text>si vous poss&eacute;dez un compte dyndns.org, freedns.afraid.org, zoneedit.com, no-ip.com, ajouter un r&egrave;gle pour mettre &agrave; jour ces services</add_dynamic_dns_text>
-<daemonstatus1>Statut du D&eacute;mon</daemonstatus1>
+<daemonstatus1>Etat du D&eacute;mon</daemonstatus1>
 <dns_host>H&ocirc;te DNS</dns_host>
 <dns_hosts>H&ocirc;te DNS</dns_hosts>
 <dynamic_dns>Param&egrave;tres du Client DNS Dynamique</dynamic_dns>

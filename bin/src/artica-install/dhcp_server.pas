@@ -145,6 +145,7 @@ function tdhcp3.PID_PATH():string;
 begin
 if FileExists('/var/run/dhcpd.pid') then exit('/var/run/dhcpd.pid');
 if FileExists('/var/run/dhcpd/dhcpd.pid') then exit('/var/run/dhcpd/dhcpd.pid');
+if FileExists('/var/run/dhcp3-server/dhcpd.pid') then exit('/var/run/dhcp3-server/dhcpd.pid');
 end;
 function tdhcp3.READ_PID():string;
 begin
@@ -221,43 +222,15 @@ end;
 function tdhcp3.STATUS():string;
 var
    ini:TstringList;
-   pid:string;
+   pidpath:string;
 begin
+SYS.MONIT_DELETE('APP_DHCP');
+if not FileExists(BIN_PATH()) then exit;
+pidpath:=logs.FILE_TEMP();
+fpsystem(SYS.LOCATE_PHP5_BIN()+' /usr/share/artica-postfix/exec.status.php --dhcpd >'+pidpath +' 2>&1');
+result:=logs.ReadFromFile(pidpath);
+logs.DeleteFile(pidpath);
 ini:=TstringList.Create;
-pid:=DAEMON_PID();
-
-   if not FileExists(BIN_PATH()) then exit;
-   ini.Add('[DHCPD]');
-   ini.Add('service_name=APP_DHCP');
-   ini.Add('service_cmd=dhcp');
-   ini.Add('service_disabled='+IntToStr(EnableDHCPServer));
-   ini.Add('master_version='+VERSION());
-   if EnableDHCPServer=0 then begin
-      result:=ini.Text;
-      ini.free;
-      SYS.MONIT_DELETE('APP_DHCP');
-      exit;
-   end;
-
-
-   logs.Debuglogs('DHCP PID:'+PID_PATH());
-
-   if SYS.MONIT_CONFIG('APP_DHCP',PID_PATH(),'dhcp') then begin
-      ini.Add('monit=1');
-      result:=ini.Text;
-      ini.free;
-      exit;
-   end;
-
-
-   if SYS.PROCESS_EXIST(pid) then ini.Add('running=1') else  ini.Add('running=0');
-   ini.Add('application_installed=1');
-   ini.Add('master_pid='+ pid);
-   ini.Add('master_memory=' + IntToStr(SYS.PROCESS_MEMORY(pid)));
-   ini.Add('status='+SYS.PROCESS_STATUS(pid));
-   result:=ini.Text;
-   ini.free;
-    logs.Debuglogs('DHCP STATUS OK');
 end;
 //#########################################################################################
 procedure tdhcp3.ApplyConf();

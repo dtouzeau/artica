@@ -496,25 +496,12 @@ function main_tabs(){
 	$array["index"]='{index}';
 	$array["artica_services"]='{artica_services}';
 	
-	if($users->POSTFIX_INSTALLED){
-		$array["postfix_services"]='{postfix_services}';
-		
-	}
-	
-	if($users->cyrus_imapd_installed){
-		$array["mail_services"]='{mail_services}';
-	}
-	
-	if($users->ZARAFA_INSTALLED){
-		$array["mail_services"]='{mail_services}';
-	}	
-	
-	if($users->SAMBA_INSTALLED){
-		$array["samba_services"]='{samba_services}';
-	}
-	if($users->SQUID_INSTALLED){
-		$array["squid_services"]='{squid_services}';
-	}
+	if($users->POSTFIX_INSTALLED){$array["postfix_services"]='{postfix_services}';}
+	if($users->cyrus_imapd_installed){$array["mail_services"]='{mail_services}';}
+	if($users->ZARAFA_INSTALLED){$array["mail_services"]='{mail_services}';}	
+	if($users->SAMBA_INSTALLED){$array["samba_services"]='{samba_services}';}
+	if($users->MLDONKEY_INSTALLED){$array["samba_services"]='{samba_services}';}	
+	if($users->SQUID_INSTALLED){$array["squid_services"]='{squid_services}';}
 	
 while (list ($num, $ligne) = each ($array) ){
 		if($_GET["section"]==$num){$class="id=tab_current";}else{$class=null;}
@@ -661,6 +648,8 @@ function SERVICES_STATUS(){
 			$html=$html . BuildRow($users,$ini->_params["OBM2"],"{APP_OBM2}");	
 			$html=$html . BuildRow($users,$ini->_params["DOTCLEAR"],"{APP_DOTCLEAR}");				
 			$html=$html . BuildRow($users,$ini->_params["PUREFTPD"],"{APP_PUREFTPD}");
+			$html=$html . BuildRow($users,$ini->_params["APP_MLDONKEY"],"{APP_MLDONKEY}");
+			
 
 					
 			$html=$html . "</table></div>";
@@ -729,7 +718,6 @@ function SERVICES_STATUS(){
 		$html=$html . BuildRow($users,$ini->_params["APP_ZARAFA_DAGENT"],"{APP_ZARAFA_DAGENT}");
 		$html=$html . BuildRow($users,$ini->_params["APP_ZARAFA_ICAL"],"{APP_ZARAFA_ICAL}");
 		$html=$html . BuildRow($users,$ini->_params["APP_ZARAFA_WEB"],"{APP_ZARAFA_WEB}");	
-		
 		$html=$html . BuildRow($users,$ini->_params["FETCHMAIL"],"{APP_FETCHMAIL}");
 		$html=$html . BuildRow($users,$ini->_params["FETCHMAIL_LOGGER"],"{APP_FETCHMAIL_LOGGER}");	
 		$html=$html . BuildRow($users,$ini->_params["P3SCAN"],"{APP_P3SCAN}");
@@ -751,6 +739,7 @@ function SERVICES_STATUS(){
 			$html=$html . BuildRow($users,$ini->_params["SAMBA_SCANNEDONLY"],"{APP_SCANNED_ONLY}");
 			$html=$html . BuildRow($users,$ini->_params["KAV4SAMBA"],"{APP_KAV4SAMBA}");
 			$html=$html . BuildRow($users,$ini->_params["CUPS"],"{APP_CUPS}");
+			$html=$html . BuildRow($users,$ini->_params["APP_MLDONKEY"],"{APP_MLDONKEY}");
 			$html=$html . "</table></div>";
 			$html_F=$html;				
 		}

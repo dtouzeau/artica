@@ -21,7 +21,10 @@ if(isset($_GET["compileCheck"])){PostfixAutoBlockCompileCheck();exit;}
 if(isset($_GET["DeleteSMTPIptableRule"])){firewall_delete_rule();exit;}
 if(isset($_GET["popup-white"])){popup_white();exit;}
 if(isset($_GET["DeleteSMTPAllIptableRules"])){firewall_delete_all_rules();exit;}
+if(isset($_GET["PostfixAutoBlockParameters"])){popup_parameters();exit;}
+if(isset($_GET["PostfixAutoBlockParametersSave"])){popup_parameters_save();exit;}
 
+if(isset($_GET["firewall-rules-list"])){firewall_rules();exit;}
 
 js();
 
@@ -80,11 +83,12 @@ function js(){
 	$title=$tpl->_ENGINE_parse_body('{postfix_autoblock}',"postfix.index.php");
 	$title2=$tpl->_ENGINE_parse_body('{PostfixAutoBlockManageFW}',"postfix.index.php");
 	$title_compile=$tpl->_ENGINE_parse_body('{PostfixAutoBlockCompileFW}',"postfix.index.php");
-	$normal_start_js="YahooWin2(650,'$page?popup=yes','$title');";
+	$normal_start_js="YahooWin2(490,'$page?popup=yes','$title');";
+	$PostfixAutoBlockParameters=$tpl->_ENGINE_parse_body("{PostfixAutoBlockParameters}");
 	
 	
 if(isset($_GET["white-js"])){
-		$normal_start_js="YahooWin3(650,'$page?popup-white=yes','$title');";
+		$normal_start_js="YahooWin3(490,'$page?popup-white=yes','$title');";
 	}
 	
 	$prefix="PostfixAutoBlockjs";
@@ -229,22 +233,23 @@ var x_PostfixEnableFwRule= function (obj) {
 		if(tempvalue.length>0){alert(tempvalue);}
 	}		
 		
-		
-		
-	function PostfixEnableFwRule(field){
-		var value=document.getElementById(field).value;
+			
+	function PostfixEnableLog(ID){
 		var XHR = new XHRConnection();
-		XHR.appendData('PostfixEnableFwRule',field);
-		XHR.appendData('value',value);
+		XHR.appendData('ID',ID)
+		if(document.getElementById('log_'+ID).checked){XHR.appendData('PostfixEnableLog',1);}else{XHR.appendData('PostfixEnableLog',0);}
 		XHR.sendAndLoad('$page', 'GET',x_PostfixEnableFwRule);	
 	}
 	
-	function PostfixEnableLog(field){
-		var value=document.getElementById(field).value;
+	function FirewallDisableSMTPRUle(ID){
 		var XHR = new XHRConnection();
-		XHR.appendData('PostfixEnableLog',field);
-		XHR.appendData('value',value);
-		XHR.sendAndLoad('$page', 'GET',x_PostfixEnableFwRule);		
+		XHR.appendData('ID',ID)
+		if(document.getElementById('enabled_'+ID).checked){XHR.appendData('PostfixEnableFwRule',0);}else{XHR.appendData('PostfixEnableFwRule',1);}
+		XHR.sendAndLoad('$page', 'GET',x_PostfixEnableFwRule);
+	}
+	
+	function PostfixAutoBlockParameters(){
+		YahooWin4('550','$page?PostfixAutoBlockParameters=yes','$PostfixAutoBlockParameters');
 	
 	}
 	
@@ -254,22 +259,7 @@ var x_PostfixEnableFwRule= function (obj) {
 	echo $html;
 	}
 	
-function PostfixAutoBlockParameters(){
-	$users=new usersMenus();
-	$tpl=new templates();
-	if(!$users->AsPostfixAdministrator){
-		$error=$tpl->_ENGINE_parse_body("{ERROR_NO_PRIVS}");
-		echo "$error";
-		die();
-	}	
-	
-	$ini=new Bs_IniHandler();
-	$ini->_params["CONF"]["PostfixAutoBlockDays"]=$_GET["PostfixAutoBlockDays"];
-	$ini->_params["CONF"]["PostfixAutoBlockEvents"]=$_GET["PostfixAutoBlockEvents"];
-	$ini->_params["CONF"]["PostfixAutoBlockPeriod"]=$_GET["PostfixAutoBlockPeriod"];
-	$sock=new sockets();
-	$sock->SaveConfigFile($ini->toString(),"PostfixAutoBlockParameters");
-	}
+
 	
 	
 function popup(){
@@ -290,56 +280,19 @@ function popup(){
 	$sock=new sockets();
 	$EnablePostfixAutoBlock=$sock->GET_INFO("EnablePostfixAutoBlock");
 	
-	$ini=new Bs_IniHandler();
-	$ini->loadString($sock->GET_INFO("PostfixAutoBlockParameters"));
-	if($ini->_params["CONF"]["PostfixAutoBlockDays"]==null){$ini->_params["CONF"]["PostfixAutoBlockDays"]=2;}
-	if($ini->_params["CONF"]["PostfixAutoBlockEvents"]==null){$ini->_params["CONF"]["PostfixAutoBlockEvents"]=100;}
-	if($ini->_params["CONF"]["PostfixAutoBlockPeriod"]==null){$ini->_params["CONF"]["PostfixAutoBlockPeriod"]=240;}
-	
-	
-	
-	$parameters="
-	<div id='PostfixAutoBlockParameters'>
-	<table style='width:240px'>
-	<tr>
-		<td class=legend nowrap>{PostfixAutoBlockDays}:</td>
-		<td>" . Field_array_Hash($arr_day,"PostfixAutoBlockDays",$ini->_params["CONF"]["PostfixAutoBlockDays"])."</td>
-		<td>" . help_icon("{PostfixAutoBlockDays_text}")."</td>
-	</tr>
-	<tr>
-		<td class=legend nowrap>{PostfixAutoBlockEvents}:</td>
-		<td>" . Field_text("PostfixAutoBlockEvents",$ini->_params["CONF"]["PostfixAutoBlockEvents"],"width:40px")."</td>
-		<td>" . help_icon("{PostfixAutoBlockEvents_text}")."</td>
-	</tr>
-	<tr>
-		<td class=legend nowrap>{PostfixAutoBlockPeriod}:</td>
-		<td nowrap>" . Field_text("PostfixAutoBlockPeriod",$ini->_params["CONF"]["PostfixAutoBlockPeriod"],"width:40px")."&nbsp;{minutes}</td>
-		<td>" . help_icon("{PostfixAutoBlockPeriod_text}")."</td>
-	</tr>		
-	<tr>
-	<td colspan=3 align='right'><hr>
-	<input type='button' OnClick=\"javascript:PostfixAutoBlockParameters();\" value='{edit}&nbsp;&raquo;'></td>
-	</tr>
-	
-	</table>
-	</div>
-	
-	
-	";
-	$parameters=RoundedLightWhite($parameters);
-	
+		
 	$form=Paragraphe_switch_img("{enable_postfix_autoblock}",
-	"{enable_postfix_autoblock_text}",'EnablePostfixAutoBlock',$EnablePostfixAutoBlock,"{enable_disable}",250);
+	"{enable_postfix_autoblock_text}",'EnablePostfixAutoBlock',$EnablePostfixAutoBlock,"{enable_disable}",450);
 	
     $form="
     <div id='EnablePostfixAutoBlockDiv'>
 			$form
 		<div style='width:100%;text-align:right'>
-			<input type='button' OnClick=\"javascript:EnablePostfixAutoBlockDeny()\" value='{edit}&nbsp;&raquo;&raquo;'>
+			". button("{apply}","javascript:EnablePostfixAutoBlockDeny()")."
 		</div>
 	</div>";
 	
-	$form=RoundedLightWhite($form);
+
 	$PostfixAutoBlockDenyAddWhiteList=$tpl->_ENGINE_parse_body("{PostfixAutoBlockDenyAddWhiteList}","postfix.index.php");
 	$add_whitelist=Paragraphe("64-bind9-add-zone.png","$PostfixAutoBlockDenyAddWhiteList","{PostfixAutoBlockDenyAddWhiteList_explain}",
 	"javascript:PostfixAutoBlockDenyAddWhiteList();");
@@ -350,37 +303,111 @@ function popup(){
 	$compile=Paragraphe("system-64.png","{PostfixAutoBlockCompileFW}","{PostfixAutoBlockCompileFW_text}",
 	"javascript:PostfixAutoBlockCompileFW();");
 	
+	$parameters=Paragraphe("64-parameters.png","{PostfixAutoBlockParameters}","{PostfixAutoBlockParameters_text}",
+	"javascript:PostfixAutoBlockParameters();");	
 	
 	
 	
-	
-	$html="<H1>{postfix_autoblock}</H1>
-	<p class=caption>{postfix_autoblock_explain}</p>
+	$html="
+	<p style='font-size:13px'>{postfix_autoblock_explain}</p>
 	<table style='width:100%'>
 	<tr>
 		<td valign='top'>$form<hr></td>
-		<td valign='top'>$parameters</td>
 	</tr>
-	</table>
-	<table style='width:100%'>
 	<tr>
 	<td valign='top'>
-	". RoundedLightWhite("<div style='width:100%;height:300px;overflow:auto' id='BlockDenyAddWhiteList'>".BlockDenyWhiteList()."</div>")."	
-		
+		<table style='width:100%'>
+		<tr>
+			<td>$parameters</td>
+			<td>$add_whitelist</td>
+			
+		</tr>
+		<tr>
+			<td>$manage_fw</td>
+			<td>$compile</td>
+		</tr>
+		</table>
 	</td>
-	<td valign='top' width=2%>
-	$add_whitelist
-	$manage_fw
-	$compile
-	</td>
-	</tr>
 	</table>
-	
+
 	";
 	
 	
 	
 	echo $tpl->_ENGINE_parse_body($html,"postfix.index.php");
+}
+
+function popup_parameters(){
+	
+	$sock=new sockets();
+	$array=unserialize(base64_decode($sock->GET_INFO("PostfixAutoBlockParameters")));
+	$page=CurrentPageName();
+	
+if($array["NAME_SERVICE_NOT_KNOWN"]<1){$array["NAME_SERVICE_NOT_KNOWN"]=10;}
+if($array["SASL_LOGIN"]<1){$array["SASL_LOGIN"]=15;}
+if($array["RBL"]<1){$array["RBL"]=5;}
+if($array["USER_UNKNOWN"]<1){$array["USER_UNKNOWN"]=10;}
+if($array["BLOCKED_SPAM"]<1){$array["BLOCKED_SPAM"]=5;}
+
+$html="
+<div id='PostfixAutoBlockParameters_id'>
+<table style='width:100%'>
+<tr>
+	<td class=legend style='font-size:13px'>{SMTPHACK_NAME_SERVICE_NOT_KNOWN}:</td>
+	<td>". Field_text("NAME_SERVICE_NOT_KNOWN",$array["NAME_SERVICE_NOT_KNOWN"],"font-size:13px;padding:3px;width:45px")."</td>
+</tr>
+<tr>
+	<td class=legend style='font-size:13px'>{SMTPHACK_SASL_LOGIN}:</td>
+	<td>". Field_text("SASL_LOGIN",$array["SASL_LOGIN"],"font-size:13px;padding:3px;width:45px")."</td>
+</tr>
+<tr>
+	<td class=legend style='font-size:13px'>{SMTPHACK_RBL}:</td>
+	<td>". Field_text("RBL",$array["RBL"],"font-size:13px;padding:3px;width:45px")."</td>
+</tr>
+<tr>
+	<td class=legend style='font-size:13px'>{SMTPHACK_USER_UNKNOWN}:</td>
+	<td>". Field_text("USER_UNKNOWN",$array["USER_UNKNOWN"],"font-size:13px;padding:3px;width:45px")."</td>
+</tr>
+<tr>
+	<td class=legend style='font-size:13px'>{SMTPHACK_BLOCKED_SPAM}:</td>
+	<td>". Field_text("BLOCKED_SPAM",$array["BLOCKED_SPAM"],"font-size:13px;padding:3px;width:45px")."</td>
+</tr>
+<tr>
+	<td colspan=2 align='right'><hr>". button("{apply}","PostfixAutoBlockParametersSave()")."</td>
+</tr>
+</table>
+</div>
+<script>
+	var x_PostfixAutoBlockParametersSave= function (obj) {
+			var tempvalue=obj.responseText;
+			if(tempvalue.length>0){alert(tempvalue)};
+			YahooWin4Hide();
+	}			
+		
+function PostfixAutoBlockParametersSave(){
+	var XHR = new XHRConnection();
+	XHR.appendData('PostfixAutoBlockParametersSave','yes');
+	XHR.appendData('NAME_SERVICE_NOT_KNOWN',document.getElementById('NAME_SERVICE_NOT_KNOWN').value);
+	XHR.appendData('SASL_LOGIN',document.getElementById('SASL_LOGIN').value);
+	XHR.appendData('RBL',document.getElementById('RBL').value);	
+	XHR.appendData('USER_UNKNOWN',document.getElementById('USER_UNKNOWN').value);
+	XHR.appendData('BLOCKED_SPAM',document.getElementById('BLOCKED_SPAM').value);
+	document.getElementById('PostfixAutoBlockParameters_id').innerHTML='<center style=\"margin:20px;padding:20px\"><img src=\"img/wait_verybig.gif\"></center>';
+	XHR.sendAndLoad('$page', 'GET',x_PostfixAutoBlockParametersSave);	
+	}
+</script>
+
+";
+
+		$tpl=new templates();
+	echo $tpl->_ENGINE_parse_body($html);
+}
+
+function popup_parameters_save(){
+	$sock=new sockets();
+	$datas=base64_encode(serialize($_GET));
+	$sock->SaveConfigFile($datas,"PostfixAutoBlockParameters");
+	$sock->getFrameWork("cmd.php?smtp-hack-reconfigure=yes");
 }
 
 
@@ -423,22 +450,24 @@ function firewall_popup(){
 		die();
 	}
 
-	$rules=firewall_rules();
 	
-	$rules=RoundedLightWhite("<div id='iptables_postfix_rules' style='width:100%;height:300px;overflow:auto'>$rules</div>");
+	$page=CurrentPageName();
+	
 	
 $html="
-<H1>{PostfixAutoBlockManageFW}</H1>
-<table style='width:100%' class=table_form>
+<table>
 <tr>
 	<td class=legend nowrap>{search}:</td>
-	<td>" . Field_text('search_fw',null,"width:190px",null,null,null,null,"PostfixIptablesSearchKey(event)")."</td>
-	<td align='right'><input type='button' OnClick=\"javascript:DeleteAllIptablesPostfixRules();\" value='{delete_all_items}&nbsp;&raquo;'></td>
+	<td>" . Field_text('search_fw',null,"width:190px;font-size:13px;padding:3px",null,null,null,null,"PostfixIptablesSearchKey(event)")."</td>
 </tR>
 </table>
 <br>
-
-$rules
+<div id='iptables_postfix_rules' style='width:100%;height:300px;overflow:auto'></div>
+<hr>
+<div style='text-align:right'><input type='button' OnClick=\"javascript:DeleteAllIptablesPostfixRules();\" value='{delete_all_items}&nbsp;&raquo;'></div>
+<script>
+	LoadAjax('iptables_postfix_rules','$page?firewall-rules-list=yes');
+</script>
 ";
 	
 //empty_table_confirm
@@ -446,67 +475,70 @@ echo $tpl->_ENGINE_parse_body($html,"postfix.index.php");
 	
 }
 
-function firewall_rules(){
-	if($_GET["page"]==null){$_GET["page"]=0;}
-	$cache_index=md5("{$_GET["page"]}{$_GET["search"]}");
-	if(strlen($_SESSION["postfix_firewall_rules"][$cache_index])>0){return $_SESSION["postfix_firewall_rules"][$cache_index];}
-	
-	$iptables=new iptables_chains();
-	$page=CurrentPageName();
-	$results=$iptables->loadPostfix_chains(($_GET["page"]*50),$_GET["search"]);
-	
-	$max=$results[0];
-	$pages=round($max/50)+1;
 
-	for($i=0;$i<$pages;$i++){
-		if($_GET["page"]==$i){$class="id=tab_current";}else{$class=null;}
-		$tabs=$tabs . "<li><a href=\"javascript:LoadAjax('iptables_postfix_rules','$page?PostfixAutoBlockLoadFWRules=yes&page=$i&search={$_GET["search"]}')\" $class>$i</a></li>\n";
-	}
-	$tabs="
-	<input type='hidden' id='postfix_firewall_page' value='{$_GET["postfix_firewall_page"]}'>
-	<br><div id=tablist>$tabs</div><br>";
+function firewall_rules(){
+	$q=new mysql();
+	$sql_count="SELECT COUNT(*) AS tcount FROM iptables WHERE local_port=25 AND flux='INPUT'{$sql_search}";
+	$ligne=mysql_fetch_array($q->QUERY_SQL($sql_count,"artica_backup"));
+	$max=$ligne["tcount"];
 	
-	$html="$tabs<table style='width:100%'>
+	
+	if($limit==null){$limit=0;}
+	
+	if($_GET["search"]<>null){
+		$_GET["search"]=$_GET["search"]."*";
+		$_GET["search"]=str_replace("**","*",$_GET["search"]);
+		$_GET["search"]=str_replace("*","%",$_GET["search"]);
+		if(preg_match("#([a-zA-Z]+)#",$_GET["search"])){
+			$sql_search="AND servername LIKE '{$_GET["search"]}' ";
+		}else{
+			$sql_search="AND serverip LIKE '{$_GET["search"]}' ";
+		}
+	}
+	
+	$sql="SELECT * FROM iptables WHERE local_port=25 AND flux='INPUT' {$sql_search}ORDER BY ID DESC LIMIT $limit,200";
+	writelogs($sql,__FUNCTION__,__FILE__,__LINE__);
+	$q=new mysql();	
+	$results=$q->QUERY_SQL($sql,"artica_backup");
+	
+	$html="
+	<div style='text-align:right'>". imgtootltip("refresh-32.png","{refresh}","PostfixIptablesSearch()")."</div>
+	<table style='width:100%'>
 	<tr>
-		<th>&nbsp;</th>
 		<th>&nbsp;</th>
 		<th>{date}</th>
 		<th>{server}</th>
 		<th>{enable}</th>
 		<th>{log}</th>
-		<th>{delete}</th>
-	</tr>
-	";
+		<th>&nbsp;</th>
+	</tr>";
 	
-//servername,serverip,local_port,disable,events_number,rule_string,rulemd5,flu	
-	
-while($ligne=@mysql_fetch_array($results[1],MYSQL_ASSOC)){
-		$disable=Field_numeric_checkbox_img("disable_{$ligne["rulemd5"]}",$ligne["disable"],"{enable_disable}","PostfixEnableFwRule");
-		$log=Field_numeric_checkbox_img("log_{$ligne["rulemd5"]}",$ligne["log"],"{enable_disable}","PostfixEnableLog");
-		$delete=imgtootltip("ed_delete.gif","{delete}","PostfixIptableDelete('{$ligne["rulemd5"]}')");
-		$ligne["saved_date"]=str_replace(date('Y-'),'',$ligne["saved_date"]);
-		$ligne["saved_date"]=str_replace(date('m-d'),'',$ligne["saved_date"]);
+	while($ligne=@mysql_fetch_array($results,MYSQL_ASSOC)){
+		if($ligne["servername"]==null){$ligne["servername"]=$ligne["serverip"];}
 		
-		if($ligne["disable"]==1){$block="{allow}";}else{$block="{block}";}
+		$disable=Field_checkbox("enabled_{$ligne["ID"]}",0,$ligne["disable"],"FirewallDisableSMTPRUle('{$ligne["ID"]}')");
+		$log=Field_checkbox("log_{$ligne["ID"]}",1,$ligne["log"],"PostfixEnableLog('{$ligne["ID"]}')");
+		$delete=imgtootltip("ed_delete.gif","{delete}","PostfixIptableDelete('{$ligne["rulemd5"]}')");
+		$ligne["events_block"]="<div style=font-size:13px>".nl2br($ligne["events_block"])."</div>";
 		
 		$html=$html . "
 		<tr " . CellRollOver().">
 		<td width=1%><img src='img/fw_bold.gif'></td>
-		<td nowrap><strong>{$ligne["saved_date"]}</strong></td>
-		<td>$block</td>
-		<td><strong>". texttooltip($ligne["servername"],"{$ligne["serverip"]}<br>{$ligne["events_number"]} {events}",null,null,0,"font-size:12px")."</strong></td>
+		<td  width=1% nowrap><strong style='font-size:13px'>{$ligne["saved_date"]}</strong></td>
+		<td><strong style='font-size:13px'><code>". texttooltip("{$ligne["servername"]}",$ligne["events_block"],null,null,0,"font-size:13px")."</strong></code></td>
 		<td width=1%>$disable</td>
 		<td width=1%>$log</td>
 		<td width=1%>$delete</td>
 		</td>
 		</tr>";
-		}
 		
-$html=$html."</table>";
-$tpl=new templates();
-$page=$tpl->_ENGINE_parse_body($html,"postfix.index.php");
-$_SESSION["postfix_firewall_rules"][$cache_index]=$page;
-return $page;		
+	}
+	$html=$html."</table>
+	
+	";
+	
+		$tpl=new templates();
+	echo $tpl->_ENGINE_parse_body($html);
 	
 }
 
@@ -514,8 +546,7 @@ return $page;
 function save(){
 	$sock=new sockets();
 	$sock->SET_INFO('EnablePostfixAutoBlock',$_GET["EnablePostfixAutoBlock"]);
-	$tpl=new templates();
-	echo $tpl->_ENGINE_parse_body('{success}');
+	
 }
 
 function BlockDenyWhiteList(){
@@ -617,11 +648,8 @@ $sock->getFrameWork("cmd.php?smtp-whitelist=yes");
 }
 
 function PostfixEnableFwRule(){
-	if(preg_match("#disable_(.+)#",$_GET["PostfixEnableFwRule"],$re)){
-		$rulemd=trim($re[1]);
-	}
 	
-	$sql="UPDATE iptables SET disable={$_GET["value"]} WHERE rulemd5='$rulemd'";
+	$sql="UPDATE iptables SET disable={$_GET["PostfixEnableFwRule"]} WHERE ID='{$_GET["ID"]}'";
 	writelogs($sql,__FUNCTION__,__FILE__);
 	$q=new mysql();
 	$q->QUERY_SQL($sql,"artica_backup");
@@ -630,11 +658,7 @@ function PostfixEnableFwRule(){
 }
 
 function PostfixEnableLog(){
-	if(preg_match("#log_(.+)#",$_GET["PostfixEnableLog"],$re)){
-		$rulemd=trim($re[1]);
-	}
-	
-	$sql="UPDATE iptables SET log={$_GET["value"]} WHERE rulemd5='$rulemd'";
+	$sql="UPDATE iptables SET log={$_GET["PostfixEnableLog"]} WHERE ID='{$_GET["ID"]}'";
 	writelogs($sql,__FUNCTION__,__FILE__);
 	$q=new mysql();
 	$q->QUERY_SQL($sql,"artica_backup");

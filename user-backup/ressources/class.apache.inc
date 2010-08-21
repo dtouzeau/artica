@@ -22,6 +22,7 @@ class vhosts{
 	"ZARAFA"=>"zarafa-logo-128.png",
 	"ZARAFA_MOBILE"=>"zarafa-logo-128.png",
 	"DRUPAL"=>"drupal-logo-128.png",
+	"WEBDAV"=>"webdav-128.png"
 	
 	);
 	
@@ -37,6 +38,7 @@ class vhosts{
 	"ZARAFA"=>"zarafa-logo-64.png",
 	"ZARAFA_MOBILE"=>"zarafa-logo-64.png",
 	"DRUPAL"=>"drupal-64.png",
+	"WEBDAV"=>"webdav-64.png",
 	
 	);
 
@@ -45,8 +47,8 @@ class vhosts{
 	
 	
 	
-	var $noneeduser=array("JOOMLA"=>true,"ROUNDCUBE"=>true,"ARTICA_USR"=>true,"ZARAFA_MOBILE"=>true,"ZARAFA"=>true,"DRUPAL"=>true);
-	var $noneeduser_mysql=array("ARTICA_USR"=>true,"ZARAFA_MOBILE"=>true,"ZARAFA"=>true,"DRUPAL"=>true);
+	var $noneeduser=array("JOOMLA"=>true,"ROUNDCUBE"=>true,"ARTICA_USR"=>true,"ZARAFA_MOBILE"=>true,"ZARAFA"=>true,"DRUPAL"=>true,'WEBDAV'=>true);
+	var $noneeduser_mysql=array("ARTICA_USR"=>true,"ZARAFA_MOBILE"=>true,"ZARAFA"=>true,"DRUPAL"=>true,"WEBDAV"=>true);
 	
 	
 	
@@ -62,6 +64,10 @@ class vhosts{
 	"ZARAFA"=>array("TITLE"=>"APP_ZARAFA","TEXT"=>"APP_ZARAFA_TEXT"),
 	"ZARAFA_MOBILE"=>array("TITLE"=>"APP_ZARAFA_MOBILE_ACCESS","TEXT"=>"APP_ZARAFA_TEXT"),
 	"DRUPAL"=>array("TITLE"=>"APP_DRUPAL","TEXT"=>"APP_DRUPAL_TEXT"),
+	"WEBDAV"=>array("TITLE"=>"APP_GROUPWAREDAV","TEXT"=>"APP_GROUPWAREDAV_TEXT"),
+	
+	
+	
 	);
 	
 	function vhost($ou){
@@ -148,6 +154,25 @@ class vhosts{
 		if(!is_array($LoadVhosts)){return array();}
 		return $LoadVhosts;
 	}
+	
+	function LoadVhostsType($ou){
+		$ldap=new clladp();
+		$dn="ou=www,ou=$ou,dc=organizations,$ldap->suffix";
+		$attrs=array();
+		$sr = @ldap_list($ldap->ldap_connection,$dn,'(&(objectclass=apacheConfig)(apacheServerName=*))',$attrs);
+		if ($sr) {
+			$hash=ldap_get_entries($ldap->ldap_connection,$sr);
+			for($i=0;$i<$hash["count"];$i++){
+				$array[$hash[$i]["wwwservertype"][0]]=true;
+				
+			}
+		}
+		
+		if(!is_array($array)){
+			writelogs("No vhosts",__CLASS__.'/'.__FUNCTION__,__FILE__,__LINE__);
+			return array();}
+		return $array;
+	}	
 	
 	
 	public function BuildRoot(){

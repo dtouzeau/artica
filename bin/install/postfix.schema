@@ -1999,7 +1999,16 @@ attributetype ( 1.1.2.1.1.10.1.392 NAME 'WWWEnableAddressBook'
   SYNTAX 1.3.6.1.4.1.1466.115.121.1.26 SINGLE-VALUE)
   )
 #-------------------------------------------------------------------
-#deleted old attribute : ProcMailRcConfig ArticaPolicyEnabled kasxFilterEnabled
+attributetype ( 1.1.2.1.1.10.1.393 NAME 'WebDavUser'
+  DESC 'WebDavUser'
+  EQUALITY caseIgnoreIA5Match
+  SYNTAX 1.3.6.1.4.1.1466.115.121.1.26 SINGLE-VALUE)
+  )
+#-------------------------------------------------------------------
+
+
+
+#deleted old attribute : ProcMailRcConfig ArticaPolicyEnabled kasxFilterEnabled OBMEnabled NTPDEnabled 
 
 
 
@@ -2008,7 +2017,7 @@ objectclass ( 1.3.6.1.4.1.15347.2.3.1.2
     	DESC 'special artica attributes'
 	SUP top
 	AUXILIARY
-	MAY(ArticaGroupPrivileges $ KasperkyAVScanningDatas $ KasperkyASDatas $ KasperskyASGroupNumber $ KasperkyASDatasRules $ MailboxActive $ KasperkyASDatasAllow $ KasperkyASDatasDeny $ CronDatas $ PostfixMaincf $ FetchMailsRules $ FetchMailsGlobalSettings $ PostfixHeadersRegex $ PostfixSSLCert $ MailBoxMaxSize $ PostfixHashSmtpSaslAuth $ SmtpdClientRestrictionsRules $ SmtpdRecipientRestrictionsRules $ SmtpdSenderRestrictionsRules $ PostFixBounceTemplate $ SieveScriptsUser $ ArticaGlobalSettings $ VirtualDomainsMapsMTA $ TemplateNotifyInfectedRecipient $ TemplateNotifyInfectedSender $  TemplateNotifyInfectedAdmin $ TemplateNotifyCorruptedRecipient $ TemplateNotifyCorruptedSender $ TemplateNotifyCorruptedAdmin $ TemplateNotifySuspiciousRecipient $ TemplateNotifySuspiciousSender $ TemplateNotifySuspiciousAdmin $ TemplateNotifyCuredRecipient $ TemplateNotifyCuredSender $ TemplateNotifyCuredAdmin $ TemplateNotifyWarningRecipient $ TemplateNotifyWarningSender $ TemplateNotifyWarningAdmin $ TemplateNotifyProtectedRecipient $ TemplateNotifyProtectedSender $ TemplateNotifyProtectedAdmin $ TemplateNotifyFilteredRecipient $ TemplateNotifyFilteredSender $ TemplateNotifyFilteredAdmin $ TemplateNotifyErrorRecipient $ TemplateNotifyErrorSender $ TemplateNotifyErrorAdmin $ CheckRecipientAccess $ checkrecipientmxaccess $ SmtpdHeloRestrictionsRules $ checkheloaccess $ checkhelomxaccess $ checkhelonsaccess $ checksenderaccess $ checksendermxaccess $ checksendernsaccess $ ArticaUserFilterRule $ ArticaMaxDayQuarantine $ ArticaFakedMailFrom $ ArticaDenyNoMXRecords $ FiltersExtensionsGroupName $ CountryDeny $ RblServers $ RblServersAction $ SURBLServers $ SURBLServersAction $ ArticaWebRootURI $ BogoFilterAction $ OuTrustMyUSers $ ArticaDansGuardianGroupRuleEnabled $ ArticaMailAddonsLevel $ ArticaMaxTempLogFilesDay $ ArticaFoldersSizeConfig $ ArticaAutoUpdateConfig $ ArticaFilterEnabled $ AmavisFilterEnabled $ jpegLogo $ OBMEnabled $ NTPDEnabled $ DefaultGroupPassword $ AutoDomainAliases))
+	MAY(ArticaGroupPrivileges $ KasperkyAVScanningDatas $ KasperkyASDatas $ KasperskyASGroupNumber $ KasperkyASDatasRules $ MailboxActive $ KasperkyASDatasAllow $ KasperkyASDatasDeny $ CronDatas $ PostfixMaincf $ FetchMailsRules $ FetchMailsGlobalSettings $ PostfixHeadersRegex $ PostfixSSLCert $ MailBoxMaxSize $ PostfixHashSmtpSaslAuth $ SmtpdClientRestrictionsRules $ SmtpdRecipientRestrictionsRules $ SmtpdSenderRestrictionsRules $ PostFixBounceTemplate $ SieveScriptsUser $ ArticaGlobalSettings $ VirtualDomainsMapsMTA $ TemplateNotifyInfectedRecipient $ TemplateNotifyInfectedSender $  TemplateNotifyInfectedAdmin $ TemplateNotifyCorruptedRecipient $ TemplateNotifyCorruptedSender $ TemplateNotifyCorruptedAdmin $ TemplateNotifySuspiciousRecipient $ TemplateNotifySuspiciousSender $ TemplateNotifySuspiciousAdmin $ TemplateNotifyCuredRecipient $ TemplateNotifyCuredSender $ TemplateNotifyCuredAdmin $ TemplateNotifyWarningRecipient $ TemplateNotifyWarningSender $ TemplateNotifyWarningAdmin $ TemplateNotifyProtectedRecipient $ TemplateNotifyProtectedSender $ TemplateNotifyProtectedAdmin $ TemplateNotifyFilteredRecipient $ TemplateNotifyFilteredSender $ TemplateNotifyFilteredAdmin $ TemplateNotifyErrorRecipient $ TemplateNotifyErrorSender $ TemplateNotifyErrorAdmin $ CheckRecipientAccess $ checkrecipientmxaccess $ SmtpdHeloRestrictionsRules $ checkheloaccess $ checkhelomxaccess $ checkhelonsaccess $ checksenderaccess $ checksendermxaccess $ checksendernsaccess $ ArticaUserFilterRule $ ArticaMaxDayQuarantine $ ArticaFakedMailFrom $ ArticaDenyNoMXRecords $ FiltersExtensionsGroupName $ CountryDeny $ RblServers $ RblServersAction $ SURBLServers $ SURBLServersAction $ ArticaWebRootURI $ BogoFilterAction $ OuTrustMyUSers $ ArticaDansGuardianGroupRuleEnabled $ ArticaMailAddonsLevel $ ArticaMaxTempLogFilesDay $ ArticaFoldersSizeConfig $ ArticaAutoUpdateConfig $ ArticaFilterEnabled $ AmavisFilterEnabled $ jpegLogo $ DefaultGroupPassword $ AutoDomainAliases))
 
 #---------------------------------------------------------------------------
 
@@ -2590,7 +2599,7 @@ objectclass (1.3.6.1.4.1.15347.2.165
 	AlternateSmtpRelay $ FinalDateToLive $ DotClearUserEnabled $ 
 	PostFixUserTransport $ EnableUserSpamLearning $ FetchMailMatchAddresses 
 	$ homeDirectoryBinded $ EnableBackupAccount $ RsyncBackupTargetPath $ UsersInterfaceDatas $
-	 ThumbnailPath $ CryptedHome $ CryptedHomePassword $ CryptedHomeSize $ SenderBccMaps)
+	 ThumbnailPath $ CryptedHome $ CryptedHomePassword $ CryptedHomeSize $ SenderBccMaps $ WebDavUser)
 	)
 #=========================================================
 objectclass (1.3.6.1.4.1.15347.2.166

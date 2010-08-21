@@ -74,7 +74,7 @@ function Myevents($text=null,$function=null){
 
 function loadcpu(){
 	$timefile="/etc/artica-postfix/croned.1/".basename(__FILE__).__FUNCTION__;
-	if(file_time_min($timefile)<5){return null;}
+	if(file_time_min($timefile)<15){return null;}
 	@unlink($timefile);
 	@file_put_contents($timefile,"#");	
 	$datas=loadavg_table();
@@ -84,7 +84,7 @@ function loadcpu(){
 }
 function loadmem(){
 	$timefile="/etc/artica-postfix/croned.1/".basename(__FILE__).__FUNCTION__;
-	if(file_time_min($timefile)<5){return null;}
+	if(file_time_min($timefile)<15){return null;}
 	@unlink($timefile);
 	@file_put_contents($timefile,"#");	
 	$sys=new os_system();
@@ -111,7 +111,7 @@ function loadavg(){
 	@file_put_contents($pidfile,$pid);
 	
 	$timefile="/etc/artica-postfix/croned.1/".basename(__FILE__).__FUNCTION__;
-	if(file_time_min($timefile)<5){return null;}
+	if(file_time_min($timefile)<15){return null;}
 	@unlink($timefile);
 	@file_put_contents($timefile,"#");
 	

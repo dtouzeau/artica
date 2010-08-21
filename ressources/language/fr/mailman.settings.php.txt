@@ -244,8 +244,7 @@ Note this action is not taken if after filtering the message still contains cont
 <filter_duplicate_messages>Filter duplicate messages</filter_duplicate_messages>
 <filter_filename_extensions_add>Supprimer les pi&egrave;ces jointes qui correspondent &agrave; la r&egrave;gle des extensions de fichiers exemple: exe</filter_filename_extensions_add>
 <filter_filename_extensions_but>Add an Extension filter</filter_filename_extensions_but>
-<filter_mime_types_add>Give the pattern to filter content type
-eg : type/subtype, e.g. image/gif</filter_mime_types_add>
+<filter_mime_types_add>Donnez le masque pour filtrer par type de contenu comme : type/sous-type,ex: image/gif</filter_mime_types_add>
 <filter_mime_types_but>Add a Content type filter</filter_mime_types_but>
 <first_strip_reply_to>Strip reply-to</first_strip_reply_to>
 <first_strip_reply_to_text>Should any existing Reply-To: header[br] found in the original message be stripped?[br]

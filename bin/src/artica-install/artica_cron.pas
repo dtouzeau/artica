@@ -336,9 +336,10 @@ end;
         end;
   end;
 pid:=SYS.AllPidsByPatternInPath('bin/artica-cron --background');
-if length(pid)>0 then begin
-   writeln('Stopping artica-cron (fcron).: '+ pid + '...');
+ while length(pid)>0 do begin
+   writeln('Stopping artica-cron (fcron).: other pid: '+ pid + '...');
    fpsystem('/bin/kill ' + pid);
+   pid:=SYS.AllPidsByPatternInPath('bin/artica-cron --background');
 end;
 
 logs.Syslogs('Stopping artica-cron (fcron).: success...');
@@ -618,7 +619,30 @@ logs.DeleteFile('/etc/cron.d/artica-cron-executor-300');
           backups.free;
       end;
 
-// -------------------------------------------------------------------------------------------------------------------------------------------
+// --------------------------------MLDONKEY-----------------------------------------------------------------------------------------------------
+
+
+      if FileExists(SYS.LOCATE_GENERIC_BIN('mlnet')) then begin
+            fpsystem(SYS.LOCATE_PHP5_BIN()+' /usr/share/artica-postfix/exec.fcron.php --schedules-mldonkey');
+            if FileExists('/etc/artica-postfix/mldonkey.tasks') then begin
+               backups:=Tstringlist.Create;
+               try
+                backups.LoadFromFile('/etc/artica-postfix/mldonkey.tasks');
+                for i:=0 to backups.Count-1 do begin
+                    if length(backups.Strings[i])>0 then begin
+                        l.Add('@'+nolog+'  '+backups.Strings[i]);
+                    end;
+                end;
+              except
+                    logs.DebugLogs('Starting......: Daemon (fcron) Error set MLDonkey settings tasks');
+              end;
+          logs.DebugLogs('Starting......: Daemon (fcron) set ' +IntToStr(backups.Count)+' MLDonkey settings tasks');
+          backups.free;
+      end;
+    end;
+
+
+
 
       SYS.DirFiles('/etc/artica-postfix/ad-import','import-ad-*');
       for i:=0 to SYS.DirListFiles.Count-1 do begin

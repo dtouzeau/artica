@@ -2689,7 +2689,7 @@ class cicap{
 			}
 			
 			
-			
+			echo "Starting......: c-icap clamav library: $modules_path/srv_clamav.so\n";
 			if(is_file("$modules_path/srv_clamav.so")){
 				echo "Starting......: c-icap VirSaveDir: \"{$this->main_array["CONF"]["VirSaveDir"]}\"\n";
 				

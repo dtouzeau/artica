@@ -3,7 +3,8 @@ session_start();
 include_once(dirname(__FILE__)."/ressources/class.templates.inc");
 include_once(dirname(__FILE__)."/ressources/class.ldap.inc");
 include_once(dirname(__FILE__)."/ressources/class.lvm.org.inc");
-
+include_once(dirname(__FILE__)."/ressources/class.donkey.inc");
+include_once(dirname(__FILE__)."/ressources/class.apache.inc");
 page();
 
 
@@ -11,11 +12,43 @@ page();
 function page(){
 	$explorer=iconTable('explorer-64.png','{explorer}','{explorer_browse_yours_files}',"Loadjs('tree.php')",null,210,null,0,true);
 	
+	$users=new usersMenus();
+	if($users->SAMBA_INSTALLED){
+		$shareAfolder=iconTable('folder-granted-64.png','{SHARE_FOLDER}','{SHARE_A_FOLDER_USER_TEXT}',"Loadjs('share-a-folder.php')",null,210,null,0,true);
+	}
+	
+	if($users->MLDONKEY_INSTALLED){
+		$ml=new EmuleTelnet();
+		if($ml->UserIsActivated($_SESSION["uid"])){
+			$mldonkey=iconTable('64-emule.png','{PEER_TO_PEER_NETWORKS}','{PEER_TO_PEER_NETWORKS_TEXT}',"Loadjs('donkey.php')",null,210,null,0,true);
+		}
+	}else{
+		writelogs("MLDONKEY_INSTALLED return false",__FUNCTION__,__FILE__,__LINE__);
+	}
+	
+	$ct=new user($_SESSION["uid"]);
+	
+	writelogs("WebDavUser=$ct->WebDavUser",__FUNCTION__,__FILE__,__LINE__);
+	
+	if($ct->WebDavUser==1){
+			$apache=new vhosts();
+			print_r($hash);
+			$hash=$apache->LoadVhostsType($ct->ou);
+			if($hash["WEBDAV"]){
+				$webdav=iconTable('webdav-64.png','{WEBDAV_HOWTO}','{WEBDAV_HOWTO_TEXT}',"Loadjs('webdav.php')",null,210,null,0,true);
+			}
+	}
+	
+	
+	
+	
+	
+	
 	$html="<H1>{storage}:{$_SESSION["ou"]}</H1>
 	<table style='width:100%'>
 	<tr>
-		<td valign='top'>$explorer" . storage_icon()."</td>
-		<td valign='top'>" . Xapian()."</td>
+		<td valign='top'>$explorer$shareAfolder" . storage_icon()."</td>
+		<td valign='top'>" . Xapian()."$mldonkey$webdav</td>
 	</tr>
 	</table>
 	

@@ -12,6 +12,7 @@ class iptables_chains{
 	var $events_number;
 	var $iptables_id;
 	var $rule_string;
+	var $EventsToAdd;
 	var $isRoot=false;
 	var $error="";
 
@@ -24,14 +25,53 @@ class iptables_chains{
 	
 public	function addPostfix_chain(){
 		$rulemd5=md5($this->rule_string);
-		$sql="INSERT INTO iptables(servername,serverip,local_port,disable,events_number,rule_string,rulemd5,flux)
-		VALUES('$this->servername','$this->serverip','25','0','$this->events_number','$this->rule_string','$rulemd5','INPUT')";
+		$date=date('Y-m-d H:i:s');
+		
+		$ID=$this->postfix_chain_get_id($rulemd5);
+		if($ID>0){
+			if($GLOBALS["VERBOSE"]){echo "$this->serverip: Already exists ID $ID\n";}
+			return true;
+		}
+		
+		$sql="INSERT INTO iptables(
+			servername,
+			serverip,
+			local_port,
+			disable,
+			events_number,
+			rule_string,
+			rulemd5,
+			flux,events_block,date_created)
+		VALUES(
+			'$this->servername',
+			'$this->serverip',
+			'25',
+			'0',
+			'$this->events_number',
+			'$this->rule_string',
+			'$rulemd5','INPUT',
+			'$this->EventsToAdd','$date')";
 		
 		$q=new mysql();
 		$q->QUERY_SQL($sql,"artica_backup");
-		if(!$q->ok){$this->events("$q->mysql_error");}
+		if(!$q->ok){
+			if($GLOBALS["VERBOSE"]){echo "$q->mysql_error\n$sql\n";}
+			$this->events("$q->mysql_error");
+			return false;
+		}
+		if($GLOBALS["VERBOSE"]){echo "OK\n";}
+		return true;
 		
 		}
+		
+private function postfix_chain_get_id($rulemd5){
+	$sql="SELECT ID FROM iptables WHERE rulemd5='$rulemd5'";
+	$q=new mysql();
+	$ligne=mysql_fetch_array($q->QUERY_SQL($sql,"artica_backup"));
+	if($GLOBALS["VERBOSE"]){echo "\"$sql\"={$ligne["ID"]}\n";}
+	if($ligne["ID"]==null){$ligne["ID"]=0;}
+	return $ligne["ID"];
+}
 		
 private function events($text){
 			if(!$this->isRoot){writelogs("iptables_chains: $text",__CLASS__,__FILE__);return null;}

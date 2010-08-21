@@ -156,7 +156,6 @@ class templates{
 		
 		if($users->POSTFIX_INSTALLED){
 			$toolbox=$toolbox."
-				
                 	<li><a href=\"rtmm.php?ajax=yes\"><span>{events}</span></a></li>
                 	<li><a href=\"backup.php?ajax=yes\"><span>{backup}</span></a></li>
                 	<li><a href=\"quarantine.php?ajax=yes\"><span>{quarantinem}</span></a></li>
@@ -173,6 +172,10 @@ class templates{
 		
 		if($users->SAMBA_INSTALLED){
 			$toolbox=$toolbox."<li><a href=\"storage.php\"><span>{storage}</span></a></li>";
+		}else{
+			if($users->MLDONKEY_INSTALLED){
+				$toolbox=$toolbox."<li><a href=\"storage.php\"><span>{storage}</span></a></li>";
+			}
 		}
 		
 		if($this->GetComputersNumber($_SESSION["uid"])>0){
@@ -222,7 +225,7 @@ class templates{
 		$content=$this->_ENGINE_parse_body($content);
 		$content=html_entity_decode($content);
 		$content=str_replace("\n","\\n",$content);
-		$content=replace_accents($content);
+		$content=utf8_encode($content);
 		return $content;
 	}
 
@@ -883,5 +886,30 @@ function Paragraphe_switch_img($title,$text,$field_name=null,$value=null,$tips=n
 	
 	
 }
-
+function file_ext($filename)
+{
+$filename = strtolower($filename) ;
+$exts = explode("[/\\.]", $filename) ;
+$n = count($exts)-1;
+$exts = $exts[$n];
+return $exts;
+} 
+function pourcentage($pourc){
+	$pourc=str_replace('%','',$pourc);
+	$orginal_pourc=$pourc;
+	$pourc=round($pourc);
+	
+	if($pourc<0){$pourc=0;}
+	if($pourc==0){$int=-119;}
+	if($pourc>0){$int=$pourc-118;}
+	if($pourc>50){$int=$pourc-100;}
+	
+	
+	$precent="
+		<table><tr><td><img style=\"background:white url(img/percentImage_back4.png) no-repeat scroll 1px 0;margin:5px 0 0;padding:0;
+		background-position:{$int}px 0pt;\"  
+		src=\"img/percentImage.png\"></td><td widht=1% nowrap style='font-size:12px'>$orginal_pourc%</td></tr></table>";
+	
+	return $precent;
+}
 ?>

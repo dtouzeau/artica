@@ -140,6 +140,25 @@ begin
      end;
 
 
+     if ParamStr(1)='--check-fuppes' then begin
+         writeln('check-postfix Starting checking base system on ' +distri.DISTRINAME + ' ' + distri.DISTRINAME_VERSION+' CODE=' +distri.DISTRINAME_CODE );
+         if distri.DISTRINAME_CODE='UBUNTU' then begin
+            install:=tubuntu.Create;
+            install.InstallPackageListssilent(install.CheckFuppes());
+            halt(0);
+         end;
+
+         if distri.DISTRINAME_CODE='DEBIAN' then  begin
+            install:=tubuntu.Create;
+            install.InstallPackageListssilent(install.CheckFuppes());
+            halt(0);
+         end;
+
+         writeln('check-base-system Not supported ' + distri.DISTRINAME+ '/' + distri.DISTRINAME_CODE);
+         halt(0);
+     end;
+
+
      if ParamStr(1)='--check-postfix' then begin
          writeln('check-postfix Starting checking base system on ' +distri.DISTRINAME + ' ' + distri.DISTRINAME_VERSION+' CODE=' +distri.DISTRINAME_CODE );
          if distri.DISTRINAME_CODE='UBUNTU' then begin
@@ -181,6 +200,8 @@ begin
          writeln('check-base-system Not supported ' + distri.DISTRINAME+ '/' + distri.DISTRINAME_CODE);
          halt(0);
      end;
+
+
 
 
      if ParamStr(1)='--check-samba' then begin

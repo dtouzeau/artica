@@ -43,14 +43,21 @@ mais il c'est assez proche de la s&eacute;mantique de Windows pour la plupart de
 <action_keepup2date>Mettre &agrave; jour la base maintenant</action_keepup2date>
 <action_start_service>D&eacute;marrer le service</action_start_service>
 <action_stop_service>Arr&ecirc;ter le service</action_stop_service>
+<ACTIVATE_APP_GROUPWARE_APACHE>Activation du service groupware</ACTIVATE_APP_GROUPWARE_APACHE>
 <ACTIVATE_BACKUP_AGENT>Activez la sauvegarde distante</ACTIVATE_BACKUP_AGENT>
 <ACTIVATE_BACKUP_AGENT_EXPLAIN>Cette fonctionnalit&eacute; autorise L'agent R&eacute;seau Artica &agrave; stocker les sauvegardes sur votre ressource de sotckage[br]
 S&eacute;lectionnez cette ressource[br]
 Cette op&eacute;ration va activer le service et la sauvegarde &agrave; distance &agrave; travers l'agent r&eacute;seau Artica</ACTIVATE_BACKUP_AGENT_EXPLAIN>
 <ACTIVATE_BACKUP_AGENT_TEXT>Autorisez les agents Artica &agrave; sauvegarder les dossiers utilisateurs sur votre stockage</ACTIVATE_BACKUP_AGENT_TEXT>
 <ACTIVATE_HD_ORG_DEFAULT_EXPLAIN>Le stockage choisi sera aussi le chemin par d&eacute;faut des r&eacute;pertoires utilisateurs (home).</ACTIVATE_HD_ORG_DEFAULT_EXPLAIN>
+<ACTIVATE_MLDONKEY>Activer le service MLDonkey</ACTIVATE_MLDONKEY>
+<ACTIVATE_MLDONKEY_TEXT>SI vous activez cette options, les administrateurs des organisations seront autoris&eacute;s &agrave; active l'acc&egrave;s des utilisateurs des services Peer to Peer.[br]Dans ce cas, les utilisateurs pourront programmer la r&eacute;cup&eacute;ration de fichier &agrave; travers l'interface utilisateur d'Artica</ACTIVATE_MLDONKEY_TEXT>
 <ACTIVATE_SPF>Activation de la v&eacute;rification SPF</ACTIVATE_SPF>
 <ACTIVATE_SPF_TEXT>Si cette fonctionnalit&eacute; est activ&eacute;e, les scores de l'anti-spam seront modifi&eacute;s avec la validation des h&ocirc;tes &eacute;metteurs.</ACTIVATE_SPF_TEXT>
+<ACTIVATE_THIS_MLDONKEY_USER>Activer cette utilisateur</ACTIVATE_THIS_MLDONKEY_USER>
+<ACTIVATE_THIS_MLDONKEY_USER_TEXT>If you turn on, this user will be able to download shared files from peer-to-peer networks using the end-user Artica Interface</ACTIVATE_THIS_MLDONKEY_USER_TEXT>
+<ACTIVATE_THIS_USER_WEBDAV>Activer l'acc&egrave;s HTTP</ACTIVATE_THIS_USER_WEBDAV>
+<ACTIVATE_THIS_USER_WEBDAV_TEXT>Si vous activez cette fonctionnalit&eacute;, cet utilisateur aura acc&egrave;s &agrave; son dossier personnel en utilisant le protocole WebDav disponible sur Windows XP/Windows 7 ou Linux.[br]Dans l'interface utilisateur d'Artica, l'utilisateur disposera d'une proc&eacute;dure pour se connecter &agrave; sa ressource &agrave; travers Internet</ACTIVATE_THIS_USER_WEBDAV_TEXT>
 <ActiveDirectorySettings>Param&egrave;tres Active Directory</ActiveDirectorySettings>
 <ActiveDirectorySettings_text>Indiquez le compte utilisateur et les coordonn&eacute;es du serveur afin de connecter Artica a votre serveur Active Directory</ActiveDirectorySettings_text>
 <activedirectory_admin>Administrateur Active Directory</activedirectory_admin>
@@ -182,6 +189,7 @@ Ajouter une liste : exe,pif,bat,doc</add_attachment_blocking_text_explain>
 <add_routing_relay_recipient_rule>Ajoutez des destinataires &agrave; relayer</add_routing_relay_recipient_rule>
 <add_routing_rule>Ajouter une r&egrave;gle d'acheminement</add_routing_rule>
 <add_rule>ajouter une nouvelle r&egrave;gle</add_rule>
+<add_schedule_parameter>Ajouter une programmation de param&egrave;tres</add_schedule_parameter>
 <add_search_connector_text>Ajoutez un connecteur de recherche directement dans votre navigateur sans avoir &agrave; vous connecter &agrave; chaque fois</add_search_connector_text>
 <add_sender_routing_rule>Nouveau cheminement d'exp&eacute;diteur</add_sender_routing_rule>
 <add_server>Ajouter un serveur</add_server>
@@ -217,6 +225,7 @@ exemples[br]
 <advanced_options>Options avanc&eacute;es</advanced_options>
 <ad_samba_member>Membre Active Directory</ad_samba_member>
 <ad_samba_member_text>Faire de ce serveur un membre d'un domaine Microsoft Active Directory</ad_samba_member_text>
+<age_of_message>Age du message</age_of_message>
 <aggressive>Site de contenus agressifs, couvre les sites racistes de haine...</aggressive>
 <alias>Alias</alias>
 <aliases>Alias</aliases>
@@ -241,8 +250,10 @@ exemples[br]
 <allowsizemismatch>autoriser les tailles inad&eacute;quates</allowsizemismatch>
 <allowsizemismatch_text>Autoriser une taille  RFC822 diff&eacute;rente de la taille du  message r&eacute;cup&eacute;r&eacute;</allowsizemismatch_text>
 <AllowViewStatistics>Voir le secteur statistique</AllowViewStatistics>
+<allow_access>Autoriser l'acc&egrave;s</allow_access>
 <all_days>Tous les jours</all_days>
 <all_events>Tous les &eacute;v&egrave;nements</all_events>
+<all_folders>tous les dossiers</all_folders>
 <all_hours>Toutes les heures</all_hours>
 <all_mailbackup_text>Effectuez des recherches dans la zone de sauvegarde des messages afin de les lib&eacute;rer, de les supprimer ou bien de les visualiser.</all_mailbackup_text>
 <all_minutes>Toutes les minutes</all_minutes>
@@ -316,6 +327,7 @@ Si un ordinateur d&eacute;passe la limite des X &eacute;v&eacute;nements, Artica
 <APP_ARTICA_GAYTEWAY_TEXT>Transformez votre serveur Artica en un serveur passerelle</APP_ARTICA_GAYTEWAY_TEXT>
 <APP_ARTICA_MAKE>Artica installateur</APP_ARTICA_MAKE>
 <APP_ARTICA_MYSQMAIL>Observateur de logs Artica-Postfix</APP_ARTICA_MYSQMAIL>
+<APP_ARTICA_NOTIFIER>Artica SMTP Notifier</APP_ARTICA_NOTIFIER>
 <APP_ARTICA_POLICY>Serveur de politiques Artica</APP_ARTICA_POLICY>
 <APP_ARTICA_SQUID_TAIL>Squid RealTime log</APP_ARTICA_SQUID_TAIL>
 <APP_ARTICA_TAIL>Artica-tail</APP_ARTICA_TAIL>
@@ -375,6 +387,7 @@ Contrairement aux autres syt&egrave;mes de r&eacute;partition de charge, l'agg&e
 <APP_DSTAT>Outil de statistiques &quot;VRS&quot;</APP_DSTAT>
 <APP_EACCELERATOR>Acc&eacute;l&eacute;rateur PHP</APP_EACCELERATOR>
 <APP_EMAILRELAY>Relai E-Mail</APP_EMAILRELAY>
+<APP_EMAILRELAY_NOT_INSTALLED>Le logiciel Email-relay n'est pas install&eacute;.[br]Cette fonctionnalit&eacute; ne peut &ecirc;tre activ&eacute;e.[br]Allez dans le Centre de contr&ocirc;le des applications pour l'installer</APP_EMAILRELAY_NOT_INSTALLED>
 <APP_FDM>FDM fetch</APP_FDM>
 <APP_FETCHMAIL>R&eacute;cup&eacute;ration de mails distants Fetchmail</APP_FETCHMAIL>
 <APP_FETCHMAIL_LOGGER>Surveillance Artica Fetchmail</APP_FETCHMAIL_LOGGER>
@@ -390,7 +403,10 @@ Contrairement aux autres syt&egrave;mes de r&eacute;partition de charge, l'agg&e
 <APP_GNUPLOT>GnuPlot</APP_GNUPLOT>
 <APP_GROUPOFFICE>Group-Office</APP_GROUPOFFICE>
 <APP_GROUPOFFICE_TEXT>La suite &quot;en ligne&quot; centralise les applications Office. Elle les rend accessible &agrave; travers un navigateur.[br]Cette suite inclut le carnet d'adresses, le calendrier, la messagerie, la gestion du temps, les notes et la gestion du contenu.</APP_GROUPOFFICE_TEXT>
+<APP_GROUPWAREDAV>Domaine de partage WebDav</APP_GROUPWAREDAV>
+<APP_GROUPWAREDAV_TEXT>Donnez l'acc&egrave;s &agrave; des utilisateurs au syst&egrave;me de fichier (leur r&eacute;pertoire personnel) en utilisant le protocole WebDav.[br]WebDav est un protocole r&eacute;cent plus facile et plus s&eacute;curis&eacute; que le protocole FTP.</APP_GROUPWAREDAV_TEXT>
 <APP_GROUPWARE_APACHE>Moteur de groupware Apache</APP_GROUPWARE_APACHE>
+<APP_GROUPWARE_APACHE_DISABLED_TEXT>Pour de raisons multiples, le service groupware est d&eacute;sactiv&eacute;.[br]Contactez votre administrateur si vous souhaitez le r&eacute;activer.</APP_GROUPWARE_APACHE_DISABLED_TEXT>
 <APP_GROUPWARE_PHP>Moteur de groupware php</APP_GROUPWARE_PHP>
 <APP_HOTWAYD>R&eacute;cup&eacute;ration &agrave; distance Hotwayd</APP_HOTWAYD>
 <APP_HPINLINUX>Pilotes d'impression HP</APP_HPINLINUX>
@@ -429,9 +445,12 @@ Si vous utilisez les produits Kaspersky sur ce serveur (antivirus de messagerie,
 <APP_MAILMAN_TEXT>Mailman est un gestionnaire de Mailing Liste GNU, logiciel libre pour g&eacute;rer de fils de discussion par Email et des listes d'e-newsletter</APP_MAILMAN_TEXT>
 <APP_MAILSPY>MailSPy Milter</APP_MAILSPY>
 <APP_MAILSYNC>MailSync (synchronisation)</APP_MAILSYNC>
+<APP_MASSMAILING_ENABLE_TEXT>Activer l'envoi de message en masse pour vos organisations</APP_MASSMAILING_ENABLE_TEXT>
 <APP_MILTERGREYLIST>Liste grise Milter</APP_MILTERGREYLIST>
 <APP_MIMEDEFANG>MimeDefang</APP_MIMEDEFANG>
 <APP_MIMEDEFANGX>Multiplexeur MimeDefang</APP_MIMEDEFANGX>
+<APP_MLDONKEY>Serveur MLDonkey</APP_MLDONKEY>
+<APP_MLDONKEY_TEXT>MLDonkey est un client eDonkey Open Source qui autorise vos utilisateurs &agrave; r&eacute;cup&eacute;rer des fichiers &agrave; travers les r&eacute;seaux peer to peer sur Internet.</APP_MLDONKEY_TEXT>
 <APP_MONIT>Moniteur de d&eacute;mons temps r&eacute;el</APP_MONIT>
 <APP_MONIT_EXPLAIN>Cette section conduit le d&eacute;mon &quot;watchdog&quot;. Ce d&eacute;mon s'assure que le service est toujours d&eacute;marr&eacute;.[br]
 Vous pouvez modifier les param&egrave;tres afin de d&eacute;finir &agrave; quel moment vous allez &ecirc;tre notifi&eacute; d'un dysfonctionnement.</APP_MONIT_EXPLAIN>
@@ -569,6 +588,7 @@ Squid optimise donc de fa&ccedil;on cons&eacute;quente le flux de donn&eacute;es
 <APP_ZARAFA_WEB>Serveur Web Zarafa</APP_ZARAFA_WEB>
 <APP_ZARAFA_WEB_TEXT>Administrer le serveur Web Zarafa qui fournit l'acc&egrave;s aux applications</APP_ZARAFA_WEB_TEXT>
 <april>Avril</april>
+<APTGET_CURRENT_INSTALL_TEXT>Le moteur de paquetage est en train d'installer:</APTGET_CURRENT_INSTALL_TEXT>
 <APT_GET_RUNNING>Mise &agrave; jour syst&egrave;me</APT_GET_RUNNING>
 <APT_GET_RUNNING_TEXT>Artica effectue actuellement une mise &agrave; jour syst&egrave;me.</APT_GET_RUNNING_TEXT>
 <architecture>architecture</architecture>
@@ -616,7 +636,7 @@ Squid optimise donc de fa&ccedil;on cons&eacute;quente le flux de donn&eacute;es
 <artica_filters_rules>D'autres r&egrave;gles de filtrage</artica_filters_rules>
 <artica_filters_rules_text>Ajouter plus de r&egrave;gles de contr&ocirc;le globales afin de diminuer le spam des emails</artica_filters_rules_text>
 <artica_filter_status>D&eacute;mon de Filtrage Artica</artica_filter_status>
-<artica_policy_status>Statut de politique Artica</artica_policy_status>
+<artica_policy_status>Etat de politique Artica</artica_policy_status>
 <ARTICA_PROTOCOL_ERROR_OR_WRONG_VERSION>Erreur de protocole Artica ou mauvaise version d'Artica sur le serveur distant</ARTICA_PROTOCOL_ERROR_OR_WRONG_VERSION>
 <artica_update_processing>artica-update en ex&eacute;cution</artica_update_processing>
 <artica_update_processing_text>Artica-update est actuellement en cours de traitement</artica_update_processing_text>
@@ -643,6 +663,8 @@ Squid optimise donc de fa&ccedil;on cons&eacute;quente le flux de donn&eacute;es
 <attachment_blocking>Pi&egrave;ces jointes interdites</attachment_blocking>
 <attachment_blocking_text>Mettez des interdictions sur les fichiers .exe .bat .vbs et bloquez certains types de pi&egrave;ces jointes</attachment_blocking_text>
 <attach_report>Joindre rapport</attach_report>
+<at_this_time>A cette heure</at_this_time>
+<Audio>Audio</Audio>
 <audit_main_domains>Audit sur les domaines de la main.cf</audit_main_domains>
 <august>Ao&ucirc;t&lt;august&gt;
 &lt;september&gt;Septembre</august>
@@ -666,7 +688,7 @@ Cette fonctionnalit&eacute; permet d'afficher un popup d'authentification si et 
 <available>disponible</available>
 <aveserver_licence_add>Envoyez le fichier cl&eacute;  *.key de Kaspersky pour Unix Mail serveur afin de mettre &agrave; jour la licence.</aveserver_licence_add>
 <aveserver_main_settings>Param&egrave;tres Anti-Virus Kaspersky  pour Postfix</aveserver_main_settings>
-<aveserver_status>Statut du serveur de Mail Kaspersky</aveserver_status>
+<aveserver_status>Etat du serveur de Mail Kaspersky</aveserver_status>
 <ave_pattern_date>Mod&egrave;le de base de donn&eacute;es date est</ave_pattern_date>
 <AVStatistics>statistiques antivirus</AVStatistics>
 <AVStatistics_text>La version 5.5 de Kaspersky Anti-Virus 5.5 dispose d'une possibilit&eacute; de collecte et de
@@ -713,6 +735,7 @@ Si un chemin d'acc&egrave;s est fix&eacute; artica ex&eacute;cute r&eacute;guli&
 <back_to>retour &agrave;</back_to>
 <bad_format>mauvais format</bad_format>
 <bad_password>Mauvais mot de passe</bad_password>
+<bandwith>Bande passante</bandwith>
 <bannedextensionlist_user_explain>Interdire le t&eacute;l&eacute;chargement en se basant sur l'extension du fichier</bannedextensionlist_user_explain>
 <BannedMimetype_user_explain>Interdire le t&eacute;l&eacute;chargement en se basant sur la famille des fichiers</BannedMimetype_user_explain>
 <BasesPath>Chemin de la base de donn&eacute;es Antivirus</BasesPath>
@@ -821,6 +844,7 @@ Specify 0 when mail delivery should be tried only once.</bounce_queue_lifetime_t
 <change_email_text>Changement de l'adresse eMail principale</change_email_text>
 <change_label>Modifier le label</change_label>
 <change_label_explain>Changer le nom du label de ce p&eacute;riph&eacute;rique</change_label_explain>
+<change_parameters>Changer les param&egrave;tres</change_parameters>
 <change_password>Changer le mot de passe</change_password>
 <Check MS Word and RTF files>V&eacute;rifier les fichiers MS Word et RTF</Check MS Word and RTF files>
 <Check Options>V&eacute;rifiez  les options</Check Options>
@@ -864,6 +888,8 @@ The relay_domains_reject_code parameter specifies the response code for rejected
 <CICAP_DNSBL>Listes Noires DNSBL</CICAP_DNSBL>
 <CICAP_DNSBL_TEXT>Utilisez les listes noires dynamiques afin d'interdire l'acc&egrave;s &agrave; certains sites web</CICAP_DNSBL_TEXT>
 <city>Ville</city>
+<clamav_unofficial>Signatures non officielles ClamAV</clamav_unofficial>
+<clamav_unofficial_text>Mise &agrave; jour des signatures antivirus tiers fournies par SaneSecurity, SecuriteInfo,MalwarePatrol, OITC, INetMsg et ScamNailer</clamav_unofficial_text>
 <CLAMD_NOT_INSTALLED>Le d&eacute;mon Clamd est manquant</CLAMD_NOT_INSTALLED>
 <CLAMD_NOT_INSTALLED_TEXT>Il semble que le d&eacute;mon Clamd n'est pas install&eacute;, des fonctionnalit&eacute;s antivirus ne seront pas disponibles</CLAMD_NOT_INSTALLED_TEXT>
 <clean_database>vider la base de donn&eacute;es</clean_database>
@@ -912,6 +938,7 @@ The default is accept message.
 <closed_session>Session ferm&eacute;e</closed_session>
 <coffrefort>coffre-fort</coffrefort>
 <coffrefort_create_user>Transformer le r&eacute;pertoire utilsateur en coffre-fort</coffrefort_create_user>
+<Col>Biblitoh&egrave;que</Col>
 <collectd_statistics>Collecte de statistiques</collectd_statistics>
 <collectd_statistics_text>Voir les statistiques recueillies par le d&eacute;mon syst&egrave;me de collecte de statistiques</collectd_statistics_text>
 <comment>commentaire</comment>
@@ -936,9 +963,11 @@ The default is accept message.
 <computer_popup_import_explain>Cette section vous permet d'importer une liste d'ordinateurs dans la base LDAP Artica[br]
 Copiez/collez une liste d'ordinateurs avec chaque nom d'ordinateur s&eacute;par&eacute; par un retour chariot</computer_popup_import_explain>
 <config file>Configuration de donn&eacute;es</config file>
+<configure>configuration</configure>
 <config_file>fichier de configuration</config_file>
 <confirm>confirm&eacute;</confirm>
 <confirm_deletion_of>Confirmation de la suppression de</confirm_deletion_of>
+<confirm_mailbox_deletetion>Confirmer la t&acirc;che de suppression sur les sous-dossiers de votre bo&icirc;te aux lettres sp&eacute;cifi&eacute;</confirm_mailbox_deletetion>
 <confirm_restore_mbx>Restaurer cette bo&icirc;te aux lettres?</confirm_restore_mbx>
 <connect>Connecter</connect>
 <Connect in SSL mode>Connect&eacute; en mode SSL</Connect in SSL mode>
@@ -1016,6 +1045,7 @@ Vous avez besoin de tester cette fonctionnalit&eacute;.[br]Parfois cpulimit effe
 <currently_scanning>L'analyse est actuellement en cours de traitement</currently_scanning>
 <current_config>Configuration courante</current_config>
 <current_directory>R&eacute;pertoire courant</current_directory>
+<current_parameters>Param&egrave;tres actuels</current_parameters>
 <cyrus admin>Compte administrateur Cyrus</cyrus admin>
 <cyrus password>Mot de passe du compte Administrateur Cyrus</cyrus password>
 <cyrus_apply_config>Appliquez ces param&egrave;tres vers le serveur imap</cyrus_apply_config>
@@ -1200,6 +1230,7 @@ Les spammeurs connus sont ainsi bloqu&eacute;s lorsqu'ils tentent d'obtenir l'ad
 <DNS_RECORDS_TESTS>Validation DNS</DNS_RECORDS_TESTS>
 <dns_server>Serveur DNS</dns_server>
 <dns_servers>Serveurs DNS</dns_servers>
+<Doc>Documents</Doc>
 <documents>documents</documents>
 <Does not Contain>Ne contient pas</Does not Contain>
 <Does not End width>Ne finit pas avec</Does not End width>
@@ -1219,8 +1250,14 @@ Les spammeurs connus sont ainsi bloqu&eacute;s lorsqu'ils tentent d'obtenir l'ad
 <double_bounce_sender_text>The sender address of postmaster notifications that are generated by the mail system.[br]All mail to this address is silently discarded, in order to terminate mail bounce loops</double_bounce_sender_text>
 <down>vers le bas</down>
 <download>t&eacute;l&eacute;chargez</download>
+<downloaded>T&eacute;l&eacute;charg&eacute;</downloaded>
 <downloading>T&eacute;l&eacute;chargement</downloading>
 <downloads>Couvre le partage de fichiers, perr-to-peer et sites web torrent</downloads>
+<downloads_edk_section>T&eacute;l&eacute;chargements</downloads_edk_section>
+<DOWNLOAD_CONFIRM_CANCEL>Arr&ecirc;ter la t&acirc;che de t&eacute;l&eacute;chargement ?</DOWNLOAD_CONFIRM_CANCEL>
+<download_kbs>Bande passante de t&eacute;l&eacute;chargement</download_kbs>
+<download_list>Liste des t&eacute;l&eacute;chargements</download_list>
+<download_this_file>T&eacute;l&eacute;charger ce fichier</download_this_file>
 <do_nothing>ne rien faire</do_nothing>
 <driver>pilote</driver>
 <DUNNO_help>
@@ -1228,6 +1265,12 @@ Les spammeurs connus sont ainsi bloqu&eacute;s lorsqu'ils tentent d'obtenir l'ad
 <duration>dur&eacute;e</duration>
 <during>pendant</during>
 <each>chaque</each>
+<ED2K-port>Pour d'&eacute;coute du service eMule</ED2K-port>
+<ED2K-port_help>C'est le port d'&eacute;coute qui autorise les autres utilisateurs eMule &agrave; se connecter &agrave; vos partages.[br]VOus avez besoin d'autoriser l'ouverture de ce port sur votre pare-feux Internet afin d'augmenter votre taux de connexion.[br]
+SI vous n'ouvrez pas ce port, vous disposerez d'un &quot;LowID&quot; et n'aurez pas toutes les performances r&eacute;seaux pour t&eacute;l&eacute;charger des fichiers.</ED2K-port_help>
+<ED2K-udp-port>Port UDP du client eMule</ED2K-udp-port>
+<ED2K-update_server_list_server>Mise &agrave; jour des serveurs automatiquement</ED2K-update_server_list_server>
+<ED2K-update_server_list_server_help>Cette option autorise si le service peut ajouter des nouveaux serveurs ou simplement utiliser une liste statique de serveurs</ED2K-update_server_list_server_help>
 <edit>Editez.</edit>
 <edit mode>Mode &eacute;dition</edit mode>
 <edit_contact>&Eacute;diter le contact</edit_contact>
@@ -1238,6 +1281,8 @@ Les spammeurs connus sont ainsi bloqu&eacute;s lorsqu'ils tentent d'obtenir l'ad
 <edit_squid_parent_parameters>Editer les param&egrave;tres du proxy parent</edit_squid_parent_parameters>
 <edit_table>Editer le tableau</edit_table>
 <edit_user>Modifier cet utilisateur</edit_user>
+<edonkey_bandwith_explain>Cette section vous permet de changer la consommation de bande passante pendant une journ&eacute;e.[br]
+Par exemple, vous pouvez affecter 50Kb/s disponibles pour les t&eacute;l&eacute;chargement et 10kb/s pour les partages internet pendant les heures de travail et 1Mb/s de t&eacute;l&eacute;chargement avec 500Kb/s pour les partages durant la nuit.[br]Vous indiquerez alors l'heure d'affectation de la bascule des param&egrave;tres.</edonkey_bandwith_explain>
 <EHLOattrsXFORWARD>Attributs X-forward</EHLOattrsXFORWARD>
 <EHLOsupport8BITMIME>Support du 8BITMIME dans la commande EHLO</EHLOsupport8BITMIME>
 <EHLOsupport8BITMIME_text>
@@ -1266,7 +1311,7 @@ supports the X-Forward extension for Postfix protocol only if [b]smtp[/b] is use
 <emailing_campain_linker_delete_confirm>&ecirc;tes-vous sur de vouloir supprimer cet &eacute;l&eacute;ment ?</emailing_campain_linker_delete_confirm>
 <emailing_queue_not_ready>La file d'attente n'est pas pr&ecirc;te</emailing_queue_not_ready>
 <emailing_queue_not_ready_text>Vous pouvez envoyer l'&eacute;mission en masse que si la file d'attente &agrave; &eacute;t&eacute; correctement construite</emailing_queue_not_ready_text>
-<emailrelay_status>Statut du Relais de Messagerie</emailrelay_status>
+<emailrelay_status>Etat du Relais de Messagerie</emailrelay_status>
 <emails>messages</emails>
 <emails_addresses>Adresses eMail</emails_addresses>
 <emails_flow>Flux de messagerie</emails_flow>
@@ -1287,6 +1332,11 @@ supports the X-Forward extension for Postfix protocol only if [b]smtp[/b] is use
 <empty_quarantine_text_mesgbox>Etes-vous s&ucirc;r de vider votre zone de quarantaine? Tous les mails seront supprim&eacute;s</empty_quarantine_text_mesgbox>
 <empty_swap>vider le fichier de pagination et la m&eacute;moire</empty_swap>
 <empty_table_confirm>Cette op&eacute;ration va supprimer toutes les entr&eacute;es SQL? Effectuer cette op&eacute;ration ?</empty_table_confirm>
+<empty_this_mailbox>Vider cette bo&icirc;te aux lettres</empty_this_mailbox>
+<empty_this_mailbox_explain>Supprime des messages dans cette bo&icirc;te aux lettres lorsque qu'il sont plus vieux ou leur taille exc&egrave;de une valeur.[br]Cette fonctionnalit&eacute; supprime les messages des tous les sous-dossiers aussi, un mauvais param&egrave;tre pourrait supprimer tous les messages.</empty_this_mailbox_explain>
+<empty_this_mailbox_text>Supprimer des messages en fonction de leur age, taille...</empty_this_mailbox_text>
+<empty_your_mailbox>Vider votre bo&icirc;te aux lettres</empty_your_mailbox>
+<eMuleIDServers>Note affect&eacute;e (ID)</eMuleIDServers>
 <enable>activ&eacute;</enable>
 <enable tls postfix>Activer le TLS dans Postfix</enable tls postfix>
 <EnableArticaWatchDog>Activer le watchdog</EnableArticaWatchDog>
@@ -1315,6 +1365,7 @@ The settings applied are :[br]
 <enable_artica_wbl_robots>Robot Artica des listes blanches et noires</enable_artica_wbl_robots>
 <enable_artica_wbl_robots_icon>Indiquez les adresses eMail qui recevront les requ&ecirc;tes de listes blanches ou noires</enable_artica_wbl_robots_icon>
 <enable_backup_email_text>Si vous activez la fonction, tous le transite de messagerie (exclus les messages bloqu&eacute;s) seront stock&eacute;s dans la base Mysql.Dans ce cas, vos utilisateurs seront autoris&eacute;s &agrave; rechercher/renvoyer les messages sauvegard&eacute;s</enable_backup_email_text>
+<enable_clamav_unofficial>Activation du rapatriement des mises &agrave; jour tiers.</enable_clamav_unofficial>
 <ENABLE_COFFREFORT>Activer le coffre-fort</ENABLE_COFFREFORT>
 <ENABLE_COFFREFORT_TEXT>Si vous activez cette fonctionnalit&eacute;, le r&eacute;pertoire utilisateur (home) sera alors chiffr&eacute;.[br]
 Pour ouvrir le coffre-fort, vous avez deux m&eacute;thodes[br]
@@ -1332,15 +1383,21 @@ La deuxi&egrave;me m&eacute;thode utilise l'agent r&eacute;seau Artica.[br]Celui
 <enable_lmtp_unix>Activer LMTP en [b]socket Unix[/b]</enable_lmtp_unix>
 <ENABLE_MAILMAN>Activez le service de listes de distribution</ENABLE_MAILMAN>
 <ENABLE_MAILMAN_TEXT>Si vous activez cette fonctionnalit&eacute;s certains utilisateurs (avec les privil&egrave;ges associ&eacute;s) seront capable de cr&eacute;er des listes de distribution email.</ENABLE_MAILMAN_TEXT>
+<ENABLE_MASSMAILING>Activation de l'envoi de messages en masse</ENABLE_MASSMAILING>
+<ENABLE_MASSMAILING_TEXT>Si vous activez cette fonctionnalit&eacute;, les organisations seront capables de cr&eacute;er des envois en masse &agrave; travers ce serveur.[br]
+Ce serveur ne sera pas n&eacute;cessairement un serveur de messagerie avec cette fonctionnalit&eacute;. Cela permet juste de transformer ce serveur en serveur d'&eacute;mission pour vos organisations.</ENABLE_MASSMAILING_TEXT>
 <enable_mynetwork>Activer les r&eacute;seaux locaux actuels</enable_mynetwork>
 <enable_mynetwork_text>Si activ&eacute;, les r&eacute;seaux d&eacute;j&agrave; indiqu&eacute;s dans les param&egrave;tres de postfix seront automatiquement ajout&eacute;s</enable_mynetwork_text>
 <enable_non_encrypted_sessions>Activer les sessions non-crypt&eacute;es</enable_non_encrypted_sessions>
 <enable_outbound>Activer le flux sortant</enable_outbound>
+<enable_pdf_reports>Activation du rapport en PDF</enable_pdf_reports>
+<enable_pdf_report_user_explain>Si vous activez cette fonctionnalit&eacute;, un rapport au format PDF sur la zone de quarantaine sera envoy&eacute;e par eMail &agrave; fr&eacute;quence r&eacute;guli&egrave;re d&eacute;finie dans cette section.</enable_pdf_report_user_explain>
 <enable_philesight>Activer le scanner</enable_philesight>
 <enable_philesight_text>Si vert, le scanner va traverser enti&egrave;rement votre disque dur afin de remplir une base de donn&eacute;e de la taille de vos r&eacute;pertoires.[br]Ceci afin d'afficher un graphique sur le taille disque de votre syst&egrave;me.[br
 Cette fonctionnalit&eacute; est &quot;ergonomique&quot;. [br]Si vous la rendez inop&eacute;rante, elle ne perturbera pas les services actuels.[br]Cela sera simplement un gain de performances...</enable_philesight_text>
 <enable_plugins_text>Activez/d&eacute;sactivez les plugins</enable_plugins_text>
 <ENABLE_POSTFIX_MULTI_INSTANCE>Activer le syst&egrave;me de multiple instances</ENABLE_POSTFIX_MULTI_INSTANCE>
+<enable_sanesecurity>Activation des mises &agrave; jour SanSecurity</enable_sanesecurity>
 <ENABLE_SA_BLACKLIST_UPDATE>Activer/D&eacute;sactiver la mise &agrave; jour des domaines en liste noire</ENABLE_SA_BLACKLIST_UPDATE>
 <ENABLE_SA_BLACKLIST_UPDATE_TEXT>Si vous changer le bouton en vert, Artica sera en mesure de mettre &agrave; jour toutes les 2 heures le fichier de signature afin d'am&eacute;liorer la d&eacute;tection de SpamAssassin avec plus de 300.000 domaines en liste noire</ENABLE_SA_BLACKLIST_UPDATE_TEXT>
 <enable_scanned_only>Activation de ScannedOnly</enable_scanned_only>
@@ -1559,6 +1616,8 @@ Il retransfert les messages sur un autre serveur sur le port 25.[br]Fetchmail n'
 <files_size_disk>Taile des fichiers sur disque</files_size_disk>
 <files_size_tmp>Taille des fichiers temporaires sur disque</files_size_tmp>
 <files_transfered>Fichiers transf&eacute;r&eacute;s</files_transfered>
+<filetp_explain>Cette fonctionnalit&eacute; vous permet de t&eacute;l&eacute;charger un fichier en HTTP,FTP par son lien web.[br]Donnez le lien web complet dans le formulaire afin de lancer l'op&eacute;ration de r&eacute;cup&eacute;ration.</filetp_explain>
+<FILE_ALREADY_SCHEDULED>Fichier d&eacute;j&agrave; programm&eacute;</FILE_ALREADY_SCHEDULED>
 <file_path>Chemin du fichier</file_path>
 <file_to_upload>fichier &agrave; charger</file_to_upload>
 <fill_form>Remplissez le formulaire</fill_form>
@@ -1614,6 +1673,7 @@ sous cette forme que vous souhaitez pr&eacute;senter</form_error>
 <from_name>Nom de l'&eacute;metteur</from_name>
 <from_name_help>Indiquez ici le nom ou phrase qui sera visible dans le champ &quot;exp&eacute;diteur&quot; des clients de messagerie.</from_name_help>
 <fs_type>Type de syst&egrave;me de fichiers</fs_type>
+<full_access>acc&egrave;s complet</full_access>
 <gateway>Passerelle</gateway>
 <GDPHP_NOT_INSTALLED>Librairie GD !</GDPHP_NOT_INSTALLED>
 <gender>genre</gender>
@@ -1651,6 +1711,7 @@ La charge g&eacute;r&eacute;e par la construction de ce rapport va d&eacute;pend
 <global_quarantine_rules>Param&egrave;tres principaux de quarantaine</global_quarantine_rules>
 <global_rule>R&egrave;gle globale</global_rule>
 <global_services_status>Statut des principaux services</global_services_status>
+<global_size>Taille globale</global_size>
 <global_smtp_rules>R&egrave;gles principales SMTP</global_smtp_rules>
 <global_whitelist>Administrateur de liste blanche et noire</global_whitelist>
 <go>Ex&eacute;cution</go>
@@ -1698,6 +1759,7 @@ Artica effectue des tests r&eacute;guliers de performances (toutes les 60mn).[br
 <hide_unwriteable_files>Cacher les fichiers prot&eacute;g&eacute;s en &eacute;criture</hide_unwriteable_files>
 <hide_unwriteable_files_text>N'autorise pas l'affichage de l'existence de fichiers qui ne peuvent pas &ecirc;tre modifi&eacute;s.[br]Notez que les r&eacute;pertoires prot&eacute;g&eacute;s en &eacute;criture sont affich&eacute;s comme d'habitude.</hide_unwriteable_files_text>
 <high>Haut</high>
+<higher_than>Plus grand que</higher_than>
 <hits>Acc&egrave;s</hits>
 <hits_number>Nombre d'acc&egrave;s</hits_number>
 <hobby-cooking>Sites concernant l'alimentation et la pr&eacute;paration des aliments</hobby-cooking>
@@ -1722,6 +1784,24 @@ Log the optional text if  specified,[br]otherwise log a generic message.
 <hourly>horraire</hourly>
 <hours>heures</hours>
 <howto_access_computer>Comment acc&eacute;der &agrave; cet ordinateur</howto_access_computer>
+<HOWTO_MAP_WEBDAV_P1>Windows XP et 2003 requi&egrave;rent les conditions suivantes:[br]
+V&eacute;rifiez que le service WebClient est d&eacute;marr&eacute;.[br]
+Ouvrez le gestionnaire de services et recherche le service WebClient.[br]
+Sur Windows 2003, ce service est d&eacute;sactiv&eacute; par d&eacute;faut.[br]
+Si le service est d&eacute;sactiv&eacute;, affichez les propri&eacute;t&eacute;s et changer le niveau de d&eacute;marrage en automatique.[br]
+Red&eacute;marrez l'ordinateur.[br]
+[br][br][b]
+Pour r&eacute;activer WebDav sur Windows XP2/3 [/b][br]
+Ouvrez l'&eacute;diteur de registres et recherchez la clef suivante:[br]
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\WebClient\Parameters
+[br]Ajoutez une clef DWORD nomm&eacute;e UseBasicAuth et donnez-lui la valeur 1</HOWTO_MAP_WEBDAV_P1>
+<HOWTO_MAP_WEBDAV_P2>br]Cliquez sur Favoris r&eacute;seaux
+[br]Ajoutez un nouveau favoris r&eacute;seaux
+[br]Ajoutez le lien indiqu&eacute; dans param&egrave;tres
+[br]Indiquez votre compte utilisateur et mot de passe.</HOWTO_MAP_WEBDAV_P2>
+<HOWTO_MAP_WEBDAV_P3>Pour mapper un r&eacute;pertoire dans Windows Explorer, cliquez sur l'ic&ocirc;ne de l'ordinateur et s&eacute;lectionnez connecter un lecteur r&eacute;seau.[br]
+A savoir que lorsque vous copiez un fichier depuis le disque dur vers le lecteur r&eacute;seau, le contenu du fichier est mis en cache dans le disque syst&egrave;me local avant de l'envoyer sur votre partage Internet.[br]Vous devez avoir suffisamment d'espace disque afin de conserver le contenu entier du fichier.</HOWTO_MAP_WEBDAV_P3>
+<HOWTO_MAP_WEBDAV_P4>Pour se connecter au dossier Internet WebDav via Nautilus, dans le menu fichier, s&eacute;lectionnez &quot;Se connecter &agrave; un serveur&quot;. Dans le type de service, utilisez (WebDav (HTTP)) ou WebDav s&eacute;curis&eacute; et remplissez les information n&eacute;cessaires.</HOWTO_MAP_WEBDAV_P4>
 <htmlSizeBlocker>Gestion HTML des fichiers re&ccedil;us</htmlSizeBlocker>
 <htmlSizeBlocker_intro>HTML Size Manager allows you to define rule to transform messages with a specified size and allow recipients to donwload attached files</htmlSizeBlocker_intro>
 <htmlSizeBlocker_text>HTML Size Manager use mhonarc application to transform big messages,defined in rules, to HTML[br]This to prevent sending mails with a big size to pass trought network.[br]
@@ -1736,6 +1816,7 @@ It send notifications to recipients in order to allow them to "download" attache
 <if_in>si dans</if_in>
 <ignore_all>Tout ignorer</ignore_all>
 <illimited>illimit&eacute;</illimited>
+<Image>Image</Image>
 <imapsync_advanced_options>Param&egrave;tres sp&eacute;cifiques pour am&eacute;liorer la synchronisation.</imapsync_advanced_options>
 <imapsync_folders_text>Indiquez les dossiers qui devront &ecirc;tre r&eacute;pliqu&eacute;s</imapsync_folders_text>
 <imapsync_main_settings>Param&egrave;tres principaux de synchronisation</imapsync_main_settings>
@@ -1762,6 +1843,7 @@ It send notifications to recipients in order to allow them to "download" attache
 <import_contacts_db_explain>Cette section va importer des contacts depuis un fichier CSV, le fichier CSV doit &ecirc;tre format&eacute; comme suit:</import_contacts_db_explain>
 <import_contacts_db_text>Importer des contacts en masse dans la base de donn&eacute;es depuis une source externe</import_contacts_db_text>
 <import_fingerprint>Importer l'empreinte SSL</import_fingerprint>
+<import_servers>Importer des serveurs</import_servers>
 <import_sub_branch>D&eacute;marrer l'importation &agrave; partir de la sous-branche</import_sub_branch>
 <in>dans</in>
 <INACTIVE>Inactif</INACTIVE>
@@ -1987,6 +2069,7 @@ With the default 100 SMTP server process limit, "in flow delay as 1s" limits the
 <kasdelete>Supprimer ce message</kasdelete>
 <kasforward>Rediriger ce message vers un autre destinataire(s)</kasforward>
 <kaspersky>Kaspersky Lab Inc</kaspersky>
+<KASPERSKY_UPDATES>Mise &agrave; jour des produits Kaspersky</KASPERSKY_UPDATES>
 <kasreject>Rejet&eacute; ce message</kasreject>
 <kassendcopy>Envoy&eacute; une copie de ce message vers un autre destinataire(s)</kassendcopy>
 <kas_licence_text>Chargez le fichier de licence Kaspersky Anti-Spam *.key afin de mettre &agrave; jour la licence.</kas_licence_text>
@@ -2155,6 +2238,7 @@ Artica pour construire des serveurs &quot;virtuels&quot; multiples sur la m&ecir
 <main.cf>Fichier de configuration</main.cf>
 <main.cf_explain>Lire le  fichier principal de configuration g&eacute;n&eacute;r&eacute; et ex&eacute;cut&eacute; par Postfix</main.cf_explain>
 <maintenance>maintenance</maintenance>
+<main_folder>R&eacute;pertoire principal</main_folder>
 <main_interfaces>Interfaces principales</main_interfaces>
 <main_parameters>Config. g&eacute;n&eacute;rale</main_parameters>
 <main_settings>Configuration g&eacute;n&eacute;rale</main_settings>
@@ -2236,6 +2320,9 @@ La valeur par d&eacute;faut est d.[br]Sp&eacute;cifiez 0 si vous d&eacute;sirez 
 <max_daemon_cpu>Utilisation CPU du d&eacute;mon</max_daemon_cpu>
 <max_daemon_cycles>Pendant X minutes</max_daemon_cycles>
 <max_daemon_memory>Utilisation m&eacute;moire du d&eacute;mon</max_daemon_memory>
+<max_downloads>T&eacute;l&eacute;chargements Max.</max_downloads>
+<max_hard_download_rate>Bande passante de t&eacute;l&eacute;chargement</max_hard_download_rate>
+<max_hard_upload_rate>Bande passante de chargement</max_hard_upload_rate>
 <Max_idle_time_in_seconds>Max. temps d'inactivit&eacute; (en secondes)</Max_idle_time_in_seconds>
 <may>Mai</may>
 <mbx_con>Connections aux bo&icirc;tes aux lettres</mbx_con>
@@ -2281,8 +2368,14 @@ This parameter also limits the time an unreachable destination is kept in the sh
 </minimal_backoff_time_text>
 <minimal_time>Temps minimum</minimal_time>
 <minor>mineure</minor>
+<minsize>Taille minimale</minsize>
 <minutes>minutes</minutes>
 <missing>il manque</missing>
+<MLDONKEY_CONNECT_TO_THIS_SERVER>Connecter &agrave; ce serveur peer to peer.</MLDONKEY_CONNECT_TO_THIS_SERVER>
+<MLDONKEY_DISCONNECT_FROM_THIS_SERVER>D&eacute;connecter ce serveur.</MLDONKEY_DISCONNECT_FROM_THIS_SERVER>
+<MLDONKEY_SEARCH_FORM>Chercher des fichiers</MLDONKEY_SEARCH_FORM>
+<MLDONKEY_USER>Utilisateur MLDonkey</MLDONKEY_USER>
+<MLDONKEY_USER_TEXT>Donnez l'acc&egrave;s &agrave; cet utilisateur aux r&eacute;seaux Peer to Peer: BitTorrent,FastTrack,HTTP, FTP,SSH, Kad Network,DirectConnect</MLDONKEY_USER_TEXT>
 <mobile>t&eacute;l&eacute;phone portable</mobile>
 <mode>mode</mode>
 <model>mod&egrave;le</model>
@@ -2412,6 +2505,7 @@ The default is to use the local machine name, $myhostname, which defaults to the
 <no>non</no>
 <noauthmd5>Pas d'auth. MD5</noauthmd5>
 <noauthmd5_text>Ne pas utiliser l'authentification bas&eacute;e sur MD5</noauthmd5_text>
+<NoDisplayIPBlocked>Masquer les serveurs bloqu&eacute;s</NoDisplayIPBlocked>
 <nofoldersizes>Pas de tailles sur le dossier</nofoldersizes>
 <nofoldersizes_text>Ne pas calculer la taille de chaque dossier dans les comptes respectifs</nofoldersizes_text>
 <NOIEPLEASE>Ne pas utiliser Internet Explorer</NOIEPLEASE>
@@ -2431,6 +2525,7 @@ The default is to use the local machine name, $myhostname, which defaults to the
 <not_installed>non install&eacute;</not_installed>
 <not_match>ne correspondent pas</not_match>
 <november>Novembre</november>
+<no_accents_feature>Les accents ne sont pas support&eacute;s dans cette configuration.</no_accents_feature>
 <no_aliases>Pas d'alias</no_aliases>
 <no_backup>Pas de conteneur de sauvegarde</no_backup>
 <NO_CONFIG_FILE>Pas de configuration trouv&eacute;e</NO_CONFIG_FILE>
@@ -2603,6 +2698,9 @@ or until further truncation is not possible.(eg:192.168.1.0/24)
 <pcfg_title1>Configuration de base</pcfg_title1>
 <pcfg_title2>Voir main.cf</pcfg_title2>
 <pcfg_title3>Voir master.cf</pcfg_title3>
+<pdf_report_quarantine_default_subject>Ma Zone de quarantaine...</pdf_report_quarantine_default_subject>
+<PEER_TO_PEER_NETWORKS>Your Peer to peer networks</PEER_TO_PEER_NETWORKS>
+<PEER_TO_PEER_NETWORKS_TEXT>Rechercher, r&eacute;cup&eacute;rer, t&eacute;l&eacute;charger des fichiers depuis un r&eacute;seau peer to peer Internet</PEER_TO_PEER_NETWORKS_TEXT>
 <percentage>Pourcentage</percentage>
 <performance>Performance</performance>
 <performances_settings>Performances</performances_settings>
@@ -2667,6 +2765,8 @@ or when the address is an authorized destination (see "permit auth destination" 
 <postalcode>Code postale</postalcode>
 <Postfix Global settings>Param&egrave;tres principaux Postfix</Postfix Global settings>
 <postfix rules>r&egrave;gles postfix</postfix rules>
+<PostfixAutoBlockParameters>scores et param&egrave;tres</PostfixAutoBlockParameters>
+<PostfixAutoBlockParameters_text>Indiquez les limites d'erreurs de connexions et scores qui vont correspondre &agrave; une r&egrave;gle</PostfixAutoBlockParameters_text>
 <POSTFIX_BUNDLE>Paquetages Postfix</POSTFIX_BUNDLE>
 <POSTFIX_BUNDLE_TEXT>Activer les filtres Antivirus/Anti-Spam conect&eacute; avec Postfix</POSTFIX_BUNDLE_TEXT>
 <postfix_events>&eacute;v&egrave;nements postfix</postfix_events>
@@ -2725,6 +2825,7 @@ This is because Postfix needs to open lookup tables ahead of time, but the reade
 <printers>Imprimantes</printers>
 <privileges>droits</privileges>
 <privileges_text>Modifier les droits et les r&egrave;gles de s&eacute;curit&eacute; des utilisateurs enregistr&eacute;s dans ce groupe</privileges_text>
+<Pro>programme</Pro>
 <Process Server Settings>Param&egrave;tres de Processus Serveur</Process Server Settings>
 <processed>trait&eacute;(s)</processed>
 <processed_messages_explain>Ce chiffre est tous les messages trait&eacute;s depuis la derni&egrave;re purge des &eacute;v&egrave;nements de messagerie.[br]
@@ -2779,6 +2880,7 @@ Vous visualisez ici le nombre total d'&eacute;v&egrave;nements sauvegard&eacute;
 <quarantines_graph>Graphique de Quarantaine</quarantines_graph>
 <quarantine_and_backup_storage>Quarantaines et sauvegardes</quarantine_and_backup_storage>
 <quarantine_and_backup_storage_text>Administrer votre espace de quarantaine et de sauvegarde</quarantine_and_backup_storage_text>
+<quarantine_email_report>Rapport de quarantaines.</quarantine_email_report>
 <quarantine_mails>Mails mis en quarantaine</quarantine_mails>
 <quarantine_mails>Messages en quarantaine</quarantine_mails>
 <quarantine_manager>Gestionnaire de quarantaine</quarantine_manager>
@@ -3208,6 +3310,7 @@ Remplissez le formulaire ci-joint afin d'obtenir un devis de la soci&eacute;t&ea
 <shalla_success_order>Votre demand&eacute; &agrave; correctement &eacute;t&eacute; transmise &agrave; la soci&eacute;t&eacute; Artica Technology</shalla_success_order>
 <shared>partag&eacute;</shared>
 <shared_folder>Nom du dossier partag&eacute;</shared_folder>
+<SHARE_A_FOLDER_USER_TEXT>Partagez sur le r&eacute;seau un r&eacute;pertoire de votre espace personnel et donnez les droits aux utilisateurs de votre organisation.</SHARE_A_FOLDER_USER_TEXT>
 <SHARE_FOLDER>Partagez un dossier</SHARE_FOLDER>
 <SHARE_FOLDER_TEXT>Partagez un r&eacute;pertoire sur ce syst&egrave;me[br]Parcourez votre disque dur and pointez un r&eacute;pertoire &agrave; partager.</SHARE_FOLDER_TEXT>
 <share_name>Nom de partage</share_name>
@@ -3259,6 +3362,7 @@ It refuses delivery of a message by sending back an [MDN] to the sender.[br]
 <since>depuis</since>
 <single_ip>Adresse IP simple</single_ip>
 <size>taille</size>
+<size_of_message>Taille du message</size_of_message>
 <skipped>ignor&eacute;(s)</skipped>
 <skipsize>ne pas faire attention &agrave; la taille</skipsize>
 <skipsize_text>Ne pas faire attention &agrave; la taille du message</skipsize_text>
@@ -3381,6 +3485,11 @@ the Postfix SMTP server delays all responses by "error sleep time" seconds.</smt
 <smtpd_tls_received_header_text>Requiert que le serveur SMTP de Postfix produise des en-t&ecirc;tes de message Received: qui incluent les informations &agrave; propos du protocole et du chiffrement utilis&eacute; ainsi que les champs CommonName des certificats client et de l'autorit&eacute; dont il est issu.[br] Ceci est d&eacute;sactiv&eacute; par d&eacute;faut, l'iinformation &eacute;tant susceptible d'&ecirc;tre modifi&eacute;e pendant le transit dans d'autres serveurs de messagerie. Seules l'information enregistr&eacute;e pas la destination finale est fiable.</smtpd_tls_received_header_text>
 <smtpd_tls_security_level>Niveau de s&eacute;curit&eacute; TLS</smtpd_tls_security_level>
 <smtpd_tls_security_level_text>Le niveau de s&eacute;curit&eacute; TLS du serveur Postfix</smtpd_tls_security_level_text>
+<SMTPHACK_BLOCKED_SPAM>Bloqu&eacute; par le filtre anti-spam (amavis/spamassassin)</SMTPHACK_BLOCKED_SPAM>
+<SMTPHACK_NAME_SERVICE_NOT_KNOWN>Impossible de r&eacute;soudre le serveur &eacute;metteur</SMTPHACK_NAME_SERVICE_NOT_KNOWN>
+<SMTPHACK_RBL>Bloqu&eacute; par les listes noires DNS</SMTPHACK_RBL>
+<SMTPHACK_SASL_LOGIN>&Eacute;chec d'authentification SMTP</SMTPHACK_SASL_LOGIN>
+<SMTPHACK_USER_UNKNOWN>Envoi &agrave; un destinataire inconnu</SMTPHACK_USER_UNKNOWN>
 <smtp_connection_cache_destinations>Cache de Connexion Postfix</smtp_connection_cache_destinations>
 <smtp_connection_cache_destinations_field>Cache des connexions par destination</smtp_connection_cache_destinations_field>
 <smtp_connection_cache_destinations_minitext>Permanently enable SMTP connection caching for the specified destinations. With SMTP connection caching, a connection is not closed immediately after completion of a mail transaction. </smtp_connection_cache_destinations_minitext>
@@ -3567,6 +3676,12 @@ Vous pouvez d&eacute;finir par exemple joe@domain.tld ou bien  *@domain.tld, le 
 <squid_events>&Eacute;v&egrave;nements de Squid</squid_events>
 <squid_filter_stats_text>Cr&eacute;ez un filtre afin de pr&eacute;ciser l'affichage des &eacute;v&egrave;nements</squid_filter_stats_text>
 <squid_main_settings>Param&egrave;tres de cache Squid</squid_main_settings>
+<SQUID_NETWORK_HELP>[ul]
+[li]R&eacute;f&eacute;rence &agrave; tout le r&eacute;seau 172.16.1.0: [b]172.16.1.0/24[/b][/li]
+[li]R&eacute;f&eacute;rence &agrave; une adresse unique 172.16.1.25: [b]172.16.1.25/32[/b][/li]
+[li]R&eacute;f&eacute;rence &agrave; une adresse unique172.16.1.25: [b]172.16.1.25[/b][/li]
+[li]R&eacute;f&eacute;rence &agrave; une tranche d'adresse  172.16.1.25-172.16.1.35 :[b]172.16.1.25-172.16.1.35/32[/b][/li]
+[/ul]</SQUID_NETWORK_HELP>
 <squid_net_settings>Param&egrave;tres r&eacute;seaux</squid_net_settings>
 <SQUID_NEWVERSION>Nouvelle version du Proxy web SQUID</SQUID_NEWVERSION>
 <SQUID_NEWVERSION_TEXT>Une nouvelle version du proxy Internet SQUID est disponible. Il est conseill&eacute; de la mettre &agrave; jour.</SQUID_NEWVERSION_TEXT>
@@ -3649,6 +3764,7 @@ Certains g&eacute;n&eacute;rateurs de statistiques peuvent ne pas &ecirc;tre ins
 <string>variable</string>
 <subdirectory>sous-r&eacute;pertoire</subdirectory>
 <subject>sujet</subject>
+<submailbox>Sous-dossiers</submailbox>
 <submit>Soumettre</submit>
 <submit_license>Soumettre votre licence</submit_license>
 <subnet>sous-r&eacute;seaux</subnet>
@@ -3716,6 +3832,7 @@ Si vous d&eacute;sactivez cette option, Artica utilisera uniquement un cache de 
 <task_name>Nom de la t&acirc;che</task_name>
 <task_postfix_network_auto>Postfix pr&eacute;vient que le DHCP change les interfaces IP (eth0 et eth1)</task_postfix_network_auto>
 <task_q1>Donn&eacute;e un nom &agrave; la t&acirc;che</task_q1>
+<task_success_check_mailbox>Ex&eacute;cution effectu&eacute;e, consultez la bo&icirc;te aux lettres...</task_success_check_mailbox>
 <tcp_address>Adresse TCP</tcp_address>
 <tcp_main_settings>Param&egrave;tres cartes r&eacute;seau</tcp_main_settings>
 <templates>Mod&egrave;les</templates>
@@ -4022,6 +4139,7 @@ Si il est en rouge, vous allez devoir maintenir la base des utilisateurs.[br]Cet
 <UPDATE_KAS3_TEXT>Mettre &agrave; jour les bases antivirus afin d'accro&icirc;tre le niveau de d&eacute;tection.</UPDATE_KAS3_TEXT>
 <update_kaspersky_database_title>Base de donn&eacute;es de mise &agrave; jour antivirale</update_kaspersky_database_title>
 <update_now>faites la mise &agrave; jour maintenant</update_now>
+<update_servers_sources>Mise &agrave; jour des serveurs.</update_servers_sources>
 <update_settings>Param&egrave;tres de mise &agrave; jour</update_settings>
 <upgrade>Mise &agrave; jour</upgrade>
 <upgrade_artica>Nouvelle version d'Artica</upgrade_artica>
@@ -4029,7 +4147,9 @@ Si il est en rouge, vous allez devoir maintenir la base des utilisateurs.[br]Cet
 <upgrade_your_system>Mettez &agrave; jour votre syst&egrave;me</upgrade_your_system>
 <upload>t&eacute;l&eacute;charger</upload>
 <upload file>Fichier de t&eacute;l&eacute;chargement</upload file>
+<uploaded>Charg&eacute;</uploaded>
 <upload_a_file>charger un fichier</upload_a_file>
+<upload_kbs>Bande passante de chargement</upload_kbs>
 <upload_max_filesize>Taille Max du fichier de t&eacute;l&eacute;chargement</upload_max_filesize>
 <upload_new_license>T&eacute;l&eacute;charger une nouvel licence</upload_new_license>
 <upload_vpn_configuration>Charger les param&egrave;tres VPN</upload_vpn_configuration>
@@ -4063,6 +4183,8 @@ Si il est en rouge, vous allez devoir maintenir la base des utilisateurs.[br]Cet
 <user_quarantine_emails_query_text>Les spams et les messages infect&eacute;s sont stock&eacute;s dans votre espace de quarantaine.</user_quarantine_emails_query_text>
 <user_tab_groups>groupes</user_tab_groups>
 <user_to_mailing_list>Transformez cet utilisateur en liste de distribution</user_to_mailing_list>
+<USER_WEBDAV>R&eacute;pertoire personnel Internet</USER_WEBDAV>
+<USER_WEBDAV_TEXT>Partagez le r&eacute;pertoire personnel de cet utilisateur sur Internet en WebDav.[br]WebDav est protocole r&eacute;cent permettant de se connecter &agrave; un serveur de fichier comme un navigateur. Plus facile et plus s&eacute;curis&eacute; que le FTP.</USER_WEBDAV_TEXT>
 <UseUpdateServerUrl>Utiliser l'url du serveur de mise &agrave; jours</UseUpdateServerUrl>
 <UseUpdateServerUrlOnly>Utiliser seulement l'url de ce serveur pour les mises &agrave; jours</UseUpdateServerUrlOnly>
 <use_apache>Utiliser uniquement Apache</use_apache>
@@ -4087,9 +4209,11 @@ Si il est en rouge, vous allez devoir maintenir la base des utilisateurs.[br]Cet
 <vgcreate_dev>Ajouter un groupe de volumes</vgcreate_dev>
 <vgcreate_dev_explain>Ajoutez un nouveau groupe afin de cr&eacute;er des volumes de disque logiques dans ce groupe</vgcreate_dev_explain>
 <vgextend_explain>Choisissez le disque dur que vous voulez liez &agrave; the groupe de disques virtuels afin d'augmenter les capacit&eacute;s de votre stockage</vgextend_explain>
+<Video>Vid&eacute;o</Video>
 <view>voir</view>
 <view_config>Visualiser le fichier de configuration</view_config>
 <view_members>Afficher les membres</view_members>
+<view_results>Afficher les r&eacute;sultats</view_results>
 <view_script>voir le script</view_script>
 <violence>Sites sur le meurtre ou permettant de blesser les gens</violence>
 <VirHTTPServer>Adresse web afin de retrouver les fichiers</VirHTTPServer>
@@ -4122,6 +4246,9 @@ In the url the "%f" can be used to specify the real name of downloaded file</Vir
 <warn_shutdown_computer>Cette op&eacute;ration va &eacute;teindre l'ordinateur.
 Voulez-vous effectuer cette op&eacute;ration ?</warn_shutdown_computer>
 <weapons>Sites sur les armes ou tout accessoires autour</weapons>
+<WEBDAV_ACCESS>Acc&egrave;s WebDav (Dossier Internet)</WEBDAV_ACCESS>
+<WEBDAV_HOWTO>Votre r&eacute;pertoire Internet</WEBDAV_HOWTO>
+<WEBDAV_HOWTO_TEXT>Comment acc&eacute;der &agrave; votre r&eacute;pertoire Internet avec Windows XP,2000,Windows 7, Linux...</WEBDAV_HOWTO_TEXT>
 <webmail>webmail</webmail>
 <webphone>Sites permettant l'utilisateur &agrave; t&eacute;l&eacute;phoner via Internet</webphone>
 <webproxy_service>Service de proxy web</webproxy_service>

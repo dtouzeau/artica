@@ -176,6 +176,7 @@ PROCEDURE tupdate.perform_clamav_updates();
 var
    clamav:tclamav;
    EnableScanSecurity:Integer;
+   EnableClamavUnofficial:integer;
    clamuser:string;
    UpdateLogFile:string;
    UpdateLogFilePath:string;
@@ -183,6 +184,10 @@ begin
 clamav:=Tclamav.Create;
 if not FileExists(clamav.CLAMD_BIN_PATH()) then exit;
 if not TryStrToInt(SYS.GET_INFO('EnableScanSecurity'),EnableScanSecurity) then EnableScanSecurity:=0;
+if not TryStrToInt(SYS.GET_INFO('EnableClamavUnofficial'),EnableClamavUnofficial) then EnableClamavUnofficial:=0;
+
+
+
 if EnableScanSecurity=1 then begin
    logs.Syslogs('EnableScanSecurity is on, downloading patterns from http://www.sanesecurity.net');
    clamav.SCAMP_CONF();
@@ -201,6 +206,26 @@ if EnableScanSecurity=1 then begin
 end else begin
    logs.Syslogs('EnableScanSecurity is off, abort downloading patterns from http://www.sanesecurity.net');
 end;
+
+if EnableClamavUnofficial=1 then begin
+   logs.Syslogs('EnableClamavUnofficial is on, downloading unofficial patterns');
+   clamav.CLAMAV_UNOFICIAL();
+   logs.Syslogs('Writing configuration done...');
+   logs.Syslogs('Executing...');
+   if FileExists('/etc/artica-postfix/ClamavUnofficial_time') then begin
+      if SYS.FILE_TIME_BETWEEN_MIN('/etc/artica-postfix/ClamavUnofficial_time')>60 then begin
+         logs.OutputCmd('/usr/share/artica-postfix/bin/clamav-unofficial-sigs.sh -c /etc/clamav-unofficial-sigs.conf');
+         logs.Syslogs('Executing clamav-unofficial-sigs.sh done...');
+         logs.DeleteFile('/etc/artica-postfix/ClamavUnofficial_time');
+         logs.OutputCmd('/bin/touch /etc/artica-postfix/ClamavUnofficial_time');
+      end else begin
+         logs.Debuglogs('Too short time to update from clamav-unofficial, i will come back later');
+      end;
+   end;
+end else begin
+   logs.Syslogs('EnableClamavUnofficial is off, abort downloading unofficial patterns');
+end;
+
 
 if FileExists(clamav.FRESHCLAM_PATH()) then begin
          clamuser:=clamav.CLAMD_GETINFO('User');

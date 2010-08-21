@@ -561,6 +561,7 @@ function Synchronize_clients(){
 	shell_exec("sysctl -w net.ipv4.ip_forward=1");
 	$tbl=$unix->dirdir($main_path);
 	$q=new mysql();
+	if(!is_array($tbl)){return;}
 	while (list ($num, $id) = each ($tbl) ){
 		$id=trim($id);
 		$mustkill=false;
@@ -655,7 +656,7 @@ function StartOpenVPNCLients(){
 	BuildOpenVpnClients();
 	$unix=new unix();
 	$tbl=$unix->dirdir($main_path);
-	
+	if(!is_array($tbl)){return null;}
 	while (list ($num, $ligne) = each ($tbl) ){
 		OpenVPNCLientStart($ligne);
 		

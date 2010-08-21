@@ -37,7 +37,7 @@ private
        function   MYSQL_EXEC_BIN_PATH():string;
        procedure  ZARAFA_INSTALL_MENU();
        procedure  ZARAFA_INSTALL_PERFORM();
-
+       function   GET_INFO(key:string):string;
 public
       constructor Create();
       procedure Free;
@@ -57,6 +57,8 @@ public
       function get_LDAP_suffix():string;
       function SLAPD_CONF_PATH():string;
       function PERL_GENERIC_INSTALL(indexWeb:string;ModulesToCheck:string;force:boolean=false;echoyes:boolean=false):boolean;
+      function PERL_MODULES_ARCH_DIR():string;
+      function PERL_MODULES_NO_ARCH_DIR():string;
       function ReadFromFile(TargetPath:string):string;
       function COMPILE_VERSION(package_name:string):integer;
       function COMPILE_VERSION_STRING(package_name:string):string;
@@ -193,7 +195,25 @@ if RegExpr.Exec(data) then begin
 end;
 end;
 //##############################################################################
-
+function tlibs.IS_DEBIAN_NON_FREE_IN_SOURCE_LIST():boolean;
+var
+   tmpstr,data:string;
+   RegExpr:TRegExpr;
+begin
+result:=false;
+if not FileExists('/etc/apt/sources.list') then exit;
+tmpstr:=FILE_TEMP();
+data:=trim(ReadFromFile('/etc/apt/sources.list'));
+RegExpr:=TRegExpr.Create;
+RegExpr.Expression:='non-free';
+if RegExpr.Exec(data) then begin
+   RegExpr.free;
+   result:=true;
+   exit;
+end;
+RegExpr.free;
+end;
+//##############################################################################
 
 
 function tlibs.CheckReposKernel():string;
@@ -302,11 +322,15 @@ var
    commandline_artica:string;
    command_line_curl:string;
    command_line_wget:string;
+   WgetBindIpAddress_cmd_line_wget:string;
+   WgetBindIpAddress_cmd_line_curl:string;
    localhost:boolean;
+   WgetBindIpAddress:string;
    ssl:boolean;
  begin
    localhost:=false;
    command_line_curl:='';
+   WgetBindIpAddress:=GET_INFO('WgetBindIpAddress');
    RegExpr:=TRegExpr.Create;
    ProxyString:=GET_HTTP_PROXY();
    ProxyString:=AnsiReplaceStr(ProxyString,'"','');
@@ -357,12 +381,15 @@ var
 
    end;
 
-
-   command_line_wget:=uri + '  -q --output-document=' + file_path;
+   if length(WgetBindIpAddress)>0 then begin
+      WgetBindIpAddress_cmd_line_wget:=' --bind-address='+WgetBindIpAddress;
+      WgetBindIpAddress_cmd_line_curl:=' --interface '+WgetBindIpAddress;
+   end;
+   command_line_wget:=uri +WgetBindIpAddress_cmd_line_wget+'  -q --output-document=' + file_path;
 
 
    if FileExists(LOCATE_CURL()) then begin
-         if ssl then command_line_curl:=command_line_curl+ ' --insecure';
+         if ssl then command_line_curl:=command_line_curl+WgetBindIpAddress_cmd_line_curl+' --insecure';
          command_line_curl:=LOCATE_CURL() + command_line_curl;
          fpsystem(command_line_curl);
          result:=true;
@@ -1122,6 +1149,65 @@ begin
 
 end;
 //#############################################################################################
+function tlibs.PERL_MODULES_ARCH_DIR():string;
+var
+   cmd:string;
+   l:TstringList;
+   RegExpr:TRegExpr;
+   i:integer;
+begin
+   if not FileExists('/tmp/artica.perlV') then begin
+      cmd:='perl -V';
+      fpsystem(cmd + ' >/tmp/artica.perlV 2>&1');
+   end;
+
+ l:=TstringList.Create;
+ RegExpr:=TRegExpr.Create;
+ l.LoadFromFile('/tmp/artica.perlV');
+ RegExpr.Expression:='-Darchlib=(.+?)\s+';
+ for i:=0 to l.Count-1 do begin
+     if RegExpr.Exec(l.Strings[i]) then begin
+      result:=trim(RegExpr.Match[1]);
+      break;
+     end else begin
+     //writeln(l.Strings[i]);
+     end;
+ end;
+ L.free;
+ RegExpr.Free;
+end;
+//#############################################################################################
+function tlibs.PERL_MODULES_NO_ARCH_DIR():string;
+var
+   cmd:string;
+   l:TstringList;
+   RegExpr:TRegExpr;
+   i:integer;
+begin
+   if not FileExists('/tmp/artica.perlV') then begin
+      cmd:='perl -V';
+      fpsystem(cmd + ' >/tmp/artica.perlV 2>&1');
+   end;
+
+ l:=TstringList.Create;
+ RegExpr:=TRegExpr.Create;
+ l.LoadFromFile('/tmp/artica.perlV');
+
+ for i:=0 to l.Count-1 do begin
+     RegExpr.Expression:='ndorarch=(.+?)\s+';
+     if RegExpr.Exec(l.Strings[i]) then begin
+      result:=trim(RegExpr.Match[1]);
+      break;
+     end;
+     RegExpr.Expression:='vendorarch=(.+?)\s+';
+     if RegExpr.Exec(l.Strings[i]) then begin
+      result:=trim(RegExpr.Match[1]);
+      break;
+     end;
+ end;
+ L.free;
+ RegExpr.Free;
+end;
 
 function tlibs.CHECK_PERL_MODULES(ModulesToCheck:string):string;
 var
@@ -1951,7 +2037,7 @@ if length(trim(openvpn))=0 then begin
        writeln('**********************************************************');
    writeln('');
     if length(nfs)>0 then begin
-       writeln('OpenVPN System :.......................................[8]');
+       writeln('OpenVPN System :.......................................[9]');
        plistSquid:=explode(',', pdns);
        writeln(IntToStr(length(pdns))+' package(s) are not installed');
     end else begin
@@ -2159,6 +2245,20 @@ begin
    if FileExists('/usr/local/bin/mysql') then exit('/usr/local/bin/mysql');
 end;
 //#############################################################################
+function tlibs.GET_INFO(key:string):string;
+var
+   str:string;
+begin
 
+
+
+str:='';
+   if FileExists('/etc/artica-postfix/settings/Daemons/'+key) then begin
+      str:=trim(ReadFileIntoString('/etc/artica-postfix/settings/Daemons/'+key));
+      result:=str;
+   end;
+
+end;
+//#############################################################################
 
 end.

@@ -333,10 +333,10 @@ var
    i:integer;
 begin
     l:=Tstringlist.Create;
-    l.Add('Compress/Raw/Zlib/Zlib.bs');
-    l.add('Compress/Raw/Zlib/Zlib.bs');
-    l.add('Compress/Raw/Zlib/Zlib.so');
-    l.add('Compress/Raw/Zlib/autosplit.ix');
+    l.Add('auto/Compress/Raw/Zlib/Zlib.bs');
+    l.add('auto/Compress/Raw/Zlib/Zlib.bs');
+    l.add('auto/Compress/Raw/Zlib/Zlib.so');
+    l.add('auto/Compress/Raw/Zlib/autosplit.ix');
     l.add('Compress/Raw/Zlib.pm');
     archdir:=libs.PERL_MODULES_ARCH_DIR();
     noarchdir:=libs.PERL_MODULES_NO_ARCH_DIR();
@@ -344,9 +344,9 @@ begin
     if DirectoryExists(archdir) then begin
        writeln('removing Compress::Raw::Zlib');
        for i:=0 to l.Count-1 do begin
-           if FileExists(archdir+'/auto/'+l.Strings[i]) then begin
-              writeln('removing '+archdir+'/auto/'+l.Strings[i]);
-              fpsystem('/bin/rm '+archdir+'/auto/'+l.Strings[i]);
+           if FileExists(archdir+'/'+l.Strings[i]) then begin
+              writeln('removing '+archdir+'/'+l.Strings[i]);
+              fpsystem('/bin/rm '+archdir+'/'+l.Strings[i]);
            end;
 
            if FileExists(noarchdir+'/'+l.Strings[i]) then begin

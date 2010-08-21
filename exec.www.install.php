@@ -118,7 +118,11 @@ if($wwwservertype=="ZARAFA_MOBILE"){
 
 if($wwwservertype=="DRUPAL"){
 		DRUPAL_INSTALL($apacheservername,$root,$hash[$i]);
-	}		
+	}
+
+if($wwwservertype=="WEBDAV"){
+		WEBDAV_USERS($apacheservername,$root,$hash[$i]);
+	}	
 	
 	
 }
@@ -519,6 +523,7 @@ for($i=0;$i<$hash["count"];$i++){
 	$root=$hash[$i]["apachedocumentroot"][0];
 	$apacheservername=trim($hash[$i]["apacheservername"][0]);
 	$wwwservertype=trim($hash[$i]["wwwservertype"][0]);
+	if($wwwservertype=="WEBDAV"){continue;}
 	$wwwsslmode=$hash[$i]["wwwsslmode"][0];
 	$DirectoryIndex="index.php";
 	unset($rewrite);
@@ -1944,33 +1949,8 @@ return true;
 }
 
 function vhosts_BuildCertificate($hostname){
-	$dir=$GLOBALS["SSLKEY_PATH"];
-	if(is_file("$dir/$hostname.crt")){
-		if(is_file("$dir/$hostname.key")){
-			return true;
-		}
-	}
-	@mkdir($dir,0600,true);
 	$unix=new unix();
-	$sock=new sockets();
-	$CertificateMaxDays=$sock->GET_INFO('CertificateMaxDays');
-	if($CertificateMaxDays==null){$CertificateMaxDays=730;}
-	$ini=new Bs_IniHandler("/etc/artica-postfix/ssl.certificate.conf");
-	$conf="/etc/ssl/certs/apache/$hostname.conf";
-	$openssl=$unix->find_program("openssl");
-	
-	
-	unset($ini->_params["HOSTS_ADDONS"]);
-	$ini->_params["default_db"]["default_days"]=$CertificateMaxDays;
-	$ini->_params["server_policy"]["commonName"]=$hostname;
-	$ini->_params["user_policy"]["commonName"]=$hostname;
-	$ini->_params["default_ca"]["commonName"]=$hostname;
-	$ini->_params["default_ca"]["commonName_value"]=$hostname;
-	$ini->_params["policy_match"]["commonName"]=$hostname;
-	$ini->_params["policy_anything"]["commonName"]=$hostname;
-	$ini->saveFile($conf);
-	$cmd="$openssl req -new -x509 -batch -config $conf -nodes -out $dir/$hostname.crt -keyout $dir/$hostname.key -days $CertificateMaxDays";
-	shell_exec($cmd);
+	$unix->vhosts_BuildCertificate($hostname);
 	
 }
 
@@ -2013,6 +1993,8 @@ function DRUPAL_INSTALL($apacheservername,$root,$hash=array()){
 	
 	
 }
+
+function WEBDAV_USERS(){}
 
 
 

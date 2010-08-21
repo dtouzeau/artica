@@ -66,12 +66,12 @@
         <Filename Value="principale.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="principale"/>
-        <CursorPos X="118" Y="200"/>
-        <TopLine Value="180"/>
+        <CursorPos X="60" Y="1015"/>
+        <TopLine Value="965"/>
         <EditorIndex Value="3"/>
         <UsageCount Value="206"/>
         <Bookmarks Count="1">
-          <Item0 X="6" Y="1047" ID="0"/>
+          <Item0 X="6" Y="1063" ID="0"/>
         </Bookmarks>
         <Loaded Value="True"/>
       </Unit4>
@@ -611,124 +611,124 @@
     </Units>
     <JumpHistory Count="30" HistoryIndex="29">
       <Position1>
-        <Filename Value="principale.pas"/>
-        <Caret Line="1485" Column="83" TopLine="1451"/>
+        <Filename Value="zsystem.pas"/>
+        <Caret Line="7509" Column="1" TopLine="7475"/>
       </Position1>
       <Position2>
-        <Filename Value="principale.pas"/>
-        <Caret Line="843" Column="162" TopLine="815"/>
+        <Filename Value="zsystem.pas"/>
+        <Caret Line="7510" Column="1" TopLine="7476"/>
       </Position2>
       <Position3>
         <Filename Value="zsystem.pas"/>
-        <Caret Line="75" Column="38" TopLine="41"/>
+        <Caret Line="7628" Column="29" TopLine="7595"/>
       </Position3>
       <Position4>
         <Filename Value="zsystem.pas"/>
-        <Caret Line="7509" Column="1" TopLine="7475"/>
+        <Caret Line="7672" Column="1" TopLine="7638"/>
       </Position4>
       <Position5>
         <Filename Value="zsystem.pas"/>
-        <Caret Line="7510" Column="1" TopLine="7476"/>
+        <Caret Line="7668" Column="1" TopLine="7634"/>
       </Position5>
       <Position6>
-        <Filename Value="zsystem.pas"/>
-        <Caret Line="7628" Column="29" TopLine="7595"/>
+        <Filename Value="principale.pas"/>
+        <Caret Line="1087" Column="1" TopLine="1047"/>
       </Position6>
       <Position7>
-        <Filename Value="zsystem.pas"/>
-        <Caret Line="7672" Column="1" TopLine="7638"/>
+        <Filename Value="principale.pas"/>
+        <Caret Line="525" Column="4" TopLine="491"/>
       </Position7>
       <Position8>
-        <Filename Value="zsystem.pas"/>
-        <Caret Line="7668" Column="1" TopLine="7634"/>
+        <Filename Value="principale.pas"/>
+        <Caret Line="547" Column="1" TopLine="513"/>
       </Position8>
       <Position9>
         <Filename Value="principale.pas"/>
-        <Caret Line="1087" Column="1" TopLine="1047"/>
+        <Caret Line="569" Column="37" TopLine="536"/>
       </Position9>
       <Position10>
         <Filename Value="principale.pas"/>
-        <Caret Line="525" Column="4" TopLine="491"/>
+        <Caret Line="1665" Column="4" TopLine="1632"/>
       </Position10>
       <Position11>
         <Filename Value="principale.pas"/>
-        <Caret Line="547" Column="1" TopLine="513"/>
+        <Caret Line="606" Column="1" TopLine="572"/>
       </Position11>
       <Position12>
         <Filename Value="principale.pas"/>
-        <Caret Line="569" Column="37" TopLine="536"/>
+        <Caret Line="609" Column="1" TopLine="575"/>
       </Position12>
       <Position13>
         <Filename Value="principale.pas"/>
-        <Caret Line="1665" Column="4" TopLine="1632"/>
+        <Caret Line="28" Column="76" TopLine="1"/>
       </Position13>
       <Position14>
         <Filename Value="principale.pas"/>
-        <Caret Line="606" Column="1" TopLine="572"/>
+        <Caret Line="72" Column="28" TopLine="38"/>
       </Position14>
       <Position15>
         <Filename Value="principale.pas"/>
-        <Caret Line="609" Column="1" TopLine="575"/>
+        <Caret Line="132" Column="35" TopLine="98"/>
       </Position15>
       <Position16>
         <Filename Value="principale.pas"/>
-        <Caret Line="28" Column="76" TopLine="1"/>
+        <Caret Line="133" Column="16" TopLine="98"/>
       </Position16>
       <Position17>
         <Filename Value="principale.pas"/>
-        <Caret Line="72" Column="28" TopLine="38"/>
+        <Caret Line="231" Column="34" TopLine="197"/>
       </Position17>
       <Position18>
         <Filename Value="principale.pas"/>
-        <Caret Line="132" Column="35" TopLine="98"/>
+        <Caret Line="248" Column="43" TopLine="197"/>
       </Position18>
       <Position19>
-        <Filename Value="principale.pas"/>
-        <Caret Line="133" Column="16" TopLine="98"/>
+        <Filename Value="process1.pas"/>
+        <Caret Line="229" Column="1" TopLine="189"/>
       </Position19>
       <Position20>
-        <Filename Value="principale.pas"/>
-        <Caret Line="231" Column="34" TopLine="197"/>
+        <Filename Value="process1.pas"/>
+        <Caret Line="252" Column="25" TopLine="193"/>
       </Position20>
       <Position21>
         <Filename Value="principale.pas"/>
-        <Caret Line="248" Column="43" TopLine="197"/>
+        <Caret Line="77" Column="17" TopLine="60"/>
       </Position21>
       <Position22>
-        <Filename Value="process1.pas"/>
-        <Caret Line="229" Column="1" TopLine="189"/>
-      </Position22>
-      <Position23>
-        <Filename Value="process1.pas"/>
-        <Caret Line="252" Column="25" TopLine="193"/>
-      </Position23>
-      <Position24>
-        <Filename Value="principale.pas"/>
-        <Caret Line="77" Column="17" TopLine="60"/>
-      </Position24>
-      <Position25>
         <Filename Value="principale.pas"/>
         <Caret Line="572" Column="33" TopLine="538"/>
+      </Position22>
+      <Position23>
+        <Filename Value="principale.pas"/>
+        <Caret Line="779" Column="41" TopLine="744"/>
+      </Position23>
+      <Position24>
+        <Filename Value="../artica-install/bogofilter.pas"/>
+        <Caret Line="18" Column="1" TopLine="3"/>
+      </Position24>
+      <Position25>
+        <Filename Value="../artica-install/monitorix.pas"/>
+        <Caret Line="49" Column="33" TopLine="1"/>
       </Position25>
       <Position26>
         <Filename Value="principale.pas"/>
         <Caret Line="779" Column="41" TopLine="744"/>
       </Position26>
       <Position27>
-        <Filename Value="../artica-install/bogofilter.pas"/>
-        <Caret Line="18" Column="1" TopLine="3"/>
+        <Filename Value="principale.pas"/>
+        <Caret Line="1" Column="1" TopLine="1"/>
       </Position27>
       <Position28>
-        <Filename Value="../artica-install/monitorix.pas"/>
-        <Caret Line="49" Column="33" TopLine="1"/>
+        <Filename Value="principale.pas"/>
+        <Caret Line="722" Column="148" TopLine="528"/>
       </Position28>
       <Position29>
         <Filename Value="principale.pas"/>
-        <Caret Line="779" Column="41" TopLine="744"/>
+        <Caret Line="591" Column="27" TopLine="642"/>
       </Position29>
       <Position30>
         <Filename Value="principale.pas"/>
-        <Caret Line="1" Column="1" TopLine="1"/>
+        <Caret Line="1011" Column="62" TopLine="965"/>
       </Position30>
     </JumpHistory>
   </ProjectOptions>

@@ -18,6 +18,7 @@ $sock=new sockets();
 $unix=new unix();
 events("running $pid ");
 file_put_contents($pidfile,$pid);
+smtp_hack_reconfigure();
 include_once(dirname(__FILE__).'/ressources/class.ini.inc');
 include_once(dirname(__FILE__).'/ressources/class.users.menus.inc');
 $users=new usersMenus();
@@ -32,6 +33,11 @@ if($GLOBALS["PopHackEnabled"]==null){$GLOBALS["PopHackEnabled"]=1;}
 if($GLOBALS["PopHackCount"]==null){$GLOBALS["PopHackCount"]=10;}
 $GLOBALS["MYPATH"]=dirname(__FILE__);
 $GLOBALS["SIEVEC_PATH"]=$unix->LOCATE_SIEVEC();
+$GLOBALS["SMTP_HACK_CONFIG_RATE"]["NAME_SERVICE_NOT_KNOWN"]=10;
+$GLOBALS["SMTP_HACK_CONFIG_RATE"]["SASL_LOGIN"]=15;
+$GLOBALS["SMTP_HACK_CONFIG_RATE"]["RBL"]=5;
+$GLOBALS["SMTP_HACK_CONFIG_RATE"]["USER_UNKNOWN"]=10;
+$GLOBALS["SMTP_HACK_CONFIG_RATE"]["BLOCKED_SPAM"]=5;
 
 $GLOBALS["postfix_bin_path"]=$unix->find_program("postfix");
 
@@ -50,6 +56,8 @@ die();
 function Parseline($buffer){
 $buffer=trim($buffer);
 if($buffer==null){return null;}
+
+if(is_file("/var/log/artica-postfix/smtp-hack-reconfigure")){smtp_hack_reconfigure();}
 
 if(preg_match("#assp\[.+?LDAP Results#",$buffer,$re)){return null;}
 if(preg_match("#smtpd\[.+?\]: disconnect from#",$buffer,$re)){return null;}
@@ -110,7 +118,108 @@ if(preg_match("#amavis\[.+?Module\s+#",$buffer)){return null;}
 if(preg_match("#amavis\[.+?\s+loaded$#",trim($buffer))){return null;}
 if(preg_match("#amavis\[.+?\s+Internal decoder#",trim($buffer))){return null;}
 if(preg_match("#amavis\[.+?\s+Creating db#",trim($buffer))){return null;}
+if(preg_match("#lost connection after CONNECT from unknown#",$buffer)){return null;}
+if(preg_match("#lost connection after DATA from unknown#",$buffer)){return null;}
+if(preg_match("#lost connection after RCPT#",$buffer)){return null;}
+if(preg_match("#smtpd\[.+? warning:.+?address not listed for hostname#",$buffer)){return null;}
 
+//SMTP HACK ######################################################################################################
+
+
+
+
+if(preg_match("#smtpd\[.+?:\s+reject:\s+CONNECT from\s+(.+?)\[([0-9\.]+)\]:\s+554.+?Service unavailable;.+?blocked#",$buffer,$re)){	
+	$GLOBALS["SMTP_HACK"][$re[1]]["RBL"]=$GLOBALS["SMTP_HACK"][$re[2]]["RBL"]+2;
+	events("Postfix Hack: {$re[1]} RBL !! {$re[2]}={$GLOBALS["SMTP_HACK"][$re[2]]["RBL"]} attempts");
+	if($GLOBALS["SMTP_HACK"][$re[2]]["RBL"]>=$GLOBALS["SMTP_HACK_CONFIG_RATE"]["RBL"]){
+		smtp_hack_perform($re[2],$GLOBALS["SMTP_HACK"][$re[2]],"RBL");
+		unset($GLOBALS["SMTP_HACK"][$re[2]]);	
+	}	
+	return null;
+}
+
+
+if(preg_match("#smtpd\[.+?warning:\s+(.+?):\s+hostname\s+(.+?)\s+verification failed: Name or service not known#",$buffer,$re)){
+	$GLOBALS["SMTP_HACK"][$re[1]]["NAME_SERVICE_NOT_KNOWN"]=$GLOBALS["SMTP_HACK"][$re[1]]["NAME_SERVICE_NOT_KNOWN"]+1;
+	events("Postfix Hack: {$re[1]} Name or service not known {$re[1]}={$GLOBALS["SMTP_HACK"][$re[1]]["NAME_SERVICE_NOT_KNOWN"]} attempts");
+	if($GLOBALS["SMTP_HACK"][$re[1]]["NAME_SERVICE_NOT_KNOWN"]>=$GLOBALS["SMTP_HACK_CONFIG_RATE"]["NAME_SERVICE_NOT_KNOWN"]){
+		smtp_hack_perform($re[1],$GLOBALS["SMTP_HACK"][$re[1]],"NAME_SERVICE_NOT_KNOWN");
+		unset($GLOBALS["SMTP_HACK"][$re[1]]);
+	}
+	return;
+}
+
+if(preg_match('#warning.+?\[([0-9\.]+)\]:\s+SASL LOGIN authentication failed: authentication failure#',$buffer,$re)){
+	$GLOBALS["SMTP_HACK"][$re[1]]["SASL_LOGIN"]=$GLOBALS["SMTP_HACK"][$re[1]]["SASL_LOGIN"]+1;
+	events("Postfix Hack:bad SASL login {$re[1]}:{$GLOBALS["SMTP_HACK"][$re[1]]["SASL_LOGIN"]} retries");
+	if($GLOBALS["SMTP_HACK"][$re[1]]["SASL_LOGIN"]>=$GLOBALS["SMTP_HACK_CONFIG_RATE"]["SASL_LOGIN"]){
+		smtp_hack_perform($re[1],$GLOBALS["SMTP_HACK"][$re[1]],"SASL_LOGIN");
+		unset($GLOBALS["SMTP_HACK"][$re[1]]);	
+	}
+	return null;
+}
+
+if(preg_match("#NOQUEUE: reject:.+?from.+?\[([0-9\.]+)\]:.+?Service unavailable.+?blocked using.+?from=<(.+?)> to=<(.+?)> proto#",$buffer,$re)){
+	event_message_reject_hostname("RBL",$re[2],$re[3],$re[1]);
+	$GLOBALS["SMTP_HACK"][$re[1]]["RBL"]=$GLOBALS["SMTP_HACK"][$re[1]]["RBL"]+1;
+	
+	events("Postfix Hack: {$re[1]} RBL !! from=<{$re[2]}> to=<{$re[3]}> {$re[1]}={$GLOBALS["SMTP_HACK"][$re[1]]["RBL"]} attempts");
+	
+	if($GLOBALS["SMTP_HACK"][$re[1]]["RBL"]>=$GLOBALS["SMTP_HACK_CONFIG_RATE"]["RBL"]){
+		smtp_hack_perform($re[1],$GLOBALS["SMTP_HACK"][$re[1]],"RBL");
+		unset($GLOBALS["SMTP_HACK"][$re[1]]);	
+	}	
+	return null;
+}
+
+if(preg_match("#NOQUEUE: reject:.+?from.+?\[([0-9\.]+)\]:.+?<(.+?)>:\s+Recipient address rejected: User unknown in local recipient table;\s+from=<(.+?)>\s+to=<(.+?)>#",$buffer,$re)){
+	event_message_reject_hostname("User unknown",$re[2],$re[3],$re[1]);
+		$GLOBALS["SMTP_HACK"][$re[1]]["USER_UNKNOWN"]=$GLOBALS["SMTP_HACK"][$re[1]]["USER_UNKNOWN"]+1;
+	events("Postfix Hack: : {$re[1]} User unknown from=<{$re[2]}> to=<{$re[3]}> {$GLOBALS["SMTP_HACK"][$re[1]]["USER_UNKNOWN"]} attempts/{$GLOBALS["SMTP_HACK_CONFIG_RATE"]["USER_UNKNOWN"]}");
+	if($GLOBALS["SMTP_HACK"][$re[1]]["USER_UNKNOWN"]>=$GLOBALS["SMTP_HACK_CONFIG_RATE"]["USER_UNKNOWN"]){
+		smtp_hack_perform($re[1],$GLOBALS["SMTP_HACK"][$re[1]],"USER_UNKNOWN");
+		unset($GLOBALS["SMTP_HACK"][$re[1]]);	
+	}	
+	return null;
+}
+
+
+if(preg_match("#ch[0-9]+.+\[.+?]:.+?Blocked SPAM,\s+.+?\[.+?\]\s+\[(.+?)]#",$buffer,$re)){
+	$GLOBALS["SMTP_HACK"][$re[1]]["BLOCKED_SPAM"]=$GLOBALS["SMTP_HACK"][$re[1]]["BLOCKED_SPAM"]+1;
+	events("Postfix Hack: {$re[1]} Spam {$GLOBALS["SMTP_HACK"][$re[1]]["BLOCKED_SPAM"]} attempts/{$GLOBALS["SMTP_HACK_CONFIG_RATE"]["BLOCKED_SPAM"]}");
+	if($GLOBALS["SMTP_HACK"][$re[1]]["BLOCKED_SPAM"]>=$GLOBALS["SMTP_HACK_CONFIG_RATE"]["BLOCKED_SPAM"]){
+		smtp_hack_perform($re[1],$GLOBALS["SMTP_HACK"][$re[1]],"BLOCKED_SPAM");
+		unset($GLOBALS["SMTP_HACK"][$re[1]]);	
+	}	
+	return null;
+}
+
+if(preg_match("#Blocked SPAM, AM\.PDP-SOCK\s+\[.+?\]\s+\[(.+?)\]#",$buffer,$re)){
+	$GLOBALS["SMTP_HACK"][$re[1]]["BLOCKED_SPAM"]=$GLOBALS["SMTP_HACK"][$re[1]]["BLOCKED_SPAM"]+1;
+	events("Postfix Hack: {$re[1]} Spam {$GLOBALS["SMTP_HACK"][$re[1]]["BLOCKED_SPAM"]} attempts/{$GLOBALS["SMTP_HACK_CONFIG_RATE"]["BLOCKED_SPAM"]}");
+	if($GLOBALS["SMTP_HACK"][$re[1]]["BLOCKED_SPAM"]>=$GLOBALS["SMTP_HACK_CONFIG_RATE"]["BLOCKED_SPAM"]){
+		smtp_hack_perform($re[1],$GLOBALS["SMTP_HACK"][$re[1]],"BLOCKED_SPAM");
+		unset($GLOBALS["SMTP_HACK"][$re[1]]);	
+	}	
+	return null;
+}
+
+
+if(preg_match("#ch[0-9]+.+\[.+?]:.+?Blocked SPAMMY,\s+.+?\[.+?\]\s+\[(.+?)]#",$buffer,$re)){
+	$GLOBALS["SMTP_HACK"][$re[1]]["BLOCKED_SPAM"]=$GLOBALS["SMTP_HACK"][$re[1]]["BLOCKED_SPAM"]+1;
+	events("Postfix Hack: {$re[1]} Spam {$GLOBALS["SMTP_HACK"][$re[1]]["BLOCKED_SPAM"]} attempts/{$GLOBALS["SMTP_HACK_CONFIG_RATE"]["BLOCKED_SPAM"]}");
+	if($GLOBALS["SMTP_HACK"][$re[1]]["BLOCKED_SPAM"]>=$GLOBALS["SMTP_HACK_CONFIG_RATE"]["BLOCKED_SPAM"]){
+		smtp_hack_perform($re[1],$GLOBALS["SMTP_HACK"][$re[1]],"BLOCKED_SPAM");
+		unset($GLOBALS["SMTP_HACK"][$re[1]]);	
+	}	
+	return null;
+}
+
+
+
+
+
+//######################################################################################################
 
 
 if(preg_match("#cyrus\/lmtp\[.+?:\s+IOERROR: not a sieve bytecode file\s+(.+?)$#",$buffer,$re)){
@@ -135,7 +244,8 @@ if(preg_match("#postfix\/lmtp\[.+?:\s+(.+?):\s+to=<(.+)>,\s+relay=([0-9\.]+)\[.+
 }
 
 
-if(preg_match("#postfix\/lmtp\[.+?:\s+connect to ([0-9\.]+)\[.+?:[0-9]+:\s+Connection refused",$buffer)){
+
+if(preg_match("#postfix\/lmtp\[.+?:\s+connect to ([0-9\.]+)\[.+?:[0-9]+:\s+Connection refused#",$buffer)){
 	events("postfix LMTP error");
 	$file="/etc/artica-postfix/croned.1/postfix.lmtp.auth.failed";
 	event_messageid_rejected($re[1],"Mailbox Authentication required","127.0.0.1",$re[2]);
@@ -148,8 +258,19 @@ if(preg_match("#postfix\/lmtp\[.+?:\s+connect to ([0-9\.]+)\[.+?:[0-9]+:\s+Conne
 	
 	return;		
 }
-
-
+if(preg_match("#postfix\/.+?:\s+warning:\s+problem talking to server\s+[0-9\.]+:12525:\s+Connection refused#",$buffer)){
+	events("postfix policyd-weight error");
+	$file="/etc/artica-postfix/croned.1/postfix.policyd-weight.conect.failed";
+	
+	if(file_time_min($file)>10){
+		email_events("Postfix: Policyd-weight server connection problem","Postfix\n$buffer\nArtica will reconfigure restart policyd-weight service","postfix");
+		THREAD_COMMAND_SET("/etc/init.d/artica-postfix restart policydw");
+		@unlink($file);
+		file_put_contents($file,"#");
+	}
+	
+	return;		
+}
 
 if(preg_match("#KASERROR.+?keepup2date\s+failed.+?no valid license info found#",$buffer,$re)){
 	events("Kas3, license error, uninstall kas3");
@@ -283,6 +404,15 @@ if(preg_match("#spamd\[[0-9]+.+?Can.+?locate\s+Mail\/SpamAssassin\/CompiledRegex
 if(preg_match("#cyrus\/lmtp\[.+?verify_user\(user\.(.+?)\)\s+failed: Mailbox does not exist#",$buffer,$re)){
 	cyrus_mailbox_not_exists($buffer,$re[1]);
 	return null;
+}
+
+if(preg_match("#cyrus\/imap\[.+?: IOERROR: opening\s+(.+?):\s+No such file or directory#",$buffer,$re)){
+	@mkdir(dirname($re[1]),0755,true);
+	shell_exec("/bin/touch {$re[1]}");
+	events("postfix -> mkdir ".dirname($re[1]));
+	THREAD_COMMAND_SET("chown -R cyrus:mail ".dirname($re[1]));
+	return;
+	
 }
 
 
@@ -616,18 +746,7 @@ if(preg_match('#badlogin: \[(.+?)\] plaintext\s+(.+?)\s+SASL\(-13\): authenticat
 	return null;
 }
 
-if(preg_match('#warning.+?\[([0-9\.]+)\]:\s+SASL LOGIN authentication failed: authentication failure#',$buffer,$re)){
-	$date=date('Y-m-d H');
-	$GLOBALS["SMTP_HACK"][$re[1]][$date]=$GLOBALS["SMTP_HACK"][$re[1]][$date]+1;
-	events("Postfix Hack:bad SASL login {$re[1]}:{$GLOBALS["SMTP_HACK"][$re[1]][$date]} retries");
-	if($GLOBALS["SMTP_HACK"][$re[1]][$date]>15){
-		email_events("SMTP HACKING !!!!","Build iptables rule \"iptables -I INPUT -s {$re[1]} -j DROP\" for {$re[1]}!\nlast error: $buffer","postfix");
-		shell_exec("iptables -I INPUT -s {$re[1]} -j DROP");
-		events("SMTP Hack: -> iptables -I INPUT -s {$re[1]} -j DROP");
-		unset($GLOBALS["IMAP_HACK"][$re[1]]);	
-	}
-	return null;
-}
+
 
 if(preg_match('#badlogin: \[(.+?)\] plaintext\s+(.+?)\s+SASL\(-1\): generic failure: checkpass failed#',$buffer,$re)){
 	$file="/etc/artica-postfix/croned.1/cyrus.checkpass.error";
@@ -1004,11 +1123,7 @@ if(preg_match("#smtp\[.+?:\s+(.+?):\s+host.+?\[(.+?)\]\s+refused to talk to me:#
 	return null;
 }
 
-if(preg_match("#NOQUEUE: reject:.+?from.+?\[([0-9\.]+)\]:.+?Service unavailable.+?blocked using.+?from=<(.+?)> to=<(.+?)> proto#",$buffer,$re)){
-	event_message_reject_hostname("RBL",$re[2],$re[3],$re[1]);
-	events("{$re[1]} RBL !! from=<{$re[2]}> to=<{$re[3]}>");
-	return null;
-}
+
 
 
 
@@ -1387,7 +1502,11 @@ function event_finish($postfix_id,$to,$status,$bounce_error,$from=null,$buffer=n
 	}	
 	
 	
-	
+	if(preg_match("#451 4.2.0 Mailbox has an invalid format#",$bounce_error)){
+			$status="rejected";
+			$delivery_success="no";
+			$bounce_error="Mailbox corrupt";
+	}		
 	
 	if(preg_match("#delivered via#",$bounce_error)){
 		$status="Deliver";
@@ -1526,30 +1645,34 @@ if(preg_match("#host.+?\[(.+?)\]\s+said:.+?<(.+?)>: Recipient address rejected: 
 			}
 			
 			
-if(preg_match("#said:.+?Authentication required#",$bounce_error)){
-			$status="Error";
-			$delivery_success="no";
-			$bounce_error="Authentication required";	
-}
-
-if(preg_match("#temporary failure.+?[0-9]+\s+[0-9\.]+\s+Bad sender address syntax.+?could not send mail#",$bounce_error)){
-			$status="Error";
-			$delivery_success="no";
-			$bounce_error="Bad sender address syntax";	
-}
-
-if(preg_match("#connect.+?Permission denied#",$bounce_error)){
-			$status="Error";
-			$delivery_success="no";
-			$bounce_error="service permissions error";	
-}
-
-if(preg_match("#Command died with status 255:.+?exec\.artica-filter\.php#",$bounce_error)){
-			$status="Error";
-			$delivery_success="no";
-			$bounce_error="artica-filter error";
-}
-
+		if(preg_match("#said:.+?Authentication required#",$bounce_error)){
+					$status="Error";
+					$delivery_success="no";
+					$bounce_error="Authentication required";	
+		}
+		
+		if(preg_match("#temporary failure.+?[0-9]+\s+[0-9\.]+\s+Bad sender address syntax.+?could not send mail#",$bounce_error)){
+					$status="Error";
+					$delivery_success="no";
+					$bounce_error="Bad sender address syntax";	
+		}
+		
+		if(preg_match("#connect.+?Permission denied#",$bounce_error)){
+					$status="Error";
+					$delivery_success="no";
+					$bounce_error="service permissions error";	
+		}
+		
+		if(preg_match("#Command died with status 255:.+?exec\.artica-filter\.php#",$bounce_error)){
+					$status="Error";
+					$delivery_success="no";
+					$bounce_error="artica-filter error";
+		}
+		if(preg_match("#250 2\.5\.0\s+Ok#",$bounce_error)){
+			$status="Deliver";
+			$delivery_success="yes";
+			$bounce_error="Sended";
+		}
 
 			
 
@@ -2078,6 +2201,98 @@ function zarafa_rebuild_db($table,$buffer){
 	@file_put_contents($file,"#");	
 	return;		
 	
+}
+
+
+function smtp_hack_reconfigure(){
+	
+	if(is_file("/var/log/artica-postfix/smtp-hack-reconfigure")){
+		@unlink("/var/log/artica-postfix/smtp-hack-reconfigure");
+	}
+	
+	$sock=new sockets();
+	$GLOBALS["SMTP_HACK_CONFIG_RATE"]=unserialize(base64_decode($sock->GET_INFO("PostfixAutoBlockParameters")));
+	
+	
+if($GLOBALS["SMTP_HACK_CONFIG_RATE"]["NAME_SERVICE_NOT_KNOWN"]<1){
+		$GLOBALS["SMTP_HACK_CONFIG_RATE"]["NAME_SERVICE_NOT_KNOWN"]=10;
+}
+
+if($GLOBALS["SMTP_HACK_CONFIG_RATE"]["SASL_LOGIN"]<1){
+		$GLOBALS["SMTP_HACK_CONFIG_RATE"]["SASL_LOGIN"]=15;
+}
+if($GLOBALS["SMTP_HACK_CONFIG_RATE"]["RBL"]<1){
+		$GLOBALS["SMTP_HACK_CONFIG_RATE"]["RBL"]=5;
+}	
+if($GLOBALS["SMTP_HACK_CONFIG_RATE"]["USER_UNKNOWN"]<1){
+		$GLOBALS["SMTP_HACK_CONFIG_RATE"]["USER_UNKNOWN"]=10;
+}	
+if($GLOBALS["SMTP_HACK_CONFIG_RATE"]["BLOCKED_SPAM"]<1){
+		$GLOBALS["SMTP_HACK_CONFIG_RATE"]["BLOCKED_SPAM"]=5;
+}	
+if($GLOBALS["SMTP_HACK_CONFIG_RATE"]["ADDRESS_NOT_LISTED"]<1){
+		$GLOBALS["SMTP_HACK_CONFIG_RATE"]["ADDRESS_NOT_LISTED"]=2;
+}	
+
+
+while (list ($num, $ligne) = each ($GLOBALS["SMTP_HACK_CONFIG_RATE"]) ){
+	$info="Starting......: artica-postfix realtime logs SMTP HACK: $num=$ligne";
+	events($info);
+	echo $info."\n";
+}
+	
+	
+}
+
+
+function smtp_hack_perform($servername,$array,$matches){
+	
+	//email_events("SMTP HACKING !!!!","Build iptables rule \"iptables -I INPUT -s {$re[1]} -j DROP\" for {$re[1]}!\nlast error: $buffer","postfix");
+	//shell_exec("iptables -I INPUT -s {$re[1]} -j DROP");
+	//events("SMTP Hack: -> iptables -I INPUT -s {$re[1]} -j DROP");
+	
+	$NAME_SERVICE_NOT_KNOWN=$array["NAME_SERVICE_NOT_KNOWN"];
+	$SASL_LOGIN=$array["SASL_LOGIN"];
+	$USER_UNKNOWN=$array["USER_UNKNOWN"];
+	$RBL=$array["RBL"];
+	$BLOCKED_SPAM=$array["BLOCKED_SPAM"];
+	$ADDRESS_NOT_LISTED=$array["ADDRESS_NOT_LISTED"];
+	
+	if($NAME_SERVICE_NOT_KNOWN==null){$NAME_SERVICE_NOT_KNOWN=0;}
+	if($SASL_LOGIN==null){$SASL_LOGIN=0;}
+	if($USER_UNKNOWN==null){$USER_UNKNOWN=0;}
+	if($RBL==null){$RBL=0;}
+	if($BLOCKED_SPAM==null){$BLOCKED_SPAM=0;}
+	if($ADDRESS_NOT_LISTED==null){$ADDRESS_NOT_LISTED=0;}
+	
+	//$EnablePostfixAutoBlock=$sock->GET_INFO("EnablePostfixAutoBlock");
+	
+	$text="
+	Rule matched: $matches
+	--------------------------------------------------------
+	NAME_SERVICE_NOT_KNOWN attempts:\t$NAME_SERVICE_NOT_KNOWN
+	SASL_LOGIN attempts:\t$SASL_LOGIN
+	RBL attempts:\t$RBL
+	USER_UNKNOWN attempts:\t$USER_UNKNOWN
+	ADDRESS_NOT_LISTED attempts:\t$ADDRESS_NOT_LISTED
+	BLOCKED_SPAM attempts:\t$BLOCKED_SPAM";
+	
+	$md=array(
+		"IP"=>$servername,
+		"MATCHES"=>$matches,
+		"EVENTS"=>$text,
+		"DATE"=>date("Y-m-d H:i:s")
+	);
+	
+	$serialize=serialize($md);
+	$md5=md5($serialize);
+	@mkdir("/var/log/artica-postfix/smtp-hack",0666,true);
+	@file_put_contents("/var/log/artica-postfix/smtp-hack/$md5.hack",$serialize);
+	events("SMTP Hack: $servername matches $matches $text");
+	if(!$GLOBALS["SMTP_HACKS_NOTIFIED"][$servername]){
+		$GLOBALS["SMTP_HACKS_NOTIFIED"][$servername]=true;
+		email_events("[SMTP HACK]: $servername match rules",$text,'postfix');
+	}
 }
 
  

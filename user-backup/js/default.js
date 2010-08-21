@@ -27,6 +27,10 @@ $(function(){
 $('#dialogS').dialog({autoOpen: true,width: width+'px',title: title}).load(uri);});
 }
 
+function encode_utf8( s ){return unescape( encodeURIComponent( s ) );}
+
+function decode_utf8( s ){return decodeURIComponent( escape( s ) );}
+
 
 
 function YahooWinT(width,uri,title,waitfor){
@@ -193,8 +197,24 @@ function LoadAjax(ID,uri,concatene) {
 
 }
 
+function trim(str, chars) {
+    return ltrim(rtrim(str, chars), chars);
+}
 
-	
+function ltrim(str, chars) {
+    chars = chars || "\\s";
+    return str.replace(new RegExp("^[" + chars + "]+", "g"), "");
+}
+
+function rtrim(str, chars) {
+    chars = chars || "\\s";
+    return str.replace(new RegExp("[" + chars + "]+$", "g"), "");
+}
+function RefreshTab(id){
+	var $tabs = $('#'+id).tabs();
+	var selected =$tabs.tabs('option', 'selected'); 
+	$tabs.tabs( 'load' , selected );
+}	
 
 function microtime () {
 	var get_as_float=false;

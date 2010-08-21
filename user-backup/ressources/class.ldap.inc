@@ -3260,10 +3260,11 @@ function getobjectDNClass($dn,$fulldn=0){
    		$r=@ldap_modify($this->ldap_connection,$this->dn_escape($dn),$update_array);	
    		if(!$r){
    			
-   			
+   			$ldap_errno=ldap_errno($this->ldap_connection);
+   			$ldap_err2str=ldap_err2str($ldap_errno);
    			$nolog=false;
    			if(ldap_errno($this->ldap_connection)<>0){
-   				switch (ldap_errno($this->ldap_connection)) {
+   				switch ($ldap_errno) {
    					case 12:$add_error="\nPlease index your LDAP server\n";break;
    					case 20:$nolog=true;break;
    					case 0:$nolog=true;break;
@@ -3272,12 +3273,12 @@ function getobjectDNClass($dn,$fulldn=0){
    				}
    			}
    			if($nolog==false){
-   				$this->ldap_last_error_num=ldap_errno($this->ldap_connection);
-   				$this->ldap_last_error='Error number ' . ldap_errno($this->ldap_connection) . "\nAction:LDAP Modify\ndn:$dn\n" . 
+   				$this->ldap_last_error_num=$ldap_errno;
+   				$this->ldap_last_error="Error number $ldap_errno $ldap_err2str\nAction:LDAP Modify\ndn:$dn\n" . 
    				ldap_err2str(ldap_errno($this->ldap_connection).$add_error);
-   				$error_string="ERROR Number:" . ldap_errno($this->ldap_connection) . " Ldap_modify  \"dn=$dn\" :  " . ldap_err2str(ldap_errno($this->ldap_connection));
-   				writelogs($error_string,__CLASS__ . "/" . __FUNCTION__,__FILE__);
-				error_log($error_string);
+   				$error_string="ERROR Number: $ldap_errno $ldap_err2str\nLdap_modify  \"dn=$dn\" :  " . ldap_err2str(ldap_errno($this->ldap_connection));
+   				writelogs($ldap_err2str,__CLASS__ . "/" . __FUNCTION__,__FILE__);
+				error_log($ldap_err2str);
    					while (list ($num, $ligne) = each ($update_array) ){
 	   					if(is_array($ligne)){
 	   						while (list ($a, $b) = each ($ligne) ){

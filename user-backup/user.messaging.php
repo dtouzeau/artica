@@ -64,6 +64,10 @@ function page(){
 					$block7=iconTable("anti-spam-learning.png",'{EnableUserSpamLearning}','{EnableUserSpamLearning_text}',
 					"Loadjs('domains.edit.user.sa.learn.php?uid={$_SESSION["uid"]}');");
 				}
+				
+				$block8=iconTable("poubelle-64.png",'{empty_your_mailbox}','{empty_this_mailbox_text}',
+					"Loadjs('domains.edit.user.empty.mailbox.php?userid={$_SESSION["uid"]}');");
+				
 			}
 		}			
 			
@@ -83,7 +87,7 @@ function page(){
 			$block1
 			$block2
 			$block3
-			
+			$block8
 		</td>
 		<td valign='top' style=''>
 		$block4
