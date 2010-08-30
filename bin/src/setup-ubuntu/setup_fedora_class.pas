@@ -478,6 +478,19 @@ l.Add('arj');
 l.add('zip');
 l.add('unzip');
 
+//OCS
+l.Add('perl-Module-Build');
+l.Add('perl-Net-Server');
+L.Add('perl-SOAP-Lite');
+l.add('perl-Net-IP');
+l.add('perl-XML-Simple');
+l.add('perl-IO-Compress');
+l.add('perl-Compress-Zlib');
+l.add('perl-LWP');
+l.add('perl-Digest-MD5');
+l.add('perl-Net-SSLeay');
+
+
 
 l.Add('htop');
 l.Add('telnet');

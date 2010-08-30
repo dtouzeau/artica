@@ -12,7 +12,7 @@ page();
 
 function page(){
 	$page=CurrentPageName();
-	$html="<H1>{computers}:{$_SESSION["ou"]}</H1>
+	$html="<H1>{my_computers}:{$_SESSION["uid"]}/{$_SESSION["ou"]}</H1>
 	<div id='computerslist' style='width:100%'></div>
 	<script>
 		LoadAjax('computerslist','$page?list=yes');

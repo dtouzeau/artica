@@ -8,7 +8,7 @@ uses
   RegExpr,zsystem,IniFiles,
   global_conf in 'global_conf.pas',common,process_infos,cyrus,clamav,spamass,pureftpd,roundcube,openldap,spfmilter,samba,mimedefang,bogofilter,squid,stunnel4,dkimfilter,
   postfix_class,mailgraph_daemon,lighttpd,miltergreylist,dansguardian,monitorix,kav4samba,awstats,ntpd,kav4proxy,bind9,fdm,p3scan,syslogng,kas3,isoqlog,dhcp_server,cups,wifi,
-  dnsmasq,kavmilter,  jcheckmail, rdiffbackup,openvpn,strutils,xapian,dstat,BaseUnix,nfsserver,policyd_weight,tcpip,pdns,mysql_daemon,assp,postfilter, vmwaretools,phpldapadmin,zarafa_server,squidguard,
+  dnsmasq,kavmilter,  jcheckmail, rdiffbackup,openvpn,strutils,xapian,dstat,BaseUnix,nfsserver,policyd_weight,tcpip,pdns,mysql_daemon,assp,postfilter, vmwaretools,phpldapadmin,zarafa_server,squidguard,backuppc,
   collectd         in '/home/dtouzeau/developpement/artica-postfix/bin/src/artica-install/collectd.pas',
   fetchmail        in '/home/dtouzeau/developpement/artica-postfix/bin/src/artica-install/fetchmail.pas',
   mailspy_milter   in '/home/dtouzeau/developpement/artica-postfix/bin/src/artica-install/mailspy_milter.pas',
@@ -561,6 +561,7 @@ var
    WifiCardOk            :integer;
    wifi                  :twifi;
    APACHE_MODULES_PATH   :string;
+   backuppc              :tbackuppc;
 
 begin
 
@@ -721,6 +722,20 @@ begin
    //mldonkey
    if FileExists(SYS.LOCATE_GENERIC_BIN('mlnet')) then list.Add('$_GLOBAL["MLDONKEY_INSTALLED"]=True;') else list.Add('$_GLOBAL["MLDONKEY_INSTALLED"]=False;');
 
+
+   if FileExists('/opt/kaspersky/kav4fs/bin/kav4fs-control') then list.Add('$_GLOBAL["KAV4FS_INSTALLED"]=True;') else list.Add('$_GLOBAL["KAV4FS_INSTALLED"]=False;');
+   if FileExists('/usr/local/bin/ocsinventory-agent') then list.Add('$_GLOBAL["OCS_LNX_AGENT_INSTALLED"]=True;') else list.Add('$_GLOBAL["OCS_LNX_AGENT_INSTALLED"]=False;');
+
+
+   //BackupPC
+   backuppc:=Tbackuppc.Create(SYS);
+   if FileExists(backuppc.BIN_PATH()) then begin
+      list.Add('$_GLOBAL["BACKUPPC_INSTALLED"]=True;');
+      list.Add('$_GLOBAL["BACKUPPC_BIN_PATH"]="'+backuppc.BIN_PATH()+'";');
+   end
+      else begin
+           list.Add('$_GLOBAL["BACKUPPC_INSTALLED"]=False;');
+      end;
    //cpu,mem...
    list.Add('$_GLOBAL["CPU_NUMBER"]="'+ IntToStr(sys.CPU_NUMBER())+'";');
    list.Add('$_GLOBAL["LOAD_AVERAGE"]="'+ sys.LOAD_AVERAGE()+'";');
@@ -999,7 +1014,14 @@ begin
      if FileExists(SYS.LOCATE_APACHE_BIN_PATH()) then begin
         list.Add('$_GLOBAL["APACHE_INSTALLED"]=True;');
         list.Add('$_GLOBAL["APACHE_PORT"]="'+SYS.APACHE_STANDARD_PORT()+'";');
+
         APACHE_MODULES_PATH:=SYS.LOCATE_APACHE_MODULES_PATH();
+        list.Add('$_GLOBAL["APACHE_MODULES_PATH"]="'+APACHE_MODULES_PATH+'";');
+        if FileExists(APACHE_MODULES_PATH+'/mod_ldap.so') then begin
+              list.Add('$_GLOBAL["APACHE_MOD_LDAP"]=True;');
+              if FileExists('/usr/share/backuppc/bin/BackupPC') then list.Add('$_GLOBAL["BACKUPPC_APACHE"]=True;') else list.Add('$_GLOBAL["BACKUPPC_APACHE"]=False;');
+        end;
+
         if FileExists(APACHE_MODULES_PATH+'/mod_vhost_ldap.so') then  list.Add('$_GLOBAL["APACHE_MODE_VHOSTS_LDAP"]=True;') else list.Add('$_GLOBAL["APACHE_MODE_VHOSTS_LDAP"]=False;');
         if FileExists(APACHE_MODULES_PATH+'/mod_dav.so') then begin
            if FileExists(APACHE_MODULES_PATH+'/mod_ldap.so') then begin
@@ -1277,6 +1299,8 @@ end;
           list.Add('$_GLOBAL["KAV4PROXY_MEMORY"]="' + IntTOStr(GLOBAL_INI.SYSTEM_PROCESS_MEMORY(kavProxy.KAV4PROXY_PID()))+ '";' );
           list.Add('$_GLOBAL["KAV4PROXY_VERSION"]="' + kavProxy.VERSION()+ '";' );
           list.Add('$_GLOBAL["KAV4PROXY_PATTERN"]="' +kavProxy.PATTERN_DATE()+ '";' );
+          list.Add('$_GLOBAL["KAV4PROXY_LICENSE_ERROR"]=' +kavProxy.LICENSE_ERROR()+ ';' );
+          list.Add('$_GLOBAL["KAV4PROXY_LICENSE_ERROR_TEXT"]="' +kavProxy.LICENSE_ERROR_TEXT+ '";' );
        end else begin list.Add('$_GLOBAL["KAV4PROXY_INSTALLED"]=False;'); end;
        
 

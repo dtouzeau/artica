@@ -89,9 +89,9 @@ between the \. escape characters.
 <globalsettings>Param&egrave;tres globaux</globalsettings>
 <icapserver_1>Parametres des processus</icapserver_1>
 <icapserver_2>Param&egrave;tres de protocole icapserver</icapserver_2>
-<IdleChildren>Idle children</IdleChildren>
+<IdleChildren>processus fils inactifs</IdleChildren>
 <IdleChildren_text>Nombre de processus enfants qui ne sont pas des processus utilis&eacute;s dans le traitement des connexions</IdleChildren_text>
-<idle_processes>Processus Idle</idle_processes>
+<idle_processes>Processus inactif</idle_processes>
 <InfectedAction>action sur les objets infect&eacute;s.</InfectedAction>
 <kav4proxy_licence_add>Ajouter une cl&eacute; de licence Kaspersky pour Squid</kav4proxy_licence_add>
 <kav4proxy_licence_text>Upload the *.key file about Kaspersky for Squid in order to update the licence.</kav4proxy_licence_text>

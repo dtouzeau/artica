@@ -490,7 +490,7 @@ function postfix_tls_certificate(){
 	$hosts=button("{hosts}","javascript:Loadjs('$page?certificate-hosts-js=yes')");
 	
 		
-	$html="<H1>{certificate infos}</h1>" . RoundedLightWhite("
+	$html="<H1>{certificate infos}</h1>
 	<form name='ffm_certificate'>
 	<input type='hidden' id='TreePostfixTLSCertificateInfosSubmit' name='TreePostfixTLSCertificateInfosSubmit' value='yes'>
 	<table>
@@ -551,7 +551,7 @@ function postfix_tls_certificate(){
 		
 	</table>
 	</form>
-	");
+	";
 	$tpl=new templates();
 	return $tpl->_ENGINE_parse_body($html);
 	

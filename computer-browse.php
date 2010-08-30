@@ -14,7 +14,7 @@ if(posix_getuid()<>0){
 }
 
 
-
+if($_GET["mode"]=="selection"){selection_js();exit;}
 if(isset($_GET["browse-computers"])){index();exit;}
 
 if(isset($_GET["browse-networks"])){networks();exit;}
@@ -40,7 +40,16 @@ if(isset($_GET["artica-importlist-popup"])){artica_importlist_popup();exit;}
 if(isset($_GET["artica_ip_addr"])){artica_import_save();exit;}
 if(isset($_POST["popup_import_list"])){artica_importlist_perform();exit;}
 
+if(isset($_GET["selection-computers"])){selection_popup();exit;}
+if(isset($_GET["selection-list"])){selection_list();exit;}
+
+
+
 if(posix_getuid()<>0){js();}
+
+
+
+
 
 
 function networks_del(){
@@ -81,6 +90,117 @@ function networks_add_save(){
 }
 
 
+function selection_js(){
+	$users=new usersMenus();
+	if(!$users->AsSambaAdministrator){die("alert('no privileges')");}
+	
+	$page=CurrentPageName();
+	$tpl=new templates();
+	$title=$tpl->_ENGINE_parse_body('{browse_computers}::{select}');
+	$callback=$_GET["callback"];
+	$html="
+	function BrowseComputerSelection(){
+		YahooLogWatcher(550,'$page?selection-computers=*&callback=$callback','$title');
+	}
+	
+	BrowseComputerSelection();";
+	
+	
+	echo $html;
+	}
+	
+	
+function selection_popup(){
+	$page=CurrentPageName();
+	$callback=$_GET["callback"];
+	$html=Field_text("selection-search",$_GET["selection-computers"],"font-size:13px;padding:3px",null,null,null,false,"SelectionComputerPress(event)")."
+	<div style='padding:3px;border:3px;height:300px;overflow:auto' id='selection-list'></div>
+	
+	
+	
+	<script>
+	   function SelectionComputerPress(e){
+	   		if(checkEnter(e)){SelectionComputer(document.getElementById('selection-search').value);}
+		}
+	
+	
+		function SelectionComputer(pattern){
+			LoadAjax('selection-list','$page?selection-list='+pattern+'&callback=$callback');
+		}
+		
+		SelectionComputer('*');
+	</script>
+	
+	";
+	
+	
+	
+	$tpl=new templates();
+	echo $tpl->_ENGINE_parse_body($html);	
+	
+}
+
+function selection_list(){
+	if($_GET["selection-list"]=='*'){$_GET["selection-list"]=null;}
+	if($_GET["selection-list"]==null){$tofind="*";}else{$tofind="*{$_GET["selection-list"]}*";}
+	$filter_search="(&(objectClass=ArticaComputerInfos)(|(cn=$tofind)(ComputerIP=$tofind)(uid=$tofind))(gecos=computer))";
+	
+$ldap=new clladp();
+$attrs=array("uid","ComputerIP","ComputerOS","ComputerMachineType","ComputerMacAddress");
+$dn="$ldap->suffix";
+$hash=$ldap->Ldap_search($dn,$filter_search,$attrs,20);
+
+
+$html="<table>";
+
+for($i=0;$i<$hash["count"];$i++){
+	$realuid=$hash[$i]["uid"][0];
+	$hash[$i]["uid"][0]=str_replace('$','',$hash[$i]["uid"][0]);
+	$js_show=MEMBER_JS($realuid,1);
+	if($_GET["callback"]<>null){$js_selection="{$_GET["callback"]}('$realuid');";}
+	
+
+	
+	$ip=$hash[$i][strtolower("ComputerIP")][0];
+	$os=$hash[$i][strtolower("ComputerOS")][0];
+	$type=$hash[$i][strtolower("ComputerMachineType")][0];
+	$mac=$hash[$i][strtolower("ComputerMacAddress")][0];
+	$name=$hash[$i]["uid"][0];
+	if(strlen($name)>25){$name=substr($name,0,23)."...";}
+	
+	
+	if($os=="Unknown"){if($type<>"Unknown"){$os=$type;}}
+	
+	if(strlen($os)>20){$os=texttooltip(substr($os,0,17).'...',$os,null,null,1);}
+	if(strlen($ip)>20){$ip=texttooltip(substr($ip,0,17).'...',$ip,null,null,1);}
+	
+	$img="<img src='img/base.gif'>";
+	
+	$roolover=CellRollOver($js_selection,"{select}");
+	
+	if(!IsPhysicalAddress($mac)){
+		$img=imgtootltip("status_warning.gif","{WARNING_MAC_ADDRESS_CORRUPT}");
+		$roolover=CellRollOver($js_show,"{edit}<hr>{WARNING_MAC_ADDRESS_CORRUPT}");
+		$js_selection=null;
+	}
+	
+	$html=$html . 
+	"<tr $roolover>
+	<td width=1% $roolover>$img</td>
+	<td nowrap><strong>$name</strong></td>
+	<td ><strong>$ip</strong></td>
+	<td><strong>$mac</strong></td>
+	$js_add
+	</tr>
+	";
+	}
+$html=$html . "</table>";
+$tpl=new templates();
+echo  $tpl->_ENGINE_parse_body($html);
+	
+}
+
+
 
 function js(){
 	
@@ -94,6 +214,9 @@ function js(){
 	$import_artica_computers=$tpl->_ENGINE_parse_body('{import_artica_computers}');
 	$prefix=str_replace('.','_',$page);
 	$prefix=str_replace('-','',$prefix);
+	
+	$start="browse_computers_start();";
+	if(isset($_GET["in-front-ajax"])){$start="browse_computers_start_infront();";}
 	$html="
 	var rule_mem='';
 	var {$prefix}timeout=0;
@@ -106,6 +229,12 @@ function js(){
 		{$prefix}demarre();
 	
 	}
+	
+	function browse_computers_start_infront(){
+	   $('#BodyContent').load('$page?browse-computers=yes&mode={$_GET["mode"]}&value={$_GET["value"]}&callback={$_GET["callback"]}&show-title=yes');
+	   {$prefix}demarre();
+	
+	}	
 	
 	function {$prefix}demarre(){
 		if(!YahooLogWatcherOpen()){return false;}
@@ -278,34 +407,28 @@ var x_ImportListComputersPerform= function (obj) {
 	
   	
 		
-var x_SaveImportComputers= function (obj) {
-		YahooWin3Hide();
-		ViewNetwork();
-	}	
+	var x_SaveImportComputers= function (obj) {
+			YahooWin3Hide();
+			ViewNetwork();
+		}	
 		
 	
-function SaveImportComputers(){
-			var XHR = new XHRConnection();
-			XHR.appendData('artica_ip_addr',document.getElementById('artica_ip_addr').value);
-			XHR.appendData('port',document.getElementById('port').value);
-			XHR.appendData('artica_user',document.getElementById('artica_user').value);
-			XHR.appendData('password',document.getElementById('password').value);
-		 	document.getElementById('import_artica_computers').innerHTML='<div style=\"width:100%\"><center style=\"margin:20px;padding:20px\"><img src=\"img/wait_verybig.gif\"></center></div>';
-			XHR.sendAndLoad('$page', 'GET',x_SaveImportComputers); 
-	} 	
+	function SaveImportComputers(){
+				var XHR = new XHRConnection();
+				XHR.appendData('artica_ip_addr',document.getElementById('artica_ip_addr').value);
+				XHR.appendData('port',document.getElementById('port').value);
+				XHR.appendData('artica_user',document.getElementById('artica_user').value);
+				XHR.appendData('password',document.getElementById('password').value);
+			 	document.getElementById('import_artica_computers').innerHTML='<div style=\"width:100%\"><center style=\"margin:20px;padding:20px\"><img src=\"img/wait_verybig.gif\"></center></div>';
+				XHR.sendAndLoad('$page', 'GET',x_SaveImportComputers); 
+		} 	
 	
-function DeleteImportComputers(ip){
-			var XHR = new XHRConnection();
-			XHR.appendData('artica-import-delete',ip);
-			XHR.sendAndLoad('$page', 'GET',x_SaveImportComputers); 
-}
-
-
-	
-	 
-	
-	
-	browse_computers_start();
+	function DeleteImportComputers(ip){
+				var XHR = new XHRConnection();
+				XHR.appendData('artica-import-delete',ip);
+				XHR.sendAndLoad('$page', 'GET',x_SaveImportComputers); 
+	}
+$start
 	";
 	
 	
@@ -314,6 +437,10 @@ function DeleteImportComputers(ip){
 
 
 function index(){
+	$tpl=new templates();
+	if(isset($_GET["show-title"])){
+		$title=$tpl->_ENGINE_parse_body('{browse_computers}')."::";
+	}
 	
 	if($_GET["mode"]=="dansguardian-ip-group"){
 		$title_add=" - {APP_DANSGUARDIAN}";
@@ -323,17 +450,18 @@ function index(){
 		$title_add=" - {select}";
 	}
 	
-	if($title_add<>null){$title_add="<H1>$title_add</H1>";}
+	
 	
 	$menus_right=menus_right();
 	$list=computer_list();
 	$html="
-	$title_add
+	<div style='float:right'>" . imgtootltip('32-refresh.png','{refresh}','BrowsComputersRefresh()')."</div>
+	<H3 style='border-bottom:1px solid #005447'>$title$title_add</H3>
 	<table style='width:100%'>
 	<tr>
 		<td valign='top' width='90%'>
-			".RoundedLightWhite("<div style='width:100%;height:350px;overflow:auto' id='computerlist'>" . $list."</div>")."
-		<div style='text-align:right;padding:4px;width:100%'><hr>" .button('{delete_all}',"DeleteAllComputers()")."</div>
+			<div style='width:100%;height:350px;overflow:auto' id='computerlist'>" . $list."</div>
+			<div style='text-align:right;padding:4px;width:100%'><hr>" .button('{delete_all}',"DeleteAllComputers()")."</div>
 		</td>
 		<td valign='top'>
 			$menus_right
@@ -344,7 +472,7 @@ function index(){
 	
 	
 	
-	$tpl=new templates();
+	
 	echo $tpl->_ENGINE_parse_body($html);	
 }
 
@@ -374,14 +502,14 @@ function computer_list(){
 $ldap=new clladp();
 $attrs=array("uid","ComputerIP","ComputerOS","ComputerMachineType");
 $dn="$ldap->suffix";
-$hash=$ldap->Ldap_search($dn,$filter_search,$attrs);
+$hash=$ldap->Ldap_search($dn,$filter_search,$attrs,20);
 
 $PowerDNS="<td width=1%><h3>&nbsp;|&nbsp;</h3></td><td><h3>". texttooltip('{APP_PDNS}','{APP_PDNS_TEXT}',"javascript:Loadjs('pdns.php')")."</h3></td>";
 
 if($_GET["mode"]=="selection"){$PowerDNS=null;}
 
 $html="
-<div style='float:right'>" . imgtootltip('32-refresh.png','{refresh}','BrowsComputersRefresh()')."</div>
+
 <input type='hidden' id='mode' value='{$_GET["mode"]}' name='mode'>
 <input type='hidden' id='value' value='{$_GET["value"]}' name='value'>
 <input type='hidden' id='callback' value='{$_GET["callback"]}' name='callback'>

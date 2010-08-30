@@ -412,6 +412,8 @@ class templates{
 		return $value;
 	}
 	
+	
+	
 	function _ENGINE_parse_body($content=null,$currpage=null){
 		if(posix_getuid()==0){return $content;}
 		$sock=new sockets();
@@ -965,6 +967,7 @@ function CellRollOver($jsOnClick=null,$tooltips=null){
 		$cursor="this.style.cursor='pointer'";
 		}
 	if($tooltips<>null){
+		$tooltips=str_replace("'","`",$tooltips);
 		$lightup1="lightup(this, 100);";
 		$lightup2="lightup(this, 50);";
 		$mtips_1="AffBulle('$tooltips');";
@@ -1036,7 +1039,7 @@ function icon_help($help,$nofloat=0){
 	
 }
 
-function texttooltip($text,$tooltip=null,$js=null,$dbclk=null,$NOHREF=0,$style=null){
+function texttooltip($text,$tooltip=null,$js=null,$dbclk=null,$NOHREF=0,$style=null,$forcejs=0){
 	
 	if($js==null){$js='void(0)';}
 	if($dbclk<>null){$js_dblclik="ondblclick=\"javascript:$dbclk\"";}
@@ -1050,10 +1053,14 @@ if($style<>null){$style=" style='$style'";}
 		$tooltip="onMouseOver=\"javascript:$pointer_on;AffBulle('$tooltip');this.style.textDecoration='underline';this.style.backgroundColor='none'\"  OnMouseOut=\"javascript:$pointer_off;HideBulle();this.style.textDecoration='none'\"";
 		}
 	
-	if($js<>null){
-		if(strpos($js,'ttp://')>0){$jshref="<a href=\"$js;\" target=_new $js_dblclik$style>";$jsafter="</a>";}else
-		{$js="OnClick=\"$js;\" $js_dblclik";$jsafter="</a>";}
-	}
+		
+	if($forcejs==0){	
+		if($js<>null){
+			if(strpos($js,'ttp://')>0){$jshref="<a href=\"$js;\" target=_new $js_dblclik$style>";$jsafter="</a>";}else{$js="OnClick=\"$js;\" $js_dblclik";$jsafter="</a>";}
+		}
+	}else{
+		 $js="OnClick=\"$js;\" $js_dblclik";$jsafter="</a>";	
+		}
 	if($NOHREF==1){
 		$js=null;
 		$jsafter=null;
@@ -2046,7 +2053,7 @@ $id=md5('Paragraphe_switch_img'.$field_name.$text.$title);
 	<tr>
 	<td width=1% valign='top' style='background-image:url(img/bg_pic-2.png);background-position:top center;background-repeat:no-repeat'><div style='min-height: 120px;'>$img</a></div></td>
 	<td valign='top' id='$id'><h3 style='font-size:16px'>$title</h3>
-	<p class='legend' style='text-align:left' id='text_$id'>$text</p>
+	<p class='legend' style='text-align:left;font-size:12px' id='text_$id'>$text</p>
 	</td>
 	</tr>
 	</table>
@@ -2144,7 +2151,7 @@ function Paragraphe_switch_img($title,$text,$field_name=null,$value=null,$tips=n
 	<tr>
 	<td width=1% valign='top' style='background-image:url(img/bg_pic-2.png);background-position:top center;background-repeat:no-repeat'><div style='min-height: 120px;'>$img</a></div></td>
 	<td valign='top' id='$id'><h3 style='font-size:16px;color:#005447'>$title</h3>
-	<div style='text-align:left;font-size:11px' id='text_$id'>$field$text</div>
+	<div style='text-align:left;font-size:12px' id='text_$id'>$field$text</div>
 	</td>
 	</tr>
 	</table>
@@ -3587,6 +3594,16 @@ function GET_CACHE($page){
 		$sock=new sockets();
 		return $sock->DATA_CACHE($page,false);
 }
+
+function distanceMinStrings($lastSeen){
+	$toTime=time();
+	$fromTime=strtotime($lastSeen);
+	$distanceInSeconds = round(abs($toTime - $fromTime));
+    $distanceInMinutes = round($distanceInSeconds / 60);
+    return $distanceInMinutes;
+}
+
+
 function distanceOfTimeInWords($fromTime, $toTime = 0, $showLessThanAMinute = true) {
     $distanceInSeconds = round(abs($toTime - $fromTime));
     $distanceInMinutes = round($distanceInSeconds / 60);
@@ -3665,6 +3682,7 @@ return round($difference/60);
 function send_email_events($subject,$text,$context,$date=null,$attached_files=array(),$recipient=null){
 	
 	$arr_APP=array(
+		"APP_KAV4FS"=>"Kaspersky For File server",
 		"APP_MLDONKEY"=>"MLDonkey server",
 		"APP_DHCP"=>"DHCP Server",
 		"APP_ARTICA_NOTIFIER"=>"Artica SMTP Notifier",
@@ -4083,7 +4101,25 @@ function getChr($car){
 	
 }
 
-
+function IsPhysicalAddress($address){
+	$address=strtoupper(trim($address));
+	if($address=="UNKNOWN"){return null;}
+	$address=str_replace(":","-",$address);
+	If(strlen($address) > 17) return false;
+	If($address == "") return false;
+	If(!preg_match("#^[0-9A-Z]+(\-[0-9A-Z]+)+(\-[0-9A-Z]+)+(\-[0-9A-Z]+)+(\-[0-9A-Z]+)+(\-[0-9A-Z]+)$#i",$address)){
+		writelogs("$address did not match pattern ",__FUNCTION__,__FILE__,__LINE__);
+		return false;
+	}
+	$Array=explode("-",$address);
+	If(strlen($Array[0]) != 2) return false;
+	If(strlen($Array[1]) != 2) return false;
+	If(strlen($Array[2]) != 2) return false;
+	If(strlen($Array[3]) != 2) return false;
+	If(strlen($Array[4]) != 2) return false;
+	If(strlen($Array[5]) != 2) return false;
+	return 1;
+}
 
 
 ?>

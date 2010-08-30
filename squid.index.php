@@ -11,7 +11,7 @@
 	if($user->AsSquidAdministrator==false){header('location:users.index.php');exit();}
 	
 	if(isset($_GET["page-index-squid-status"])){page_index_status();exit;}
-	
+	if(isset($_GET["kav-error"])){kavicap_license_error();exit;}
 	if(isset($_GET["ApplyConfig"])){main_apply_conf();exit;}
 	if(isset($_GET["status"])){main_little_status();exit;}
 	if(isset($_GET["main"])){main_switch();exit;}
@@ -167,12 +167,17 @@ function main_status_tab(){
 function main_status(){
 	
 	
-	
+	$page=CurrentPageName();
 	$tabs=main_tabs();
 	$squid=new squid($_GET["hostname"]);
-	$ini=new Bs_IniHandler();
 	$sock=new sockets();
+	$ini=new Bs_IniHandler();
+	
+	$users=new usersMenus();
 	$ini->loadString(base64_decode($sock->getFrameWork('cmd.php?squid-ini-status=yes')));
+	
+
+	
 	
 
 	$squid_status=DAEMON_STATUS_ROUND("SQUID",$ini);
@@ -186,19 +191,24 @@ function main_status(){
 	$squid=new squidbee();
 
 	if(count($squid->network_array)==0){
-		
 		$net=Paragraphe("warning64.png","{no_squid_network}","{no_squid_network_text}","javascript:Loadjs('squid.popups.php?script=network')");
 	}	
 
 	$html="<table style='width:99%'>
 	<tr>
-		<td valign='top'>$net$squid_status$kav</td>
+		<td valign='top'><span id='kav-error'></span>$net$squid_status$kav</td>
 		<td valign='top'>$dansguardian_status$cicap$APP_PROXY_PAC</td>
 	</tr>
 	
 	
 	</table>
 	<center style='margin:15px'><hr><img src='images.listener.php?uri=squid/rrd/connections.hour.png&hostname={$_GET["hostname"]}&md=$md'></center>
+	
+	<script>
+		LoadAjax('kav-error','$page?kav-error=yes');
+	</script>
+	
+	
 	";
 	
 	$tpl=new templates();
@@ -207,7 +217,49 @@ function main_status(){
 	
 
 	
+function kavicap_license_error(){
+	$users=new usersMenus();
+	$sock=new sockets();
+	if(!$users->KAV4PROXY_INSTALLED){return null;}
+	$kavicapserverEnabled=$sock->GET_INFO("kavicapserverEnabled");
+	if($kavicapserverEnabled==null){$kavicapserverEnabled=0;}	
+	if($kavicapserverEnabled==0){return null;}
+	if(!$users->KAV4PROXY_LICENSE_ERROR){return null;}
 	
+	$pattern_date=trim(base64_decode($sock->getFrameWork("cmd.php?kav4proxy-pattern-date=yes")));
+	if($pattern_date==null){
+			$html="<table style='width:1OO%'>
+				<tr>
+				<td width=1% valign='top'>" . imgtootltip("42-red.png",'{av_pattern_database}',"Loadjs('squid.newbee.php?kav-license=yes')")."</td>
+				<td valign='top'>". RoundedLightWhite("
+						<strong>
+							<span style='font-size:14px;color:red'>{av_pattern_database_obsolete_or_missing}</span><hr>
+							
+							")."
+				</td>
+				</tr>
+				</table>";
+							$tpl=new templates();
+				echo $tpl->_ENGINE_parse_body(RoundedLightGreen($html)."<br>");	
+				return;
+	}
+
+	$html="<table style='width:1OO%'>
+<tr>
+<td width=1% valign='top'>" . imgtootltip("42-red.png",'{license}',"Loadjs('squid.newbee.php?kav-license=yes')")."</td>
+<td valign='top'>". RoundedLightWhite("
+		<strong>
+			<span style='font-size:14px;color:red'>{license_error} {APP_KAV4PROXY} !!</span><hr>
+			<span style='font-size:11px;color:red'>$users->KAV4PROXY_LICENSE_ERROR_TEXT</span></strong>
+			")."
+</td>
+</tr>
+</table>";		
+
+$tpl=new templates();
+echo $tpl->_ENGINE_parse_body(RoundedLightGreen($html)."<br>");	
+	
+}
 	
 	
 function main_icap_service(){

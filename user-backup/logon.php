@@ -70,6 +70,9 @@ $sr =@ldap_search($ldap->ldap_connection,"dc=organizations,$ldap->suffix","(uid=
 		$passw=$attrs["userPassword"][0];
 		
 		$passw=md5($passw);
+		
+		
+		
 		if(!$_GET["credentials"]){$_POST["password"]=md5($_POST["password"]);}
 			
 		

@@ -22,7 +22,9 @@ class vhosts{
 	"ZARAFA"=>"zarafa-logo-128.png",
 	"ZARAFA_MOBILE"=>"zarafa-logo-128.png",
 	"DRUPAL"=>"drupal-logo-128.png",
-	"WEBDAV"=>"webdav-128.png"
+	"WEBDAV"=>"webdav-128.png",
+	"BACKUPPC"=>"backuppc-128.png"
+	
 	
 	);
 	
@@ -39,7 +41,7 @@ class vhosts{
 	"ZARAFA_MOBILE"=>"zarafa-logo-64.png",
 	"DRUPAL"=>"drupal-64.png",
 	"WEBDAV"=>"webdav-64.png",
-	
+	"BACKUPPC"=>"backuppc-64.png",
 	);
 
 	
@@ -47,8 +49,9 @@ class vhosts{
 	
 	
 	
-	var $noneeduser=array("JOOMLA"=>true,"ROUNDCUBE"=>true,"ARTICA_USR"=>true,"ZARAFA_MOBILE"=>true,"ZARAFA"=>true,"DRUPAL"=>true,'WEBDAV'=>true);
-	var $noneeduser_mysql=array("ARTICA_USR"=>true,"ZARAFA_MOBILE"=>true,"ZARAFA"=>true,"DRUPAL"=>true,"WEBDAV"=>true);
+	var $noneeduser=array("JOOMLA"=>true,"ROUNDCUBE"=>true,"ARTICA_USR"=>true,"ZARAFA_MOBILE"=>true,"ZARAFA"=>true,"DRUPAL"=>true,'WEBDAV'=>true,"BACKUPPC"=>true);
+	var $noneeduser_mysql=array("ARTICA_USR"=>true,"ZARAFA_MOBILE"=>true,"ZARAFA"=>true,"DRUPAL"=>true,"WEBDAV"=>true,"BACKUPPC"=>true);
+	
 	
 	
 	
@@ -65,6 +68,7 @@ class vhosts{
 	"ZARAFA_MOBILE"=>array("TITLE"=>"APP_ZARAFA_MOBILE_ACCESS","TEXT"=>"APP_ZARAFA_TEXT"),
 	"DRUPAL"=>array("TITLE"=>"APP_DRUPAL","TEXT"=>"APP_DRUPAL_TEXT"),
 	"WEBDAV"=>array("TITLE"=>"APP_GROUPWAREDAV","TEXT"=>"APP_GROUPWAREDAV_TEXT"),
+	"BACKUPPC"=>array("TITLE"=>"APP_BACKUPPC","TEXT"=>"APP_BACKUPPC_TEXT"),
 	
 	
 	

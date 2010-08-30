@@ -575,15 +575,15 @@ function AJAX_USER_TAB() {
 	} else {
 		$hostname = $_GET ["hostname"];
 	}
-	$arr ["account"] = "{account}";
+	$arr["account"] = "{account}";
 	$userid = $_GET ["userid"];
 	
-	if ($users->POSTFIX_INSTALLED) {$arr ["email"] = "{messaging}";}
-	if ($users->cyrus_imapd_installed) {$arr ["mailbox"] = "{mailbox}";}
-	if ($users->POSTFIX_INSTALLED) {$arr ["aliases"] = "{aliases}";}
-	if ($users->ZARAFA_INSTALLED) {$arr ["mailbox"] = "{mailbox}";}
+	if ($users->POSTFIX_INSTALLED) {$arr["email"] = "{messaging}";}
+	if ($users->cyrus_imapd_installed) {$arr["mailbox"] = "{mailbox}";}
+	if ($users->POSTFIX_INSTALLED) {$arr["aliases"] = "{aliases}";}
+	if ($users->ZARAFA_INSTALLED) {$arr["mailbox"] = "{mailbox}";}
 	
-	$arr ["groups"] = "{user_tab_groups}";
+	$arr["groups"] = "{user_tab_groups}";
 	
 	writelogs("PUREFTP_INSTALLED=$users->PUREFTP_INSTALLED",__FUNCTION__,__FILE__,__LINE__);
 	
@@ -599,14 +599,14 @@ function AJAX_USER_TAB() {
 
 	
 	if ($as_connected_user) {
-		unset($arr ["groups"] );
-		unset($arr ["file_share"] );
-		unset($arr ["ftp_access"] );
-		unset($arr ["mailbox"] );
+		unset($arr["groups"] );
+		unset($arr["file_share"] );
+		unset($arr["ftp_access"] );
+		unset($arr["mailbox"] );
 		$arr["privs"] = "{privileges}";
 	}
 	
-	$arr ["computer"] = "{computer}";
+	$arr["computer"] = "{computer}";
 	
 	while(list( $num, $ligne ) = each ($arr)){
 		if ($num == "computer") {
@@ -722,28 +722,29 @@ function AJAX_COMPUTER_TAB() {
 		$_GET ["section"] = "computer";
 	}
 	
-	$arr ["computer"] = "{computer}";
-	$arr ["material"] = "{materialos}";
+	$arr["computer"] = "{computer}";
+	$arr["material"] = "{materialos}";
 	
-	if ($users->BIND9_INSTALLED) {
-		$arr ["computer_aliases"] = "{alias}";
-	}
+	if ($users->BIND9_INSTALLED) {$arr["computer_aliases"] = "{alias}";}
+	if ($users->OCSI_INSTALLED) {$arr["ocs"] = "{APP_OCSI}";}
 	
-	if ($users->OCSI_INSTALLED) {
-		$arr ["ocs"] = "{APP_OCSI}";
-	}
+	$arr["openports"] = "{openports}";
+	$arr["applications"]="{services}";
+	$arr["ressources"] = "{netressources}";
+	$arr["groups"] = "{groups}";
 	
-	$arr ["openports"] = "{openports}";
-	$arr ["ressources"] = "{netressources}";
-	$arr ["groups"] = "{groups}";
 	
-	if ($_GET ["userid"] == 'newcomputer$') {
-		unset ( $arr );
-		$arr ["computer"] = "{computer}";
-	}
+	
+	if ($_GET ["userid"] == 'newcomputer$') {unset ( $arr );$arr["computer"] = "{computer}";}
 	
 	while ( list ( $num, $ligne ) = each ( $arr ) ) {
-		$toolbox [] = "<li><a href=\"$page?userid={$_GET["userid"]}&ajaxmode=yes&section=$num\"><span>$ligne</span></a></li>";
+		
+		if($num=="applications"){
+			$toolbox[]="<li><a href=\"computer.infos.php?popup-services=yes&uid={$_GET["userid"]}\"><span>$ligne</span></a></li>";
+			continue;	
+		}
+		
+		$toolbox[]="<li><a href=\"$page?userid={$_GET["userid"]}&ajaxmode=yes&section=$num\"><span>$ligne</span></a></li>";
 	}
 	
 	$html = "<div id='container-computer-tabs' style='width:99%;margin:0px;background-color:white'>
@@ -1154,7 +1155,8 @@ function AJAX_COMPUTER() {
 		if (preg_match ( "#(.+?)\.#", $computer->DisplayName, $re )) {$Diplayname = $re [1];} else {$Diplayname = $computer->DisplayName;}} else {$Diplayname = $computer->DisplayName;}
 	
 	$password = Paragraphe ( "cyrus-password-64.png", "{credentials_informations}", "{credentials_informations_text}", "javascript:Loadjs('computer.passwd.php?uid={$_GET["userid"]}')" );
-	$backup_icon = Paragraphe ( "64-backup.png", "{backup}", "{BACKUP_COMPUTER_TEXT}", "javascript:Loadjs('computer.backup.php?uid=$computer->uid')" );
+	$computer_infos_services = Paragraphe ( "computer-tour-64.png", "{COMPUTER_INFOS_SERVICES}", "{COMPUTER_INFOS_SERVICES_TEXT}", 
+	"javascript:Loadjs('computer.infos.php?uid=$computer->uid');" );
 	
 	
 	
@@ -1170,9 +1172,11 @@ function AJAX_COMPUTER() {
 	
 	$MacField = Field_text ( 'ComputerMacAddress', $computer->ComputerMacAddress, 'width:100%' );
 	
-	if (preg_match ( "#[0-9A-Z]+:[0-9A-Z]+:[0-9A-Z]+:[0-9A-Z]+:[0-9A-Z]+:[0-9A-Z]+#", $computer->ComputerMacAddress )) {
+	if (IsPhysicalAddress($computer->ComputerMacAddress)) {
 		$MacField = "<input type='hidden' name='ComputerMacAddress' id='ComputerMacAddress' value='$computer->ComputerMacAddress'>
 		<code style='font-size:11px'>$computer->ComputerMacAddress</code>";
+	}else{
+		$mac_warn=imgtootltip("status_warning.gif","{WARNING_MAC_ADDRESS_CORRUPT}");
 	}
 	
 	$dns = AJAX_COMPUTER_DNS_FORM ( $_GET ["userid"] );
@@ -1197,38 +1201,50 @@ function AJAX_COMPUTER() {
 	<td width=1% valign='top'>
 		<div id='computer_refresh_div'>$computer_icon</div>
 		$password
-		$backup_icon
+		$computer_infos_services
 		$scan_computer
 		$delete
 		</td>
 	<td valign='top' width=99%>
 			<table style='width:100%'>
 				<tr>
-					<td colspan=2><H5>{network_information}</H5></td>
+					<td colspan=3><H5>{network_information}</H5></td>
 					
 				</tr>				
 				<tr>
+					
 					<td class=legend>{computer_name}:</strong></td>
+					<td width=1%>&nbsp;</td>
 					<td align=left>" . Field_text ( 'uid', $computer->uid, 'width:100%;font-size:14px;padding:3px;font-weight:bold' ) . "</strong></td>
 				</tr>								
 				<tr>
+					
 					<td class=legend>{computer_ip}:</strong></td>
+					<td width=1%>&nbsp;</td>
 					<td align=left>" . Field_text ( 'ComputerIP', $computer->ComputerIP, 'width:100%' ) . "</strong></td>
 				</tr>			
 				<tr>
+					
 					<td class=legend>{ComputerMacAddress}:</strong></td>
+					<td width=1%>$mac_warn</td>
 					<td align=left>$MacField</strong></td>
 				</tr>
 				<tr>
+					
 					<td class=legend>{uid_number}:</strong></td>
+					<td>&nbsp;</td>
 					<td align=left><strong>$computer->uidNumber</strong></td>
 				</tr>					
 				<tr>
+					
 					<td class=legend>{dhcpfixed}:</strong></td>
+					<td>&nbsp;</td>
 					<td align=left>$dhcp_fix</td>
 				</tr>	
 				<tr>
+					
 					<td class=legend>{VolatileIPAddress}:</strong></td>
+					<td>&nbsp;</td>
 					<td align=left>$VolatileIPAddress</td>
 				</tr>	
 				</table>
@@ -1237,7 +1253,7 @@ function AJAX_COMPUTER() {
 											
 				
 				<tr>
-					<td colspan=2 align='right'><hr style='border-color:#005447'>" . button ( "{edit}", "SaveComputerForm('FFM34567-{$_GET["userid"]}');" ) . "
+					<td colspan=3 align='right'><hr style='border-color:#005447'>" . button ( "{edit}", "SaveComputerForm('FFM34567-{$_GET["userid"]}');" ) . "
 						
 					</td>
 				</tr>
@@ -4250,7 +4266,7 @@ function COMPUTER_SAVE_INFOS() {
 
 function COMPUTER_NMAP() {
 	$sock = new sockets ( );
-	$datas = $sock->getfile ( 'nmapscan:' . $_GET ["NmapScanComputer"] );
+	$datas = $sock->getFrameWork("cmd.php?nmap-scan={$_GET["NmapScanComputer"]}");
 	$tbl = explode ( "\n", $datas );
 	while ( list ( $num, $ligne ) = each ( $tbl ) ) {
 		if (trim ( $ligne != null )) {

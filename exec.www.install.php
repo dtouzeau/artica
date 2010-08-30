@@ -13,7 +13,7 @@
 
 	
 	
-$GLOBALS["SSLKEY_PATH"]="/etc/ssl/certs/apache";
+
 if(preg_match("#--verbose#",implode(" ",$argv))){$GLOBALS["VERBOSE"]=true;}
 
 if(posix_getuid()<>0){die("Cannot be used in web server mode\n\n");}
@@ -524,6 +524,7 @@ for($i=0;$i<$hash["count"];$i++){
 	$apacheservername=trim($hash[$i]["apacheservername"][0]);
 	$wwwservertype=trim($hash[$i]["wwwservertype"][0]);
 	if($wwwservertype=="WEBDAV"){continue;}
+	if($wwwservertype=="BACKUPPC"){continue;}
 	$wwwsslmode=$hash[$i]["wwwsslmode"][0];
 	$DirectoryIndex="index.php";
 	unset($rewrite);

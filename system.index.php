@@ -377,6 +377,11 @@ function main_services(){
 		$mldonkey=Paragraphe('64-emule.png','{APP_MLDONKEY}','{APP_MLDONKEY_TEXT}',"javascript:Loadjs('mldonkey.php')","");
 	}
 	
+	if($users->KAV4FS_INSTALLED){
+		$kav4fs=Paragraphe('bigkav-64.png','{APP_KAV4FS}','{APP_KAV4FS_TEXT}',"javascript:Loadjs('kav4fs.php')","");
+		
+		
+	}
 	
 	$massmailing=Paragraphe('mass-mailing-64.png','{email_campaigns}','{APP_MASSMAILING_ENABLE_TEXT}',"javascript:Loadjs('system.enable.massmailing.php');","{APP_MASSMAILING_ENABLE_TEXT}");
 	$userautofill=Paragraphe('member-add-64.png','{auto_account}','{auto_account_text}',"javascript:Loadjs('auto-account.php?script=yes')",'auto_account_text');
@@ -384,17 +389,31 @@ function main_services(){
 	$add_remove=Paragraphe('add-remove-64.png','{application_setup}','{application_setup_txt}',"javascript:Loadjs('setup.index.php?js=yes')");
 	$services=Paragraphe('folder-servicesm-64.jpg','{manage_services}','{manage_services_text}','javascript:Loadjs("admin.index.services.status.php?js=yes");','manage_services_text');
 
+	if($users->BACKUPPC_INSTALLED){
+		$backuppc=Paragraphe('backuppc-64.png','{APP_BACKUPPC}','{APP_BACKUPPC_TEXT}',"javascript:Loadjs('backup-pc.index.php');",'APP_BACKUPPC_TEXT');
+	}
+	if($users->OCSI_INSTALLED){
+		$ocs=Paragraphe('64-ocs.png','{APP_OCSI}','{APP_OCSI_TEXT}',"javascript:Loadjs('ocs.ng.php');",'APP_OCSI_TEXT');
+	}	
 	
+	if($users->OCS_LNX_AGENT_INSTALLED){
+		$ocsAgent=Paragraphe('64-ocs.png','{APP_OCSI_LINUX_CLIENT}','{APP_OCSI_LINUX_CLIENT_TEXT}',"javascript:Loadjs('ocs.agent.php');",'APP_OCSI_LINUX_CLIENT_TEXT');
+	}
+
 	
 	$tr[]=$add_remove;
 	$tr[]=$services;
 	$tr[]=$phpldapadmin;
+	$tr[]=$backuppc;
 	$tr[]=$mldonkey;
 	$tr[]=$massmailing;
 	$tr[]=$addressbook;
 	$tr[]=$userautofill;
 	$tr[]=$obm2;
 	$tr[]=$dotclear;
+	$tr[]=$kav4fs;
+	$tr[]=$ocs;
+	$tr[]=$ocsAgent;
 
 
 	

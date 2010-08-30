@@ -4,7 +4,9 @@ define('BS_INIHANDLER_UNQUOTE_DOUBLE', 1);
 define('BS_INIHANDLER_UNQUOTE_SINGLE', 2);
 define('BS_INIHANDLER_UNQUOTE_ALL',    3);
 define('BS_INIHANDLER_HEAD_COMMENT',   "#\n\n");
-class Bs_IniHandler {
+
+
+class iniframe {
   	var $commentChars = array('#', '/', ';');
    	var $unQuote = BS_INIHANDLER_UNQUOTE_ALL;
 	var $_sections;
@@ -33,6 +35,8 @@ class Bs_IniHandler {
     $this->_fileFullPath = $fileFullPath;
     
     $fileContent = file($fileFullPath);
+    $length=(strlen($str)/1024)/1000;
+    if($length>0){error_log("Loading big file !!! $fileFullPath $length Mb");}
     $this->_parseFromArray($fileContent);
     
     return TRUE;
@@ -41,7 +45,7 @@ class Bs_IniHandler {
   
   function loadString($str) {
     $this->reset();
-    
+    //error_log("Loading ". strlen($str) . " bytes");
     $arr = explode("\n", $str);
     $this->_parseFromArray($arr);
     
@@ -70,11 +74,11 @@ class Bs_IniHandler {
     $this->_comments = array();
     $comment = array();
     $section = '';
-  if(count($arr)>100000){
+    if(count($arr)>100000){
     	error_log("Warning, Array expected ". count($arr). "(path=" .$this->_fileFullPath.") in ". __FILE__. " line ". __LINE__);
     	$this->reset();
     	return null;
-    }    
+    }
     foreach($arr as $line) {
       $sectionFound = $valueFound = FALSE;
       $param = array('key'=>'', 'val'=>'');

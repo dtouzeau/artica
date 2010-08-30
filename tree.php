@@ -814,7 +814,7 @@ function download_file(){
 	$datas=base64_decode($sock->getFrameWork("cmd.php?file-content=".base64_encode($path)));
 	$content_type=base64_decode($sock->getFrameWork("cmd.php?mime-type=".base64_encode($path)));
 header('Content-Type: '.$content_type);
-header("Content-Disposition: inline; filename=\"$file\""); 
+header("Content-Disposition: attachment; filename=\"$file\""); 
 echo $datas;	
 	
 }

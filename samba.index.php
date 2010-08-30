@@ -1079,6 +1079,7 @@ function SaveFolderProp(){
  	unset($_GET["hide_unwriteable_files"]);
 	unset($_GET["hide_unreadable"]);
 	unset($_GET["inherit_acls"]);
+	unset($_GET["hide_unwriteable_files"]);
 	
 while (list ($num, $val) = each ($_GET) ){
 		$samba->main_array["$folder_name"][$num]=$val;

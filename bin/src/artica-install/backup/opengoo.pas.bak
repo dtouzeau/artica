@@ -6,7 +6,7 @@ unit opengoo;
 interface
 
 uses
-    Classes, SysUtils,variants,strutils,IniFiles, Process,logs,unix,RegExpr in 'RegExpr.pas',zsystem,apache_artica,roundcube,obm2,lighttpd,ocsi;
+    Classes, SysUtils,variants,strutils,IniFiles, Process,logs,unix,RegExpr in 'RegExpr.pas',zsystem,apache_artica,roundcube,obm2,lighttpd;
 
   type
   topengoo=class
@@ -329,6 +329,7 @@ if FileExists(APACHECTL) then begin
    logs.OutputCmd(SYS.LOCATE_APACHECTL() +' -f /usr/local/apache-groupware/conf/apache-groupware.conf -k restart');
    exit;
 end;
+
 STOP();
 START();
 
@@ -410,7 +411,6 @@ var
    joomla:string;
    rdcube:string;
    obm:tobm2;
-   ocsi:tocsi;
    ocswebservername:string;
    lighttpd:tlighttpd;
    userfull:string;
@@ -455,7 +455,7 @@ if DirectoryExists('/usr/share/artica-groupware') then logs.OutputCmd('/bin/chow
 
 logs.DebugLogs('Starting......: Apache groupware using '+user+' user to run');
 
- ocsi:=tocsi.Create(SYS);
+
 l.Add('User '+user);
 l.Add('Group '+group);
 l.Add('PidFile /var/run/apache-groupware/httpd.pid');
@@ -471,7 +471,7 @@ l.Add('ServerName ' + SYS.HOSTNAME_g());
 l.Add('DocumentRoot "/usr/share/artica-groupware"');
 l.Add('');
 
-if ocswebservernameEnabled=1 then l.add(ocsi.ifmodperl());
+
 l.Add('');
 l.Add('<Directory />');
 l.Add('    Options FollowSymLinks');
@@ -596,19 +596,22 @@ l.add('NameVirtualHost *:'+ApacheGroupWarePort);
 if length(joomla)>0 then l.add(joomla);
 if length(rdcube)>0 then l.add(rdcube);
 
-if ocswebservernameEnabled=1 then l.Add(ocsi.VirtualHost(ApacheGroupWarePort));
+
 
 fpsystem(SYS.LOCATE_PHP5_BIN()+' /usr/share/artica-postfix/exec.www.install.php --Wvhosts');
 fpsystem(SYS.LOCATE_PHP5_BIN()+' /usr/share/artica-postfix/exec.www.webdav.php --users');
+fpsystem(SYS.LOCATE_PHP5_BIN()+' /usr/share/artica-postfix/exec.www.backuppc.php --vhosts');
 L.Add(LOGS.ReadFromFile('/usr/local/apache-groupware/conf/vhosts'));
 
 l.add('Include /usr/local/apache-groupware/conf/webdav-vhosts.conf');
+l.add('Include /usr/local/apache-groupware/conf/backuppc-vhosts.conf');
 l.add('# If you want create others vhost, file the file below');
 l.add('Include /usr/local/apache-groupware/conf/others-vhosts.conf');
 
 forceDirectories('/usr/local/apache-groupware/conf');
 if not FileExists('/usr/local/apache-groupware/conf/others-vhosts.conf') then logs.WriteToFile('#','/usr/local/apache-groupware/conf/others-vhosts.conf');
 if not FileExists('/usr/local/apache-groupware/conf/webdav-vhosts.conf') then logs.WriteToFile('#','/usr/local/apache-groupware/conf/webdav-vhosts.conf');
+if not FileExists('/usr/local/apache-groupware/conf/backuppc-vhosts.conf') then logs.WriteToFile('#','/usr/local/apache-groupware/conf/backuppc-vhosts.conf');
 
 
 
@@ -616,7 +619,7 @@ if not FileExists('/usr/local/apache-groupware/conf/webdav-vhosts.conf') then lo
 forceDirectories('/usr/local/apache-groupware/php5/lib/php');
 logs.Debuglogs('Starting......: Apache groupware daemon writing apache-groupware.conf');
 logs.WriteToFile(l.Text,'/usr/local/apache-groupware/conf/apache-groupware.conf');
-ocsi.free;
+
 l.clear;
 forceDirectories('/usr/local/apache-groupware/php5/lib');
 WRITE_CONFIG();

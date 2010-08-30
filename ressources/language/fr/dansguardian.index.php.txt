@@ -238,7 +238,7 @@ Cela peut casser le Big5 ou tout autre caract&egrave;re  16bits.[br]Si besoin, v
 <proxies>Services proxy (phproxy,cgiproxy,lists of proxies)</proxies>
 <publicite>Publicit&eacute;</publicite>
 <radio>Sites de radio par Internet</radio>
-<reaffected>Websites which have been reaffected</reaffected>
+<reaffected>Sites web qui ont &eacute;t&eacute; r&eacute;affect&eacute;s</reaffected>
 <redirector>Sites de redirection, utilis&eacute; pour contourner le filtrage</redirector>
 <restrictions>Restrictions</restrictions>
 <reverseaddresslookups>Inverser l'adresse lookups</reverseaddresslookups>

@@ -37,6 +37,10 @@ if(isset($_GET["fcron-restart"])){FCRON_RESTART();exit;}
 if(isset($_GET["restart-mldonkey"])){MLDONKEY_RESTART();exit;}
 if(isset($_GET["restart-artica-maillog"])){ARTICA_MAILLOG_RESTART();exit;}
 if(isset($_GET["notifier-restart"])){EMAILRELAY_RESTART();exit;}
+if(isset($_GET["cdir-calc"])){IP_CALC_CDIR();exit;}
+
+
+
 
 if(isset($_GET["hamachi-net"])){hamachi_net();exit;}
 if(isset($_GET["hamachi-status"])){hamachi_status();exit;}
@@ -51,6 +55,27 @@ if(isset($_GET["kavmilter-mem"])){kavmilter_mem();exit;}
 if(isset($_GET["kavmilter-pattern"])){kavmilter_pattern();exit;}
 if(isset($_GET["kavmilter_license"])){kavmilter_license();exit;}
 if(isset($_GET["kavmilter-bases-infos"])){kav4lms_bases_infos();exit;}
+
+if(isset($_GET["kav4fs-infos"])){kav4fs_infos();exit;}
+if(isset($_GET["kav4fs-ini-status"])){kav4fs_status();exit;}
+if(isset($_GET["kaf4fs-install-key"])){kav4fs_install_key();exit;}
+if(isset($_GET["kaf4fs-pattern"])){kav4fsPatternDate();exit;}
+if(isset($_GET["kav4fs-tasks"])){kav4fs_tasks();exit;}
+
+
+if(isset($_GET["ocsweb-restart"])){OCSWEB_RESTART();exit;}
+if(isset($_GET["ocsweb-status"])){OCSWEB_STATUS();exit;}
+if(isset($_GET["ocs-generate-certificate"])){OCSWEB_CERTIFICATE();exit();}
+if(isset($_GET["ocs-get-csr"])){OCSWEB_CERTIFICATE_CSR();exit;}
+if(isset($_GET["ocs-generate-final-certificate"])){OCSWEB_FINAL_CERTIFICATE();exit;}
+if(isset($_GET["ocs-package-infos"])){OCSWEB_PACKAGE_INFOS();exit;}
+if(isset($_GET["ocs-package-cp"])){OCSWEB_PACKAGE_COPY();exit;}
+if(isset($_GET["ocs-package-cpinfo"])){OCSWEB_PACKAGE_CREATE_INFO();exit;}
+if(isset($_GET["ocs-package-delete"])){OCSWEB_PACKAGE_DELETE();exit;}
+if(isset($_GET["ocs-package-frag"])){OCSWEB_PACKAGE_FRAGS();exit;}
+if(isset($_GET["ocs-agent-zip-packages"])){OCSWEB_GET_AGENT_PACKAGE_FILENAME();exit;}
+if(isset($_GET["ocsagntlnx-status"])){OCSAGENT_STATUS();exit;}
+if(isset($_GET["ocsagntlnx-restart"])){OCSAGENT_RESTART();exit;}
 
 
 if(isset($_GET["milter-greylist-ini-status"])){MILTER_GREYLIST_INI_STATUS();exit;}
@@ -261,6 +286,8 @@ if(isset($_GET["mldonkey-ini-status"])){MLDONKEY_INI_STATUS();exit;}
 
 
 
+
+
 if(isset($_GET["philesize-img"])){philesizeIMG();exit;}
 if(isset($_GET["philesize-img-path"])){philesizeIMGPath();exit;}
 
@@ -371,6 +398,10 @@ if(isset($_GET["imapsync-events"])){imapsync_events();exit;}
 if(isset($_GET["imapsync-cron"])){imapsync_cron();exit;}
 if(isset($_GET["imapsync-run"])){imapsync_run();exit;}
 if(isset($_GET["imapsync-stop"])){imapsync_stop();exit;}
+if(isset($_GET["imapsync-show"])){imapsync_show();exit;}
+
+
+
 	
 //cyrus
 if(isset($_GET["cyrus-backup-now"])){CyrusBackupNow();exit;}
@@ -387,6 +418,13 @@ if(isset($_GET["backup-sql-test"])){backup_sql_tests();exit;}
 if(isset($_GET["backup-build-cron"])){backup_build_cron();exit;}
 if(isset($_GET["backup-task-run"])){backup_task_run();exit;}
 
+
+if(isset($_GET["backuppc-ini-status"])){BACKUPPPC_INI_STATUS();exit;}
+if(isset($_GET["backuppc-affect"])){backuppc_affect();exit;}
+if(isset($_GET["backuppc-comp"])){backuppc_load_computer_config();exit;}
+if(isset($_GET["backuppc-save-computer"])){backuppc_save_computer_config();exit;}
+if(isset($_GET["restart-backuppc"])){backuppc_restart();exit;}
+if(isset($_GET["backuppc-computer-infos"])){backuppc_computer_infos();exit;}
 
 
 //apache
@@ -504,7 +542,7 @@ if(isset($_GET["lvm-unlink-disk"])){LVM_UNLINK_DISK();exit;}
 if(isset($_GET["lvm-link-disk"])){LVM_LINK_DISK();exit;}
 if(isset($_GET["vgcreate-dev"])){LVM_CREATE_GROUP();exit;}
 if(isset($_GET["DirectorySize"])){disk_directory_size();exit;}
-
+if(isset($_GET["filemd5"])){FILE_MD5();exit;}
 
 if(isset($_GET["lvs-all"])){LVM_lVS_INFO_ALL();exit;}
 if(isset($_GET["lv-resize-add"])){LVM_LV_ADDSIZE();exit;}
@@ -522,6 +560,11 @@ if(isset($_GET["etc-hosts-open"])){etc_hosts_open();exit;}
 if(isset($_GET["etc-hosts-add"])){etc_hosts_add();exit;}
 if(isset($_GET["etc-hosts-del"])){etc_hosts_del();exit;}
 if(isset($_GET["full-hostname"])){hostname_full();exit;}
+
+//computers
+
+if(isset($_GET["nmap-scan"])){nmap_scan();exit;}
+
 
 //tcp
 if(isset($_GET["ifconfig-interfaces"])){ifconfig_interfaces();exit;}
@@ -588,6 +631,7 @@ if(isset($_GET["cluster-add"])){CLUSTER_ADD();exit;}
 
 //computers
 if(isset($_GET["computers-import-nets"])){COMPUTERS_IMPORT_ARTICA();exit;}
+if(isset($_GET["smbclientL"])){smbclientL();exit;}
 
 //paths 
 if(isset($_GET["SendmailPath"])){SendmailPath();exit;}
@@ -614,7 +658,11 @@ switch ($uri) {
 	break;
 }
 
-writelogs_framework("unable to understand query !!!!!!!!!!!...","main()",__FILE__,__LINE__);
+while (list ($num, $line) = each ($_GET)){
+	$f[]="$num=$ligne";
+}
+
+writelogs_framework("unable to understand query !!!!!!!!!!!..." .@implode(",",$f),"main()",__FILE__,__LINE__);
 die();
 
 function SMTP_WHITELIST(){
@@ -630,6 +678,18 @@ function artica_update_query_logs(){
 	$array=explode("\n",@file_get_contents("/var/log/artica-postfix/{$_GET["file"]}"));
 	echo "<articadatascgi>".base64_encode(serialize($array))."</articadatascgi>";	
 }
+
+
+function nmap_scan(){
+	 $unix=new unix();
+	 $computer=$unix->shellEscapeChars($_GET["nmap-scan"]);
+	 writelogs_framework("Scan the computer:{$_GET["nmap-scan"]}=$computer",__FUNCTION__,__FILE__,__LINE__);
+	 $cmd=LOCATE_PHP5_BIN2()." /usr/share/artica-postfix/exec.nmapscan.php $computer";
+   	 writelogs_framework("$cmd",__FUNCTION__,__FILE__,__LINE__);
+	 exec($cmd,$results);
+	 echo "<articadatascgi>". @implode("\n",$results)."</articadatascgi>";		
+}
+
 
 function acls_infos(){
 	$unix=new unix();
@@ -786,6 +846,10 @@ function SQUID_INI_STATUS(){
 }
 function MLDONKEY_INI_STATUS(){
 	exec(LOCATE_PHP5_BIN2()." /usr/share/artica-postfix/exec.status.php --mldonkey",$results);
+	echo "<articadatascgi>". base64_encode(implode("\n",$results))."</articadatascgi>";
+}
+function BACKUPPPC_INI_STATUS(){
+	exec(LOCATE_PHP5_BIN2()." /usr/share/artica-postfix/exec.status.php --backuppc",$results);
 	echo "<articadatascgi>". base64_encode(implode("\n",$results))."</articadatascgi>";
 }
 
@@ -1310,7 +1374,7 @@ function samba_status(){
 }
 
 function samba_shares_list(){
-	$ini=new Bs_IniHandler("/etc/samba/smb.conf");
+	$ini=new iniframe("/etc/samba/smb.conf");
 	while (list($num,$array)=each($ini->_params)){
 		if(trim($array["path"])==null){continue;}
 		if(!is_dir(trim($array["path"]))){continue;}
@@ -1750,7 +1814,11 @@ echo "<articadatascgi>".base64_encode(serialize($array))."</articadatascgi>";
 }
 
 function ChangeLDPSSET(){
-	$vals=shell_exec("/usr/share/artica-postfix/bin/artica-install --change-ldap-settings {$_GET["ldap_server"]} {$_GET["ldap_port"]} {$_GET["suffix"]} {$_GET["username"]} {$_GET["password"]} {$_GET["change_ldap_server_settings"]}");
+	$unix=new unix();
+	$password=base64_decode($_GET["password"]);
+	$password=$unix->shellEscapeChars($password);
+	$password="$password";
+	$vals=shell_exec("/usr/share/artica-postfix/bin/artica-install --change-ldap-settings {$_GET["ldap_server"]} {$_GET["ldap_port"]} {$_GET["suffix"]} {$_GET["username"]} $password {$_GET["change_ldap_server_settings"]}");
 	echo "<articadatascgi>$vals</articadatascgi>";
 }
 function ASSPOriginalConf(){
@@ -2383,7 +2451,7 @@ function file_content(){
 }
 
 function samba_smbclient(){
-	$ini=new Bs_IniHandler("/etc/samba/smb.conf");
+	$ini=new iniframe("/etc/samba/smb.conf");
 	$unix=new unix();
 	$creds=unserialize(base64_decode($_GET["creds"]));
 	$comp=$_GET["computer"];
@@ -2657,7 +2725,7 @@ function hamachi_net(){
 
 function hamachi_status(){
 	exec("/usr/share/artica-postfix/bin/artica-install --hamachi-status",$rr);
-	$ini=new Bs_IniHandler();
+	$ini=new iniframe();
 	$ini->loadString(implode("\n",$rr));
 	echo "<articadatascgi>". base64_encode(serialize($ini->_params))."</articadatascgi>";
 }
@@ -3216,6 +3284,13 @@ function imapsync_stop(){
 	sys_THREAD_COMMAND_SET(LOCATE_PHP5_BIN2()." /usr/share/artica-postfix/exec.mailsync.php --stop {$_GET["imapsync-stop"]}");
 }
 
+function imapsync_show(){
+	exec(LOCATE_PHP5_BIN2()." /usr/share/artica-postfix/exec.mailsync.php --sync {$_GET["imapsync-show"]} --verbose",$results);
+	$datas=trim(@implode(" ",$results));
+	echo "<articadatascgi>". base64_encode($datas)."</articadatascgi>";
+}
+
+
 function cyrus_restore_mount_dir(){
 	$taskid=$_GET["cyr-restore"];
 	exec(LOCATE_PHP5_BIN2()." /usr/share/artica-postfix/exec.backup.php --mount $taskid",$results);
@@ -3620,7 +3695,7 @@ function SQUID_CACHE_INFOS(){
 		writelogs_framework("Unable to stat squidclient !!",__FUNCTION__,__LINE__);;
 		return;}
 	
-	$ini=new Bs_IniHandler("/etc/artica-postfix/settings/Daemons/ArticaSquidParameters");
+	$ini=new iniframe("/etc/artica-postfix/settings/Daemons/ArticaSquidParameters");
 	if($ini->_params["NETWORK"]["LDAP_AUTH"]==1){
 		$ldappassword=trim(@file_get_contents("/etc/artica-postfix/ldap_settings/password"));
 		$auth=" -u squidinternalauth -w $ldappassword ";
@@ -4206,6 +4281,384 @@ function directory_chown(){
 	writelogs_framework("\n$cmd\n". @implode("\n",$results) ,__FUNCTION__,__FILE__,__LINE__);
 	echo "<articadatascgi>". base64_encode(@implode("\n",$results))."</articadatascgi>";
 }
+
+function smbclientL(){
+	$ip=$_GET["smbclientL"];
+	$user=base64_decode($_GET["user"]);
+	$password=base64_decode($_GET["password"]);
+	$unix=new unix();
+	$smbclient=$unix->find_program("smbclient");
+	if($smbclient==null){
+		writelogs_framework("UNable to find smbclient" ,__FUNCTION__,__FILE__,__LINE__);
+		return;
+	}	
+	$f[]=$smbclient;$f[]="-L";$f[]=$ip;	
+	if($password==null){$f[]="-N";}else{$f[]="-U $user%$password";}
+	$cmd=@implode(" ",$f);
+	exec($cmd,$results);
+	writelogs_framework("\n$cmd\n". @implode("\n",$results) ,__FUNCTION__,__FILE__,__LINE__);
+	while (list ($index, $line) = each ($results) ){
+		if(preg_match("#session setup failed: (.+)#",$line,$re)){
+			echo "<articadatascgi>". base64_encode($re[1])."</articadatascgi>";
+			return;
+		}
+		if(preg_match("#(.+?)\s+(Printer|IPC|Disk)(.*)#",$line,$re)){
+			$array[trim($re[1])]=array("TYPE"=>trim($re[2]),"INFOS"=>trim($re[3]));
+		}else{
+			writelogs_framework("$line NO MATCH",__FUNCTION__,__FILE__,__LINE__);	
+		}
+	}
+	echo "<articadatascgi>". base64_encode(serialize($array))."</articadatascgi>";
+	
+}
+
+
+function backuppc_load_computer_config(){
+	
+	$unix=new unix();
+	$path=$unix->BACKUPPC_locate_config_path();
+	if(!is_dir($path)){return;}
+	$file="$path/{$_GET["backuppc-comp"]}.pl";
+	if(!is_file($file)){return null;}
+	writelogs_framework("Open $file",__FUNCTION__,__FILE__,__LINE__);	
+	echo "<articadatascgi>". base64_encode(@file_get_contents($file))."</articadatascgi>";
+}
+
+function backuppc_save_computer_config(){
+	$unix=new unix();
+	$path=$unix->BACKUPPC_locate_config_path();
+	if(!is_dir($path)){return;}	
+	$file="$path/{$_GET["backuppc-save-computer"]}.pl";
+	$file2="/usr/share/artica-postfix/ressources/logs/{$_GET["backuppc-save-computer"]}.pl";
+	@copy($file2,$file);
+	@chown($file,"backuppc");
+	shell_exec(LOCATE_PHP5_BIN2()." /usr/share/artica-postfix/exec.backup-pc.php --affect");
+	shell_exec("/etc/init.d/backuppc reload");
+	}
+	
+function backuppc_affect(){
+	$unix=new unix();
+	$path=$unix->BACKUPPC_locate_config_path();
+	if(!is_dir($path)){return;}	
+	sys_THREAD_COMMAND_SET(LOCATE_PHP5_BIN2()." /usr/share/artica-postfix/exec.backup-pc.php --affect");
+}
+
+function backuppc_restart(){
+	sys_THREAD_COMMAND_SET("/etc/init.d/artica-postfix restart backuppc");
+}
+
+function backuppc_computer_infos(){
+	$unix=new unix();
+	$uid=$_GET["backuppc-computer-infos"];
+	$TopDir=$unix->BACKUPPC_GET_CONFIG_INFOS("TopDir");
+	
+	$datas=@file_get_contents("$TopDir/log/status.pl");
+	writelogs_framework("$uid: Open TopDir $TopDir/log/status.pl ". strlen($datas)." bytes lenght",__FUNCTION__,__FILE__,__LINE__);
+	$pattern='#"'.$uid.'".*?=>.*?\{(.+?)\}#is';
+	$array=array();
+	if(preg_match($pattern,$datas,$re)){
+		writelogs_framework("$uid: found $pattern",__FUNCTION__,__FILE__,__LINE__);
+		$f=@explode("\n",$re[1]);
+		while (list ($num, $ligne) = each ($f) ){
+			if(preg_match('#"(.+?)".*=>(.*)#',$ligne,$re)){
+				$re[2]=str_replace(",","",trim($re[2]));
+				$re[2]=str_replace("'","",$re[2]);
+				$re[2]=str_replace('"',"",$re[2]);
+				$array[$re[1]]=$re[2];
+			}else{
+				writelogs_framework("$uid: Not found $ligne",__FUNCTION__,__FILE__,__LINE__);
+			}
+		}
+		
+		
+		
+	}else{
+		writelogs_framework("$uid: Not found $pattern",__FUNCTION__,__FILE__,__LINE__);
+	}
+	
+	echo "<articadatascgi>". base64_encode(serialize($array))."</articadatascgi>";
+	
+}
+
+function kav4fs_infos(){
+	
+	exec("/opt/kaspersky/kav4fs/bin/kav4fs-control --app-info 2>&1",$results);
+	while (list ($num, $ligne) = each ($results) ){
+		if(preg_match("#(.+?)[:=]+(.+)#",$ligne,$re)){
+			$array[trim($re[1])]=trim($re[2]);
+		}else{
+			writelogs_framework("$ligne No match",__FUNCTION__,__FILE__,__LINE__);
+		}
+		
+	}
+	echo "<articadatascgi>". base64_encode(serialize($array))."</articadatascgi>";
+}
+
+function kav4fs_status(){
+	exec(LOCATE_PHP5_BIN2()." /usr/share/artica-postfix/exec.status.php --kav4fs",$results);
+	echo "<articadatascgi>". base64_encode(@implode("\n",$results))."</articadatascgi>";
+}
+
+function kav4fs_install_key(){
+	$license_file=base64_decode($_GET["kaf4fs-install-key"]);
+	exec("/opt/kaspersky/kav4fs/bin/kav4fs-control --validate-key $license_file 2>&1",$results);
+	while (list ($num, $ligne) = each ($results) ){
+		if(preg_match("#error#i",$ligne,$re)){
+			echo "<articadatascgi>". base64_encode(@implode("\n",$results))."</articadatascgi>";
+			return;
+		}
+	}
+	
+}
+
+function kav4fsPatternDate(){
+	$u=new kav4fsUnix();
+	$pattern_path=$u->MAIN["UpdateFolder"]."/".$u->MAIN["AVBasesFolderName"];
+	writelogs_framework("UpdateFolder=$pattern_path",__FUNCTION__,__FILE__,__LINE__);
+	if(!is_file($pattern_path."/index.html")){
+		return null;
+	}
+}
+
+function kav4fs_tasks(){
+	$u=new kav4fsUnix();
+	$u->GetTaskList();
+	echo "<articadatascgi>". base64_encode(serialize($u->TASKS))."</articadatascgi>";
+}
+
+function IP_CALC_CDIR(){
+	$pattern=base64_decode($_GET["cdir-calc"]);
+	exec("/usr/share/artica-postfix/bin/ipcalc \"$pattern\" 2>&1",$results);	
+	while (list ($num, $ligne) = each ($results) ){
+		if(preg_match("#Network:\s+\s+([0-9\.\/]+)\s+[0-9]+#",$ligne,$re)){
+			echo "<articadatascgi>". base64_encode(trim($re[1]))."</articadatascgi>";
+			return;
+		}
+	}
+	
+}
+
+function kav4ProxyPatternDate(){
+	$unix=new unix();
+	$base=$unix->KAV4PROXY_GET_CONF_PATH("path","BasesPath");
+	if(!is_file("$base/master.xml")){return;}
+	$f=explode("\n",@file_get_contents("$base/master.xml"));
+	$reg='#UpdateDate="([0-9]+)\s+([0-9]+)"#';
+	while (list ($num, $ligne) = each ($results) ){
+		if(preg_match($reg,$ligne,$re)){
+			echo "<articadatascgi>". base64_encode(trim($re[1]).";".trim($re[2]))."</articadatascgi>";
+			return;
+		}
+	}	
+	
+}
+
+function OCSWEB_RESTART(){
+	sys_THREAD_COMMAND_SET("/etc/init.d/artica-postfix restart ocsweb");
+}
+function OCSWEB_STATUS(){
+exec(LOCATE_PHP5_BIN2()." /usr/share/artica-postfix/exec.status.php --ocsweb",$results);
+	echo "<articadatascgi>". base64_encode(@implode("\n",$results))."</articadatascgi>";	
+}
+function OCSAGENT_STATUS(){
+	exec(LOCATE_PHP5_BIN2()." /usr/share/artica-postfix/exec.status.php --ocsagent",$results);
+	echo "<articadatascgi>". base64_encode(@implode("\n",$results))."</articadatascgi>";	
+}
+function OCSAGENT_RESTART(){
+	sys_THREAD_COMMAND_SET("/etc/init.d/artica-postfix restart ocsagent");
+}
+
+
+function OCSWEB_CERTIFICATE(){
+	$send=false;
+	$UseSelfSignedCertificate=@file_get_contents("/etc/artica-postfix/settings/Daemons/UseSelfSignedCertificate");
+	if($UseSelfSignedCertificate==null){$UseSelfSignedCertificate=1;}
+	
+	if($UseSelfSignedCertificate==0){
+		shell_exec(LOCATE_PHP5_BIN2()." /usr/share/artica-postfix/exec.ocsweb.php --certificate");
+	}
+	if($UseSelfSignedCertificate==1){
+		exec(LOCATE_PHP5_BIN2()." /usr/share/artica-postfix/exec.ocsweb.php --certificate-self 2>&1",$results);
+		while (list ($num, $ligne) = each ($results) ){
+			if(preg_match("#error#",$ligne)){$send=true;$err[]=$ligne;}
+			writelogs_framework("OCS-PACKAGES:: --certificate-self: $ligne",__FUNCTION__,__FILE__,__LINE__);
+		}
+		
+		if($send){
+			echo "<articadatascgi>". base64_encode(@implode("\n",$err))."</articadatascgi>";	
+		}
+		
+		sys_THREAD_COMMAND_SET("/etc/init.d/artica-postfix restart ocsweb");
+	}
+}
+
+function OCSWEB_CERTIFICATE_CSR(){
+	if(!is_file("/etc/ocs/cert/server.csr")){return null;}
+	echo "<articadatascgi>". base64_encode(file_get_contents("/etc/ocs/cert/server.csr"))."</articadatascgi>";
+}
+function OCSWEB_FINAL_CERTIFICATE(){
+	$path=base64_decode($_GET["path"]);
+	if(!is_file($path)){return null;}
+	shell_exec("/bin/cp $path /etc/artica-postfix/settings/Daemons/OCSServerDotCrt");
+	shell_exec("/bin/cp $path /etc/ocs/cert/server.crt");
+	shell_exec(LOCATE_PHP5_BIN2()." /usr/share/artica-postfix/exec.ocsweb.php --final-cert");
+	sys_THREAD_COMMAND_SET("/etc/init.d/artica-postfix restart ocsweb");
+}
+
+function OCSWEB_PACKAGE_INFOS(){
+	$FILEID=$_GET["ocs-package-infos"];
+	$filepath="/var/lib/ocsinventory-reports/download/$FILEID/info";
+	$content=@file_get_contents($filepath);
+	if(preg_match('#<DOWNLOAD\s+ID="(.*?)"\s+PRI="(.*?)"\s+ACT="(.*?)"\s+DIGEST="(.*?)"\s+PROTO="(.*?)"\s+FRAGS="(.*?)"\s+DIGEST_ALGO="(.*?)"\s+DIGEST_ENCODE="(.*?)"\s+PATH="(.*?)"\s+NAME="(.*?)"\s+COMMAND="(.*?)"\s+NOTIFY_USER="(.*?)"\s+NOTIFY_TEXT="(.*?)"\s+NOTIFY_COUNTDOWN="(.*?)"\s+NOTIFY_CAN_ABORT="(.*?)"\s+NOTIFY_CAN_DELAY="(.*?)"\s+NEED_DONE_ACTION="(.*?)"\s+NEED_DONE_ACTION_TEXT="(.*?)"#'
+	,$content,$re)){
+		$array["PRI"]=$re[2];
+		$array["ACT"]=$re[3];
+		$array["DIGEST"]=$re[4];
+		$array["PROTO"]=$re[5];
+		$array["FRAGS"]=$re[6];
+		$array["DIGEST_ALGO"]=$re[7];
+		$array["DIGEST_ENCODE"]=$re[8];
+		$array["PATH"]=$re[9];
+		$array["NAME"]=$re[10];
+		$array["COMMAND"]=$re[11];
+		$array["NOTIFY_USER"]=$re[12];
+		$array["NOTIFY_TEXT"]=$re[13];
+		$array["NOTIFY_COUNTDOWN"]=$re[14];
+		$array["NOTIFY_CAN_ABORT"]=$re[15];
+		$array["NOTIFY_CAN_DELAY"]=$re[16];
+		$array["NEED_DONE_ACTION"]=$re[17];
+		$array["NEED_DONE_ACTION_TEXT"]=$re[18];
+		echo "<articadatascgi>". base64_encode(serialize($array))."</articadatascgi>";
+	}
+}
+
+function FILE_MD5(){
+	echo "<articadatascgi>".md5_file(base64_decode($_GET["filemd5"]))."</articadatascgi>";
+	
+}
+
+function OCSWEB_PACKAGE_COPY(){
+	$sourcefile=base64_decode($_GET["filesource"]);
+	$FILEID=$_GET["FILEID"];
+	$document_root="/var/lib/ocsinventory-reports";
+	@mkdir("$document_root/download/$FILEID",0666,true);
+	shell_exec("/bin/cp $sourcefile $document_root/download/$FILEID/$FILEID");
+}
+
+function OCSWEB_PACKAGE_CREATE_INFO(){
+	$unix=new unix();
+	$userwww=$unix->APACHE_GROUPWARE_ACCOUNT();
+	$FILEID=$_GET["FILEID"];
+	$sourcefile="/usr/share/artica-postfix/ressources/logs/$FILEID.info";
+	writelogs_framework("OCS-PACKAGES:: SOURCE=\"$sourcefile\"",__FUNCTION__,__FILE__,__LINE__);
+	$document_root="/var/lib/ocsinventory-reports";
+	@mkdir("$document_root/download/$FILEID",0755,true);
+	@chown("$document_root/download/$FILEID",$userwww);
+	$finale_file="$document_root/download/$FILEID/info";
+	writelogs_framework("OCS-PACKAGES::$sourcefile file:$finale_file",__FUNCTION__,__FILE__,__LINE__);
+	shell_exec("/bin/cp $sourcefile $finale_file");
+	@chown("$finale_file",$userwww);
+	@unlink($sourcefile);
+	writelogs_framework("OCS-PACKAGES:: chown:$userwww",__FUNCTION__,__FILE__,__LINE__);
+	exec("/bin/chown -R $userwww $document_root/download/$FILEID",$results);
+	while (list ($num, $ligne) = each ($results) ){
+		writelogs_framework("OCS-PACKAGES:: chown: $ligne",__FUNCTION__,__FILE__,__LINE__);
+	}
+	
+}
+
+
+FUNCTION OCSWEB_PACKAGE_FRAGS(){
+		$sourcefile=base64_decode($_GET["filesource"]);
+		$unix=new unix();
+		$userwww=$unix->APACHE_GROUPWARE_ACCOUNT();
+		if(trim($sourcefile)==null){
+			writelogs_framework("OCS-PACKAGES:: base64_decode({$_GET["filesource"]})=\"NULL\" aborting",__FUNCTION__,__FILE__,__LINE__);
+			return;
+		}		
+		
+		$FILEID=$_GET["FILEID"];
+		if(trim($FILEID)==null){
+			writelogs_framework("OCS-PACKAGES:: FILEID=\"NULL\" aborting",__FUNCTION__,__FILE__,__LINE__);
+			return;
+		}
+		$nbfrags=$_GET["nbfrags"];
+		
+		if(trim($nbfrags)==null){
+			writelogs_framework("OCS-PACKAGES:: nbfrags=\"NULL\" aborting",__FUNCTION__,__FILE__,__LINE__);
+			return;
+		}		
+		
+		
+		
+		$TMP=$unix->FILE_TEMP();
+		shell_exec("/bin/cp $sourcefile $TMP");
+		$document_root="/var/lib/ocsinventory-reports";
+		writelogs_framework("OCS-PACKAGES:: nbfrags=\"$nbfrags\"",__FUNCTION__,__FILE__,__LINE__);
+		writelogs_framework("OCS-PACKAGES:: SOURCE=\"$sourcefile\"",__FUNCTION__,__FILE__,__LINE__);
+		writelogs_framework("OCS-PACKAGES:: DEST=\"$TMP\"",__FUNCTION__,__FILE__,__LINE__);
+		@mkdir("$document_root/download/$FILEID",0755,true);
+		@chmod("$document_root/download/$FILEID",0755);
+		@chown("$document_root/download/$FILEID",$userwww);
+		
+		$fname = $TMP;
+		if( $size = @filesize( $fname )) {
+			writelogs_framework("OCS-PACKAGES:: SIZE=\"$size\"",__FUNCTION__,__FILE__,__LINE__);
+			$handle = fopen ( $fname, "rb");
+			
+			$read = 0;
+			for( $i=1; $i<$nbfrags; $i++ ) {
+				$contents = fread ($handle, $size / $nbfrags );
+				$read += strlen( $contents );
+				writelogs_framework("OCS-PACKAGES:: OPEN=\"$document_root/download/$FILEID/$FILEID-$i\"",__FUNCTION__,__FILE__,__LINE__);
+				$handfrag = fopen( "$document_root/download/$FILEID/$FILEID-$i", "w+b" );
+				fwrite( $handfrag, $contents );
+				fclose( $handfrag );
+				@chown("$document_root/download/$FILEID/$FILEID-$i",$userwww);
+			}	
+			
+			$contents = fread ($handle, $size - $read);
+			$read += strlen( $contents );
+			$handfrag = fopen( "$document_root/download/$FILEID/$FILEID-$i", "w+b" );
+			fwrite( $handfrag, $contents );
+			fclose( $handfrag );
+			fclose ($handle);
+			@chown("$document_root/download/$FILEID/$FILEID-$i",$userwww);
+			unlink($TMP);
+		}
+		
+	exec("/bin/chown -R $userwww $document_root/download/$FILEID",$results);
+	while (list ($num, $ligne) = each ($results) ){
+		writelogs_framework("OCS-PACKAGES:: chown: $ligne",__FUNCTION__,__FILE__,__LINE__);
+	}		
+		
+}
+
+function OCSWEB_PACKAGE_DELETE(){
+	writelogs_framework("OCS-PACKAGES:: ID={$_GET["FILEID"]}",__FUNCTION__,__FILE__,__LINE__);
+	$FILEID=$_GET["FILEID"];
+	if(trim($FILEID)==null){return;}
+	if(strpos($FILEID,"/")>0){return;}
+	$FILEID=str_replace("..","",$FILEID);
+	$document_root="/var/lib/ocsinventory-reports";
+	writelogs_framework("OCS-PACKAGES:: /bin/rm -rf $document_root/$FILEID",__FUNCTION__,__FILE__,__LINE__);
+	shell_exec("/bin/rm -rf $document_root/$FILEID");
+}
+function OCSWEB_GET_AGENT_PACKAGE_FILENAME(){
+	$document_root="/var/lib/ocsinventory-reports";
+	foreach (glob("$document_root/OCSNG_WINDOWS_AGENT-*") as $filename) {
+		$file=basename($filename);
+		$size=@filesize($filename)/1024;
+		$array[$file]=$size;
+		
+	}
+	echo "<articadatascgi>". base64_encode(serialize($array))."</articadatascgi>";
+}
+
+
+
+
+
 
 
 ?>

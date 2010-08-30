@@ -43,6 +43,7 @@ mais il c'est assez proche de la s&eacute;mantique de Windows pour la plupart de
 <action_keepup2date>Mettre &agrave; jour la base maintenant</action_keepup2date>
 <action_start_service>D&eacute;marrer le service</action_start_service>
 <action_stop_service>Arr&ecirc;ter le service</action_stop_service>
+<activate>Activer</activate>
 <ACTIVATE_APP_GROUPWARE_APACHE>Activation du service groupware</ACTIVATE_APP_GROUPWARE_APACHE>
 <ACTIVATE_BACKUP_AGENT>Activez la sauvegarde distante</ACTIVATE_BACKUP_AGENT>
 <ACTIVATE_BACKUP_AGENT_EXPLAIN>Cette fonctionnalit&eacute; autorise L'agent R&eacute;seau Artica &agrave; stocker les sauvegardes sur votre ressource de sotckage[br]
@@ -54,6 +55,8 @@ Cette op&eacute;ration va activer le service et la sauvegarde &agrave; distance 
 <ACTIVATE_MLDONKEY_TEXT>SI vous activez cette options, les administrateurs des organisations seront autoris&eacute;s &agrave; active l'acc&egrave;s des utilisateurs des services Peer to Peer.[br]Dans ce cas, les utilisateurs pourront programmer la r&eacute;cup&eacute;ration de fichier &agrave; travers l'interface utilisateur d'Artica</ACTIVATE_MLDONKEY_TEXT>
 <ACTIVATE_SPF>Activation de la v&eacute;rification SPF</ACTIVATE_SPF>
 <ACTIVATE_SPF_TEXT>Si cette fonctionnalit&eacute; est activ&eacute;e, les scores de l'anti-spam seront modifi&eacute;s avec la validation des h&ocirc;tes &eacute;metteurs.</ACTIVATE_SPF_TEXT>
+<activate_ssl_bump>Activer l'interception SSL</activate_ssl_bump>
+<activate_ssl_bump_text>Si vous activez cette fonctionnalit&eacute;, le proxy sera en mesure d'intercepter le pages web et documents t&eacute;l&eacute;charg&eacute;s en SSL afin de les envoyer vers une analyse antivirus.[br]Cela induit que Kaspersky Antivirus ou ClamAV antivirus ont &eacute;t&eacute; d&eacute;ja activ&eacute;s pour l'inspection antivirus de votre flux web.</activate_ssl_bump_text>
 <ACTIVATE_THIS_MLDONKEY_USER>Activer cette utilisateur</ACTIVATE_THIS_MLDONKEY_USER>
 <ACTIVATE_THIS_MLDONKEY_USER_TEXT>If you turn on, this user will be able to download shared files from peer-to-peer networks using the end-user Artica Interface</ACTIVATE_THIS_MLDONKEY_USER_TEXT>
 <ACTIVATE_THIS_USER_WEBDAV>Activer l'acc&egrave;s HTTP</ACTIVATE_THIS_USER_WEBDAV>
@@ -139,6 +142,7 @@ Ajouter une liste : exe,pif,bat,doc</add_attachment_blocking_text_explain>
 <ADD_COMPUTER>Ajouter un nouvel ordinateur</ADD_COMPUTER>
 <add_computer_access>Ajouter un acc&egrave;s ordinateur</add_computer_access>
 <ADD_COMPUTER_TEXT>Ajoute un nouvel ordianteur dans la base d'Artica</ADD_COMPUTER_TEXT>
+<add_condition>Ajouter une condition</add_condition>
 <add_contact>Ajouter un contact</add_contact>
 <add_contact_text>Ajouter un contact unique dans la base de donn&eacute;es</add_contact_text>
 <add_default_rules>Ajouter les r&egrave;gles par d&eacute;faut</add_default_rules>
@@ -341,6 +345,7 @@ Si un ordinateur d&eacute;passe la limite des X &eacute;v&eacute;nements, Artica
 <APP_AVESERVER>Kaspersky pour serveur de Messagerie</APP_AVESERVER>
 <APP_AWSTATS>awstats</APP_AWSTATS>
 <APP_BACKUP>Sauvegarde Artica</APP_BACKUP>
+<APP_BACKUPPC>BackupPC</APP_BACKUPPC>
 <APP_BIND9>Serveur DNS Bind</APP_BIND9>
 <APP_BIND9_TEXT>BIND (Berkeley Internet Name Domain ou &quot;nom&quot;) est le plus couramment utilis&eacute; sur le serveur DNS d'Internet</APP_BIND9_TEXT>
 <APP_BOA>moteur Boa</APP_BOA>
@@ -419,6 +424,8 @@ Contrairement aux autres syt&egrave;mes de r&eacute;partition de charge, l'agg&e
 <APP_JOOMLA>Service web Joomla</APP_JOOMLA>
 <APP_KAS3>Passerelle Anti-spam Kaspersky</APP_KAS3>
 <APP_KAS3_MILTER>Auditeur Kaspersky Anti-spam Milter</APP_KAS3_MILTER>
+<APP_KAV4FS>Kaspersky Antivirus For Linux File Server</APP_KAV4FS>
+<APP_KAV4FS_AVS>Kaspersky Antivirus Scanner en temps r&eacute;el</APP_KAV4FS_AVS>
 <APP_KAV4PROXY>Kaspersky pour Squid</APP_KAV4PROXY>
 <APP_KAV4PROXY_TEXT>Kaspersky Pour  SQUID fournit l'acc&egrave;s Internet s&eacute;curis&eacute; pour tous les employ&eacute;s de l'organisation,
 supprime automatiquement les logiciels malveillant et potentiellement hostiles du trafic entrant HTTP / FTP.</APP_KAV4PROXY_TEXT>
@@ -471,6 +478,7 @@ Vous pouvez modifier les param&egrave;tres afin de d&eacute;finir &agrave; quel 
 <APP_OBM2_TEXT>Open Business Management, is now recognized as the leader of GPL enterprise-class email and Groupware solution face to Microsoft Exchange® or Lotus Notes®</APP_OBM2_TEXT>
 <APP_OBM_APACHE>Lighttpd pour OBM</APP_OBM_APACHE>
 <APP_OCSI>Inventaire OCS</APP_OCSI>
+<APP_OCSI_DOWNLOAD>Service Web SSL de t&eacute;l&eacute;chargement</APP_OCSI_DOWNLOAD>
 <APP_OCSI_TEXT>Open Computer and Software Inventory nouvelle g&eacute;n&eacute;ration est une application d&eacute;velopp&eacute;e a aider l'administration r&eacute;seau en ayant une vision de la configuration des ordinateurs et des logiciels install&eacute;s dans le r&eacute;seau</APP_OCSI_TEXT>
 <APP_OPENGOO>Groupware OpenGoo</APP_OPENGOO>
 <APP_OPENGOO_TEXT>It is a complete online solution focused on improving productivity, collaboration, communication and management of your teams.</APP_OPENGOO_TEXT>
@@ -674,6 +682,7 @@ Cette fonctionnalit&eacute; permet d'afficher un popup d'authentification si et 
 <authentication>Authentification</authentication>
 <Authorized networks>R&eacute;seaux Autoris&eacute;s</Authorized networks>
 <Authorized networks text>Autoris&eacute; &agrave; envoyer des emails &agrave; travers Internet</Authorized networks text>
+<auth_banner>Banni&egrave;re d'authentification</auth_banner>
 <autoblock>Auto-bloquer</autoblock>
 <AutomaticConfig>Sauvegarder automatiquement les param&egrave;tres du syst&egrave;me</AutomaticConfig>
 <automobile-bikes>Tout ce qui parle des motos, incluant les sites marchands de fans, de passions, scooters inclus</automobile-bikes>
@@ -696,6 +705,8 @@ l'examen des statistiques sur l'activit&eacute; virale pendant une p&eacute;riod
 D&eacute;finissez un chemin d'acc&egrave;s (comme / var/log/kav/5.5/kav4mailservers/smtpscanner.stat) afin d'activer les statistiques antivirales.[br]
 Si un chemin d'acc&egrave;s est fix&eacute; artica ex&eacute;cute r&eacute;guli&egrave;rement des statistiques.</AVStatistics_text>
 <av_notify_rules>Souscription des actions et des r&egrave;gles</av_notify_rules>
+<av_pattern_database>Bases de signatures antivirus</av_pattern_database>
+<av_pattern_database_obsolete_or_missing>les bases de signatures antivirus sont obsol&egrave;tes ou manquante !</av_pattern_database_obsolete_or_missing>
 <av_settings>Param&egrave;tres d'antivirus eMail</av_settings>
 <awstats>awstats</awstats>
 <awstats_statistics_allemailr>tous les emails re&ccedil;us</awstats_statistics_allemailr>
@@ -728,6 +739,7 @@ Si un chemin d'acc&egrave;s est fix&eacute; artica ex&eacute;cute r&eacute;guli&
 <BACKUP_TASK_TEST>Effectuer un test de connexion sur cette t&acirc;che.[br]La sauvegarde ne sera pas effectu&eacute;e.[br]Juste un test de connexion sera effectu&eacute;</BACKUP_TASK_TEST>
 <backup_this_directory>Sauvegarder ce r&eacute;pertoire</backup_this_directory>
 <backup_this_directory_explain>Choisissez les t&acirc;ches d&eacute;j&agrave; programm&eacute;es afin de rajouter ce r&eacute;pertoire dans le processus de sauvegarde</backup_this_directory_explain>
+<backup_this_folder>Sauvegarder ce dossier</backup_this_folder>
 <BACKUP_WARNING_NOT_CONFIGURED>Pas de sauvegarde programm&eacute;e</BACKUP_WARNING_NOT_CONFIGURED>
 <BACKUP_WARNING_NOT_CONFIGURED_TEXT>Aucune sauvegarde de programm&eacute;e sur ce serveur. En cas de crash, vous risquez de tout perdre.</BACKUP_WARNING_NOT_CONFIGURED_TEXT>
 <back_system>Revenir au syst&egrave;me</back_system>
@@ -748,6 +760,8 @@ Si de multiples actions BCC sont pr&eacute;cis&eacute;es dans la m&ecirc;me tran
 <bits_rate>Taux de transferts</bits_rate>
 <black list>Liste Noire</black list>
 <black list explain>G&eacute;rer la liste de groupe des adresses interdites. [br]Les messages de ces adresses sont automatiquement v&eacute;rifi&eacute;es comme Spam</black list explain>
+<BlackoutPeriods>P&eacute;riodes de pause.</BlackoutPeriods>
+<BlackoutPeriods_text>Ne pas ex&eacute;cuter de sauvegarde...</BlackoutPeriods_text>
 <black_lists>Moteurs de listes noires</black_lists>
 <black_spam>mis en liste noire</black_spam>
 <Body>Corps</Body>
@@ -828,8 +842,8 @@ Specify 0 when mail delivery should be tried only once.</bounce_queue_lifetime_t
 <calling_daemon_to_perform_operation>d&eacute;mon d'appel artica pour effectuer des op&eacute;rations</calling_daemon_to_perform_operation>
 <campain_name>Nom de l'envoi en masse</campain_name>
 <cancel>annuler</cancel>
-<catch_all>Catch-all</catch_all>
-<catch_all_mail_text>A catch-all mailbox will receive all mails when recipients not matching your users stored in local database</catch_all_mail_text>
+<catch_all>attrape tout</catch_all>
+<catch_all_mail_text>Une bo&icirc;te aux lettres &quot;attrape tout&quot; va recevoir tous les messages dont les destinataires n'existent pas dans la base de donn&eacute;es locale.</catch_all_mail_text>
 <categorize>Cat&eacute;goriser</categorize>
 <categoryies>cat&eacute;gorie(s)</categoryies>
 <categoryies_community>Cat&eacute;gories de la communaut&eacute;</categoryies_community>
@@ -887,6 +901,7 @@ The relay_domains_reject_code parameter specifies the response code for rejected
 <choose_org>Choisir l'organisation</choose_org>
 <CICAP_DNSBL>Listes Noires DNSBL</CICAP_DNSBL>
 <CICAP_DNSBL_TEXT>Utilisez les listes noires dynamiques afin d'interdire l'acc&egrave;s &agrave; certains sites web</CICAP_DNSBL_TEXT>
+<CICAP_WILLBEENABLED>C-ICAP va &ecirc;tre activ&eacute; dans quelques secondes</CICAP_WILLBEENABLED>
 <city>Ville</city>
 <clamav_unofficial>Signatures non officielles ClamAV</clamav_unofficial>
 <clamav_unofficial_text>Mise &agrave; jour des signatures antivirus tiers fournies par SaneSecurity, SecuriteInfo,MalwarePatrol, OITC, INetMsg et ScamNailer</clamav_unofficial_text>
@@ -941,6 +956,7 @@ The default is accept message.
 <Col>Biblitoh&egrave;que</Col>
 <collectd_statistics>Collecte de statistiques</collectd_statistics>
 <collectd_statistics_text>Voir les statistiques recueillies par le d&eacute;mon syst&egrave;me de collecte de statistiques</collectd_statistics_text>
+<command_lines_view>Voir les commandes</command_lines_view>
 <comment>commentaire</comment>
 <commonName>nom commun</commonName>
 <community>Communaut&eacute;</community>
@@ -952,12 +968,18 @@ The default is accept message.
 <compile_statistics>Statistiques de compilation</compile_statistics>
 <compile_statistics_text>Ex&eacute;cuter des statistiques en vue d'obtenir les derniers &eacute;v&eacute;nements et graphiques</compile_statistics_text>
 <compiling>Compiler</compiling>
+<COMPILING_SOFTWARES>Logiciels en cours de compilation</COMPILING_SOFTWARES>
+<COMPILING_SOFTWARES_TEXT>Artica est en train de compiler des logiciels, le syst&egrave;me risque d'&ecirc;tre un peu charg&eacute;.</COMPILING_SOFTWARES_TEXT>
 <COMPLETED>Connect&eacute;</COMPLETED>
 <computer>ordinateur</computer>
 <computers>ordinateurs</computers>
 <computers_management>Administration des ordinateurs</computers_management>
 <COMPUTER_ACCESS>Param&egrave;tres d'acc&egrave;s r&eacute;seau</COMPUTER_ACCESS>
 <COMPUTER_ACCESS_TEXT>D&eacute;finissez le compte et le mot de passe permettant de parcourir les ressources de cet ordinateur</COMPUTER_ACCESS_TEXT>
+<COMPUTER_INFOS_SERVICES>Services &amp; applications</COMPUTER_INFOS_SERVICES>
+<COMPUTER_INFOS_SERVICES_TEXT>Ajouter des services, sauvegarde, inventaires, utilisateurs &agrave; cet ordinateur</COMPUTER_INFOS_SERVICES_TEXT>
+<COMPUTER_NETWORK>R&eacute;seaux et DNS</COMPUTER_NETWORK>
+<COMPUTER_NETWORK_TEXT>Modifier les informations r&eacute;seaux, DNS de cet ordinateur</COMPUTER_NETWORK_TEXT>
 <computer_password>Mot de passe de l'ordinateur</computer_password>
 <computer_password_text>Indiquez le mot de passe de cet ordinateur afin de pouvoir le lier &agrave; un domaine Windows.[br]Tr&egrave;s utile lorsque vous d&eacute;sirez lier cet ordinateur &agrave; un PDC ou BDC</computer_password_text>
 <computer_popup_import_explain>Cette section vous permet d'importer une liste d'ordinateurs dans la base LDAP Artica[br]
@@ -994,6 +1016,7 @@ Copiez/collez une liste d'ordinateurs avec chaque nom d'ordinateur s&eacute;par&
 <Correspondent>Correspondant</Correspondent>
 <corrupt>corrompue</corrupt>
 <Corrupted>Corrompu</Corrupted>
+<corrupted_database>Base de donn&eacute;es corrompue</corrupted_database>
 <CORRUPTED_LDAP_BRANCH>Branche LDAP corrompue !</CORRUPTED_LDAP_BRANCH>
 <CORRUPTED_LDAP_BRANCH_PERFORM>Cette op&eacute;ration va supprimer la branche d'Artica.
 Des informations internes &agrave; Artica seront alors effac&eacute;es et reconstruites (pas celle des utilisateurs).
@@ -1188,6 +1211,7 @@ Vous pouvez ajouter des privil&egrave;ges de groupe afin d'autoriser certains ut
 <DisableMagicQuotesGpc_text>D&eacute;sactive le mode magic_quotes pour les op&eacute;rations GPC (Get/Post/Cookie). Lorsque magic_quotes est activ&eacute;, tous les caract&egrave;res ' (guillemets simples), &quot; (guillemets doubles), \ (antislash) et NUL sont &eacute;chapp&eacute;s avec un antislash. (Assure la compatibilit&eacute; avec eGroupware)</DisableMagicQuotesGpc_text>
 <disable_all_filters>D&eacute;sactiver tous les filtres</disable_all_filters>
 <disable_jgrowl>D&eacute;sactiver les messages de notification syst&egrave;me</disable_jgrowl>
+<DISABLE_KAV_ENABLE_CICAP>Kaspersky est d&eacute;sactiv&eacute; car C-ICAP prend la main.</DISABLE_KAV_ENABLE_CICAP>
 <disable_service_text_operation>Cette op&eacute;ration va d&eacute;sactiver le service:</disable_service_text_operation>
 <disable_this_service_click>Cliquez ici afin de d&eacute;sactiver le service</disable_this_service_click>
 <discard>jeter</discard>
@@ -1220,6 +1244,8 @@ Le DNS Black Listing est utilis&eacute; en s&eacute;curit&eacute; informatique p
 [br]
 Le DNS Black Listing est un effort coop&eacute;ratif des fournisseurs de noms de domaine pour interdire le service DNS aux spammeurs connus.[br]
 Les spammeurs connus sont ainsi bloqu&eacute;s lorsqu'ils tentent d'obtenir l'adresse IP d'un fournisseur de courrier &eacute;lectronique, ce qui les emp&ecirc;che d'envoyer des courriers &eacute;lectroniques. En effet, pour envoyer un courrier &eacute;lectronique &agrave; l'utilisateur ayant l'adresse utilisateur@fournisseur.fr, le spammeur doit pr&eacute;alablement demander l'adresse IP du domaine fournisseur.fr, c'est cette demande qui est bloqu&eacute;e gr&acirc;ce au DNS Black Listing.</DNSBL_EXPLAIN>
+<dnsDomainIs>Si DNS trouv&eacute;</dnsDomainIs>
+<dnsDomainIs_text>D&eacute;tecte si le nom d'h&ocirc;te appartient &agrave; un domaine donn&eacute; DNS. Ex: www.dalloz.fr ou .springer.de ou mydomain.example</dnsDomainIs_text>
 <dnsmasq_DNS_records>Enregistrements MX</dnsmasq_DNS_records>
 <dnsmasq_DNS_records_text>DnsMasq peut r&eacute;pondre aux requ&egrave;tes DNS avec sa propre base de donn&eacute;es</dnsmasq_DNS_records_text>
 <dnsmasq_settings>param&egrave;tres dnsmasq</dnsmasq_settings>
@@ -1664,6 +1690,7 @@ sous cette forme que vous souhaitez pr&eacute;senter</form_error>
 <ForwardMailer>Forward Mail ip/port</ForwardMailer>
 <found>trouv&eacute;</found>
 <free>libre</free>
+<free_pattern>champs libre</free_pattern>
 <frequency>fr&eacute;quence</frequency>
 <friday>Vendredi</friday>
 <from>de</from>
@@ -1673,6 +1700,11 @@ sous cette forme que vous souhaitez pr&eacute;senter</form_error>
 <from_name>Nom de l'&eacute;metteur</from_name>
 <from_name_help>Indiquez ici le nom ou phrase qui sera visible dans le champ &quot;exp&eacute;diteur&quot; des clients de messagerie.</from_name_help>
 <fs_type>Type de syst&egrave;me de fichiers</fs_type>
+<ftp_list_width>Taille du listing</ftp_list_width>
+<ftp_list_width_explain>Indiquez la longueur du listage FTP.Ce pourrait &ecirc;tre la longueur standard d&eacute;finie dans les navigateurs.[br]Mettre une largeur trop petite peut &quot;couper&quot; les noms de fichier longs lors du parcours du site FTP.</ftp_list_width_explain>
+<ftp_passive>Mode PASSIF</ftp_passive>
+<ftp_passive_explain>Si votre pare-feux n'accepte que les connexions FTP en mode passif.</ftp_passive_explain>
+<ftp_user>Utilisateur FTP</ftp_user>
 <full_access>acc&egrave;s complet</full_access>
 <gateway>Passerelle</gateway>
 <GDPHP_NOT_INSTALLED>Librairie GD !</GDPHP_NOT_INSTALLED>
@@ -1708,6 +1740,7 @@ La charge g&eacute;r&eacute;e par la construction de ce rapport va d&eacute;pend
 <global_director_report_text>Envoyer de fa&ccedil;on p&eacute;riodique un rapport du flux de messagerie.</global_director_report_text>
 <global_memory>M&eacute;moire globale utilis&eacute;e</global_memory>
 <global_organization>organisation global</global_organization>
+<global_parameters>Param&egrave;tres globaux</global_parameters>
 <global_quarantine_rules>Param&egrave;tres principaux de quarantaine</global_quarantine_rules>
 <global_rule>R&egrave;gle globale</global_rule>
 <global_services_status>Statut des principaux services</global_services_status>
@@ -1774,6 +1807,7 @@ Log the optional text if  specified,[br]otherwise log a generic message.
 <HomeBinding_text>Liez les autres r&eacute;pertoires locaux vers le r&eacute;pertoire Home.</HomeBinding_text>
 <homePhone>T&eacute;l&eacute;phone personnel</homePhone>
 <homePostalAddress>Adresse personnelle</homePostalAddress>
+<HOME_PUBLIC_ACCESS_TEXT>Partagez ce r&eacute;pertoires pour les acc&egrave;s anonymes.[br]Utile si vous voulez partager des fichiers pour les bo&icirc;tiers multim&eacute;dias ou des robots sp&eacute;cifiques.</HOME_PUBLIC_ACCESS_TEXT>
 <host>H&ocirc;te</host>
 <hostname>nom d'h&ocirc;te</hostname>
 <hosts>h&ocirc;tes</hosts>
@@ -1781,6 +1815,8 @@ Log the optional text if  specified,[br]otherwise log a generic message.
 <hosts_without_proxy>Les h&ocirc;tes sans proxy</hosts_without_proxy>
 <hotmail>Hotmail &amp; Live</hotmail>
 <hour>heure</hour>
+<hourBegin>Heure de d&eacute;marrage</hourBegin>
+<hourEnd>Heur de fin</hourEnd>
 <hourly>horraire</hourly>
 <hours>heures</hours>
 <howto_access_computer>Comment acc&eacute;der &agrave; cet ordinateur</howto_access_computer>
@@ -1820,6 +1856,9 @@ It send notifications to recipients in order to allow them to "download" attache
 <imapsync_advanced_options>Param&egrave;tres sp&eacute;cifiques pour am&eacute;liorer la synchronisation.</imapsync_advanced_options>
 <imapsync_folders_text>Indiquez les dossiers qui devront &ecirc;tre r&eacute;pliqu&eacute;s</imapsync_folders_text>
 <imapsync_main_settings>Param&egrave;tres principaux de synchronisation</imapsync_main_settings>
+<imapsync_prefix_destination>Supprimer le &quot;pr&eacute;fix&quot; sur le serveur de destination</imapsync_prefix_destination>
+<imapsync_prefix_source>Supprimer le &quot;pr&eacute;fix&quot; sur le serveur source</imapsync_prefix_source>
+<imapsync_prefix_text>Supprime le pr&eacute;fix sur tous les r&eacute;pertoires destinataires (habituellement INBOX. pour les serveurs de messagerie &quot;Cyrus IMAP&quot;).[br]Vous pouvez c&ocirc;cher la case sur le serveur source si il n'a pas de capacit&eacute; &quot;NAMESPACE&quot; [b]NO NAMESPACE capability[/b]</imapsync_prefix_text>
 <imap_connection_broken>La connexion Imap est actuellement rompu et les informations ne peuvent pas &ecirc;tre lus</imap_connection_broken>
 <imap_connection_locked>La connexion imap est actuellement verrouill&eacute; car le serveur imap n'a pas r&eacute;pondu &agrave; temps</imap_connection_locked>
 <imap_server_name>adresse du serveur</imap_server_name>
@@ -2047,6 +2086,8 @@ With the default 100 SMTP server process limit, "in flow delay as 1s" limits the
 <isInNet_explain>Les navigateurs n'utiliseront pas de proxy si les ordinateurs sont dans les r&eacute;seaux list&eacute;s ci-dessous: [br]Exemple: 192.168.1.0 - 255.255.255.0</isInNet_explain>
 <isnot>n'est pas</isnot>
 <ISP>Fournisseur Internet</ISP>
+<isPlainhost>Si le nom d'h&ocirc;te est complet</isPlainhost>
+<isPlainhost_text>D&eacute;tecte si le nom d'h&ocirc;te dans l'URL demand&eacute;e est un nom d'h&ocirc;te complet ou d'un nom de domaine pleinement qualifi&eacute;</isPlainhost_text>
 <ISP_MODE>Mode fournisseur d'acc&egrave;s</ISP_MODE>
 <items>&eacute;l&eacute;ments</items>
 <january>Janvier</january>
@@ -2078,6 +2119,7 @@ With the default 100 SMTP server process limit, "in flow delay as 1s" limits the
 <kav4proxyprocess_explain>Options avanc&eacute;es sur les processus de Kaspersky Antivirus</kav4proxyprocess_explain>
 <kav4proxy_status>Statut de Kaspersky pour squid</kav4proxy_status>
 <kav4proy_main_settings>Param&egrave;tres de l'antivirus Kaspersky pour squid</kav4proy_main_settings>
+<KAVPROXY_WILLBEENABLED>Kaspersky antivirus pour Proxy va &ecirc;tre activ&eacute; dans quelques secondes</KAVPROXY_WILLBEENABLED>
 <kav_add_protection_domain>Prot&eacute;ger un nouveau domaine</kav_add_protection_domain>
 <kav_legend_protection_domain>Domaine &agrave; prot&eacute;ger</kav_legend_protection_domain>
 <kav_milter_status>Statut du Milter Kaspersky</kav_milter_status>
@@ -2102,6 +2144,7 @@ With the default 100 SMTP server process limit, "in flow delay as 1s" limits the
 <last_24_h>Derni&egrave;res 24 heures</last_24_h>
 <last_48_h>Derni&egrave;res 48 Heures</last_48_h>
 <last_days>Derniers jours</last_days>
+<last_error>Derni&egrave;re erreur</last_error>
 <last_logoff>Derni&egrave;re fermeture de session</last_logoff>
 <last_logon>Derni&egrave;re session ouverte</last_logon>
 <last_mails>Derniers messages transf&eacute;r&eacute;s</last_mails>
@@ -2114,6 +2157,9 @@ With the default 100 SMTP server process limit, "in flow delay as 1s" limits the
 <ldap settings>Param&egrave;tres ldap</ldap settings>
 <ldap suffix>Suffixe LDAP</ldap suffix>
 <LDAP_ERROR_TEXT>Erreur, pas de connexion LDAP</LDAP_ERROR_TEXT>
+<ldap_filter_group>Filtre de recherche des groupes</ldap_filter_group>
+<ldap_filter_users>filtre de recherche utilisateur</ldap_filter_users>
+<ldap_password>Mot de passe LDAP</ldap_password>
 <Leave messages on server>Laissez des messages sur le serveur</Leave messages on server>
 <left_menu_internal_hard_drives>Disques durs</left_menu_internal_hard_drives>
 <left_menu_net_settings>R&eacute;seaux</left_menu_net_settings>
@@ -2125,14 +2171,17 @@ With the default 100 SMTP server process limit, "in flow delay as 1s" limits the
 <license_error>Erreur de licence</license_error>
 <license_expired>La licence est expir&eacute;e</license_expired>
 <license_info>Information de Licence</license_info>
+<license_informations>Informations Licence.</license_informations>
 <license_info_text>Afficher la licence et mettez la &agrave; jour</license_info_text>
 <limit>limite</limit>
 <lines>lignes</lines>
 <link_hard_drive>Connecter un disque dur</link_hard_drive>
 <link_hard_drive_confirm>Confirmez-vous la connexion de ce disque dur &agrave; cet objet ?</link_hard_drive_confirm>
 <list>liste</list>
+<listen_http_port>Port d'&eacute;coute HTTP</listen_http_port>
 <listen_ip>Adresse IP d'&eacute;coute</listen_ip>
 <listen_port>port d'&eacute;coute</listen_port>
+<listen_ssl_port>Port d'&eacute;coute SSL</listen_ssl_port>
 <listing_content>Parcours du contenu</listing_content>
 <list_mailboxes>Liste de boites aux lettres</list_mailboxes>
 <load>Charge</load>
@@ -2152,6 +2201,7 @@ With the default 100 SMTP server process limit, "in flow delay as 1s" limits the
 <localmx>MX Locale</localmx>
 <localmx_text>Return an MX record pointing to the MX Target for all local machines.</localmx_text>
 <LocalSocketPath>Chemin du socket local</LocalSocketPath>
+<local_database>Base locale</local_database>
 <local_destination_concurrency_limit>local destination concurrency limit</local_destination_concurrency_limit>
 <local_destination_concurrency_limit_text>The maximal number of parallel deliveries via the local mail delivery transport to the same recipient 
 (when &quot;local destination recipient limit = 1&quot;) or the maximal number of parallel deliveries to the same local domain (when &quot;local destination recipient limit &amp;raquo; 1&quot;).[br]
@@ -2457,6 +2507,7 @@ The default is to use the local machine name, $myhostname, which defaults to the
 <MYSQL_CLUSTER>Cluster Mysql</MYSQL_CLUSTER>
 <MYSQL_CLUSTER_TEXT>Augmentez la disponibilit&eacute; de vos bases de donn&eacute;es gr&acirc;ce &agrave; la construction d'un ensemble de ressources cluster.</MYSQL_CLUSTER_TEXT>
 <my_address_book>Mon Carnet d'Adresses</my_address_book>
+<my_computers>Mes ordinateurs</my_computers>
 <name>Nom</name>
 <name_resolve_order>Ordre des r&eacute;solutions</name_resolve_order>
 <name_the_new_account_explain>Ce nom est l'identificateur unique dans la base de donn&eacute;es des utilisateurs, il sera utilis&eacute; pour acc&eacute;der &agrave; la bo&icirc;te aux lettres et sur le portail</name_the_new_account_explain>
@@ -2573,6 +2624,9 @@ The default is to use the local machine name, $myhostname, which defaults to the
 <num_slots>nombre de connecteurs d'extension</num_slots>
 <objects>Objets</objects>
 <observations>Observations</observations>
+<OCSI_NORMAL_PORT_EXPLAIN>Le port HTTP est utilis&eacute; afin de recevoir les inventaires des ordinateurs distants et aussi d'afficher la console d'administration originale OCS.[br]Les ordinateurs distants envois des donn&eacute;es XML &agrave; ce port afin de remplir la base de donn&eacute;es de l'inventaire.</OCSI_NORMAL_PORT_EXPLAIN>
+<OCSI_SERVERNAME_EXPLAIN>Le nom de serveur va &ecirc;tre utilis&eacute; afin d'expliquer &agrave; vos utilisateurs le nom de votre serveur web qui sera utilis&eacute; par les agents OCS install&eacute;s sur les postes clients.</OCSI_SERVERNAME_EXPLAIN>
+<OCSI_SSL_PORT_EXPLAIN>Le port SSL est utilis&eacute; afin de permettre le d&eacute;ployement de logiciels.[br]Les ordinateurs distants utilisent ce service afin de t&eacute;l&eacute;charger les paquets avant de les ex&eacute;cuter.</OCSI_SSL_PORT_EXPLAIN>
 <october>Octobre</october>
 <OK_help>Accepter l'adresse etc qui correspond au mod&egrave;le</OK_help>
 <ok_listen>Ce service &eacute;coute actuellement le port d&eacute;finie</ok_listen>
@@ -2862,6 +2916,7 @@ Vous visualisez ici le nombre total d'&eacute;v&egrave;nements sauvegard&eacute;
 <proxy_pac_rules>R&egrave;gles d'Auto-configuration</proxy_pac_rules>
 <proxy_pac_rules_text>Personnalisez le fichier d'auto-configuration pour vos utilisateurs</proxy_pac_rules_text>
 <proxy_pac_text>Utilisez un fichier d'auto-configuration afin de personnaliser tous les navigateurs de vos utilisateurs</proxy_pac_text>
+<PUBLIC_ACCESS>Acc&egrave;s publique</PUBLIC_ACCESS>
 <pureftpd_main_settings>Param&egrave;tres Pure-ftpd</pureftpd_main_settings>
 <pureftpd_satus>Statut Pure-ftpd</pureftpd_satus>
 <put_user_quarantine>envoyer les mails vers la quarantaine utilisateur</put_user_quarantine>
@@ -2924,6 +2979,7 @@ See also "maximal backoff time".
 <rcpt_to_rules>R&egrave;gles RCPT TO (r&egrave;gles pour clients)</rcpt_to_rules>
 <read>lire</read>
 <read_conf>Voir la configuration g&eacute;n&eacute;rale</read_conf>
+<reason>raison</reason>
 <rebuild_mailboxes_org>Reconstruire toutes les bo&icirc;tes aux lettres</rebuild_mailboxes_org>
 <rebuild_mailboxes_org_explain>Cette op&eacute;ration va reconstruire toutes les bo&icirc;tes aux lettres.[br]Elle peut &ecirc;tre utilis&eacute; lors d'une re-cr&eacute;ation globale des bo&icirc;tes aux lettres suite &agrave; une restauration.Lorsque certaines n'existent pas ou n'existent plus.[br]
 Les bo&icirc;tes aux lettres d&eacute;j&agrave; cr&eacute;es ne seront pas impact&eacute;es. Vous pouvez utiliser cette fonctionnalit&eacute; en tout confiance.</rebuild_mailboxes_org_explain>
@@ -3081,6 +3137,7 @@ This feature is off by default. </relay_recipient_maps_text>
 <remote server mailbox>Votre serveur de messagerie distant</remote server mailbox>
 <remote username>Nom d'utilisateur distant</remote username>
 <remote-mail retrieval>r&eacute;cup&eacute;ration de mails distants</remote-mail retrieval>
+<remote_database>base distante</remote_database>
 <remote_rsync_server>Serveur Rsync distant</remote_rsync_server>
 <remote_smb_server>R&eacute;pertoire partag&eacute;</remote_smb_server>
 <removed>supprim&eacute;</removed>
@@ -3124,6 +3181,7 @@ Placer une limite sur les ent&ecirc;tes HTTP peut r&eacute;soudre certains probl
 <resource>ressource</resource>
 <resource_testing>V&eacute;rification des ressources</resource_testing>
 <ressources_insuffisantes>Ressources insuffisantes</ressources_insuffisantes>
+<restarting>red&eacute;marrage</restarting>
 <restart_autofs>Red&eacute;marrer le service Auto-connect</restart_autofs>
 <restart_autofs_text>Red&eacute;marrez le service Auto-connect afin d'appliquer vos param&egrave;tres en mode &quot;production&quot;</restart_autofs_text>
 <restart_computer>Red&eacute;marrer</restart_computer>
@@ -3134,6 +3192,7 @@ Placer une limite sur les ent&ecirc;tes HTTP peut r&eacute;soudre certains probl
 <restore_mailbox_text>Restaurer des &eacute;l&eacute;ments depuis des sauvegardes d&eacute;j&agrave; effectu&eacute;es.</restore_mailbox_text>
 <restrictions>restrictions</restrictions>
 <restrictions_classes_list>Liste de Classes</restrictions_classes_list>
+<result>resultat</result>
 <results>R&eacute;sultats</results>
 <RETRANSLATOR_CONNECT_URI>Utilisez ce lien web dans les produits Kaspersky afin de les mettre &agrave; jour &agrave; travers ce serveur (voir le lien ci-dessous)</RETRANSLATOR_CONNECT_URI>
 <Return-Path>Adresse de retour</Return-Path>
@@ -3182,6 +3241,7 @@ Lorsqu'un message arrive, Postfix enregistre le nom d'utilisateur fournit, la m&
 <save_task>Sauvegarder la t&acirc;che</save_task>
 <SCANNING>Analyse</SCANNING>
 <scanning_your_network>Analyse en cours de vos r&eacute;seaux</scanning_your_network>
+<scan_this_computer>Analyser cet ordinateur</scan_this_computer>
 <schedule>planification</schedule>
 <scheduled>planifi&eacute;</scheduled>
 <schedule_import_settings>Programmez un importation r&eacute;guli&egrave;re afin de rafra&icirc;chir la base automatiquement</schedule_import_settings>
@@ -3316,6 +3376,8 @@ Remplissez le formulaire ci-joint afin d'obtenir un devis de la soci&eacute;t&ea
 <share_name>Nom de partage</share_name>
 <SHARE_RSYNC>Param&egrave;tres du partage Rsync</SHARE_RSYNC>
 <share_this_rsync>Partagez ce dossier avec Rsync</share_this_rsync>
+<shExpMatch>Correspond &agrave; l'expression r&eacute;guli&egrave;re</shExpMatch>
+<shExpMatch_text>une expression shell &agrave; comparer Ex:.*host\.com</shExpMatch_text>
 <show>afficher</show>
 <show_config_file>Voir le fichier de configuration cr&eacute;e</show_config_file>
 <shutdown>&eacute;teindre</shutdown>
@@ -3673,8 +3735,15 @@ Vous pouvez d&eacute;finir par exemple joe@domain.tld ou bien  *@domain.tld, le 
 <SQUID_CACHES_OVER>Caches proxy en surcapacit&eacute;</SQUID_CACHES_OVER>
 <SQUID_CACHES_OVER_TEXT>Il semble que votre syst&egrave;me de cache soit en surcapacit&eacute;, afin d'am&eacute;liorer les performances, veuillez &eacute;tendre vos caches sur le disque dur</SQUID_CACHES_OVER_TEXT>
 <SQUID_CACHE_TINYTEXT>Squid est un des meilleurs Proxy cache et acc&eacute;l&eacute;rateur de navigation Internet qui existe.[br]Plus de 10 ans exp&eacute;rience on fait de lui un produit puissant et adapt&eacute; &agrave; l'acc&eacute;l&eacute;ration Internet.</SQUID_CACHE_TINYTEXT>
+<SQUID_DISABLED>Squid est d&eacute;sactiv&eacute;</SQUID_DISABLED>
+<SQUID_DISABLED_TEXT>Squid est actuellement d&eacute;sactiv&eacute;, cliquez ici afin de le r&eacute;activer</SQUID_DISABLED_TEXT>
 <squid_events>&Eacute;v&egrave;nements de Squid</squid_events>
 <squid_filter_stats_text>Cr&eacute;ez un filtre afin de pr&eacute;ciser l'affichage des &eacute;v&egrave;nements</squid_filter_stats_text>
+<squid_ftp_user>Param&egrave;tres FTP</squid_ftp_user>
+<squid_ftp_user_explain>Si vous d&eacute;sirez que la connexion anonyme soit plus d&eacute;taill&eacute;e, vous pouvez corriger ce param&egrave;tre avec une information plus sp&eacute;cifique comme votre propre domaine (squid@squid.visolve.com).[br]
+La raison est que certains sites FTP distants v&eacute;rifient la validit&eacute; du domaine de connexion.</squid_ftp_user_explain>
+<squid_ftp_user_text>Param&egrave;tres sp&eacute;cifiques au protocole FTP manag&eacute; par squid.</squid_ftp_user_text>
+<SQUID_LDAP_AUTH_EXT>Au lieu d'utiliser la base des comptes LDAP du serveur Artica,vous pouvez d&eacute;finir une base de donn&eacute;es LDAP distante pour l'authentification des utilisateurs.[br]Cette base peut &ecirc;tre h&eacute;berg&eacute;e par un serveur Active Directory ou OpenLDAP.</SQUID_LDAP_AUTH_EXT>
 <squid_main_settings>Param&egrave;tres de cache Squid</squid_main_settings>
 <SQUID_NETWORK_HELP>[ul]
 [li]R&eacute;f&eacute;rence &agrave; tout le r&eacute;seau 172.16.1.0: [b]172.16.1.0/24[/b][/li]
@@ -3682,7 +3751,9 @@ Vous pouvez d&eacute;finir par exemple joe@domain.tld ou bien  *@domain.tld, le 
 [li]R&eacute;f&eacute;rence &agrave; une adresse unique172.16.1.25: [b]172.16.1.25[/b][/li]
 [li]R&eacute;f&eacute;rence &agrave; une tranche d'adresse  172.16.1.25-172.16.1.35 :[b]172.16.1.25-172.16.1.35/32[/b][/li]
 [/ul]</SQUID_NETWORK_HELP>
+<squid_net_calc_mask>Calcul du nombre de bits</squid_net_calc_mask>
 <squid_net_settings>Param&egrave;tres r&eacute;seaux</squid_net_settings>
+<squid_net_simple>Configuration r&eacute;seau simple</squid_net_simple>
 <SQUID_NEWVERSION>Nouvelle version du Proxy web SQUID</SQUID_NEWVERSION>
 <SQUID_NEWVERSION_TEXT>Une nouvelle version du proxy Internet SQUID est disponible. Il est conseill&eacute; de la mettre &agrave; jour.</SQUID_NEWVERSION_TEXT>
 <SQUID_NOT_COMPILED_NTLM_RUN_RECONFIGURE>Le proxy principale (SQUID) n'est pas compil&eacute; avec la directive NTLM, si vous voulez utiliser l'authentification &agrave; travers un domaine NT, vous devez mettre &agrave; jour SQUID.[br]
@@ -3701,6 +3772,8 @@ Trois valeurs possible :[ul]
 <squid_reverse_proxy>Proxy invers&eacute;</squid_reverse_proxy>
 <squid_reverse_proxy_text>Utiliser SQUID en tant que &quot;frontal&quot; de vos serveurs web</squid_reverse_proxy_text>
 <squid_sizelimit>Limite des requ&ecirc;tes</squid_sizelimit>
+<squid_sslbump>Analyse HTTPS</squid_sslbump>
+<squid_sslbump_text>Activation/D&eacute;sactivation du d&eacute;chiffrement/chiffrement des sites web s&eacute;curis&eacute;s afin d'autoriser l'analyse antivirus.</squid_sslbump_text>
 <squid_status>Statut de Squid</squid_status>
 <SQUID_TOP_HITS_STAT_EXPLAIN>Vous trouverez ici le top 50 des pages les plus visit&eacute;es par vos utilisateurs</SQUID_TOP_HITS_STAT_EXPLAIN>
 <SQUID_TOP_USERS_STAT_EXPLAIN>Vous trouverez ici le top 50 des utilisateurs qui utilisent le plus ce site web. Et ce, depuis le d&eacute;but de l'enregistrement des &eacute;v&egrave;nements.</SQUID_TOP_USERS_STAT_EXPLAIN>
@@ -3718,10 +3791,12 @@ la connexion SSL &eacute;chouera, malgr&eacute; l'option  d'empreinte digitale S
 [br] Notez que ce comportement peut devenir facultatif car cette option sera par d&eacute;faut dans les  futures versions de fetchmail</sslcertck_text>
 <SSLStrictSNIVHostCheck>D&eacute;sactiver le support SNI</SSLStrictSNIVHostCheck>
 <SSLStrictSNIVHostCheck_text>Utilis&eacute; pour les application groupware avec Apache.[br]Cette option d&eacute;fini si un client NON SNI est autoris&eacute; &agrave; acc&eacute;der au service web.[br]Elle pr&eacute;vient une erreur &quot;No hostname was provided via SNI for a name based virtual host&quot;</SSLStrictSNIVHostCheck_text>
+<SSL_BUMP_WL>Cette section vous permet d'interdire le proxy d'intercepter les sites web s&eacute;curis&eacute;s.[br]Dans ce cas, le certificat SSL ne sera pas modifi&eacute; mais les antivirus ne seront pas en mesure d'analyser le contenu t&eacute;l&eacute;charg&eacute;.</SSL_BUMP_WL>
 <ssl_fingerprint>Empreinte digitale SSL</ssl_fingerprint>
 <standard_classes>Classes standart</standard_classes>
 <start>D&eacute;marrer</start>
 <Start With>D&eacute;marrer avec</Start With>
+<startTime>Heure de d&eacute;marrage</startTime>
 <start_all_failed_services>D&eacute;marrer tous les services</start_all_failed_services>
 <start_all_services_perform>L'ordre de d&eacute;marrage des services &agrave; &eacute;t&eacute; programm&eacute;. 
 Cette op&eacute;ration va s'effectuer dans quelques temps.</start_all_services_perform>
@@ -4151,7 +4226,7 @@ Si il est en rouge, vous allez devoir maintenir la base des utilisateurs.[br]Cet
 <upload_a_file>charger un fichier</upload_a_file>
 <upload_kbs>Bande passante de chargement</upload_kbs>
 <upload_max_filesize>Taille Max du fichier de t&eacute;l&eacute;chargement</upload_max_filesize>
-<upload_new_license>T&eacute;l&eacute;charger une nouvel licence</upload_new_license>
+<upload_new_license>Charger une nouvelle licence</upload_new_license>
 <upload_vpn_configuration>Charger les param&egrave;tres VPN</upload_vpn_configuration>
 <upload_your_file_here>Chargez vos fichiers ici</upload_your_file_here>
 <uptime>temps de vie</uptime>
@@ -4165,6 +4240,7 @@ Si il est en rouge, vous allez devoir maintenir la base des utilisateurs.[br]Cet
 <use%>utilis&eacute; %</use%>
 <used>utilis&eacute;</used>
 <UseProxy>Activer le serveur proxy</UseProxy>
+<userdn>DN utilisateur</userdn>
 <userid>Identifiant unique[br] (boite aux lettres)</userid>
 <username>Nom d'utilisateur</username>
 <usernanmeorip>utilisateur ou adresse IP</usernanmeorip>
@@ -4212,6 +4288,7 @@ Si il est en rouge, vous allez devoir maintenir la base des utilisateurs.[br]Cet
 <Video>Vid&eacute;o</Video>
 <view>voir</view>
 <view_config>Visualiser le fichier de configuration</view_config>
+<view_generated_command_lines>Afficher l'ex&eacute;cution finale de vos param&egrave;tres dans un mode technique</view_generated_command_lines>
 <view_members>Afficher les membres</view_members>
 <view_results>Afficher les r&eacute;sultats</view_results>
 <view_script>voir le script</view_script>
@@ -4240,6 +4317,8 @@ In the url the "%f" can be used to specify the real name of downloaded file</Vir
 <WANT_INSTALL>Voulez-vous installer le produit s&eacute;lectionn&eacute; ?</WANT_INSTALL>
 <warn>avertissement</warn>
 <Warning>attention</Warning>
+<warning_license_not_installed>La licence pour ce service n'est pas install&eacute;e.[br]V&eacute;rifiez la licence afin de rendre ce service disponible et en production.</warning_license_not_installed>
+<WARNING_MAC_ADDRESS_CORRUPT>L'adresse de la carte MAC de cet ordinateur n'est pas valable, allez dans le compte de cet ordinateur et indiquez la valeur correcte dans le champs Carte MAC</WARNING_MAC_ADDRESS_CORRUPT>
 <WARN_help>Ecrire un &eacute;v&egrave;nement avec un texte optionnel, si disponible ajout des information du serveur exp&eacute;diteur avec le helo, l'&eacute;metteur , destinataire et les informations protocolaires</WARN_help>
 <warn_if_reject>Avertir dans le log en cas de rejeter</warn_if_reject>
 <warn_if_reject_text>Change the meaning of the next restriction,[br] so that it logs a warning instead of rejecting a request[br] (look for logfile records that contain "reject_warning").[br] This is useful for testing new restrictions[br] in a "live" environment without risking unnecessary loss of mail</warn_if_reject_text>
@@ -4260,6 +4339,7 @@ Il offre aussi le filtrage de contenu avec un antivirus et le filtrage des pages
 <website>Site Web</website>
 <websites>Sites Web</websites>
 <website_name>Nom du site</website_name>
+<website_ssl_wl_help>Ajoutez un nom de site par exemple : .domain.com ou www.domain.com</website_ssl_wl_help>
 <webtv>Site offrant la T&eacute;l&eacute;vision via Internet</webtv>
 <web_filter>Filtrage web</web_filter>
 <web_proxy>Proxy Web</web_proxy>
@@ -4267,6 +4347,7 @@ Il offre aussi le filtrage de contenu avec un antivirus et le filtrage des pages
 <web_server_path>Chemin complet vers le dossier source php artica</web_server_path>
 <wednesday>mercredi</wednesday>
 <week>semaine</week>
+<weekdays>Jours de la semaine</weekdays>
 <weekly>hebdomadaire</weekly>
 <WELCOME>Bienvenue sur Artica-Postfix</WELCOME>
 <welcomeb>bienvenue</welcomeb>
@@ -4319,6 +4400,8 @@ Pendant la sauvegarde, le serveur risque d'&ecirc;tre occup&eacute;.[br]Il est i
 <WORKGROUP>Groupe de travail</WORKGROUP>
 <working_title>Emploi</working_title>
 <write>Ecrire</write>
+<wrong_squid_version>Mauvaise version de squid.</wrong_squid_version>
+<wrong_squid_version_feature_text>Il semble que cette version de Squid n'int&egrave;gre pas cette fonctionnalit&eacute;.[br]Allez dans le Centre de Contr&ocirc;le des applications et mettez &agrave; jour SQUID en derni&egrave;re version.</wrong_squid_version_feature_text>
 <WWWMultiSMTPSender>serveur SMTP</WWWMultiSMTPSender>
 <www_adv>Tout sur les publicit&eacute;s</www_adv>
 <www_chat>Site de discussions instantan&eacute;es</www_chat>

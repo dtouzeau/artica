@@ -183,7 +183,6 @@ begin
        cmd:=cmd+' --with-maxfd=16384';
        cmd:=cmd+' --enable-useragent-log ';
        cmd:=cmd+' --enable-referer-log ';
-       cmd:=cmd+' --enable-ssl ';
        cmd:=cmd+' --enable-x-accelerator-vary ';
        cmd:=cmd+' --with-dl ';
        cmd:=cmd+' --enable-basic-auth-helpers=LDAP';
@@ -215,6 +214,7 @@ begin
        cmd:=cmd+' --enable-async-io ';
        cmd:=cmd+' --enable-delay-pools ';
        cmd:=cmd+' --enable-ssl';
+       cmd:=cmd+' --enable-ssl-crtd';
        cmd:=cmd+' CFLAGS="-DNUMTHREADS=60 -O3 -pipe -fomit-frame-pointer -funroll-loops -ffast-math -fno-exceptions" CPPFLAGS="-I../libltdl"';
        writeln(cmd);
        result:=cmd;

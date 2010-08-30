@@ -110,7 +110,8 @@ class usersMenus {
 	var $HOSTAPD_BINVER=0;
 	var $POSTMULTI=false;
 	var $MLDONKEY_INSTALLED=false;
-	
+	var $KAV4PROXY_LICENSE_ERROR=false;
+	var $KAV4PROXY_LICENSE_ERROR_TEXT="";
 	/* This licence must be used Only with Artica-for postfix */
 	var $ChartLicence="D1XFWGMEW9L.HSK5T4Q79KLYCK07EK";
 	/*you cannot use it without any authorizations of maani.us.
@@ -352,6 +353,9 @@ class usersMenus {
 	var $MAIL_DKIM_VERSION=null;
 	var $HDPARM_INSTALLED=false;
 	var $APACHE_MODE_WEBDAV=false;
+	var $BACKUPPC_INSTALLED=false;
+	var $KAV4FS_INSTALLED=false;
+	var $OCS_LNX_AGENT_INSTALLED=false;
 	
 	
 	function usersMenus($priv=null,$nobuild=0,$hostname=null){
@@ -629,6 +633,12 @@ class usersMenus {
 			$this->APACHE_MODE_WEBDAV=$_GLOBAL["APACHE_MODE_WEBDAV"];
 			$this->hostname=str_replace('.(none)','',$this->hostname);
 			$this->fqdn=str_replace('.(none)','',$this->fqdn);
+			$this->BACKUPPC_INSTALLED=$_GLOBAL["BACKUPPC_INSTALLED"];
+			$this->BACKUPPC_APACHE=$_GLOBAL["BACKUPPC_APACHE"];
+			$this->KAV4FS_INSTALLED=$_GLOBAL["KAV4FS_INSTALLED"];
+			$this->KAV4PROXY_LICENSE_ERROR=$_GLOBAL["KAV4PROXY_LICENSE_ERROR"];
+			$this->KAV4PROXY_LICENSE_ERROR_TEXT=$_GLOBAL["KAV4PROXY_LICENSE_ERROR_TEXT"];
+			$this->OCS_LNX_AGENT_INSTALLED=$_GLOBAL["OCS_LNX_AGENT_INSTALLED"];
 			
 			if($this->SAMBA_INSTALLED){
 				if($this->LOCAL_SID==null){
@@ -939,6 +949,13 @@ private function build_user_left_menus(){
 		$array["{index page}"]["SUB"]["{master_panel}"]="javascript:document.location.href='users.index.php';";
 		if($this->AsSystemAdministrator){
 			$array["{index page}"]["SUB"]["{backup}"]="javascript:Loadjs('backup.tasks.php');";	
+			if($this->BACKUPPC_INSTALLED){
+				$array["{index page}"]["SUB"]["{APP_BACKUPPC}"]="javascript:Loadjs('backup-pc.index.php?in-front-ajax=yes');";
+			}
+			if($this->OCSI_INSTALLED){
+				$array["{index page}"]["SUB"]["{APP_OCSI}"]="javascript:Loadjs('ocs.ng.php?in-front-ajax=yes');";
+			}
+			
 		}
 
 		
@@ -1042,7 +1059,7 @@ private function build_user_left_menus(){
 				if($this->CUPS_INSTALLED){
 					$array["{fileshare}"]["SUB"]["{printers}"]="javascript:Loadjs('cups.index.php?in-front-ajax=yes');";
 				}
-				$array["{fileshare}"]["SUB"]["{computers}"]="javascript:Loadjs('computer-browse.php');";
+				$array["{fileshare}"]["SUB"]["{computers}"]="javascript:Loadjs('computer-browse.php?in-front-ajax=yes');";
 				}
 		}
 		
@@ -1074,33 +1091,37 @@ private function build_user_left_menus(){
 		
 		
 		if($this->SQUID_INSTALLED==true){if($this->AsSquidAdministrator==true){
-			
-			$array["{web_proxy}"]["MAIN"]="javascript:Loadjs('squid.newbee.php?yes')";
-			$array["{web_proxy}"]["SUB"]["{main_parameters}"]="javascript:Loadjs('squid.newbee.php?yes')";
-			
-			if($SquidActHasReverse<>1){
-				if($this->DANSGUARDIAN_INSTALLED){
-					$array["{web_proxy}"]["SUB"]["{DANSGUARDIAN_RULES}"]="javascript:Loadjs('dansguardian.index.php?js=yes')";
-
+			$sock=new sockets();
+			$SQUIDEnable=trim($sock->GET_INFO("SQUIDEnable"));
+			if($SQUIDEnable==null){$SQUIDEnable=1;}
+			if($SQUIDEnable==1){
+					$array["{web_proxy}"]["MAIN"]="javascript:Loadjs('squid.newbee.php?yes')";
+					$array["{web_proxy}"]["SUB"]["{main_parameters}"]="javascript:Loadjs('squid.newbee.php?yes')";
+					
+					if($SquidActHasReverse<>1){
+						if($this->DANSGUARDIAN_INSTALLED){
+							$array["{web_proxy}"]["SUB"]["{DANSGUARDIAN_RULES}"]="javascript:Loadjs('dansguardian.index.php?js=yes')";
+		
+						}
+					}
+					
+					if($SquidActHasReverse<>1){
+						if($this->SQUIDGUARD_INSTALLED){
+							$array["{web_proxy}"]["SUB"]["{DANSGUARDIAN_RULES}"]="javascript:Loadjs('dansguardian.index.php?js=yes')";
+						}
+					}
+					
+					if($SquidActHasReverse<>1){
+						if($this->C_ICAP_INSTALLED){
+							$array["{web_proxy}"]["SUB"]["{DANSGUARDIAN_RULES}"]="javascript:Loadjs('dansguardian.index.php?js=yes')";
+						}
+					}
+		
+					$array["{web_proxy}"]["SUB"]["{statistics}"]="javascript:Loadjs('squid.statistics.php')";
+					
 				}
 			}
-			
-			if($SquidActHasReverse<>1){
-				if($this->SQUIDGUARD_INSTALLED){
-					$array["{web_proxy}"]["SUB"]["{DANSGUARDIAN_RULES}"]="javascript:Loadjs('dansguardian.index.php?js=yes')";
-				}
-			}
-			
-			if($SquidActHasReverse<>1){
-				if($this->C_ICAP_INSTALLED){
-					$array["{web_proxy}"]["SUB"]["{DANSGUARDIAN_RULES}"]="javascript:Loadjs('dansguardian.index.php?js=yes')";
-				}
-			}
-
-			$array["{web_proxy}"]["SUB"]["{statistics}"]="javascript:Loadjs('squid.statistics.php')";
-			
 		}
-	}
 		
 		if($this->POSTFIX_INSTALLED){
 			if($this->AsPostfixAdministrator==true){
@@ -2022,6 +2043,53 @@ return $array_m[$type];
 }
 
 
-
+function url_decode_special($path){
+	$path=str_replace("%E9","é",$path);
+	$path=str_replace("%E0","à",$path);
+	$path=str_replace("%F9","ù",$path);
+	$path=str_replace("%20"," ",$path);
+	$path=str_replace("%E8","è",$path);
+	$path=str_replace("%E7","ç",$path);
+	$path=str_replace("%3F","€",$path);
+	$path=str_replace("%26","&",$path);
+	$path=str_replace("%FC","ü",$path);
+	$path=str_replace("%F6","ö",$path);
+	$path=str_replace("%EB","ë",$path);
+	$path=str_replace("%EF","ï",$path);
+	$path=str_replace("%EE","î",$path);
+	$path=str_replace("%EA","ê",$path);
+	$path=str_replace("%E2","â",$path);
+	$path=str_replace("%FB","û",$path);
+	$path=str_replace("%u20AC","€",$path);
+	$path=str_replace("%24","$",$path);
+	$path=str_replace("%21","!",$path);
+	$path=str_replace("%23","#",$path);
+	$path=str_replace("%5C",'\\',$path);
+	$path=str_replace("%7E",'~',$path);
+	$path=str_replace("%22",'"',$path);
+	$path=str_replace("%22",'"',$path);
+	$path=str_replace("%27","'",$path);
+	$path=str_replace("%F8","ø",$path);
+	$path=str_replace("%2C",",",$path);
+	$path=str_replace("%3A",":",$path);
+	$path=str_replace("%A1","¡",$path);
+	$path=str_replace("%A7","§",$path);
+	$path=str_replace("%B2","²",$path);
+	$path=str_replace("%3B",";",$path);
+	$path=str_replace("%3C","<",$path);
+	$path=str_replace("%3E",">",$path);
+	$path=str_replace("%B5","µ",$path);
+	$path=str_replace("%B0","°",$path);
+	$path=str_replace("%7C","|",$path);
+	$path=str_replace("%5E","^",$path);
+	$path=str_replace("%60","`",$path);
+	$path=str_replace("%25","%",$path);
+	$path=str_replace("%A3","£",$path);
+	
+	
+	
+	
+	return $path;
+}
 
 ?>

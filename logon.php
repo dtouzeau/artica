@@ -111,7 +111,7 @@ var x_SendLogonStart=function(obj){
 	function SendLogonStart(){
 		var XHR = new XHRConnection();
 		XHR.appendData('artica_username',document.getElementById('artica_username').value);
-		XHR.appendData('artica_password',document.getElementById('artica_password').value);
+		XHR.appendData('artica_password',escape(document.getElementById('artica_password').value));
 		XHR.appendData('lang',document.getElementById('lang').value);
 		document.getElementById('anim').innerHTML='<img src=img/wait.gif>';
 		XHR.sendAndLoad('$page', 'POST',x_SendLogonStart);
@@ -127,22 +127,23 @@ echo $html;
 }
 
 function pagelogon(){
-$GLOBALS["LOGON-PAGE"]=true;	
-error_log("-> buildFrontEnd GET_CACHED? ". __FILE__. " line ". __LINE__);	
-if(GET_CACHED(__FILE__,__FUNCTION__,__FUNCTION__)){
-	error_log("->Return cache  ". __FILE__. " line ". __LINE__);
-	return;
-	}
-
-error_log("-> No cache, build the page  ". __FILE__. " line ". __LINE__);	
 $sock=new sockets();
 $user=new usersMenus();
+
+if($user->SQUID_INSTALLED){
+	$sock=new sockets();
+	$SQUIDEnable=trim($sock->GET_INFO("SQUIDEnable"));
+	if($SQUIDEnable==null){$SQUIDEnable=1;}
+	if($SQUIDEnable==0){$user->SQUID_INSTALLED=false;}
+}
 
 error_log("logon form ". __FILE__. " line ". __LINE__);
 $fixed_template=$sock->GET_INFO('ArticaFixedTemplate');
 error_log("init fixed template=$fixed_template in ". __FILE__. " line ". __LINE__);
 if(trim($fixed_template)<>null){$_COOKIE["artica-template"]=$fixed_template;}
 $imglogon="img/logon2.png";
+
+
 
 
 if(!$user->POSTFIX_INSTALLED){
@@ -399,8 +400,9 @@ function LDAP_FORM(){
 function logon(){
 	include("ressources/settings.inc");
 	
-	
-	writelogs("Testing logon....{$_POST["artica_username"]}",__FUNCTION__,__FILE__);	
+	$_POST["artica_password"]=url_decode_special($_POST["artica_password"]);
+	writelogs("Testing logon....{$_POST["artica_username"]}",__FUNCTION__,__FILE__,__LINE__);
+	writelogs("Testing logon.... password:{$_POST["artica_password"]}",__FUNCTION__,__FILE__,__LINE__);	
 	$_COOKIE["artica-language"]=$_POST["lang"];
 	
 	$socks=new sockets();

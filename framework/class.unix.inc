@@ -1,5 +1,8 @@
 <?php
 if(!class_exists("Bs_IniHandler")){include_once(dirname(__FILE__).'/class.ini.inc');}
+$GLOBALS["SSLKEY_PATH"]="/etc/ssl/certs/apache";
+
+
 class unix {
 	
 	function unix(){
@@ -55,8 +58,20 @@ class unix {
     		}
 		
 	}
+	
+	public function KAV4PROXY_GET_VALUE($key,$value){
+		    $ini=new Bs_IniHandler($this->KAV4PROXY_GET_CONF_PATH());
+		    return $ini->get($key,$value);
+		
+	}	
 
 
+	private function KAV4PROXY_GET_CONF_PATH(){
+		if(is_file('/etc/opt/kaspersky/kav4proxy.conf')){return '/etc/opt/kaspersky/kav4proxy.conf';}
+		if(is_file('/opt/kaspersky/kav4proxy/etc/opt/kaspersky/kav4proxy.conf')){return '/opt/kaspersky/kav4proxy/etc/opt/kaspersky/kav4proxy.conf';}
+	}
+	
+	
 	public function LOCATE_SMBD_PID(){
 		if(is_file("/var/run/smbd.pid")){return "/var/run/smbd.pid";}
 		if(is_file("/var/run/samba/smbd.pid")){return "/var/run/samba/smbd.pid";}
@@ -139,19 +154,32 @@ class unix {
 		
 	}
 	
-public function GetMemoriesOf($pid){
+	private function VERBOSE_COMMAND_LINE($pid){
+		return @file_get_contents("/proc/$pid/cmdline");
+	}
 	
+public function GetMemoriesOf($pid){
+	if($pid<1){
+	if($GLOBALS["DEBUG"]){echo __FUNCTION__." bad pid \"$pid\"\n";}
+		return null;
+	}
+	$pid=$this->PROCESS_PPID($pid);
 	$rss=$this->PROCESS_MEMORY($pid,true);
 	$vm=$this->PROCESS_CACHE_MEMORY($pid,true);
-	exec("pgrep -P $pid",$results);
-	$count=0;
+	$cmd=$this->find_program("pgrep")." -P $pid";
+	if($GLOBALS["DEBUG"]){echo __FUNCTION__." $cmd\n";}
+	exec($cmd,$results);
+	$count=1;
 	while (list ($num, $ligne) = each ($results) ){
 		$ligne=trim($ligne);
-		if($ligne<1){continue;}
-		$count=$count+1;
-		$rss=$rss+$this->PROCESS_MEMORY($ligne,true);
-		$vm=$vm+$this->PROCESS_CACHE_MEMORY($ligne,true);		
+		if($ligne<50){continue;}
 		
+		$count=$count+1;
+		$rss0=$this->PROCESS_MEMORY($ligne,true);
+		$vm0=$this->PROCESS_CACHE_MEMORY($ligne,true);
+		$rss=$rss+$rss0;
+		$vm=$vm+$vm0;		
+		if($GLOBALS["DEBUG"]){echo __FUNCTION__."PID $ligne \"$count\" rss:$rss0 vm:$vm0 Process: \"". $this->VERBOSE_COMMAND_LINE($ligne)."\"\n";}
 	}
 	if($count==0){$count=1;}
 	if($this->process_exists($pid)){$l[]="installed=1";$l[]="running=1";}
@@ -372,7 +400,7 @@ public function GetVersionOf($name){
 		
 public function shellEscapeChars($path){
 		$path=str_replace(" ","\ ",$path);
-		$path=str_replace("$","\$",$path);
+		$path=str_replace('$','\$',$path);
 		$path=str_replace("&","\&",$path);
 		$path=str_replace("?","\?",$path);
 		$path=str_replace("#","\#",$path);
@@ -380,7 +408,9 @@ public function shellEscapeChars($path){
 		$path=str_replace("]","\]",$path);
 		$path=str_replace("{","\{",$path);
 		$path=str_replace("}","\}",$path);
-		$path=str_replace("*","\*",$path);	
+		$path=str_replace("*","\*",$path);
+		$path=str_replace('"','\\"',$path);
+		$path=str_replace("'","\\'",$path);	
 		return $path;	
 }		
 		
@@ -426,10 +456,13 @@ public function shellEscapeChars($path){
 	public function PPID_OF($pid){
 		$datas=explode("\n",@file_get_contents("/proc/$pid/status"));
 		while (list ($index, $line) = each ($datas)){
-		 if(preg_match("#^PPid.+?([0-9]+)#",$line,$re)){
+		 if(preg_match("#^PPid.+?([0-9]+)#i",$line,$re)){
+		 	if($re[1]<3){return $pid;}
 		 	return $re[1];
 		 }
 		}
+		
+		return $pid;
 		
 	}
 
@@ -514,6 +547,85 @@ public function LOCATE_PURE_FTPD_PID_PATH(){
  		@unlink($tmp);
  		return $res; 
 		}
+		
+		
+	function BACKUPPC_locate_config_path(){
+		if(is_file("/etc/backuppc/config.pl")){return "/etc/backuppc";}
+		if(is_file("/etc/BackupPC/config.pl")){return "/etc/BackupPC";}
+	
+	}
+
+	function BACKUPPC_GET_CONFIG_INFOS($key){
+		$f=explode("\n",@file_get_contents($this->BACKUPPC_locate_config_path()."/config.pl"));
+		while (list ($num, $ligne) = each ($f) ){
+			if(preg_match("#Conf\{$key\}.*?'(.+?)';#i",$ligne,$re)){
+				$re[1]=trim($re[1]);
+				$re[2]=str_replace("'","",$re[1]);
+				return $re[1];
+			}
+		}
+		
+	}
+	
+	function BACKUPPC_GET_CGIBIN_PATH(){
+		if(is_file("/usr/share/backuppc/cgi-bin/index.cgi")){return "/usr/share/backuppc/cgi-bin/index.cgi";}
+		if(is_file("/usr/share/backuppc/cgi-bin/BackupPC_Admin")){return "/usr/share/backuppc/cgi-bin/BackupPC_Admin";}
+		if(is_file("/usr/share/BackupPC/sbin/BackupPC_Admin")){return "/usr/share/BackupPC/sbin/BackupPC_Admin";}
+		}
+		
+	function BACKUPPC_GET_IMG_DIR(){
+		if(is_dir("/usr/share/backuppc/image")){return "/usr/share/backuppc/image";}
+		if(is_dir("/usr/share/BackupPC/html")){return "/usr/share/BackupPC/html";}
+		
+		}		
+		
+		
+	public function add_EtcHosts($hostname,$ip){
+		writelogs_framework("Add/edit $ip -> $hostname in /etc/hosts",__CLASS__.'/'.__FUNCTION__,__FILE__);
+		if(trim($ip)==trim($hostname)){
+			writelogs_framework("$ip == $hostname ABORT",__CLASS__.'/'.__FUNCTION__,__FILE__);
+			return;
+		}
+		if(preg_match("#([0-9]+)\.([0-9]+).([0-9]+)\.([0-9]+)#",$hostname)){
+			writelogs_framework(" $hostname is an IP ABORT",__CLASS__.'/'.__FUNCTION__,__FILE__);	
+			return;
+		}
+		
+		
+		$f=explode("\n",@file_get_contents("/etc/hosts"));
+		while (list ($num, $ligne) = each ($f) ){
+			if(preg_match("#([0-9\.:a-z]+)\s+(.+?)\s+(.+)#",$ligne,$re)){
+				if(strlen(trim($re[2]))>1){
+					if(preg_match("#([0-9]+)\.([0-9]+).([0-9]+)\.([0-9]+)#",$re[2])){continue;}
+					$array[$re[2]]=$re[1];
+				}
+				continue;
+			}
+			
+			if(preg_match("#([0-9\.:a-z]+)\s+(.+)#",$ligne,$re)){
+				if(strlen(trim($re[2]))>1){
+					if(preg_match("#([0-9]+)\.([0-9]+).([0-9]+)\.([0-9]+)#",$re[2])){continue;}
+					$array[$re[2]]=$re[1];
+				}
+				continue;
+			}			
+			
+		}
+		
+		
+		$array[$hostname]=$ip;
+		
+		while (list ($hostname,$ip) = each ($array) ){
+				if($md5s[md5("$ip$hostname")]){continue;}
+				$conf[]="$ip\t$hostname";
+				$md5s[md5("$ip$hostname")]=true;
+		}
+		
+		@file_put_contents("/etc/hosts",@implode("\n",$conf));
+		
+	}
+		
+		
 		
 	public function DISK_LIST(){
 		$tmp=$this->FILE_TEMP();
@@ -725,14 +837,20 @@ public function alt_stat($file) {
 	}	
 	
 	private function PROCESS_PPID($pid){
-	if(!is_file("/proc/$pid/status")){return 0;}
+	if(!is_file("/proc/$pid/status")){
+		if($GLOBALS["VERBOSE"]){echo __FUNCTION__.":: unable to stat /proc/$pid/status\n";}
+		return 0;}
 		$f=@explode("\n",@file_get_contents("/proc/$pid/status"));
 		$pattern="#^PPid:\s+([0-9]+)#";
 		while (list ($num, $ligne) = each ($f) ){
 			if(preg_match($pattern,$ligne,$re)){
-				return intval($re[1]);
+				if($GLOBALS["VERBOSE"]){echo __FUNCTION__.":: Found {$re[1]}\n";}
+				if(trim($re[1])<50){return $pid;}
+				return trim($re[1]);
 			}
 		}
+		if($GLOBALS["VERBOSE"]){echo __FUNCTION__.":: not Found return $pid\n";}
+		return $pid;
 		
 	}
 	
@@ -1448,9 +1566,14 @@ function DirFiles($path){
 
 
 	public function PIDOF($binpath){
+		$cmd=$this->find_program('pidof')." -s $binpath";
+		if($GLOBALS["VERBOSE"]){echo __FUNCTION__.":: $cmd\n";}
 		exec($this->find_program('pidof')." -s $binpath",$re);
 		while (list ($num, $ligne) = each ($re) ){	
-			if(preg_match("#[0-9]+#",$ligne)){return trim($ligne);}
+			if(preg_match("#[0-9]+#",$ligne)){
+				$pid=trim($ligne);
+				return $this->PROCESS_PPID($pid);
+			}
 		}
 		
 	}
@@ -1710,6 +1833,48 @@ class services_status{
 		
 		
 	}
+	
+}
+
+
+class kav4fsUnix{
+	var	$MAIN=array();
+	var $TASKS=array();
+	
+	
+	function kav4fsUnix(){
+		exec('/opt/kaspersky/kav4fs/bin/kav4fs-control --get-app-settings 2>&1',$results);
+		writelogs_framework(count($results)." rows for --get-app-setting",__CLASS__."/".__FUNCTION__,__FILE__);
+		$ini=new Bs_IniHandler();
+		$ini->loadString("[INFOS]".@implode("\n",$results));
+		$this->MAIN=$ini->_params["INFOS"];
+	}
+	
+	
+	function GetTaskList(){
+		exec('/opt/kaspersky/kav4fs/bin/kav4fs-control --get-task-list 2>&1',$results);
+		
+		if(preg_match_all('#Name:\s+(.+?)\s+Id:\s+(.+?)\s+Class:\s+(.+?)\s+State:\s+([a-zA-Z0-9]+)#is',
+		@implode("\n",$results),$re)){
+			while (list ($index, $ID) = each ($re[2]) ){
+				if(preg_match("#([0-9]+)\s+Runtime ID:\s+([0-9]+)#is",$ID,$ri)){
+					$ID=$ri[1];
+					$RUNTIMEID=$ri[2];
+				}
+				$array[$ID]=array(
+					"NAME"=>$re[1][$index],"RUNTIMEID"=>$RUNTIMEID,
+					"CLASS"=>$re[3][$index],"STATE"=>$re[4][$index]);
+				
+				$classes[$re[3][$index]][]=$ID;
+			}
+		
+		}
+		
+		$this->TASKS["LIST"]=$array;
+		$this->TASKS["CLASSES"]=$classes;
+		
+	}
+	
 	
 }
 

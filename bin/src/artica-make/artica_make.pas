@@ -16,7 +16,7 @@ uses
   setup_hostapd, zsystem, setup_mysql, setup_winexe, setup_assp, setup_ocs,
   setup_lmb, setup_glusterfs, setup_postfilter, setup_vmtools,
   setup_phpldapadmin, setup_zarafa, setup_cpulimit, setup_drupal,
-  setup_emailrelay, setup_mldonkey;
+  setup_emailrelay, setup_mldonkey, setup_backuppc, setup_kav4fs;
 
 var
    collectd:tsetup_collectd;
@@ -79,6 +79,8 @@ var
    drupal:tsetup_drupal;
    emailrelay:tsetup_emailrelay;
    mldonkey:tsetup_mldonkey;
+   backuppc:tsetup_backuppc;
+   kav4fs:Tsetup_kav4fs;
 begin
 
 
@@ -117,6 +119,27 @@ begin
          cpulimit.xinstall();
          halt(0);
    end;
+
+
+   if ParamStr(1)='APP_BACKUPPC' then begin
+         fpsystem('/usr/share/artica-postfix/bin/setup-ubuntu --check-base-system');
+         fpsystem('/usr/share/artica-postfix/bin/setup-ubuntu --check-samba');
+         backuppc:=tsetup_backuppc.Create;
+         backuppc.xinstall();
+         zinstall.EMPTY_CACHE();
+         halt(0);
+   end;
+
+  if ParamStr(1)='APP_KAV4FS' then begin
+       //  fpsystem('/usr/share/artica-postfix/bin/setup-ubuntu --check-base-system');
+        // fpsystem('/usr/share/artica-postfix/bin/setup-ubuntu --check-samba');
+         kav4fs:=tsetup_kav4fs.Create;
+         kav4fs.xinstall();
+         //zinstall.EMPTY_CACHE();
+         halt(0);
+   end;
+
+
 
 
    if ParamStr(1)='APP_EMAIL_RELAY' then begin
@@ -284,13 +307,20 @@ begin
    end;
 
    if ParamStr(1)='APP_OCSI' then begin
+         fpsystem('/usr/share/artica-postfix/bin/setup-ubuntu --check-base-system');
          ocsi:=tsetup_ocs.Create;
          ocsi.xinstall();
+         fpsystem('/usr/share/artica-postfix/bin/artica-make APP_OCSI_CLIENT &');
          ocsi.xclient_install();
          winexe:=tsetup_winexe.Create;
          winexe.xinstall();
-         fpsystem('/usr/share/artica-postfix/bin/process1 --force OCSI &');
          zinstall.EMPTY_CACHE();
+         halt(0);
+   end;
+
+   if ParamStr(1)='APP_OCSI_CLIENT' then begin
+         ocsi:=tsetup_ocs.Create;
+         ocsi.xclient_install();
          halt(0);
    end;
 
@@ -298,6 +328,14 @@ begin
          ocsi:=tsetup_ocs.Create;
          ocsi.xclient_install();
          zinstall.EMPTY_CACHE();
+         halt(0);
+   end;
+
+
+   if ParamStr(1)='APP_OCSI_LINUX_CLIENT' then begin
+         if ParamStr(2)<>'--nocheck' then fpsystem('/usr/share/artica-postfix/bin/setup-ubuntu --check-base-system');
+         ocsi:=tsetup_ocs.Create;
+         ocsi.xclient_linux_install();
          halt(0);
    end;
 
@@ -336,7 +374,7 @@ begin
 
 
    if ParamStr(1)='APP_HOSTAPD' then begin
-        // fpsystem('/usr/share/artica-postfix/bin/setup-ubuntu --check-base-system');
+         fpsystem('/usr/share/artica-postfix/bin/setup-ubuntu --check-base-system');
          writeln('Start installing hostapd Code name=APP_HOSTAPD');
          hostpad:=tsetup_hostapd.Create;
          hostpad.xinstall();
@@ -1153,6 +1191,11 @@ begin
    writeln('___________________________________________________________');
    writeln('APP_SAMBA................: install/reconfigure Samba');
    writeln('APP_KAV4SAMBA............: install Kaspersky For Samba server');
+   writeln('APP_KAV4FS...............: install Kaspersky For Linux File server 8.x');
+
+
+
+   writeln('APP_BACKUPPC.............: install BackupPC');
    writeln('APP_MLDONKEY.............: install MlDonkey');
    writeln('APP_CUPS_DRV.............: install/reconfigure Cups printers drivers');
    writeln('APP_CUPS_BROTHER.........: install/reconfigure Cups Brother printers drivers');

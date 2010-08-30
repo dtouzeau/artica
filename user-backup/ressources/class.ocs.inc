@@ -9,6 +9,7 @@ include_once(dirname(__FILE__).'/class.mysql.inc');
 		var $ComputerName;
 		var $ComputerOS;
 		var $ComputerIP;
+		var $PROLOG_FREQ=0;
 		
 		function ocs($mac=null){
 			if($mac<>null){
@@ -38,6 +39,25 @@ include_once(dirname(__FILE__).'/class.mysql.inc');
 			$this->ComputerIP=$ligne["IPADDR"];
 			
 			
+		}
+		
+		public function GET_SERVER_SETTINGS(){
+			$sql="SELECT * FROM config";
+			$q=new mysql();
+			$results=$q->QUERY_SQL($sql,"ocsweb");
+			while($ligne=mysql_fetch_array($results,MYSQL_ASSOC)){
+				$array[$ligne["NAME"]]=$ligne["IVALUE"];
+			}
+			
+			return $array;
+		}
+		
+		public function SET_SERVER_SETTINGS($key,$value){
+			$sql="UPDATE config SET IVALUE='$value' WHERE NAME='$key'";
+			$q=new mysql();
+			$q->QUERY_SQL($sql,"ocsweb");
+			if(!$q->ok){echo __FUNCTION__.":".$q->mysql_error;return;}
+			return true;
 		}
 		
 		
@@ -214,6 +234,146 @@ include_once(dirname(__FILE__).'/class.mysql.inc');
 			return RoundedLightWhite($html);
 			
 		}
+		
+		function PACKAGE_ID_FROM_FILEID($FILEID){
+			if($_SESSION["PACKAGE_ID_FROM_FILEID"][$FILEID]>0){return $_SESSION["PACKAGE_ID_FROM_FILEID"][$FILEID];}
+			if($FILEID<1){return 0;}
+			$sql="SELECT ID FROM download_enable WHERE FILEID='$FILEID'";
+			$q=new mysql();
+			$ligne=@mysql_fetch_array($q->QUERY_SQL($sql,'ocsweb'));
+			$ID=$ligne["ID"];
+			if($ID==null){return 0;}
+			$_SESSION["PACKAGE_ID_FROM_FILEID"][$FILEID]=$ID;
+			return $ID;
+		}
+		
+		function PACKAGE_NAME_FROM_FILEID($FILEID){
+			$sql="SELECT NAME FROM download_available WHERE FILEID=$FILEID";
+			$q=new mysql();
+			$ligne=@mysql_fetch_array($q->QUERY_SQL($sql,'ocsweb'));
+			return $ligne["NAME"];
+			
+		}
+		
+		function COMPUTER_SEARCH_QUERY($pattern=null){
+				$pattern=str_replace("*","%",$pattern);
+				$pattern=$pattern."%";
+				$pattern=str_replace("%%","%",$pattern);
+				$osc=new ocs();
+				
+				
+				
+				return "SELECT hardware.LASTCOME,networks.MACADDR,networks.IPADDRESS,networks.HARDWARE_ID,hardware.ID,hardware.NAME,hardware.IPADDR,hardware.IPSRC FROM networks,hardware WHERE 1 AND
+				(networks.HARDWARE_ID=hardware.ID AND hardware.NAME LIKE '$pattern') 
+				OR (networks.HARDWARE_ID=hardware.ID AND hardware.IPADDR LIKE '$pattern')
+				OR (networks.HARDWARE_ID=hardware.ID AND hardware.IPSRC LIKE '$pattern')
+				ORDER BY hardware.LASTCOME DESC
+				LIMIT 0,50 
+				";			
+			
+		}
+		
+		/*
+		 * return tableau HARDWARE_ID=>1 d'un fileid spécifié.
+		 */
+		
+		function PACKAGE_HASH_AFFECTED_COMPUTERS($FILEID){
+			if(isset($_SESSION["PACKAGE_HASH_AFFECTED_COMPUTERS"])){return $_SESSION["PACKAGE_HASH_AFFECTED_COMPUTERS"];}
+			$ID=$this->PACKAGE_ID_FROM_FILEID($FILEID);
+			$sql="SELECT HARDWARE_ID FROM devices WHERE IVALUE=$ID AND NAME='DOWNLOAD'";
+			$q=new mysql();
+			$results=$q->QUERY_SQL($sql,"ocsweb");
+			while($ligne=mysql_fetch_array($results,MYSQL_ASSOC)){
+				$_SESSION["PACKAGE_HASH_AFFECTED_COMPUTERS"][$ligne["HARDWARE_ID"]]=1;
+				
+			}
+			
+			return $_SESSION["PACKAGE_HASH_AFFECTED_COMPUTERS"];
+			
+		}
+		
+		function PACKAGE_IS_AFFECTED($FILEID,$HARDWARE_ID){
+			$ID=$this->PACKAGE_ID_FROM_FILEID($FILEID);
+			$sql="SELECT NAME FROM devices WHERE HARDWARE_ID='$HARDWARE_ID' AND IVALUE='$ID' AND NAME='DOWNLOAD'";
+			$q=new mysql();
+			$ligne=@mysql_fetch_array($q->QUERY_SQL($sql,'ocsweb'));
+			if($ligne["NAME"]=='DOWNLOAD'){return true;}
+		}
+		
+		function PACKAGE_AFFECT($FILEID,$HARDWARE_ID){
+			if($this->PACKAGE_IS_AFFECTED($FILEID,$HARDWARE_ID)){return;}
+			$ID=$this->PACKAGE_ID_FROM_FILEID($FILEID);
+			$sql="INSERT INTO devices (NAME,HARDWARE_ID,IVALUE) VALUES('DOWNLOAD',$HARDWARE_ID,$ID)";
+			$q=new mysql();
+			$q->QUERY_SQL($sql,"ocsweb");
+			writelogs($sql,__CLASS__.'/'.__FUNCTION__,__FILE__,__LINE__);
+			if(!$q->ok){echo __FUNCTION__.":".$q->mysql_error;return;}
+			$_SESSION["PACKAGE_HASH_AFFECTED_COMPUTERS"][$HARDWARE_ID]=1;
+			
+		}
+		function PACKAGE_DESAFFECT($FILEID,$HARDWARE_ID){
+			if(!$this->PACKAGE_IS_AFFECTED($FILEID,$HARDWARE_ID)){return;}
+			$ID=$this->PACKAGE_ID_FROM_FILEID($FILEID);
+			$sql="DELETE FROM devices WHERE HARDWARE_ID='$HARDWARE_ID' AND IVALUE='$ID' AND NAME='DOWNLOAD'";
+			$q=new mysql();
+			$q->QUERY_SQL($sql,"ocsweb");
+			if(!$q->ok){echo __FUNCTION__.":".$q->mysql_error;return;}
+			unset($_SESSION["PACKAGE_HASH_AFFECTED_COMPUTERS"][$HARDWARE_ID]);
+			
+		}
+		
+		function PACKAGE_DOWNLOAD_INFOS_HASH($FILEID){
+			$sql="SELECT * FROM download_enable WHERE FILEID='$FILEID'";
+			$q=new mysql();
+			$ligne=@mysql_fetch_array($q->QUERY_SQL($sql,'ocsweb'));
+			return $ligne;
+		}
+		
+	function PACKAGE_AFFECT_COUNT_COMPUTERS($FILEID){
+		$ID=$this->PACKAGE_ID_FROM_FILEID($FILEID);
+		$sql="SELECT COUNT(HARDWARE_ID) as tcount FROM devices WHERE IVALUE='$ID' AND NAME='DOWNLOAD'";
+		$q=new mysql();
+		$ligne=@mysql_fetch_array($q->QUERY_SQL($sql,'ocsweb'));
+		writelogs($sql."={$ligne["tcount"]}",__CLASS__.'/'.__FUNCTION__,__FILE__,__LINE__);
+		return $ligne["tcount"];
+	}
+
+	function PACKAGE_UPDATE_ALL_RESSOURCES(){
+			$sock=new sockets();
+			$OCSCertInfos=unserialize(base64_decode($sock->GET_INFO("OCSCertInfos")));
+			$servername=$OCSCertInfos["OCSCertServerName"];
+			$domainname=$OCSCertInfos["OCSCertDomainName"];
+			$OCSWebPort=$sock->GET_INFO("OCSWebPort");
+			$OCSWebPortSSL=$sock->GET_INFO("OCSWebPortSSL");
+			if($OCSWebPort==null){$OCSWebPort=9080;}
+			if($OCSWebPortSSL==null){$OCSWebPortSSL=$OCSWebPort+50;}	
+			if($servername==null){return;}
+			if($domainname<>null){
+				$servername=$servername.".$domainname";
+			}
+			
+			$sql="UPDATE download_enable SET INFO_LOC='$servername:$OCSWebPortSSL/download',PACK_LOC='$servername:$OCSWebPort/download'";
+			$q=new mysql();
+			$q->QUERY_SQL($sql,"ocsweb");
+			if(!$q->ok){echo __CLASS__.'/'.__FUNCTION__."\n".$q->mysql_error;}
+		
+	}
+	
+	function SSL_SERVER_NAME(){
+			$sock=new sockets();
+			$OCSCertInfos=unserialize(base64_decode($sock->GET_INFO("OCSCertInfos")));
+			$servername=$OCSCertInfos["OCSCertServerName"];
+			$domainname=$OCSCertInfos["OCSCertDomainName"];
+			$users=new usersMenus();
+			if($servername==null){$servername=$users->hostname;}
+			if($domainname<>null){
+				if(preg_match("#^(.+?)\.#",$servername,$re)){$servername=$re[1];}
+				$servername=$servername.".$domainname";
+			}
+			
+			return $servername;
+		
+	}
 		
 		
 	 	 	

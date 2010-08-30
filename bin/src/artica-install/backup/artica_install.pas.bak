@@ -6,9 +6,9 @@ uses
 Classes, SysUtils, class_install, zsystem, global_conf, postfix_addons,
 process_infos, BaseUnix, unix, RegExpr in 'RegExpr.pas', dos, clamav, spamass,
 logs, pureftpd, openldap, ntpd, samba, spfmilter, mimedefang, cyrus, squid,
-stunnel4, dkimfilter, postfix_class, mailgraph_daemon, miltergreylist,
-lighttpd, artica_tcp, roundcube, dansguardian, strutils, kav4samba, awstats,
-artica_menus, debian_class, bind9, fdm, collectd, apache_artica,
+stunnel4, dkimfilter, postfix_class, mailgraph_daemon, miltergreylist, lighttpd,
+artica_tcp, roundcube, dansguardian, strutils, kav4samba, awstats, artica_menus,
+debian_class, bind9, fdm, collectd, apache_artica,
 kas3 in '/home/dtouzeau/developpement/artica-postfix/bin/src/artica-install/kas3.pas',
 dnsmasq in '/home/dtouzeau/developpement/artica-postfix/bin/src/artica-install/dnsmasq.pas',
 cups,
@@ -16,8 +16,9 @@ amavisd_milter in '/home/dtouzeau/developpement/artica-postfix/bin/src/artica-in
 artica_cron, kretranslator, isoqlog, obm, openvpn, jcheckmail, mailmanctl,
 imapsync, dhcp_server, samba4, obm2, xapian, opengoo, dstat, rsync, tcpip,
 nfsserver, lvm, assp, pdns, gluster, kav4proxy, zabbix, hamachi, kavmilter,
-kavm4mls, postfilter, fetchmail, vmwaretools, zarafa_server, monit,
-squidguard, wifi,fail2ban,mysql_daemon,saslauthd,xfce, emailrelay,mldonkey,policyd_weight;
+kavm4mls, postfilter, fetchmail, vmwaretools, zarafa_server, monit, squidguard,
+wifi, fail2ban, mysql_daemon, saslauthd, xfce, emailrelay, mldonkey,
+policyd_weight, backuppc, kav4fs,ocsi, ocsagent;
 
 var
 install:Tclass_install;
@@ -102,6 +103,10 @@ zsaslauthd:tsaslauthd;
 zxfce:txfce;
 zmldonkey:tmldonkey;
 zpolicyd_weight:tpolicyd_weight;
+zbackuppc:tbackuppc;
+zkav4fs:tkav4fs;
+zocsi:tocsi;
+zocsagent:tocsagent;
 
 begin
 SYS:=Tsystem.Create;
@@ -566,6 +571,27 @@ end;
    writeln(zmldonkey.VERSION());
    halt(0);
 end;
+  if ParamStr(2)='policydw' then begin
+   zpolicyd_weight:=tpolicyd_weight.Create(SYS);
+   writeln(zpolicyd_weight.VERSION());
+   halt(0);
+end;
+  if ParamStr(2)='backuppc' then begin
+   zbackuppc:=tbackuppc.Create(SYS);
+   writeln(zbackuppc.VERSION());
+   halt(0);
+end;
+  if ParamStr(2)='kav4fs' then begin
+   zkav4fs:=tkav4fs.Create(SYS);
+   writeln(zkav4fs.VERSION());
+   halt(0);
+end;
+  if ParamStr(2)='ocsi' then begin
+   zocsi:=tocsi.Create(SYS);
+   writeln(zocsi.VERSION());
+   halt(0);
+end;
+
 
 
 writeln('help:');
@@ -587,6 +613,9 @@ writeln('--export-version emailrelay');
 writeln('--export-version dhcpd');
 writeln('--export-version pure-ftpd');
 writeln('--export-version mldonkey');
+writeln('--export-version backuppc');
+writeln('--export-version kav4fs');
+writeln('--export-version ocsi');
 
 
 halt(0);
@@ -1998,10 +2027,9 @@ halt(0);
 end;
 
 
-if paramStr(1)='wget' then
-begin
+if paramStr(1)='wget' then begin
 GLOBAL_INI:=MyConf.Create();
-GLOBAL_INI.WGET_DOWNLOAD_FILE(paramStr(2),'/tmp/test.txt');
+GLOBAL_INI.WGET_DOWNLOAD_FILE(paramStr(2),paramStr(3));
 halt(0);
 end;
 
@@ -3085,49 +3113,38 @@ halt(0);
 end;
 
 
-if ParamStr(1)='--generate-status' then
-begin
-if SYS.isoverloaded() then
-begin
-zlogs.Debuglogs('WARNING !!!! --generate-status system overloaded');
-exit;
+if ParamStr(1)='--generate-status' then begin
+   if SYS.isoverloaded() then begin
+      zlogs.Debuglogs('WARNING !!!! --generate-status system overloaded');
+      exit;
+   end;
+
+   if not SYS.BuildPids() then begin
+      zlogs.Debuglogs('--generate-status already instance running');
+      halt(0);
+   end;
+
+   if SYS.croned_seconds(20) then begin
+      zlogs.Debuglogs('--generate-status too short time to execute this process');
+      halt(0);
+   end;
+    GLOBAL_INI:=myconf.Create();
+    GLOBAL_INI.WRITE_STATUS();
+    halt(0);
 end;
 
-if not SYS.BuildPids() then
-begin
-zlogs.Debuglogs('--generate-status already instance running');
-halt(0);
+if ParamStr(1)='--generate-status-forced' then begin
+   if SYS.isoverloadedTooMuch() then begin halt(0) end;
+   if not SYS.BuildPids() then begin
+      zlogs.Debuglogs('--generate-status-forced already instance running');
+      halt(0);
+   end;
+   GLOBAL_INI:=myconf.Create();
+   GLOBAL_INI.WRITE_STATUS();
+   halt(0);
 end;
 
-if SYS.croned_seconds(20) then
-begin
-zlogs.Debuglogs('--generate-status too short time to execute this process');
-halt(0);
-end;
-GLOBAL_INI:=myconf.Create();
-zlogs.WriteToFile(GLOBAL_INI.GLOBAL_STATUS(),GLOBAL_INI.get_ARTICA_PHP_PATH()+'/ressources/logs/global.status.ini');
-zlogs.WriteToFile(GLOBAL_INI.STATUS_PATTERN_DATABASES(),GLOBAL_INI.get_ARTICA_PHP_PATH()+'/ressources/logs/pattern.status.ini');
-fpsystem('/bin/chown www-data:www-data '+GLOBAL_INI.get_ARTICA_PHP_PATH()+'/ressources/logs/*.ini');
-halt(0);
-end;
 
-if ParamStr(1)='--generate-status-forced' then
-begin
-if SYS.isoverloadedTooMuch() then
-begin halt(0) end;
-
-if not SYS.BuildPids() then
-begin
-zlogs.Debuglogs('--generate-status-forced already instance running');
-halt(0);
-end;
-
-GLOBAL_INI:=myconf.Create();
-zlogs.WriteToFile(GLOBAL_INI.GLOBAL_STATUS(),GLOBAL_INI.get_ARTICA_PHP_PATH()+'/ressources/logs/global.status.ini');
-zlogs.WriteToFile(GLOBAL_INI.STATUS_PATTERN_DATABASES(),GLOBAL_INI.get_ARTICA_PHP_PATH()+'/ressources/logs/pattern.status.ini');
-fpsystem('/bin/chown www-data:www-data '+GLOBAL_INI.get_ARTICA_PHP_PATH()+'/ressources/logs/*.ini');
-halt(0);
-end;
 
 
 if ParamStr(1)='--ls' then

@@ -27,7 +27,12 @@
 	if($_GET["script"]=="visible_hostname"){echo visible_hostname_js();exit;}
 	if($_GET["script"]=="ldap"){echo ldap_js();exit;}
 	if($_GET["script"]=="dns"){echo dns_js();exit;}
+	
+	
+	//plugins
 	if($_GET["script"]=="plugins"){echo plugins_js();exit;}
+	if($_GET["content"]=="plugins"){echo plugins_popup();exit;}
+	if(isset($_GET["enable_plugins"])){plugins_save();exit;}
 	
 	
 	if($_GET["script"]=="url_regex"){echo url_regex_js();exit;}
@@ -38,8 +43,14 @@
 	if($_GET["content"]=="network"){echo network_popup();exit;}
 	if($_GET["content"]=="listen_port"){echo listen_port_popup();exit;}
 	if($_GET["content"]=="visible_hostname"){echo visible_hostname_popup();exit;}
-	if($_GET["content"]=="ldap_auth"){echo ldap_auth_popup();exit;}
-	if($_GET["content"]=="plugins"){echo plugins_popup();exit;}
+	
+	if($_GET["content"]=="ldap_auth"){echo ldap_auth_index();exit;}
+	if($_GET["content"]=="ldap_local"){echo ldap_auth_popup();exit;}
+	if($_GET["content"]=="ldap_remote"){echo ldap_auth_remote();exit;}
+	
+	
+	
+	
 	if($_GET["content"]=="url_regex"){echo url_regex_popup();exit;}
 	if($_GET["content"]=="url_regex_list"){echo url_regex_popup_list();exit;}
 	if($_GET["content"]=="url_regex_import"){url_regex_popup_import();exit;}
@@ -55,12 +66,19 @@
 	
 	if(isset($_GET["addipfrom"])){CalculCDR();exit;}
 	if(isset($_GET["add-ip-single"])){network_add_single();exit;}
+	if(isset($_GET["SquidnetMaskCheckIP"])){network_calculate_cdir();exit;}
+	
+	
 	
 	if(isset($_GET["NetDelete"])){network_delete();exit;}
 	if(isset($_GET["listenport"])){listen_port_save();exit;}
 	if(isset($_GET["visible_hostname_save"])){visible_hostname_save();exit;}
+	
 	if(isset($_GET["ldap_auth"])){ldap_auth_save();exit;}
 	if(isset($_GET["ntlm_auth"])){ldap_ntlm_auth_save();exit;}
+	if(isset($_GET["EnableSquidExternalLDAP"])){ldap_external_auth_save();exit;}
+	
+	
 	if(isset($_GET["nameserver"])){dns_add();exit();}
 	if(isset($_GET["DnsDelete"])){dns_del();exit();}
 	if(isset($_GET["enable_plugins"])){plugins_save();exit;}
@@ -132,6 +150,14 @@ function ldap_auth_save(){
 			exit;
 		}
 	}
+	
+function ldap_external_auth_save(){
+	if($_GET["EnableSquidExternalLDAP"]==1){$squid->LDAP_AUTH=1;}
+	$squid=new squidbee();	
+	$squid->LDAP_EXTERNAL_AUTH=$_GET["EnableSquidExternalLDAP"];
+	$squid->EXTERNAL_LDAP_AUTH_PARAMS=$_GET;
+	$squid->SaveToLdap();
+}
 
 	
 function ldap_ntlm_auth_save(){
@@ -540,9 +566,11 @@ if(!$squid->SaveToLdap()){
 }
 function ldap_js(){
 		$page=CurrentPageName();
+		$tpl=new templates();
+		$title=$tpl->_ENGINE_parse_body("{authenticate_users}");
 		echo "
 		function ldapauth_display(){
-				YahooWin2(500,'$page?content=ldap_auth','LDAP authentication...','');
+				YahooWin2(500,'$page?content=ldap_auth','$title');
 		}
 		
 		
@@ -575,6 +603,179 @@ function ldap_js(){
 		ldapauth_display();";}
 
 
+function ldap_auth_index(){
+
+	$page=CurrentPageName();
+	$tpl=new templates();
+	$array["ldap_local"]='{local_database}';
+	$array["ldap_remote"]='{remote_database}';
+		
+	
+	while (list ($num, $ligne) = each ($array) ){
+		$html[]= $tpl->_ENGINE_parse_body("<li><a href=\"$page?content=$num\"><span>$ligne</span></li>\n");
+	}
+	
+	
+	echo "
+	<div id=main_squid_auth style='width:100%;height:450px;overflow:auto'>
+		<ul>". implode("\n",$html)."</ul>
+	</div>
+		<script>
+				$(document).ready(function(){
+					$('#main_squid_auth').tabs({
+				    load: function(event, ui) {
+				        $('a', ui.panel).click(function() {
+				            $(ui.panel).load(this.href);
+				            return false;
+				        });
+				    }
+				});
+			
+			
+			});
+		</script>";	
+	
+}
+
+function ldap_auth_remote(){
+	$squid=new squidbee();
+	$users=new usersMenus();	
+	$tpl=new templates();
+	$page=CurrentPageName();
+	
+	
+	if(trim($users->SQUID_LDAP_AUTH)==null){
+		$form_ldap="	
+			<table style='width:100%'>
+				<tr>
+				<td valign='top'>" . Paragraphe_switch_disable("{authenticate_users}","{authenticate_users_no_binaries}",null,300)."</td>
+				<td  valign='top'></td>
+				</tr>
+			</table>";
+		echo $tpl->_ENGINE_parse_body($form_ldap);
+		return;	
+	}	
+	
+	$ldap_server=$squid->EXTERNAL_LDAP_AUTH_PARAMS["ldap_server"];
+	$ldap_port=$squid->EXTERNAL_LDAP_AUTH_PARAMS["ldap_port"];
+	$userdn=$squid->EXTERNAL_LDAP_AUTH_PARAMS["ldap_user"];
+	$ldap_password=$squid->EXTERNAL_LDAP_AUTH_PARAMS["ldap_password"];
+	$ldap_suffix=$squid->EXTERNAL_LDAP_AUTH_PARAMS["ldap_suffix"];
+	$ldap_filter_users=$squid->EXTERNAL_LDAP_AUTH_PARAMS["ldap_filter_users"];
+	$ldap_filter_group=$squid->EXTERNAL_LDAP_AUTH_PARAMS["ldap_filter_group"];
+	$ldap_server=$squid->EXTERNAL_LDAP_AUTH_PARAMS["ldap_server"];
+	$auth_banner=$squid->EXTERNAL_LDAP_AUTH_PARAMS["auth_banner"];		
+	
+	
+	$EnableSquidExternalLDAP=$squid->LDAP_EXTERNAL_AUTH;
+	if($auth_banner==null){$auth_banner="Squid proxy-caching web server";}
+	
+	if($ldap_filter_users==null){$ldap_filter_users="sAMAccountName=%s";}
+	if($ldap_filter_group==null){$ldap_filter_group="(&(objectclass=person)(sAMAccountName=%u)(memberof=*))";}
+	
+	if($ldap_port==null){$ldap_port=389;}
+	$html="
+	<div style='font-size:13px;margin:5px'>{SQUID_LDAP_AUTH_EXT}</div>
+	
+	<div id='ldap_ext_auth'>
+	<table style='width:100%;margin:3px'>
+	<tr>
+		<td valign='top' style='font-size:13px' class=legend>{activate}:</td>
+		<td>". Field_checkbox("EnableSquidExternalLDAP",1,$EnableSquidExternalLDAP,"EnableSquidExternalLDAP()")."</td>
+	</tr>		
+	<tr>
+		<td valign='top' style='font-size:13px' class=legend>{servername}:</td>
+		<td>". Field_text("ldap_server",$ldap_server,"font-size:13px;padding:3px")."</td>
+	</tr>
+	<tr>
+		<td valign='top' style='font-size:13px' class=legend>{listen_port}:</td>
+		<td>". Field_text("ldap_port",$ldap_port,"font-size:13px;padding:3px")."</td>
+	</tr>	
+	<tr>
+		<td valign='top' style='font-size:13px' class=legend>{auth_banner}:</td>
+		<td>". Field_text("auth_banner",$auth_banner,"font-size:13px;padding:3px")."</td>
+	</tr>	
+	
+	<tr>
+		<td valign='top' style='font-size:13px' class=legend>{userdn}:</td>
+		<td>". Field_text("ldap_user",$userdn,"font-size:13px;padding:3px")."</td>
+	</tr>
+	<tr>
+		<td valign='top' style='font-size:13px' class=legend>{ldap_password}:</td>
+		<td>". Field_password("ldap_password",$ldap_password,"font-size:13px;padding:3px")."</td>
+	</tr>
+	<tr><td colspan=2><hr></tD></tr>
+	<tr>
+		<td valign='top' style='font-size:13px' class=legend>{ldap_suffix}:</td>
+		<td>". Field_text("ldap_suffix",$ldap_suffix,"font-size:13px;padding:3px")."</td>
+	</tr>		
+	<tr>
+		<td valign='top' style='font-size:13px' class=legend>{ldap_filter_users}:</td>
+		<td>". Field_text("ldap_filter_users",$ldap_filter_users,"font-size:13px;padding:3px")."</td>
+	</tr>	
+	<tr>
+		<td valign='top' style='font-size:13px' class=legend>{ldap_filter_group}:</td>
+		<td>". Field_text("ldap_filter_group",$ldap_filter_group,"font-size:13px;padding:3px")."</td>
+	</tr>	
+	<tr>
+		<td colspan=2 align='right'>
+			<hr>
+				". button("{apply}","SaveExternalLDAPSYS()")."</td>
+	</tr>
+	</table>
+	</div>
+	
+	
+	<script>
+		function EnableSquidExternalLDAP(){
+			var disabled=false;
+			if(!document.getElementById('EnableSquidExternalLDAP').checked){disabled=true;}
+			document.getElementById('ldap_server').disabled=disabled;
+			document.getElementById('ldap_port').disabled=disabled;
+			document.getElementById('ldap_user').disabled=disabled;
+			document.getElementById('ldap_password').disabled=disabled;
+			document.getElementById('ldap_suffix').disabled=disabled;
+			document.getElementById('ldap_filter_users').disabled=disabled;
+			document.getElementById('ldap_filter_group').disabled=disabled;
+			document.getElementById('auth_banner').disabled=disabled;
+			
+			
+			}
+			
+	var x_SaveExternalLDAPSYS= function (obj) {
+		var results=obj.responseText;
+		if(results.length>0){alert(results);}
+		RefreshTab('main_squid_auth');
+	}				
+			
+		function SaveExternalLDAPSYS(){
+			var XHR = new XHRConnection();
+			var enable=1;
+			if(!document.getElementById('EnableSquidExternalLDAP').checked){enable=0;}
+			XHR.appendData('EnableSquidExternalLDAP',enable);
+			XHR.appendData('ldap_server',document.getElementById('ldap_server').value);
+			XHR.appendData('ldap_port',document.getElementById('ldap_port').value);
+			XHR.appendData('ldap_user',document.getElementById('ldap_user').value);
+			XHR.appendData('ldap_password',document.getElementById('ldap_password').value);
+			XHR.appendData('ldap_suffix',document.getElementById('ldap_suffix').value);
+			XHR.appendData('ldap_filter_users',document.getElementById('ldap_filter_users').value);
+			XHR.appendData('ldap_filter_group',document.getElementById('ldap_filter_group').value);
+			XHR.appendData('auth_banner',document.getElementById('auth_banner').value);
+			document.getElementById('ldap_ext_auth').innerHTML='<center style=\"margin:20px;padding:20px\"><img src=\"img/wait_verybig.gif\"></center>';
+			XHR.sendAndLoad('$page', 'GET',x_SaveExternalLDAPSYS);		
+			}
+			
+	
+		EnableSquidExternalLDAP();
+	</script>
+	";
+	
+	
+	echo $tpl->_ENGINE_parse_body($html);
+	
+}
+
+		
 function ldap_auth_popup(){
 	$squid=new squidbee();
 	$users=new usersMenus();
@@ -587,7 +788,23 @@ function ldap_auth_popup(){
 			</tr>
 		</table>			
 		";
-		
+	
+	$form_ldap_disabled="
+			<table style='width:100%'>
+			<tr>
+			<td valign='top'>" . Paragraphe_switch_disable("{authenticate_users}","{authenticate_users_explain}",null,300)."</td>
+			<td  valign='top'></td>
+			</tr>
+		</table>";
+	
+	$form_ntlm_disabled="
+			<table style='width:100%'>
+			<tr>
+			<td valign='top'>" . Paragraphe_switch_disable("{authenticate_users_ntlm}","{authenticate_users_ntlm_explain}",null,300)."</td>
+			<td  valign='top'></td>
+			</tr>
+		</table>";	
+
 	
 	if($users->SAMBA_INSTALLED){
 		if($users->WINBINDD_INSTALLED){
@@ -632,8 +849,13 @@ if(trim($users->SQUID_LDAP_AUTH)==null){
 		}}
 	}	
 	
+	if($squid->LDAP_EXTERNAL_AUTH==1){
+		$form_ldap=$form_ldap_disabled;
+		$form_ntlm=$form_ntlm_disabled;
+	}
+	
 
-$html="<H1>{authenticate_users}</H1>$form_ntlm$form_ldap";
+$html="$form_ntlm$form_ldap";
 $tpl=new templates();
 echo $tpl->_ENGINE_parse_body($html,'squid.index.php');		
 }
@@ -685,10 +907,30 @@ echo $tpl->_ENGINE_parse_body($html,'squid.index.php');
 
 function plugins_save(){
 	$squid=new squidbee();
+	$multiple=false;
+	$users=new usersMenus();
+	if(preg_match('#^([0-9]+)\.([0-9]+)#',$users->SQUID_VERSION,$re)){
+		if($re[1]>=3){
+			if($re[2]>=1){
+				$multiple=true;
+			}
+		}
+		
+	}
+	
+	$tpl=new templates();
 	if(isset($_GET["enable_kavproxy"])){
-		if($_GET["enable_c_icap"]==1){$_GET["enable_kavproxy"]=0;}
+		if(!$multiple){
+			if($_GET["enable_c_icap"]==1){
+				echo $tpl->javascript_parse_text("{DISABLE_KAV_ENABLE_CICAP}");
+				$_GET["enable_kavproxy"]=0;
+			}
+		}
 		$squid->enable_kavproxy=$_GET["enable_kavproxy"];
 	}
+	
+	writelogs("Save kavProxy {$_GET["enable_kavproxy"]}",__FUNCTION__,__FILE__);
+	writelogs("Save c-icap {$_GET["enable_c_icap"]}",__FUNCTION__,__FILE__);
 	
 	if(isset($_GET["enable_c_icap"])){
 		writelogs("Save c-icap {$_GET["enable_c_icap"]}",__FUNCTION__,__FILE__);
@@ -714,6 +956,17 @@ function plugins_save(){
 	if(!$squid->SaveToLdap()){
 			if(trim($squid->ldap_error)<>null){echo $squid->ldap_error;}
 			return;
+	}
+	
+	writelogs("Save kavProxy:Final $squid->enable_kavproxy",__FUNCTION__,__FILE__);
+	writelogs("Save c-icap:Final $squid->enable_cicap",__FUNCTION__,__FILE__);	
+	
+	if($squid->enable_kavproxy==1){
+		echo $tpl->javascript_parse_text("{KAVPROXY_WILLBEENABLED}");
+	}
+	
+	if($squid->enable_cicap==1){
+		echo $tpl->javascript_parse_text("{CICAP_WILLBEENABLED}");
 	}
 	
 }
@@ -973,9 +1226,7 @@ function CalculCDR(){
 	}
 	
 function listen_port_save(){
-	
-	
-$squid=new squidbee();
+		$squid=new squidbee();
 		$squid->listen_port=$_GET["listenport"];
 		if(!$squid->SaveToLdap()){
 			echo $squid->ldap_error;
@@ -988,8 +1239,9 @@ $squid=new squidbee();
 	}
 	
 	
-	function network_popup(){
-		$squid=new squidbee();
+function network_popup(){
+	$page=CurrentPageName();
+	$squid=new squidbee();
 		while (list ($num, $ligne) = each ($squid->network_array) ){
 			$list=$list . "
 			<tr " . CellRollOver().">
@@ -1009,6 +1261,42 @@ $squid=new squidbee();
 		$list="<table style='width:100%;'>$list</table>";
 		
 		
+		$pattern_form="
+		<table style='width:100%;padding:3px;border:1px solid #CCCCCC'>
+		<tr>
+			<td class=legend style='font-size:14px'>{pattern}:</td>
+			<td>". Field_text("FREE_FIELD",null,"font-size:14px;padding:3px",null,null,null,false,"SquidnetaddSingleCheck(event)")."</td>
+			<td width=1%>". help_icon("{SQUID_NETWORK_HELP}")."</td>
+		</tr>
+		</table>
+		";
+		
+		$netcacl_form="
+		<table style='width:100%;padding:3px;border:1px solid #CCCCCC'>
+		<tr>
+			<td class=legend style='font-size:14px' nowrap>{ip_address}:</td>
+			<td>". Field_text("IP_NET_FIELD",null,"font-size:14px;padding:3px",null,null,null,false,"SquidnetMaskCheck(event)")."</td>
+			<td width=1%></td>
+		</tr>
+		<tr>
+			<td class=legend style='font-size:14px' nowrap>{netmask}:</td>
+			<td>". Field_text("IP_NET_MASK",null,"font-size:14px;padding:3px",null,null,null,false,"SquidnetMaskCheck(event)")."</td>
+			<td width=1%></td>
+		</tr>	
+		<tr>
+			<td class=legend style='font-size:14px' nowrap>{results}:</td>
+			<td style='font-size:13px'><input type='hidden' value='' id='IP_NET_CALC'><span id='IP_NET_CALC_TEXT'></span></td>
+			<td width=1%>". imgtootltip("img_calc_icon-16.gif","{results}","SquidnetMaskCheck()")."</td>
+		</tr>
+		
+		<tr>
+			<td colspan=3 align='right'><hr>". button("{add}","SquidnetMaskAdd()")."</td>
+		</table>
+		
+		
+		";
+		
+		
 		$form="
 		<div id='squid_network_id'>
 		<p class=caption style='font-size:13px'>{your_network_text}</p>
@@ -1018,6 +1306,7 @@ $squid=new squidbee();
 			<td valign='top' style='padding:4xp'>
 			<div style='padding:2px;border:1px solid #CCCCCC;height:225px;overflow:auto'>$list</div></td>
 			<td valign='top' style='padding:4xp'>
+				<H3>{squid_net_simple}</H3>
 				<table style='width:100%;padding:3px;border:1px solid #CCCCCC'>
 					<tr>
 					<td class=legend nowrap style='font-size:13px'>{from_ip}:</td>
@@ -1033,31 +1322,66 @@ $squid=new squidbee();
 						". button("{add}","netadd()")."
 					</tr>
 					</table>	
+					<hr>
+					<H3>{squid_net_calc_mask}</H3>
+					$netcacl_form
+					<hr>
+					<H3>{free_pattern}</H3>
+					$pattern_form
+
 				</td>		
 			</tr>
 		</table>
-		{SQUID_NETWORK_HELP}
-		
-		<table style='width:100%'>
-		<tr>
-			<td class=legend style='font-size:14px'>{pattern}:</td>
-			<td>". Field_text("FREE_FIELD",null,"font-size:14px;padding:3px",null,null,null,false,"SquidnetaddSingleCheck(event)")."</td>
-		</tr>
-		</table>
-		
 		</div>
-		";
+		
+		<script>
+		var x_SquidnetMaskCheck=function(obj){
+     		var tempvalue=obj.responseText;
+      		if(tempvalue.length>0){
+     			document.getElementById('IP_NET_CALC_TEXT').innerHTML=tempvalue;
+     			document.getElementById('IP_NET_CALC').value=tempvalue;
+			}
+       }	
+
+	function SquidnetMaskCheck(){
+		var XHR = new XHRConnection();
+		XHR.appendData('SquidnetMaskCheckIP',document.getElementById('IP_NET_FIELD').value);
+		XHR.appendData('SquidnetMaskCheckMask',document.getElementById('IP_NET_MASK').value);
+		document.getElementById('IP_NET_CALC_TEXT').innerHTML='<center style=\"width:100%\"><img src=img/wait.gif></center>';
+		XHR.sendAndLoad('$page', 'GET',x_SquidnetMaskCheck);		
+	
+	}
+	
+	function SquidnetMaskAdd(){
+		var XHR = new XHRConnection();
+		XHR.appendData('add-ip-single',document.getElementById('IP_NET_CALC').value);
+		document.getElementById('squid_network_id').innerHTML='<center style=\"width:100%\"><img src=img/wait_verybig.gif></center>';
+		XHR.sendAndLoad('$page', 'GET',x_netadd);
+	}
 		
 		
-		
-		
+		</script>";
 		$html=$form;
-		
 		$tpl=new templates();
 		echo $tpl->_ENGINE_parse_body($html,'squid.index.php');
-		
-		
-	}
+}
+
+function network_calculate_cdir(){
+	
+	$ip=$_GET["SquidnetMaskCheckIP"];
+	$mask=$_GET["SquidnetMaskCheckMask"];
+	if(!preg_match("#([0-9]+)\.([0-9]+)\.([0-9]+)#",$ip)){return;}
+	if(!preg_match("#([0-9]+)\.([0-9]+)\.([0-9]+).([0-9]+)#",$mask)){return;}
+	
+	
+	$sock=new sockets();
+	$calc=base64_encode("$ip/$mask");
+	echo base64_decode($sock->getFrameWork("cmd.php?cdir-calc=$calc"));
+	
+	
+	
+}
+
 	
 function force_upgrade_squid(){
 	$sock=new sockets();

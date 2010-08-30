@@ -1,9 +1,18 @@
-1.4.082116:
+1.4.083016:
 ========================================================================================
 
 Proxy Changes
 -------------------------------------------------
 1.4.081200: Add possibility to set a pattern in the Local SQUID network section 
+1.4.082313: Allow to specify external LDAP server for user authentication.
+1.4.082313: Adding specifics FTP informations parameters.
+1.4.082600: Adding conditions in proxy.pac for an added proxy.
+1.4.082617: Fix unable to activate Kaspersky For Proxy server in modules area.
+1.4.082617: Adding a license checking function for Kaspersky For Proxy server.
+1.4.082700: Adding new feature that enables SSL interception in order to send web SSL pages trough antivirus.
+1.4.082717: Minors tweaks in ICAP configuration directives.
+1.4.082717: When using transparent mode, is SSL interception is used, Artica will configure SQUID to use transparent SSL mode.
+1.4.082717: Possibility to run C-ICAP and Kaspersky Antivirus at the same time. 
 
 Messaging Changes:
 -------------------------------------------------
@@ -13,7 +22,9 @@ Messaging Changes:
 1.4.081223: Improve PostfixInstant Iptables feature.
 1.4.081415: Add possibility to schedule quarantine PDF reports for each user (the last HTML report was removed for performances issues).
 1.4.082102: Add a syslog watchdog on amavis[5302]: (!)_DIE: Suicide in child_init_hook (artica action = restart amavisd)
-1.4.082116: Fix unable to restart policyd-weight cause monit take the hand
+1.4.082116: Fix unable to restart policyd-weight cause monit take the hand.
+1.4.082417: Fix separator token error and adding prefix option for synchronize mailboxes features (imapSync).
+1.4.082812: Fix command-lines parameters that did not reflect the mask for synchronize mailboxes features (imapSync).
 
 File Sharing changes:
 -----------------------------------------------
@@ -23,17 +34,25 @@ File Sharing changes:
 1.4.081913: Fix wrong parameter "wide symlinks" change to "wide links" in samba.
 1.4.081913: Starting MLDonkey support
 1.4.082102: WebDav support for users Home Directory
+1.4.082401: Starting BackupPC support.
+1.4.082919: Starting OCS Inventory Support.
 
 System Changes:
 -------------------------------------------------
 1.4.081402: Support enable/disable clamav unofficial updates.
 1.4.081613: Fix wrong DHCP server status when running on Ubuntu 8.04
+1.4.082313: Unable to perform NMAP scanning to a targeted computer.
+1.4.082417: Fix downloading problems on RPMForge for setup-centos.
+1.4.082717: fix missing packages php-pecl-json, php-pecl-Fileinfo, php-dom in setup-centos for Roundcube on CentOS 5.3 
+1.4.083016: OCS Linux Agent support, administrator is able to install OCS Linux Agent from Artica web console.
 
 
 Interface Changes
 -------------------------------------------------
 1.4.081200: Add new feature (in beta mode) enables mass mailing tasks with artica !
 1.4.081402: Fix unable to change the Unique identifier trough interface.
+1.4.082600: Support specials characters when changing the Manager password.
+
 
 1.4.080521: release
 ========================================================================================

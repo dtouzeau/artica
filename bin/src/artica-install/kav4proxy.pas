@@ -34,6 +34,7 @@ private
 
      FUNCTION KAV4PROXY_PID_PATH():string;
 public
+    LICENSE_ERROR_TEXT:string;
     procedure   Free;
     constructor Create(const zSYS:Tsystem);
     function    INITD_PATH():string;
@@ -48,6 +49,7 @@ public
     function    PATTERN_DATE():string;
     function    KAV4PROXY_PERFORM_UPDATE():string;
     procedure   KAV4PROXY_RELOAD();
+    function    LICENSE_ERROR():string;
     procedure   REMOVE();
 END;
 
@@ -467,9 +469,33 @@ l.free;
 end;
 //##############################################################################
 
-
-
-
+function tkav4proxy.LICENSE_ERROR():string;
+var
+tmp:string;
+RegExpr:TRegExpr;
+l:TstringList;
+i:Integer;
+begin
+result:='False';
+tmp:=logs.FILE_TEMP();
+fpsystem('/opt/kaspersky/kav4proxy/bin/kav4proxy-licensemanager -s >'+tmp+' 2>&1');
+l:=Tstringlist.Create;
+l.LoadFromFile(tmp);
+RegExpr:=TRegExpr.Create;
+RegExpr.Expression:='Error\s+';
+for i:=0 to l.Count-1 do begin
+      if RegExpr.Exec(l.Strings[i]) then begin
+         result:='True';
+         LICENSE_ERROR_TEXT:=l.Strings[i];
+         RegExpr.free;
+         l.free;
+         exit;
+      end;
+end;
+         RegExpr.free;
+         l.free;
+end;
+//##############################################################################
 
 
 

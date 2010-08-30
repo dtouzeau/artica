@@ -163,7 +163,7 @@ begin
 
    if u='2' then begin
           InstallPackageLists(cyrus);
-         fpsystem('/usr/share/artica-postfix/bin/artica-make APP_ROUNDCUBE3');
+          fpsystem('/usr/share/artica-postfix/bin/artica-make APP_ROUNDCUBE3');
           fpsystem('/etc/init.d/artica-postfix restart');
           Show_Welcome;
           exit;
@@ -243,8 +243,10 @@ if LowerCase(u)<>'y' then exit;
           fulllist:=fulllist + ' ' +  trim(ll[i]);
        end;
    end;
-
-   fpsystem('/usr/bin/yum -y install ' + fulllist);
+   if FileExists('/usr/bin/package-cleanup') then begin
+      fpsystem('/usr/bin/package-cleanup  -y --cleandupes');
+   end;
+   fpsystem('/usr/bin/yum -y --nogpgcheck --skip-broken install ' + fulllist);
 
    if FileExists('/tmp/packages.list') then fpsystem('/bin/rm -f /tmp/packages.list');
    result:=true;
@@ -380,6 +382,7 @@ l.Add('php-mysql');
 l.Add('php-imap ');
 l.Add('php-pear');
 l.Add('php-gd');
+l.add('php-dom');
 l.Add('php-pear-Log');
 l.Add('php-pecl-mailparse');
 l.add('php-pear-Mail-Mime');
@@ -387,6 +390,8 @@ l.add('php-pear-Net-Sieve');
 l.Add('php-mbstring');
 l.Add('php-mcrypt');
 l.add('php-pecl-apc');
+l.add('php-pecl-json'); //lighttpd
+l.add('php-pecl-Fileinfo');
 l.Add('lighttpd');
 
 //Apache
@@ -404,6 +409,11 @@ L.Add('perl-SOAP-Lite');
 l.add('perl-Net-IP');
 l.add('perl-XML-Simple');
 l.add('perl-IO-Compress');
+l.add('perl-Compress-Zlib');
+l.add('perl-LWP');
+l.add('perl-Digest-MD5');
+l.add('perl-Net-SSLeay');
+
 
 //l.add('perl-Compress-Zlib');
 
@@ -505,7 +515,7 @@ l.add('monit');
 
 //clamav
 l.add('libtool-ltdl-devel');
-l.add('libtommath-devel');
+//l.add('libtommath-devel');
 
 //dhcp gateway
 l.Add('dhcp');
@@ -530,6 +540,18 @@ l.add('zip');
 l.add('nmap');
 l.add('unzip');
 
+//Backuppc
+l.add('perl-Archive-Zip');
+l.add('perl-File-RsyncP');
+l.add('perl-Time-modules');
+l.add('perl-XML-RSS');
+l.add('perl-DateTime-Format-Mail');
+l.add('perl-DateTime-Format-W3CDTF');
+l.add('perl-DateTime');
+l.add('perl-Params-Validate');
+l.add('perl-Time-modules');
+L.add('perl-suidperl');
+l.add('perl-Class-Singleton');
 
 //lvm
 if not libs.COMMANDLINE_PARAMETERS('--without-lvm') then begin
@@ -540,6 +562,7 @@ end;
 l.Add('htop');
 l.Add('telnet');
 l.Add('lsof');
+l.add('yum-utils');
 //l.Add('dar');
 //l.Add('preload');
 c:=0;
@@ -810,6 +833,12 @@ l.add('libjpeg-devel');
 l.add('e2fsprogs-devel');
 l.add('pam-devel');
 L.add('acl');
+L.add('BackupPC');
+l.add('par2cmdline');
+
+
+
+
 for i:=0 to l.Count-1 do begin
      if not libs.RPM_is_application_installed(l.Strings[i]) then begin
           f:=f + ',' + l.Strings[i];
@@ -945,7 +974,9 @@ end;
 //#########################################################################################
 
 function tcentos.RPMFORGE():boolean;
-var u:string;
+var
+   u:string;
+   link:string;
 
 begin
    result:=false;
@@ -956,7 +987,14 @@ begin
    if length(u)=0 then u:='Y';
    if u<>'Y' then exit;
    writeln('Checking.............: retrieve rpmforge-release');
-   fpsystem('rpm -iv http://apt.sw.be/redhat/el5/en/i386/RPMS.dag/rpmforge-release-0.3.6-1.el5.rf.i386.rpm');
+
+   if ARCH=64 then link:='http://rpmforge.sw.be/redhat/el4/en/x86_64/rpmforge/RPMS/rpmforge-release-0.5.1-1.el4.rf.x86_64.rpm';
+   if ARCH=32 then link:='http://rpmforge.sw.be/redhat/el5/en/i386/rpmforge/RPMS/rpmforge-release-0.5.1-1.el5.rf.i386.rpm';
+
+
+
+
+   fpsystem('rpm -iv '+link);
    fpsystem('/bin/rm -rf /tmp/packages.list');
    if not libs.RPM_is_application_installed('rpmforge-release') then begin
       writeln('Unable to install rpmforge-release');
@@ -975,7 +1013,7 @@ if not libs.RPM_is_application_installed('wv') then begin
    fpsystem('rpm --import http://repo.fossmart.net/artica/RPM-GPG-FOSSMART-KEY');
    fpsystem('rpm -Uvh http://repo.fossmart.net/artica/artica-centos-addons-5-3.noarch.rpm');}
    
-   fpsystem('rpm --import http://dag.wieers.com/rpm/packages/RPM-GPG-KEY.dag.txt');
+   fpsystem('rpm --import http://apt.sw.be/RPM-GPG-KEY.dag.txt');
    fpsystem('yum check-update');
    exit(true);
 end;

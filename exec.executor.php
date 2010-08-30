@@ -1,16 +1,29 @@
 <?php
 if(posix_getuid()<>0){die("Cannot be used in web server mode\n\n");}
+include_once(dirname(__FILE__).'/framework/class.unix.inc');
+include_once(dirname(__FILE__)."/framework/frame.class.inc");
+
+
+
+$pidfile="/etc/artica-postfix/".basename(__FILE__).".pid";
+$unix=new unix();
+if($unix->process_exists(@file_get_contents($pidefile))){die();}
+@file_put_contents($pidefile,getmypid());
+
+
 include_once(dirname(__FILE__).'/ressources/class.templates.inc');
 include_once(dirname(__FILE__).'/ressources/class.mysql.inc');
 include_once(dirname(__FILE__).'/ressources/class.status.inc');
 include_once(dirname(__FILE__).'/ressources/class.os.system.inc');
 include_once(dirname(__FILE__).'/ressources/class.system.network.inc');
-include_once(dirname(__FILE__).'/framework/class.unix.inc');
-include_once(dirname(__FILE__)."/framework/frame.class.inc");
 
 if(preg_match("#--verbose#",implode(" ",$argv))){$GLOBALS["debug"]=true;$GLOBALS["VERBOSE"]=true;}
 
 if($GLOBALS["VERBOSE"]){writelogs("Start...","MAIN",__FILE__,__LINE__);}
+
+
+
+
 
 if(systemMaxOverloaded()){
 	writelogs("This system is too many overloaded, die()",__FUNCTION__,__FILE__,__LINE__);
@@ -80,6 +93,10 @@ function stats_console(){
 
 // sans vérifications, toutes les 5 minutes
 function group5(){
+	
+	
+	$fileTime="/etc/artica-postfix/cron.2/executor.".__FUNCTION__;
+	if(file_time_min($fileTime)<5){return;}	
 	
 	writelogs("DANSGUARDIAN_INSTALLED={$GLOBALS["DANSGUARDIAN_INSTALLED"]}",__FUNCTION__,__FILE__,__LINE__);
 	
@@ -155,12 +172,20 @@ function group5(){
 	}}		
 	
 	if($GLOBALS["VERBOSE"]){events(__FUNCTION__. ":: die...");}
+	
+	@unlink($fileTime);
+	@file_put_contents($fileTime,"#");	
 
 }
 
 
 //sans vérifications toutes les 10mn
 function group10(){
+	
+	
+	$fileTime="/etc/artica-postfix/cron.2/executor.".__FUNCTION__;
+	if(file_time_min($fileTime)<10){return;}
+	
 	$EnablePhileSight=GET_INFO_DAEMON("EnablePhileSight");
 	if($EnablePhileSight==null){$EnablePhileSight=1;}
 	
@@ -201,12 +226,14 @@ function group10(){
 	
 	if($GLOBALS["VERBOSE"]){events(__FUNCTION__. ":: die...");}
 	
-	
+	@unlink($fileTime);
+	@file_put_contents($fileTime,"#");
 }
 
 //toutes les minutes
 function Group0(){
-	
+	$fileTime="/etc/artica-postfix/cron.2/executor.".__FUNCTION__;
+	if(file_time_min($fileTime)<5){return;}
 
 	if($GLOBALS["POSTFIX_INSTALLED"]){
 		$array[]="exec.whiteblack.php";
@@ -230,11 +257,17 @@ if(is_array($array2)){
 		sys_THREAD_COMMAND_SET($cmd);
 	}	
 }
+
+	@unlink($fileTime);
+	@file_put_contents($fileTime,"#");
 	
 }
 //toutes les 2 minutes
 function Group2(){
-
+	$fileTime="/etc/artica-postfix/cron.2/executor.".__FUNCTION__;
+	if(file_time_min($fileTime)<2){return;}
+	
+	
 	$array[]="exec.dhcpd-leases.php";
 	$array[]="exec.mailbackup.php";
 
@@ -255,13 +288,18 @@ if(is_array($array2)){
 		sys_THREAD_COMMAND_SET($cmd);
 	}	
 }
+
+	@unlink($fileTime);
+	@file_put_contents($fileTime,"#");
 	
 }
 
 function group10s(){
-
-
-  if(is_array($array)){
+	
+	$fileTime="/etc/artica-postfix/cron.2/executor.".__FUNCTION__;
+	if(file_time_sec($fileTime)<10){return;}
+  
+if(is_array($array)){
 		while (list ($index, $file) = each ($array) ){
 			$cmd="{$_GET["PHP5"]} /usr/share/artica-postfix/$file";
 			@sys_THREAD_COMMAND_SET($cmd);
@@ -277,6 +315,8 @@ if(is_array($array2)){
 		}	
 	}
 
+	@unlink($fileTime);
+	@file_put_contents($fileTime,"#");
 	if($GLOBALS["VERBOSE"]){events(__FUNCTION__. ":: die...");}
 
 }

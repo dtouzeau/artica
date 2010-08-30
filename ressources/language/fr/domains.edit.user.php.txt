@@ -201,5 +201,5 @@ Indiquez dans le champs ci-dessous sa taille en Mo.[br]
 <user_transport>Serveur SMTP d'&eacute;mission</user_transport>
 <user_transport_text>D&eacute;finir un serveur de routage mail pour cet utilisateur</user_transport_text>
 <use_ssl>utiliser le ssl</use_ssl>
-<VolatileIPAddress>Adresse IP non fix&eacute;e</VolatileIPAddress>
+<VolatileIPAddress>Utilise DHCP</VolatileIPAddress>
 <warn_import>L'importation sera lanc&eacute; en arri&egrave;re-plan, pour suivre l'op&eacute;ration, cliquez sur l'ic&ocirc;ne dans les journaux afin de voir si l'op&eacute;ration sera couronn&eacute;e de succ&egrave;s</warn_import>

@@ -1719,12 +1719,7 @@ end;
    end;
 
 //----------------------------------------------------------------------------------------------------------------------------------------------------------------
- RegExpr.expression:='nmapscan:(.+)';
-   if RegExpr.Exec(uri) then begin
-      FileData.LoadFromFile(logs.OutputCmdR(SYS.LOCATE_PHP5_BIN()+' /usr/share/artica-postfix/exec.nmapscan.php '+RegExpr.Match[1]));
-      exit(true);
-   end;
-//----------------------------------------------------------------------------------------------------------------------------------------------------------------
+
  RegExpr.expression:='nmapmem';
    if RegExpr.Exec(uri) then begin
       FileData.Add(SYS.PROCESS_LIST_PID(SYS.LOCATE_NMAP()));

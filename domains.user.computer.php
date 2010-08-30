@@ -33,7 +33,7 @@ function page(){
 		
 	var x_AddComputerToUserSelect= function (obj) {
 		var results=obj.responseText;
-		if(results.length>0){alert(results);return;}
+		if(results.length>0){alert(results);}
 		YahooLogWatcherHide();
 		LoadComputerList();
 		
@@ -62,6 +62,17 @@ function page(){
 function computer_add(){
 	$userid=$_GET["userid"];
 	$computer=new computers($_GET["add-computer"]);
+	if(!IsPhysicalAddress($computer->ComputerMacAddress)){
+		$tpl=new templates();
+		echo $tpl->javascript_parse_text("{computer}:$computer->ComputerRealName
+		{MAC}:$computer->ComputerMacAddress
+		--------------------
+		{WARNING_MAC_ADDRESS_CORRUPT}
+		");
+		return;
+	}
+	
+	
 	$user=new user($userid);
 	$user->add_computer($computer->ComputerMacAddress,$computer->uid);
 	}
@@ -96,6 +107,8 @@ function computer_list(){
 	
 	
 }
+
+
 
 
 function IsRight(){

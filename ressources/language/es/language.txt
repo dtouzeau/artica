@@ -56,6 +56,7 @@ This parameter allows Samba to permit delegation of the control over a point in 
 <action_keepup2date>Update database now</action_keepup2date>
 <action_start_service>Start the service</action_start_service>
 <action_stop_service>Detener el Servicio</action_stop_service>
+<activate>activate</activate>
 <ACTIVATE_APP_GROUPWARE_APACHE>Activate the groupware web service</ACTIVATE_APP_GROUPWARE_APACHE>
 <ACTIVATE_BACKUP_AGENT>Activate remote backup</ACTIVATE_BACKUP_AGENT>
 <ACTIVATE_BACKUP_AGENT_EXPLAIN>This feature enable Artica Network Agent to store backup on your ressource disk[br]
@@ -68,6 +69,8 @@ This operation will activate service and enable remote backup trough Artica Netw
 IN this case, users can retreive peer-to-peer files trough their Artica End-user interfaces.</ACTIVATE_MLDONKEY_TEXT>
 <ACTIVATE_SPF>Activate Sender Policy Framework checking</ACTIVATE_SPF>
 <ACTIVATE_SPF_TEXT>If this feature is enabled, anti-spam scores will be modified with sender verification SPF method</ACTIVATE_SPF_TEXT>
+<activate_ssl_bump>Activate SSL interception</activate_ssl_bump>
+<activate_ssl_bump_text>If you turn on this feature, the proxy will able to intercept the SSL traffic in order to send it trough antivirus.[br]It means that you have already enabled Kaspersky Antivirus or ClamAV antivirus in your web traffic inspection</activate_ssl_bump_text>
 <ACTIVATE_THIS_MLDONKEY_USER>Activate this user</ACTIVATE_THIS_MLDONKEY_USER>
 <ACTIVATE_THIS_MLDONKEY_USER_TEXT>If you turn on, this user will be able to download shared files from peer-to-peer networks using the end-user Artica Interface</ACTIVATE_THIS_MLDONKEY_USER_TEXT>
 <ACTIVATE_THIS_USER_WEBDAV>Activate HTTP remote access</ACTIVATE_THIS_USER_WEBDAV>
@@ -166,6 +169,7 @@ Add a list:exe,pif,bat,pdf,doc</add_attachment_blocking_text_explain>
 <ADD_COMPUTER>Add a new computer</ADD_COMPUTER>
 <add_computer_access>Add computer access</add_computer_access>
 <ADD_COMPUTER_TEXT>Add a new computer in Artica Database</ADD_COMPUTER_TEXT>
+<add_condition>Add a condition</add_condition>
 <add_contact>Add a contact</add_contact>
 <add_contact_text>Add a single contact into a database</add_contact_text>
 <add_default_rules>Add default rules</add_default_rules>
@@ -369,6 +373,7 @@ If a computer reach X events, Artica will automatically create a FireWall rule t
 <APP_AVESERVER>Kaspersky For Mail server</APP_AVESERVER>
 <APP_AWSTATS>awstats</APP_AWSTATS>
 <APP_BACKUP>Artica Backup</APP_BACKUP>
+<APP_BACKUPPC>BackupPC</APP_BACKUPPC>
 <APP_BIND9>Bind DNS Server</APP_BIND9>
 <APP_BIND9_TEXT>BIND (Berkeley Internet Name Domain or "named") is the most commonly used DNS server on the Internet</APP_BIND9_TEXT>
 <APP_BOA>Boa middleware</APP_BOA>
@@ -449,6 +454,8 @@ Unlike other systems for load balancing IMAP mailboxes, the aggregator allows us
 <APP_JOOMLA>Joomla web service</APP_JOOMLA>
 <APP_KAS3>Kaspersky Anti-spam Gateway</APP_KAS3>
 <APP_KAS3_MILTER>Kaspersky Anti-spam Milter listener</APP_KAS3_MILTER>
+<APP_KAV4FS>Kaspersky Antivirus For Linux File Server</APP_KAV4FS>
+<APP_KAV4FS_AVS>Kaspersky Antivirus Realtime Scanner</APP_KAV4FS_AVS>
 <APP_KAV4PROXY>Kaspersky For Squid</APP_KAV4PROXY>
 <APP_KAV4PROXY_TEXT>Kaspersky For SQUID provides secure Internet access for all employees in the organization,
 automatically removing malicious and potentially hostile programs from incoming HTTP/FTP traffic.</APP_KAV4PROXY_TEXT>
@@ -503,6 +510,7 @@ This feature will help you to concentrate and factorize internet updates.</APP_K
 <APP_OBM2_TEXT>Open Business Management, is now recognized as the leader of GPL enterprise-class email and Groupware solution face to Microsoft Exchange® or Lotus Notes®</APP_OBM2_TEXT>
 <APP_OBM_APACHE>Lighttpd for OBM</APP_OBM_APACHE>
 <APP_OCSI>OCS Inventory</APP_OCSI>
+<APP_OCSI_DOWNLOAD>OCS Web SSL download service</APP_OCSI_DOWNLOAD>
 <APP_OCSI_TEXT>Open Computer and Software Inventory Next Generation is an application designed to help a network or system administrator keep track of the computers configuration and software that are installed on the network</APP_OCSI_TEXT>
 <APP_OPENGOO>OpenGoo groupware</APP_OPENGOO>
 <APP_OPENGOO_TEXT>It is a complete online solution focused on improving productivity, collaboration, communication and management of your teams.</APP_OPENGOO_TEXT>
@@ -713,6 +721,7 @@ If users are connected to the Domain, the authentication is sended silently to t
 <authentication>Authentication</authentication>
 <Authorized networks>Authorized networks</Authorized networks>
 <Authorized networks text>Authorized to send emails trought Internet</Authorized networks text>
+<auth_banner>Authentication banner</auth_banner>
 <autoblock>Auto block</autoblock>
 <AutomaticConfig>Save automatically settings on system</AutomaticConfig>
 <automobile-bikes>All around motorcycles. Included are vendor sites, resellers, fan and hobby pages as well as and suppliers. Scooters included</automobile-bikes>
@@ -736,6 +745,8 @@ Set a path (like /var/log/kav/5.5/kav4mailservers/smtpscanner.stat) in order to 
 If a path is set artica will execute at regular time statistics generation.
 </AVStatistics_text>
 <av_notify_rules>Notify & actions rules</av_notify_rules>
+<av_pattern_database>Antivirus Scanner Pattern Databases</av_pattern_database>
+<av_pattern_database_obsolete_or_missing>Antivirus Scanner Pattern Databases are obsolete or missing !</av_pattern_database_obsolete_or_missing>
 <av_settings>eMail antivirus settings</av_settings>
 <awstats>awstats</awstats>
 <awstats_statistics_allemailr>all Receiver EMail</awstats_statistics_allemailr>
@@ -768,6 +779,7 @@ If a path is set artica will execute at regular time statistics generation.
 <BACKUP_TASK_TEST>Perform tests operation on this task.[br]The backup will be not performed,[br] only a test connection will be executed</BACKUP_TASK_TEST>
 <backup_this_directory>Backup this directory</backup_this_directory>
 <backup_this_directory_explain>Choose scheduled tasks in order to add backup process of this directory</backup_this_directory_explain>
+<backup_this_folder>Backup this folder</backup_this_folder>
 <BACKUP_WARNING_NOT_CONFIGURED>No scheduled backup</BACKUP_WARNING_NOT_CONFIGURED>
 <BACKUP_WARNING_NOT_CONFIGURED_TEXT>No backup scheduled on this server.If it crash you will loose all datas</BACKUP_WARNING_NOT_CONFIGURED_TEXT>
 <back_system>Back to system</back_system>
@@ -788,6 +800,8 @@ If multiple BCC actions are  specified  within  the same  SMTP  MAIL  transactio
 <bits_rate>Bits rate</bits_rate>
 <black list>Black List</black list>
 <black list explain>Managing thegroup list of banned addresses.[br] Messages from these addresses are automatically checked as Spam</black list explain>
+<BlackoutPeriods>Blackout periods</BlackoutPeriods>
+<BlackoutPeriods_text>Do not execute backup tasks...</BlackoutPeriods_text>
 <black_lists>Black lists engines</black_lists>
 <black_spam>Blacklisted</black_spam>
 <Body>Body</Body>
@@ -931,6 +945,7 @@ The relay_domains_reject_code parameter specifies the response code for rejected
 <choose_org>Choose organization</choose_org>
 <CICAP_DNSBL>DNS black list lookup</CICAP_DNSBL>
 <CICAP_DNSBL_TEXT>Use dynamics DNS black lists servers in order to ban websites</CICAP_DNSBL_TEXT>
+<CICAP_WILLBEENABLED>C-ICAP service will be enabled in few seconds.</CICAP_WILLBEENABLED>
 <city>City</city>
 <clamav_unofficial>clamav unofficial signatures</clamav_unofficial>
 <clamav_unofficial_text>update the 3rd-party signature databases
@@ -987,6 +1002,7 @@ The default is accept message.
 <Col>Collection</Col>
 <collectd_statistics>Statistics collection</collectd_statistics>
 <collectd_statistics_text>View statistics collected by System statistics collection daemon</collectd_statistics_text>
+<command_lines_view>View commands</command_lines_view>
 <comment>comment</comment>
 <commonName>common name</commonName>
 <community>Community</community>
@@ -998,12 +1014,18 @@ The default is accept message.
 <compile_statistics>Compile statistics</compile_statistics>
 <compile_statistics_text>Run statistics process in order to obtain last events and graphs</compile_statistics_text>
 <compiling>Compiling</compiling>
+<COMPILING_SOFTWARES>Compiling softwares</COMPILING_SOFTWARES>
+<COMPILING_SOFTWARES_TEXT>Artica compiling some softwares, the system load should be increased</COMPILING_SOFTWARES_TEXT>
 <COMPLETED>Connected</COMPLETED>
 <computer>computer</computer>
 <computers>computers</computers>
 <computers_management>Computers management</computers_management>
 <COMPUTER_ACCESS>Share credentials access</COMPUTER_ACCESS>
 <COMPUTER_ACCESS_TEXT>Set the username and password that have privileges to browse this computer</COMPUTER_ACCESS_TEXT>
+<COMPUTER_INFOS_SERVICES>Services & informations</COMPUTER_INFOS_SERVICES>
+<COMPUTER_INFOS_SERVICES_TEXT>Add some services (backup, inventory, users) for this computer</COMPUTER_INFOS_SERVICES_TEXT>
+<COMPUTER_NETWORK>Network and DNS</COMPUTER_NETWORK>
+<COMPUTER_NETWORK_TEXT>Modify network informations and DNS settings for this computer</COMPUTER_NETWORK_TEXT>
 <computer_password>Computer password</computer_password>
 <computer_password_text>Define the computer password in order to allow link this computer to the PDC.[br]Useful when you want to link this computer has a BDC of this server</computer_password_text>
 <computer_popup_import_explain>This section allow you to import computers in Artica database.[br]
@@ -1042,6 +1064,7 @@ Requests that specify a larger TTL will be stored with the maximum allowed TTL.
 <Correspondent>Correspondent</Correspondent>
 <corrupt>corrupt</corrupt>
 <Corrupted>Corrupted</Corrupted>
+<corrupted_database>Corrupted database</corrupted_database>
 <CORRUPTED_LDAP_BRANCH>Corrupted LDAP branch!</CORRUPTED_LDAP_BRANCH>
 <CORRUPTED_LDAP_BRANCH_PERFORM>This operation will delete the corrupted Artica branch.
 Some Internal Artica informations will be erased and rebuilded (not users database).
@@ -1244,6 +1267,7 @@ Setting this parameter to a value of 1 changes the meaning of the corresponding 
 <DisableMagicQuotesGpc_text>Disable fixing the magic_quotes on the GPC operations (get/post/cookie).[br] especially for egroupware compatibility</DisableMagicQuotesGpc_text>
 <disable_all_filters>Disable all filters</disable_all_filters>
 <disable_jgrowl>Disable corner notifications system</disable_jgrowl>
+<DISABLE_KAV_ENABLE_CICAP>Kaspersky will be disabled because C-ICAP is enabled</DISABLE_KAV_ENABLE_CICAP>
 <disable_service_text_operation>This operation will disable the service:</disable_service_text_operation>
 <disable_this_service_click>click here to Disable this service</disable_this_service_click>
 <discard>discard</discard>
@@ -1284,6 +1308,8 @@ There are dozens of DNSBLs in existence,[1][2] which use a wide array of standar
 These may include listing the addresses of zombie computers or other machines being used to send spam, listing the addresses of ISPs who willingly host spammers, or listing addresses which have sent spam to a honeypot system.[br]
 Since the creation of the first DNSBL in 1997, the operation and policies of these lists have been frequently controversial, both in Internet advocacy and occasionally in lawsuits. Many mail system operators and users consider DNSBLs a valuable tool to share information about spam sources, but others including prominent Internet activists have objected to them as a form of censorship. In addition, a small number of DNSBL operators have been the target of lawsuits filed by spammers seeking to have the lists shut down.
 </DNSBL_EXPLAIN>
+<dnsDomainIs>If contains in host fqdn</dnsDomainIs>
+<dnsDomainIs_text>Detects whether the URL host name belongs to a given DNS domain</dnsDomainIs_text>
 <dnsmasq_DNS_records>MX Records</dnsmasq_DNS_records>
 <dnsmasq_DNS_records_text>Dnsmasq can serve DNS MX records with its database</dnsmasq_DNS_records_text>
 <dnsmasq_settings>dnsmasq settings</dnsmasq_settings>
@@ -1744,6 +1770,7 @@ in this form you want to submit</form_error>
 <ForwardMailer>Forward Mail ip/port</ForwardMailer>
 <found>found</found>
 <free>free</free>
+<free_pattern>Free pattern</free_pattern>
 <frequency>frequency</frequency>
 <friday>Friday</friday>
 <from>from</from>
@@ -1753,6 +1780,11 @@ in this form you want to submit</form_error>
 <from_name>From name</from_name>
 <from_name_help>set here the name/string of the from address that will be displayed in the recipient email client.</from_name_help>
 <fs_type>filesystem type</fs_type>
+<ftp_list_width>List width</ftp_list_width>
+<ftp_list_width_explain> set the width of ftp listings. This should be set to fit in the width of a standard browser.[br] Setting this too small can cut off long filenames when browsing ftp sites</ftp_list_width_explain>
+<ftp_passive>PASSIVE Mode</ftp_passive>
+<ftp_passive_explain>If your firewall does not allow Squid to use passive connections, then turn off this option</ftp_passive_explain>
+<ftp_user>FTP user</ftp_user>
 <full_access>Full access</full_access>
 <gateway>Gateway</gateway>
 <GDPHP_NOT_INSTALLED>GD Library !</GDPHP_NOT_INSTALLED>
@@ -1790,6 +1822,7 @@ depends of the mails number and user number, server performance, generating this
 <global_director_report_text>Send organisation's mail flow report periodically</global_director_report_text>
 <global_memory>Global memory used</global_memory>
 <global_organization>global organization</global_organization>
+<global_parameters>Global parameters</global_parameters>
 <global_quarantine_rules>Global quarantine settings</global_quarantine_rules>
 <global_rule>Global rule</global_rule>
 <global_services_status>Global services status</global_services_status>
@@ -1864,6 +1897,7 @@ Log the optional text if  specified,[br]otherwise log a generic message.
 <HomeBinding_text>Link others local folders to Home directory account</HomeBinding_text>
 <homePhone>Home phone</homePhone>
 <homePostalAddress>Home Postal Address</homePostalAddress>
+<HOME_PUBLIC_ACCESS_TEXT>Share this directory to unknown users.[br]usefull if you want to share files for multimedia blackboxes or specified robots</HOME_PUBLIC_ACCESS_TEXT>
 <host>Host</host>
 <hostname>hostname</hostname>
 <hosts>hosts</hosts>
@@ -1871,6 +1905,8 @@ Log the optional text if  specified,[br]otherwise log a generic message.
 <hosts_without_proxy>Hosts without proxy</hosts_without_proxy>
 <hotmail>Hotmail & Live</hotmail>
 <hour>hour</hour>
+<hourBegin>Hour begin</hourBegin>
+<hourEnd>Hour End</hourEnd>
 <hourly>hourly</hourly>
 <hours>hours</hours>
 <howto_access_computer>Howto access to this computer</howto_access_computer>
@@ -1918,6 +1954,9 @@ It send notifications to recipients in order to allow them to "download" attache
 <imapsync_advanced_options>Define specifics options and tune your mail retreival engine</imapsync_advanced_options>
 <imapsync_folders_text>Define folders to replicate in your mailbox</imapsync_folders_text>
 <imapsync_main_settings>Set main synchronization parameters</imapsync_main_settings>
+<imapsync_prefix_destination>Remove prefix on destination server</imapsync_prefix_destination>
+<imapsync_prefix_source>Remove prefix on source server</imapsync_prefix_source>
+<imapsync_prefix_text>remove prefix to all destination folders  (usually INBOX. for cyrus imap servers) you can check prefix on source server if your source imap server does not have NAMESPACE capability</imapsync_prefix_text>
 <imap_connection_broken>Imap connection is currently broken and informations could not be read</imap_connection_broken>
 <imap_connection_locked>The imap connection is currently locked cause the imap server didn't respond on time</imap_connection_locked>
 <imap_server_name>Mailbox server name</imap_server_name>
@@ -2149,6 +2188,8 @@ With the default 100 SMTP server process limit, "in flow delay as 1s" limits the
 <isInNet_explain>Browsers will not use proxy if computers is a part of listed networks[br]Example: 192.168.1.0 - 255.255.255.0</isInNet_explain>
 <isnot>is not</isnot>
 <ISP>Internet Provider</ISP>
+<isPlainhost>plain host name</isPlainhost>
+<isPlainhost_text>Detects whether the host name in the requested URL is a plain host name or a fully qualified domain name</isPlainhost_text>
 <ISP_MODE>Internet Provider Mode</ISP_MODE>
 <items>items</items>
 <january>January</january>
@@ -2180,6 +2221,7 @@ With the default 100 SMTP server process limit, "in flow delay as 1s" limits the
 <kav4proxyprocess_explain>Advanced settings for the processes of Kaspersky Anti-Virus</kav4proxyprocess_explain>
 <kav4proxy_status>Kaspersky For squid status</kav4proxy_status>
 <kav4proy_main_settings>Kaspersky Anti-Virus for Squid settings</kav4proy_main_settings>
+<KAVPROXY_WILLBEENABLED>Kaspersky Will be enabled in few seconds</KAVPROXY_WILLBEENABLED>
 <kav_add_protection_domain>Protect a new domain</kav_add_protection_domain>
 <kav_legend_protection_domain>Domain to protect</kav_legend_protection_domain>
 <kav_milter_status>Kaspersky Milter status</kav_milter_status>
@@ -2204,6 +2246,7 @@ With the default 100 SMTP server process limit, "in flow delay as 1s" limits the
 <last_24_h>last 24 hours</last_24_h>
 <last_48_h>last 48 hours</last_48_h>
 <last_days>last days</last_days>
+<last_error>Last error</last_error>
 <last_logoff>Last logoff</last_logoff>
 <last_logon>Last logon</last_logon>
 <last_mails>Last routing mails</last_mails>
@@ -2216,6 +2259,9 @@ With the default 100 SMTP server process limit, "in flow delay as 1s" limits the
 <ldap settings>ldap settings</ldap settings>
 <ldap suffix>LDAP suffix</ldap suffix>
 <LDAP_ERROR_TEXT>Error, no LDAP connection !</LDAP_ERROR_TEXT>
+<ldap_filter_group>Groups LDAP filter</ldap_filter_group>
+<ldap_filter_users>users LDAP Filter</ldap_filter_users>
+<ldap_password>LDAP Password</ldap_password>
 <Leave messages on server>Leave messages on server</Leave messages on server>
 <left_menu_internal_hard_drives>Hard drives</left_menu_internal_hard_drives>
 <left_menu_net_settings>Networks</left_menu_net_settings>
@@ -2227,14 +2273,17 @@ With the default 100 SMTP server process limit, "in flow delay as 1s" limits the
 <license_error>License error</license_error>
 <license_expired>The license is expired</license_expired>
 <license_info>License information</license_info>
+<license_informations>license informations</license_informations>
 <license_info_text>Display license and update it</license_info_text>
 <limit>limit</limit>
 <lines>lines</lines>
 <link_hard_drive>Link hard drive</link_hard_drive>
 <link_hard_drive_confirm>Confirm link this hard drive to this object ?</link_hard_drive_confirm>
 <list>list</list>
+<listen_http_port>Listen HTTP port</listen_http_port>
 <listen_ip>Listen IP address</listen_ip>
 <listen_port>listen port</listen_port>
+<listen_ssl_port>Listen SSL Port</listen_ssl_port>
 <listing_content>listing content</listing_content>
 <list_mailboxes>List mailboxes</list_mailboxes>
 <load>Load</load>
@@ -2254,6 +2303,7 @@ With the default 100 SMTP server process limit, "in flow delay as 1s" limits the
 <localmx>Local MX</localmx>
 <localmx_text>Return an MX record pointing to the MX Target for all local machines.</localmx_text>
 <LocalSocketPath>Local Socket path</LocalSocketPath>
+<local_database>Local Database</local_database>
 <local_destination_concurrency_limit>local destination concurrency limit</local_destination_concurrency_limit>
 <local_destination_concurrency_limit_text>The maximal number of parallel deliveries via the local mail delivery transport to the same recipient 
 (when &quot;local destination recipient limit = 1&quot;) or the maximal number of parallel deliveries to the same local domain (when &quot;local destination recipient limit &amp;raquo; 1&quot;).[br]
@@ -2560,6 +2610,7 @@ The default is to use the local machine name, $myhostname, which defaults to the
 <MYSQL_CLUSTER>Mysql cluster</MYSQL_CLUSTER>
 <MYSQL_CLUSTER_TEXT>Increase mysql Database high availability by build a set of mysql clusters nodes</MYSQL_CLUSTER_TEXT>
 <my_address_book>My Address Book</my_address_book>
+<my_computers>My computers</my_computers>
 <name>Name</name>
 <name_resolve_order>Name Resolution Order</name_resolve_order>
 <name_the_new_account_explain>This name will be the unique identifier in the users database, it will be used to access to the mailbox and to the portal</name_the_new_account_explain>
@@ -2678,6 +2729,9 @@ don't forget to - Save & Apply settings - to make them in production mode</notif
 <num_slots>slots number</num_slots>
 <objects>Objects</objects>
 <observations>Observations</observations>
+<OCSI_NORMAL_PORT_EXPLAIN>This HTTP Port is used to receive inventory from remote computers and to open the OCSI Web console .[br]Remote computers will send XML datas to this port in order to fill inventory database</OCSI_NORMAL_PORT_EXPLAIN>
+<OCSI_SERVERNAME_EXPLAIN>This server name will be used to explain to your users what is the name of your server that will be used by OCS agent to connect to the service</OCSI_SERVERNAME_EXPLAIN>
+<OCSI_SSL_PORT_EXPLAIN>The SSL port is used to perform softwares deployments.[br]Remote computers will use this service to download packages before execute them</OCSI_SSL_PORT_EXPLAIN>
 <october>October</october>
 <OK_help>Accept the address etc. that matches the pattern</OK_help>
 <ok_listen>The service currently listen the defined port</ok_listen>
@@ -2977,6 +3031,7 @@ You will see here the total of messages events saved</processed_messages_explain
 <proxy_pac_rules>Autoconfiguration file rules</proxy_pac_rules>
 <proxy_pac_rules_text>Define the Autoconfiguration file settings for your users</proxy_pac_rules_text>
 <proxy_pac_text>Use a client autoconfiguration file to configure all of your Navigator clients</proxy_pac_text>
+<PUBLIC_ACCESS>Public Access</PUBLIC_ACCESS>
 <pureftpd_main_settings>Pure-ftpd settings</pureftpd_main_settings>
 <pureftpd_satus>Pure-ftpd status</pureftpd_satus>
 <put_user_quarantine>put mails into user quarantine</put_user_quarantine>
@@ -3039,6 +3094,7 @@ See also "maximal backoff time".
 <rcpt_to_rules>RCPT TO rules (clients rules)</rcpt_to_rules>
 <read>read</read>
 <read_conf>View global configuration</read_conf>
+<reason>reason</reason>
 <rebuild_mailboxes_org>Reconstruct all mailboxes</rebuild_mailboxes_org>
 <rebuild_mailboxes_org_explain>This operation will reconstruct all mailboxes.[br]It can be used when you want to globally create mailboxes when did not exists.[br]Already stored mailboxes will be passed, so you can safe use this feature</rebuild_mailboxes_org_explain>
 <rebuild_mailboxes_org_text>Reconstruct all user's mailboxes in your organization</rebuild_mailboxes_org_text>
@@ -3201,6 +3257,7 @@ This feature is off by default. </relay_recipient_maps_text>
 <remote server mailbox>Your mailbox remote server</remote server mailbox>
 <remote username>remote username</remote username>
 <remote-mail retrieval>remote-mail retrieval</remote-mail retrieval>
+<remote_database>Remote database</remote_database>
 <remote_rsync_server>Remote rsync server</remote_rsync_server>
 <remote_smb_server>Remote shared directory</remote_smb_server>
 <removed>removed</removed>
@@ -3247,6 +3304,7 @@ and possibly buffer-overflow or denial-of-service attacks</request_header_max_si
 <resource>resource</resource>
 <resource_testing>resource testing</resource_testing>
 <ressources_insuffisantes>insufficient resources</ressources_insuffisantes>
+<restarting>restarting</restarting>
 <restart_autofs>Restart Auto-connect service</restart_autofs>
 <restart_autofs_text>Restart the auto-connect service in order to apply new settings in production mode</restart_autofs_text>
 <restart_computer>Reboot</restart_computer>
@@ -3258,6 +3316,7 @@ Once backup task selected, you will choose the backup date in order to browse yo
 <restore_mailbox_text>Restore items from backups containers to your local mailbox</restore_mailbox_text>
 <restrictions>restrictions</restrictions>
 <restrictions_classes_list>Classes list</restrictions_classes_list>
+<result>Result</result>
 <results>Results</results>
 <RETRANSLATOR_CONNECT_URI>Use this uri in the Kaspersky products in order to update them trough this server.(see the link below)</RETRANSLATOR_CONNECT_URI>
 <Return-Path>return path</Return-Path>
@@ -3314,6 +3373,7 @@ in a SASL password LDAP, and if a username/password is found, it will use that u
 <save_task>Save task</save_task>
 <SCANNING>Scanning</SCANNING>
 <scanning_your_network>Scanning your network</scanning_your_network>
+<scan_this_computer>Scan this computer</scan_this_computer>
 <schedule>schedule</schedule>
 <scheduled>Scheduled</scheduled>
 <schedule_import_settings>Schedule the importation process periodically in order to refresh database automatically</schedule_import_settings>
@@ -3450,6 +3510,8 @@ You will receive a quote from Artica Technology.</shallalist_buye>
 <share_name>Share name</share_name>
 <SHARE_RSYNC>Rsync share settings</SHARE_RSYNC>
 <share_this_rsync>Share it using Rsync</share_this_rsync>
+<shExpMatch>matches Regex pattern</shExpMatch>
+<shExpMatch_text>a shell expression against which to compare.</shExpMatch_text>
 <show>show</show>
 <show_config_file>View generated config file</show_config_file>
 <shutdown>Shutdown</shutdown>
@@ -3824,8 +3886,17 @@ to "accept then bounce" mail from an SMTP session, or in any other way respond b
 <SQUID_CACHES_OVER>Proxy caches over !</SQUID_CACHES_OVER>
 <SQUID_CACHES_OVER_TEXT>It seems that your cache storage exceed the limit, in order to get better performances when surfing you need to increase your cache size or adding a new cache repository</SQUID_CACHES_OVER_TEXT>
 <SQUID_CACHE_TINYTEXT>Squid is the famous proxy cache used for most companies, more than 10 years old it is a scalable and strong web internet accelerator</SQUID_CACHE_TINYTEXT>
+<SQUID_DISABLED>Squid is disabled</SQUID_DISABLED>
+<SQUID_DISABLED_TEXT>Squid is currently disabled, click here if you want to re-enable it</SQUID_DISABLED_TEXT>
 <squid_events>Squid Events</squid_events>
 <squid_filter_stats_text>Create filter in order to display specifics events</squid_filter_stats_text>
+<squid_ftp_user>FTP parameters</squid_ftp_user>
+<squid_ftp_user_explain>if you want the anonymous login password to be more informative.[br]
+You can set this to something reasonable for your domain, like squid@squid.visolve.com.[br]
+The reason why this is domain less by default is that the request can be made on the behalf of a 
+user in any domain, depending on how the cache is used.[br] Some ftp servers also validate the email address</squid_ftp_user_explain>
+<squid_ftp_user_text>Define specific parameters on FTP protocol managed by Squid</squid_ftp_user_text>
+<SQUID_LDAP_AUTH_EXT>Instead using the local Artica LDAP database, you can set here an external LDAP authentification server out of the Artica environment</SQUID_LDAP_AUTH_EXT>
 <squid_main_settings>Squid-cache settings</squid_main_settings>
 <SQUID_NETWORK_HELP>
 [ul]
@@ -3835,7 +3906,9 @@ to "accept then bounce" mail from an SMTP session, or in any other way respond b
 [li]This refers range of IP Addresses from 172.16.1.25-172.16.1.35 :[b]172.16.1.25-172.16.1.35/32[/b][/li]
 [/ul]
 </SQUID_NETWORK_HELP>
+<squid_net_calc_mask>CDIR calculation</squid_net_calc_mask>
 <squid_net_settings>Squid Network parameters</squid_net_settings>
+<squid_net_simple>Simple network configuration</squid_net_simple>
 <SQUID_NEWVERSION>New Squid-cache version</SQUID_NEWVERSION>
 <SQUID_NEWVERSION_TEXT>A new squid cache version is vailable in artica update server,it is recommended to upgrade to this version</SQUID_NEWVERSION_TEXT>
 <SQUID_NOT_COMPILED_NTLM_RUN_RECONFIGURE>Squid is not compiled with NTLM directive, if you want to use authentication trough NT Domain, you must upgrade SQUID[br]
@@ -3861,6 +3934,8 @@ UDP packets are almost always unicast too, though they can be sent to the broadc
 <squid_reverse_proxy>Reverse Proxy</squid_reverse_proxy>
 <squid_reverse_proxy_text>Make one accelerator act as a single front-end for multiple servers</squid_reverse_proxy_text>
 <squid_sizelimit>Headers/Page size limits</squid_sizelimit>
+<squid_sslbump>SSL traffic inspection</squid_sslbump>
+<squid_sslbump_text>Enable/Disable Squid-in-the-middle decryption and encryption in order to activate Antivirus checking on SSL web sites</squid_sslbump_text>
 <squid_status>Squid Status</squid_status>
 <SQUID_TOP_HITS_STAT_EXPLAIN>You will find here the 50 best web pages opened by your users</SQUID_TOP_HITS_STAT_EXPLAIN>
 <SQUID_TOP_USERS_STAT_EXPLAIN>You will find here the 50 best users that browsing this web site since the first time Artica store logs</SQUID_TOP_USERS_STAT_EXPLAIN>
@@ -3880,10 +3955,12 @@ UDP packets are almost always unicast too, though they can be sent to the broadc
 <SSLStrictSNIVHostCheck>Disable SNI support</SSLStrictSNIVHostCheck>
 <SSLStrictSNIVHostCheck_text>Used for Groupwares applications with Apache.[br]This directive sets whether a non SNI client is allowed to access a name based virtual host.[br]
 prevent error No hostname was provided via SNI for a name based virtual host</SSLStrictSNIVHostCheck_text>
+<SSL_BUMP_WL>This section allow you to deny SQUID intercepting SSL web sites listed.[br]In this case, SSL certificate will be not changed and antivirus will be not able to scan the website content</SSL_BUMP_WL>
 <ssl_fingerprint>SSL fingerprint</ssl_fingerprint>
 <standard_classes>standard classes</standard_classes>
 <start>Start</start>
 <Start With>Start With</Start With>
+<startTime>Start Time</startTime>
 <start_all_failed_services>Start all services</start_all_failed_services>
 <start_all_services_perform>Order to start all service scheduled.
 The operation will be performed in few times</start_all_services_perform>
@@ -4329,6 +4406,7 @@ The rules for transferring (routing) are set in this section.[br]
 <use%>Use %</use%>
 <used>used</used>
 <UseProxy>Enable proxy server</UseProxy>
+<userdn>User DN</userdn>
 <userid>Unique identifier[br] (mailbox)</userid>
 <username>User name</username>
 <usernanmeorip>Username or IP address</usernanmeorip>
@@ -4375,6 +4453,7 @@ The rules for transferring (routing) are set in this section.[br]
 <Video>Video</Video>
 <view>View</view>
 <view_config>View configuration file</view_config>
+<view_generated_command_lines>Display the final execution of your settings in technical mode</view_generated_command_lines>
 <view_members>Display members</view_members>
 <view_results>View results</view_results>
 <view_script>View script</view_script>
@@ -4404,6 +4483,8 @@ Backscatter is mail you didn't ask to receive, generated by legitimate, non-spam
 <WANT_INSTALL>Do you want to install the selected product ?</WANT_INSTALL>
 <warn>warn</warn>
 <Warning>Warning</Warning>
+<warning_license_not_installed>The license for this service is not installed.[br]check the license in order to make this service in production mode</warning_license_not_installed>
+<WARNING_MAC_ADDRESS_CORRUPT>The MAC address of this computer is corrupted, go into account of this computer and fill correctly the MAC address field</WARNING_MAC_ADDRESS_CORRUPT>
 <WARN_help>Log a warning with the optional text, together with client information and  if  available,  with  helo,sender, recipient and protocol information.</WARN_help>
 <warn_if_reject>Warn in log if reject</warn_if_reject>
 <warn_if_reject_text>Change the meaning of the next restriction,[br] so that it logs a warning instead of rejecting a request[br] (look for logfile records that contain "reject_warning").[br] This is useful for testing new restrictions[br] in a "live" environment without risking unnecessary loss of mail</warn_if_reject_text>
@@ -4423,6 +4504,7 @@ Backscatter is mail you didn't ask to receive, generated by legitimate, non-spam
 <website>Web site</website>
 <websites>Web sites</websites>
 <website_name>Website name</website_name>
+<website_ssl_wl_help>add a web site pattern eg: .domain.com or www.domain.com</website_ssl_wl_help>
 <webtv>Collection of site offering TV streams via world wide web</webtv>
 <web_filter>Web filter</web_filter>
 <web_proxy>Web Proxy</web_proxy>
@@ -4430,6 +4512,7 @@ Backscatter is mail you didn't ask to receive, generated by legitimate, non-spam
 <web_server_path>Full path to php artica source folder</web_server_path>
 <wednesday>Wednesday</wednesday>
 <week>week</week>
+<weekdays>Days of the week</weekdays>
 <weekly>Weekly</weekly>
 <WELCOME>Welcome on Artica-Postfix</WELCOME>
 <welcomeb>welcome</welcomeb>
@@ -4486,6 +4569,8 @@ At the opposit, Weekly container will use the incremental benefit but increase r
 <WORKGROUP>Workgroup</WORKGROUP>
 <working_title>Working title</working_title>
 <write>write</write>
+<wrong_squid_version>Wrong squid version</wrong_squid_version>
+<wrong_squid_version_feature_text>It seems that your squid version did not include this feature.[br]Go to the setup center and upgrade your SQUID version to the latest one</wrong_squid_version_feature_text>
 <WWWMultiSMTPSender>SMTP server</WWWMultiSMTPSender>
 <www_adv>All about advertising</www_adv>
 <www_chat>Site for realtime chatting and instant messaging</www_chat>

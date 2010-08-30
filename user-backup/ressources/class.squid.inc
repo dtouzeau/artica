@@ -4,7 +4,8 @@ include_once(dirname(__FILE__).'/class.kav4proxy.inc');
 include_once(dirname(__FILE__).'/class.mysql.inc');
 include_once(dirname(__FILE__).'/class.sockets.inc');
 include_once(dirname(__FILE__).'/class.samba.inc');	
-include_once(dirname(__FILE__)."/class.c-icap-filter.inc");	
+include_once(dirname(__FILE__)."/class.c-icap-filter.inc");
+include_once(dirname(__FILE__)."/class.icap.inc");		
 
 
 
@@ -1460,7 +1461,8 @@ class squidbee{
 	var $enable_squidguard;
 	var $LDAP_AUTH=0;
 	var $NTLM_AUTH=0;
-
+	var $SSL_BUMP=0;
+	
 	var $CACHE_SIZE=2000;
 	var $CACHE_PATH;
 	var $CACHE_TYPE="ufs";
@@ -1479,8 +1481,12 @@ class squidbee{
 	var $SQUID_VERSION="";
 	var $KAV4PROXY_INSTALLED=false;
 	var $EnableParentProxy=0;
-	
-	
+	var $LDAP_EXTERNAL_AUTH=0;
+	var $EXTERNAL_LDAP_AUTH_PARAMS=array();
+	var $IS_31=false;
+	var $IS_32=false;
+	var $ICAP_SERVICES_COUNT=0;
+	var $FTP_PARAMS=array();
 	function squidbee(){
 		$this->VerifyLdapBranch();
 		$this->ParseConfig();
@@ -1494,6 +1500,15 @@ class squidbee{
 		$this->KAV4PROXY_INSTALLED=$users->KAV4PROXY_INSTALLED;
 		$this->SquidAcountUpdate();
 		
+		if(preg_match('#^([0-9]+)\.([0-9]+)#',$users->SQUID_VERSION,$re)){
+		if($re[1]==3){
+			if($re[2]==1){$this->IS_31=true;}
+			if($re[2]>=2){$this->IS_32=true;}
+		}
+		
+	}
+		
+		
 		$this->hasProxyTransparent=$sock->GET_INFO("hasProxyTransparent");
 		if($this->hasProxyTransparent==null){$this->hasProxyTransparent=0;}
 		if(posix_getuid()==0){$this->ASROOT=true;}
@@ -1501,21 +1516,33 @@ class squidbee{
 	
 	
 	function isicap(){
-		
+		if(trim($this->SQUID_VERSION)==null){
+			$users=new usersMenus();
+			$this->SQUID_VERSION=$users->SQUID_VERSION;
+			$this->SQUID_ICAP_ENABLED=$users->SQUID_ICAP_ENABLED;
+			$this->KAV4PROXY_INSTALLED=$users->KAV4PROXY_INSTALLED;
+		}
+		writelogs("SQUID:: SQUID_VERSION::=$users->SQUID_VERSION",__CLASS__.'/'.__FUNCTION__,__FILE__);
 		if(preg_match('#([0-9\.]+)#',$this->SQUID_VERSION,$re)){$this->SQUID_VERSION=$re[1];}
-		if($this->SQUID_VERSION>2.6){
+		if($this->SQUID_VERSION>=3){
 			if($this->SQUID_ICAP_ENABLED){
 				if($this->KAV4PROXY_INSTALLED){
 					return true;
 				}else{
+					writelogs("SQUID:: error_kavproxy_not_installed::",__CLASS__.'/'.__FUNCTION__,__FILE__);
 					$this->kav_accept_why='{error_kavproxy_not_installed}';
 				}
 			}else{
+				writelogs("SQUID:: error_squid_icap_not_compliance::",__CLASS__.'/'.__FUNCTION__,__FILE__);
 				$this->kav_accept_why='{error_squid_icap_not_compliance}';
 			}
 		}else{
+			writelogs("SQUID:: error_squid_upto_three::version=$this->SQUID_VERSION",__CLASS__.'/'.__FUNCTION__,__FILE__);
 			$this->kav_accept_why='{error_squid_upto_three}<br><strong>'.$this->SQUID_VERSION."</strong>";
 		}
+		
+		writelogs("SQUID:: version=$this->SQUID_VERSION::",__CLASS__.'/'.__FUNCTION__,__FILE__);
+		
 	}
 	
 	function VerifyLdapBranch(){
@@ -1535,6 +1562,7 @@ class squidbee{
 	function ParseConfig(){
 		$ini=new Bs_IniHandler();
 		$sock=new sockets();
+		$users=new usersMenus();
 		$ini->loadString($this->ArticaSquidParameters);
 		$network=explode(';',$ini->_params["NETWORK"]["cdir"]);
 		$dns=explode(';',$ini->_params["NETWORK"]["dns_servers"]);
@@ -1542,6 +1570,7 @@ class squidbee{
 		$this->visible_hostname=$ini->_params["NETWORK"]["visible_hostname"];
 		$this->LDAP_AUTH=$ini->_params["NETWORK"]["LDAP_AUTH"];
 		$this->NTLM_AUTH=$ini->_params["NETWORK"]["NTLM_AUTH"];
+		$this->LDAP_EXTERNAL_AUTH=$ini->_params["NETWORK"]["LDAP_EXTERNAL_AUTH"];
 		$this->EnableParentProxy=$ini->_params["NETWORK"]["EnableParentProxy"];
 
 		
@@ -1553,6 +1582,11 @@ class squidbee{
 		$this->CACHE_TYPE=$ini->_params["CACHE"]["CACHE_TYPE"];
 		$this->enable_cicap=$sock->GET_INFO('CicapEnabled');
 		$this->enable_squidguard=$sock->GET_INFO('squidGuardEnabled');
+		$this->EXTERNAL_LDAP_AUTH_PARAMS=unserialize(base64_decode($sock->GET_INFO("SquidExternalAuth")));
+		$this->FTP_PARAMS=unserialize(base64_decode($sock->GET_INFO("SquidFTPParams")));
+		$this->SSL_BUMP=$ini->_params["NETWORK"]["SSL_BUMP"];
+		
+		
 		
 		if($this->enable_cicap==null){$this->enable_cicap=0;}
 		if(is_array($ini->_params)){
@@ -1586,7 +1620,11 @@ class squidbee{
 		if($this->CACHE_SIZE==null){$this->CACHE_SIZE=2000;}
 		if($this->CACHE_PATH==null){$this->CACHE_PATH="/var/cache/squid";}
 		if($this->CACHE_TYPE==null){$this->CACHE_TYPE="ufs";}
+		if($this->SSL_BUMP==null){$this->SSL_BUMP=0;}
 		
+		if(!preg_match("#([0-9]+)\.([0-9]+)#",$users->SQUID_VERSION,$re)){
+    		if($re[1]<3){$this->SSL_BUMP=0;}else{if($re[2]<1){$this->SSL_BUMP=0;}}
+		}
 		
 		while (list ($num, $cidr) = each ($network)){
 			if(trim($cidr)<>null){
@@ -1699,7 +1737,10 @@ class squidbee{
 	}
 		
 function SaveToLdap(){
-			if(!$this->kav_accept){$this->enable_kavproxy=0;}
+			if(!$this->kav_accept){
+				writelogs("SQUID:: kavaccept = FALSE",__CLASS__.'/'.__FUNCTION__,__FILE__);
+				$this->enable_kavproxy=0;
+			}
 			if($this->hasProxyTransparent==1){$this->LDAP_AUTH=0;}
 			$sock=new sockets();
 			$ini=$ini."[NETWORK]\n";
@@ -1719,6 +1760,11 @@ function SaveToLdap(){
 			$ini=$ini."visible_hostname=$this->visible_hostname\n";
 			$ini=$ini."LDAP_AUTH=$this->LDAP_AUTH\n";
 			$ini=$ini."NTLM_AUTH=$this->NTLM_AUTH\n";
+			$ini=$ini."LDAP_EXTERNAL_AUTH=$this->LDAP_EXTERNAL_AUTH\n";
+			$ini=$ini."SSL_BUMP=$this->SSL_BUMP\n";
+			
+			
+			
 			$ini=$ini."[KAV]\n";
 			$ini=$ini."enabled=$this->enable_kavproxy\n";
 			$ini=$ini."[DANSGUARDIAN]\n";
@@ -1727,6 +1773,10 @@ function SaveToLdap(){
 			$ini=$ini."CACHE_SIZE=$this->CACHE_SIZE\n";
 			$ini=$ini."CACHE_PATH=$this->CACHE_PATH\n";
 			$ini=$ini."CACHE_TYPE=$this->CACHE_TYPE\n";
+			
+			
+							
+	
 
 			if(is_array($this->cache_list)){
 				reset($this->cache_list);
@@ -1759,8 +1809,12 @@ function SaveToLdap(){
 			$sock->SET_INFO("ArticaEnableKav4ProxyInSquid",$this->enable_kavproxy);
 			$sock->SET_INFO("CicapEnabled",$this->enable_cicap);
 			$sock->SET_INFO("squidGuardEnabled",$this->enable_squidguard);
+			$sock->SaveConfigFile(base64_encode(serialize($this->EXTERNAL_LDAP_AUTH_PARAMS)),"SquidExternalAuth");
+			$sock->SaveConfigFile(base64_encode(serialize($this->FTP_PARAMS)),"SquidFTPParams");
 			
 				
+			
+			
 			if($this->enable_dansguardian==1){
 				writelogs("",__FUNCTION__,__FILE__);
 				writelogs("Save Dansguardian configuration...",__FUNCTION__,__FILE__);
@@ -1783,19 +1837,7 @@ function SaveToLdap(){
 		}
 		
 		
-		private function ICAP_HEADERS($kaspersky=0){
-			$conf[]="icap_enable on";
-			if($kaspersky==1){
-				$conf[]="icap_preview_enable off";
-				$conf[]="icap_preview_size 128";			
-			}
-			$conf[]="icap_send_client_ip on";
-			$conf[]="icap_send_client_username on";
-			$conf[]="icap_client_username_header X-Authenticated-User";
-			$conf[]="icap_client_username_encode on";
-			return implode("\n",$conf);
-			
-		}
+
 		
 public function SquidGuardDatabasesStatus($all=0){
 	$datas=explode("\n",@file_get_contents("/etc/squid/squidGuard.conf"));
@@ -1839,14 +1881,37 @@ public function SquidGuardDatabasesStatus($all=0){
 			$users=new usersMenus();
 			$ldap=new clladp();
 			if($ldap->ldap_host==null){$ldap->ldap_host="127.0.0.1";}
+			
+			$ldap_host=$ldap->ldap_host;
+			$ldap_port=$ldap->ldap_port;
+			$suffix=$ldap->suffix;
+			$ldap_admin="cn=$ldap->ldap_admin,$ldap->suffix";
+			$ldap_password=$ldap->ldap_password;
+			$user_filter="(&(objectClass=userAccount)(uid=%s))";
+			$group_filter="(&(objectClass=posixGroup)(gidNumber=%a)(memberUid=%v))";
+			$auth_banner="Squid proxy-caching web server";
+			
+			
+			if($this->LDAP_EXTERNAL_AUTH==1){
+				$ldap_host=$this->EXTERNAL_LDAP_AUTH_PARAMS["ldap_server"];
+				$ldap_port=$this->EXTERNAL_LDAP_AUTH_PARAMS["ldap_port"];	
+				$ldap_password=$this->EXTERNAL_LDAP_AUTH_PARAMS["ldap_password"];
+				$ldap_admin=$this->EXTERNAL_LDAP_AUTH_PARAMS["ldap_user"];		
+				$suffix=$this->EXTERNAL_LDAP_AUTH_PARAMS["ldap_suffix"];
+				$user_filter=$this->EXTERNAL_LDAP_AUTH_PARAMS["ldap_filter_users"];
+				$group_filter=$this->EXTERNAL_LDAP_AUTH_PARAMS["ldap_filter_group"];
+				$auth_banner=$this->EXTERNAL_LDAP_AUTH_PARAMS["auth_banner"];					
+			}
+					
+			
 			$conf[]= "#--------- LDAP AUTH settings\n";
-			$conf[]= "\n#Authentification mode, building using squid compiled for artica";
+			$conf[]= "\n#Authentification mode, building using squid compiled for $ldap_host:$ldap_port";
 			if(trim($users->SQUID_LDAP_AUTH)<>null){
-				$conf[]= "auth_param basic program $users->SQUID_LDAP_AUTH -b \"$ldap->suffix\" -D \"cn=$ldap->ldap_admin,$ldap->suffix\" -w $ldap->ldap_password -f \"(&(objectClass=userAccount)(uid=%s))\" -v 3 -h $ldap->ldap_host";
+				$conf[]= "auth_param basic program $users->SQUID_LDAP_AUTH -b \"$suffix\" -D \"$ldap_admin\" -w \"$ldap_password\" -f \"$user_filter\" -v 3 -h $ldap_host -p $ldap_port";
 				$conf[]= "#--------- GLOBAL";
-				$conf[]= "external_acl_type ldap_group %LOGIN " . dirname($users->SQUID_LDAP_AUTH)."/squid_ldap_group -D \"cn=$ldap->ldap_admin,$ldap->suffix\" -w $ldap->ldap_password -b \"$ldap->suffix\"  -f \"(&(objectClass=posixGroup)(gidNumber=%a)(memberUid=%v))\" -S -v 3 -h $ldap->ldap_host";
+				$conf[]= "external_acl_type ldap_group %LOGIN " . dirname($users->SQUID_LDAP_AUTH)."/squid_ldap_group -D \"$ldap_admin\" -w \"$ldap_password\" -b \"$suffix\"  -f \"$group_filter\" -S -v 3 -h $ldap_host -p $ldap_port";
 				$conf[]= "auth_param basic children 5";
-				$conf[]= "auth_param basic realm Squid proxy-caching web server";
+				$conf[]= "auth_param basic realm $auth_banner";
 				$conf[]= "acl ldapauth proxy_auth REQUIRED";
 				$conf[]= "http_access allow ldapauth";
 				$conf[]="";
@@ -1897,113 +1962,7 @@ public function SquidGuardDatabasesStatus($all=0){
 			$conf[]="";
 			return implode("\n",$conf);
 			}
-			
 
-			
-
-			
-	private function icap_kav_services_3(){
-		if($this->enable_kavproxy<>1){
-			if($this->ASROOT){echo "Starting......: Squid Kaspersky ICAP is disabled\n";}
-			return $this->icap_cicap_services_3();}
-		if($this->ASROOT){echo "Starting......: Squid activating Kaspersky ICAP Mode\n";}
-		if($this->SQUID_BIN_VERSION>310000000000){return $this->icap_kav_services_31();}
-		$kav_rules[]="";
-		$kav_rules[]="# --------- icap_service KASPERSKY mode 3.0.x";
-		$kav_rules[]=$this->ICAP_HEADERS(1);
-		$kav_rules[]="";
-		$kav_rules[]="icap_service\tis_kav_resp respmod_precache 0 icap://127.0.0.1:1344/av/respmod";
-		$kav_rules[]="icap_service\tis_kav_req reqmod_precache 0 icap://127.0.0.1:1344/av/reqmod";
-		$kav_rules[]="";
-		$kav_rules[]="# --------- icap_class";
-		$kav_rules[]="icap_class\tic_kav_resp is_kav_resp";
-		$kav_rules[]="icap_class\tic_kav_req is_kav_req"; 
-		$kav_rules[]="";
-		$kav_rules[]="# --------- icap_access";
-		$kav_rules[]="icap_access\tic_kav_resp allow all";
-		$kav_rules[]="icap_access\tic_kav_req allow all !acl_kav_GET";			
-		$kav_rules[]="";	
-
-		return implode("\n",$kav_rules);	
-	}
-	
-	private function icap_kav_services_31(){
-		
-		if($this->ASROOT){echo "Starting......: Squid adaptation enabled\n";}
-		$kav_rules[]="";
-		$kav_rules[]="# --------- icap_service KASPERSKY mode 3.1.1";
-		$kav_rules[]=$this->ICAP_HEADERS(1);
-		$kav_rules[]="";
-		$kav_rules[]="icap_service\tis_kav_resp respmod_precache 0 icap://127.0.0.1:1344/av/respmod";
-		$kav_rules[]="icap_service\tis_kav_req reqmod_precache 0 icap://127.0.0.1:1344/av/reqmod";
-		$kav_rules[]="";
-		$kav_rules[]="# --------- adaptation";
-		$kav_rules[]="";
-		$kav_rules[]="adaptation_access is_kav_req allow all";
-		$kav_rules[]="adaptation_access is_kav_resp allow all";	
-		$kav_rules[]="";	
-		return implode("\n",$kav_rules);	
-	}	
-
-
-
-	
-	
-	private function icap_cicap_services_3(){
-		if($this->enable_cicap<>1){return null;}
-		if($this->enable_dansguardian==1){return null;}
-		if($this->SQUID_BIN_VERSION>310000000000){return $this->icap_cicap_services_31();}
-		if($this->ASROOT){echo "Starting......: Squid activating C-ICAP\n";}
-		$kav_rules[]="# --------- icap_service C-ICAP";
-		$kav_rules[]="icap_service\tservice_req reqmod_precache bypass=1 icap://127.0.0.1:1344/srv_clamav";
-		$kav_rules[]="icap_service\tservice_avi respmod_precache bypass=0 icap://127.0.0.1:1344/srv_clamav";
-		
-		$kav_rules[]=$this->ICAP_HEADERS();
-		
-
-		
-		$kav_rules[]="";
-		$kav_rules[]="icap_class\tclass_antivirus service_avi";
-		$kav_rules[]="icap_class\tclass_antivirus_req service_req";		
-		$kav_rules[]="icap_access\tclass_antivirus allow all";
-		$kav_rules[]="icap_access\tclass_antivirus_req allow all";
-		$kav_rules[]="";
-		return implode("\n",$kav_rules);				
-		
-	}
-	
-	private function icap_cicap_services_31(){
-		if($this->ASROOT){echo "Starting......: Squid activating C-ICAP\n";}
-		$kav_rules[]="";
-		$kav_rules[]="# --------- icap_service C-ICAP mode 3.1.x";
-		$kav_rules[]="acl MULTIMEDIA rep_mime_type -i ^(audio\/x-mpegurl|audio\/mpeg|video\/flv|video\/x-flv|application\/x-shockwave-flash|audio\/ogg|video\/ogg|application\/ogg)$";		
-		//$kav_rules[]="icap_service  service_antivir_req reqmod_precache 1 icap://127.0.0.1:1344/srv_clamav";
-		if($this->enable_squidguard==1){
-			$kav_rules[]="icap_service\tservice_url_check reqmod_precache 1 icap://127.0.0.1:1344/url_check";
-			$kav_rules[]="adaptation_service_set  class_url_check   service_url_check";
-			$kav_rules[]="adaptation_access  class_url_check  allow all";
-			$kav_rules[]="";
-		}		
-		$kav_rules[]="icap_service  service_antivir 	respmod_precache 1 icap://127.0.0.1:1344/srv_clamav";
-		$kav_rules[]="";		
-		//$kav_rules[]="adaptation_service_set  class_antivirus_req $service_url_check service_antivir_req";
-		//$kav_rules[]="adaptation_access       class_antivirus_req deny MULTIMEDIA";
-		$kav_rules[]="";
-		$kav_rules[]="adaptation_service_set  class_antivirus service_antivir";
-		$kav_rules[]="adaptation_access       class_antivirus deny MULTIMEDIA";
-		$kav_rules[]="adaptation_access       class_antivirus allow all";
-		$kav_rules[]="";
-		$kav_rules[]="icap_preview_enable on";
-		$kav_rules[]="icap_preview_size 128";
-		$kav_rules[]="icap_service_failure_limit -1";	
-		$kav_rules[]=$this->ICAP_HEADERS();
-		$kav_rules[]="";
-		$kav_rules[]="";
-		
-		return implode("\n",$kav_rules);		
-		}	
-		
-		
 	private function squidGuard(){
 		
 		$users=new usersMenus();
@@ -2099,6 +2058,8 @@ public function SquidGuardDatabasesStatus($all=0){
 		
 function BuildSquidConf(){
 		$sock=new sockets();
+		
+		
 		$SquidActHasReverse=$sock->GET_INFO("SquidActHasReverse");
 		$EnableMalwarePatrol=$sock->GET_INFO("EnableMalwarePatrol");
 		if($this->ASROOT){echo "Starting......: Squid Version $this->SQUID_BIN_VERSION\n";}
@@ -2106,8 +2067,19 @@ function BuildSquidConf(){
 			$squidGuard=$this->squidGuard();
 		}
 		
+		if(!$this->IS_31){
+			$conf=$conf . "#Squid version is under 3.1x or 3.2x version...\n";
+			if($this->enable_kavproxy==1){
+				if($this->enable_cicap==1){
+					$conf=$conf . "#C-ICAP was removed, this squid version did not accept more that 1 ICAP server\n";
+					$this->enable_cicap=0;
+		}}}else{
+			if($this->enable_kavproxy==1){$this->ICAP_SERVICES_COUNT=$this->ICAP_SERVICES_COUNT+1;}
+			if($this->enable_cicap==1){$this->ICAP_SERVICES_COUNT=$this->ICAP_SERVICES_COUNT+1;}
+		}
 		
-		$kav_rules=$this->icap_kav_services_3();
+		
+
 		$kav_acl="acl acl_kav_GET method GET\n";
 		$kav_acl=$this->acls_multimedias();
 		$acl_blocked_sites="acl blockedsites url_regex \"/etc/squid3/squid-block.acl\"\n";
@@ -2213,7 +2185,9 @@ function BuildSquidConf(){
 		if($this->EnableParentProxy==1){
 			$conf=$conf."\n#--------- RULES THAT FORCE TO PASS trough parent proxies except FTP\n";
 			$conf=$conf."always_direct allow FTP\n";
-			$conf=$conf."always_direct deny all\n\n";
+			if($this->SSL_BUMP==0){
+				$conf=$conf."always_direct deny all\n\n";
+			}
 		}		
 		
 		if($this->LDAP_AUTH==1){
@@ -2271,13 +2245,20 @@ function BuildSquidConf(){
 		$conf=$conf. $acl_ldapauth;
 		$conf=$conf .$acl_ldap_auth;
 		$conf=$conf .$acl_access_time;
+		$conf=$conf."acl MULTIMEDIA rep_mime_type -i ^(audio\/x-mpegurl|audio\/mpeg|video\/flv|video\/x-flv|application\/x-shockwave-flash|audio\/ogg|video\/ogg|application\/ogg)$\n";
 		$conf=$conf .$office_network;
 		$conf=$conf. $this->SSL_PORTS();
 		$conf=$conf ."http_access deny !Safe_ports\n";
 		$conf=$conf ."http_access deny CONNECT !SSL_ports\n";
 		$conf=$conf ."http_access deny to_localhost\n";
 		$conf=$conf ."http_access deny all\n";
-		$conf=$conf . $kav_rules;
+		$conf=$conf."\n";
+		
+		$icap=new icap();
+		
+		$conf=$conf."# --------- ICAP Services.($icap->ICAP_SERVICES_COUNT service(s))\n";
+		$conf=$conf.$icap->icap_final_string;
+		$conf=$conf."\n";
 		$conf=$conf."# --------- ident_lookup_access\n";
 		$conf=$conf."hierarchy_stoplist cgi-bin ?\n";
 		$conf=$conf."\n";
@@ -2314,10 +2295,18 @@ function BuildSquidConf(){
 			$conf=$conf.$this->squid_reverse_websites();
 		}
 		
-		$conf=$conf."#http ports\n";
-		$conf=$conf."http_port $listen_port$transparent\n";
+		$http_port_sslbump=$this->ssl_bump_port();
+		
+		
+		$conf=$conf."#http/https ports\n";
+		$conf=$conf."http_port $listen_port$transparent$http_port_sslbump\n";
+		$conf=$conf.$this->ssl_bump_tranparent($listen_port);
 		$conf=$conf."\n";
 		$conf=$conf."\n";
+		$conf=$conf ."# --------- SSL Rules \n";
+		$conf=$conf .$this->ssl_bump_access();
+		$conf=$conf."\n";
+		
 		$conf=$conf ."# --------- Caches \n";
 		$conf=$conf ."#cache_replacement_policy heap LFUDA\n";
 		$conf=$conf ."cache_mem {$this->global_conf_array["cache_mem"]}\n";
@@ -2339,7 +2328,7 @@ function BuildSquidConf(){
 			}
 		}
 
-		
+		$conf=$conf.$this->ftp_parameters();
 		$conf=$conf."debug_options ALL,1\n";
 		//$conf=$conf."cache deny QUERY\n";
 		$conf=$conf."refresh_pattern ^ftp:		1440	20%	10080\n";
@@ -2376,6 +2365,67 @@ function BuildSquidConf(){
 		return $conf;	
 		
 		}
+		
+		private function ssl_bump_port(){
+			if($this->SSL_BUMP==0){return null;}
+			if($this->hasProxyTransparent==1){return null;}
+			return " sslBump cert=/etc/squid3/ssl/cacert.pem key=/etc/squid3/ssl/privkey.pem";
+		}
+		
+		private function ssl_bump_tranparent($listen_port){
+			$listen_port=$listen_port+1;
+			if($this->hasProxyTransparent==0){return null;}
+			 return "https_port $listen_port transparent sslBump cert=/etc/squid3/ssl/cacert.pem key=/etc/squid3/ssl/privkey.pem\n";  
+		}
+		
+		private function ssl_bump_access(){
+			if($this->SSL_BUMP==0){return null;}
+			$sql="SELECT website_name FROM squid_ssl WHERE `type`='ssl-bump-wl' AND enabled=1 ORDER BY website_name LIMIT 0,50";
+			$q=new mysql();
+			$results=$q->QUERY_SQL($sql,"artica_backup");
+			$c=0;
+			while($ligne=@mysql_fetch_array($results,MYSQL_ASSOC)){
+				if($ligne["website_name"]==null){continue;}
+				$c=$c+1;
+				$array[]="acl no_ssl_bump dstdomain {$ligne["website_name"]}";
+			}
+			
+			if($c>0){
+				$array[]="ssl_bump deny no_ssl_bump";
+				
+			}
+			$array[]="ssl_bump allow all";
+			$array[]="always_direct allow all";
+			$array[]="";
+			$array[]="";
+			return @implode("\n",$array);
+		}
+		
+
+		
+		
+		
+		private function ftp_parameters(){
+				$ftp_passive=$this->FTP_PARAMS["ftp_passive"];						
+				if($this->FTP_PARAMS["ftp_list_width"]==null){$this->FTP_PARAMS["ftp_list_width"]=32;}
+				if($ftp_passive==null){$ftp_passive=1;}	
+				if($ftp_passive==1){$ftp_passive="yes";}else{$ftp_passive="no";}
+				
+				
+				$conf[]="";
+				$conf[]="#--------- FTP specific parameters";
+				if(preg_match("#(.+?)@#",$this->FTP_PARAMS["ftp_user"])){
+					$conf[]="ftp_user {$this->FTP_PARAMS["ftp_user"]}";
+				}
+				
+				$conf[]="ftp_list_width {$this->FTP_PARAMS["ftp_list_width"]}";
+				$conf[]="ftp_passive $ftp_passive";
+				$conf[]="";
+				$conf[]="";
+				return @implode("\n",$conf);
+		}
+		
+		
 		
 	private function squid_reverse_websites(){
 		
@@ -2618,7 +2668,7 @@ class cicap{
 			$conf[]="ThreadsPerChild     {$this->main_array["CONF"]["ThreadsPerChild"]}";
 			$conf[]="MaxRequestsPerChild  {$this->main_array["CONF"]["MaxRequestsPerChild"]}";
 			$conf[]="MaxMemObject 131072";
-			$conf[]="Port 1344 ";
+			$conf[]="Port 1345 ";
 			$conf[]="User $user";
 			$conf[]="Group $user";
 			$conf[]="ServerAdmin you@your.address";

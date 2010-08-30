@@ -39,7 +39,7 @@ private
      function    GET_LOCAL_PORT():string;
      function    TAIL_PID():string;
      function    PROXY_PAC_PID():string;
-
+     function    GET_SSL_PORT():string;
 
 public
     Caches      :TstringList;
@@ -292,6 +292,8 @@ procedure tsquid.AS_TRANSPARENT_MODE();
 var
    hasProxyTransparent:Integer;
    local_port:string;
+   https_port:string;
+   https_port_int:integer;
 begin
 if not TryStrToInt(SYS.GET_INFO('hasProxyTransparent'),hasProxyTransparent) then hasProxyTransparent:=0;
 if hasProxyTransparent=1 then begin
@@ -305,14 +307,40 @@ if hasProxyTransparent=1 then begin
     end;
     //http://www.fido-fr.net/linux_squid_iptables.shtml
     local_port:=GET_LOCAL_PORT();
-
+    https_port:=GET_SSL_PORT();
+    if not TryStrToInt(https_port,https_port_int) then https_port_int:=0;
 
     if not IS_IPTABLES_SQUID_EXISTS(local_port) then begin
-       logs.Syslogs('Starting......: Insert routing table in iptables configuration... dest:'+local_port);
+       logs.Syslogs('Starting......: Insert routing table HTTP in iptables configuration... dest:'+local_port);
        fpsystem(SYS.LOCATE_IPTABLES() + ' -A PREROUTING -t nat -p tcp --dport 80 -j REDIRECT --to-port '+local_port);
+       if not IS_IPTABLES_SQUID_EXISTS(local_port) then begin
+           logs.Syslogs('Starting......: Failed using '+ SYS.LOCATE_IPTABLES() + ' -A PREROUTING -t nat -p tcp --dport 80 -j REDIRECT --to-port '+local_port);
+       end;
+
     end else begin
-       logs.Debuglogs('Starting......: Insert routing table in iptables already done...');
+       logs.Debuglogs('Starting......: Insert routing table HTTP in iptables already done...');
     end;
+
+    if https_port_int<5 then begin
+        logs.Debuglogs('Starting......: Insert routing table HTTPS failed, no defined port');
+        exit;
+    end;
+
+     if not IS_IPTABLES_SQUID_EXISTS(https_port) then begin
+          logs.Syslogs('Starting......: Insert routing table HTTPS in iptables configuration... dest:'+https_port);
+          fpsystem(SYS.LOCATE_IPTABLES() + ' -A PREROUTING -t nat -p tcp --dport 443 -j REDIRECT --to-port '+https_port);
+
+          if not IS_IPTABLES_SQUID_EXISTS(https_port) then begin
+             logs.Syslogs('Starting......: Failed using '+ SYS.LOCATE_IPTABLES() + ' -A PREROUTING -t nat -p tcp --dport 443 -j REDIRECT --to-port '+https_port);
+          end;
+
+      end else begin
+       logs.Debuglogs('Starting......: Insert routing table HTTPS in iptables already done...');
+    end;
+
+
+
+
 end else begin
      logs.Debuglogs('Starting......: Squid, transparent is disabled');
 
@@ -335,7 +363,11 @@ F:=false;
 result:=false;
 tmpstr:=LOGS.FILE_TEMP();
 fpsystem(SYS.LOCATE_IPTABLES() + ' -L -t nat --line-numbers >'+tmpstr + ' 2>&1');
-if not FileExists(tmpstr) then exit;
+if not FileExists(tmpstr) then begin
+   logs.Debuglogs('Starting......: IS_IPTABLES_SQUID_EXISTS failed -> '+tmpstr+' no such file');
+   exit;
+end;
+
 l:=TstringList.Create;
 l.LoadFromFile(tmpstr);
 logs.DeleteFile(tmpstr);
@@ -345,8 +377,12 @@ for i:=0 to l.Count-1 do begin
       if RegExpr.Exec(l.Strings[i]) then begin
        if not F then begin
          if RegExpr.Match[2]=listen_port then begin
+            logs.Debuglogs('Starting......: Insert routing table found line '+inttostr(i)+' for port '+listen_port);
             f:=true;
-            continue;
+            result:=true;
+            RegExpr.free;
+            l.free;
+            exit;
          end;
        end;
 
@@ -390,6 +426,26 @@ begin
 end;
 
 //##############################################################################
+function tsquid.GET_SSL_PORT():string;
+var
+   RegExpr      :TRegExpr;
+
+
+begin
+   result:=SQUID_GET_CONFIG('https_port');
+   RegExpr:=TRegExpr.Create;
+
+   RegExpr.Expression:='([0-9\.]+):([0-9]+)';
+   if RegExpr.Exec(result) then result:=RegExpr.Match[2];
+   RegExpr.Expression:='([0-9]+)';
+   RegExpr.Exec(result);
+   result:=RegExpr.Match[1];
+end;
+
+//##############################################################################
+
+
+
 function tsquid.DANSGUARDIAN_PORT():string;
 var
    l            :TstringList;
@@ -450,7 +506,7 @@ SYS:=Tsystem.Create;
 
 
 if DirectoryExists('/var/lib/squidguard') then begin
-     logs.DebugLogs('Starting......: Squid apply security permission on /var/lib/squidguard');
+     logs.DebugLogs('Starting......: Squid apply security permissions on /var/lib/squidguard');
      fpsystem('/bin/chmod -R 755 /var/lib/squidguard');
 end;
 
@@ -977,24 +1033,37 @@ procedure tsquid.SQUID_STOP();
     pid:string;
     count:integer;
     i:integer;
+    binpath:string;
+    FileTemp:string;
 begin
 count:=0;
-  if not FileExists(SQUID_BIN_PATH()) then exit;
+binpath:=SQUID_BIN_PATH();
+  if not FileExists(binpath) then exit;
   pid:=SQUID_PID();
   if SYS.PROCESS_EXIST(pid) then begin
    writeln('Stopping Squid...............: ' + pid + ' PID');
-   logs.OutputCmd('/bin/kill '+pid);
+   logs.OutputCmd(binpath+' -k kill');
 
+   while SYS.PROCESS_EXIST(pid) do begin
+        sleep(200);
+        inc(count);
+        if count>30 then break;
+        pid:=SQUID_PID();
+   end;
+   
+   if SYS.PROCESS_EXIST(pid) then begin
+       writeln('Stopping Squid...............: '+pid+' pid timeout, kill it...');
+       logs.OutputCmd('/bin/kill -9 '+pid);
+   end;
+
+   count:=0;
    while SYS.PROCESS_EXIST(pid) do begin
         sleep(100);
         inc(count);
         if count>30 then break;
+        pid:=SQUID_PID();
    end;
-   
-   if SYS.PROCESS_EXIST(pid) then begin
-       writeln('Stopping Squid...............: timeout, kill it...');
-       logs.OutputCmd('/bin/kill -9 '+pid);
-   end;
+
 
 
    if SYS.PROCESS_EXIST(pid) then begin
@@ -1030,7 +1099,11 @@ end;
 
 
 if not SYS.PROCESS_EXIST(pid) then begin
-     writeln('Stopping Squid...............: Stopped');
+     writeln('Stopping Squid...............: success stopping Squid daemon');
+     writeln('Stopping Squid...............: checking transparent mode...');
+     FileTemp:=logs.FILE_TEMP();
+     fpsystem(SYS.LOCATE_PHP5_BIN()+' /usr/share/artica-postfix/exec.squid.php --build >' +FileTemp+' 2>&1');
+     AS_TRANSPARENT_MODE();
      TAIL_STOP();
   end;
 end;

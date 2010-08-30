@@ -628,6 +628,19 @@ function SERVICES_STATUS(){
 			$html=$html . BuildRow($users,$ini->_params["DNSMASQ"],"{APP_DNSMASQ}");
 			$html=$html . BuildRow($users,$ini->_params["CLAMAV"],"{APP_CLAMAV}");	
 			$html=$html . BuildRow($users,$ini->_params["FRESHCLAM"],"{APP_FRESHCLAM}");
+			
+			$html=$html . BuildRow($users,$ini->_params["APP_KAV4FS"],"{APP_KAV4FS}");
+			$html=$html . BuildRow($users,$ini->_params["APP_KAV4FS_AVS"],"{APP_KAV4FS_AVS}");
+			
+			
+			$html=$html . BuildRow($users,$ini->_params["APP_OCSI"],"{APP_OCSI}");
+			$html=$html . BuildRow($users,$ini->_params["APP_OCSI_DOWNLOAD"],"{APP_OCSI_DOWNLOAD}");
+			$html=$html . BuildRow($users,$ini->_params["APP_OCSI_LINUX_CLIENT"],"{APP_OCSI_LINUX_CLIENT}");
+			
+			
+			
+			
+			
 			$html=$html . BuildRow($users,$ini->_params["KRETRANSLATOR_HTTPD"],"{APP_KRETRANSLATOR_HTTPD}");	
 			$html=$html . BuildRow($users,$ini->_params["SYSLOGNG"],"{APP_SYSLOGNG}");
 			$html=$html . BuildRow($users,$ini->_params["COLLECTD"],"{APP_COLLECTD}");
@@ -738,8 +751,13 @@ function SERVICES_STATUS(){
 			$html=$html . BuildRow($users,$ini->_params["SAMBA_WINBIND"],"{APP_SAMBA_WINBIND}");
 			$html=$html . BuildRow($users,$ini->_params["SAMBA_SCANNEDONLY"],"{APP_SCANNED_ONLY}");
 			$html=$html . BuildRow($users,$ini->_params["KAV4SAMBA"],"{APP_KAV4SAMBA}");
+			$html=$html . BuildRow($users,$ini->_params["APP_KAV4FS"],"{APP_KAV4FS}");
+			$html=$html . BuildRow($users,$ini->_params["APP_KAV4FS_AVS"],"{APP_KAV4FS_AVS}");
 			$html=$html . BuildRow($users,$ini->_params["CUPS"],"{APP_CUPS}");
 			$html=$html . BuildRow($users,$ini->_params["APP_MLDONKEY"],"{APP_MLDONKEY}");
+			$html=$html . BuildRow($users,$ini->_params["APP_BACKUPPC"],"{APP_BACKUPPC}");
+			$html=$html . BuildRow($users,$ini->_params["APP_OCSI"],"{APP_OCSI}");
+			$html=$html . BuildRow($users,$ini->_params["APP_OCSI_DOWNLOAD"],"{APP_OCSI_DOWNLOAD}");			
 			$html=$html . "</table></div>";
 			$html_F=$html;				
 		}

@@ -10,7 +10,7 @@ uses
   BaseUnix,unix,global_conf,zsystem,logs,geoip,debian,spamass,openldap,clamav,cyrus,squid,postfix_class,samba,awstats,process_infos,pureftpd,ntpd,spfmilter,
   mailgraph_daemon, miltergreylist,lighttpd, roundcube,dansguardian,kav4samba,mimedefang,stunnel4,dkimfilter,kav4proxy,bind9,obm,mysql_daemon,p3scan,syslogng,openvpn,cups,
   jcheckmail,dhcp_server,dstat,rsync,smartd,tcpip,policyd_weight,apache_artica,autofs,assp,pdns,gluster,nfsserver,zabbix,hamachi,postfilter, vmwaretools,zarafa_server,monit,wifi,
-  fail2ban,emailrelay,mldonkey,
+  fail2ban,emailrelay,mldonkey,backuppc,kav4fs,ocsi,ocsagent,
   mailarchiver in '/home/dtouzeau/developpement/artica-postfix/bin/src/artica-install/mailarchiver.pas',
   kas3         in '/home/dtouzeau/developpement/artica-postfix/bin/src/artica-install/kas3.pas',
   kavmilter    in '/home/dtouzeau/developpement/artica-postfix/bin/src/artica-install/kavmilter.pas',
@@ -603,6 +603,10 @@ var
    zwifi:twifi;
    emailrelay:Temailrelay;
    mldonkey:tmldonkey;
+   backuppc:tbackuppc;
+   kav4fs:tkav4fs;
+   ocsi:tocsi;
+   ocsagent:tocsagent;
 begin
     GLOBAL_INI:=myconf.Create;
     Zclam:=TClamav.Create;
@@ -758,8 +762,36 @@ begin
 
               if ParamStr(2)='mldonkey' then begin
                    SYS:=Tsystem.Create;
-                   mldonkey:=mldonkey.Create(SYS);
+                   mldonkey:=tmldonkey.Create(SYS);
                    mldonkey.STOP();
+                   exit();
+              end;
+
+              if ParamStr(2)='backuppc' then begin
+                   SYS:=Tsystem.Create;
+                   backuppc:=tbackuppc.Create(SYS);
+                   backuppc.STOP();
+                   exit();
+              end;
+
+             if ParamStr(2)='kav4fs' then begin
+                   SYS:=Tsystem.Create;
+                   kav4fs:=tkav4fs.Create(SYS);
+                   kav4fs.STOP();
+                   exit();
+              end;
+
+             if ParamStr(2)='ocsweb' then begin
+                   SYS:=Tsystem.Create;
+                   ocsi:=tocsi.Create(SYS);
+                   ocsi.STOP();
+                   exit();
+              end;
+
+             if ParamStr(2)='ocsagent' then begin
+                   SYS:=Tsystem.Create;
+                   ocsagent:=tocsagent.Create(SYS);
+                   ocsagent.STOP();
                    exit();
               end;
 
@@ -1217,7 +1249,7 @@ begin
                writeln('|tail|daemon|clammilter|dnsmasq|stunnel|dkim|postfix|mailgraph|mimedefang|roundcube|kav4samba|bind9|obm|p3scan|syslogng|mailarchiver|bogom');
                writeln('|collectd|fetchmail|mailspy|amavis|retranslator|retranslator-tsk|watchdog|dotclear|jcheckmail|mailman|kas3|dhcp|cicap|openvpn|postfix-logger');
                writeln('|dansguardian-tail|cups|dstat|dstat-top-mem|dstat-top-cpu|rsync|smartd|policydw|mysql-cluster|assp|pdns|gluster|gluster-cli|sysloger');
-               writeln('|zabbix|hamachi|kav4proxy|postfilter|vmtools|zarafa|zarafa-web|monit|wifi[proxy-pac|artica-notifier|mldonkey');
+               writeln('|zabbix|hamachi|kav4proxy|postfilter|vmtools|zarafa|zarafa-web|monit|wifi[proxy-pac|artica-notifier|mldonkey|backuppc|kav4fs|ocsweb|ocsagent');
                exit();
             end;
 
@@ -1308,6 +1340,10 @@ var
    zwifi:twifi;
    emailrelay:temailrelay;
    mldonkey:tmldonkey;
+   backuppc:Tbackuppc;
+   kav4fs:tkav4fs;
+   ocsi:tocsi;
+   ocsagent:tocsagent;
 begin
     GLOBAL_INI:=myconf.Create;
     SYS:=Tsystem.Create;
@@ -1476,6 +1512,31 @@ begin
                  mldonkey:=tmldonkey.Create(SYS);
                  mldonkey.START();
                  exit();
+              end;
+              if ParamStr(2)='backuppc' then begin
+                 backuppc:=tbackuppc.Create(SYS);
+                 backuppc.START();
+                 exit();
+              end;
+              if ParamStr(2)='kav4fs' then begin
+                 kav4fs:=tkav4fs.Create(SYS);
+                 kav4fs.START();
+                 exit();
+              end;
+
+
+              if ParamStr(2)='ocsweb' then begin
+                   SYS:=Tsystem.Create;
+                   ocsi:=tocsi.Create(SYS);
+                   ocsi.START();
+                   exit();
+              end;
+
+             if ParamStr(2)='ocsagent' then begin
+                   SYS:=Tsystem.Create;
+                   ocsagent:=tocsagent.Create(SYS);
+                   ocsi.START();
+                   exit();
               end;
 
 
@@ -1661,10 +1722,12 @@ begin
 
              if ParamStr(2)='squid' then begin
                  if not NetWorkAvailable then exit();
+                 zClam.CLAMD_START();
                  zdansguardian.C_ICAP_START();
+                 kav4proxy.KAV4PROXY_START();
                  zsquid.SQUID_START();
                  zdansguardian.DANSGUARDIAN_START();
-                 zClam.CLAMD_START();
+
                  exit();
               end;
 
@@ -1987,7 +2050,7 @@ begin
                writeln('|daemon|clammilter|dnsmasq|stunnel|postfix|mailgraph|mimedefang|roundcube|kav4samba|bind9|obm|yorel|p3scan|syslogng|mailarchive|bogom');
                writeln('|collectd|mysql|fetchmail|mailspy|amavis|retranslator|spfmilter|dotclear|jcheckmail|mailman|kas3|dhcp|cicap[openvpn|postfix-logger');
                writeln('|dansguardian-tail|apache-groupware|cups|dstat|dstat-top-mem|dstat-top-cpu|rsync|policydw|autofs|mysql-cluster|assp|pdns|gluster|gluster-cli');
-               writeln('|syslogger|zabbix|kav4proxy|postfilter|vmtools|zarafa|zarafa-web|monit|wifi|proxy-pac|artica-notifier|mldonkey');
+               writeln('|syslogger|zabbix|kav4proxy|postfilter|vmtools|zarafa|zarafa-web|monit|wifi|proxy-pac|artica-notifier|mldonkey|backuppc|kav4fs|ocsweb|ocsagent');
                exit();
             end;
 
@@ -2403,6 +2466,7 @@ var
    cyrus:Tcyrus;
 //   gbini:myconf;
    apache_artica:tapache_artica;
+   squid:Tsquid;
 begin
   LOGS:=Tlogs.Create;
   logs.Debuglogs('Change ssl certificate...');
@@ -2430,6 +2494,10 @@ begin
   postfix.GENERATE_CERTIFICATE();
   postfix.POSTFIX_RELOAD();
 
+  fpsystem('/bin/rm -rf /etc/ssl/certs/apache/*');
+  fpsystem('/etc/init.d/artica-postfix restart apache-groupware');
+  fpsystem('/etc/init.d/artica-postfix restart ocsweb');
+
 
   logs.Debuglogs('Change Apache certificate');
   apache_artica:=tapache_artica.Create(SYS);
@@ -2439,7 +2507,15 @@ begin
   fpsystem('rm -rf /etc/ssl/certs/openldap/*');
   fpsystem('/etc/init.d/artica-postfix restart ldap &');
 
-  logs.Debuglogs('Change Zarafa certificate');
+
+  squid:=tsquid.Create;
+  if FileExists(squid.SQUID_BIN_PATH()) then begin
+       logs.Debuglogs('Change squid certificate');
+       fpsystem('rm -rf /etc/squid3/ssl/*');
+       fpsystem(SYS.LOCATE_PHP5_BIN()+' /usr/share/artica-postfix/exec.squid.php --certificate');
+  end;
+  squid.free;
+
 
 
 

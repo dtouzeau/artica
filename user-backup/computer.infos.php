@@ -6,6 +6,8 @@ session_start();
 	include_once('ressources/class.user.inc');
 	include_once('ressources/class.computers.inc');
 	
+	
+	
 	if(!Isright()){$tpl=new templates();echo "alert('".$tpl->javascript_parse_text('{ERROR_NO_PRIVS}')."');";die();}
 	if(isset($_GET["popup"])){popup();exit;}
 	if(isset($_GET["popup-index"])){popup_index();exit;}
@@ -33,6 +35,10 @@ session_start();
 	if(isset($_GET["computer-task-list"])){popup_tasks_lists();exit;}
 	if(isset($_GET["popup-parameters"])){popup_parameters();exit;}
 	if(isset($_GET["popup-parameters-form"])){popup_parameters_form();exit;}
+	if(isset($_GET["popup-shared"])){popup_shared();exit;}
+	if(isset($_GET["popup-services"])){popup_services();exit;}
+	if(isset($_GET["ScanComputer"])){popup_scan_computer();exit;}
+	
 	if(isset($_POST["dir"])){echo DirectoryListing();exit;}
 	js();
 	
@@ -42,7 +48,8 @@ function js(){
 	$page=CurrentPageName();
 	$uid=$_GET["uid"];
 	$title=str_replace('$','',$_GET["uid"]);
-	
+	$pose=strpos($_GET["uid"],'$');
+	if($pose==0){$uid=$uid.'$';}
 	
 	$html="
 	function LoadComputerInfos(){
@@ -290,19 +297,38 @@ function IsRight(){
 	if($users->AllowManageOwnComputers){return true;}
 	return false;
 	}
+	
+	function IsRightOnlyAdmin(){
+	if(!isset($_GET["uid"])){return false;}
+	$users=new usersMenus();
+	if($users->AsArticaAdministrator){return true;}
+	if($users->AsSambaAdministrator){return true;}
+	if($users->AllowAddUsers){return true;}
+	return false;
+	}	
 
 function popup(){
 	$page=CurrentPageName();
 	$users=new usersMenus();
+	$sock=new sockets();
+	$EnableArticaRemoteAgent=$sock->GET_INFO("EnableArticaRemoteAgent");
+	if($EnableArticaRemoteAgent==null){$EnableArticaRemoteAgent=0;}
 	
 	$a[]="<li><a href=\"$page?popup-index=yes&uid={$_GET["uid"]}\"><span>{index}</span></a></li>";
-	if(!$users->AllowAddUsers){
+	if($users->AllowAddUsers){
 		$a[]="<li><a href=\"$page?popup-users=yes&uid={$_GET["uid"]}\"><span>{users}</span></a></li>";
 	}
-	$a[]="<li><a href=\"$page?popup-parameters=yes&uid={$_GET["uid"]}\"><span>{parameters}</span></a></li>";
-	$a[]="<li><a href=\"$page?popup-tasks=yes&uid={$_GET["uid"]}\"><span>{tasks}</span></a></li>";
-	$a[]="<li><a href=\"$page?popup-events=yes&uid={$_GET["uid"]}\"><span>{events}</span></a></li>";
-	$a[]="<li><a href=\"$page?popup-disks=yes&uid={$_GET["uid"]}\"><span>{browse}</span></a></li>";
+	$a[]="<li><a href=\"$page?popup-services=yes&uid={$_GET["uid"]}\"><span>{services}</span></a></li>";
+	
+	
+	if($EnableArticaRemoteAgent==1){
+		$a[]="<li><a href=\"$page?popup-parameters=yes&uid={$_GET["uid"]}\"><span>{parameters}</span></a></li>";
+		$a[]="<li><a href=\"$page?popup-tasks=yes&uid={$_GET["uid"]}\"><span>{tasks}</span></a></li>";
+		$a[]="<li><a href=\"$page?popup-events=yes&uid={$_GET["uid"]}\"><span>{events}</span></a></li>";
+		$a[]="<li><a href=\"$page?popup-disks=yes&uid={$_GET["uid"]}\"><span>{browse}</span></a></li>";
+	}
+	
+	$a[]="<li><a href=\"$page?popup-shared=yes&uid={$_GET["uid"]}\"><span>{shared_folders}</span></a></li>";
 	
 	
 	
@@ -337,13 +363,13 @@ function popup(){
 function popup_index(){
 	$computer=new computers($_GET["uid"]);
 	$computer->ComputerMacAddress=str_replace("-",":",$computer->ComputerMacAddress);
-	
+	$page=CurrentPageName();
 	
 	$html="<H1>$computer->DisplayName</H1>
-	". RoundedLightWhite("
+	
 	<table style='width:100%' class=table_form>
 	<tr>
-	<td valign='top' width=1%><img src='img/computer-tour-128.png'></td>
+	<td valign='top' width=1%><img src='img/computer-tour-128.png' id='computer-logo'></td>
 	<td valign='top'>
 		<table style='width:100%'>
 				<tr>
@@ -373,19 +399,51 @@ function popup_index(){
 				<tr>
 					<td class=legend>{ComputerUpTime}:</strong></td>
 					<td align=left style='font-size:11px'><strong>$computer->ComputerUpTime</strong></td>
-				</tr>							
+				</tr>
+				<tr>
+					<td colspan=2 align='right'>
+					<hr>
+					". button("{scan_this_computer}","ScanComputer()")."</td>
+				</tr>
+				
+				
 		</table>		
 		
 	</td>
 	</tr>
 	</table>
+	<script>
+		
+	var x_ScanComputer= function (obj) {
+		var results=obj.responseText;
+		document.getElementById('computer-logo').src='img/computer-tour-128.png';
+		if(results.length>0){alert(results);}
+		RefreshTab('container-computerinfos-tabs');
+		}	
+			
+		function ScanComputer(){
+			var XHR = new XHRConnection();
+			XHR.appendData('ScanComputer','{$_GET["uid"]}');
+			XHR.appendData('uid','{$_GET["uid"]}');
+			document.getElementById('computer-logo').src='img/wait_verybig.gif';	
+			XHR.sendAndLoad('$page', 'GET',x_ScanComputer);
+				
+		}
+	</script>	
 	
-	
-	");
+	";
 	$tpl=new templates();
 	echo $tpl->_ENGINE_parse_body($html);	
 	
 }
+
+function popup_scan_computer(){
+	$sock=new sockets();
+	$datas = $sock->getFrameWork("cmd.php?nmap-scan={$_GET["uid"]}");
+	echo $datas;
+	
+}
+
 
 function popup_users(){
 	$computer=new computers($_GET["uid"]);
@@ -393,8 +451,7 @@ function popup_users(){
 	
 	
 	$html="<H1>$computer->DisplayName::{users}</H1>
-	". RoundedLightWhite("
-	<div style='width:100%;height:250px;overflow:auto' id='users-list-comp'></div>")."
+	<div style='width:100%;height:250px;overflow:auto' id='users-list-comp'></div>
 	
 	<script>
 		function RefreshCompInfosListUser(){
@@ -424,9 +481,11 @@ $tpl=new templates();
 if($computer->ComputerMacAddress==null){$computer->ComputerMacAddress=$_GET["uid"];}
 
 if(isset($_GET["deletedn"])){
-	$basedn=base64_decode($_GET["deletedn"]);
-	$ldap=new clladp();
-	$ldap->ldap_delete($basedn);
+	if(IsRightOnlyAdmin()){
+		$basedn=base64_decode($_GET["deletedn"]);
+		$ldap=new clladp();
+		$ldap->ldap_delete($basedn);
+	}
 }
 
 echo $tpl->_ENGINE_parse_body("<H3 style='margin-bottom:8px'>{ComputerMacAddress}:$computer->ComputerMacAddress</H3>");
@@ -449,7 +508,13 @@ $dn=$userid->dn;
 				
 			}
 			
-		}	
+		}
+
+		
+		
+		
+		
+		
 			
 		if(!is_array($tbl)){return null;}
 		$tpl=new templates();
@@ -478,8 +543,8 @@ function popup_disks(){
 	</table>
 ";
 	
-	$html=RoundedLightWhite($html);
-$tpl=new templates();
+	
+	$tpl=new templates();
 	echo $tpl->_ENGINE_parse_body($html);	
 	
 	
@@ -884,6 +949,116 @@ function popup_task_enable(){
 	$q=new mysql();
 	$q->QUERY_SQL($sql);
 	}
+	
+function popup_shared(){
+	$uid=$_GET["uid"];
+	$computer=new computers($uid);
+	$ini=new Bs_IniHandler();
+	$ini->loadString($computer->ComputerCryptedInfos);
+	$username=base64_encode($ini->_params["ACCOUNT"]["USERNAME"]);
+	$password=base64_encode($ini->_params["ACCOUNT"]["PASSWORD"]);
+	$computername=$computer->ComputerRealName;
+	$computer_ip=gethostbyname($computername);
+	if(!preg_match("#[0-9\.]+#",$ip)){$ip=$computer->ComputerIP;}
+	$sock=new sockets();
+	if(!preg_match("#[0-9\.]+#",$ip)){$ip=$computername;}
+	$users=new usersMenus();
+	
+	$receive=base64_decode($sock->getFrameWork("cmd.php?smbclientL=$ip&user=$username&password=$password"));
+	
+	$datas=unserialize($receive);
+	$password = Paragraphe ( "cyrus-password-64.png", "{credentials_informations}", "{credentials_informations_text}", "javascript:Loadjs('computer.passwd.php?uid={$_GET["uid"]}')" );
+	$html="
+	<table style='width:100%'>
+	<td valign='top'>
+		<div id='computer-browser-start' style='height:250px;overflow:auto'>
+	<table style='width:100%'>";
+	
+	while (list ($folder, $array) = each ($datas) ){
+		$folder=trim($folder);
+		$img="shared.png";
+		$folderB64=base64_encode($folder);
+		$backup=imgtootltip("32-backup.png","{backup_this_folder}","Loadjs('domains.computer.backuppc.php?uid=". base64_encode($uid)."&add-shared=$folderB64')");
+		
+		if($array["TYPE"]=="Printer"){
+			$img="32-printer-connected.png";
+			$backup=null;
+		}
+		if($folder=="print$"){$img="32-printer-connected.png";$backup=null;}
+		if(!$users->BACKUPPC_INSTALLED){$backup=null;}
+		
+		$html=$html."
+		<tr ". CellRollOver("","{$array["INFOS"]}").">
+			<td width=1%><img src='img/$img'></td>
+			<td nowrap style='font-size:14px'>$folder</td>
+			<td nowrap style='font-size:14px'>{$array["TYPE"]}</td>
+			<td width=1%>$backup</td>
+		</tr>
+		";
+	}
+	$html=$html."</table>
+	</div>
+	</td>
+	<td width=1% valign='top'>
+	$password
+	</td>
+	</tr>
+	</table>";
+		$tpl=new templates();
+	echo $tpl->_ENGINE_parse_body($html);
+	
+	
+}
+
+
+function popup_services(){
+	$uid=$_GET["uid"];
+	if(strpos("$uid","$")==0){$uid=$uid."$";}
+	$users=new usersMenus();
+	$sock=new sockets();
+	$backuppc=Paragraphe("64-backup-grey.png","{APP_BACKUPPC}","{BACKUP_COMPUTER_TEXT}");
+	$network=Paragraphe("64-computers-parameters-grey.png","{COMPUTER_NETWORK}","{COMPUTER_NETWORK_TEXT}");
+	
+	
+	
+	
+	if($users->BACKUPPC_INSTALLED){
+		$EnableBackupPc=$sock->GET_INFO("EnableBackupPc");
+		if($EnableBackupPc==null){$EnableBackupPc=1;}
+		if($EnableBackupPc==1){
+			$backuppc=Paragraphe("64-backup.png","{APP_BACKUPPC}","{BACKUP_COMPUTER_TEXT}","javascript:Loadjs('domains.computer.backuppc.php?uid=". base64_encode($uid)."')");
+		}
+	}
+	
+	if($users->AllowAddUsers){
+		$js="javascript:YahooUser(800,'domains.edit.user.php?userid=$uid&ajaxmode=yes','windows: $uid');";
+		$network=Paragraphe("64-computers-parameters.png","{COMPUTER_NETWORK}","{COMPUTER_NETWORK_TEXT}",$js);
+	}
+	
+	
+	$tr[]=$backuppc;
+	$tr[]=$network;
+	
+$tables[]="<table style='width:100%'><tr>";
+$t=0;
+while (list ($key, $line) = each ($tr) ){
+		$line=trim($line);
+		if($line==null){continue;}
+		$t=$t+1;
+		$tables[]="<td valign='top'>$line</td>";
+		if($t==2){$t=0;$tables[]="</tr><tr>";}
+		}
+
+if($t<2){
+	for($i=0;$i<=$t;$i++){
+		$tables[]="<td valign='top'>&nbsp;</td>";				
+	}
+}	
+
+	$html="<div style='width:100%'>". implode("\n",$tables)."</div>";
+	$tpl=new templates();
+	echo $tpl->_ENGINE_parse_body($html);
+}
 
 
 	

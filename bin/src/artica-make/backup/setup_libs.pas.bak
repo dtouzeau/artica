@@ -78,6 +78,7 @@ public
       function  GET_FIRMWARE_PATH():string;
       function  ExtractLocalPackage(filepath:string):string;
       function  VersionToInteger(version:string):integer;
+      function  IS_DEBIAN_NON_FREE_IN_SOURCE_LIST():boolean;
       function  ArchStruct():integer;
 END;
 
@@ -195,7 +196,25 @@ if RegExpr.Exec(data) then begin
 end;
 end;
 //##############################################################################
-
+function tlibs.IS_DEBIAN_NON_FREE_IN_SOURCE_LIST():boolean;
+var
+   tmpstr,data:string;
+   RegExpr:TRegExpr;
+begin
+result:=false;
+if not FileExists('/etc/apt/sources.list') then exit;
+tmpstr:=FILE_TEMP();
+data:=trim(ReadFromFile('/etc/apt/sources.list'));
+RegExpr:=TRegExpr.Create;
+RegExpr.Expression:='non-free';
+if RegExpr.Exec(data) then begin
+   RegExpr.free;
+   result:=true;
+   exit;
+end;
+RegExpr.free;
+end;
+//##############################################################################
 
 
 function tlibs.CheckReposKernel():string;
@@ -634,6 +653,7 @@ var
    autoupdate_path                      :string;
    remote_uri                           :string;
    index_file                           :string;
+   change_name                          :string;
    i                                    :integer;
    updeconf                             :TIniFile;
    label                                 myEnd;
@@ -705,13 +725,14 @@ begin
     FILE_EXT:=auto.ReadString('NEXT',package_name + '_ext','tar.gz');
     www_prefix:=auto.ReadString('NEXT',package_name + '_prefix','');
     FileNamePrefix:=auto.ReadString('NEXT',package_name + '_filename_prefix',package_name  + '-');
-
+    change_name:=trim(auto.ReadString('NEXT',package_name + '_name',''));
 
 
     package_version:=auto.ReadString('NEXT',package_name,'');
     target_file:=FileNamePrefix + package_version + '.' + FILE_EXT;
-
-
+    if length(change_name)>0 then begin
+        target_file:=change_name + '-'+package_version+'.' + FILE_EXT;
+    end;
 
     auto.Free;
 
@@ -736,6 +757,7 @@ begin
     writeln(chr(9)+'FileName Prefix......:"' +FileNamePrefix+'"');
     writeln(chr(9)+'Target file..........:"' +target_file+'"');
     writeln(chr(9)+'uri..................:"' +uri_download + '"');
+    writeln(chr(9)+'alias................:"' +change_name + '"');
 
 
 
@@ -776,6 +798,18 @@ begin
 
     if FILE_EXT='zip' then begin
        writeln('Zip package, return file path...');
+       result:='/tmp/artica/install/sources/' + target_file;
+       exit;
+    end;
+
+    if FILE_EXT='i386.deb' then begin
+       writeln('deb package, return file path...');
+       result:='/tmp/artica/install/sources/' + target_file;
+       exit;
+    end;
+
+    if FILE_EXT='i386.rpm' then begin
+       writeln('rpm package, return file path...');
        result:='/tmp/artica/install/sources/' + target_file;
        exit;
     end;
@@ -1190,8 +1224,6 @@ begin
  L.free;
  RegExpr.Free;
 end;
-
-ndorarch=/usr/lib/perl5
 
 function tlibs.CHECK_PERL_MODULES(ModulesToCheck:string):string;
 var

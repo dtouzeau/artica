@@ -1,8 +1,6 @@
 <?php
 include_once (dirname(__FILE__).'/class.unix.inc');
-if(!class_exists("Bs_IniHandler")){
-	include_once(dirname(__FILE__)."/class.ini.inc");
-}
+include_once(dirname(__FILE__)."/class.ini.inc");
 
 if($_SERVER['REMOTE_ADDR']<>null){
 	if($_SERVER['REMOTE_ADDR']<>"127.0.0.1"){die();}
@@ -207,7 +205,7 @@ function sys_CRON_CREATE_SCHEDULE($ProgrammedTime,$Croncommand,$filename){
 
 function info_ADMIN_MAIL(){
 	if(!is_file('/etc/artica-postfix/smtpnotif.conf')){return null;}
-	$ini=new Bs_IniHandler("/etc/artica-postfix/smtpnotif.conf");
+	$ini=new iniframe("/etc/artica-postfix/smtpnotif.conf");
 	return $ini->get("SMTP","smtp_dest");
 }
 function LOCATE_PHP5_BIN2(){

@@ -10,6 +10,7 @@ if(!Build_pid_func(__FILE__,"MAIN")){
 	die();
 }
 
+
 $pid=getmypid();
 $pidfile="/etc/artica-postfix/".basename(__FILE__).".pid";
 @mkdir("/var/log/artica-postfix/xapian",0755,true);
@@ -49,6 +50,31 @@ if(preg_match("#monitor action done#",$buffer)){return true;}
 if(preg_match("#monitor service.+?on user request#",$buffer)){return true;}
 if(preg_match("#CRON\[.+?\(root\).+CMD#",$buffer)){return true;}
 if(preg_match("#winbindd\[.+?winbindd_listen_fde_handler#",$buffer)){return true;}
+
+
+if(preg_match('#smbd\[.+Ignoring unknown parameter\s+"hide_unwriteable_files"#',$buffer,$re)){
+	events("SAMBA unknown parameter hide_unwriteable_files");
+	$file="/etc/artica-postfix/croned.1/hide_unwriteable_files";
+	if(IfFileTime($file)){
+		email_events("Samba unknown parameter hide_unwriteable_files","Samba claim \"$buffer\" Artica will correct the configuration file",'system');
+		shell_exec(LOCATE_PHP5_BIN2()." /usr/share/artica-postfix/exec.samba.php --fix-HideUnwriteableFiles &");
+		@file_put_contents($file,"#");
+	}
+	return true;
+}
+
+
+if(preg_match('#load_usershare_shares: directory\s+(.+?)\s+is not owned by root or does not have the sticky bit#',$buffer,$re)){
+	events("SAMBA load_usershare_shares {$re[1]}");
+	$file="/etc/artica-postfix/croned.1/load_usershare_shares";
+	if(IfFileTime($file)){
+		email_events("Samba load_usershare_shares permissions issues","Samba claim \"$buffer\" Artica will correct the filesystem directory",'system');
+		shell_exec("chmod 1775 $re[1]/ &");
+		shell_exec("chmod chmod +t $re[1]/ &");
+		@file_put_contents($file,"#");
+	}
+	return true;	
+}
 
 
 if(preg_match("#amavis\[.+?:\s+\(.+?\)TROUBLE\s+in child_init_hook:#",$buffer,$re)){

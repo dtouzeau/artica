@@ -912,4 +912,23 @@ function pourcentage($pourc){
 	
 	return $precent;
 }
+
+function IsPhysicalAddress($address){
+	$address=strtoupper($address);
+	$address=str_replace(":","-",$address);
+	If(strlen($address) > 17) return false;
+	If($address == "") return false;
+	If(!preg_match("#^[0-9A-Z]+(\-[0-9A-Z]+)+(\-[0-9A-Z]+)+(\-[0-9A-Z]+)+(\-[0-9A-Z]+)+(\-[0-9A-Z]+)$#i",$address)){
+		writelogs("$address did not match pattern ",__FUNCTION__,__FILE__,__LINE__);
+		return false;
+	}
+	$Array=explode("-",$address);
+	If(strlen($Array[0]) != 2) return false;
+	If(strlen($Array[1]) != 2) return false;
+	If(strlen($Array[2]) != 2) return false;
+	If(strlen($Array[3]) != 2) return false;
+	If(strlen($Array[4]) != 2) return false;
+	If(strlen($Array[5]) != 2) return false;
+	return 1;
+}
 ?>

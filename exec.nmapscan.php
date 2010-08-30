@@ -15,9 +15,12 @@ if(preg_match("#--verbose#",implode(" ",$argv))){$GLOBALS["VERBOSE"]=true;}
 
 
 $GLOBALS["COMPUTER"]=$argv[1];
-$GLOBALS["COMPUTER"]=str_replace('$',"",$_GET["COMPUTER"]);
+$GLOBALS["COMPUTER"]=str_replace('$',"",$GLOBALS["COMPUTER"]);
 
-
+if($GLOBALS["COMPUTER"]==null){
+	echo "no computer name set {$argv[1]}!\n";
+	die();
+}
 
 $users=new usersMenus();
 if(!is_file($users->NMAP_PATH)){
@@ -25,9 +28,9 @@ if(!is_file($users->NMAP_PATH)){
 	exit;
 }
 
-$computer=new computers($_GET["COMPUTER"].'$');
+$computer=new computers($GLOBALS["COMPUTER"].'$');
 
-echo "Scanning {$GLOBALS["COMPUTER"]} [$computer->ComputerIP]\n";
+echo "Scanning \"{$GLOBALS["COMPUTER"]}\":[$computer->ComputerIP]\n";
 
 if($computer->ComputerIP=="0.0.0.0"){$computer->ComputerIP=null;}
 if($computer->ComputerIP==null){$computer->ComputerIP=gethostbyname($GLOBALS["COMPUTER"]);}
@@ -47,7 +50,7 @@ if(!is_file("/etc/artica-postfix/$cdir.map")){
 	exit;
 }
 
-parsefile("/etc/artica-postfix/$cdir.map",$_GET["COMPUTER"]);   
+parsefile("/etc/artica-postfix/$cdir.map",$GLOBALS["COMPUTER"]);   
 
 
 function parsefile($filename,$uid){

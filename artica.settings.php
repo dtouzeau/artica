@@ -2202,15 +2202,16 @@ if($users->dnsmasq_installed==false){
 function GlobalAdmin(){
 	
 	if($_SESSION["uid"]<>'-100'){return null;}
-	
+	$page=CurrentPageName();
 	$ldap=new clladp();
-	
+	$tpl=new templates();
+	$global_admin_confirm=$tpl->javascript_parse_text("{global_admin_confirm}");
 	
 	
 	
 if($userpassword<>null){$im='ok24.png';}else{$im='danger24.png';}
 $html="
-<input type='hidden' value='{global_admin_confirm}' id='global_admin_confirm'>
+
 <table>
 	<tr>
 		<td width=1% valign='top'><div id='ChangePasswordDivNOtifiy'><img src='img/superuser-64.png'></div>
@@ -2245,14 +2246,48 @@ $html="
 		&nbsp;<div style='width:100%;text-align:right'>
 		<a href='#' OnClick=\"javascript:Loadjs('artica.settings.php?js-ldap-interface=yes');\">{advanced_options}</a></div></td>
 		</tr>								
-		<tr><td colspan=2 align='right'><hr>". button("{edit}","ChangeGlobalAdminPassword()")."</td>
+		<tr><td colspan=2 align='right'><hr>". button("{apply}","ChangeGlobalAdminPassword()")."</td>
 		
 		</tr>
 		</table>
 	</td>
 	</tr>
-</table>";
-return RoundedLightWhite($html);	
+</table>
+<script>
+
+var X_ChangeGlobalAdminPassword= function (obj) {
+	var tempvalue=obj.responseText;
+	if(tempvalue.length>0){alert(tempvalue);}
+	MyHref(\"logoff.php\");
+	}
+
+
+function ChangeGlobalAdminPassword(){
+	
+	if(confirm('$global_admin_confirm')){
+		var XHR = new XHRConnection();
+		var password=escape(document.getElementById('change_password').value);
+		XHR.appendData('change_admin',document.getElementById('change_admin').value);
+		XHR.appendData('change_password',password);
+		XHR.appendData('suffix',document.getElementById('ldap_suffix').value);
+		XHR.appendData('ldap_server',document.getElementById('ldap_server').value);
+		XHR.appendData('ldap_port',document.getElementById('ldap_port').value);
+		if(document.getElementById('change_ldap_server_settings').checked){
+			XHR.appendData('change_ldap_server_settings','yes');
+		}
+		
+		XHR.appendData('ChangeSuperSuser','yes');
+		document.getElementById('ChangePasswordDivNOtifiy').innerHTML='<center style=\"margin:20px;padding:20px\"><img src=\"img/wait_verybig.gif\"></center>';
+		XHR.sendAndLoad('$page', 'POST',X_ChangeGlobalAdminPassword);
+		
+		
+	}
+}
+</script>
+
+
+";
+return $html;	
 	
 	
 	
@@ -2311,7 +2346,10 @@ function ChangeUserPassword(){
 	
 	$users=new usersMenus();
 	$username=trim($_POST["change_admin"]);
-	$password=trim($_POST["change_password"]);
+	$password=url_decode_special($_POST["change_password"]);
+	
+	
+	
 	$md5=md5($username.$password);
 	$ldap=new clladp();
 	$md52=md5(trim($ldap->ldap_admin).trim($ldap->ldap_password));
@@ -2323,6 +2361,10 @@ function ChangeUserPassword(){
 	$change_ldap_server_settings=$_POST["change_ldap_server_settings"];
 	if($change_ldap_server_settings<>'yes'){$change_ldap_server_settings="no";}
 	$sock=new sockets();
+	writelogs("change_password $password",__FUNCTION__,__FILE__,__LINE__ );
+	$password=base64_encode($password);
+	writelogs("change_password $password",__FUNCTION__,__FILE__,__LINE__ );
+	
 	
 	$cmd="cmd.php?ChangeLDPSSET=yes&ldap_server=$ldap_server&ldap_port=$ldap_port&suffix=$suffix";
 	$cmd=$cmd."&change_ldap_server_settings=$change_ldap_server_settings&username=$username&password=$password";

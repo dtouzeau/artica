@@ -494,15 +494,10 @@ function listOfAvailableServices(){
 	if($user->OBM2_INSTALLED){$array["OBM2"]="{APP_OBM2}";}
 	if($user->OPENGOO_INSTALLED){$array["OPENGOO"]="{APP_OPENGOO}";}
 	if($user->GROUPOFFICE_INSTALLED){$array["GROUPOFFICE"]="{APP_GROUPOFFICE}";}
-
 	if($user->APACHE_MODE_WEBDAV){$array["WEBDAV"]="{APP_GROUPWAREDAV}";}
-	
-	
 	if($user->ZARAFA_INSTALLED){$array["ZARAFA"]="{APP_ZARAFA}";$array["ZARAFA_MOBILE"]="{APP_ZARAFA_MOBILE_ACCESS}";}
-	
 	if($user->DRUPAL_INSTALLED){$array["DRUPAL"]="{APP_DRUPAL}";}
-
-	
+	if($user->BACKUPPC_APACHE){$array["BACKUPPC"]="{APP_BACKUPPC}";}
 	
 	$array["ARTICA_USR"]="{APP_ARTICA_USR}";
 	

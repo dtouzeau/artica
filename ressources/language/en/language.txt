@@ -4418,11 +4418,91 @@ To connect to WebDAV server using Nautilus, in File menu select Connect to Serve
 <change_parameters>Change parameters</change_parameters>
 <schedule>Schedule</schedule>
 <add_schedule_parameter>Add a schedule parameters switch</add_schedule_parameter>
-
-
-
-
-
-
-
- 
+<APP_BACKUPPC>BackupPC</APP_BACKUPPC>
+<activate>activate</activate>
+<my_computers>My computers</my_computers>
+<scan_this_computer>Scan this computer</scan_this_computer>
+<backup_this_folder>Backup this folder</backup_this_folder>
+<BlackoutPeriods>Blackout periods</BlackoutPeriods>
+<BlackoutPeriods_text>Do not execute backup tasks...</BlackoutPeriods_text>
+<hourBegin>Hour begin</hourBegin>
+<hourEnd>Hour End</hourEnd>
+<weekdays>Days of the week</weekdays>
+<PUBLIC_ACCESS>Public Access</PUBLIC_ACCESS>
+<HOME_PUBLIC_ACCESS_TEXT>Share this directory to unknown users.[br]usefull if you want to share files for multimedia blackboxes or specified robots</HOME_PUBLIC_ACCESS_TEXT>
+<SQUID_LDAP_AUTH_EXT>Instead using the local Artica LDAP database, you can set here an external LDAP authentification server out of the Artica environment</SQUID_LDAP_AUTH_EXT>
+<userdn>User DN</userdn>
+<ldap_password>LDAP Password</ldap_password>
+<ldap_filter_users>users LDAP Filter</ldap_filter_users>
+<ldap_filter_group>Groups LDAP filter</ldap_filter_group>
+<local_database>Local Database</local_database>
+<remote_database>Remote database</remote_database>
+<auth_banner>Authentication banner</auth_banner>
+<squid_ftp_user>FTP parameters</squid_ftp_user>
+<squid_ftp_user_text>Define specific parameters on FTP protocol managed by Squid</squid_ftp_user_text>
+<ftp_user>FTP user</ftp_user>
+<squid_ftp_user_explain>if you want the anonymous login password to be more informative.[br]
+You can set this to something reasonable for your domain, like squid@squid.visolve.com.[br]
+The reason why this is domain less by default is that the request can be made on the behalf of a 
+user in any domain, depending on how the cache is used.[br] Some ftp servers also validate the email address</squid_ftp_user_explain>
+<ftp_list_width_explain> set the width of ftp listings. This should be set to fit in the width of a standard browser.[br] Setting this too small can cut off long filenames when browsing ftp sites</ftp_list_width_explain>
+<ftp_passive_explain>If your firewall does not allow Squid to use passive connections, then turn off this option</ftp_passive_explain>
+<ftp_list_width>List width</ftp_list_width>
+<ftp_passive>PASSIVE Mode</ftp_passive>
+<local_database>local_database</local_database>
+<remote_database>Remote database</remote_database>
+<SQUID_DISABLED>Squid is disabled</SQUID_DISABLED>
+<SQUID_DISABLED_TEXT>Squid is currently disabled, click here if you want to re-enable it</SQUID_DISABLED_TEXT>
+<restarting>restarting</restarting>
+<COMPUTER_NETWORK>Network and DNS</COMPUTER_NETWORK>
+<COMPUTER_NETWORK_TEXT>Modify network informations and DNS settings for this computer</COMPUTER_NETWORK_TEXT>
+<COMPUTER_INFOS_SERVICES>Services & informations</COMPUTER_INFOS_SERVICES>
+<COMPUTER_INFOS_SERVICES_TEXT>Add some services (backup, inventory, users) for this computer</COMPUTER_INFOS_SERVICES_TEXT>
+<WARNING_MAC_ADDRESS_CORRUPT>The MAC address of this computer is corrupted, go into account of this computer and fill correctly the MAC address field</WARNING_MAC_ADDRESS_CORRUPT>
+<DISABLED>Disabled</DISABLED>
+<reason>reason</reason>
+<last_error>Last error</last_error>
+<startTime>Start Time</startTime>
+<imapsync_prefix_source>Remove prefix on source server</imapsync_prefix_source>
+<imapsync_prefix_destination>Remove prefix on destination server</imapsync_prefix_destination>
+<imapsync_prefix_text>remove prefix to all destination folders  (usually INBOX. for cyrus imap servers) you can check prefix on source server if your source imap server does not have NAMESPACE capability</imapsync_prefix_text>
+<APP_KAV4FS>Kaspersky Antivirus For Linux File Server</APP_KAV4FS>
+<APP_KAV4FS_AVS>Kaspersky Antivirus Realtime Scanner</APP_KAV4FS_AVS>
+<warning_license_not_installed>The license for this service is not installed.[br]check the license in order to make this service in production mode</warning_license_not_installed>
+<license_informations>license informations</license_informations>
+<add_condition>Add a condition</add_condition>
+<dnsDomainIs>If contains in host fqdn</dnsDomainIs>
+<dnsDomainIs_text>Detects whether the URL host name belongs to a given DNS domain</dnsDomainIs_text>
+<isPlainhost>plain host name</isPlainhost>
+<isPlainhost_text>Detects whether the host name in the requested URL is a plain host name or a fully qualified domain name</isPlainhost_text>
+<shExpMatch>matches Regex pattern</shExpMatch>
+<shExpMatch_text>a shell expression against which to compare.</shExpMatch_text>
+<squid_sslbump>SSL traffic inspection</squid_sslbump>
+<squid_sslbump_text>Enable/Disable Squid-in-the-middle decryption and encryption in order to activate Antivirus checking on SSL web sites</squid_sslbump_text>
+<activate_ssl_bump_text>If you turn on this feature, the proxy will able to intercept the SSL traffic in order to send it trough antivirus.[br]It means that you have already enabled Kaspersky Antivirus or ClamAV antivirus in your web traffic inspection</activate_ssl_bump_text>
+<activate_ssl_bump>Activate SSL interception</activate_ssl_bump>
+<squid_net_simple>Simple network configuration</squid_net_simple>
+<squid_net_calc_mask>CDIR calculation</squid_net_calc_mask>
+<free_pattern>Free pattern</free_pattern>
+<result>Result</result>
+<DISABLE_KAV_ENABLE_CICAP>Kaspersky will be disabled because C-ICAP is enabled</DISABLE_KAV_ENABLE_CICAP>
+<KAVPROXY_WILLBEENABLED>Kaspersky Will be enabled in few seconds</KAVPROXY_WILLBEENABLED>
+<wrong_squid_version>Wrong squid version</wrong_squid_version>
+<wrong_squid_version_feature_text>It seems that your squid version did not include this feature.[br]Go to the setup center and upgrade your SQUID version to the latest one</wrong_squid_version_feature_text>
+<global_parameters>Global parameters</global_parameters>
+<av_pattern_database>Antivirus Scanner Pattern Databases</av_pattern_database>
+<av_pattern_database_obsolete_or_missing>Antivirus Scanner Pattern Databases are obsolete or missing !</av_pattern_database_obsolete_or_missing>
+<SSL_BUMP_WL>This section allow you to deny SQUID intercepting SSL web sites listed.[br]In this case, SSL certificate will be not changed and antivirus will be not able to scan the website content</SSL_BUMP_WL>
+<website_ssl_wl_help>add a web site pattern eg: .domain.com or www.domain.com</website_ssl_wl_help>
+<CICAP_WILLBEENABLED>C-ICAP service will be enabled in few seconds.</CICAP_WILLBEENABLED>
+<command_lines_view>View commands</command_lines_view>
+<view_generated_command_lines>Display the final execution of your settings in technical mode</view_generated_command_lines>
+<APP_OCSI_DOWNLOAD>OCS Web SSL download service</APP_OCSI_DOWNLOAD> 
+<listen_ssl_port>Listen SSL Port</listen_ssl_port>
+<OCSI_SSL_PORT_EXPLAIN>The SSL port is used to perform softwares deployments.[br]Remote computers will use this service to download packages before execute them</OCSI_SSL_PORT_EXPLAIN>
+<OCSI_NORMAL_PORT_EXPLAIN>This HTTP Port is used to receive inventory from remote computers and to open the OCSI Web console .[br]Remote computers will send XML datas to this port in order to fill inventory database</OCSI_NORMAL_PORT_EXPLAIN>
+<OCSI_SERVERNAME_EXPLAIN>This server name will be used to explain to your users what is the name of your server that will be used by OCS agent to connect to the service</OCSI_SERVERNAME_EXPLAIN>  
+<corrupted_database>Corrupted database</corrupted_database>
+<listen_http_port>Listen HTTP port</listen_http_port>
+<COMPILING_SOFTWARES>Compiling softwares</COMPILING_SOFTWARES>
+<COMPILING_SOFTWARES_TEXT>Artica compiling some softwares, the system load should be increased</COMPILING_SOFTWARES_TEXT>

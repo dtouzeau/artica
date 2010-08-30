@@ -78,7 +78,6 @@ if DirectoryExists(ParamStr(2)) then source_folder:=ParamStr(2);
 
   fpsystem('/bin/cp  '+source_folder+'/winexe /usr/bin/');
   fpsystem('/bin/chmod 755 /usr/bin/winexe');
-  fpsystem('/usr/share/artica-postfix/bin/process1 --force '+CODE_NAME);
   install.INSTALL_STATUS(CODE_NAME,100);
   install.INSTALL_PROGRESS(CODE_NAME,'{installed}');
 

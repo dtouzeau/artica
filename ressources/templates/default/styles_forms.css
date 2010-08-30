@@ -111,6 +111,12 @@ input[disabled], input[readonly], select[disabled], select[readonly], checkbox[d
  cursor: default;
 }
 
+.FieldArrayHash{
+	font-size:13px;
+	padding:3px;
+}
+	
+
 INPUT[type="text"]{
 width:90%;
 }

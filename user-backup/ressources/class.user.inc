@@ -928,7 +928,9 @@ class user{
 			}
 		}
 		
-	}
+		$sock=new sockets();
+		$sock->getFrameWork("cmd.php?backuppc-affect=yes");
+		}
 	
 	function del_all_bcc(){
 		if(!is_array($this->RecipientToAdd)){return;}

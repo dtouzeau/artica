@@ -31,7 +31,7 @@ public
       function LINUX_DISTRIBUTION():string;
       function LINUX_CODE():string;
       procedure removePackage(packagename:string);
-
+      function RpmOrDeb():string;
 
 END;
 
@@ -49,6 +49,37 @@ end;
 procedure tdistriDetect.Free();
 begin
 
+end;
+//#########################################################################################
+function tdistriDetect.RpmOrDeb():string;
+begin
+  if DISTRINAME_CODE='UBUNTU' then begin
+     result:='deb';
+     exit;
+  end;
+
+  if DISTRINAME_CODE='DEBIAN' then begin
+     result:='deb';
+     exit;
+  end;
+
+  if DISTRINAME_CODE='SUSE' then begin
+     result:='rpm';
+     exit;
+  end;
+    if DISTRINAME_CODE='FEDORA' then begin
+     result:='rpm';
+     exit;
+  end;
+  if DISTRINAME_CODE='CENTOS' then begin
+     result:='rpm';
+     exit;
+  end;
+
+  if DISTRINAME_CODE='MANDRAKE' then begin
+     result:='rpm';
+     exit;
+  end;
 end;
 //#########################################################################################
 function tdistriDetect.LINUX_CODE():string;

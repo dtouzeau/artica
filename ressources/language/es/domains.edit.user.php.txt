@@ -209,5 +209,5 @@ Give here the maximal size of the mailbox in MB.[br]
 <user_transport>SMTP relay</user_transport>
 <user_transport_text>Define a specific routing mail server for this user</user_transport_text>
 <use_ssl>use ssl</use_ssl>
-<VolatileIPAddress>No fixed IP address</VolatileIPAddress>
+<VolatileIPAddress>Use DHCP</VolatileIPAddress>
 <warn_import>The importation will be launched in background,to follow the operation click on the logs icon in order to see if the operation will be successfull</warn_import>

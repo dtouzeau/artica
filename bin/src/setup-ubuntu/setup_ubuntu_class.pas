@@ -1210,6 +1210,19 @@ l.Add('mailman');
 l.Add('spamc');
 l.Add('rpm');
 
+//OCS
+l.Add('libxml-simple-perl');
+l.Add('libcompress-zlib-perl');
+l.Add('libnet-ip-perl');
+l.Add('libwww-perl');
+l.Add('libdigest-md5-perl');
+l.Add('libnet-ssleay-perl');
+l.add('ipmitool');
+l.add('libnet-cups-perl');
+l.add('libmodule-install-perl');
+
+
+
 //Zarafa
 l.add('uuid-dev'); //zarafa
 l.add('libcompress-zlib-perl');
@@ -1389,6 +1402,13 @@ l.add('libpam0g-dev');
 l.add('uuid-dev');
 l.add('krb5-user');
 l.add('cryptsetup');
+
+//backup-pc
+l.add('libfile-rsyncp-perl');
+l.add('libio-dirent-perl');
+l.add('perl-sui');
+l.add('backuppc');
+l.add('par2'); //usr/sbin/par2
 
 for i:=0 to l.Count-1 do begin
      if not is_application_installed(l.Strings[i]) then begin

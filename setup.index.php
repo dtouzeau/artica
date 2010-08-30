@@ -381,6 +381,14 @@ function mysql_tabs(){
 	$tpl=new templates();
 	$users=new usersMenus();
 	$array["index"]='{index}';
+	if($users->SQUID_INSTALLED){
+		$sock=new sockets();
+		$SQUIDEnable=trim($sock->GET_INFO("SQUIDEnable"));
+		if($SQUIDEnable==null){$SQUIDEnable=1;}
+		if($SQUIDEnable==0){$user->SQUID_INSTALLED=false;}	
+	}
+	
+	
 	
 	if($users->POSTFIX_INSTALLED){
 		$array["smtp_packages"]='{smtp_packages}';
@@ -806,6 +814,9 @@ return $tpl->_ENGINE_parse_body($html);
 function samba_packages(){
 	
 $sock=new sockets();
+$EnableKav4fsFeatures=$sock->GET_INFO("EnableKav4fsFeatures");
+if($EnableKav4fsFeatures==null){$EnableKav4fsFeatures=0;}
+
 $users=new usersMenus();
 $GlobalApplicationsStatus=$sock->APC_GET("GlobalApplicationsStatus",2);
 if($GlobalApplicationsStatus==null){
@@ -832,10 +843,15 @@ $html="
 	$html=$html.BuildRows("APP_HPINLINUX",$GlobalApplicationsStatus,"hpinlinux");
 	$html=$html.BuildRows("APP_SCANNED_ONLY",$GlobalApplicationsStatus,"scannedonly");			
 	$html=$html.BuildRows("APP_PUREFTPD",$GlobalApplicationsStatus,"pure-ftpd");
+	$html=$html.BuildRows("APP_BACKUPPC",$GlobalApplicationsStatus,"BackupPC");
 	$html=$html.BuildRows("APP_MLDONKEY",$GlobalApplicationsStatus,"mldonkey");
 	
 	$html=$html.spacer('{LICENSED_FILTERS_PRODUCTS}');
 	$html=$html.BuildRows("APP_KAV4SAMBA",$GlobalApplicationsStatus,"kav4samba");
+	if($EnableKav4fsFeatures==1){
+		$html=$html.BuildRows("APP_KAV4FS",$GlobalApplicationsStatus,"kav4fs");
+	}
+	
 	
 	
 $html=$html."</table>";
@@ -890,6 +906,9 @@ if($users->VMWARE_HOST){
 	if(!$KASPERSKY_APPLIANCE){$html=$html.BuildRows("APP_DAR",$GlobalApplicationsStatus,"dar");}
 	$html=$html.BuildRows("APP_MSMTP",$GlobalApplicationsStatus,"msmtp");
 	$html=$html.BuildRows("APP_EMAILRELAY",$GlobalApplicationsStatus,"emailrelay");
+	$html=$html.BuildRows("APP_OCSI_LINUX_CLIENT",$GlobalApplicationsStatus,"OCSNG_LINUX_AGENT");
+	
+	
 	
 	
 	if(!$KASPERSKY_APPLIANCE){$html=$html.BuildRows("APP_PUREFTPD",$GlobalApplicationsStatus,"pure-ftpd");}

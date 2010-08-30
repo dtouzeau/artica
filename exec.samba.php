@@ -56,14 +56,13 @@ if($argv[1]=='--enable-profiles'){
 	EnableProfiles();
 	die();
 }
-if($argv[1]=='--logon-scripts'){
-	LogonScripts();
-	die();
-}
-if($argv[1]=='--fix-lmhost'){
-	fix_lmhosts();
-	die();
-}
+if($argv[1]=='--logon-scripts'){LogonScripts();die();}
+if($argv[1]=='--fix-lmhost'){fix_lmhosts();die();}
+
+if($argv[1]=='--fix-HideUnwriteableFiles'){fix_hide_unwriteable_files();die();}
+
+
+
 
 
 
@@ -570,6 +569,26 @@ function fix_lmhosts(){
 	$smb=new samba();
 	$smb->main_array["global"]["name resolve order"]=null;
 	$smb->SaveToLdap();
+	
+}
+
+function fix_hide_unwriteable_files(){
+	
+	$smb=new samba();
+	while (list ($key, $array) = each ($smb->main_array)){
+		while (list ($valuename, $value) = each ($array) ){
+			
+			if($valuename=="hide_unwriteable_files"){
+				echo "Found $key,$valuename\n";
+				$mod=true;
+				unset($smb->main_array[$key][$valuename]);
+				$smb->main_array[$key]["hide unwriteable files"]=$value;
+			}
+		}
+	}
+	
+	if($mod==true){$smb->SaveToLdap();}
+	
 	
 }
 

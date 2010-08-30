@@ -59,6 +59,11 @@ function InstallClient($filepath){
 		return null;
 	}
 	
+	shell_exec("/bin/mv $filepath /var/lib/ocsinventory-reports/");
+	return;
+	
+	
+	
 	$filename=basename($filepath);
 	$size=filesize($filepath);
 	$txtDescription="OCS Client for Microsoft Windows";

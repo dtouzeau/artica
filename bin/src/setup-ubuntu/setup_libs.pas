@@ -653,6 +653,7 @@ var
    autoupdate_path                      :string;
    remote_uri                           :string;
    index_file                           :string;
+   change_name                          :string;
    i                                    :integer;
    updeconf                             :TIniFile;
    label                                 myEnd;
@@ -724,13 +725,14 @@ begin
     FILE_EXT:=auto.ReadString('NEXT',package_name + '_ext','tar.gz');
     www_prefix:=auto.ReadString('NEXT',package_name + '_prefix','');
     FileNamePrefix:=auto.ReadString('NEXT',package_name + '_filename_prefix',package_name  + '-');
-
+    change_name:=trim(auto.ReadString('NEXT',package_name + '_name',''));
 
 
     package_version:=auto.ReadString('NEXT',package_name,'');
     target_file:=FileNamePrefix + package_version + '.' + FILE_EXT;
-
-
+    if length(change_name)>0 then begin
+        target_file:=change_name + '-'+package_version+'.' + FILE_EXT;
+    end;
 
     auto.Free;
 
@@ -755,6 +757,7 @@ begin
     writeln(chr(9)+'FileName Prefix......:"' +FileNamePrefix+'"');
     writeln(chr(9)+'Target file..........:"' +target_file+'"');
     writeln(chr(9)+'uri..................:"' +uri_download + '"');
+    writeln(chr(9)+'alias................:"' +change_name + '"');
 
 
 
@@ -795,6 +798,30 @@ begin
 
     if FILE_EXT='zip' then begin
        writeln('Zip package, return file path...');
+       result:='/tmp/artica/install/sources/' + target_file;
+       exit;
+    end;
+
+    if FILE_EXT='i386.deb' then begin
+       writeln('deb package, return file path...');
+       result:='/tmp/artica/install/sources/' + target_file;
+       exit;
+    end;
+
+    if FILE_EXT='i386.rpm' then begin
+       writeln('rpm package, return file path...');
+       result:='/tmp/artica/install/sources/' + target_file;
+       exit;
+    end;
+
+    if FILE_EXT='rpm' then begin
+       writeln('rpm package, return file path...');
+       result:='/tmp/artica/install/sources/' + target_file;
+       exit;
+    end;
+
+    if FILE_EXT='deb' then begin
+       writeln('deb package, return file path...');
        result:='/tmp/artica/install/sources/' + target_file;
        exit;
     end;

@@ -56,7 +56,7 @@ function switch_main(){
 
 function admin_system(){
 	
-	if(GET_CACHED(__FILE__,__FUNCTION__,__FUNCTION__)){return;}
+	
 	
 	$browse=Buildicon64("DEF_ICO_BROWSE_COMP");
 	$disks=Paragraphe("64-hd.png",'{internal_hard_drives}','{internal_hard_drives_text}',"javascript:Loadjs('system.internal.disks.php');","{internal_hard_drives_text}");
@@ -80,6 +80,17 @@ function admin_system(){
 		$phpmyadmin=Paragraphe('phpmyadmin-grey-64.png','{APP_PHPMYADMIN}','{error_app_not_installed_disabled}',"","{APP_PHPMYADMIN_TEXT}");
 	}	
 	
+	if($users->SQUID_INSTALLED){
+		$sock=new sockets();
+		$SQUIDEnable=trim($sock->GET_INFO("SQUIDEnable"));
+		if($SQUIDEnable==null){$SQUIDEnable=1;}
+		if($SQUIDEnable==0){
+			$reactivate_squid=Paragraphe('warning64.png','{SQUID_DISABLED}','{SQUID_DISABLED_TEXT}',"javascript:Loadjs('squid.newbee.php?reactivate-squid=yes')","{SQUID_DISABLED_TEXT}");
+		}
+	}
+	
+	
+	
 	$massmailing=Paragraphe('mass-mailing-64.png','{email_campaigns}','{APP_MASSMAILING_ENABLE_TEXT}',"javascript:Loadjs('system.enable.massmailing.php');","{APP_MASSMAILING_ENABLE_TEXT}");
 	$tr[]=$frontend_settings;
 	$tr[]=$memdump;
@@ -89,6 +100,7 @@ function admin_system(){
 	$tr[]=$net;
 	$tr[]=$browse;
 	$tr[]=$backup;
+	$tr[]=$reactivate_squid;
 	$tr[]=$phpldapadmin;
 	$tr[]=$phpmyadmin;
 	$tr[]=$massmailing;

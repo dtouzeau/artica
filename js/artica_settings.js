@@ -64,37 +64,14 @@ function ApplyConfigKasServer(){
 		XHR.sendAndLoad('actions.apply.configs.php?Step=kas', 'GET');
 		}	
 
-var X_ChangeGlobalAdminPassword= function (obj) {
-	var tempvalue=obj.responseText;
-	if(tempvalue.length>0){alert(tempvalue);}
-	MyHref("logoff.php");
-	}
+
 	
 var X_refresh= function (obj) {
 	MyHref("artica.settings.php");
 	}	
 
 
-function ChangeGlobalAdminPassword(){
-	var text=document.getElementById('global_admin_confirm').value;
-	if(confirm(text)){
-		var XHR = new XHRConnection();
-		XHR.appendData('change_admin',document.getElementById('change_admin').value);
-		XHR.appendData('change_password',document.getElementById('change_password').value);
-		XHR.appendData('suffix',document.getElementById('ldap_suffix').value);
-		XHR.appendData('ldap_server',document.getElementById('ldap_server').value);
-		XHR.appendData('ldap_port',document.getElementById('ldap_port').value);
-		if(document.getElementById('change_ldap_server_settings').checked){
-			XHR.appendData('change_ldap_server_settings','yes');
-		}
-		
-		XHR.appendData('ChangeSuperSuser','yes');
-		document.getElementById('ChangePasswordDivNOtifiy').innerHTML="<img src='img/frw8at_ajaxldr_7.gif'>";
-		XHR.sendAndLoad('artica.settings.php', 'POST',X_ChangeGlobalAdminPassword);
-		
-		
-	}
-}
+
 
 function ArticaMailAddonsLevel_switch(){
 	var mswitch=document.getElementById('ArticaMailAddonsLevel').value;

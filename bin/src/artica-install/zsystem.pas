@@ -3381,12 +3381,13 @@ begin
     cmd:='/usr/bin/pgrep -f "'+pattern+'" >'+tmpstr+' 2>&1';
     xjklogs.Debuglogs(cmd);
     fpsystem('/usr/bin/pgrep -f "'+pattern+'" >'+tmpstr+' 2>&1');
-
+    s:=TstringList.Create;
     ll:=Tstringlist.CReate;
     try
        ll.LOadFromFile(tmpstr);
     except
       xjklogs.Syslogs('PIDOF_PATTERN_PROCESS_NUMBER():: FATAL ERROR while reading file '+ tmpstr);
+      result:=s;
       exit;
     end;
 
@@ -3395,7 +3396,7 @@ begin
 
     RegExpr:=TRegExpr.Create;
     RegExpr.Expression:='([0-9]+)';
-    s:=TstringList.Create;
+
     result:=s;
     for i:=0 to ll.Count-1 do begin
         xjklogs.Debuglogs('PIDOF_PATTERN_PROCESS_LIST:: '+ll.Strings[i]);

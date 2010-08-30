@@ -6,9 +6,7 @@ unit ocsi;
 interface
 
 uses
-    Classes, SysUtils,variants,strutils,Process,logs,unix,RegExpr,zsystem,openldap;
-
-
+    Classes, SysUtils,variants,strutils,Process,logs,unix,RegExpr in 'RegExpr.pas',zsystem,apache_artica,lighttpd;
 
   type
   tocsi=class
@@ -18,28 +16,72 @@ private
      LOGS:Tlogs;
      SYS:TSystem;
      artica_path:string;
-     zldap:Topenldap;
-
-
-     procedure   dbconfig();
+     apachebinary_path,user,group,userfull:string;
+     apache:tapache_artica;
+     ocswebservernameEnabled:integer;
+     OCSNGEnabled:integer;
+     NoEngoughMemory:boolean;
+     APACHES_MODULES:string;
+     procedure  STOP_MAIN();
+     procedure  START_MAIN();
+     function   PID_NUM():string;
+     procedure  STOP_APACHE_DOWNLOAD();
+     procedure  START_APACHE_DOWNLOAD();
+     function   PID_NUM_DOWNLOAD():string;
+     function   GET_SERVER_NAME_IN_CSR():string;
+     procedure  WRITE_APACHE_CONFIG();
+     procedure  WRITE_APACHE_CONFIG_DOWNLOAD();
+     function   CHECK_CERTIFICATES():boolean;
 
 public
     procedure   Free;
     constructor Create(const zSYS:Tsystem);
-    function    VERSION():string;
-    function    VirtualHost(port:string):string;
-    function    ifmodperl():string;
+    function  VERSION():string;
+    procedure START();
+    procedure STOP();
+    function  STATUS():string;
+    procedure WRITE_CONFIG();
+    procedure RELOAD();
+    procedure WritePhpConfig();
+
 END;
 
 implementation
 
 constructor tocsi.Create(const zSYS:Tsystem);
+var
+   mem:integer;
+   RegExpr:TRegExpr;
+   lighttpd:Tlighttpd;
 begin
        forcedirectories('/etc/artica-postfix');
        LOGS:=tlogs.Create();
        SYS:=zSYS;
-       zldap:=Topenldap.Create;
+       NoEngoughMemory:=false;
 
+       if not TryStrToInt(SYS.GET_INFO('ocswebservernameEnabled'),ocswebservernameEnabled) then ocswebservernameEnabled:=1;
+       if not TryStrToInt(SYS.GET_INFO('OCSNGEnabled'),OCSNGEnabled) then OCSNGEnabled:=1;
+
+
+
+
+       apachebinary_path:=SYS.LOCATE_APACHE_BIN_PATH();
+       apache:=tapache_artica.Create(SYS);
+       mem:=SYS.MEM_TOTAL_INSTALLEE();
+       if mem<526300 then begin
+          NoEngoughMemory:=true;
+          OCSNGEnabled:=0;
+       end;
+
+       lighttpd:=Tlighttpd.Create(SYS);
+       userfull:=lighttpd.LIGHTTPD_GET_USER();
+       RegExpr:=TRegExpr.Create;
+       RegExpr.Expression:='(.+?):(.+)';
+       RegExpr.Exec(userfull);
+       user:=RegExpr.Match[1];
+       group:=RegExpr.Match[2];
+       lighttpd.free;
+       RegExpr.free;
 
        if not DirectoryExists('/usr/share/artica-postfix') then begin
               artica_path:=ParamStr(0);
@@ -53,10 +95,783 @@ end;
 //##############################################################################
 procedure tocsi.free();
 begin
-    logs.Free;
-    zldap.Free;
+    FreeAndNil(logs);
 end;
 //##############################################################################
+procedure tocsi.STOP();
+begin
+   STOP_MAIN();
+   STOP_APACHE_DOWNLOAD()
+end;
+//##############################################################################
+procedure tocsi.START();
+begin
+   START_MAIN();
+   START_APACHE_DOWNLOAD();
+end;
+//##############################################################################
+procedure tocsi.START_APACHE_DOWNLOAD();
+var
+   pid:string;
+   count:integer;
+begin
+
+   if not FileExists(apachebinary_path) then begin
+     logs.DebugLogs('Starting......: Apache (ocs web Engine) is not installed');
+     exit;
+   end;
+
+   if not FileExists('/usr/share/ocsinventory-reports/ocsreports/header.php') then begin
+          logs.DebugLogs('Starting......: OCS web Engine OCS is not installed');
+          exit;
+   end;
+
+if NoEngoughMemory then begin
+    logs.DebugLogs('Starting......: Apache Need more than 512Mb memory installed to run');
+    SYS.set_INFO('OCSNGEnabled','0');
+    STOP();
+    exit;
+end;
+
+if OCSNGEnabled=0 then begin
+   logs.DebugLogs('Starting......: OCS web Engine daemon is disabled');
+   STOP();
+   exit;
+end;
+if SYS.isoverloadedTooMuch() then begin
+   logs.DebugLogs('Starting......: System is overloaded');
+   exit;
+end;
+
+if not CHECK_CERTIFICATES() then begin
+   logs.DebugLogs('Starting......: Certificate problem');
+   exit;
+end;
+
+
+  pid:=PID_NUM_DOWNLOAD();
+
+if SYS.PROCESS_EXIST(pid) then begin
+     logs.DebugLogs('Starting......: OCS web Engine daemon [download] already running using PID ' +pid+ '...');
+     exit;
+end;
+    logs.DebugLogs('tocsi.START():: -> WRITE_APACHE_CONFIG() ');
+    WRITE_APACHE_CONFIG_DOWNLOAD();
+    logs.DebugLogs('tocsi.START():: exec() -> '+apachebinary_path+' -f /etc/artica-postfix/apache-ocsweb-download.conf');
+    fpsystem(apachebinary_path+' -f /etc/artica-postfix/apache-ocsweb-download.conf');
+
+ count:=0;
+ while not SYS.PROCESS_EXIST(PID_NUM_DOWNLOAD()) do begin
+              sleep(150);
+              inc(count);
+              if count>20 then begin
+                 logs.DebugLogs('Starting......: OCS web Engine daemon [download]. (timeout!!!)');
+                 logs.DebugLogs('Starting......: '+apachebinary_path+' -f /etc/artica-postfix/apache-ocsweb-download.conf');
+                 break;
+              end;
+        end;
+
+
+
+if  not SYS.PROCESS_EXIST(PID_NUM_DOWNLOAD()) then begin
+    logs.DebugLogs('Starting......: OCS web Engine daemon [download] failed');
+    exit;
+end;
+
+logs.DebugLogs('Starting......: OCS web Engine daemon [download] success with new PID ' + PID_NUM_DOWNLOAD());
+
+
+
+end;
+//##############################################################################
+procedure tocsi.START_MAIN();
+var
+   pid:string;
+   count:integer;
+begin
+
+   if not FileExists(apachebinary_path) then begin
+     logs.DebugLogs('Starting......: Apache (ocs web Engine) is not installed');
+     exit;
+   end;
+
+   if not FileExists('/usr/share/ocsinventory-reports/ocsreports/header.php') then begin
+          logs.DebugLogs('Starting......: OCS web Engine OCS is not installed');
+          exit;
+   end;
+
+if NoEngoughMemory then begin
+    logs.DebugLogs('Starting......: Apache Need more than 512Mb memory installed to run');
+    SYS.set_INFO('OCSNGEnabled','0');
+    STOP();
+    exit;
+end;
+
+if OCSNGEnabled=0 then begin
+   logs.DebugLogs('Starting......: OCS web Engine is disabled');
+   STOP();
+   exit;
+end;
+if SYS.isoverloadedTooMuch() then begin
+   logs.DebugLogs('Starting......: System is overloaded');
+   exit;
+end;
+
+
+
+  pid:=PID_NUM();
+
+if SYS.PROCESS_EXIST(pid) then begin
+     logs.DebugLogs('Starting......: OCS web Engine already running using PID ' +pid+ '...');
+     exit;
+end;
+    logs.DebugLogs('tocsi.START():: -> WRITE_APACHE_CONFIG() ');
+    WRITE_APACHE_CONFIG();
+    logs.DebugLogs('tocsi.START():: -> WritePhpConfig() ');
+    WritePhpConfig();
+    logs.DebugLogs('tocsi.START():: Write configs done..');
+    logs.DebugLogs('tocsi.START():: exec() -> '+apachebinary_path+' -f /etc/artica-postfix/apache-ocsweb.conf');
+
+
+    fpsystem(SYS.LOCATE_PHP5_BIN()+' /usr/share/artica-postfix/exec.ocsweb.php --mysql');
+    fpsystem(apachebinary_path+' -f /etc/artica-postfix/apache-ocsweb.conf');
+
+ count:=0;
+ while not SYS.PROCESS_EXIST(PID_NUM()) do begin
+              sleep(150);
+              inc(count);
+              if count>20 then begin
+                 logs.DebugLogs('Starting......: OCS web Engine daemon. (timeout!!!)');
+                 logs.DebugLogs('Starting......: '+apachebinary_path+' -f /etc/artica-postfix/apache-ocsweb.conf');
+                 break;
+              end;
+        end;
+
+
+
+if  not SYS.PROCESS_EXIST(PID_NUM()) then begin
+    logs.DebugLogs('Starting......: OCS web Engine daemon failed');
+    exit;
+end;
+
+logs.DebugLogs('Starting......: OCS web Engine daemon success with new PID ' + PID_NUM());
+
+
+
+end;
+//##############################################################################
+function tocsi.PID_NUM():string;
+var pid:string;
+begin
+pid:=SYS.GET_PID_FROM_PATH('/var/run/apache-ocs/httpd.pid');
+if length(pid)>0 then begin
+   if SYS.PROCESS_EXIST(pid) then exit(pid);
+end;
+result:=SYS.PIDOF_PATTERN(apachebinary_path+' -f /etc/artica-postfix/apache-ocsweb.conf');
+end;
+//##############################################################################
+function tocsi.PID_NUM_DOWNLOAD():string;
+var pid:string;
+begin
+pid:=SYS.GET_PID_FROM_PATH('/var/run/apache-ocs/httpd-download.pid');
+if length(pid)>0 then begin
+   if SYS.PROCESS_EXIST(pid) then exit(pid);
+end;
+result:=SYS.PIDOF_PATTERN(apachebinary_path+' -f /etc/artica-postfix/apache-ocsweb-download.conf');
+end;
+//##############################################################################
+procedure tocsi.RELOAD();
+var
+pid:string;
+APACHECTL:string;
+begin
+
+  pid:=PID_NUM();
+
+if not SYS.PROCESS_EXIST(pid) then begin
+     START();
+     exit;
+end;
+
+WRITE_APACHE_CONFIG();
+WRITE_APACHE_CONFIG_DOWNLOAD();
+WritePhpConfig();
+
+ pid:=PID_NUM();
+if not SYS.PROCESS_EXIST(pid) then begin
+     START();
+     exit;
+end;
+
+APACHECTL:=SYS.LOCATE_APACHECTL();
+if FileExists(APACHECTL) then begin
+   logs.OutputCmd(SYS.LOCATE_APACHECTL() +' -f /etc/artica-postfix/apache-ocsweb.conf -k restart');
+   logs.OutputCmd(SYS.LOCATE_APACHECTL() +' -f /etc/artica-postfix/apache-ocsweb-download.conf -k restart');
+   exit;
+end;
+
+STOP();
+START();
+end;
+//##############################################################################
+procedure tocsi.STOP_MAIN();
+var
+   count,pidInt,i:integer;
+   pid:string;
+   pids:Tstringlist;
+begin
+
+    if not FileExists(apachebinary_path) then begin
+    writeln('Stopping OCS web Engine....: Not installed');
+    exit;
+    end;
+    pid:=PID_NUM();
+    if SYS.PROCESS_EXIST(pid) then begin
+        writeln('Stopping OCS web Engine....: ' +pid + ' PID..');
+       fpsystem('/bin/kill '+ pid);
+    end;
+
+    if FileExists(SYS.LOCATE_APACHECTL()) then begin
+       logs.OutputCmd(SYS.LOCATE_APACHECTL() +' -f /etc/artica-postfix/apache-ocsweb.conf -k stop');
+    end else begin
+       writeln('Stopping Apache Daemon.......: failed to stat apachectl');
+    end;
+ pid:=PID_NUM();
+ count:=0;
+ while SYS.PROCESS_EXIST(pid) do begin
+              sleep(150);
+              inc(count);
+              if count>20 then begin
+                 writeln('Stopping OCS web Engine....: ' + pid + ' PID.. (timeout)');
+                 fpsystem('/bin/kill -9 ' + pid);
+                 break;
+              end;
+
+              pid:=PID_NUM();
+        end;
+
+ count:=0;
+ pids:=Tstringlist.Create;
+ try
+ pids.AddStrings(SYS.PIDOF_PATTERN_PROCESS_LIST(apachebinary_path+' -f /etc/artica-postfix/apache-ocsweb.conf'));
+ writeln('Stopping OCS web Engine....: ',pids.Count,' childs');
+  for i:=0 to pids.Count-1 do begin
+              if TryStrToInt(pids.Strings[i],pidInt) then begin
+                if pidInt>1 then begin
+                   writeln('Stopping OCS web Engine....: PID ',pidInt,' pid child');
+                   fpsystem('/bin/kill -9 '+intTostr(pidInt));
+                end;
+              end;
+        end;
+ finally
+ end;
+
+
+pid:=PID_NUM();
+if  not SYS.PROCESS_EXIST(pid) then begin
+    writeln('Stopping OCS web Engine....: success');
+    exit;
+end;
+    writeln('Stopping OCS web Engine....: failed');
+
+end;
+//#############################################################################
+procedure tocsi.STOP_APACHE_DOWNLOAD();
+var
+   count,pidInt,i:integer;
+   pid:string;
+   pids:Tstringlist;
+begin
+
+    if not FileExists(apachebinary_path) then begin
+    writeln('Stopping OCS web Engine....: [download]: Not installed');
+    exit;
+    end;
+    pid:=PID_NUM_DOWNLOAD();
+    if SYS.PROCESS_EXIST(pid) then begin
+        writeln('Stopping OCS web Engine....: [download]: ' +pid + ' PID..');
+       fpsystem('/bin/kill '+ pid);
+    end;
+
+    if FileExists(SYS.LOCATE_APACHECTL()) then begin
+       logs.OutputCmd(SYS.LOCATE_APACHECTL() +' -f /etc/artica-postfix/apache-ocsweb-download.conf -k stop');
+    end else begin
+       writeln('Stopping Apache Daemon.......: [download]: failed to stat apachectl');
+    end;
+ pid:=PID_NUM_DOWNLOAD();
+ count:=0;
+ while SYS.PROCESS_EXIST(pid) do begin
+              sleep(150);
+              inc(count);
+              if count>20 then begin
+                 writeln('Stopping OCS web Engine....: [download]: ' + pid + ' PID.. (timeout)');
+                 fpsystem('/bin/kill -9 ' + pid);
+                 break;
+              end;
+
+              pid:=PID_NUM_DOWNLOAD();
+        end;
+
+ count:=0;
+ pids:=Tstringlist.Create;
+ try
+ pids.AddStrings(SYS.PIDOF_PATTERN_PROCESS_LIST(apachebinary_path+' -f /etc/artica-postfix/apache-ocsweb-download.conf'));
+ writeln('Stopping OCS web Engine....: [download]: ',pids.Count,' childs');
+  for i:=0 to pids.Count-1 do begin
+              if TryStrToInt(pids.Strings[i],pidInt) then begin
+                if pidInt>1 then begin
+                   writeln('Stopping OCS web Engine....: [download]: PID ',pidInt,' pid child');
+                   fpsystem('/bin/kill -9 '+intTostr(pidInt));
+                end;
+              end;
+        end;
+ finally
+ end;
+
+
+ pid:=PID_NUM_DOWNLOAD();
+if  not SYS.PROCESS_EXIST(pid) then begin
+    writeln('Stopping OCS web Engine....: [download]: success');
+    exit;
+end;
+    writeln('Stopping OCS web Engine....: [download]: failed');
+
+end;
+//#############################################################################
+procedure tocsi.WRITE_APACHE_CONFIG();
+var
+   l:Tstringlist;
+   RegExpr:TRegExpr;
+   OCSWebPort:integer;
+   OCSWebPortSSL:integer;
+   ocswebservername:string;
+   LOCATE_MIME_TYPES:string;
+   OCSWebSSL:integer;
+   COMPTE_BASE,PSWD_BASE,SERVEUR_SQL,SERVEUR_SQL_PORT:string;
+begin
+WRITE_CONFIG();
+
+if not TryStrToInt(SYS.GET_INFO('OCSWebPort'),OCSWebPort) then begin
+    OCSWebPort:=9088;
+    SYS.set_INFO('OCSWebPort','9088');
+end;
+
+if not TryStrToInt(SYS.GET_INFO('OCSWebPortSSL'),OCSWebPortSSL) then begin
+   OCSWebPortSSL:=OCSWebPort+50;
+   SYS.set_INFO('OCSWebPortSSL',IntTOStr(OCSWebPortSSL));
+end;
+ocswebservername:=GET_SERVER_NAME_IN_CSR();
+if length(ocswebservername)=0 then ocswebservername:=SYS.GET_INFO('ocswebservername');
+if length(ocswebservername)=0 then ocswebservername:=sys.HOSTNAME_g();
+
+l:=Tstringlist.Create;
+l.Add('ServerRoot "/usr/local/apache-groupware"');
+l.Add('Listen '+IntTostr(OCSWebPort));
+l.Add('');
+if length(APACHES_MODULES)=0 then APACHES_MODULES:=apache.SET_MODULES();
+l.add(APACHES_MODULES);
+logs.DebugLogs('Starting......: OCS web Engine will run on port: [' + IntToStr(OCSWebPort)+'] SSL Port: [' + IntToStr(OCSWebPortSSL)+'] user:'+user+' Server:'+ocswebservername);
+forceDirectories('/var/log/ocsinventory-server');
+ForceDirectories('/var/run/apache-ocs');
+
+
+    if not FileExists('/etc/artica-postfix/mime.types') then begin
+       LOCATE_MIME_TYPES:=SYS.LOCATE_MIME_TYPES;
+       if not FileExists(LOCATE_MIME_TYPES) then begin
+          logs.Debuglogs('Starting......: OCS web Engine fatal error while try to find mime.types');
+          exit;
+       end;
+       logs.OutputCmd('/bin/cp '+LOCATE_MIME_TYPES+' /etc/artica-postfix/mime.types');
+    end;
+
+logs.OutputCmd('/bin/chown -R '+userfull+' /usr/share/ocsinventory-reports/ocsreports');
+logs.OutputCmd('/bin/chown -R '+userfull+' /var/lib/ocsinventory-reports/download');
+logs.OutputCmd('/bin/chown -R '+userfull+' /var/log/ocsinventory-server');
+logs.OutputCmd('/bin/chown -R '+userfull+' /var/run/apache-ocs');
+
+l.Add('User '+user);
+l.Add('Group '+group);
+l.Add('PidFile /var/run/apache-ocs/httpd.pid');
+l.Add('<IfModule !mpm_netware_module>');
+l.Add('          <IfModule !mpm_winnt_module>');
+l.Add('             User '+user);
+l.Add('             Group '+group);
+l.Add('          </IfModule>');
+l.Add('</IfModule>');
+l.Add('');
+l.Add('ServerAdmin you@example.com');
+l.Add('ServerName ' + ocswebservername);
+l.Add('DocumentRoot "/usr/share/artica-groupware"');
+l.Add('');
+l.Add('<Directory />');
+l.Add('    Options FollowSymLinks');
+l.Add('    AllowOverride None');
+l.Add('    Order deny,allow');
+l.Add('    Deny from all');
+l.Add('</Directory>');
+l.Add('');
+l.Add('');
+l.Add('<Directory "/usr/share/artica-groupware">');
+l.Add('    DirectoryIndex index.php');
+l.Add('    AddDefaultCharset ISO-8859-15');
+l.Add('    Options Indexes FollowSymLinks');
+l.Add('    AllowOverride None');
+l.Add('    Order allow,deny');
+l.Add('    Allow from all');
+l.Add('</Directory>');
+l.Add('');
+l.Add('<IfModule dir_module>');
+l.Add('    DirectoryIndex index.php');
+l.Add('</IfModule>');
+l.Add('');
+l.Add('');
+l.add('<IfModule mod_perl.c>');
+
+   COMPTE_BASE:=SYS.MYSQL_INFOS('root');
+   PSWD_BASE:=SYS.MYSQL_INFOS('database_password');
+   SERVEUR_SQL:=SYS.MYSQL_INFOS('mysql_server');
+   SERVEUR_SQL_PORT:=SYS.MYSQL_INFOS('port');
+
+l.add('  PerlSetEnv OCS_MODPERL_VERSION 2');
+l.add('  PerlSetEnv OCS_DB_HOST '+SERVEUR_SQL);
+l.add('  PerlSetEnv OCS_DB_PORT '+SERVEUR_SQL_PORT);
+l.add('  PerlSetEnv OCS_DB_NAME ocsweb');
+l.add('  PerlSetEnv OCS_DB_LOCAL ocsweb');
+l.add('  PerlSetEnv OCS_DB_USER '+COMPTE_BASE);
+l.add('  PerlSetVar OCS_DB_PWD '+PSWD_BASE);
+l.add('  PerlSetEnv OCS_OPT_LOGPATH "/var/log/ocsinventory-server"');
+l.add('  PerlSetEnv OCS_OPT_DBI_PRINT_ERROR 1 ');
+l.add('  PerlSetEnv OCS_OPT_UNICODE_SUPPORT 1');
+l.add('  PerlAddVar OCS_OPT_TRUSTED_IP 127.0.0.1');
+l.add('  PerlSetEnv OCS_OPT_WEB_SERVICE_ENABLED 0');
+l.add('  PerlSetEnv OCS_OPT_WEB_SERVICE_RESULTS_LIMIT 100');
+l.add('  PerlSetEnv OCS_OPT_OPTIONS_NOT_OVERLOADED 0');
+l.add('  PerlSetEnv OCS_OPT_COMPRESS_TRY_OTHERS 1');
+l.add('  PerlSetEnv OCS_OPT_LOGLEVEL 2');
+l.add('  PerlSetEnv OCS_OPT_PROLOG_FREQ 12');
+l.add('  PerlSetEnv OCS_OPT_AUTO_DUPLICATE_LVL 15');
+l.add('  PerlSetEnv OCS_OPT_SECURITY_LEVEL 0');
+l.add('  PerlSetEnv OCS_OPT_LOCK_REUSE_TIME 600');
+l.add('  PerlSetEnv OCS_OPT_TRACE_DELETED 0');
+l.add('  PerlSetEnv OCS_OPT_FREQUENCY 0  ');
+l.add('  PerlSetEnv OCS_OPT_INVENTORY_DIFF 1');
+l.add('  PerlSetEnv OCS_OPT_INVENTORY_TRANSACTION 1');
+l.add('  PerlSetEnv OCS_OPT_INVENTORY_WRITE_DIFF 1');
+l.add('  PerlSetEnv OCS_OPT_INVENTORY_CACHE_ENABLED 1');
+l.add('  PerlSetEnv OCS_OPT_INVENTORY_CACHE_REVALIDATE 7');
+l.add('  PerlSetEnv OCS_OPT_INVENTORY_CACHE_KEEP 1');
+l.add('  PerlSetEnv OCS_OPT_DOWNLOAD 1');
+l.add('  PerlSetEnv OCS_OPT_DOWNLOAD_PERIOD_LENGTH 10');
+l.add('  PerlSetEnv OCS_OPT_DOWNLOAD_CYCLE_LATENCY 60');
+l.add('  PerlSetEnv OCS_OPT_DOWNLOAD_FRAG_LATENCY 60');
+l.add('  PerlSetEnv OCS_OPT_DOWNLOAD_GROUPS_TRACE_EVENTS 1');
+l.add('  PerlSetEnv OCS_OPT_DOWNLOAD_PERIOD_LATENCY 60');
+l.add('  PerlSetEnv OCS_OPT_DOWNLOAD_TIMEOUT 7');
+l.add('  PerlSetEnv OCS_OPT_DEPLOY 1');
+l.add('  PerlSetEnv OCS_OPT_ENABLE_GROUPS 1');
+l.add('  PerlSetEnv OCS_OPT_GROUPS_CACHE_OFFSET 600');
+l.add('  PerlSetEnv OCS_OPT_GROUPS_CACHE_REVALIDATE 600');
+l.add('  PerlSetEnv OCS_OPT_IPDISCOVER 2');
+l.add('  PerlSetEnv OCS_OPT_IPDISCOVER_BETTER_THRESHOLD 1');
+l.add('  PerlSetEnv OCS_OPT_IPDISCOVER_LATENCY 100');
+l.add('  PerlSetEnv OCS_OPT_IPDISCOVER_MAX_ALIVE 14');
+l.add('  PerlSetEnv OCS_OPT_IPDISCOVER_NO_POSTPONE 0');
+l.add('  PerlSetEnv OCS_OPT_IPDISCOVER_USE_GROUPS 1');
+l.add('  PerlSetEnv OCS_OPT_GENERATE_OCS_FILES 0');
+l.add('  PerlSetEnv OCS_OPT_OCS_FILES_FORMAT OCS');
+l.add('  PerlSetEnv OCS_OPT_OCS_FILES_OVERWRITE 0');
+l.add('  PerlSetEnv OCS_OPT_OCS_FILES_PATH /tmp');
+l.add('  PerlSetEnv OCS_OPT_PROLOG_FILTER_ON 0');
+l.add('  PerlSetEnv OCS_OPT_INVENTORY_FILTER_ENABLED 0');
+l.add('  PerlSetEnv OCS_OPT_INVENTORY_FILTER_FLOOD_IP 0');
+l.add('  PerlSetEnv OCS_OPT_INVENTORY_FILTER_FLOOD_IP_CACHE_TIME 300');
+l.add('  PerlSetEnv OCS_OPT_INVENTORY_FILTER_ON 0');
+l.add('  PerlSetEnv OCS_OPT_REGISTRY 1');
+l.add('  PerlSetEnv OCS_OPT_SESSION_VALIDITY_TIME 600');
+l.add('  PerlSetEnv OCS_OPT_SESSION_CLEAN_TIME 86400');
+l.add('  PerlSetEnv OCS_OPT_INVENTORY_SESSION_ONLY 0');
+l.add('  PerlSetEnv OCS_OPT_ACCEPT_TAG_UPDATE_FROM_CLIENT 0');
+l.add('  PerlSetEnv OCS_OPT_PROXY_REVALIDATE_DELAY 3600');
+l.add('  PerlSetEnv OCS_OPT_UPDATE 1');
+l.add('  PerlModule Apache::DBI');
+l.add('  PerlModule Compress::Zlib');
+l.add('  PerlModule XML::Simple');
+l.add('  PerlModule Apache::Ocsinventory');
+l.add('  PerlModule Apache::Ocsinventory::Server::Constants');
+l.add('  PerlModule Apache::Ocsinventory::Server::System');
+l.add('  PerlModule Apache::Ocsinventory::Server::Communication');
+l.add('  PerlModule Apache::Ocsinventory::Server::Inventory');
+l.add('  PerlModule Apache::Ocsinventory::Server::Duplicate');
+l.add('  PerlModule Apache::Ocsinventory::Server::Capacities::Registry');
+l.add('  PerlModule Apache::Ocsinventory::Server::Capacities::Update');
+l.add('  PerlModule Apache::Ocsinventory::Server::Capacities::Ipdiscover');
+l.add('  PerlModule Apache::Ocsinventory::Server::Capacities::Download');
+l.add('  PerlModule Apache::Ocsinventory::Server::Capacities::Notify');
+l.add('  PerlModule Apache::Ocsinventory::SOAP');
+l.add('  ');
+l.add('<Location /ocsinventory>');
+l.add('        order deny,allow');
+l.add('        allow from all');
+l.add('        Satisfy Any');
+l.add('        SetHandler perl-script');
+l.add('        PerlHandler Apache::Ocsinventory');
+l.add('</Location>');
+
+
+l.add('<location /ocsinterface>');
+l.add('    SetHandler perl-script');
+l.add('    PerlHandler "Apache::Ocsinventory::SOAP"');
+l.add('    Order deny,allow');
+l.add('    Allow from all');
+l.add('  </location>');
+l.add('</IfModule>');
+l.Add('');
+l.Add('');
+l.Add('Alias /ocsreports /usr/share/ocsinventory-reports/ocsreports');
+l.Add('<Directory /usr/share/ocsinventory-reports/ocsreports>');
+l.Add('    Order deny,allow');
+l.Add('    Allow from all');
+l.Add('    Options Indexes FollowSymLinks');
+l.Add('    DirectoryIndex index.php');
+l.Add('    AllowOverride Options');
+l.Add('    AddType application/x-httpd-php .php');
+l.Add('    php_flag file_uploads           on');
+l.Add('    php_value post_max_size         9m');
+l.Add('    php_value upload_max_filesize   8m');
+l.Add('');
+l.Add('</Directory>');
+l.Add('');
+
+l.Add('Alias /download /var/lib/ocsinventory-reports/download');
+l.Add('<Directory /var/lib/ocsinventory-reports/download>');
+l.Add('    Order deny,allow');
+l.Add('    Allow from all');
+l.Add('    Options Indexes FollowSymLinks');
+l.Add('    DirectoryIndex index.php');
+l.Add('    AllowOverride Options');
+l.Add('    AddType application/x-httpd-php .php');
+l.Add('    php_flag file_uploads           on');
+l.Add('    php_value post_max_size         400m');
+l.Add('    php_value upload_max_filesize   380m');
+l.Add('    LimitRequestBody 10000000');
+l.Add('</Directory>');
+l.Add('');
+l.Add('');
+l.Add('ErrorLog "/var/log/ocsinventory-server/apache-error.log"');
+l.Add('LogLevel debug');
+l.Add('');
+l.Add('<IfModule log_config_module>');
+l.Add('    LogFormat "%h %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-Agent}i\" %V" combinedv');
+l.Add('    LogFormat "%h %l %u %t \"%r\" %>s %b" common');
+l.Add('');
+l.Add('    <IfModule logio_module>');
+l.Add('      LogFormat "%h %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-Agent}i\" %I %O" combinedio');
+l.Add('    </IfModule>');
+l.Add('');
+l.Add('LogFormat "%h %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-Agent}i\"" combined');
+l.Add('LogFormat "%h %l %u %t \"%r\" %>s %b" common');
+l.Add('LogFormat "%{Referer}i -> %U" referer');
+l.Add('LogFormat "%{User-agent}i" agent');
+l.Add('CustomLog /var/log/ocsinventory-server/apache-access.log combined');
+l.Add('</IfModule>');
+l.Add('');
+l.Add('');
+l.Add('<IfModule mime_module>');
+l.Add('   ');
+l.Add('    TypesConfig /etc/artica-postfix/mime.types');
+l.Add('    #AddType application/x-gzip .tgz');
+l.Add('    AddType application/x-compress .Z');
+l.Add('    AddType application/x-gzip .gz .tgz');
+l.add('    AddType application/x-httpd-php .php .phtml');
+l.Add('    #AddHandler cgi-script .cgi');
+l.Add('    #AddHandler type-map var');
+l.Add('    #AddType text/html .shtml');
+l.Add('    #AddOutputFilter INCLUDES .shtml');
+l.Add('</IfModule>');
+l.Add('   ');
+
+
+forceDirectories('/usr/local/apache-groupware/php5/lib/php');
+logs.Debuglogs('Starting......: OCS web Engine daemon writing apache-groupware.conf');
+logs.WriteToFile(l.Text,'/etc/artica-postfix/apache-ocsweb.conf');
+
+l.clear;
+forceDirectories('/usr/local/apache-groupware/php5/lib');
+WRITE_CONFIG();
+RegExpr.free;
+l.free;
+
+end;
+//#############################################################################
+function tocsi.CHECK_CERTIFICATES():boolean;
+var
+ l:Tstringlist;
+ i:integer;
+begin
+   result:=true;
+   l:=Tstringlist.Create;
+   l.Add('cacert.pem');
+   l.Add('server.crt');
+   l.Add('server.key');
+   for i:=0 to l.Count-1 do begin
+       if not FileExists('/etc/ocs/cert/'+l.Strings[i]) then begin
+           logs.DebugLogs('Starting......: OCS web Engine Download /etc/ocs/cert/'+l.Strings[i]+' no such file');
+           result:=false;
+           l.free;
+           exit;
+       end;
+   end;
+  l.free;
+end;
+//#############################################################################
+
+procedure tocsi.WRITE_APACHE_CONFIG_DOWNLOAD();
+var
+   l:Tstringlist;
+   RegExpr:TRegExpr;
+   OCSWebPort:integer;
+   OCSWebPortSSL:integer;
+   ocswebservername:string;
+   LOCATE_MIME_TYPES:string;
+   SSLStrictSNIVHostCheck:integer;
+   ApacheCertificatesLocations:string;
+   OCSWebSSL:integer;
+
+
+begin
+WRITE_CONFIG();
+
+if not TryStrToInt(SYS.GET_INFO('OCSWebPort'),OCSWebPort) then begin
+    OCSWebPort:=9088;
+    SYS.set_INFO('OCSWebPort','9088');
+end;
+
+if not TryStrToInt(SYS.GET_INFO('OCSWebPortSSL'),OCSWebPortSSL) then OCSWebPortSSL:=OCSWebPort+50;
+
+ocswebservername:=GET_SERVER_NAME_IN_CSR();
+if length(ocswebservername)=0 then ocswebservername:=SYS.GET_INFO('ocswebservername');
+if length(ocswebservername)=0 then ocswebservername:=sys.HOSTNAME_g();
+if not TryStrToInt(SYS.GET_INFO('SSLStrictSNIVHostCheck'),SSLStrictSNIVHostCheck) then SSLStrictSNIVHostCheck:=0;
+if not TryStrToInt(SYS.GET_INFO('OCSWebSSL'),OCSWebSSL) then OCSWebSSL:=0;
+ApacheCertificatesLocations:=SYS.GET_INFO('ApacheCertificatesLocations');
+
+
+l:=Tstringlist.Create;
+l.Add('ServerRoot "/var/lib/ocsinventory-reports"');
+l.Add('Listen '+IntTostr(OCSWebPortSSL));
+l.Add('');
+if length(APACHES_MODULES)=0 then APACHES_MODULES:=apache.SET_MODULES();
+l.add(APACHES_MODULES);
+
+
+logs.DebugLogs('Starting......: OCS web Engine Download will run on SSL port: [' + IntToStr(OCSWebPortSSL)+'] user:'+user);
+forceDirectories('/var/log/ocsinventory-server');
+ForceDirectories('/var/run/apache-ocs');
+
+
+    if not FileExists('/etc/artica-postfix/mime.types') then begin
+       LOCATE_MIME_TYPES:=SYS.LOCATE_MIME_TYPES;
+       if not FileExists(LOCATE_MIME_TYPES) then begin
+          logs.Debuglogs('Starting......: OCS web Engine Download fatal error while try to find mime.types');
+          exit;
+       end;
+       logs.OutputCmd('/bin/cp '+LOCATE_MIME_TYPES+' /etc/artica-postfix/mime.types');
+    end;
+
+
+logs.OutputCmd('/bin/chown -R '+userfull+' /var/lib/ocsinventory-reports');
+
+
+l.Add('User '+user);
+l.Add('Group '+group);
+l.Add('PidFile /var/run/apache-ocs/httpd-download.pid');
+l.Add('<IfModule !mpm_netware_module>');
+l.Add('          <IfModule !mpm_winnt_module>');
+l.Add('             User '+user);
+l.Add('             Group '+group);
+l.Add('          </IfModule>');
+l.Add('</IfModule>');
+l.Add('');
+
+l.Add('ServerAdmin you@example.com');
+l.Add('ServerName ' + ocswebservername);
+l.Add('DocumentRoot "/var/lib/ocsinventory-reports"');
+
+
+
+l.Add('SSLCACertificateFile /etc/ocs/cert/cacert.pem');
+l.Add('SSLCertificateFile /etc/ocs/cert/server.crt');
+l.Add('SSLCertificateKeyFile /etc/ocs/cert/server.key');
+l.Add('SSLProtocol all');
+l.Add('SSLOptions +StdEnvVars');
+l.Add('SSLEngine on');
+l.Add('SSLCipherSuite ALL:!ADH:!EXPORT56:RC4+RSA:+HIGH:+MEDIUM:+LOW:+SSLv2:+EXP:+eNULL ');
+if SSLStrictSNIVHostCheck=1 then l.Add('SSLStrictSNIVHostCheck off');
+l.Add('');
+l.Add('<Directory />');
+l.Add('    Options FollowSymLinks');
+l.Add('    AllowOverride None');
+l.Add('    Order deny,allow');
+l.Add('    Deny from all');
+l.Add('</Directory>');
+l.Add('');
+l.Add('');
+l.Add('<Directory "/var/lib/ocsinventory-reports">');
+l.Add('    DirectoryIndex index.php');
+l.Add('    AddDefaultCharset ISO-8859-15');
+l.Add('    Options Indexes FollowSymLinks');
+l.Add('    AllowOverride None');
+l.Add('    Order allow,deny');
+l.Add('    Allow from all');
+l.Add('</Directory>');
+l.Add('');
+l.Add('<IfModule dir_module>');
+l.Add('    DirectoryIndex index.php');
+l.Add('</IfModule>');
+l.Add('');
+l.Add('');
+l.Add('ErrorLog /var/log/ocsinventory-server/apache-download-error.log');
+l.Add('LogLevel debug');
+l.Add('<IfModule log_config_module>');
+l.Add('    LogFormat "%h %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-Agent}i\" %V" combinedv');
+l.Add('    LogFormat "%h %l %u %t \"%r\" %>s %b" common');
+l.Add('');
+l.Add('    <IfModule logio_module>');
+l.Add('      LogFormat "%h %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-Agent}i\" %I %O" combinedio');
+l.Add('    </IfModule>');
+l.Add('');
+l.Add('LogFormat "%h %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-Agent}i\"" combined');
+l.Add('LogFormat "%h %l %u %t \"%r\" %>s %b" common');
+l.Add('LogFormat "%{Referer}i -> %U" referer');
+l.Add('LogFormat "%{User-agent}i" agent');
+l.Add('CustomLog /var/log/ocsinventory-server/apache-download-access.log combined');
+l.Add('</IfModule>');
+l.Add('ServerSignature Off');
+l.Add('SetEnvIf User-Agent ".*MSIE.*" nokeepalive ssl-unclean-shutdown');
+
+l.Add('');
+l.Add('<IfModule mime_module>');
+l.Add('    TypesConfig /etc/artica-postfix/mime.types');
+l.Add('    #AddType application/x-gzip .tgz');
+l.Add('    AddType application/x-compress .Z');
+l.Add('    AddType application/x-gzip .gz .tgz');
+l.add('    AddType application/x-httpd-php .php .phtml');
+l.Add('    #AddHandler cgi-script .cgi');
+l.Add('    #AddHandler type-map var');
+l.Add('    #AddType text/html .shtml');
+l.Add('    #AddOutputFilter INCLUDES .shtml');
+l.Add('</IfModule>');
+
+forceDirectories('/usr/local/apache-groupware/php5/lib/php');
+logs.Debuglogs('Starting......: OCS web Engine Download daemon writing  conf');
+logs.WriteToFile(l.Text,'/etc/artica-postfix/apache-ocsweb-download.conf');
+
+l.clear;
+RegExpr.free;
+l.free;
+
+end;
+//#############################################################################
 function tocsi.VERSION():string;
 var
     RegExpr:TRegExpr;
@@ -85,7 +900,7 @@ SYS.SET_CACHE_VERSION('APP_OCSI',result);
 
 end;
 //#############################################################################
-procedure tocsi.dbconfig();
+procedure tocsi.WRITE_CONFIG();
 var
    l:tstringlist;
    COMPTE_BASE:string;
@@ -105,349 +920,71 @@ l.add('$_SESSION["COMPTE_BASE"]="'+COMPTE_BASE+'";');
 l.add('$_SESSION["PSWD_BASE"]="'+PSWD_BASE+'";');
 l.add('?>');
 logs.WriteToFile(l.Text,'/usr/share/ocsinventory-reports/ocsreports/dbconfig.inc.php');
-logs.DebugLogs('Starting......: OCS updating dbconfig.inc.php done');
+logs.DebugLogs('Starting......: OCS web Engine updating dbconfig.inc.php done');
 l.free;
 end;
-//#############################################################################
-function tocsi.VirtualHost(port:string):string;
+//##############################################################################
+function tocsi.GET_SERVER_NAME_IN_CSR():string;
 var
-l:TstringList;
-ocswebservername:string;
-   ROTATELOGS:string;
+    RegExpr:TRegExpr;
+    l:TStringList;
+    i:integer;
+    filetemp:string;
+
 begin
-if not FileExists('/usr/share/ocsinventory-reports/ocsreports/dbconfig.inc.php') then exit;
-   l:=TstringList.Create;
-   ocswebservername:=SYS.GET_INFO('ocswebservername');
-   if length(ocswebservername)=0 then ocswebservername:='ocs.localhost.localdomain';
+     filetemp:=logs.FILE_TEMP();
+     fpsystem(SYS.LOCATE_GENERIC_BIN('openssl')+' req -text -noout -in /etc/ocs/cert/server.csr >'+filetemp+' 2>&1');
+     if not FileExists(filetemp) then exit;
+
+     l:=Tstringlist.Create;
+     l.LoadFromFile(filetemp);
+     RegExpr:=TRegExpr.Create;
+     RegExpr.Expression:='CN=(.+?)\/emailAddress';
 
 
+     for i:=0 to l.Count-1 do begin
+           if RegExpr.Exec(l.Strings[i]) then begin
+              result:=RegExpr.Match[1];
+              RegExpr.free;
+              l.free;
+              exit;
+           end;
+     end;
 
-   dbconfig();
-   fpsystem(SYS.LOCATE_PHP5_BIN()+' /usr/share/artica-postfix/exec.ocsweb.install.php &');
-   ROTATELOGS:=SYS.LOCATE_ROTATELOGS();
-
-l.add('<VirtualHost *:'+port+'>');
-l.add('        ServerName '+ocswebservername);
-l.add('        DocumentRoot "/usr/share/ocsinventory-reports/ocsreports"');
-l.add('');
-l.add('        <Directory "/usr/share/ocsinventory-reports/ocsreports">');
-l.add('                Options Indexes FollowSymLinks');
-l.add('                AllowOverride All');
-l.add('                Allow from all');
-l.add('        </Directory>');
-l.add('');
-l.add('        <IfModule alias_module>');
-l.add('                ScriptAlias /cgi-bin/ "/usr/share/ocsinventory-reports/ocsreports/cgi-bin/"');
-l.add('                Alias /download /var/lib/ocsinventory-reports/download');
-l.add('        </IfModule>');
-l.add('');
-l.add('        <Directory "/usr/share/ocsinventory-reports/ocsreports/cgi-bin">');
-l.add('                AllowOverride None');
-l.add('                Options None');
-l.add('                Order allow,deny');
-l.add('                Allow from all');
-l.add('        </Directory>');
-l.add('');
-l.add('#Injection du referentiel Perl pour OCSng');
-l.add(ifmodperl());
-l.add('');
-l.add('CustomLog "|'+ROTATELOGS+' /usr/local/apache-groupware/logs/ocs.log 86400" "%h %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-Agent}i\" %V"');
-l.add('ErrorLog /usr/local/apache-groupware/logs/ocs_err.log');
-
-l.add('</VirtualHost>');
-   result:=l.Text;
-   l.free;
+     RegExpr.free;
+     l.free;
 
 end;
 //##############################################################################
-function tocsi.ifmodperl():string;
+
+
+function tocsi.STATUS();
 var
-   l:Tstringlist;
-   COMPTE_BASE:string;
-   SERVEUR_SQL:string;
-   PSWD_BASE:string;
-   sql_port:string;
+pidpath:string;
 begin
-
-if not FileExists('/usr/share/ocsinventory-reports/ocsreports/dbconfig.inc.php') then exit;
-
-forceDirectories('/var/lib/ocsinventory-reports/download');
-fpsystem('/bin/chmod 0755 /var/lib/ocsinventory-reports/download');
-
-
-l:=Tstringlist.Create;
-
-   COMPTE_BASE:=SYS.MYSQL_INFOS('root');
-   PSWD_BASE:=SYS.MYSQL_INFOS('database_password');
-   SERVEUR_SQL:=SYS.MYSQL_INFOS('mysql_server');
-   sql_port:=SYS.MYSQL_INFOS('port');
-
-l.add('        <IfModule mod_perl.c>');
-l.add('                  # Database options');
-l.add('                  PerlSetEnv OCS_DB_HOST '+SERVEUR_SQL);
-l.add('                  PerlSetEnv OCS_DB_PORT '+sql_port);
-l.add('                  PerlSetEnv OCS_DB_NAME ocsweb');
-l.add('                  PerlSetEnv OCS_DB_LOCAL ocsweb');
-l.add('                  PerlSetEnv OCS_DB_USER '+COMPTE_BASE);
-if length(trim(PSWD_BASE))>0 then begin
-   l.add('                  PerlSetVar OCS_DB_PWD '+PSWD_BASE);
+   pidpath:=logs.FILE_TEMP();
+   fpsystem(SYS.LOCATE_PHP5_BIN()+' /usr/share/artica-postfix/exec.status.php --ocsweb >'+pidpath +' 2>&1');
+   result:=logs.ReadFromFile(pidpath);
+   logs.DeleteFile(pidpath);
 end;
-l.add('                  PerlSetEnv OCS_MODPERL_VERSION 2');
-l.add('');
-{l.add('                  # Slave Database settings');
-l.add('                  # Replace localhost by hostname or ip of MySQL server for READ');
-l.add('                  # Useful if you handle mysql slave databases');
-l.add('                  # PerlSetEnv OCS_DB_SL_HOST localhost');
-l.add('                  # Replace 3306 by port where running MySQL server, generally 3306');
-l.add('                  # PerlSetEnv OCS_DB_SL_PORT_SLAVE 3306');
-l.add('                  # User allowed to connect to database');
-l.add('                  # PerlSetEnv OCS_DB_SL_USER ocs');
-l.add('                  # Name of the database');
-l.add('                  # PerlSetEnv OCS_DB_SL_NAME ocsweb');
-l.add('                  # Password for user');
-l.add('                  # PerlSetVar OCS_DB_SL_PWD ocs');
-l.add('  ');                                              }
 
-l.add('                  # Path to log directory (must be writeable)');
-l.add('                  PerlSetEnv OCS_OPT_LOGPATH "/var/log/ocsinventory-server"');
-l.add('  ');
-l.add('                  # If you need to specify a mysql socket that the client''s built-in');
-l.add('                  #PerlSetVar OCS_OPT_DBI_MYSQL_SOCKET "path/to/mysql/unix/socket"');
-l.add('                  # DBI verbosity');
-l.add('                  PerlSetEnv OCS_OPT_DBI_PRINT_ERROR 0');
-l.add('  ');
-l.add('                  # Unicode support');
-l.add('                  PerlSetEnv OCS_OPT_UNICODE_SUPPORT 1');
-l.add('');
-l.add('                  # If you are using a multi server architecture, ');
-l.add('                  # Put the ip addresses of the slaves on the master');
-l.add('                  # (This is read as perl regular expressions)');
-l.add('                  PerlAddVar OCS_OPT_TRUSTED_IP 127.0.0.1');
-l.add('                  #PerlAddVar OCS_OPT_TRUSTED_IP XXX.XXX.XXX.XXX');
-l.add('  ');
-l.add('                  # ===== WEB SERVICE (SOAP) SETTINGS =====');
-l.add('');
-l.add('                  PerlSetEnv OCS_OPT_WEB_SERVICE_ENABLED 0');
-l.add('                  PerlSetEnv OCS_OPT_WEB_SERVICE_RESULTS_LIMIT 100');
-l.add('                  # PerlSetEnv OCS_OPT_WEB_SERVICE_PRIV_MODS_CONF "WEBSERV_PRIV_MOD_CONF_FILE"');
-l.add('');
-l.add('                  # Be careful: you must restart apache to make settings taking effects');
-l.add('');
-l.add('                  # Configure engine to use the settings from this file  ');
-l.add('                  PerlSetEnv OCS_OPT_OPTIONS_NOT_OVERLOADED 0');
-l.add('');
-l.add('                  # Try to use other compress algorythm than raw zlib');
-l.add('                  # GUNZIP and clear XML are supported');
-l.add('                  PerlSetEnv OCS_OPT_COMPRESS_TRY_OTHERS 1');
-l.add('  ');
-l.add('                  ##############################################################');
-l.add('                  # ===== OPTIONS BELOW ARE OVERLOADED IF YOU USE OCS GUI =====#');
-l.add('                  ##############################################################');
-l.add('');
-l.add('                  # NOTE: IF YOU WANT TO USE THIS CONFIG FILE INSTEAD, set OCS_OPT_OPTIONS_NOT_OVERLOADED to ''1''');
-l.add('');
-l.add('                  # ===== MAIN SETTINGS =====');
-l.add('');
-l.add('                  # Enable engine logs (see LOGPATH setting)');
-l.add('                  PerlSetEnv OCS_OPT_LOGLEVEL 1');
-l.add('                  # Specify agent''s prolog frequency');
-l.add('                  PerlSetEnv OCS_OPT_PROLOG_FREQ 12');
-l.add('                  # Configure the duplicates detection system');
-l.add('                  PerlSetEnv OCS_OPT_AUTO_DUPLICATE_LVL 15');
-l.add('                  # Futur security improvements');
-l.add('                  PerlSetEnv OCS_OPT_SECURITY_LEVEL 0');
-l.add('                  # Validity of a computer''s lock');
-l.add('                  PerlSetEnv OCS_OPT_LOCK_REUSE_TIME 600');
-l.add('                  # Enable the history tracking system (useful for external data synchronisation');
-l.add('                  PerlSetEnv OCS_OPT_TRACE_DELETED 1');
-l.add('  ');
-l.add('                  # ===== INVENTORY SETTINGS =====');
-l.add('  ');
-l.add('                  # Specify the validity of inventory data');
-l.add('                  PerlSetEnv OCS_OPT_FREQUENCY 0  ');
-l.add('                  # Configure engine to update inventory regarding to CHECKSUM agent value (lower DB backend load)');
-l.add('                  PerlSetEnv OCS_OPT_INVENTORY_DIFF 1');
-l.add('                  # Make engine consider an inventory as a transaction (lower concurency, better disk usage)');
-l.add('                  PerlSetEnv OCS_OPT_INVENTORY_TRANSACTION 1');
-l.add('                  # Configure engine to make a differential update of inventory sections (row level). Lower DB backend load, higher frontend load');
-l.add('                  PerlSetEnv OCS_OPT_INVENTORY_WRITE_DIFF 1');
-l.add('                  # Enable some stuff to improve DB queries, especially for GUI multicriteria searching system');
-l.add('                  PerlSetEnv OCS_OPT_INVENTORY_CACHE_ENABLED 1');
-l.add('                  # Specify when the engine will clean the inventory cache structures');
-l.add('                  PerlSetEnv OCS_OPT_INVENTORY_CACHE_REVALIDATE 7');
-l.add('                  # Enable you to keep trace of every elements encountered in db life');
-l.add('                  PerlSetEnv OCS_OPT_INVENTORY_CACHE_KEEP 1');
-l.add('');
-l.add('                  # ===== SOFTWARES DEPLOYMENT SETTINGS =====');
-l.add('');
-l.add('                  # Enable this feature');
-l.add('                  PerlSetEnv OCS_OPT_DOWNLOAD 1');
-l.add('                  # Package wich have a priority superior than this value will not be downloaded');
-l.add('                  PerlSetEnv OCS_OPT_DOWNLOAD_PERIOD_LENGTH 10');
-l.add('                  # Time between two download cycles (bandwidth control)');
-l.add('                  PerlSetEnv OCS_OPT_DOWNLOAD_CYCLE_LATENCY 60');
-l.add('                  # Time between two fragment downloads (bandwidth control)');
-l.add('                  PerlSetEnv OCS_OPT_DOWNLOAD_FRAG_LATENCY 60');
-l.add('                  # Specify if you want to track packages affected to a group on computer''s level');
-l.add('                  PerlSetEnv OCS_OPT_DOWNLOAD_GROUPS_TRACE_EVENTS 1');
-l.add('                  # Time between two download periods (bandwidth control)');
-l.add('                  PerlSetEnv OCS_OPT_DOWNLOAD_PERIOD_LATENCY 60');
-l.add('                  # Agents will send ERR_TIMEOUT event and clean the package it is older than this setting');
-l.add('                  PerlSetEnv OCS_OPT_DOWNLOAD_TIMEOUT 7');
-l.add('                  # Number of cycle within a period');
-l.add('  ');
-l.add('                  # Enable ocs engine to deliver agent''s files (deprecated)');
-l.add('                  PerlSetEnv OCS_OPT_DEPLOY 0');
-l.add('                  # Enable the softwares deployment capacity (bandwidth control)');
-l.add('  ');
-l.add('                  # ===== GROUPS SETTINGS =====');
-l.add('');
-l.add('                  # Enable the computer\s groups feature');
-l.add('                  PerlSetEnv OCS_OPT_ENABLE_GROUPS 1');
-l.add('                  # Random number computed in the defined range. Designed to avoid computing many groups in the same process');
-l.add('                  PerlSetEnv OCS_OPT_GROUPS_CACHE_OFFSET 43200');
-l.add('                  # Specify the validity of computer''s groups (default: compute it once a day - see offset)');
-l.add('                  PerlSetEnv OCS_OPT_GROUPS_CACHE_REVALIDATE 43200');
-l.add('  ');
-l.add('                  # ===== IPDISCOVER SETTINGS =====');
-l.add('');
-l.add('                  # Specify how much agent per LAN will discovered connected peripherals (0 to disable)');
-l.add('                  PerlSetEnv OCS_OPT_IPDISCOVER 2');
-l.add('                  # Specify the minimal difference to replace an ipdiscover agent');
-l.add('                  PerlSetEnv OCS_OPT_IPDISCOVER_BETTER_THRESHOLD 1');
-l.add('                  # Time between 2 arp requests (mini: 10 ms)');
-l.add('                  PerlSetEnv OCS_OPT_IPDISCOVER_LATENCY 100');
-l.add('                  # Specify when to remove a computer when it has not come until this period');
-l.add('                  PerlSetEnv OCS_OPT_IPDISCOVER_MAX_ALIVE 14');
-l.add('                  # Disable the time before a first election (not recommended)');
-l.add('                  PerlSetEnv OCS_OPT_IPDISCOVER_NO_POSTPONE 0');
-l.add('                  # Enable groups for ipdiscover (for example, you might want to prevent some groups to be ipdiscover agents)');
-l.add('                  PerlSetEnv OCS_OPT_IPDISCOVER_USE_GROUPS 1');
-l.add('  ');
-l.add('                  # ===== INVENTORY FILES MAPPING SETTINGS =====');
-l.add('');
-l.add('                  # Use with ocsinventory-injector, enable the multi entities feature');
-l.add('                  PerlSetEnv OCS_OPT_GENERATE_OCS_FILES 0');
-l.add('                  # Generate either compressed file or clear XML text');
-l.add('                  PerlSetEnv OCS_OPT_OCS_FILES_FORMAT OCS');
-l.add('                  # Specify if you want to keep trace of all inventory between to synchronisation with the higher level server');
-l.add('                  PerlSetEnv OCS_OPT_OCS_FILES_OVERWRITE 0');
-l.add('                  # Path to ocs files directory (must be writeable)');
-l.add('                  PerlSetEnv OCS_OPT_OCS_FILES_PATH /tmp');
-l.add('');
-l.add('                  # ===== FILTER SETTINGS =====');
-l.add('');
-l.add('                  # Enable prolog filter stack');
-l.add('                  PerlSetEnv OCS_OPT_PROLOG_FILTER_ON 0');
-l.add('                  # Enable core filter system to modify some things "on the fly"');
-l.add('                  PerlSetEnv OCS_OPT_INVENTORY_FILTER_ENABLED 0');
-l.add('                  # Enable inventory flooding filter. A dedicated ipaddress ia allowed to send a new computer only once in this period');
-l.add('                  PerlSetEnv OCS_OPT_INVENTORY_FILTER_FLOOD_IP 0');
-l.add('                  # Period definition for INVENTORY_FILTER_FLOOD_IP');
-l.add('                  PerlSetEnv OCS_OPT_INVENTORY_FILTER_FLOOD_IP_CACHE_TIME 300');
-l.add('                  # Enable inventory filter stack');
-l.add('                  PerlSetEnv OCS_OPT_INVENTORY_FILTER_ON 0');
-l.add('  ');
-l.add('                  # ===== REGISTRY SETTINGS =====');
-l.add('');
-l.add('                  # Enable the registry capacity');
-l.add('                  PerlSetEnv OCS_OPT_REGISTRY 1');
-l.add('  ');
-l.add('                  # ===== SESSION SETTINGS =====');
-l.add('                  # Not yet in GUI');
-l.add('');
-l.add('                  # Validity of a session (prolog=>postinventory)');
-l.add('                  PerlSetEnv OCS_OPT_SESSION_VALIDITY_TIME 600');
-l.add('                  # Consider a session obsolete if it is older thant this value');
-l.add('                  PerlSetEnv OCS_OPT_SESSION_CLEAN_TIME 86400');
-l.add('                  # Accept an inventory only if required by server');
-l.add('                  #( Refuse "forced" inventory)');
-l.add('                  PerlSetEnv OCS_OPT_INVENTORY_SESSION_ONLY 0');
-l.add('');
-l.add('                  # ===== TAG =====');
-l.add('');
-l.add('                  # The default behavior of the server is to ignore TAG changes from the');
-l.add('                   # agent.');
-l.add('                   PerlSetEnv OCS_OPT_ACCEPT_TAG_UPDATE_FROM_CLIENT 0');
-l.add('');
-l.add('');
-l.add('                   # ===== DEPRECATED =====');
-l.add('');
-l.add('                   # Set the proxy cache validity in http headers when sending a file');
-l.add('                   PerlSetEnv OCS_OPT_PROXY_REVALIDATE_DELAY 3600');
-l.add('                   # Deprecated');
-l.add('                   PerlSetEnv OCS_OPT_UPDATE 0');
-l.add('  ');
-l.add('                   ############ DO NOT MODIFY BELOW ! #######################');
-l.add('  ');
-l.add('                   # External modules');
-l.add('                   PerlModule Apache::DBI');
-l.add('                   PerlModule Compress::Zlib');
-l.add('                   PerlModule XML::Simple');
-l.add('  ');
-l.add('                   # Ocs');
-l.add('                   PerlModule Apache::Ocsinventory');
-l.add('                   PerlModule Apache::Ocsinventory::Server::Constants');
-l.add('                   PerlModule Apache::Ocsinventory::Server::System');
-l.add('                   PerlModule Apache::Ocsinventory::Server::Communication');
-l.add('                   PerlModule Apache::Ocsinventory::Server::Inventory');
-l.add('                   PerlModule Apache::Ocsinventory::Server::Duplicate');
-l.add('');
-l.add('                   # Capacities');
-l.add('                   PerlModule Apache::Ocsinventory::Server::Capacities::Registry');
-l.add('                   PerlModule Apache::Ocsinventory::Server::Capacities::Update');
-l.add('                   PerlModule Apache::Ocsinventory::Server::Capacities::Ipdiscover');
-l.add('                   PerlModule Apache::Ocsinventory::Server::Capacities::Download');
-l.add('                   PerlModule Apache::Ocsinventory::Server::Capacities::Notify');
-l.add('                   # This module guides you through the module creation');
-l.add('                   # PerlModule Apache::Ocsinventory::Server::Capacities::Example');
-l.add('                   # This module adds some rules to filter some request sent to ocs server in the prolog and inventory stages');
-l.add('                   # PerlModule Apache::Ocsinventory::Server::Capacities::Filter');
-l.add('  ');
-l.add('                   # PerlTaintCheck On');
-l.add('');
-l.add('                   # SSL apache settings ');
-l.add('                   #SSLEngine "SSL_ENABLE"');
-l.add('                   #SSLCertificateFile "SSL_CERTIFICATE_FILE"');
-l.add('                   #SSLCertificateKeyFile "SSL_CERTIFICATE_KEY_FILE"');
-l.add('                   #SSLCACertificateFile "SSL_CERTIFICATE_FILE"');
-l.add('                   #SSLCACertificatePath "SSL_CERTIFICATE_PATH"');
-l.add('                   #SSLVerifyClient "SSL_VALIDATE_CLIENT"');
-l.add('');
-l.add('                   # Engine apache settings');
-l.add('                   # "Virtual" directory for handling OCS Inventory NG agents communications');
-l.add('                   # Be careful, do not create such directory into your web server root document !');
-l.add('                   <Location /ocsinventory>');
-l.add('	                      order deny,allow');
-l.add('	                      allow from all');
-l.add('	                      Satisfy Any');
-l.add('	                      # If you protect this area you have to deal with http_auth_* agent''s parameters');
-l.add('	                      # AuthType Basic');
-l.add('	                      # AuthName "OCS Inventory agent area"');
-l.add('	                      # AuthUserFile "APACHE_AUTH_USER_FILE"');
-l.add('	                      # require valid-user');
-l.add('                       SetHandler perl-script');
-l.add('                       PerlHandler Apache::Ocsinventory');
-l.add('                   </Location>');
-l.add('');
-l.add('                   # Web service apache settings');
-l.add('                   PerlModule Apache::Ocsinventory::SOAP');
-l.add('');
-l.add('                  <location /ocsinterface>');
-l.add('                        SetHandler perl-script');
-l.add('                        PerlHandler "Apache::Ocsinventory::SOAP"');
-l.add('');
-l.add('                        # By default, you can query web service from everywhere with a valid user');
-l.add('                        Order deny,allow');
-l.add('                        Allow from all');
-l.add('       	               AuthType Basic');
-l.add('	                       AuthName "OCS Inventory SOAP Area"');
-l.add('	                       # Use htpasswd to create/update soap-user (or another granted user)');
-l.add('	                       AuthUserFile "APACHE_AUTH_USER_FILE"');
-l.add('	                       require "SOAP_USER"');
-l.add('                   </location>');
-l.add('        </IfModule>');
-result:=l.Text;
-l.free;
+//##############################################################################
+procedure tocsi.WritePhpConfig();
+var
+   lighttpd:Tlighttpd;
+begin
+if not FileExists('/usr/local/apache-groupware/php5/lib/php.ini') then begin
+   logs.Debuglogs('OCS web Engine unable to stat /usr/local/apache-groupware/php5/lib/php.ini');
+
 end;
+forcedirectories('/usr/local/apache-groupware/php5/sessions');
+logs.OutputCmd('/bin/chmod 755 /usr/local/apache-groupware/php5/sessions');
+logs.OutputCmd('/bin/chown -R www-data:www-data /usr/local/apache-groupware/php5/sessions');
+lighttpd:=Tlighttpd.Create(SYS);
+lighttpd.LIGHTTPD_ADD_INCLUDE_PATH();
+end;
+//##############################################################################
+
+
 end.
+

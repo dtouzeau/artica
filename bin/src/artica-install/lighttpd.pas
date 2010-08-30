@@ -6,7 +6,7 @@ unit lighttpd;
 interface
                                                               
 uses
-    Classes, SysUtils,variants,strutils,IniFiles, Process,logs,unix,RegExpr in 'RegExpr.pas',zsystem,awstats,mailmanctl,tcpip,mysql_daemon,zarafa_server;
+    Classes, SysUtils,variants,strutils,IniFiles, Process,logs,unix,RegExpr in 'RegExpr.pas',zsystem,awstats,mailmanctl,tcpip,mysql_daemon,zarafa_server,backuppc;
 
 type
   TStringDynArray = array of string;
@@ -1737,6 +1737,9 @@ max_procs:integer;
 roundcube_folder:string;
 zarafa:tzarafa_server;
 ArticaHttpsPort:integer;
+backuppcCgiBin:string;
+perlbin:string;
+backuppc:tbackuppc;
 begin
 ArticaHttpsPort:=9000;
 user:=LIGHTTPD_GET_USER();
@@ -1747,7 +1750,7 @@ if length(user)=0 then begin
 end;
 
 if not TrYStrToInt(SYS.GET_INFO('ArticaHttpsPort'),ArticaHttpsPort) then ArticaHttpsPort:=9000;
-logs.Debuglogs('Starting......: lighttpd: runnin on port '+IntToStr(ArticaHttpsPort));
+logs.Debuglogs('Starting......: lighttpd: (config) running on port '+IntToStr(ArticaHttpsPort));
 
 RegExpr:=TRegExpr.Create;
 RegExpr.Expression:='(.+?):(.+)';
@@ -1786,7 +1789,7 @@ l.Add('server.document-root        = "/usr/share/artica-postfix"');
 l.Add('server.username = "'+name+'"');
 l.Add('server.groupname = "'+group+'"');
 l.Add('server.errorlog             = "/var/log/lighttpd/error.log"');
-l.Add('index-file.names            = ( "index.php")');
+l.Add('index-file.names            = ( "index.php","index.cgi")');
 l.Add('');
 l.Add('mimetype.assign             = (');
 l.Add('  ".pdf"          =>      "application/pdf",');
@@ -1858,20 +1861,20 @@ l.Add('server.max-fds 		    = 2048');
 l.Add('server.network-backend      = "write"');
 l.Add('');
 l.Add('fastcgi.server = ( ".php" =>((');
-l.Add('                "bin-path" => "/usr/bin/php-cgi",');
-l.Add('                "socket" => "/var/run/lighttpd/php.socket",');
+l.Add('         "bin-path" => "/usr/bin/php-cgi",');
+l.Add('         "socket" => "/var/run/lighttpd/php.socket",');
 l.Add('		"min-procs" => 1,');
 l.Add('         "max-procs" => '+IntToStr(max_procs)+',');
 l.Add('		"max-load-per-proc" => 4,');
 l.Add('         "idle-timeout" => 10,');
 l.Add('         "bin-environment" => (');
-l.Add('                        "PHP_FCGI_CHILDREN" => "'+IntToStr(PHP_FCGI_CHILDREN)+'",');
-l.Add('                        "PHP_FCGI_MAX_REQUESTS" => "'+intToStr(PHP_FCGI_MAX_REQUESTS)+'"');
-l.Add('                ),');
-l.Add('                "bin-copy-environment" => (');
-l.Add('                        "PATH", "SHELL", "USER"');
-l.Add('                ),');
-l.Add('                "broken-scriptfilename" => "enable"');
+l.Add('             "PHP_FCGI_CHILDREN" => "'+IntToStr(PHP_FCGI_CHILDREN)+'",');
+l.Add('             "PHP_FCGI_MAX_REQUESTS" => "'+intToStr(PHP_FCGI_MAX_REQUESTS)+'"');
+l.Add('          ),');
+l.Add('          "bin-copy-environment" => (');
+l.Add('            "PATH", "SHELL", "USER"');
+l.Add('           ),');
+l.Add('          "broken-scriptfilename" => "enable"');
 l.Add('        ))');
 l.Add(')');
 l.Add('ssl.engine                 = "enable"');
@@ -1884,7 +1887,7 @@ forceDirectories('/var/lighttpd/upload');
 fpsystem('/bin/chown -R '+name+' /var/lighttpd');
 
 if DirectoryExists(roundcube_folder) then begin
-logs.Debuglogs('Starting......: lighttpd: roundcube is installed on '+roundcube_folder);
+logs.Debuglogs('Starting......: lighttpd: (config) roundcube is installed on '+roundcube_folder);
 fpsystem(SYS.LOCATE_GENERIC_BIN('nohup')+' '+SYS.LOCATE_PHP5_BIN()+' /usr/share/artica-postfix/exec.roundcube.php --databases >/dev/null 2>&1 &');
 l.Add('alias.url += (	"/webmail" 			 => "'+roundcube_folder+'")');
 l.Add('$HTTP["url"] =~ "^/webmail/config|/webmail/temp|/webmail/logs" { url.access-deny = ( "" )}');
@@ -1892,7 +1895,7 @@ end;
 
 zarafa:=tzarafa_server.Create(SYS);
 if FileExists(zarafa.SERVER_BIN_PATH()) then begin
-logs.Debuglogs('Starting......: lighttpd: zarafa is installed');
+logs.Debuglogs('Starting......: lighttpd: (config) zarafa is installed');
 l.Add('alias.url += (	"/webaccess" 			 => "/usr/share/zarafa-webaccess")');
 zarafa.WEB_ACCESS_CONFIG();
 //l.Add('$HTTP["url"] =~ "^/webmail/config|/webmail/temp|/webmail/logs" { url.access-deny = ( "" )}');
@@ -1905,13 +1908,29 @@ l.Add('alias.url += ("/blocked_attachments"=> "/var/spool/artica-filter/bightml"
 
 if DirectoryExists(awstats.AWSTATS_www_root()) then l.Add('alias.url += ( "/awstats" => "'+awstats.AWSTATS_www_root()+'" )');
 
+perlbin:=SYS.LOCATE_GENERIC_BIN('perl');
 l.Add('alias.url += ( "/cgi-bin/" => "/usr/lib/cgi-bin/" )');
+
+
+
+// BackuPPC ---------------------------------------------------------------------
+
+backuppc:=tbackuppc.Create(SYS);
+backuppcCgiBin:=backuppc.CGI_BIN_PATH();
+logs.Debuglogs('Starting......: lighttpd: (config) BackupPC "'+backuppcCgiBin+'"');
+   if DirectoryExists(backuppcCgiBin) then begin
+      logs.Debuglogs('Starting......: lighttpd: (config) BackupPC is installed');
+      l.Add('alias.url  += ( "/backuppc" => "'+backuppcCgiBin+'")');
+    end else begin
+    logs.Debuglogs('Starting......: lighttpd: (config) BackupPC is not installed');
+end;
+
 l.Add('');
 l.Add('cgi.assign= (');
-l.Add('	".pl"  => "/usr/bin/perl",');
+l.Add('	".pl"  => "'+perlbin+'",');
 l.Add('	".php" => "/usr/bin/php-cgi",');
 l.Add('	".py"  => "/usr/bin/python",');
-l.Add('	".cgi"  => "/usr/bin/perl",');
+l.Add('	".cgi"  => "'+perlbin+'",');
 
 mailman:=tmailman.Create(SYS);
 
@@ -1932,7 +1951,7 @@ l.Add(')');
 l.Add('');
 if Not FileExists('/etc/lighttpd/lighttpd.conf') then begin
    forceDirectories('/etc/lighttpd');
-   logs.Debuglogs('Starting......: lighttpd: save /etc/lighttpd/lighttpd.conf');
+   logs.Debuglogs('Starting......: lighttpd: (config) save /etc/lighttpd/lighttpd.conf');
    logs.WriteToFile(l.Text,'/etc/lighttpd/lighttpd.conf');
 end;
 result:=l.text;

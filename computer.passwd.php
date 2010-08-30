@@ -2,8 +2,8 @@
 include_once(dirname(__FILE__).'/ressources/class.templates.inc');
 include_once(dirname(__FILE__).'/ressources/class.computers.inc');
 include_once(dirname(__FILE__).'/ressources/class.ini.inc');
-	$user=new usersMenus();
-	if($user->AsSambaAdministrator==false){die("NO PRIVS!");exit();}
+	
+	if(!Isright()){$tpl=new templates();echo "alert('".$tpl->javascript_parse_text('{ERROR_NO_PRIVS}')."');";die();}
 	if(isset($_GET["username"])){save();exit;}
 	
 	if(isset($_GET["index"])){popup();exit;}
@@ -19,7 +19,7 @@ function js(){
 	$page=CurrentPageName();	
 	$html="
 	function {$prefix}Load(){
-		YahooWin5(550,'$page?index={$_GET["uid"]}','$title');
+		YahooWin5(550,'$page?index={$_GET["uid"]}&uid={$_GET["uid"]}','$title');
 	}
 	
 	{$prefix}Load();
@@ -30,8 +30,10 @@ var x_{$prefix}SaveComputerPasswd= function (obj) {
 	if(results.length>0){alert(results);}
 	YahooWin5Hide();
 	if(document.getElementById('FenetreComputerBrowse')){
-		Loadjs('ComputerBrowse.php?&computer={$_GET["uid"]}&'+document.getElementById('FenetreComputerBrowse').value);
+		Loadjs('ComputerBrowse.php?&computer={$_GET["uid"]}&uid={$_GET["uid"]}&'+document.getElementById('FenetreComputerBrowse').value);
 	}
+	if(document.getElementById('container-computerinfos-tabs')){RefreshTab('container-computerinfos-tabs');}
+	
 		
 }		
 	
@@ -168,6 +170,14 @@ $uid=$_GET["uid"];
 	$computer->SaveCryptedInfos();	
 	
 }
-
+function IsRight(){
+	if(!isset($_GET["uid"])){return false;}
+	$users=new usersMenus();
+	if($users->AsArticaAdministrator){return true;}
+	if($users->AsSambaAdministrator){return true;}
+	if($users->AllowAddUsers){return true;}
+	if($users->AllowManageOwnComputers){return true;}
+	return false;
+	}
 	
 ?>

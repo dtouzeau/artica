@@ -273,6 +273,12 @@ if moduleso_file='mod_dav.so' then begin
 end;
 
 
+if moduleso_file='mod_suexec.so' then begin
+    result:='LoadModule suexec_module'+chr(9)+APACHE_MODULES_PATH+'/'+moduleso_file;
+    exit;
+end;
+
+
 
 
 
@@ -332,6 +338,7 @@ l.add('mod_status.so');
 l.add('mod_ssl.so');
 L.add('mod_dav.so');
 l.add('mod_ldap.so');
+l.add('mod_suexec.so');
 for i:=0 to l.Count-1 do begin
     if l.Strings[i]=module_so then begin
        result:=true;

@@ -43,6 +43,8 @@
 	if($user->SQUID_INSTALLED==false){header('location:users.index.php');exit();}
 	if($user->AsSquidAdministrator==false){header('location:users.index.php');exit();}
 	
+	if(isset($_GET["reactivate-squid"])){reactivate_squid();exit;}
+	
 	if(isset($_GET["ajaxmenu"])){main_switch();exit;}
 	if(isset($_GET["main"])){main_switch();exit;}
 	if(isset($_GET["fqdncache_size"])){main_save_array();exit;}
@@ -261,6 +263,12 @@ function ConnectionTimeDelete(gpid,ou,d){
 echo $html;
 	
 }
+
+function reactivate_squid(){
+	
+	$js=js_enable_disable_squid()."\nEnableDisableSQUID();";
+	echo $js;
+}
 	
 function popup(){
 	if(GET_CACHED(__FILE__,__FUNCTION__,__FUNCTION__)){return;}
@@ -349,7 +357,7 @@ if($html<>null){return $html;}
 $page=CurrentPageName();
 $sock=new sockets();
 
-
+	$users=new usersMenus();
 	$your_network=Paragraphe('folder-realyrules-64.png','{your_network}','{your_network_text}',"javascript:Loadjs('squid.popups.php?script=network')");
 	$listen_port=Paragraphe('network-connection2.png','{listen_port}','{listen_port_text}',"javascript:Loadjs('squid.popups.php?script=listen_port')");
 	$dns_servers=Paragraphe('64-bind.png','{dns_servers}','{dns_servers_text}',"javascript:Loadjs('squid.popups.php?script=dns')");
@@ -369,7 +377,14 @@ $sock=new sockets();
     $proxy_pac_rules=Paragraphe('proxy-pac-rules-64.png','{proxy_pac_rules}','{proxy_pac_text}',"javascript:Loadjs('squid.proxy.pac.rules.php')");
     
     
-$SquidEnableProxyPac=$sock->GET_INFO("SquidEnableProxyPac");	
+    $ftp_user=Paragraphe('ftp-user-64.png','{squid_ftp_user}','{squid_ftp_user_text}',"javascript:Loadjs('squid.ftp.user.php')");
+    $sslbump=Paragraphe('web-ssl-64.png','{squid_sslbump}','{squid_sslbump_text}',
+    			"javascript:Loadjs('squid.sslbump.php')");
+    
+
+    
+    
+	$SquidEnableProxyPac=$sock->GET_INFO("SquidEnableProxyPac");	
 	
 	if($sock->GET_INFO("SquidActHasReverse")==1){
 		$listen_port=null;
@@ -397,10 +412,12 @@ if($sock->GET_INFO("SquidEnableProxyPac")<>1){$proxy_pac_rules=null;}
 	$tr[]=$squid_parent_proxy;
 	$tr[]=$squid_reverse_proxy;	
 	$tr[]=$listen_port;
+	$tr[]=$sslbump;
 	$tr[]=$squid_accl_websites;
 	$tr[]=$dns_servers;
 	$tr[]=$applysquid;
 	$tr[]=$authenticate_users;
+	$tr[]=$ftp_user;
 	$tr[]=$proxy_pac;
 	$tr[]=$proxy_pac_rules;
 	$tr[]=$visible_hostname;
@@ -574,13 +591,13 @@ function main_enableETDisable(){
 	
 	
 	$sock=new sockets();
-	$SQUIDEnable=$sock->GET_INFO("SQUIDEnable");
+	$SQUIDEnable=trim($sock->GET_INFO("SQUIDEnable"));
 	if($SQUIDEnable==null){$SQUIDEnable=1;}
 	
 	$field=Paragraphe_switch_img("{enable_squid_service}","{enable_squid_service_explain}","SQUIDEnable",$SQUIDEnable);
 	
 	
-	$html="<H1 style='width:105.5%'>{enable_squid_service}</H1>
+	$html="
 	<div id='EnableETDisableSquidDiv'>
 	<p class=caption>{enable_squid_service_text}</p>
 	$field
@@ -1466,6 +1483,8 @@ function transparent_save(){
 		}
 	$squid->SaveToLdap();
 	$squid->SaveToServer();
+	$sock=new sockets();
+	$sock->getFrameWork("cmd.php?squid-reconfigure=yes");
 	
 }
 

@@ -8,7 +8,7 @@ interface
 uses
 //depreciated oldlinux -> linux
 Classes, SysUtils,Process,strutils,IniFiles,RegExpr in 'RegExpr.pas',unix,logs,dateutils,uHashList,Geoip,BaseUnix,md5,dhcp_server,openvpn,cups,pdns, obm2,
-samba,smartd,xapian,opengoo,dstat,sugarcrm,rsync,tcpip,policyd_weight,apache_artica, autofs,nfsserver,framework,ocsi,assp,gluster,zabbix,hamachi,vmwaretools,phpldapadmin,monit,zarafa_server,squidguard,wifi, emailrelay,mldonkey,
+samba,smartd,xapian,opengoo,dstat,sugarcrm,rsync,tcpip,policyd_weight,apache_artica, autofs,nfsserver,framework,ocsi,assp,gluster,zabbix,hamachi,vmwaretools,phpldapadmin,monit,zarafa_server,squidguard,wifi, emailrelay,mldonkey,backuppc,kav4fs,ocsagent,
 mailarchiver in '/home/dtouzeau/developpement/artica-postfix/bin/src/artica-install/mailarchiver.pas',
 kavmilter    in '/home/dtouzeau/developpement/artica-postfix/bin/src/artica-install/kavmilter.pas',
 kas3         in '/home/dtouzeau/developpement/artica-postfix/bin/src/artica-install/kas3.pas',
@@ -130,7 +130,7 @@ public
       function CGI_ALL_APPLIS_INSTALLED():string;
       function INYADIN_VERSION():string;
       PROCEDURE BuildDeb(targetfile:string;targetversion:string);
-
+      procedure WRITE_STATUS();
 
       procedure THREAD_COMMAND_SET(zcommands:string);
       function CheckInterface( if_name:string):boolean;
@@ -2760,6 +2760,7 @@ var
    rsync:Trsync;
    policyd_weight:tpolicyd_weight;
    ocsi:tocsi;
+   ocsagent:tocsagent;
    mgreylist:tmilter_greylist;
    assp:tassp;
    pdns:tpdns;
@@ -2772,6 +2773,8 @@ var
    zarafa_server:tzarafa_server;
    zsquidguard:tsquidguard;
    mldonkey:tmldonkey;
+   backuppc:tbackuppc;
+   kav4fs:tkav4fs;
 begin
 
    debug:=false;
@@ -2849,15 +2852,24 @@ begin
     bogom.free;
 
 
+    kav4fs:=Tkav4fs.Create(SYS);
+    ArrayList.Add('[APP_KAV4FS] "' + kav4fs.VERSION() + '"');
+    kav4fs.free;
+
     //stunnel;
     stunnel:=Tstunnel.Create(SYS);
     ArrayList.Add('[APP_STUNNEL] "' + stunnel.VERSION() + '"');
     stunnel.free;
 
     //mldonkey
-    mldonkey:tmldonkey.Create(SYS);
+    mldonkey:=tmldonkey.Create(SYS);
     ArrayList.Add('[APP_MLDONKEY] "' + mldonkey.VERSION() + '"');
     mldonkey.free;
+
+    //backuppc
+    backuppc:=tbackuppc.Create(SYS);
+    ArrayList.Add('[APP_BACKUPPC] "' + backuppc.VERSION() + '"');
+    backuppc.free;
 
     //rsync
     rsync:=Trsync.Create(SYS);
@@ -2872,6 +2884,17 @@ begin
     except
           logs.Syslogs('FATAL ERROR on CGI_ALL_APPLIS_INSTALLED after ocsi.VERSION()');
     end;
+
+
+    //ocsagent
+    ocsagent:=tocsagent.CReate(SYS);
+    try
+     ArrayList.Add('[APP_OCSI_LINUX_CLIENT] "' + ocsagent.VERSION() + '"');
+     ocsagent.free;
+    except
+          logs.Syslogs('FATAL ERROR on CGI_ALL_APPLIS_INSTALLED after ocsagent.VERSION()');
+    end;
+
 
     //gluster
     if debug then writeln('GLUSTER START');
@@ -5632,6 +5655,7 @@ var
    gluster:tgluster;
    zabbix:tzabbix;
    mldonkey:tmldonkey;
+   backuppc:tbackuppc;
 begin
      logs:=Tlogs.Create;
      spfm:=tspf.Create;
@@ -5697,6 +5721,11 @@ begin
     mldonkey:=tmldonkey.CReate(SYS);
     mldonkey.START();
     mldonkey.free;
+
+    backuppc:=tbackuppc.CReate(SYS);
+    backuppc.START();
+    backuppc.free;
+
 
 
     if NetWorkAvailable then begin
@@ -9698,6 +9727,27 @@ logs.Debuglogs('#############################################################');
 end;
 //******************************************************************************
 
+
+procedure myconf.WRITE_STATUS();
+var
+   TimeInt:integer;
+   path:string;
+   fulldata:string;
+begin
+     path:=get_ARTICA_PHP_PATH()+'/ressources/logs/global.status.ini';
+     TimeInt:=SYS.FILE_TIME_BETWEEN_MIN(path);
+     if TimeInt>=1 then begin
+        fulldata:=GLOBAL_STATUS();
+        logs.DeleteFile(path);
+        logs.WriteToFile(fulldata,path);
+        fpsystem('/bin/chown www-data:www-data '+get_ARTICA_PHP_PATH()+'/ressources/logs/*.ini');
+        logs.WriteToFile(STATUS_PATTERN_DATABASES(),get_ARTICA_PHP_PATH()+'/ressources/logs/pattern.status.ini');
+     end;
+
+end;
+
+//******************************************************************************
+
 FUNCTION myconf.GLOBAL_STATUS():string;
 
          const
@@ -9744,6 +9794,10 @@ FUNCTION myconf.GLOBAL_STATUS():string;
  zwifi:twifi;
  opengoo:topengoo;
  emailrelay:temailrelay;
+ mldonkey:tmldonkey;
+ backuppc:tbackuppc;
+ kav4fs:tkav4fs;
+ ocsi:Tocsi;
 begin
 LSHW_TIME:=0;
 INSTANT_SEARCH();
@@ -9797,12 +9851,31 @@ end;
    emailrelay:=Temailrelay.CReate(SYS);
    ini:=ini+ emailrelay.STATUS()+CRLF;
 
+   backuppc:=tbackuppc.CReate(SYS);
+   ini:=ini+ backuppc.STATUS()+CRLF;
+   backuppc.free;
+
+   mldonkey:=tmldonkey.Create(SYS);
+   ini:=ini+ mldonkey.STATUS()+CRLF;
+   mldonkey.free;
+
+   ocsi:=tocsi.Create(SYS);
+   ini:=ini+ ocsi.STATUS()+CRLF;
+   ocsi.free;
+
+
 
    //retranslator
     logs.Debuglogs('retranslator STATUS ----------------------------------');
    retranslator:=tkretranslator.Create(SYS);
    ini:=ini+ retranslator.STATUS()+CRLF;
    retranslator.Free;
+
+   kav4fs:=Tkav4fs.Create(SYS);
+   ini:=ini+ kav4fs.STATUS()+CRLF;
+   kav4fs.free;
+
+
 
    //boa [monit ok]
     logs.Debuglogs('boa STATUS ----------------------------------');

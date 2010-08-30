@@ -301,12 +301,13 @@ function daemons_status(){
 	}
 	
 	$kernel_mismatch=kernel_mismatch();
-
 	$newversion=null;
+	$kavicap_license_error=kavicap_license_error();
 
 	$final="
 	$no_orgs
 	$kernel_mismatch
+	$kavicap_license_error
 	$services
 	$nobackup
 	$events_paragraphe
@@ -324,6 +325,26 @@ function daemons_status(){
 events(__FUNCTION__."/usr/share/artica-postfix/ressources/logs/status.global.html ok");	
 file_put_contents('/usr/share/artica-postfix/ressources/logs/status.global.html',$final);
 system('/bin/chmod 755 /usr/share/artica-postfix/ressources/logs/status.global.html');	
+	
+}
+
+function kavicap_license_error(){
+	$users=new usersMenus();
+	$sock=new sockets();
+	if(!$users->KAV4PROXY_INSTALLED){return null;}
+	$kavicapserverEnabled=$sock->GET_INFO("kavicapserverEnabled");
+	if($kavicapserverEnabled==null){$kavicapserverEnabled=0;}	
+	if($kavicapserverEnabled==0){return null;}
+	if(!$users->KAV4PROXY_LICENSE_ERROR){return null;}
+	
+	$pattern_date=trim(base64_decode($sock->getFrameWork("cmd.php?kav4proxy-pattern-date=yes")));
+
+	if($pattern_date==null){
+	return Paragraphe("license-error-64.png",'{av_pattern_database}',"{APP_KAV4PROXY}:: {av_pattern_database_obsolete_or_missing}","","{APP_KAV4PROXY}",300,76,1);
+	}
+	
+	return Paragraphe("license-error-64.png",'{license_error}',"{APP_KAV4PROXY}:: $users->KAV4PROXY_LICENSE_ERROR_TEXT","javascript:Loadjs('squid.newbee.php?kav-license=yes');","{license}",300,76,1);
+	
 	
 }
 

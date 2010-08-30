@@ -3055,8 +3055,19 @@ private	function CheckTables_repositories(){
 				`options` TEXT NOT NULL ,
 				INDEX ( `servername` ))"; 		
 			$this->QUERY_SQL($sql,"artica_backup");
-		}		
+		}	
+
 		
+		
+		if(!$this->TABLE_EXISTS('squid_ssl','artica_backup')){		
+			$sql="CREATE TABLE `artica_backup`.`squid_ssl` (
+			`ID` INT( 5 ) NOT NULL AUTO_INCREMENT PRIMARY KEY ,
+			`website_name` VARCHAR( 255 ) NOT NULL ,
+			`type` VARCHAR( 40 ) NOT NULL ,
+			`enabled` INT( 1 ) NOT NULL DEFAULT '1',
+			INDEX ( `type` , `enabled`,`website_name` ))";
+			$this->QUERY_SQL($sql,"artica_backup");
+			}
 		
  		
 		

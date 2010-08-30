@@ -3116,13 +3116,6 @@ if RegExpr.Exec(uri) then begin
    exit(true);
 end;
 
-RegExpr.expression:='ChangeDiskLabel:(.+?);(.+)';
-if RegExpr.Exec(uri) then begin
-   SYS:=Tsystem.Create();
-   logs.Debuglogs('ParseUri:: usb_change_label('+RegExpr.Match[1]+','+RegExpr.Match[2]+')');
-   SYS.usb_change_disk_label(RegExpr.Match[1],RegExpr.Match[2]);
-   exit(true);
-end;
 
 RegExpr.expression:='BuildUniquePartition:(.+?);(.+)';
 if RegExpr.Exec(uri) then begin

@@ -14,7 +14,7 @@ session_start();
 		echo "alert('". $tpl->javascript_parse_text("{ERROR_NO_PRIVS}")."');";
 		die();exit();
 	}
-	
+	if(isset($_GET["script"])){popup_script();exit;}
 	if(isset($_GET["popup"])){popup();exit;}
 	if(isset($_GET["remote_imap_server"])){add_account();exit;}
 	if(isset($_GET["imapsynclist"])){imapsynclist();exit;}
@@ -34,7 +34,22 @@ session_start();
 	
 js();
 
-
+function popup_script(){
+	$uid=$_GET["uid"];
+	$id=$_GET["id"];
+	$page=CurrentPageName();
+	$sock=new sockets();
+	$cmdline=base64_decode($sock->getFrameWork("cmd.php?imapsync-show=$id"));
+	echo "
+	<div style='margin-top:10px'>
+	<code style='font-size:13px'>$cmdline</code>
+	</div>
+	<script>
+		LoadAjax('imapsync-toolbox','$page?toolbox=yes&ID=$id&uid=$uid&width-folder-params=yes');
+	</script>
+	";
+	
+}
 
 function js(){
 	$tpl=new templates();
@@ -44,6 +59,7 @@ function js(){
 	$events=$tpl->_ENGINE_parse_body("{events}");
 	$schedule=$tpl->_ENGINE_parse_body("{schedule}");
 	$apply_upgrade_help=$tpl->javascript_parse_text("{apply_upgrade_help}");
+	$command_lines_view=$tpl->_ENGINE_parse_body("{command_lines_view}");
 	$page=CurrentPageName();
 	$uid=$_GET["uid"];
 	
@@ -80,6 +96,10 @@ function js(){
 		YahooWin6(245,'$page?schedule=yes&uid=$uid&id='+id,'$schedule');
 	}
 	
+	function imapsync_script(id){
+		LoadAjax('imapsyncadddiv','$page?script=yes&uid=$uid&id='+id);
+	}
+	
 	
 		
 	function impasync_add(){
@@ -100,6 +120,7 @@ function js(){
 			if(document.getElementById('dest_use_ssl').checked){XHR.appendData('dest_use_ssl',1);}else{XHR.appendData('dest_use_ssl',0);}
 			if(document.getElementById('delete_messages').checked){XHR.appendData('delete_messages',1);}else{XHR.appendData('delete_messages',0);}
 			
+			if(document.getElementById('local_mailbox_source')){if(document.getElementById('local_mailbox_source').checked){XHR.appendData('local_mailbox_source',1);}else{XHR.appendData('local_mailbox_source',0);}}
 			
 			
 			document.getElementById('imapsyncadddiv').innerHTML='<center><img src=img/wait_verybig.gif></center>';
@@ -218,6 +239,16 @@ function add_popup(){
 			<td>". Field_checkbox("local_mailbox",1,$parameters["local_mailbox"],"tr_local_mailbox_switch()")."</td>
 		</tr>";
 		
+		if($parameters["local_mailbox_source"]==null){$parameters["local_mailbox_source"]=0;}
+		
+		$tr_local_mailbox_source_switch="
+		<tr>
+			<td class=legend nowrap style='font-size:13px'>{local_mailbox}:</td>
+			<td>". Field_checkbox("local_mailbox_source",1,$parameters["local_mailbox_source"],"tr_local_mailbox_source_switch()")."</td>
+		</tr>";		
+		
+		
+		
 	}
 	
 	
@@ -228,7 +259,11 @@ $html=Field_hidden("ID",$ID). "
 <td valign='top'><div id='imapsync-toolbox'></div></td>
 <td valign='top'>
 <div id='imapsyncadddiv'>
+
+
 		<table style='width:100%'>
+		<tr><td colspan=2><h3>{remote_imap_server}</h3></td></tr>
+		$tr_local_mailbox_source_switch
 		<tr>
 			<td class=legend nowrap style='font-size:13px'>{remote_imap_server}:</td>
 			<td>" . Field_text('remote_imap_server',$remote_imap_server,"font-size:13px;padding:3px",null) . "</td>
@@ -249,8 +284,9 @@ $html=Field_hidden("ID",$ID). "
 			<td class=legend nowrap style='font-size:13px;'>{nokeepmess}:</td>
 			<td>". Field_checkbox("delete_messages",1,$parameters["delete_messages"])."</td>
 		</tr>				
-
+		
 		<tr><td colspan=2><hr></td></tr>
+		<tr><td colspan=2><h3>{dest_imap_server}</h3></td></tr>
 		$tr_local_mailbox_switch
 		<tr>
 			<td class=legend nowrap style='font-size:13px'>{dest_imap_server}:</td>
@@ -283,6 +319,7 @@ $html=Field_hidden("ID",$ID). "
 </table>
 <script>
 	tr_local_mailbox_switch();
+	tr_local_mailbox_source_switch();
 	imapsync_toolbox();
 	function tr_local_mailbox_switch(){
 		if(!document.getElementById('local_mailbox')){return;}
@@ -291,16 +328,28 @@ $html=Field_hidden("ID",$ID). "
 			document.getElementById('dest_imap_username').disabled=true;
 			document.getElementById('dest_imap_password').disabled=true;
 			document.getElementById('dest_use_ssl').disabled=true;
-		}else{
-		
+		}else{	
 			document.getElementById('dest_imap_server').disabled=false;
 			document.getElementById('dest_imap_username').disabled=false;
 			document.getElementById('dest_imap_password').disabled=false;
 			document.getElementById('dest_use_ssl').disabled=false;		
 		}
-		
-		
 	}
+	
+	function tr_local_mailbox_source_switch(){
+	  if(!document.getElementById('local_mailbox_source')){return;}
+		if(document.getElementById('local_mailbox_source').checked){
+			document.getElementById('remote_imap_server').disabled=true;
+			document.getElementById('remote_imap_username').disabled=true;
+			document.getElementById('remote_imap_password').disabled=true;
+			
+		}else{
+			document.getElementById('remote_imap_server').disabled=false;
+			document.getElementById('remote_imap_username').disabled=false;
+			document.getElementById('remote_imap_password').disabled=false;				
+		}	
+	}	
+
 	
 	function imapsync_toolbox(){
 		LoadAjax('imapsync-toolbox','$page?toolbox=yes&ID=$ID&uid=$uid');
@@ -358,44 +407,70 @@ function adv_options_form(){
 		
 		
 		$html="
-		<table style='width:100%'>
+				<table style='width:100%'>
 		<tr>
 			<td class=legend nowrap style='font-size:13px'>{syncinternaldate}:</td>
+			<td>&nbsp;</td>
 			<td>". Field_checkbox("syncinternaldate",1,$array["syncinternaldates"])."</td>
 			<td width=1%>". help_icon("{syncinternaldate_text}")."</td>
 		</tr>
 		<tr>
 			<td class=legend nowrap style='font-size:13px'>{noauthmd5}:</td>
+			<td>&nbsp;</td>
 			<td>". Field_checkbox("noauthmd5",1,$array["noauthmd5"])."</td>
 			<td width=1%>". help_icon("{noauthmd5_text}")."</td>
 		</tr>	
 		<tr>
 			<td class=legend nowrap style='font-size:13px'>{nosyncacls}:</td>
+			<td>&nbsp;</td>
 			<td>". Field_checkbox("nosyncacls",1,$array["nosyncacls"])."</td>
 			<td width=1%>&nbsp;</td>
 		</tr>		
 		<tr>
 			<td class=legend nowrap style='font-size:13px'>{allowsizemismatch}:</td>
+			<td>&nbsp;</td>
 			<td>". Field_checkbox("allowsizemismatch",1,$array["allowsizemismatch"])."</td>
 			<td width=1%>". help_icon("{allowsizemismatch_text}")."</td>
 		</tr>
 		<tr>
 			<td class=legend nowrap style='font-size:13px'>{skipsize}:</td>
+			<td>&nbsp;</td>
 			<td>". Field_checkbox("skipsize",1,$array["skipsize"])."</td>
 			<td width=1%>". help_icon("{skipsize_text}")."</td>
 		</tr>			
 		<tr>
 			<td class=legend nowrap style='font-size:13px'>{nofoldersizes}:</td>
+			<td width=1%>&nbsp;</td>
 			<td>". Field_checkbox("nofoldersizes",1,$array["nofoldersizes"])."</td>
 			<td width=1%>". help_icon("{nofoldersizes_text}")."</td>
 		</tr>
+		
+		<tr>
+			<td class=legend nowrap style='font-size:13px;' nowrap>{imapsync_prefix_source}:</td>
+			<td width=1%>".Field_checkbox("usePrefix1",1,$array["usePrefix1"],"SwitchOnOffSep()")."</td>
+			<td >". Field_text("prefix1",$array["prefix1"])."</td>
+			<td width=1%>". help_icon("{imapsync_prefix_text}")."</td>
+		</tr>			
+		
 		<tr>
 			<td class=legend nowrap style='font-size:13px;' nowrap>{mailbox_separator_source}:</td>
-			<td>". Field_text("sep",$array["sep"])."</td>
+			<td width=1%>".Field_checkbox("useSep1",1,$array["useSep1"],"SwitchOnOffSep()")."</td>
+			<td >". Field_text("sep",$array["sep"])."</td>
 			<td width=1%>". help_icon("{mailbox_separator_text}")."</td>
-		</tr>			
+		</tr>
+		
+		
+		<tr>
+			<td class=legend nowrap style='font-size:13px;' nowrap>{imapsync_prefix_destination}:</td>
+			<td width=1%>".Field_checkbox("usePrefix2",1,$array["usePrefix2"],"SwitchOnOffSep()")."</td>
+			<td >". Field_text("prefix2",$array["prefix2"])."</td>
+			<td width=1%>". help_icon("{imapsync_prefix_text}")."</td>
+		</tr>		
+
+		
 		<tr>
 			<td class=legend nowrap style='font-size:13px;' nowrap>{mailbox_separator_destination}:</td>
+			<td width=1%>".Field_checkbox("useSep2",1,$array["useSep2"],"SwitchOnOffSep()")."</td>
 			<td>". Field_text("sep2",$array["sep2"])."</td>
 			<td width=1%>". help_icon("{mailbox_separator_text}")."</td>
 		</tr>		
@@ -406,6 +481,7 @@ function adv_options_form(){
 		
 		<script>
 		function imapsync_toolbox_adv(){
+			SwitchOnOffSep();
 			LoadAjax('imapsync-toolbox','$page?toolbox=yes&ID=$ID&uid=$uid&width-folder-params=yes');
 		}
 		
@@ -414,7 +490,23 @@ function adv_options_form(){
 	     if(tempvalue.length>0){alert(tempvalue);}
 	     imapsync_adv($ID);
 	      
-	     }			
+	     }	
+
+	     
+	 function SwitchOnOffSep(){
+	 	document.getElementById('sep').disabled=true;
+	 	document.getElementById('sep2').disabled=true;
+	 	
+	 	document.getElementById('prefix1').disabled=true;
+	 	document.getElementById('prefix2').disabled=true;	 	
+	 	
+	 	if(document.getElementById('useSep1').checked){document.getElementById('sep').disabled=false;}
+		if(document.getElementById('useSep2').checked){document.getElementById('sep2').disabled=false;}
+	 	if(document.getElementById('usePrefix1').checked){document.getElementById('prefix1').disabled=false;}
+		if(document.getElementById('usePrefix2').checked){document.getElementById('prefix2').disabled=false;}		
+	 
+	}
+	     
 		
 		function ImapSyncSaveAdv(){
 			var XHR = new XHRConnection();
@@ -428,13 +520,20 @@ function adv_options_form(){
 			if(document.getElementById('nofoldersizes').checked){XHR.appendData('nofoldersizes',1);}else{XHR.appendData('nofoldersizes',0);}
 			XHR.appendData('sep',document.getElementById('sep').value);
 			XHR.appendData('sep2',document.getElementById('sep2').value);
+			if(document.getElementById('useSep2').checked){XHR.appendData('useSep2',1);}else{XHR.appendData('useSep2',0);}
+			if(document.getElementById('useSep1').checked){XHR.appendData('useSep1',1);}else{XHR.appendData('useSep1',0);}
+			
+			if(document.getElementById('usePrefix1').checked){XHR.appendData('usePrefix1',1);}else{XHR.appendData('usePrefix1',0);}
+			if(document.getElementById('usePrefix2').checked){XHR.appendData('usePrefix2',1);}else{XHR.appendData('usePrefix2',0);}			
+			XHR.appendData('prefix1',document.getElementById('prefix1').value);
+			XHR.appendData('prefix2',document.getElementById('prefix2').value);			
+			
 			document.getElementById('imapsyncadddiv').innerHTML='<center><img src=img/wait_verybig.gif></center>';
 			XHR.sendAndLoad('$page', 'GET',x_ImapSyncSaveAdv); 	
 		}		
 		
 		imapsync_toolbox_adv();
-		</script>
-		";
+		</script>";
 	$tpl=new templates();
 	echo $tpl->_ENGINE_parse_body($html);		
 		
@@ -561,6 +660,7 @@ function folders_sync_del(){
 
 function toolbox(){
 	$ID=$_GET["ID"];
+	$users=new usersMenus();
 	if($ID<1){return;}
 	$folders=Paragraphe("folder-network2-64.png","{mailbox_folders}","{imapsync_folders_text}","javascript:imapsync_folders('$ID')");
 	$adv_options=Paragraphe("parameters2-64.png","{advanced_options}","{imapsync_advanced_options}","javascript:imapsync_adv('$ID')");
@@ -570,8 +670,12 @@ function toolbox(){
 		$folders=Paragraphe("64-parameters.png","{main_settings}","{imapsync_main_settings}","javascript:ImapSyncEdit('$ID')");
 		
 	}
+	if($users->AsAnAdministratorGeneric){
+		$script_view="<br>".Paragraphe("script-view-64.png","{command_lines_view}","{view_generated_command_lines}",
+		"javascript:imapsync_script('$ID')");
+	}
 
-	$html=$folders."<br>$adv_options";
+	$html=$folders."<br>$adv_options$script_view";
 	$tpl=new templates();
 	echo $tpl->_ENGINE_parse_body($html);
 }
