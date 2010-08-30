@@ -110,11 +110,20 @@ function js(){
 	$tpl=new templates();
 	$title=$tpl->_ENGINE_parse_body('{APP_OCSI}');
 	$prefix=str_replace(".","_",$page);
+	$start="{$prefix}LoadMain()";
+	if(isset($_GET["in-front-ajax"])){
+		$start="{$prefix}LoadMainAjax()";
+	}
+	
 	$html="
 	
 	function {$prefix}LoadMain(){
 		LoadWinORG('730','$page?popup=yes','$title');
 		}	
+		
+function {$prefix}LoadMainAjax(){
+	$('#BodyContent').load('$page?popup=yes');
+	}		
 		
 	function ocs_web_params(){
 		YahooWin2('500','$page?params-web=yes');
@@ -178,8 +187,7 @@ function SaveWebServerName(){
 		XHR.sendAndLoad('$page', 'GET',x_SaveWebServerName);
 }
 	
-
-{$prefix}LoadMain();
+$start;
 	
 ";
 
